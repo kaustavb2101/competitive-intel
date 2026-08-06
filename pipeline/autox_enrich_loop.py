@@ -60,7 +60,7 @@ PINKSHEET_PAGE = "https://www.worldbank.org/en/research/commodity-markets"
 PINKSHEET = "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx"
 WB_COMMODITIES = {  # column name -> (label, crop/segment region weights N/I/C/S, stress sign)
  "Rice, Thai 5%":"rice","Rubber, RSS3":"rubber","Palm oil":"palm","Sugar, world":"sugar","Maize":"maize",
- "Beef **":"beef","Chicken **":"chicken","Fishmeal":"fishmeal","Shrimps, Mexican":"shrimp",
+ "Beef **":"beef","Chicken **":"chicken","Fish meal":"fishmeal","Shrimps, Mexican":"shrimp",
  "Logs, Cameroon":"logs","Sawnwood, Malaysian":"sawnwood","Gold":"gold"}
 # HDX feeds (resource ids)
 HDX_POP = "a5d0b682-1644-4a2d-a9d7-90f1a0fdc959"      # UNFPA district population

@@ -9,8 +9,13 @@ year. Every existing vehicle layer (vehicles_by_province.json / branch_vehicles.
 outlook board) is a SINGLE-VINTAGE province snapshot; none carries the TIME dimension. This adds it:
 a measured national trajectory for the three title-collateral classes.
 
-Why it matters (objective #1, portfolio / collateral risk): AutoX's book is ~50% motorcycle-title and
-~25% car/pickup-title. If the national registered fleet of a collateral class is contracting, the
+Why it matters (objective #1, portfolio / collateral risk). CORRECTED 2026-08-02: this file used to
+say the book is "~50% motorcycle-title and ~25% car/pickup-title". That was written before the real
+tape landed (2026-07-21) and the tape does not support it. MEASURED: motorcycles are 33.3% of ACCOUNTS
+but only 5.8% of OUTSTANDING (THB2.69bn of THB46.57bn); pickup + passenger car are 54.0% of accounts
+and 60.7% of outstanding. The old figure was an account-count intuition applied to a money question —
+the same unit error the farm book was built to kill. If the national registered fleet of a collateral
+class is contracting, the
 resale/recovery pool behind that slice of the book is shrinking even before any change in default
 rates — a leading, measured signal that the collateral outlook board currently only carries as an
 "editorial / estimated watch" for the diesel-pickup side. This lets that watch cite a measured number.
@@ -50,14 +55,17 @@ SOURCE_URL = "https://datagov.mot.go.th/dataset/รถจดทะเบีย�
 
 # AutoX title-loan collateral classes, mapped by the registry's English type label (ประเภทรถ). The
 # registry splits ~25 statutory vehicle types; we roll up only the classes AutoX actually lends against
-# into their book meaning. Order is display order (largest slices of the book first).
+# into their book meaning. Order is display order (largest slices of the book by OUTSTANDING first).
 CLASSES = [
-    ("moto",   "Motorcycle title", ["Motorcycle", "Public Motorcycle"],
-     "~50% of the AutoX book — the largest, most volatile, lowest-recovery title collateral."),
     ("pickup", "Pickup title",     ["Van & Pick Up"],
-     "The diesel-pickup collateral behind much of the car/pickup book; resale under EV/glut pressure."),
+     "38.3% of AutoX outstanding (measured tape) — the single largest collateral class in the book; "
+     "resale under EV/glut pressure."),
     ("car",    "Car title",        ["Sedan", "Microbus & Passenger Van"],
-     "Passenger-car title collateral — higher ticket, deeper resale market than motorcycles."),
+     "22.4% of AutoX outstanding (measured tape) — higher ticket and a deeper resale market than "
+     "motorcycles."),
+    ("moto",   "Motorcycle title", ["Motorcycle", "Public Motorcycle"],
+     "33.3% of AutoX accounts but 5.8% of outstanding (measured tape) — the most numerous and "
+     "lowest-recovery title collateral, and the smallest slice of the money."),
 ]
 N_YEARS = 6                          # trailing window for the trend series/sparkline
 

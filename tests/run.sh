@@ -4,24 +4,25 @@
 # Phases (run all by default; pass a phase name to run just one):
 #   check    determinism gate: pipeline --check + node --check on app.js & every page's inline JS
 #            + data integrity (validate_data.py over platform/data/*.json)
-#   render   headless-render every page in tests/pages.manifest with self-hosted deck.gl/leaflet
+#   render   headless-render every page in tests/pages.manifest (map libs vendored in platform/vendor/)
 #   health   per-page smoke: no uncaught errors, lib init, non-blank canvas, DOM hooks present
 #   visual   compare fresh renders to tests/baseline/*.png within tolerance
+#   overflow layout audit: does the text fit inside its box, at desktop AND phone width
 #   baseline (re)generate tests/baseline/*.png from current pages (use when a change is intended)
 #
 # Usage:
-#   tests/run.sh                 # check + render + health + visual  (the CI gate)
-#   tests/run.sh check           # offline, no chromium/npm needed beyond python
+#   tests/run.sh                 # check + render + health + visual + overflow  (the CI gate)
+#   tests/run.sh check           # offline, no chromium needed beyond python
 #   tests/run.sh baseline        # refresh committed baselines
 #
-# Network: ONLY the npm registry (to install deck.gl/leaflet into tests/.cache). NO data pulls.
+# Network: NONE. deck.gl + Leaflet are committed under platform/vendor/, so the whole suite —
+# determinism, render, health, visual — runs fully offline. NO data pulls, no npm registry.
 set -u
 TESTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(dirname "$TESTS")"
 PLATFORM="$REPO/platform"
 PIPE="$REPO/pipeline"
 LIB="$TESTS/lib"
-CACHE="$TESTS/.cache"
 WORK="$TESTS/.work"
 BASE="$TESTS/baseline"
 MANIFEST="$TESTS/pages.manifest"
@@ -40,18 +41,22 @@ hdr(){ printf '\n%s== %s ==%s\n' "$YLW" "$1" "$RST"; }
 manifest_rows(){ grep -vE '^\s*#' "$MANIFEST" | grep -vE '^\s*$'; }
 
 # ---------------------------------------------------------------------------
+# deck.gl + Leaflet are COMMITTED under platform/vendor/ (since 2026-08-01), so there is nothing to
+# install and the whole suite is network-free. This asserts the bundles are present and — the part
+# that matters — that no page has drifted back to a CDN <script>/<link>, which would make the render
+# phase silently depend on the network again.
 deps(){
-  if [ -f "$CACHE/node_modules/deck.gl/dist.min.js" ] && [ -f "$CACHE/node_modules/leaflet/dist/leaflet.js" ]; then
-    return 0
+  local missing=0
+  for f in vendor/deck.gl-8.9.35.min.js vendor/leaflet/leaflet.js vendor/leaflet/leaflet.css; do
+    [ -s "$PLATFORM/$f" ] || { bad "vendored bundle missing: platform/$f"; missing=1; }
+  done
+  [ "$missing" = 0 ] || return 1
+  if grep -lE '<(script|link)[^>]*(unpkg\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com)' "$PLATFORM"/*.html >/dev/null 2>&1; then
+    bad "a page loads a map library from a CDN again — vendor it into platform/vendor/ instead:"
+    grep -lE '<(script|link)[^>]*(unpkg\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com)' "$PLATFORM"/*.html | sed 's/^/         /'
+    return 1
   fi
-  hdr "installing self-hosted deps (npm registry only)"
-  mkdir -p "$CACHE"
-  # npm --prefix reads package.json from the prefix dir, so seed it there from the committed pin.
-  cp "$TESTS/package.json" "$CACHE/package.json"
-  ( cd "$CACHE" && npm install --no-audit --no-fund --no-package-lock --loglevel=error ) || {
-    bad "npm install failed (need deck.gl@8.9.35 + leaflet@1.9.4)"; return 1; }
-  [ -f "$CACHE/node_modules/deck.gl/dist.min.js" ] || { bad "deck.gl bundle missing after install"; return 1; }
-  ok "deps installed into tests/.cache/node_modules"
+  ok "map libraries vendored (platform/vendor/), no CDN <script>/<link> on any page"
 }
 
 # ---------------------------------------------------------------------------
@@ -81,6 +86,17 @@ phase_check(){
   # (each --check reproduces its committed output byte-for-byte; all inputs are git-tracked source-data).
   ( cd "$PIPE" && python3 build_farmgate_prices.py --check >/dev/null 2>&1 ) && ok "build_farmgate_prices.py --check" || bad "build_farmgate_prices.py --check (source-data/farmgate_prices.json drifted from source-data/nabc_prices.json)"
   ( cd "$PIPE" && python3 build_crop_stress.py --check >/dev/null 2>&1 ) && ok "build_crop_stress.py --check" || bad "build_crop_stress.py --check (crop_stress.json drifted from crop_prov_area.json/commodity_board.json/farmgate_prices.json/branches_final.json)"
+  ( cd "$PIPE" && python3 build_farm_income_impact.py --check >/dev/null 2>&1 ) && ok "build_farm_income_impact.py --check" || bad "build_farm_income_impact.py --check (farm_income_impact.json drifted from crop_prov_area.json/doae_planted_area.json/crop_margin.json/agri_income_by_province.json/farm_household.json/branches_final.json)"
+  ( cd "$PIPE" && python3 check_commodity_board.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "check_commodity_board.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "check_commodity_board.py --check (commodities.json/commodities_protein.json absent — not drift)"
+  else bad "check_commodity_board.py --check (commodity_board.json yoy/vintage drifted from its MEASURED Pink Sheet source commodities.json/commodities_protein.json — run: python3 pipeline/check_commodity_board.py)"
+  fi
+  ( cd "$PIPE" && python3 build_assist_radar_price.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_assist_radar_price.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_assist_radar_price.py --check (tape_real.json/crop_stress.json/farmgate_prices.json absent — not data drift)"
+  else bad "build_assist_radar_price.py --check (assist_price_radar.json drifted from tape_real.json/crop_stress.json/farmgate_prices.json)"
+  fi
   ( cd "$PIPE" && python3 build_building_tiles.py --check >/dev/null 2>&1 ) && ok "build_building_tiles.py --check" || bad "build_building_tiles.py --check (tiles_config.json drifted from branches.json/competitors_census.json)"
   ( cd "$PIPE" && python3 build_sfi_credit.py --check >/dev/null 2>&1 ) && ok "build_sfi_credit.py --check" || bad "build_sfi_credit.py --check (sfi_credit.json drifted from source-data/fpo_sfi_npl.csv/fpo_sfi_credit.csv)"
   ( cd "$PIPE" && python3 build_peer_npl.py --check >/dev/null 2>&1 ) && ok "build_peer_npl.py --check" || bad "build_peer_npl.py --check (peer_npl.json drifted — the AutoX anchor from platform/data/tape_real.json or the cited peer constants; run: python3 pipeline/build_peer_npl.py)"
@@ -94,6 +110,11 @@ phase_check(){
   if [ "$rc" -eq 0 ]; then ok "build_province_cropland.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_province_cropland.py --check (source-data/doae_planted_area.json absent — not data drift)"
   else bad "build_province_cropland.py --check (province_cropland.json drifted from doae_planted_area)"
+  fi
+  ( cd "$PIPE" && python3 build_flood_hazard.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_flood_hazard.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_flood_hazard.py --check (source-data/gistda_flood_hazard.json or an input layer absent — not data drift)"
+  else bad "build_flood_hazard.py --check (flood_hazard.json drifted from gistda_flood_hazard.json/amphoe.json/branches.json)"
   fi
   ( cd "$PIPE" && python3 build_pico_census.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_pico_census.py --check"
@@ -110,10 +131,20 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_pico_competitors.py --check (pico_census.json absent — upstream FPO pull, not committed)"
   else bad "build_pico_competitors.py --check (pico_competitors.json drifted from pico_census.json/branches.json)"
   fi
+  ( cd "$PIPE" && python3 build_branch_pico.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_branch_pico.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_branch_pico.py --check (an input layer branches/amphoe/pico_district absent — not data drift)"
+  else bad "build_branch_pico.py --check (branch_pico.json drifted from amphoe.json/pico_district.json — per-branch PICO district join)"
+  fi
   ( cd "$PIPE" && python3 build_dbd_formation.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_dbd_formation.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_dbd_formation.py --check (source-data/datagoth/dbd_newco.csv absent — re-pullable pull_datagoth input, not committed)"
   else bad "build_dbd_formation.py --check (dbd_formation.json drifted from source-data/datagoth/dbd_newco.csv)"
+  fi
+  ( cd "$PIPE" && python3 build_baac_credit.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_baac_credit.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_baac_credit.py --check (source-data/datagoth/baac_credit.xlsx absent — Thai-IP pull_datagoth input, not committed)"
+  else bad "build_baac_credit.py --check (baac_credit.json drifted from source-data/datagoth/baac_credit.xlsx)"
   fi
   ( cd "$PIPE" && python3 build_occupation_income_individual.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_occupation_income_individual.py --check"
@@ -178,6 +209,25 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_fuel_prices.py --check (source-data/fuel_prices.json absent — not data drift)"
   else bad "build_fuel_prices.py --check (fuel_prices.json drifted from source-data/fuel_prices.json)"
   fi
+  ( cd "$PIPE" && python3 build_commodity_history.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_commodity_history.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_commodity_history.py --check (source-data/commodity_history.json absent — owner-side Pink Sheet parse, not data drift)"
+  else bad "build_commodity_history.py --check (commodity_history.json drifted from source-data/commodity_history.json — run: python3 pipeline/build_commodity_history.py)"
+  fi
+  # Accumulated history for the feeds whose source only publishes "now". Gated BEFORE the live
+  # board, which reads this layer to decide which feeds have a drawable series.
+  ( cd "$PIPE" && python3 build_feed_history.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_feed_history.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_feed_history.py --check (source-data/feed_history.json absent — run: python3 pipeline/append_history.py --from-git)"
+  else bad "build_feed_history.py --check (feed_history.json drifted from the accumulator — run: python3 pipeline/build_feed_history.py)"
+  fi
+  # The live board reads every other layer's meta stamp, so it drifts whenever an upstream feed is
+  # re-pulled — which is exactly what it is for, and exactly why it must be gated: a stale
+  # live_board.json would report a fresh feed as old (or worse, an old one as fresh).
+  ( cd "$PIPE" && python3 build_live_board.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_live_board.py --check"
+  else bad "build_live_board.py --check (live_board.json is behind its upstream feeds' stamps — run: python3 pipeline/build_live_board.py)"
+  fi
   # --- PR#2 enrichment layers (vehicle/EV collateral erosion + hydrology + labour) ---------------
   # All deterministic + network-free over committed source-data. Each SKIPs (exit 3) when its upstream
   # pull is absent (dlt CSV mirror is NOT committed — 20MB) or its output is not yet generated — never a
@@ -225,6 +275,30 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_brand_trends.py --check (dlt CSVs absent or output not generated — not data drift)"
   else bad "build_brand_trends.py --check (brand_trends.json drifted from the dlt CSVs)"
   fi
+  ( cd "$PIPE" && python3 build_vehicle_models.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_models.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_models.py --check (dlt model-grain mirror absent or output not generated — not data drift)"
+  else bad "build_vehicle_models.py --check (vehicle_models.json drifted from the dlt model-grain mirror)"
+  fi
+  # vehicle_mix / used_vehicle_value project COMMITTED source-data (vehicle_mix_province.json, bot_uvpi.json),
+  # so both byte-reproduce here — they were previously outside the gate, leaving app-consumed committed
+  # layers unprotected against silent drift. vehicle_brands reads the OWNER-SIDE gitignored dlt mirror, so it
+  # SKIPs in CI like its dlt-fed siblings above.
+  ( cd "$PIPE" && python3 build_vehicle_mix.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_mix.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_mix.py --check (source-data/vehicle_mix_province.json absent — not data drift)"
+  else bad "build_vehicle_mix.py --check (vehicle_mix.json drifted from source-data/vehicle_mix_province.json)"
+  fi
+  ( cd "$PIPE" && python3 build_used_vehicle_value.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_used_vehicle_value.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_used_vehicle_value.py --check (source-data/bot_uvpi.json absent — BOT pull, not data drift)"
+  else bad "build_used_vehicle_value.py --check (used_vehicle_value.json drifted from source-data/bot_uvpi.json)"
+  fi
+  ( cd "$PIPE" && python3 build_vehicle_brands.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_brands.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_brands.py --check (source-data/dlt/raw mirror absent — owner-side dlt pull, not committed)"
+  else bad "build_vehicle_brands.py --check (vehicle_brands.json drifted from the dlt raw mirror)"
+  fi
   ( cd "$PIPE" && python3 build_napprang.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_napprang.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_napprang.py --check (oae_napprang.json absent or output not generated — not data drift)"
@@ -265,6 +339,16 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_google_ads.py --check (source-data/google_ads_raw.json absent — network pull, not data drift)"
   else bad "build_google_ads.py --check (rival_ads.json drifted from source-data/google_ads_raw.json — run: python3 pipeline/build_google_ads.py)"
   fi
+  ( cd "$PIPE" && python3 build_social_themes.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_social_themes.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_social_themes.py --check (youtube_comments/app_reviews/apple_reviews/pantip_threads absent — network pulls, not data drift)"
+  else bad "build_social_themes.py --check (social_themes.json drifted from the demand+supply sources — run: python3 pipeline/build_social_themes.py)"
+  fi
+  ( cd "$PIPE" && python3 build_pantip_panel.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_pantip_panel.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_pantip_panel.py --check (source-data/pantip_threads.json absent — network pull, not data drift)"
+  else bad "build_pantip_panel.py --check (pantip_panel.json drifted from source-data/pantip_threads.json — run: python3 pipeline/build_pantip_panel.py)"
+  fi
   ( cd "$PIPE" && python3 build_rival_youtube.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_rival_youtube.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_rival_youtube.py --check (source-data/rival_youtube_raw.json absent — network pull, not data drift)"
@@ -275,13 +359,59 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_rival_universe.py --check (source-data/rival_universe.json absent)"
   else bad "build_rival_universe.py --check (rival_universe.json drifted from source-data/rival_universe.json + app_reviews.json — run: python3 pipeline/build_rival_universe.py)"
   fi
-  for ing in build_crop_margin build_drought_district build_province_lfs build_region_debt build_amphoe_crops build_tape_layers build_impact_cards build_income_impact build_scenarios build_commodities build_product_segments; do
+  # Deterministic, network-free builders over COMMITTED inputs — source-data/ (now INCLUDING the
+  # committed source-data/staging/ aggregates, 21 tracked files) and, for the *_book layers, the
+  # committed platform/data layers they roll up. Each carries --check and byte-reproduces here (rc 0);
+  # rc 3 = an optional / owner-pulled input absent (SKIP, honest — not drift); any other code = the
+  # committed output drifted from its named source (FAIL — regenerate it). Driven from an explicit
+  # name|source table (not a bare-name loop) so each FAIL message points at the ACTUAL source rather
+  # than blanket-blaming source-data/staging/, and so a grep for "build_X.py --check" over this file
+  # finds every gated builder below (a bare loop hid these 19 from gate-coverage audits):
+  #   build_crop_margin.py --check   build_drought_district.py --check   build_province_lfs.py --check
+  #   build_region_debt.py --check   build_amphoe_crops.py --check       build_tape_layers.py --check
+  #   build_impact_cards.py --check  build_income_impact.py --check      build_scenarios.py --check
+  #   build_commodities.py --check   build_product_segments.py --check   ingest_ocsb_cane.py --check
+  #   build_thai_price_history.py --check  build_farm_household.py --check  build_debt_source.py --check
+  #   build_crop_mix.py --check      build_farm_book.py --check           build_collateral_book.py --check
+  #   build_macro_book.py --check
+  # NOTE: this is a `while read <<'HEREDOC'` (not a pipe), so it runs in the current shell and ok/bad
+  # keep incrementing pass/failc — same counter semantics as the bare `for` loop it replaced.
+  while IFS='|' read -r ing src; do
+    [ -z "$ing" ] && continue
     ( cd "$PIPE" && python3 "$ing.py" --check >/dev/null 2>&1 ); rc=$?
     if [ "$rc" -eq 0 ]; then ok "$ing.py --check"
-    elif [ "$rc" -eq 3 ]; then skip "$ing.py --check (staging source absent — ingest wave, not data drift)"
-    else bad "$ing.py --check (output drifted from source-data/staging/ — run: python3 pipeline/$ing.py)"
+    elif [ "$rc" -eq 3 ]; then skip "$ing.py --check (an input absent — optional/owner-pulled source, not data drift)"
+    else bad "$ing.py --check ($ing output drifted from $src — run: python3 pipeline/$ing.py)"
     fi
-  done
+  done <<'INGESTS'
+build_crop_margin|source-data/farmgate_prices.json + staging/oae_crop_costs.json
+build_drought_district|source-data/staging/drought_district.json
+build_province_lfs|source-data/staging/nso_lfs.json
+build_region_debt|source-data/staging/bot_hhdebt.json
+build_amphoe_crops|source-data/staging/amphoe_crops_*.json + doae_amphoe_crops.json
+build_tape_layers|source-data/staging/real_tape_aggregates.json
+build_impact_cards|source-data/branches_final.json + commodity_board.json + employment_by_province.json
+build_income_impact|source-data/commodity_board.json + crop_prov_area.json + energy_prices.json
+build_scenarios|source-data/commodity_board.json
+build_commodities|source-data/commodity_board.json + crop_prov_area.json + doae_fruit_area.json
+build_product_segments|source-data/staging/ tape aggregates
+ingest_ocsb_cane|source-data/ocsb_cane.json + ocsb_canearea.csv
+build_thai_price_history|source-data/nabc_history.json + ocsb_cane.json
+build_farm_household|source-data/oae_household/*.csv
+build_debt_source|source-data/nso_debt_by_source.json
+build_crop_mix|source-data/crop_prov_area.json + ocsb_cane.json
+build_farm_book|platform/data book layers (tape_geo_occ/crop_mix/crop_stress/income_impact/crop_margin/napprang)
+build_collateral_book|source-data/staging/real_tape_aggregates.json
+build_macro_book|platform/data book layers (collateral_book/province_lfs/dbd_formation/region_debt/sfi_credit)
+INGESTS
+  # macro_indicators projects COMMITTED Thai-official series (nesdc_gdp / tpso_cpi / bot_current_account /
+  # bot_tourist_arrivals), so it byte-reproduces here; it was outside the gate, leaving the Macro-backdrop
+  # layer (macro_indicators.json) unprotected against silent drift.
+  ( cd "$PIPE" && python3 build_macro_indicators.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_macro_indicators.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_macro_indicators.py --check (a bot/nesdc/tpso source-data series absent — network pull, not data drift)"
+  else bad "build_macro_indicators.py --check (macro_indicators.json drifted from nesdc_gdp/tpso_cpi/bot_current_account/bot_tourist_arrivals)"
+  fi
   ( cd "$PIPE" && python3 build_rival_threat.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_rival_threat.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_rival_threat.py --check (rival_reputation.json absent — Google Places pull, not data drift)"
@@ -350,6 +480,19 @@ phase_check(){
   # reproduce against the just-verified committed data tree.
   ( cd "$PIPE" && python3 build_provenance.py --check >/dev/null 2>&1 ) && ok "build_provenance.py --check" || bad "build_provenance.py --check (provenance.json drifted from platform/data/*.json — run: python3 pipeline/build_provenance.py)"
 
+  # The data-pull workflows re-derive their fan-out by running rederive_drift.py, which discovers
+  # what to rebuild by PARSING the --check invocations in THIS file. That makes run.sh's syntax load-
+  # bearing for those jobs: reshape the lines above and the parser could quietly match nothing, the
+  # pulls would stop re-deriving, and every data PR would go back to arriving red — with no error
+  # anywhere to say why. --selftest fails if the parse drops below its floor, so that breaks here
+  # instead, next to the change that caused it.
+  ( cd "$PIPE" && python3 rederive_drift.py --selftest >/dev/null 2>&1 ) && ok "rederive_drift.py --selftest" || bad "rederive_drift.py --selftest (it can no longer read the --check set out of tests/run.sh — the data-pull workflows would silently stop re-deriving; fix RE_EXPLICIT/RE_HEREDOC in pipeline/rederive_drift.py)"
+
+  # resolve_derived_conflicts.sh auto-resolves merge conflicts and the committee/auto-merge jobs call
+  # it before pushing STRAIGHT TO MASTER, so its two abort paths are the only thing between an
+  # unattended job and a wrongly-resolved conflict in source-data/ or in code. Fixture-based, seconds.
+  bash "$REPO/tests/test_resolve_derived_conflicts.sh" >/dev/null 2>&1 && ok "resolve_derived_conflicts.sh (16 fixture cases)" || bad "resolve_derived_conflicts.sh fixture tests (run: bash tests/test_resolve_derived_conflicts.sh)"
+
   node --check "$PLATFORM/app.js" >/dev/null 2>&1 && ok "node --check app.js" || bad "node --check app.js (syntax error)"
 
   # every page: extract each inline <script> (that has no src) and node --check it.
@@ -367,6 +510,18 @@ phase_check(){
     [ "$nbad" -eq 0 ] && ok "node --check inline JS of $name" || bad "node --check inline JS of $name ($nbad block(s) failed)"
   done
 
+  # nav consistency + route reachability. The main nav is hand-copied into six pages with no build
+  # step to keep them honest, and index.html builds one section per hash route with nothing
+  # asserting those routes are linked. Both failure modes had already shipped silently: status.html
+  # sat on pre-five-pillar labels for a week, and #branches/#provinces/#market rendered perfectly
+  # while being reachable only by typed URL. Verified to FAIL on nav drift, a dropped Explore entry,
+  # a reordered pillar, and a newly-orphaned route.
+  if python3 "$TESTS/nav_consistency.py"; then
+    ok "nav_consistency.py (one nav across 6 pages, no orphan routes)"
+  else
+    bad "nav_consistency.py (nav drift or an unreachable route — see report above)"
+  fi
+
   # data-integrity sub-check: assert platform/data/*.json is internally sane (offline, stdlib).
   # The determinism/syntax checks above don't look INSIDE the data; this does. Its own per-check
   # report is shown so a failure points at the exact integrity violation (an IPO-readiness gate).
@@ -374,6 +529,22 @@ phase_check(){
     ok "validate_data.py (platform/data integrity)"
   else
     bad "validate_data.py (platform/data integrity — see report above)"
+  fi
+
+  # deploy-probe self-test: the SAME code path the nightly live site-health check runs (check_site_health.py),
+  # but pointed at the local committed tree (--local platform, LocalFetcher = filesystem only, pure stdlib,
+  # NO network). It asserts every deploy probe validator (_shape_*) still ACCEPTS its real committed payload,
+  # every critical page carries the AutoX wordmark, and no probed data file is missing/oversized. Added
+  # because the ~40 probes are hand-authored by the intelligence loop yet had NO repo-gate guard: a future
+  # edit that broke a validator against the real data would ship silently and only surface on the nightly
+  # LIVE run (a filed GitHub issue), not here. All 41 probed data files + the probed pages are git-tracked,
+  # so this reproduces on a clean checkout; it FAILs only on a genuine probe/payload regression.
+  hc_out="$( python3 "$PIPE/check_site_health.py" --local "$PLATFORM" 2>&1 )"; rc=$?
+  if [ "$rc" -eq 0 ]; then
+    ok "check_site_health.py --local (deploy probe validators accept the committed payloads)"
+  else
+    printf '%s\n' "$hc_out" | grep -E '\[FAIL\]|ERROR|Traceback' | head -12 | sed 's/^/      /'
+    bad "check_site_health.py --local (a deploy probe validator rejects its committed payload — see above)"
   fi
 }
 
@@ -423,6 +594,32 @@ phase_visual(){
   done < <(manifest_rows)
 }
 
+# Layout audit — the one class of defect the other four phases structurally cannot see. `check`
+# reads bytes, `render` only asks whether a page painted, `visual` diffs against a baseline that a
+# new section changes legitimately. None of them asks whether the text fits inside its box. This
+# does, at desktop AND phone width. Added after PR #259 shipped a Risk-tab panel that pushed a
+# 390px phone to 494px of horizontal page scroll and every gate stayed green.
+phase_overflow(){
+  hdr "visual overflow audit (bleed / clip / page-x / collide)"
+  if ! command -v node >/dev/null 2>&1; then skip "overflow (node not installed)"; return 0; fi
+  local port=8791
+  python3 -m http.server "$port" --directory "$PLATFORM" >/dev/null 2>&1 &
+  local srv=$!
+  local i=0
+  while [ $i -lt 40 ]; do
+    curl -s -o /dev/null "http://localhost:$port/" 2>/dev/null && break
+    i=$((i+1)); sleep 0.25
+  done
+  local out rc
+  out="$(node "$TESTS/visual_overflow.js" "http://localhost:$port" 2>&1)"; rc=$?
+  kill "$srv" 2>/dev/null; wait "$srv" 2>/dev/null
+  printf '%s\n' "$out"
+  # exit 2 is "could not run" (playwright missing) — an environment gap, not a layout defect.
+  if [ "$rc" -eq 0 ]; then ok "visual overflow (no findings)"
+  elif [ "$rc" -eq 2 ]; then skip "visual overflow (could not run)"
+  else bad "visual overflow (findings above)"; fi
+}
+
 phase_baseline(){
   deps || return 1
   hdr "(re)generating baselines -> tests/baseline"
@@ -446,9 +643,10 @@ case "$PHASE" in
   render)   phase_render ;;
   health)   phase_health ;;
   visual)   phase_visual ;;
+  overflow) phase_overflow ;;
   baseline) phase_baseline ;;
-  all)      phase_check; phase_render; phase_health; phase_visual ;;
-  *) echo "unknown phase: $PHASE (use: check|render|health|visual|baseline|all)"; exit 2 ;;
+  all)      phase_check; phase_render; phase_health; phase_visual; phase_overflow ;;
+  *) echo "unknown phase: $PHASE (use: check|render|health|visual|overflow|baseline|all)"; exit 2 ;;
 esac
 
 printf '\n%s========================================%s\n' "$YLW" "$RST"

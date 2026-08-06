@@ -172,10 +172,19 @@ def build():
                 branch_join += 1
                 break
         if branch_sid[i] is None:
-            # fallback: nearest amphoe centroid (geometric, ESTIMATED)
+            # fallback: nearest amphoe centroid (geometric, ESTIMATED). The branch
+            # sits just off every polygon (coast/border geometry) but is still a real
+            # branch of its nearest district — count it there too so the per-record
+            # .branches total-joins all of master. Without this the off-polygon coastal
+            # branches were assigned in branch_amphoe (the flat index) yet dropped from
+            # every district COUNT, so amphoe.json .branches summed to 2000 not 2015 and
+            # the shortfall propagated to every layer that rolls it up (rival_density,
+            # peer_province) — understating AutoX and overstating the rival:AutoX ratio
+            # in those districts. branch_pip stays False: this is a fallback, not a PIP.
             (cxx0, cyy0), sid0 = min(
                 poly_centroids, key=lambda c: hav(y, x, c[0][1], c[0][0]))
             branch_sid[i] = sid0
+            branches_by_poly[sid0].append(b)
 
     # branch centroids per province for assigning province to ZERO-branch amphoe
     # (nearest branch's province). Branch amphoe get province from their branches.
@@ -314,6 +323,25 @@ def build():
     branch_amphoe = [sid_to_idx[sid] for sid in branch_sid]
     n_fallback = sum(1 for p in branch_pip if not p)
 
+    # ── data-integrity invariant: total-join, asserted at SOURCE ──────────────────
+    # Every branch must be counted in EXACTLY one district's .branches AND appear in
+    # the flat branch_amphoe index. This once diverged silently (2026-08-01: the
+    # off-polygon coastal branches were set in branch_sid but never appended to
+    # branches_by_poly, so .branches summed to 2000 while branch_amphoe held 2015,
+    # overstating rival:AutoX ratios up to 31% downstream). The gate's --check runs
+    # build(), so asserting here makes that class of drift fail LOUDLY at its origin
+    # rather than surfacing three layers away via a downstream index-alignment check.
+    _sum_branches = sum(r["branches"] for r in recs)
+    _n_master = len(master)
+    if not (_sum_branches == len(branch_amphoe) == _n_master):
+        raise SystemExit(
+            f"build_amphoe.py INVARIANT VIOLATION: sum(.branches)={_sum_branches}, "
+            f"len(branch_amphoe)={len(branch_amphoe)}, len(master)={_n_master} — "
+            "every branch must total-join exactly one district count and the flat "
+            "index (an off-polygon branch set in branch_sid must also be appended to "
+            "branches_by_poly)."
+        )
+
     meta = {
         "generated_by": "pipeline/build_amphoe.py",
         "n_amphoe": len(recs),
@@ -321,7 +349,10 @@ def build():
         "n_amphoe_zero_branch": sum(1 for r in recs if r["branches"] == 0),
         "provenance": {
             "measured_at_amphoe": [
-                "branches (point-in-polygon of branches_final.json into th_amphoe.geojson)",
+                "branches (point-in-polygon of branches_final.json into th_amphoe.geojson; "
+                "the few off-polygon coastal/border branches are counted in their nearest "
+                "amphoe — see join_rates.branch_amphoe_fallback — so .branches total-joins "
+                "all of master and matches branch_amphoe)",
                 "poi counts by type (point-in-polygon of osm_layers.json — OSM, measured)",
                 "fac/workers (DIW factories_by_district, prov|district join — MEASURED, "
                 "only where the amphoe has a branch so a Thai district name is readable; "
@@ -331,7 +362,10 @@ def build():
                 "kept SEPARATE from risk_proxy; see pico_district_rivals meta. Present only "
                 "when the pico layer is; a district absent from the registry is a measured zero)",
             ] if pico_meta is not None else [
-                "branches (point-in-polygon of branches_final.json into th_amphoe.geojson)",
+                "branches (point-in-polygon of branches_final.json into th_amphoe.geojson; "
+                "the few off-polygon coastal/border branches are counted in their nearest "
+                "amphoe — see join_rates.branch_amphoe_fallback — so .branches total-joins "
+                "all of master and matches branch_amphoe)",
                 "poi counts by type (point-in-polygon of osm_layers.json — OSM, measured)",
                 "fac/workers (DIW factories_by_district, prov|district join — MEASURED, "
                 "only where the amphoe has a branch so a Thai district name is readable; "

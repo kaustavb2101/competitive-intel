@@ -306,6 +306,58 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 .mcard .d{font:600 11px var(--mono);margin-top:2px}
 .mcard .d.up,.mcard .v.up{color:var(--up)} .mcard .d.dn,.mcard .v.down{color:var(--down)}
 
+/* ---------- macro overlay, compact strip (owner review 2026-08-02, point 7) ----------
+   One scrollable line replaces two rows of KPI tiles. The full cards stay behind the <details>
+   below it, so nothing is lost — this is a summary, not a substitution. */
+.mstrip{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.mcell{display:flex;align-items:baseline;gap:6px;padding:5px 10px;background:var(--panel);
+  border:1px solid var(--line);border-radius:999px;white-space:nowrap;line-height:1.15}
+.mcell .mk{font-size:10px;color:var(--mid);text-transform:uppercase;letter-spacing:.4px}
+.mcell .mv{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--hi);
+  font-variant-numeric:tabular-nums;letter-spacing:-.2px}
+.mcell .md{font:600 10.5px var(--mono);font-style:normal;font-variant-numeric:tabular-nums}
+.mcell .md.up{color:var(--up)} .mcell .md.dn{color:var(--down)} .mcell .md.fl{color:var(--dim)}
+.mcell .mspark{align-self:center;margin-left:1px;opacity:.9}
+/* WHEN + WHAT IT MEANS, on the chip (owner review 2026-08-02, point 3). The period was previously
+   only in the hover title, so nothing on screen distinguished a daily FX rate from a figure eighteen
+   months old — which is how a stale 2025 inflation number survived on this page in the first place. */
+.mcell .mper{font:500 9.5px var(--mono);color:var(--dim);align-self:center;
+  border-left:1px solid var(--line);padding-left:6px;margin-left:1px;white-space:nowrap}
+/* An undated chip is marked, not left blank — see the note in compactMacro(). Dashed and italic so
+   it reads as "missing" at a glance rather than as a period nobody recognises. */
+.mcell .mper.undated{color:var(--gold);font-style:italic;border-left-style:dashed;cursor:help}
+/* The gloss wraps, so the chip becomes two lines rather than running off the strip. Only the few
+   chips whose LABEL is jargon carry one; the rest stay single-line.
+   FIXED 2026-08-02 (owner: "you have an overbleed issue here"). `.mcell` sets white-space:nowrap for
+   the single-line chips, and the gloss INHERITED it — so flex-basis:100% gave it a row of its own
+   and nowrap then forbade it from wrapping inside that row, and the sentence ran straight out
+   through the pill's right edge. The gloss has to opt back into normal wrapping explicitly, and a
+   two-line chip is a card, not a pill, so the 999px radius comes down with it. */
+.mcell.has-gloss{flex-wrap:wrap;max-width:340px;border-radius:12px;align-items:center}
+.mcell .mgl{flex-basis:100%;min-width:0;white-space:normal;overflow-wrap:anywhere;
+  font-size:10px;line-height:1.4;color:var(--mid);margin-top:3px}
+/* `hidden` must beat the display rule on .grid.macro, or the container would still render. */
+[hidden]{display:none!important}
+/* ---------- conditions-at-our-grain block: lens nav + the NPL sparkline (points 15-17, 20-22) --- */
+.mb-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  gap:10px;margin:0 0 8px}
+.mb-navwrap{display:flex;flex-wrap:wrap;gap:5px}
+.mb-lens{font:500 11.5px/1 var(--sans);color:var(--mid);background:var(--panel);cursor:pointer;
+  border:1px solid var(--line);border-radius:999px;padding:6px 12px;transition:color .12s,border-color .12s}
+.mb-lens:hover{color:var(--hi);border-color:#3a4868}
+.mb-lens.on{color:var(--bg);background:var(--accent);border-color:var(--accent);font-weight:600}
+.mb-lens:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mb-npl{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--mid);
+  font-variant-numeric:tabular-nums}
+.mb-npl b{color:var(--hi);font-family:var(--mono)}
+.mb-npl .sub{font-size:10px;color:var(--dim)}
+.mb-note{margin:0 0 10px}
+.mfull{margin:0 0 14px}
+.mfull > summary{cursor:pointer;font-size:11px;color:var(--mid);letter-spacing:.3px;
+  padding:3px 0;list-style:revert}
+.mfull > summary:hover{color:var(--hi)}
+.mfull[open] > summary{margin-bottom:8px}
+
 /* ---------- insight callout: tinted glass, segment-coded ---------- */
 .insight{background:linear-gradient(180deg,rgba(35,162,143,.10),var(--panel));
   border:1px solid var(--line);border-left:3px solid var(--merch);border-radius:var(--r);
@@ -325,6 +377,15 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 .verdict.v-warn{background:linear-gradient(180deg,rgba(217,116,43,.13),var(--panel));border-left-color:#D9742B}
 
 /* ---------- tables: raised card, zebra, right-aligned numerics, glowing bars ---------- */
+/* `.tbl-wrap` is the hyphenated spelling of `.tblwrap` used at ten call sites that had never
+   matched any rule — so those tables had no guard rail and pushed the whole page sideways on a
+   phone (Assistance: 636px of scroll in a 390px viewport). Aliased, not renamed, so the two
+   spellings cannot drift apart again. Descendant selector, not child: index.html wraps a mount div,
+   app.js wraps the table directly. */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);max-width:100%;
+  min-width:0;overscroll-behavior-x:contain}
+.tbl-wrap .tbl{width:auto;min-width:100%}
+
 /* .tblwrap is the mobile guard rail: a wide multi-column .tbl scrolls INSIDE this box
    instead of pushing the whole page sideways. app.js wraps every table.tbl in one at boot. */
 .tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);max-width:100%;
@@ -367,7 +428,7 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 #expocards .mcard{display:flex;flex-direction:column}
 #expocards .mcard .k{text-transform:none;letter-spacing:.2px;min-height:2.5em;line-height:1.3}
 #expocards .mcard .v{margin-top:auto}
-#expocards .mcard .n{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#expocards .mcard .n{overflow-wrap:anywhere}
 
 /* ---------- provenance + status tags ---------- */
 .tag{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;
@@ -650,9 +711,14 @@ html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6f
 .pill-num{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;
   background:var(--pc,var(--accent));color:#0a0e17;font:700 10px var(--mono);flex:none}
 .pill-name{color:var(--hi)}
-.pill-big{font:700 21px/1.05 var(--mono);color:var(--hi);letter-spacing:-.3px;margin-top:1px;font-variant-numeric:tabular-nums}
+/* overflow-wrap:anywhere — the pill box is overflow:hidden, so a long unbreakable token (a Thai
+   branch/province name in the Acquisition/Competitor read, e.g. densest-branch or radar-#1 name)
+   would otherwise be CLIPPED at the right edge on a narrow phone; let it break instead. Mirrors the
+   sibling .cc-hero-big/.cc-hero-sub guard (ux-cc-hero-card-narrow-overflow). Space-separated content
+   is unaffected, so zero visual change on the current data. */
+.pill-big{font:700 21px/1.05 var(--mono);color:var(--hi);letter-spacing:-.3px;margin-top:1px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .pill-big small{font-size:12px;color:var(--mid);font-weight:600}
-.pill-read{font-size:11.5px;line-height:1.45;color:var(--mid);flex:1}
+.pill-read{font-size:11.5px;line-height:1.45;color:var(--mid);flex:1;overflow-wrap:anywhere}
 .pill-read b{color:var(--txt);font-weight:600}
 .pill-foot{font-size:10.5px;color:var(--pc,var(--accent));font-weight:600;letter-spacing:.2px;margin-top:2px}
 html[data-theme="light"] .pill-num{color:#fff}
@@ -664,8 +730,8 @@ html[data-theme="light"] .pill-num{color:#fff}
 .cc-link:hover{text-decoration:underline}
 .cc-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line2)}
 .cc-row:last-child{border-bottom:none}
-.cc-row .l{font-size:12.5px;color:var(--txt);flex:1;min-width:0}
-.cc-row .l .s{display:block;font-size:10.5px;color:var(--dim)}
+.cc-row .l{font-size:12.5px;color:var(--txt);flex:1;min-width:0;overflow-wrap:anywhere}
+.cc-row .l .s{display:block;font-size:10.5px;color:var(--dim);overflow-wrap:anywhere}
 .cc-row .r{font-family:var(--mono);font-size:13px;font-weight:600;white-space:nowrap;text-align:right}
 .cc-row .r .s{display:block;font-size:10px;font-weight:400;color:var(--dim)}
 /* .cc-tag shares ONE provenance visual language with .prov (leading dot, mono 11px,
@@ -795,8 +861,11 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
   .pi,[title]:after,.tooltip,.skel,.skel-rows{display:none!important}
   body{background:#fff!important;color:#111!important}
   main{max-width:none!important;padding:0!important}
+  /* 2026-08-01: print the tab you are ON. This used to be a hard-coded `#v-home`, so Ctrl-P from
+     any other tab silently printed the Command Center — the reader got a document about something
+     they were not looking at. `.view.on` is the same class the SPA router already sets. */
   .view{display:none!important}
-  #v-home{display:block!important}
+  .view.on{display:block!important}
   .cc-card,.mcard,.verdict,.insight{background:#fff!important;border:1px solid #bbb!important;break-inside:avoid;box-shadow:none!important;color:#111!important}
   /* board thesis: whiten the band, darken the sentence. */
   .cc-thesis{background:#fff!important;border:1px solid #bbb!important;border-left:4px solid #b88a2e!important;break-inside:avoid;box-shadow:none!important}
@@ -835,26 +904,34 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
 .jumpnav .chip{text-decoration:none}
 [data-theme=light] .jumpnav{background:rgba(247,248,251,.92)}
 /* collapsible sections — keep the h2 look, add a disclosure caret to summary */
-details.acqsec{border-top:1px solid var(--line2);margin:0}
-details.acqsec:first-of-type{border-top:none}
-details.acqsec>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
-  outline-offset:2px}
-details.acqsec>summary::-webkit-details-marker{display:none}
-details.acqsec>summary>h2{flex:1;border-bottom:none;margin:18px 0;padding-bottom:0}
-details.acqsec:first-of-type>summary>h2{margin-top:4px}
-details.acqsec>summary::after{content:'▸';color:var(--dim);font-size:11px;transition:transform .15s;
+details.compsec,details.ovsec{border-top:1px solid var(--line2);margin:0}
+details.compsec:first-of-type,details.ovsec:first-of-type{border-top:none}
+details.compsec>summary,details.ovsec>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
+  outline-offset:2px;min-width:0}
+details.compsec>summary::-webkit-details-marker,details.ovsec>summary::-webkit-details-marker{display:none}
+details.compsec>summary>h2,details.ovsec>summary>h2{flex:1;min-width:0;border-bottom:none;margin:18px 0;padding-bottom:0}
+details.compsec:first-of-type>summary>h2,details.ovsec:first-of-type>summary>h2{margin-top:4px}
+details.compsec>summary::after,details.ovsec>summary::after{content:'▸';color:var(--dim);font-size:11px;transition:transform .15s;
   margin-top:2px}
-details.acqsec[open]>summary::after{transform:rotate(90deg)}
-details.acqsec>summary:hover::after,details.acqsec>summary:hover>h2{color:var(--txt)}
-details.acqsec[open]>summary>h2{border-bottom:1px solid var(--line2);padding-bottom:6px}
-details.acqsec>summary:focus-visible{outline:2px solid var(--accent);border-radius:6px}
-.acqsub{font-size:12px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
+details.compsec[open]>summary::after,details.ovsec[open]>summary::after{transform:rotate(90deg)}
+details.compsec>summary:hover::after,details.compsec>summary:hover>h2,details.ovsec>summary:hover::after,details.ovsec>summary:hover>h2{color:var(--txt)}
+details.compsec[open]>summary>h2,details.ovsec[open]>summary>h2{border-bottom:1px solid var(--line2);padding-bottom:6px}
+details.compsec>summary:focus-visible,details.ovsec>summary:focus-visible{outline:2px solid var(--accent);border-radius:6px}
+.compsub,.ovsub{font-size:12px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
   margin:18px 0 8px;font-weight:600;border-bottom:1px solid var(--line2);padding-bottom:6px}
-.acqsub.opp{color:var(--opp)}
-.acqsub.risk{color:#ef7d76}
-.acqsub2{font-size:11.5px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
+.compsub.opp,.ovsub.opp{color:var(--opp)}
+.compsub.risk,.ovsub.risk{color:#ef7d76}
+.compsub2{font-size:11.5px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
   margin:18px 0 8px;font-weight:600}
-@media print{.jumpnav{display:none!important}details.acqsec>summary::after{display:none}}
+/* A provenance pill that is a SENTENCE, not a word, has to be allowed to wrap. `.tag` is
+   white-space:nowrap — right for "MEASURED", wrong for "MIXED · footprint EST · service MEASURED",
+   which is 40 characters and ran 16px out of its own heading on a 390px phone. Caught in CI, where
+   the Google-hosted IBM Plex never loads and the wider system fallback is used — but the pages ship
+   `display=swap`, so that fallback is also what EVERY phone paints first, and what stays on a slow
+   Thai mobile connection. inline-block so it wraps INSIDE one continuous pill border instead of
+   breaking the border across two lines. */
+.compsub .tag,.compsub2 .tag,.ovsub .tag{white-space:normal;display:inline-block;max-width:100%}
+@media print{.jumpnav{display:none!important}details.compsec>summary::after,details.ovsec>summary::after{display:none}}
 
 /* ============================================================
    DESIGN-SYSTEM TIGHTENING (design-sys) — appended; wins via the
@@ -885,7 +962,7 @@ h2:first-child{margin-top:var(--s2)}
 .search{font-size:var(--fz-body)}
 
 /* CAPTION (11) — labels, eyebrows, sub-notes, table heads, tags: one small size */
-.mcard .k,.cc-card-h,.tbl th,.kpi .k,.acqsub,.acqsub2,.sim-ctl-h,
+.mcard .k,.cc-card-h,.tbl th,.kpi .k,.compsub,.ovsub,.compsub2,.sim-ctl-h,
 .maplegend,.chip,.tag,.cc-tag,.note,.loading{font-size:var(--fz-caption);letter-spacing:.4px}
 .mcard .n,.mcard .d,.lens .ld,.cc-sub2,.cc-row .l .s,.cc-row .r .s,
 .sub,.sim-hint,.prov,.pop .pv{font-size:var(--fz-caption);letter-spacing:0}
@@ -901,7 +978,30 @@ main{padding:64px var(--s5) 96px}
 .purpose{padding:var(--s3) var(--s4);margin:var(--s2) 0 var(--s5)}
 .note{padding:var(--s4) var(--s4);margin-top:var(--s5)}
 .lenses,.chips{gap:var(--s2);margin-bottom:var(--s4)}
-.tbl th,.tbl td{padding:13px 14px}
+/* COMPACTED 2026-08-02 (owner review, point 3): "for tables, your column spacing is very wide.
+   Make it more compact." This rule was the cause — it sits late in the cascade and overrode the
+   7px/10px padding set earlier, so EVERY .tbl on the site ran at 13x14. The first pass scoped the
+   fix to the farm drill's .gd-tbl, which was too narrow a reading: the comment was about tables,
+   and the commodities board (many columns, all nowrap) was still overflowing its container.
+   `width:auto` is the other half of the fix — a `width:100%` table with few columns stretches the
+   spare width into the gaps between them, which is what produced the acres of white space between
+   THAI PRICE and BOOK EXPOSED. Sizing to content and letting .tblwrap scroll is both tighter and
+   honest about how wide the data actually is.
+
+   2026-08-02, second pass (owner: "the massive column spacing in the first column is present in all
+   tables in the macro tab"). `min-width:100%` was still forcing every table to fill its card, and a
+   browser hands that leftover width to the only column that can absorb it — the first one, because
+   every numeric column is nowrap/tabular and sizes to its digits. So "Isan" sat ~900px away from its
+   own outstanding balance. This is an OLD issue, not something this wave introduced: .tbl has been
+   width:100% since the base sheet (line 59). The padding pass shrank the cells but left the stretch.
+   Dropping min-width lets the table hug its content and left-pack; .tblwrap still scrolls when the
+   data really is wider than the card. Trailing space at the right of a wide card is the correct
+   place for slack — between a row label and its number is not. */
+.tbl th,.tbl td{padding:7px 9px}
+.tblwrap > .tbl{width:auto}
+/* .ic-tbl keeps its own 760px min-width — that floor is what stops the nowrap cells collapsing into
+   an unreadable column. It just needs to hit that floor INSIDE the scroller instead of outside it. */
+.tblwrap > .ic-tbl{width:auto}
 .cc-row{padding:8px 0}
 
 /* ---- 3 · HIERARCHY: make the primary metric dominate; dim the labels ---- */
@@ -936,7 +1036,7 @@ h2::before{top:2px;bottom:2px;width:3px}
 .cc-row{border-bottom:1px solid var(--line2)}
 .cc-row:last-child{border-bottom:none}
 /* acquisition sub-heads: same calm treatment, no heavy underline */
-.acqsub{border-bottom:1px solid var(--line2);padding-bottom:var(--s2);color:var(--mid)}
+.compsub,.ovsub{border-bottom:1px solid var(--line2);padding-bottom:var(--s2);color:var(--mid)}
 
 /* ---- 5 · POLISH: unified radius + softer, consistent shadows ---- */
 .mcard,.cc-card,.lens,.insight,.verdict,.purpose,.note,.tbl,.search,
@@ -1222,7 +1322,7 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
    5 region cards on Home + pillar front doors; press-to-drill.
    ============================================================ */
 #cc-impact{margin:14px 0 18px}
-#assist-impact,#exposure-impact,#acq-impact{margin:10px 0 18px}
+#assist-impact,#exposure-impact,#competition-impact{margin:10px 0 18px}
 .ic-strip-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline;
   font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mid);
   padding-bottom:7px;border-bottom:1px solid var(--line);margin-bottom:12px}
@@ -1258,7 +1358,14 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .ic-drill:hover{border-color:var(--accent)}
 .ic-chev{display:inline-block;width:1em}
 .ic-provs{margin-top:8px}
-.ic-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+/* `max-width:100%` + `min-width:0` added 2026-08-02 — this was the "table is overspilling" bug.
+   .ic-scroll already had overflow-x:auto, but with no max-width it simply GREW to its content
+   instead of clipping it, so the commodities board (min-width:760px, every cell nowrap) and its
+   per-crop belt tables ran ~235px past the container on any viewport under ~1000px, with the
+   scrollbar never engaging. min-width:0 is the flex-item half of the same guard: inside a flex or
+   grid parent, `auto` min-width lets a child refuse to shrink below its content. .tblwrap has
+   carried both since it was written; .ic-scroll was missed. */
+.ic-scroll{overflow-x:auto;max-width:100%;min-width:0;border:1px solid var(--line);border-radius:8px}
 .ic-tbl{border-collapse:collapse;width:100%;font-size:12px;min-width:760px}
 .ic-tbl th,.ic-tbl td{text-align:left;padding:6px 9px;border-bottom:1px solid var(--line2);white-space:nowrap}
 .ic-tbl thead th{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
@@ -1317,10 +1424,221 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .scn-prov{margin:0;font-size:10.5px;color:var(--dim);line-height:1.5}
 /* commodities board drill (Overview) */
 .cb-exp{cursor:pointer;color:var(--accent);font-family:var(--mono);white-space:nowrap}
+/* "Our exposure to it" — our book, set apart from the market read above it so the macro section
+   visibly leads with the external move and carries the loan book as the consequence, not the lead. */
+.cb-ours{margin-top:10px;padding-top:9px;border-top:1px solid var(--line2)}
 .cb-chev{display:inline-block;width:1em}
-.cb-drill>td{background:var(--panel2);padding:0}
-.cb-belt{padding:10px 12px;font-size:12px;color:var(--mid);line-height:1.55}
+/* `white-space:normal` is LOAD-BEARING, not cosmetic. The drill cell is a `<td>` inside .ic-tbl, and
+   .ic-tbl sets `white-space:nowrap` on every cell so the numeric columns don't collapse. That nowrap
+   was inherited by this cell too — which holds five PARAGRAPHS of prose, not a number. In an
+   auto-layout table an unwrappable cell sets the table's max-content width, so opening any belt drill
+   stretched the whole board table to the length of its longest sentence (the DLD provenance line runs
+   ~300 chars) and everything to the right of the viewport simply left the screen: the belt table's own
+   value column ended up a thousand-odd pixels out, and the income footnotes were cut mid-word.
+   Same failure mode as the .ic-scroll fix at L1325 and the .cb-felt one at L1457 — a nowrap intended
+   for one kind of cell reaching a cell that is nothing like it. overflow-wrap:anywhere additionally
+   lets the long unbroken source tokens (source-data/livestock_province.json, dld.gdcatalog.go.th)
+   break instead of setting a min-content floor of their own. */
+.cb-drill>td{background:var(--panel2);padding:0;white-space:normal;overflow-wrap:anywhere}
+/* Second half of the same fix. Wrapping alone is not enough: the board table is WIDER than its scroll
+   box on a laptop (eight nowrap numeric columns want ~1,400px against a ~1,150px box), so prose that
+   wraps at the TABLE width still has its right-hand half outside the visible area — reachable only by
+   scrolling sideways, which nobody does to read a sentence. --cb-w is the scroll box's own client
+   width, set and re-set on resize by renderCommoditiesBoard; sticky/left:0 then holds the panel
+   against the left edge of the box however far the table itself is scrolled. */
+.cb-belt{padding:10px 12px;font-size:12px;color:var(--mid);line-height:1.55;
+  max-width:var(--cb-w,100%);position:sticky;left:0}
 .cb-belt b{color:var(--hi)}
+/* Belt table now lists EVERY province in the belt (rice = 26 rows), so it scrolls inside the drill
+   rather than pushing the price history and call-list below the fold. The sticky header keeps the
+   column meanings visible while scrolling; the footer total is the row the eye is looking for. */
+.cb-belttbl{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:6px;margin-top:6px}
+.cb-belttbl table{margin-top:0!important}
+.cb-belttbl thead th{position:sticky;top:0;z-index:1;background:var(--panel)}
+.cb-foot td{position:sticky;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding-top:6px;font-size:11px;vertical-align:top}
+.cb-foot .s{color:var(--mid);font-weight:400}
+/* The belt table's own footnote cell is prose too ("adds up to the 136,293 above — this is the whole
+   belt, not a sample"), so it gets the same treatment: it was setting the belt table's width instead
+   of wrapping under the two columns it spans. */
+.cb-foot td.s{white-space:normal}
+.cb-incbasis{margin:7px 0 2px;font-size:11px;line-height:1.5;color:var(--mid)}
+.cb-incbasis b{color:var(--hi)}
+/* BoT Used Vehicle Price Index — the "what is the collateral worth" card that leads the resale
+   section on the Macro tab. Grid, not flex-wrap: three tiles that must stay the same width for the
+   index levels to be comparable at a glance, collapsing to one column on a phone. */
+.uv-verdict{margin-bottom:10px}
+.uv-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+@media(max-width:820px){.uv-tiles{grid-template-columns:1fr}}
+.uv-tile{border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:var(--panel2);min-width:0}
+/* The pickup tile is the one that matters — it is the largest collateral class in the book — so it
+   carries the accent border rather than being one of three identical boxes. */
+.uv-tile.hot{border-color:rgba(200,67,59,.45)}
+.uv-lab{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.uv-flag{font-family:var(--mono);font-size:9px;color:var(--agri);border:1px solid rgba(200,67,59,.5);
+  border-radius:9px;padding:0 5px;margin-left:5px;text-transform:none;letter-spacing:0;white-space:nowrap}
+.uv-val{font-family:var(--mono);font-size:27px;font-weight:600;line-height:1.15;margin-top:3px;font-variant-numeric:tabular-nums}
+.uv-base{font-size:11px;color:var(--mid);font-variant-numeric:tabular-nums}
+.uv-spark{margin:7px 0 4px}
+.uv-spark svg{width:100%;height:30px;display:block}
+/* The sparkline's own range, said out loud (owner review 2026-08-02, point 10). It used to live
+   only in the SVG title attribute, so the line had no stated start or end anywhere on screen. */
+.uv-sprange{display:block;font:400 9px var(--mono);color:var(--dim);letter-spacing:.02em;margin-top:2px}
+.uv-yoy{font-size:11.5px;color:var(--mid);font-variant-numeric:tabular-nums}
+.uv-sub{display:block;margin-top:5px;font-size:10.5px;line-height:1.45}
+.uv-p{font-family:var(--mono);font-size:9px;color:var(--gold);border:1px solid var(--gold);
+  border-radius:4px;padding:0 4px;vertical-align:1px;cursor:help}
+.uv-answers{margin:6px 0 2px;line-height:1.7;font-size:13px}
+.uv-dir{margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-variant-numeric:tabular-nums;cursor:help}
+.uv-dirb{font-family:var(--mono);font-size:9.5px;border:1px solid;border-radius:9px;padding:1px 7px;white-space:nowrap}
+.uv-dir .s{font-size:10.5px;color:var(--dim);line-height:1.6}
+/* The trailing window each slope was measured over, set as a quiet inline chip so the figure and
+   the months it covers can never drift apart on screen (owner review 2026-08-02, point 10). */
+.uv-w{font-size:9px;color:var(--dim);opacity:.85;white-space:nowrap;
+  border:1px solid var(--line);border-radius:4px;padding:0 4px;margin-left:2px}
+/* THE RESALE-VALUE CHART — full-size because the finding is a SHAPE (slide, trough, floor) that a
+   sparkline cannot carry. Two series share one y-axis, which is only legitimate because both are
+   the same index on the same 2015=100 base. */
+.uv-charth{margin:12px 0 4px;border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:var(--panel2)}
+.uvc{width:100%;height:auto;display:block;margin-top:4px;overflow:visible}
+.uvc-l{fill:none;stroke-linejoin:round;stroke-linecap:round}
+.uvc-g{stroke:var(--line);stroke-width:1;opacity:.55}
+/* The 2015 base is what the index MEANS, so it is drawn differently from an ordinary gridline. */
+.uvc-base{stroke:var(--dim);stroke-width:1;stroke-dasharray:2 3;opacity:.9}
+.uvc-baset{fill:var(--dim);font-size:8.5px}
+.uvc-tl{stroke:var(--agri);stroke-width:1;stroke-dasharray:3 3;opacity:.45}
+.uvc-y{font-family:var(--mono);font-size:9px;fill:var(--dim)}
+.uvc-x{font-family:var(--mono);font-size:9px;fill:var(--dim)}
+.uvc-m{font-family:var(--mono);font-size:9.5px;fill:var(--agri)}
+/* HOVER READOUT (owner review 2026-08-02, point 9). One transparent hit-band per month, each
+   carrying a pre-rendered crosshair + dots + readout that CSS reveals on :hover or :focus-within.
+   No JS listener, so nothing has to be re-bound when a window button redraws the chart, and the
+   whole thing survives a keyboard tab. pointer-events are OFF for everything except the band, so
+   the readout can never sit between the cursor and the band that draws it and flicker. */
+.uvc-hov{pointer-events:none}
+.uvc-hit{fill:transparent;pointer-events:all;cursor:crosshair}
+.uvc-hshow{opacity:0;transition:opacity .08s ease}
+.uvc-hov:hover .uvc-hshow,.uvc-hov:focus-within .uvc-hshow{opacity:1}
+.uvc-hx{stroke:var(--hi);stroke-width:1;opacity:.35;stroke-dasharray:2 2}
+.uvc-hbox{fill:var(--panel);stroke:var(--line);opacity:.97}
+.uvc-hm{font-family:var(--mono);font-size:9.5px;fill:var(--hi);font-weight:600}
+.uvc-ht{font-family:var(--mono);font-size:9.5px;font-variant-numeric:tabular-nums}
+/* On a phone the 760-unit viewBox scales to ~270px, which would render the 9-unit axis labels at
+   about 3 real pixels. Rather than shrink the chart until it lies, it keeps a readable minimum
+   width and scrolls inside its own box — the page itself still never scrolls sideways. */
+@media(max-width:700px){
+  #uv-chart{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .uvc{min-width:600px}
+  .uvc-y,.uvc-x{font-size:12px}
+  .uvc-m{font-size:13px}
+  .uvc-baset{font-size:11px}
+  .uvc-hm,.uvc-ht{font-size:11px}
+}
+/* Touch has no hover, so the crosshair readout is a desktop affordance. On a touch screen the
+   month labels and the y-axis carry the reading instead — nothing is hidden behind a gesture that
+   device cannot make. */
+@media(hover:none){.uvc-hit{cursor:default}}
+.uvc-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--mid);margin-bottom:2px}
+.uvc-key{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.uvc-key i{display:inline-block;width:14px;height:3px;border-radius:2px;flex:none}
+.uv-gap{margin:12px 0 4px;border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:var(--panel2)}
+.uv-gaph{font-size:12px;color:var(--txt);font-weight:600;margin-bottom:6px}
+.uv-gap svg{width:100%;max-width:560px;height:auto;display:block}
+.uv-zero{stroke:var(--line);stroke-width:1}
+.uv-gx{font-family:var(--mono);font-size:9px;fill:var(--dim)}
+.uv-gapf{margin-top:7px;line-height:1.55;color:var(--mid)}
+/* DLT fleet mix — stock vs new, all 28 classes. The Thai DLT class name is the authority and the
+   English gloss sits under it, so the row is scannable without the label ever being replaced. */
+.vm-en{display:block;font-size:10.5px;color:var(--dim);font-weight:400;margin-top:1px}
+/* The two classes AutoX actually lends against, marked so the eye finds them in a 28-row table. */
+.vm-core{background:rgba(122,79,224,.05)}
+.vm-div td{background:var(--panel2);color:var(--mid);font-size:11px;line-height:1.5;
+  white-space:normal;padding:7px 8px;border-top:1px solid var(--line)}
+.vm-pu{margin:9px 0;padding:9px 12px;border:1px solid rgba(122,79,224,.35);border-radius:8px;
+  background:var(--panel2);font-size:12px;line-height:1.55;color:var(--mid)}
+.vm-pu b{color:var(--hi)}
+/* The AutoX PU restatement (owner review 2026-08-02, point 11). It is a RESTATEMENT of two classes
+   below it, not a 29th class, so it is banded and rule-separated rather than styled like a peer row —
+   and it deliberately does not participate in the 100% sum. The ★ is the same mark on the two classes
+   it draws from, so the overlap is visible in the table rather than only in the footnote. */
+.vm-ax{background:rgba(122,79,224,.13);border-bottom:1px solid var(--collat)}
+.vm-ax td{padding-top:9px;padding-bottom:9px}
+.vm-ax .gd-geo b{color:var(--collat)}
+.vm-star{color:var(--collat);font-size:11px;margin-left:5px;cursor:help;vertical-align:1px}
+.vm-vs{font:500 10.5px var(--mono);color:var(--dim);white-space:nowrap}
+/* DLT brand mix — pickups beside passenger cars, because the finding IS the contrast (pickup
+   concentrated in two nameplates, cars fragmenting toward BEV). Two columns that stack on a phone. */
+.vb-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+@media(max-width:880px){.vb-cols{grid-template-columns:1fr}}
+.vb-col{min-width:0}
+.vb-cap{font-size:12px;font-weight:600;color:var(--txt);margin-bottom:5px}
+/* Every brand is listed rather than a top-ten, so the list scrolls in place instead of running the
+   section to several screens. Sticky header keeps the columns meaningful while scrolling. */
+.vb-scroll{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:7px}
+.vb-scroll table{margin:0;min-width:0}
+.vb-scroll thead th{position:sticky;top:0;z-index:1;background:var(--panel)}
+.vb-big td{color:var(--txt)}
+.vb-f{margin-top:5px;color:var(--mid)}
+.vb-prov{margin-top:12px;border-top:1px solid var(--line);padding-top:11px}
+.vb-provhead{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:4px;font-size:12px;color:var(--mid)}
+.vb-provhead select{font:500 12.5px var(--sans);background:var(--panel2);color:var(--txt);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;cursor:pointer;max-width:100%}
+.vb-caveat{line-height:1.55;color:var(--mid);margin-top:6px}
+/* MAJOR-BRAND RESILIENCE — is the grip holding? Two panels side by side because the whole finding
+   IS the contrast: pickup concentration holds while the car side fragments. They stack on a phone,
+   pickup first, since that is the class carrying most of the book. */
+.rz-winbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:10px 0 4px}
+.rz-win{font:500 11.5px var(--mono);color:var(--mid);background:var(--panel2);border:1px solid var(--line);
+  border-radius:7px;padding:4px 10px;cursor:pointer;letter-spacing:.02em;text-align:center;line-height:1.25}
+.rz-win:hover{color:var(--txt);border-color:var(--dim)}
+.rz-win.on{color:var(--collat);border-color:var(--collat);background:rgba(122,79,224,.1)}
+.rz-win:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rz-range{color:var(--dim);font-variant-numeric:tabular-nums;margin-left:2px}
+.rz-panels{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:8px 0 4px}
+@media(max-width:880px){.rz-panels{grid-template-columns:1fr}}
+.rz-panel{border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:var(--panel2);min-width:0}
+.rz-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rz-title{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim)}
+.rz-badge{font-family:var(--mono);font-size:9.5px;border:1px solid;border-radius:9px;padding:1px 7px;white-space:nowrap}
+.rz-big{font-family:var(--mono);font-size:30px;font-weight:600;line-height:1.1;margin-top:4px;font-variant-numeric:tabular-nums}
+.rz-pc{font-size:16px;font-weight:500;margin-left:1px}
+.rz-cap{font-size:11.5px;color:var(--mid);line-height:1.5;margin-top:1px}
+.rz-cap b{color:var(--hi)}
+/* One bar, two segments, labels inside — the split reads without a legend. Labels clip rather than
+   wrap so a narrow panel never grows a second line and knocks the two panels out of alignment. */
+.rz-bar{display:flex;height:22px;border-radius:5px;overflow:hidden;margin:9px 0 2px;background:var(--panel)}
+.rz-bar span{display:flex;align-items:center;padding:0 7px;overflow:hidden;white-space:nowrap;
+  text-overflow:ellipsis;font-family:var(--mono);font-size:10px;letter-spacing:.02em}
+/* White label with a shadow rather than a dark one: the segment is filled with whichever grade
+   colour applies (green / gold / red), and no single fixed text colour reads on all three. */
+.rz-maj b{color:#fff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.55)}
+.rz-min{background:var(--line)}
+.rz-min b{color:var(--mid);font-weight:500}
+.rz-spark{margin:8px 0 2px}
+.rz-spark svg{width:100%;height:34px;display:block}
+.rz-spark .s{display:block;color:var(--dim);font-size:10px;margin-top:2px}
+.rz-kv{width:100%;margin:7px 0 0;border-collapse:collapse}
+.rz-kv th{text-align:left;font-weight:400;font-size:11.5px;color:var(--mid);padding:3px 0;white-space:normal}
+.rz-kv td{text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--txt);
+  padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* The seasonal cross-check (owner review 2026-08-02, point 12). It is a control on the trailing
+   move above it, not a second grade, so it is set apart by a rule and quieter type — a reader who
+   stops at the rule has still read the whole answer. Its value cell wraps, because when there is no
+   year-earlier period the cell carries a sentence saying so rather than an em-dash. */
+/* Why the two readings of the same window differ, said at the number rather than in the footnote. */
+.rz-caveat td{font-size:10px;line-height:1.5;color:var(--dim);white-space:normal!important;
+  text-align:left!important;font-family:var(--sans)!important;padding:1px 0 4px!important}
+.rz-caveat td b{color:var(--mid);font-weight:600}
+.rz-xcheck th{border-top:1px dashed var(--line);padding-top:6px!important;font-size:10.5px;color:var(--dim);cursor:help}
+.rz-xcheck td{border-top:1px dashed var(--line);padding-top:6px!important;white-space:normal;font-size:10.5px}
+.rz-xcheck td .s{color:var(--dim);font-family:var(--sans);line-height:1.45}
+/* The month range under each window button — the button says "6 months", this says which six. */
+.rz-wm{display:block;font-size:9px;letter-spacing:.02em;opacity:.72;margin-top:1px;font-weight:400}
+.rz-minh{margin-top:9px;padding-top:8px;border-top:1px solid var(--line);color:var(--dim);
+  font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase}
+.rz-min-tbl{width:100%;margin:4px 0 0;border-collapse:collapse}
+.rz-min-tbl td{font-size:11.5px;color:var(--mid);padding:2px 0;font-variant-numeric:tabular-nums}
+.rz-min-tbl td.n{text-align:right;font-family:var(--mono);white-space:nowrap;padding-left:8px}
+.rz-min-tbl td.n b{color:var(--txt)}
 /* product → segment → driver map (Exposure) */
 .pm-drv{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--gold);
   border:1px solid rgba(230,180,80,.4);border-radius:5px;padding:1px 6px;margin:1px 2px 1px 0;white-space:nowrap}
@@ -1337,3 +1655,312 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .imf-peer{font-family:var(--mono);font-size:10.5px;color:var(--dim);background:var(--panel2);
   border:1px solid var(--line2);border-radius:5px;padding:2px 6px;white-space:nowrap}
 .imf-peer.me{color:var(--accent);border-color:var(--accent);font-weight:600}
+
+/* ============================================================
+   CHART KIT (hand-rolled inline SVG — see app.js svgBars/svgSpark/svgDots).
+   No library, no CDN: this is a no-build static deploy and a CDN <script>
+   would be a new external dependency on both Vercel and the local
+   `python -m http.server` workflow. Colours come from the theme tokens so
+   light/dark are free. Nothing animates.
+   ============================================================ */
+.chartwrap{background:var(--panel);border:1px solid var(--line);border-radius:9px;
+  padding:11px 12px 8px;margin:8px 0 10px;overflow-x:auto}
+.chartwrap>svg{width:100%;height:auto;display:block;min-width:340px;max-width:620px;margin:0 auto}
+/* max-width is a GUARD, not decoration: a viewBox svg at width:100% scales uniformly, so
+   without a cap a 560-unit chart rendered 1590px wide with ~30px label text on a 1920px
+   screen. Any future .chartwrap chart is capped near its designed size and centred. */
+.chart-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  margin-bottom:7px}
+.chart-h .t{font:600 11px var(--sans);color:var(--txt);letter-spacing:.2px}
+.chart-h .s{font-size:10.5px;color:var(--dim)}
+
+/* diverging bars + dot plot share the axis/label/value type */
+.cbars-ax{stroke:var(--line);stroke-width:1}
+.cbars-l{font-family:var(--sans);font-size:10.5px;fill:var(--mid);text-anchor:end;dominant-baseline:middle}
+.cbars-v{font-family:var(--mono);font-size:10.5px;text-anchor:end;dominant-baseline:middle;
+  font-variant-numeric:tabular-nums}
+.cbars-b{shape-rendering:crispEdges}
+g:hover .cbars-l{fill:var(--hi)}
+g:hover .cbars-b,g:hover .cdot{filter:brightness(1.25)}
+.cdot-s{stroke-width:1.4;opacity:.45}
+
+/* sparkline: sits inline beside a number in a table cell or card */
+.csp{width:108px;height:26px;vertical-align:-7px;overflow:visible}
+.csp-l{fill:none;stroke-width:1.5;vector-effect:non-scaling-stroke}
+.csp-a{opacity:.12}
+.csp-p{stroke:var(--panel);stroke-width:1.2}
+/* `white-space:nowrap` here was pushing the whole DOCUMENT wider than the viewport: this span sits
+   in the flex row .ab-tr, and a nowrap flex item refuses to shrink below its content width. The
+   result was a page that scrolled sideways by ~30px, which clips the left edge of every heading and
+   table on the tab — the "sizing" symptom, and it was never the tables' fault. Keep the compact
+   mono look, drop the nowrap, and let it shrink. (Reported 2026-08-02.) */
+.csp-none{font:400 10px var(--mono);color:var(--dim);letter-spacing:.02em;min-width:0}
+
+/* two-column on wide screens — a verdict card and its table sit side by side
+   instead of stacked, which is where roughly half the Macro tab's height went.
+   Single column on anything narrower; print always single column. */
+.ovpair{display:grid;grid-template-columns:1fr;gap:12px;align-items:start}
+@media(min-width:1180px){.ovpair{grid-template-columns:minmax(300px,.85fr) 1.15fr}}
+@media print{.ovpair{grid-template-columns:1fr!important}}
+
+/* ---------- geo drill (national → region → province → branch) ----------
+   Owner point 13. Also carries the "column spacing is very wide" fix: these tables are dense
+   numeric reads, so they get tabular figures, tighter horizontal padding than the general .tbl, and
+   numeric columns sized to content instead of sharing the row equally. A 9-column table that
+   distributes width evenly wastes half the row on the geo name and squeezes the numbers. */
+.gd-crumb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 8px;font-size:12px}
+.gd-crumb button{background:none;border:0;padding:2px 6px;border-radius:5px;font:inherit;
+  color:var(--accent);cursor:pointer}
+.gd-crumb button:hover{background:rgba(255,255,255,.05)}
+.gd-crumb button.on{color:var(--hi);cursor:default;font-weight:600}
+.gd-crumb span{color:var(--dim)}
+.gd-nat{display:flex;flex-wrap:wrap;gap:14px;padding:8px 11px;margin:0 0 8px;border-radius:7px;
+  background:var(--panel2);border:1px solid var(--line);font:600 12.5px var(--mono);
+  font-variant-numeric:tabular-nums;color:var(--hi)}
+.gd-nat i{font-style:normal;font-weight:500;color:var(--dim);font-size:10px;text-transform:uppercase;
+  letter-spacing:.4px;margin-right:5px}
+.gd-act{margin:0 0 8px;padding:9px 11px;background:var(--panel);border-left:3px solid var(--accent);
+  border-radius:0 6px 6px 0;font-size:12px;line-height:1.55}
+.gd-wrap{max-height:420px;overflow:auto}
+/* width:auto, NOT 100% — see the note at .tblwrap > .tbl. A full-width table has to give its spare
+   width to some column, and every column here but the first is nowrap/tabular, so the label column
+   took all of it. Sizing to content left-packs the row: the geo name sits next to its own number. */
+.gd-tbl{font-size:12px;font-variant-numeric:tabular-nums;width:auto;min-width:min(100%,520px)}
+.gd-tbl th,.gd-tbl td{padding:5px 8px;white-space:nowrap}
+.gd-tbl th{position:sticky;top:0;z-index:1;background:var(--panel);font-size:10px;
+  text-transform:uppercase;letter-spacing:.3px}
+.gd-tbl th.gd-r,.gd-tbl td.gd-r{text-align:right}
+/* was width:99% ("geo name absorbs slack; numbers stay tight") — that WAS the massive first column.
+   The geo cell now takes its natural width and caps, so a long Thai province name wraps onto a second
+   line instead of shoving the whole numeric block to the far edge of the card. */
+.gd-tbl td.gd-geo{white-space:normal;max-width:260px}
+.gd-tbl tr.gd-go{cursor:pointer}
+.gd-tbl tr.gd-go:hover td{background:rgba(255,255,255,.045)}
+.gd-tbl tr.gd-go:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.gd-ar{color:var(--dim);margin-left:5px}
+.gd-na{color:var(--dim)}
+.gd-foot{font-size:10.5px;color:var(--dim);margin:6px 0 0}
+.fb-crop{display:inline-flex;align-items:baseline;gap:4px;margin-right:9px;font-size:11px}
+.fb-crop b{font-weight:600;color:var(--txt)}
+.fb-crop i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--merch)}
+.fb-crop i.dn{color:var(--agri)}
+/* a lens INSIDE a block (the by-crop cut of the farm book, the four cuts of the collateral book), so
+   the heading is subordinate to the block's <h3> and carries no rule of its own — it must not read
+   as a new section. */
+.fb-h4{font-size:12.5px;font-weight:600;color:var(--hi);letter-spacing:.2px;margin:16px 0 7px;
+  display:flex;align-items:center;gap:8px}
+/* focus tier on a collateral row — the owner's stated core/secondary split, made visible so the
+   reader does not have to remember which classes are the ones we actually lend against. */
+.cb-tier{font:600 9px var(--mono);text-transform:uppercase;letter-spacing:.5px;padding:1px 5px;
+  border-radius:3px;vertical-align:1px}
+.cb-tier.core{color:var(--collat);border:1px solid var(--collat)}
+.cb-tier.sec{color:var(--dim);border:1px solid var(--line)}
+.cb-tier.oth{color:var(--dim);border:1px dashed var(--line)}
+@media print{.gd-wrap{max-height:none;overflow:visible}
+  .gd-crumb,.gd-ar{display:none} .gd-tbl th{position:static}}
+
+/* ---------- within-topic sub-switcher (second level under the Macro chips) ----------
+   SCREEN ONLY. The hide has to be !important because several renderers set an explicit inline
+   `display:block` on their own wrapper, which would otherwise win. Scoping the whole rule to
+   @media screen is what keeps printing whole: in print the rule simply does not apply, so the
+   inline/normal styles govern and every subsection is emitted. Do not "fix" this by adding a
+   print override with display:revert — that would drop grid/flex layouts back to UA defaults. */
+@media screen{ .ovsub-off{ display:none!important } }
+/* Second sticky row: sits UNDER the topic chips (which stick at 48px and are ~40px tall) with a
+   lower z-index, so scrolling a long topic keeps both levels visible and the topic row always wins
+   the overlap. Without the offset the two rows stack on the same line and hide each other. */
+.ovsubnav{top:88px;z-index:19;margin:0 0 10px;padding:6px 0 7px;border-bottom:1px dashed var(--line2)}
+.ovsubnav .chip{font-size:11.5px;padding:3px 9px;cursor:pointer;font-family:inherit}
+.ovsubnav .chip[aria-selected="true"]{border-color:var(--accent);color:var(--hi)}
+@media(max-width:720px){.ovsubnav{top:0;position:relative}}
+
+/* ---------- Macro decision band (above the answer band) ----------
+   Rows, not tiles. A tile competes with the five next to it for the eye; a row is read in order, which
+   is the point — this is the "what does it mean" list, and its order IS the priority. Each row is a
+   <button> so it is keyboard-reachable and announces itself as an action: every row goes somewhere. */
+.sowhat{margin:12px 0 6px;border:1px solid var(--line);border-radius:10px;background:var(--panel);overflow:hidden}
+.sw-hd{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--mid);
+  padding:9px 12px 8px;border-bottom:1px solid var(--line)}
+.sw-hd .s{text-transform:none;letter-spacing:0;color:var(--dim)}
+.sw-row{display:grid;grid-template-columns:22px 1fr 16px;align-items:start;gap:9px;width:100%;
+  padding:10px 12px;background:none;border:0;border-top:1px solid var(--line);text-align:left;
+  font:inherit;color:var(--txt);cursor:pointer;line-height:1.5}
+.sw-row:first-of-type{border-top:0}
+.sw-row:hover{background:rgba(255,255,255,.04)}
+.sw-row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.sw-ico{font-size:15px;line-height:1.35}
+.sw-txt{font-size:13px}
+.sw-txt b{color:var(--hi);font-weight:600}
+.sw-tail{color:var(--mid);font-size:12px}
+.sw-go{color:var(--dim);font-size:13px;line-height:1.35}
+.sw-row:hover .sw-go{color:var(--accent)}
+@media print{.sowhat{background:#fff!important;border-color:#bbb!important}
+  .sw-row{color:#111!important;border-top-color:#ddd!important;break-inside:avoid}
+  .sw-tail,.sw-go,.sw-hd{color:#444!important} .sw-go{display:none}}
+
+/* ---------- Macro answer band (top of #overview) ----------
+   Six measured numbers, each with its move, its refresh cadence and a trend line only where
+   history actually exists on disk. Sits above everything else on the tab. */
+.answerband{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:9px;margin:12px 0 4px}
+.ab{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:10px 11px 9px;
+  position:relative;display:flex;flex-direction:column}
+.ab-k{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.35px;line-height:1.35;
+  padding-right:2px;display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.ab-cad{font:600 8.5px var(--mono);letter-spacing:.6px;padding:1px 4px;border-radius:3px;
+  border:1px solid var(--dim);color:var(--dim);white-space:nowrap}
+.ab-cad.d{color:var(--accent);border-color:var(--accent)}
+.ab-cad.m{color:var(--opp);border-color:var(--opp)}
+.ab-cad.q{color:var(--dim);border-color:var(--dim)}
+.ab-v{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--hi);letter-spacing:-.5px;
+  font-variant-numeric:tabular-nums;margin-top:5px;line-height:1.15}
+.ab-v small{font-size:11.5px;font-weight:500;color:var(--mid);letter-spacing:0}
+.ab-mv{font:600 11px var(--mono);font-variant-numeric:tabular-nums;margin-top:3px}
+.ab-tr{margin-top:7px;min-height:26px;display:flex;align-items:center;flex-wrap:wrap;min-width:0}
+.ab-tr > *{min-width:0}
+.ab-s{font-size:10px;color:var(--dim);margin-top:6px;line-height:1.4}
+@media print{.answerband{grid-template-columns:repeat(3,1fr)}
+  .ab{background:#fff!important;border:1px solid #bbb!important;break-inside:avoid}
+  .ab-v,.ab-k{color:#111!important} .ab-s,.ab-cad{color:#444!important}}
+/* trend column in the commodities board — sparkline sits in its own narrow cell */
+.cb-spark{width:104px;padding-top:4px;padding-bottom:4px}
+.cb-spark .csp{width:96px;height:22px;vertical-align:middle}
+/* one-line "what's inside" on a collapsed Overview/Competition section — a closed section still has
+   to say what it holds, or collapsing it just hides the tab from you. */
+.ovsec-what{font:400 11px var(--sans);color:var(--dim);text-transform:none;letter-spacing:0;
+  flex:0 1 auto;min-width:0;text-align:right;margin-left:auto;padding-left:12px;line-height:1.35}
+@media(max-width:820px){.ovsec-what{display:none}}
+details.ovsec[open]>summary .ovsec-what{opacity:.45}
+@media print{.ovsec-what{display:none}}
+
+/* ---------- print-only blocks (summary head + provenance appendix) ----------
+   Injected by preparePrint() on beforeprint and removed on afterprint, so they never
+   exist in the on-screen DOM. `.printing` is set while the dialog is open so the
+   blocks are also visible in a headless render check. */
+.print-only{display:none}
+html.printing .print-only{display:block}
+@media print{
+  .print-only{display:block!important}
+  .pr-mast{border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:14px}
+  .pr-brand{font:600 9.5px var(--mono);letter-spacing:1.2px;text-transform:uppercase;color:#444!important}
+  .pr-mast h1{font:700 20px var(--sans);color:#111!important;margin:6px 0 5px;letter-spacing:-.3px;
+    text-transform:none;border:none;padding:0}
+  .pr-meta{font-size:10.5px;color:#444!important}
+  .pr-sum{border:1px solid #bbb;border-left:3px solid #111;padding:12px 14px;margin-bottom:16px;
+    break-inside:avoid}
+  .pr-sum h3{font:600 10px var(--mono);letter-spacing:1px;text-transform:uppercase;color:#111!important;
+    margin:12px 0 6px;border:none;padding:0}
+  .pr-sum h3:first-child{margin-top:0}
+  .pr-kv,.pr-v{list-style:none;margin:0;padding:0}
+  .pr-kv li,.pr-v li{font-size:11.5px;color:#111!important;margin-bottom:4px;padding-left:12px;
+    position:relative;line-height:1.45}
+  .pr-kv li::before,.pr-v li::before{content:'·';position:absolute;left:2px;color:#666}
+  .pr-kv i{font-style:normal;color:#444!important}
+  .pr-toc{margin-top:4px}
+  .pr-toc th,.pr-toc td{font-size:10.5px;padding:4px 6px}
+  #print-appendix{margin-top:20px;padding-top:12px;border-top:1px solid #999;break-inside:avoid}
+  #print-appendix h3{font:600 10px var(--mono);letter-spacing:1px;text-transform:uppercase;
+    color:#111!important;border:none;padding:0;margin-bottom:8px}
+  .pr-p{font-size:10px;color:#333!important;margin-bottom:5px;line-height:1.45}
+  .pr-tags{margin-bottom:8px}
+  .pr-tags span{display:inline-block;font:600 8.5px var(--mono);letter-spacing:.6px;border:1px solid #888;
+    color:#333!important;padding:1px 5px;border-radius:3px;margin:0 4px 4px 0}
+  /* keep an SVG chart from being sliced across a page, and never print a collapsed section */
+  .chartwrap{break-inside:avoid;border:1px solid #bbb!important;background:#fff!important}
+  details.ovsec,details.compsec{break-inside:auto}
+  details.ovsec>summary>h2,details.compsec>summary>h2{break-after:avoid}
+  h3.ovsub,h3.compsub{break-after:avoid;color:#111!important}
+  .cbars-l,.cbars-v{fill:#333!important}
+  .csp-none{color:#555!important}
+  @page{margin:14mm 12mm}
+}
+
+/* ---------- long-table fold (see app.js foldLongTables) ----------
+   Rows past the first five are hidden on screen and revealed by the control row. They stay in the
+   DOM — print force-shows them, so the printout keeps every row. */
+tr.tr-folded{display:none}
+tr.tr-folded.tr-open{display:table-row}
+.foldbtn{background:none;border:1px dashed var(--line);color:var(--mid);font:500 11px var(--sans);
+  border-radius:6px;padding:4px 10px;cursor:pointer;width:100%;text-align:center}
+.foldbtn:hover{color:var(--hi);border-color:var(--accent)}
+.foldbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+tr.tr-foldctl td{padding:5px 7px 3px;border-bottom:none}
+@media print{
+  tr.tr-folded{display:table-row!important}   /* the printout carries EVERY row */
+  tr.tr-foldctl{display:none!important}
+}
+
+/* ---------- lead clamp (see app.js clampLeads) ----------
+   Method/caveat prose stays available but stops dominating the scroll. Print shows it in full. */
+p.lead.lead-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden}
+.clampbtn{background:none;border:none;color:var(--accent);font:500 11px var(--sans);cursor:pointer;
+  padding:1px 0 3px;text-decoration:underline;text-underline-offset:2px}
+.clampbtn:hover{color:var(--hi)}
+.clampbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+@media print{
+  p.lead.lead-clamp{display:block!important;-webkit-line-clamp:none!important;overflow:visible!important}
+  .clampbtn{display:none!important}
+}
+
+/* Pantip borrower quotes (#acq). Verbatim Thai, so the block is set for reading rather than
+   scanning: generous line-height, a quiet rule instead of quotation marks (Thai does not use
+   them the way English does), and a width cap so a long post does not run the panel's full
+   width. Deliberately NOT styled as a testimonial — several of these are complaints about us. */
+.qgrp{margin:10px 0 0}
+.pq{margin:6px 0 0;padding:8px 0 8px 12px;border-left:2px solid var(--line);
+  font:400 12.5px/1.7 var(--sans);color:var(--mid);max-width:78ch}
+.pq .sub{font-size:10.5px;letter-spacing:.2px}
+@media print{.pq{break-inside:avoid}}
+
+/* Commodities board — "Borrower feels" cell bar. Replaced the full-width chart that scaled to
+   1590x627 on a 1920px screen; these are fixed-pixel and cannot inflate with the container. */
+.cb-felt{white-space:nowrap;font-variant-numeric:tabular-nums}
+.cb-felt b{font:600 11px var(--mono);margin-left:7px}
+.cb-felt .cb-deg{margin-left:2px;color:var(--dim)}
+svg.cbcell{vertical-align:middle;display:inline-block}
+.cb-key{margin:6px 2px 0;color:var(--dim)}
+.cb-areasrc{margin:7px 0 2px;font-size:11px;line-height:1.5}
+.cb-gap{border-left:2px solid var(--gold);padding-left:9px}
+/* Thai price history block inside a commodity drill. The sparkline is given fixed pixel width/height
+   attributes (not width:100%) for the same reason the cell bars are: a viewBox SVG stretched to its
+   container scales its whole coordinate system, so the line thickens as the panel widens. */
+.cb-thai{margin:9px 0 2px;padding:8px 10px;border:1px solid var(--line);border-radius:4px}
+.cb-thai-hd{display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-size:11.5px}
+.cb-thai-body{display:flex;align-items:center;gap:10px;margin-top:5px;flex-wrap:wrap}
+.cb-thai-body svg{flex:0 0 auto}
+.cb-spread{margin-top:7px;font-size:11px;line-height:1.5}
+.cb-spread .ic-tbl{max-width:420px}
+.cb-mkt{margin-left:5px;color:var(--dim);font-size:10px}
+.cb-mkt.thin{color:var(--gold)}
+
+/* Crop-mix → farm income (Macro · Farm households). The 77-bar rank strip needs FIXED pixel
+   width/height attributes on the <svg>; a width:100% SVG collapses to zero here. */
+.cm-spark{margin:10px 0 6px;overflow-x:auto}
+.cm-spark svg{display:block}
+.cm-spark .s{margin-top:4px;font-size:11px;color:var(--mid)}
+.cm-tbl td,.cm-tbl th{vertical-align:top}
+.cm-tbl .n{font-variant-numeric:tabular-nums;text-align:right}
+/* Crop-mix drill: region cards → province table → branch table. One level on screen at a time. */
+.cm-crumb{font-size:12px;margin:2px 0 8px;color:var(--mid)}
+.cm-crumb a{color:var(--accent);text-decoration:none}
+.cm-crumb a:hover{text-decoration:underline}
+.cm-crumb .cm-sep{margin:0 6px;color:var(--line)}
+.cm-crumb .cm-here{color:var(--hi);font-weight:600}
+.cm-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.cm-card{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;font:inherit;color:inherit}
+.cm-card:hover{border-color:var(--accent)}
+.cm-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cm-card-k{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--mid)}
+.cm-card-v{font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.cm-card-n{font-size:11px;color:var(--mid);line-height:1.45}
+.cm-prow{cursor:pointer}
+.cm-prow:hover{background:var(--panel)}
+.cm-chev{color:var(--accent)}
+.cm-act{margin:0 0 8px;padding:9px 11px;background:var(--panel);border-left:3px solid var(--accent);border-radius:6px;font-size:12px;line-height:1.55}
+
+/* A ThaiWater gauge reading that is physically implausible AND unsupported by the rest of its own
+   province's stations (owner 2026-08-02: "the comments and the table don't jive"). Shown, because
+   deleting a measured value would be worse, but marked and greyed so it cannot be read as the
+   province's condition — and it no longer ranks or colours the row. */
+.tw-susp{font:600 9px var(--mono);color:var(--gold);border:1px solid var(--gold);border-radius:4px;
+  padding:0 4px;margin-left:5px;white-space:nowrap;cursor:help;vertical-align:1px}

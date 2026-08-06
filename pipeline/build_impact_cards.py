@@ -51,8 +51,10 @@ def load(*path):
     return json.load(open(os.path.join(*path), encoding="utf-8"))
 
 
-def norm_branch(s):  # keep in sync with ingest_real_tape.norm_branch
-    return re.sub(r"เงินไชโย|สาขา|\s+", "", str(s or ""))
+# The join key lives in ONE place now (pipeline/branchkey.py). It used to be copy-pasted here, in
+# ingest_real_tape.py and in make_call_lists.py, kept in sync by a comment — three chances for a
+# silent join to drift apart.
+from branchkey import norm_branch, master_index, join_report  # noqa: E402
 
 
 def wmean(pairs):
@@ -149,10 +151,13 @@ def build():
             dprov.setdefault(pv, []).append(b["d_a"])
     dprov = {pv: round(sum(v) / len(v), 1) for pv, v in dprov.items()}
 
-    # ── branch rows under their province (tape top-400, joined via the master) ───
-    bname = {}
-    for m in mrows:
-        bname.setdefault(norm_branch(m.get("name")), m.get("prov"))
+    # ── branch rows under their province (joined via the master) ────────────────
+    # The miss is now COUNTED. It used to `continue` with no counter and no note, so a branch that
+    # failed to join simply was not in the drill — indistinguishable from a branch that does not
+    # exist. Everything the join drops is named in meta.branch_name_join.
+    bname, bcoll = master_index(mrows, lambda m: m.get("prov"))
+    bjoin = join_report(bname, geo["branches"].keys())
+    bjoin["master_key_collisions"] = bcoll
     branch_rows = {}
     for name, c in geo["branches"].items():
         pv = bname.get(norm_branch(name))
@@ -305,8 +310,16 @@ def build():
                              "note": "trend chips = agri-risk deltas between committed "
                                      "vintages; tape-NPL deltas begin at the second monthly "
                                      "tape vintage (current tape is the first)."},
-            "branch_note": "branch rows cover the tape's top-400 booking branches "
-                           "(no-PII floor n>=30); smaller branches are suppressed.",
+            "branch_note": "branch rows cover EVERY booking branch clearing the no-PII floor "
+                           "(n>=30 accounts), so they reconcile to their province total. Until "
+                           "2026-07-31 this read a top-400-by-size tab as well as the floor, "
+                           "which silently dropped ~1,570 branches that cleared the floor and "
+                           "left the rows summing to ~36% of their own province totals; the note "
+                           "then blamed the floor for what was actually the cap. Branches still "
+                           "absent are those under 30 accounts, which stay suppressed, plus the "
+                           "handful named in branch_name_join.unmatched_names whose tape spelling "
+                           "cannot be matched to a master branch.",
+            "branch_name_join": bjoin,
             "occ_note": "occupation split is the BOOK mix per geo region (tape cross); the "
                         "workforce side is NSO LFS employed + informal share — NSO publishes "
                         "no per-region occupation census we can join yet.",

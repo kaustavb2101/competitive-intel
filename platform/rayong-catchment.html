@@ -18,8 +18,12 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="3D catchment · AutoX · เงินไชโย">
 <meta name="twitter:description" content="Overture 3D building scene for any province — reachable population and competitive pressure around AutoX branches. Numbers tagged measured or estimated.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><!-- font files load from gstatic; preconnect avoids a DNS+TLS handshake waterfall before text paints -->
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<!-- deck.gl is VENDORED (platform/vendor/), not loaded from unpkg: a 3D scene that silently
+     fails because a CDN is unreachable looks identical to a broken page. Pinned 8.9.35 bytes. -->
+<script src="vendor/deck.gl-8.9.35.min.js"></script>
 <script src="pmtiles-layer.js"></script>
 <style>
 :root{--ink:#10131c;--paper:#f3f0ea;--card:#0e1320;--cardln:#222c41;--hi:#eef1f7;--txt:#c7cedd;--mid:#8a94a8;--dim:#6a7589;
@@ -483,10 +487,18 @@ body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!importan
   <a href="index.html#acq">Competition</a>
   <a href="rayong-catchment.html" id="nav3d" hidden>3D scene</a>
   <div class="nav-more" id="navMore">
-    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
-    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">Explore ▾</button>
+    <!-- EXPLORE = the tools tier (everything that is not a step in the five-pillar journey).
+         Must stay identical to index.html's Explore menu - tests/nav_consistency.py fails the
+         gate on drift. Branches points at the data book's browse-all, the canonical branch list. -->
+    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="Explore views">
+      <a href="index.html#trend" role="menuitem">Risk trend</a>
       <a href="index.html#map" role="menuitem">Map view</a>
+      <a href="index.html#provinces" role="menuitem">Provinces 3D</a>
+      <a href="data.html?branches" role="menuitem">Branches ↗</a>
+      <a href="index.html#market" role="menuitem">Market assessment</a>
       <a href="index.html#sim" role="menuitem">Simulator</a>
+      <a href="live.html" role="menuitem" title="Every live feed — freshness against each source's own cadence, plus the four with real stored history">Live board</a>
     </div>
   </div>
   <button id="themeToggle" title="Toggle light / dark" aria-pressed="false">☾</button>
@@ -647,10 +659,12 @@ function _normNat(b){const k=b.k10||{};
     gold:(b.gold!=null?b.gold:(k.gold!=null?k.gold:null)),
     pop:(b.pop!=null?b.pop:null),
     k10:b.k10||null};}
-// population for a focal branch's catchment. PREFER the true ~10km-perimeter figure
-// (branch_population.json, area-weighted district pop — index-aligned to branches.json/NATBRANCHES).
-// Fall back to the branch's DISTRICT population (branches.json `pop`, MEASURED NSO) if the perimeter
-// layer isn't built. Returns {v:number, scope:'10km'|'district'} or null.
+// population for a focal branch's catchment. PREFER the MEASURED WorldPop-2020 raster count of the
+// 10km catchment population (contested_pop.json rows[i][0]) — the SAME measured figure the app.js
+// branch popup shows. Fall back to the ESTIMATED area-weight layer (branch_population.json .values[i],
+// meta.measured:false) when the raster count is unavailable, then to the branch's DISTRICT population
+// (branches.json `pop`, MEASURED NSO). All index-aligned to branches.json/NATBRANCHES.
+// Returns {v:number, scope:'10km'|'district', meas:bool} or null.
 function branchPopIndex(f){
   const NB=window.NATBRANCHES; if(!NB||!NB.length)return -1;
   // _normNat branches ARE NATBRANCHES entries; curated ones aren't — match by nearest coordinate.
@@ -663,11 +677,16 @@ function branchPopIndex(f){
 function branchPop(f){
   if(!f)return null;
   const idx=branchPopIndex(f);
+  // MEASURED WorldPop-2020 raster count first (a true 10km catchment count, contested_pop.json
+  // rows[i][0]), matching the app.js popup; BRANCHPOP is only the ESTIMATED area-weight fallback
+  // (its meta.measured is false), then the branch's DISTRICT population (MEASURED NSO).
+  const CP=window.CPOP;
+  if(CP&&idx>=0&&idx<CP.length&&Array.isArray(CP[idx])&&CP[idx][0]>0)return {v:CP[idx][0],scope:'10km',meas:true};
   const BP=window.BRANCHPOP;
-  if(BP&&idx>=0&&BP[idx]>0)return {v:BP[idx],scope:'10km'};
-  if(f.pop!=null&&f.pop>0)return {v:f.pop,scope:'district'};
+  if(BP&&idx>=0&&BP[idx]>0)return {v:BP[idx],scope:'10km',meas:!!window.BRANCHPOP_MEAS};
+  if(f.pop!=null&&f.pop>0)return {v:f.pop,scope:'district',meas:true};
   const NB=window.NATBRANCHES;
-  if(idx>=0&&NB&&NB[idx]&&NB[idx].pop>0)return {v:NB[idx].pop,scope:'district'};
+  if(idx>=0&&NB&&NB[idx]&&NB[idx].pop>0)return {v:NB[idx].pop,scope:'district',meas:true};
   return null;
 }
 // BR = the interactive branch set: dropdown, dots, labels, 10km rings, fly-to focus.
@@ -2009,7 +2028,7 @@ function updatePanels(){
     // in the 10km perimeter (sum of every measured OSM POI count). Lead with the answer.
     const totalPOI=Object.keys(k).reduce((a,kk)=>a+(k[kk]||0),0);
     const pop=branchPop(focal);
-    const popMeas=(pop&&pop.scope==='10km'&&window.BRANCHPOP_MEAS);   // 10km figure from the WorldPop raster
+    const popMeas=(pop&&pop.scope==='10km'&&pop.meas);   // 10km figure from the MEASURED WorldPop raster (contested_pop.json)
     const popScope=pop&&pop.scope==='10km'?'people ≤10km':'people in district';
     const popTag=popMeas?'<span class="tag meas">WorldPop</span>'
       :(pop&&pop.scope==='10km'?'<span class="tag est">EST · NSO</span>':'<span class="tag meas">NSO</span>');
@@ -2771,31 +2790,55 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
  // time. Until a province's file exists, do NOT crash into a broken/empty GL scene: show a quiet
  // notice and a link to the always-available district view (province.html?p=<slug>). Rayong +
  // Bangkok ship with their files, so this only ever fires for not-yet-pulled provinces.
+ // data/catchments_r2.json is the manifest of which provinces actually have a building scene served.
+ // It was committed but read by nothing, so this page could only ever guess: any failure — a province
+ // that was never pulled, a CDN hiccup, a dropped connection — printed the same "haven't been pulled
+ // yet" notice. For 74 of the 77 provinces that message was simply FALSE (they are all served from
+ // R2; only 3 are also in git), and it sent the reader away from a scene that exists. The manifest
+ // lets the page tell the two cases apart and say the true one.
+ var CATALOG=null;   // {provinces:[slug], git:[slug]} once loaded; null = manifest itself absent
+ function haveScene(){ return !CATALOG||!Array.isArray(CATALOG.provinces) ? null
+                            : CATALOG.provinces.indexOf(CITY)>-1; }
  function notPulled(){
    killLoader();
    var prettyP=pretty; // already title-cased from the slug
+   var served=haveScene();   // true = manifest says it exists, so this is a LOAD failure, not absence
    var href='province.html?p='+encodeURIComponent(CITY)+
      (location.search.indexOf('theme=light')>-1?'&theme=light':'');
+   var head=served?('The 3D scene for '+prettyP+' didn’t load')
+                  :('3D buildings for '+prettyP+' haven’t been pulled yet');
+   var body=served
+     ? ('The manifest lists '+prettyP+' as served, so this is a network or CDN failure, not a missing '+
+        'pull — reloading usually fixes it. The district view works either way.')
+     : ('The Overture building scene is pulled per province from the desktop. Until then, the '+
+        'district view has '+prettyP+'’s branches, districts, POIs and 10&nbsp;km reach.');
+   var foot=served?('reload to retry · manifest: data/catchments_r2.json')
+                  :('pull command: pull_overture_buildings.py --province '+CITY);
    var el=document.createElement('div');el.className='err';el.style.color='#A7B0C2';
    el.innerHTML='<div style="max-width:560px;line-height:1.6">'+
-     '<div style="font:700 17px \'IBM Plex Sans Thai\';color:#D7DEEC;margin-bottom:10px">'+
-       '3D buildings for '+prettyP+' haven’t been pulled yet</div>'+
-     '<div style="font:400 13px \'IBM Plex Sans Thai\';color:#8A94A8;margin-bottom:18px">'+
-       'The Overture building scene is pulled per province from the desktop. Until then, the '+
-       'district view has '+prettyP+'’s branches, districts, POIs and 10&nbsp;km reach.</div>'+
+     '<div style="font:700 17px \'IBM Plex Sans Thai\';color:#D7DEEC;margin-bottom:10px">'+head+'</div>'+
+     '<div style="font:400 13px \'IBM Plex Sans Thai\';color:#8A94A8;margin-bottom:18px">'+body+'</div>'+
+     (served?'<a href="'+location.href+'" style="display:inline-block;padding:9px 16px;border-radius:8px;'+
+       'background:var(--blue,#5B7CFA);color:#fff;text-decoration:none;margin-right:8px;'+
+       'font:700 13px \'IBM Plex Sans Thai\'">Try again →</a>':'')+
      '<a href="'+href+'" style="display:inline-block;padding:9px 16px;border-radius:8px;'+
-       'background:var(--blue,#5B7CFA);color:#fff;text-decoration:none;'+
+       (served?'border:1px solid #3A4256;color:#A7B0C2;background:transparent;'
+              :'background:var(--blue,#5B7CFA);color:#fff;')+'text-decoration:none;'+
        'font:700 13px \'IBM Plex Sans Thai\'">Open the '+prettyP+' district view →</a>'+
-     '<div style="font:400 11px \'IBM Plex Mono\';color:#5B6479;margin-top:16px">'+
-       'pull command: pull_overture_buildings.py --province '+CITY+'</div>'+
+     '<div style="font:400 11px \'IBM Plex Mono\';color:#5B6479;margin-top:16px">'+foot+'</div>'+
      '</div>';
    document.body.appendChild(el);
  }
  // tiles_config first: it may carry catchments.baseUrl (operator CDN, e.g. Cloudflare R2 with all
  // 77 province pulls). The catchment loader below falls back to it on a local 404, so provinces
  // too big to commit to git still render their real buildings. CDN miss => same calm notPulled().
- opt('data/tiles_config.json').then(function(TILECFG){
- var cdnBase=(TILECFG&&TILECFG.catchments&&TILECFG.catchments.baseUrl)||null;
+ Promise.all([opt('data/tiles_config.json'),opt('data/catchments_r2.json')]).then(function(cfg){
+ var TILECFG=cfg[0];
+ CATALOG=cfg[1]||null;
+ // The manifest carries its own baseUrl. Prefer tiles_config (the operator's override) and fall back
+ // to the manifest, so the CDN keeps working if only one of the two is present.
+ var cdnBase=(TILECFG&&TILECFG.catchments&&TILECFG.catchments.baseUrl)||
+             (CATALOG&&CATALOG.meta&&CATALOG.meta.baseUrl)||null;
  if(cdnBase)cdnBase=String(cdnBase).replace(/\/+$/,'');
  // Optional scenery (travel-time isochrone bands + street trees) is pulled per-province by
  // pull_isochrone.py, which has run for NO province yet — so requesting <slug>_isochrone.json /
@@ -2870,8 +2913,9 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    // layer) reads it, and never for curated-province scenes; keeping its ~1.2MB off the critical path
    // lets the buildings paint first.
    Promise.resolve(null),
-   // TRUE ~10km-perimeter population per branch (area-weighted district pop), index-aligned to
-   // branches.json — the "people" headline the catchment card shows.
+   // a[15] ESTIMATED ~10km-perimeter population per branch (area-weighted district pop), index-aligned
+   // to branches.json — the FALLBACK "people" figure; the MEASURED WorldPop raster count (a[19]) is
+   // preferred over it when present.
    opt('data/branch_population.json'),
    // a[16] occupation leads — DEFERRED to the second wave (its ~6.8MB parse was the biggest non-scene
    // item on the critical path); fetched + applied ~1s after first paint.
@@ -2882,7 +2926,11 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    // a[18] per-branch WORKFORCE mix (build_branch_workforce.py, ~330KB) — the reflective
    // "who works here" layer where farmers surface; kept on the critical path so the panel
    // leads with occupations, not storefronts. Index-aligned to branches.json / NATBRANCHES.
-   opt('data/branch_workforce.json')
+   opt('data/branch_workforce.json'),
+   // a[19] MEASURED WorldPop-2020 catchment population (contested_pop.json rows[i]=[pop10, contested]),
+   // index-aligned to branches.json — the true 10km people count the card headlines, preferred over the
+   // a[15] area-weight estimate (the same measured source the app.js branch popup reads).
+   opt('data/contested_pop.json')
  ]);
  }).then(function(a){
    if(!a[0]){notPulled();return;}   // building file not pulled yet for this province — calm state
@@ -2893,7 +2941,8 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    window.COMPNAT=a[11];window.TILECFG=a[13];   // a[12] (opportunity_score) removed — strategy pivot
    window.POINAT=(a[14]&&a[14].poi)||null;
    window.BRANCHPOP=(a[15]&&a[15].values)||null;
-   window.BRANCHPOP_MEAS=!!(a[15]&&a[15].meta&&a[15].meta.measured);   // raster count => MEASURED tag
+   window.BRANCHPOP_MEAS=!!(a[15]&&a[15].meta&&a[15].meta.measured);   // area-weight fallback => ESTIMATED
+   window.CPOP=(a[19]&&Array.isArray(a[19].rows))?a[19].rows:null;     // MEASURED WorldPop 10km catchment pop (rows[i][0]) — preferred
    window.OCCLEADS=(a[16]&&a[16].branches)||null;
    window.OCCLEADS_BUCKETS=(a[16]&&a[16].meta&&a[16].meta.buckets)||null;
    window.SCENEPLACES=a[17]||null;               // dense Overture POI for this city (folded in by initCatch)

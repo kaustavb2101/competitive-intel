@@ -90,6 +90,13 @@ CROP_TO_FARMGATE = {
     "rice": "rice",
     "rubber": "rubber",
     "oilpalm": "oilpalm",
+    # Added 2026-08-01 alongside their area. These three are the board's three steepest FALLING
+    # measured Thai prices, so before this the area-weighted price_stress could only ever be
+    # dragged UP: every crop it could see was rising. cassava/maize keep coming through
+    # CROP_TO_NABC below, which resolves to the same measured feed.
+    "coconut": "coconut",
+    "pineapple": "pineapple",
+    "sugarcane": "sugarcane",
 }
 FARMGATE_FILE = "farmgate_prices.json"
 # staleness guard: the OAE vintage may lag the commodity board's own vintage by
@@ -102,11 +109,21 @@ OAE_MAX_LAG_MONTHS = 12
 # crop_mix display, priced by the same live NABC daily feed already trusted for rice/rubber/oilpalm.
 # Absent file => cassava/maize simply do not load and the output degrades to the prior 3-crop build.
 DOAE_FILE = "doae_planted_area.json"
-DOAE_AREA_CROPS = ("cassava", "maize")   # crops area-folded from DOAE (not in crop_prov_area.json)
+# Coconut and pineapple joined 2026-08-01, when ingest_doae.py started reading all 19 registry crops
+# instead of 5. Their area was in the same webservice response all along.
+DOAE_AREA_CROPS = ("cassava", "maize", "coconut", "pineapple")
 HA_TO_RAI = 6.25                          # DOAE hectares -> rai (crop_prov_area.json is in rai)
+
+# Sugarcane is in NEITHER crop_prov_area.json NOR the DOAE registry — cane growers register with
+# OCSB, which is the register of record for the crop. Folded in from its own measured layer so the
+# largest crop belt in the country (11.4m rai across 47 provinces) stops being invisible to
+# price_stress. Absent file => sugarcane simply does not load, same graceful degrade as DOAE.
+OCSB_FILE = "ocsb_cane.json"
+OCSB_AREA_CROPS = ("sugarcane",)
 # human-readable crop labels (en) for the UI
 CROP_EN = {"rice": "Rice", "rubber": "Rubber", "oilpalm": "Oil palm",
-           "cassava": "Cassava", "maize": "Maize"}
+           "cassava": "Cassava", "maize": "Maize", "coconut": "Coconut",
+           "pineapple": "Pineapple", "sugarcane": "Sugarcane"}
 
 # normalization constants (see FORMULA in module docstring)
 PRICE_SCALE = 25.0      # % YoY drop that maps price_term to 1.0
@@ -211,6 +228,30 @@ def load_doae_area():
     return {c: m for c, m in out.items() if m}
 
 
+def load_ocsb_area():
+    """MEASURED sugarcane area per province from OCSB (already rai — no ha conversion).
+
+    Same contract as load_doae_area(): {crop: {prov_th: rai}}, or {} when the file is absent or
+    malformed, so the build degrades to the prior shape instead of failing.
+    """
+    path = os.path.join(SRC, OCSB_FILE)
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            provs = json.load(f)["provinces"]
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as e:
+        print("WARNING: %s present but unreadable (%s) — sugarcane area not folded in"
+              % (OCSB_FILE, e), file=sys.stderr)
+        return {}
+    out = {}
+    for prov, rec in provs.items():
+        rai = (rec or {}).get("area_rai")
+        if isinstance(rai, (int, float)) and rai > 0:
+            out.setdefault("sugarcane", {})[prov] = int(round(rai))
+    return out
+
+
 def build():
     crop_area = load("crop_prov_area.json")   # {crop: {prov_th: rai}} — OAE rice/rubber/oilpalm
     # fold in MEASURED cassava/maize area (DOAE farmer registry, hectares -> rai). Only crops NOT
@@ -221,6 +262,12 @@ def build():
         if c not in crop_area:
             crop_area[c] = m
             doae_area_crops.append(c)
+    # ...then sugarcane from OCSB, on the same never-overwrite rule.
+    ocsb_area_crops = []
+    for c, m in load_ocsb_area().items():
+        if c not in crop_area:
+            crop_area[c] = m
+            ocsb_area_crops.append(c)
     board = load("commodity_board.json")       # list of rows
     branches = load("branches_final.json")     # list of branch dicts
 
@@ -534,6 +581,13 @@ def build():
             "%s, the dominant upland borrower crops absent from the OAE crop_prov_area.json "
             "(rice/rubber/oil palm only). Priced by the live NABC daily feed." %
             ", ".join(CROP_EN.get(c, c) for c in doae_area_crops))
+    if ocsb_area_crops:
+        meta["provenance"][OCSB_FILE] = (
+            "MEASURED OCSB cane area (production year 2565/66, rai) — folded in for %s. Cane is in "
+            "neither the OAE planted-area census nor the DOAE farmer registry, because growers "
+            "register with OCSB; this is the register of record. Priced by the ANNOUNCED national "
+            "cane price (administered per season, ~10 CCS), not a market quote." %
+            ", ".join(CROP_EN.get(c, c) for c in ocsb_area_crops))
 
     # --- MEASURED relabel: when a measured price source (NABC live or OAE farm-gate) was used ---
     # Every mutation of meta lives inside this guard so the all-proxy output stays byte-identical to
@@ -613,7 +667,16 @@ def main():
         if not os.path.exists(OUT):
             print("CHECK FAIL: %s does not exist" % OUT)
             sys.exit(1)
-        with open(OUT, encoding="utf-8") as f:
+        # newline="" on the READ as well as the write, so this compares what is ACTUALLY in the
+        # file. Without it, Python's universal-newline translation turns CRLF back into \n on the
+        # way in and --check passes on Windows over bytes that are not the bytes on disk.
+        #
+        # git normalises to LF on commit, so the committed blob was never wrong — the damage is
+        # local and quieter than that: build_provenance.py records os.path.getsize(), so running it
+        # on a Windows working copy censuses the INFLATED CRLF sizes and writes a provenance file
+        # that then fails --check on CI. That is the whole reason provenance has to be regenerated
+        # through the WSL LF mirror. Writing LF here removes one more reason to need it.
+        with open(OUT, encoding="utf-8", newline="") as f:
             existing = f.read()
         if existing == text:
             print("CHECK OK: %s reproduces byte-for-byte (%d provinces)" %
@@ -622,7 +685,8 @@ def main():
         print("CHECK FAIL: %s differs from a fresh build" % OUT)
         sys.exit(1)
 
-    with open(OUT, "w", encoding="utf-8") as f:
+    # newline="" keeps the file LF on every platform — see the --check comment above.
+    with open(OUT, "w", encoding="utf-8", newline="") as f:
         f.write(text)
     print("wrote %s (%d provinces, worst-first)" % (OUT, data["meta"]["n_provinces"]))
     top = data["provinces"][:5]

@@ -1,0 +1,5 @@
+# Build outputs of build_mcom_macro_pptx.py --preview. Regenerable from the script; the review
+# page in particular is ~500KB because it inlines every slide as a base64 PNG, which has no business
+# in the history of a data repo.
+preview/
+mcom-review.html

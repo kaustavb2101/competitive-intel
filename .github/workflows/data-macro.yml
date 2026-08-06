@@ -27,13 +27,24 @@ jobs:
         run: python pipeline/pull_macro.py --selftest
       - name: Pull macro indicators
         run: python pipeline/pull_macro.py --stamp "$(date -u +%F)"
+      - name: Re-derive every layer the macro pull left stale
+        run: |
+          # This step used to name the two layers a macro refresh was believed to drift (live_board,
+          # provenance). Naming them is the problem: the list is a copy of the dependency graph that
+          # nothing keeps honest, and across this repo's pull jobs that copy went stale repeatedly.
+          # rederive_drift.py instead iterates the determinism gate's OWN --check set to a fixed
+          # point, so it re-derives whatever actually drifted — no more, no less.
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
       - name: Commit to a data branch + open a draft PR
         env:
           GH_TOKEN: ${{ github.token }}
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/macro-${{ github.run_id }}
         run: |
-          git add platform/data/macro_indicators.json
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list to go stale, and never adds an untracked generated layer.
+          git add -u source-data platform/data
           if git diff --cached --quiet; then echo "unchanged; no PR."; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

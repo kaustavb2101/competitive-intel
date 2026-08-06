@@ -2,18 +2,21 @@
   "meta": {
     "title": "Measured Thai farm-gate crop prices (portfolio risk, objective #1)",
     "generated_by": "pipeline/build_farmgate_prices.py",
-    "label": "MEASURED — Thai daily national-average prices for RAW farm commodities (farm-gate product forms: paddy, fresh cassava root, whole palm bunch, raw rubber sheet, maize). Nothing modelled.",
-    "source": "NABC Agricultural Data Service (agriapi.nabc.go.th) — daily market prices, national average across quoting markets, pulled by pipeline/pull_nabc_prices.py (REACHABLE from a Thai IP and from cloud runners; verified live 2026-07-12).",
+    "label": "MEASURED — Thai prices for RAW farm commodities in farm-gate product forms (paddy, fresh cassava root, whole palm bunch, raw rubber sheet, maize, coconut, cannery pineapple, cane). Nothing modelled. Every commodity carries its own `source`: all are daily market averages EXCEPT sugarcane, whose price is administered rather than quoted.",
+    "source": "NABC Agricultural Data Service (agriapi.nabc.go.th) — daily market prices, national average across quoting markets, pulled by pipeline/pull_nabc_prices.py (REACHABLE from a Thai IP and from cloud runners; verified live 2026-07-12). Sugarcane only: OCSB announced cane price via pipeline/ingest_ocsb_cane.py — Thailand sets one national cane price per season, so cane is quoted by no market and cannot come from NABC.",
     "farmgate_note": "OAE's ราคาที่เกษตรกรขายได้ (price-farmers-received) series is not exposed as a machine-readable price resource on catalog.oae.go.th (only value-of-production datasets remain; the price series moved to the geo-blocked data.go.th aggregator). NABC's quoted products ARE the raw farm commodities farmers sell, so this stands in for farm-gate as the reachable measured Thai price layer — replacing the World Bank Pink Sheet GLOBAL proxy for price_stress. It is a national daily average, not a per-province farm-gate census.",
-    "vintage": "2026-07-23",
-    "pulled": "2026-07-29",
+    "vintage": "2026-08-04",
+    "pulled": "2026-08-04",
     "upstream": "source-data/nabc_prices.json",
     "crops_covered": [
       "cassava",
+      "coconut",
       "maize",
       "oilpalm",
+      "pineapple",
       "rice",
-      "rubber"
+      "rubber",
+      "sugarcane"
     ],
     "consumer": "pipeline/build_crop_stress.py prefers these measured Thai YoY values over the World Bank GLOBAL Pink Sheet proxy for matching crops; the GLOBAL proxy remains the graceful fallback when this layer is absent."
   },
@@ -22,31 +25,56 @@
       "crop_en": "Cassava (fresh root)",
       "product_th": "หัวมันสำปะหลังสด (แป้ง 25%)",
       "category_th": "มันสำปะหลัง",
-      "price": 3.5,
+      "price": 3.75,
       "unit": "บาท/กก.",
-      "latest_date": "2026-07-23",
-      "yoy": 57.3,
-      "n_markets": 3
+      "latest_date": "2026-08-04",
+      "yoy": 59.3,
+      "n_markets": 3,
+      "source": "NABC daily market average"
+    },
+    "coconut": {
+      "crop_en": "Coconut (fruit)",
+      "product_th": "มะพร้าวผลแห้ง ขนาดใหญ่",
+      "category_th": "มะพร้าว",
+      "price": 640.0,
+      "unit": "บาท/ร้อยผล",
+      "latest_date": "2026-08-04",
+      "yoy": -69.3,
+      "n_markets": 5,
+      "source": "NABC daily market average"
     },
     "maize": {
       "crop_en": "Maize",
       "product_th": "ข้าวโพดเลี้ยงสัตว์ ความชื้น 14.5%",
       "category_th": "ข้าวโพดเลี้ยงสัตว์",
-      "price": 10.68,
+      "price": 10.2,
       "unit": "บาท/กก.",
-      "latest_date": "2026-07-23",
-      "yoy": 11.3,
-      "n_markets": 4
+      "latest_date": "2026-08-04",
+      "yoy": 13.3,
+      "n_markets": 2,
+      "source": "NABC daily market average"
     },
     "oilpalm": {
       "crop_en": "Oil palm (fresh bunch)",
       "product_th": "ผลปาล์มน้ำมันทั้งทะลาย นน. > 15 กก. ขึ้นไป",
       "category_th": "ปาล์มน้ำมัน",
-      "price": 8.65,
+      "price": 8.87,
       "unit": "บาท/กก.",
-      "latest_date": "2026-07-23",
-      "yoy": 31.8,
-      "n_markets": 6
+      "latest_date": "2026-08-04",
+      "yoy": 27.3,
+      "n_markets": 6,
+      "source": "NABC daily market average"
+    },
+    "pineapple": {
+      "crop_en": "Pineapple (cannery)",
+      "product_th": "สับปะรดปัตตาเวียส่งโรงงาน",
+      "category_th": "สับปะรดโรงงาน",
+      "price": 10.2,
+      "unit": "บาท/กก.",
+      "latest_date": "2026-07-27",
+      "yoy": -18.4,
+      "n_markets": 1,
+      "source": "NABC daily market average"
     },
     "rice": {
       "crop_en": "Rice (paddy)",
@@ -54,26 +82,42 @@
       "category_th": "ข้าวหอมมะลิ",
       "price": 17738.33,
       "unit": "บาท/ตัน",
-      "latest_date": "2026-07-23",
-      "yoy": 12.4,
-      "n_markets": 6
+      "latest_date": "2026-08-04",
+      "yoy": 13.4,
+      "n_markets": 6,
+      "source": "NABC daily market average"
     },
     "rubber": {
       "crop_en": "Rubber (raw sheet)",
       "product_th": "ยางพาราแผ่นดิบ ชั้น 3",
       "category_th": "ยางพารา",
-      "price": 84.08,
+      "price": 81.99,
       "unit": "บาท/กก.",
-      "latest_date": "2026-07-23",
-      "yoy": 38.0,
-      "n_markets": 2
+      "latest_date": "2026-08-04",
+      "yoy": 41.1,
+      "n_markets": 3,
+      "source": "NABC daily market average"
+    },
+    "sugarcane": {
+      "crop_en": "Sugarcane (announced price)",
+      "product_th": "อ้อยโรงงาน",
+      "category_th": null,
+      "price": 1.15,
+      "unit": "บาท/กก.",
+      "latest_date": "2025",
+      "yoy": -17.9,
+      "n_markets": null,
+      "source": "OCSB announced cane price (administered, ~10 CCS) — not a market quote"
     }
   },
   "crop_yoy": {
-    "cassava": 57.3,
-    "maize": 11.3,
-    "oilpalm": 31.8,
-    "rice": 12.4,
-    "rubber": 38.0
+    "cassava": 59.3,
+    "coconut": -69.3,
+    "maize": 13.3,
+    "oilpalm": 27.3,
+    "pineapple": -18.4,
+    "rice": 13.4,
+    "rubber": 41.1,
+    "sugarcane": -17.9
   }
 }

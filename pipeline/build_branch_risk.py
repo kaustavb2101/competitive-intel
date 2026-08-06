@@ -354,7 +354,9 @@ def main():
         sys.exit(1)
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "w", encoding="utf-8") as f:
+    # newline="\n": the Windows default turns every \n into \r\n, inflating the byte sizes
+    # build_provenance.py censuses and diverging the local tree from the LF blob CI reads.
+    with open(OUT, "w", encoding="utf-8", newline="\n") as f:
         f.write(text)
     m = data["meta"]
     print("wrote %s (%d branches, %d scored)" % (OUT, m["n_branches"], m["n_scored"]))

@@ -1,0 +1,197 @@
+# docs/decks — presentation builds
+
+## MCOM · 5 August 2026 — the Macro tab
+
+```bash
+python docs/decks/build_mcom_macro_pptx.py              # -> mcom-2026-08-05-macro.pptx
+python docs/decks/build_mcom_macro_pptx.py --lang th    # -> mcom-2026-08-05-macro-TH.pptx
+python docs/decks/build_mcom_macro_pptx.py --preview    # + preview/slideNN.png thumbnails
+python docs/decks/build_mcom_macro_pptx.py --review     # + mcom-review.html, the sign-off page
+```
+
+Both .pptx files are committed, so they can be downloaded without running anything.
+
+Deterministic, network-free, and every figure is read out of `platform/data/` at build time — no
+transcribed numbers — so a rebuild after a data refresh picks the new vintage up. Layers read:
+`macro_book`, `macro_indicators`, `imf_weo`, `commodity_history`, `commodities`, `crop_mix`,
+`farm_book`, `farm_income_impact`, `crop_farmer_income`, `income_impact`, `province_stress_index`,
+`amphoe_crops`, `thaiwater_rain`, `thaiwater_flood`, `flood_hazard`, `used_vehicle_value`,
+`vehicle_models`, `collateral_book`, plus one file upstream of the app —
+`source-data/bot_tourist_arrivals.json`, because `platform/data/` carries only the trailing-twelve-
+month arrivals LEVEL and the year-on-year move has to be computed from the monthly series.
+
+### That claim used to be half true, and it cost a review cycle
+
+Numbers in TABLES were always read from the data. Numbers in PROSE — callouts, cards, the vintage
+footer — were transcribed, and on 2026-08-04 a routine NABC price pull moved eight farm-gate series
+under a deck that had been signed off. What went stale, and is now computed:
+
+| was typed | said | data said |
+|---|---|---|
+| commodity board, 9 rows | nine falling; pork −6.7%, shrimp −4.3%, chicken −2.4%, eggs −1.7% | **eight** falling; −3.5%, −1.8%, −0.1%, eggs no longer negative |
+| crop belts callout | rubber +38%, cassava +57%, palm +32%, rice +12% | **+41%, +59%, +28%, +13%** |
+| crop belts callout | South +34.9%, East +23.9%, worst province −66.4% | **+36.4%, +25.3%, −65.2%** |
+| rice callout ×3 | price up 12.4% | **13.2%** |
+| coconut, twice | collapsing 70.9% | **69.7%** |
+| answer slide | a 24% price move becomes a 73% swing | **25% → 80%** |
+| USD/THB chip | 33.47 at 2026-07-31 | **33.34 at 2026-08-03** |
+| falling-crop area, twice | 12.2% of planted area | **10.7%** — this one was never right |
+| water cards | 31 provinces with heavy rain, 2026-08-03 | **41**, observed to **2026-08-04** |
+
+So the discipline is now: **if a figure can move with a vintage, the build computes it.** `pct()`
+formats with the typographic minus the hand-written prose already used, and `word()` spells small
+counts out, because "the 3 crops" in a sentence is the tell that a number was interpolated. The
+vintage footer reads its own stamps off the layers. What remains hand-typed is the argument, the
+crop names, and figures from layers that do not move on a price pull (OAE cost of production, DLT
+turnover, the used-vehicle index).
+
+`--review` regenerates `mcom-review.html` from the build. That page used to be hand-authored, and it
+had drifted furthest of all: it still announced "Twelve slides" against an eighteen-slide deck and
+still listed the nine-commodity board from two price vintages back. The design is unchanged — only
+its content is generated now.
+
+Scope is the **Macro tab only, and the tab is EXTERNAL DATA** — that line is the owner's, set when
+`renderRecoverySensitivity` was moved off the tab on 2026-08-02: *"it is a balance-sheet reading, and
+this tab is external data."* No figure in the deck comes from the loan tape. Where a tab layer joins
+our outstanding to an external number (`farm_book`, `collateral_book`, `macro_book` all do), only the
+external side is used. Book readouts belong on Exposure and Risk.
+
+The deck's job is to point at **regions, provinces and districts** where published statistics say a
+household is being squeezed, early enough for a pre-emptive conversation. Turning a geography into a
+call list is the Assistance tab's work and needs the book beside it.
+
+Eighteen slides: the answer · macro backdrop and the conditions under it (2) · agriculture (6) ·
+where to reach out first · collateral behind a divider (6) · the close.
+
+### Three places the build argues with its own source, deliberately
+
+1. **Two published prices per crop.** `crop_margin.json` (via `farm_book`) nets a **NABC daily market
+   quote** against an **OAE farm-gate cost**: rice at ฿17.74/kg against a ฿9.54/kg cost reads +51%
+   margin, and the layer's own headline claims all seven joined crops clear their cost.
+   `crop_farmer_income.json` uses OAE's price, OAE's cost and OAE's published net return per tonne —
+   one basis throughout — and reads rice at **−฿1,433 a tonne**. The costs agree (rubber ฿63.18 on
+   both sides); the prices are 1.4–2.2× apart because a market quote is a milled, graded product
+   several steps past the field. Slide 06 uses the OAE basis and shows the market quote in a
+   separate, labelled column. **This is a live defect in `pipeline/build_crop_margin.py`, not just a
+   presentation choice** — its `headline` field is wrong as written.
+2. **The pickup slope.** The six-month registration window ends on a month the pipeline itself flags
+   as an incentive pull-forward, so the trend column is recomputed without it (`ols_slope`) and both
+   callouts say what changes — raw six-month slope +131 pickups a month, ex-January −986.
+3. **The drought double-stress count** is zero only because that test is scored on world prices; the
+   worked counter-example on the Thai farm gate (สุพรรณบุรี) is named instead of presenting the
+   clean zero.
+
+### Ranking discipline on slide 09
+
+"Where to reach out first" is ordered by **how many of its four signals tripped**, with the measured
+debt + unemployment composite only breaking ties. An earlier version ranked on two of the four and
+displayed the other two beside the ranking, so a province tripping all four could sit at rank 30 and
+never appear (สิงห์บุรี did). The lead crop comes from the full eight-crop OAE mix in
+`crop_mix.json`, not `income_impact.json`'s three-crop (rice/rubber/palm) weighting — that one called
+กำแพงเพชร "rice 97%" when its measured mix is 47% rice, 29% sugarcane, 18% cassava.
+
+The crop signal trips in **70 of 77 provinces**, so the slide says out loud that it is context rather
+than a discriminator; debt, unemployment and rain do the separating.
+
+### The Thai deck is the same build, not a second deck
+
+`--lang th` runs the **same `build()`** with a translation catalogue attached, so both languages read
+the same data on the same day and a price pull moves both. A separate Thai script would be a second
+copy of every number, and the copy would be wrong within a week.
+
+Every display string passes through `Deck._t()`. The catalogue key is the English string with each
+number punched out to `{}` (`Deck.tkey`), so one entry covers every vintage: `"GDP {}, CPI {}"` is one
+key whatever the quarter says. A template consumes those numbers in order, or reorders them with
+`{0}`/`{1}` where Thai word order differs — slide 13's "33 pts below its 2015 base" has to become
+"below its 2015 base by 33 pts", which is `{9}` then `{8}`.
+
+```bash
+python docs/decks/th/build_catalog.py            # th/*.py  -> mcom_th.json
+python docs/decks/th/build_catalog.py --check    # verify the json matches its sources
+python docs/decks/build_mcom_macro_pptx.py --lang th --harvest /tmp/left.json
+```
+
+The catalogue source is four commented `.py` files under `th/` — `labels`, `headings`, `prose`,
+`misc` — merged into `mcom_th.json` by `build_catalog.py`, which rejects a duplicate key, an empty
+translation, a key that still carries a literal number, and a template asking for more placeholders
+than its key supplies. JSON cannot carry a comment, and a translation with no note on why a term was
+chosen (ราคาที่เกษตรกรขายได้ for farm gate, วัดจริง / ประมาณการ for MEASURED / ESTIMATED) decays the first
+time someone else edits it.
+
+**One known cost of `word()`.** Spelling small counts out is what stops "the 3 crops" reading as an
+interpolated figure — but a spelled count is part of the catalogue KEY, not a `{}` argument. When a
+price pull moves the count ("eight of seventeen falling" → "seven"), that sentence becomes a new key
+and reports as untranslated. That is the harvest working, not a bug; budget two or three new entries
+per data refresh, and keep the old reading, because the count can move back.
+
+**`0 string(s) still English` plus `fit: no findings` is the pass condition.** `--harvest` writes
+every string with no entry, so the gap is a file rather than a hunt. Fit matters more here than in
+English: Kanit sets Thai at different widths, so a table header or a callout that fitted in English
+can wrap to an extra line and land on the footer.
+
+Four bugs the Thai build found in the English one, all now fixed: the preview renderer drew table
+text from the untranslated source (so a translated deck's thumbnails silently reassured you about
+text nobody would see); `callout()` sized its tint block from the untranslated string, so a longer
+translation spilled out of the box; `Deck._NUM` read the compound "Pre-2022" as the number −2022,
+which no Thai sentence can reposition — the English now spells it out; and the vertical fit check
+used a single 7.30in floor when the confidentiality caption actually starts at 7.21in across the left
+seven inches, which was hiding a genuine collision on **the English slides 07 and 16 too**.
+
+### Why python-pptx and not the html2pptx workflow
+
+Kanit is the house font — confirmed by reading the run properties of the LTV decks, not assumed — and
+it is not installed on the laptop. An HTML renderer would compute every box position with fallback
+metrics and lay the deck out to the wrong widths. `deckkit.py` drives python-pptx directly and
+measures text against the Kanit TTF itself through Pillow, so a box that fits at build time fits in
+PowerPoint.
+
+**The fit check is the point.** There is no LibreOffice here, so nothing can render the .pptx back for
+inspection. Instead every text box is measured as it is created and any string that needs more room
+than its box gets reported at the end of the build; `--preview` redraws each slide with Pillow at the
+same geometry so the layout can be eyeballed. The preview is approximate by construction — it catches
+a box that has run off its slide, it does not certify pixels.
+
+### House style, read out of the reference decks rather than invented
+| | |
+|---|---|
+| Slide | 13.333 × 7.5 in (16:9) |
+| Navy | `1E2F5C` · table headers `1B2A6B` |
+| Red | `CC0000` · Gold `F5C242` · Secondary text `606060` |
+| Cover | navy field, gold band at L10.73 W2.60, red hairline at L10.73 W0.12, logo at 0.70/0.70 |
+| Content | white field, 20pt navy title, AutoX mark at L11.63 T0.28 W1.03 H0.32, red bar at T7.38 |
+| Footer | "Restricted Data – Reproduction is prohibited", 8pt |
+
+Two deliberate departures from the reference decks:
+
+1. **Content slides have no navy header bar.** The AutoX mark is dark navy artwork on transparency;
+   the reference puts it inside that bar, where it nearly disappears. Same furniture, readable
+   contrast.
+2. **A desaturated green (`15795F`) was added** for tailwind figures. The house palette has no
+   positive colour, and without one every number on a macro slide reads as a warning.
+
+### Fonts
+`Kanit-Regular.ttf` and `Kanit-SemiBold.ttf` live in `.fonts/` — vendored so the fit check is
+reproducible on any machine rather than silently degrading to "unchecked". Kanit is SIL OFL 1.1
+(Cadson Demak), which permits redistribution; see `.fonts/OFL.txt`. Override the location with
+`KANIT_DIR` if you keep them elsewhere.
+
+### Files
+- `deckkit.py` — the layout kit: cover / divider / content furniture, cards, callouts, provenance
+  chips, native tables, line and bar charts, the fit checker and the Pillow preview renderer. Records
+  `(eyebrow, title)` per slide in `Deck.headings` so a review page needs no parallel title list.
+- `build_mcom_macro_pptx.py` — the deck's content, one function, eighteen slides, speaker notes on
+  each.
+- `mcom-review.html` — the reviewable page: one card per slide, PNG plus the speaker note. Written
+  by `--review` (`Deck.review()` in deckkit); gitignored, since it inlines every slide as base64 and
+  runs to ~3MB. Do not hand-edit it — the previous hand-written copy is exactly how it went stale.
+- `mcom_th.json` — the generated Thai catalogue, 506 strings. Build artefact; edit `th/*.py`.
+- `th/labels.py`, `th/headings.py`, `th/prose.py`, `th/misc.py` — the catalogue source, split by kind
+  of string so the notes stay next to what they explain. `misc.py` also holds the pass-throughs:
+  province names arrive from the pipeline already in Thai, but they still need an entry, because a
+  string with no entry is reported as untranslated and "0 untranslated" is the only signal that
+  nothing was missed.
+- `th/build_catalog.py` — merges and validates those four into `mcom_th.json`.
+- `mcom-2026-08-05-macro.html` — the earlier HTML version of the same deck. **Superseded**: its
+  commodity slide predates the measured Thai farm-gate layer that landed 2026-08-02 and is annotated
+  to that effect. The .pptx is the deliverable.
+- `assets/` — the เงินไชโย and AutoX marks, extracted from the reference decks.

@@ -18,8 +18,12 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Province · เงินไชโย — Deep-Dive">
 <meta name="twitter:description" content="3D district deep-dive of any Thai province — AutoX coverage, rival density and district risk. Numbers tagged measured or estimated.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><!-- font files load from gstatic; preconnect avoids a DNS+TLS handshake waterfall before text paints -->
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<!-- deck.gl is VENDORED (platform/vendor/), not loaded from unpkg: a 3D scene that silently
+     fails because a CDN is unreachable looks identical to a broken page. Pinned 8.9.35 bytes. -->
+<script src="vendor/deck.gl-8.9.35.min.js"></script>
 <script src="pmtiles-layer.js"></script>
 <style>
 :root{--ink:#070a11;--card:#0e131f;--cardln:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;
@@ -351,10 +355,18 @@ html[data-theme="light"] .lg.on b{color:#11151F}
   <a href="index.html#exposure">Risk</a>
   <a href="index.html#acq">Competition</a>
   <div class="nav-more" id="navMore">
-    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
-    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">Explore ▾</button>
+    <!-- EXPLORE = the tools tier (everything that is not a step in the five-pillar journey).
+         Must stay identical to index.html's Explore menu - tests/nav_consistency.py fails the
+         gate on drift. Branches points at the data book's browse-all, the canonical branch list. -->
+    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="Explore views">
+      <a href="index.html#trend" role="menuitem">Risk trend</a>
       <a href="index.html#map" role="menuitem">Map view</a>
+      <a href="index.html#provinces" role="menuitem">Provinces 3D</a>
+      <a href="data.html?branches" role="menuitem">Branches ↗</a>
+      <a href="index.html#market" role="menuitem">Market assessment</a>
       <a href="index.html#sim" role="menuitem">Simulator</a>
+      <a href="live.html" role="menuitem" title="Every live feed — freshness against each source's own cadence, plus the four with real stored history">Live board</a>
     </div>
   </div>
   <button id="themeToggle" title="Toggle light / dark" aria-pressed="false">☾</button>

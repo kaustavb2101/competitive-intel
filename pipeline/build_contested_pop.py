@@ -12,9 +12,12 @@ same people, not just the same street.
 METHOD (both factors measured; the overlay is pure geometry)
 ------------------------------------------------------------
   pop10      Sum the WorldPop 2020 1km gridded-population raster over the branch's 10km
-             circle — the EXACT raster-sampling approach of build_branch_population.py
-             (source-data/worldpop_tha_2020_1km.tif, UN-adjusted to the official national
-             total ~69.8M; each 1km cell whose centre falls inside the circle is added).
+             circle — a direct raster sample (source-data/worldpop_tha_2020_1km.tif,
+             UN-adjusted to the official national total ~69.8M; each 1km cell whose centre
+             falls inside the circle is added). This is NOT the same number as
+             branch_population.json, whose shipped values are a district-population
+             AREA-WEIGHT estimate (build_branch_population.py's rasterio path was
+             unavailable and fell back); pop10 is the genuine raster count.
   contested  The same sum restricted to CONTESTED cells: a 1km cell is contested when its
              centre lies within 2km of ANY rival in the merged measured competitor census
              (platform/data/competitors_census.json — official store-locator networks for
@@ -106,7 +109,8 @@ def build():
                     contested.add((row, col))
 
     # ── pass 2: per branch, sum the 10km disc (pop10) + its contested subset ──────────
-    # identical raster-sampling loop to build_branch_population.py so pop10 matches it.
+    # direct WorldPop raster sample; branch_population.json's shipped values instead
+    # area-weight district populations (rasterio fallback), so the two do NOT match.
     deg_pad_lat = (RADIUS_M / MLAT) + abs(dy)
     rows = []
     tot_pop = tot_con = 0
@@ -172,8 +176,11 @@ def build():
             "population": "MEASURED — WorldPop 2020 gridded population (1km, UN-adjusted to the "
                           "official national total ~69.8M): source-data/worldpop_tha_2020_1km.tif. "
                           "pop10 sums every 1km cell whose centre falls within the branch's %.0f km "
-                          "circle — the EXACT raster-sampling method of build_branch_population.py, "
-                          "so pop10 matches branch_population.json." % (RADIUS_M / 1000.0),
+                          "circle — a direct sample of the WorldPop raster. NOTE: this does NOT match "
+                          "branch_population.json, whose shipped values are a district-population "
+                          "AREA-WEIGHT estimate (build_branch_population.py's rasterio path was "
+                          "unavailable and fell back); pop10 is the genuine raster count that the "
+                          "area-weight figure only approximates." % (RADIUS_M / 1000.0),
             "rivals": "MEASURED — platform/data/competitors_census.json .items (%d usable points; "
                       "%d skipped for missing coords). Official store-locator networks for "
                       "Muangthai/Srisawad/Tidlor (measured-complete); Heng is a Google∪Overture "

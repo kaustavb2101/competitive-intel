@@ -3,7 +3,7 @@
     "generated_by": "build_fuel_prices.py",
     "source": "Bangchak retail oil-price API (www.bangchak.co.th/api/oilprice) — daily Bangkok reference prices; free, no key, cloud-reachable (EPPO/PTT/data.go.th are geoblocked).",
     "label": "MEASURED — live Thai retail fuel prices (฿/litre, Bangkok reference)",
-    "pulled": "2026-07-29",
+    "pulled": "2026-08-05",
     "unit": "THB/litre",
     "n_fuels": 8,
     "provenance": "Verbatim projection of source-data/fuel_prices.json (pipeline/pull_fuel_prices.py, refreshed daily by .github/workflows/data-fuel-prices.yml). No recomputation — every price carried through unchanged.",
@@ -14,7 +14,7 @@
     "diesel": 36.69,
     "diesel_name": "Hi Diesel S",
     "diesel_delta_tomorrow": 0.0,
-    "gasohol95": 36.69,
+    "gasohol95": 35.99,
     "gasohol95_name": "Gasohol 95 S EVO",
     "gasohol95_delta_tomorrow": 0.0
   },
@@ -25,23 +25,23 @@
       "delta_tomorrow": 0.0
     },
     "Gasohol 91 S EVO": {
-      "today": 36.32,
-      "tomorrow": 36.32,
+      "today": 35.62,
+      "tomorrow": 35.62,
       "delta_tomorrow": 0.0
     },
     "Gasohol 95 S EVO": {
-      "today": 36.69,
-      "tomorrow": 36.69,
+      "today": 35.99,
+      "tomorrow": 35.99,
       "delta_tomorrow": 0.0
     },
     "Gasohol E20 S EVO": {
-      "today": 31.69,
-      "tomorrow": 31.69,
+      "today": 30.99,
+      "tomorrow": 30.99,
       "delta_tomorrow": 0.0
     },
     "Gasohol E85 S EVO": {
-      "today": 27.63,
-      "tomorrow": 27.63,
+      "today": 26.93,
+      "tomorrow": 26.93,
       "delta_tomorrow": 0.0
     },
     "Hi Diesel S": {

@@ -14,6 +14,18 @@ youth), and the agri-vs-factory hours gap (underemployment context).
 
 Deterministic over the committed JSON; --check byte-exact; exits 3 (SKIP) when source absent.
 
+FRESHER OVERRIDE (owner escalation 2026-08-02: "AGRI JOBS 28.3% = 2025" and "SELF-EMPLOYED 50.4% =
+2025" were called out as stale — ILOSTAT mirrors NSO's LFS only ANNUALLY, while NSO's own LFS is
+QUARTERLY). When source-data/nso_lfs_status.json is present (pipeline/pull_nso_lfs_status.py — NSO's
+own quarterly region x industry / region x work-status cross-tabs, summed to national), its latest
+quarter OVERRIDES the self_employment block and the Agriculture row of employment.sectors with the
+SAME concepts (own-account + contributing-family + employers for self-employment; agriculture share
+of total employment for the sector row — see pull_nso_lfs_status.py's docstring for the exact
+ICSE-93-class mapping), just a fresher, quarterly cut. informality is NOT touched: NSO's own annual
+Informal Employment Survey (the primary source ILOSTAT's informality mirror is itself derived from)
+currently tops out at survey year 2566 (2023, published May 2024) — OLDER than the 2024-vintage
+ILOSTAT figure already shown, so there is nothing fresher to fold in there yet.
+
   python3 build_labour_context.py
   python3 build_labour_context.py --check
 """
@@ -21,6 +33,7 @@ import argparse, json, os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "source-data", "ilostat_labour.json")
+SRC_NSO = os.path.join(ROOT, "source-data", "nso_lfs_status.json")
 OUT = os.path.join(ROOT, "platform", "data", "labour_context.json")
 
 SECTORS = {  # ILO aggregate -> plain label (segment-relevant order)
@@ -44,6 +57,61 @@ def _at(series, classif, time):
         if r.get("classif1") == classif and str(r.get("time")) == str(time):
             return r.get("obs_value")
     return None
+
+
+def _nso_quarter_label(snapshot):
+    """{'year_be': '2569', 'quarter': 'ไตรมาส 1'} -> '2026-Q1' (bare ISO-ish period the chip-strip's
+    MACRO_PERIOD regex on the live page can read directly)."""
+    y_ad = int(snapshot["year_be"]) - 543
+    q_num = snapshot["quarter"].replace("ไตรมาส", "").strip()
+    return "%04d-Q%s" % (y_ad, q_num)
+
+
+def _apply_nso_override(self_emp, sectors):
+    """Mutates self_emp (in place) and the Agriculture entry of sectors (in place) with NSO's own
+    latest quarterly cut, when source-data/nso_lfs_status.json is present. Returns a short note for
+    meta describing what happened (or why not), never silently."""
+    if not os.path.exists(SRC_NSO):
+        return ("source-data/nso_lfs_status.json absent — self_employment and the Agriculture "
+                "sector row remain the ILOSTAT annual figures (run pipeline/pull_nso_lfs_status.py "
+                "to fold in NSO's own quarterly cut).")
+    nso = json.load(open(SRC_NSO, encoding="utf-8"))
+    latest = nso.get("latest")
+    if not latest:
+        return "source-data/nso_lfs_status.json has no 'latest' quarter — override skipped."
+    as_of = _nso_quarter_label(latest)
+    trend = (nso.get("trend") or {}).get("vs_year_ago_quarter") or {}
+
+    if self_emp is not None:
+        comp = latest["self_employed"]["components_thousand"]
+        own = comp.get("ทำงานส่วนตัว")
+        fam = comp.get("ช่วยธุรกิจครอบครัว")
+        emprs = comp.get("นายจ้าง")
+        wsb = latest.get("work_status_breakdown_thousand") or {}
+        employees = (wsb.get("ลูกจ้างเอกชน") or 0) + (wsb.get("ลูกจ้างรัฐบาล") or 0)
+        self_emp["as_of"] = as_of
+        self_emp["self_employed_thousands"] = latest["self_employed"]["employed_thousand"]
+        self_emp["self_employed_pct"] = latest["self_employed"]["share_pct"]
+        self_emp["own_account_thousands"] = own
+        self_emp["contributing_family_thousands"] = fam
+        self_emp["employers_thousands"] = emprs
+        self_emp["employees_thousands"] = round(employees, 2) if employees else None
+        self_emp["note"] = ("self-employed = own-account + contributing-family + employers — no "
+                            "payslip-issuing employer, the exact vehicle-title borrower profile. "
+                            "NSO LFS quarterly (national, summed over 7 regions x 2 sexes) — "
+                            "supersedes the ILOSTAT annual mirror of this same indicator.")
+
+    for s in sectors:
+        if s["sector"] != "Agriculture":
+            continue
+        s["employed_thousands"] = latest["agriculture"]["employed_thousand"]
+        s["share_pct"] = latest["agriculture"]["share_pct"]
+        s["yoy_change_thousands"] = trend.get("agri_employed_delta_thousand")
+        s["as_of"] = as_of
+
+    return ("OVERRODE self_employment and the Agriculture sector row with NSO LFS quarterly %s "
+            "(source-data/nso_lfs_status.json, pipeline/pull_nso_lfs_status.py) — fresher than "
+            "the ILOSTAT annual mirror both were carrying." % as_of)
 
 
 def build():
@@ -96,15 +164,21 @@ def build():
     une_tot_t, une_tot = _latest(une, "AGE_10YRBANDS_YGE15")
     _, une_youth = _latest(une, "AGE_10YRBANDS_Y15-24")
 
+    nso_note = _apply_nso_override(self_emp, sectors)
+
     return {
         "meta": {
             "title": "National labour context — the informal-borrower base (measured)",
             "generated_by": "pipeline/build_labour_context.py",
-            "label": "MEASURED — ILOSTAT mirror of Thailand's official NSO LFS submissions. "
-                     "NATIONAL level only (the geoblock verdict: no cloud path to per-province "
-                     "LFS; vendored SES 2566 remains the per-province source).",
+            "label": "MEASURED — ILOSTAT mirror of Thailand's official NSO LFS submissions "
+                     "(informality, unemployment, other sectors), OVERLAID with NSO's own "
+                     "quarterly LFS cross-tabs for self-employment and the agriculture sector "
+                     "where source-data/nso_lfs_status.json is present (see nso_source note on "
+                     "those two entries). NATIONAL level only (the geoblock verdict: no cloud "
+                     "path to per-province LFS; vendored SES 2566 remains the per-province source).",
             "source": "source-data/ilostat_labour.json (pull_ilostat_labour.py, pulled %s)"
                       % src.get("meta", {}).get("pulled", "?"),
+            "nso_override": nso_note,
             "why": "Informal workers lack payslips — that is the title-loan borrower base. "
                    "Informality + sector employment set the demand backdrop for every segment "
                    "score on this platform.",

@@ -420,13 +420,19 @@ def main():
         if not os.path.exists(OUT):
             print("build_crop_farmer_income.py --check: SKIP (output not generated yet)")
             sys.exit(3)
-        if open(OUT, encoding="utf-8").read() != text:
+        # newline="" on the read too, so this compares what is ACTUALLY in the file rather than a
+        # universal-newline translation of it. git normalises to LF on commit so the committed blob
+        # was never wrong; the damage is local — build_provenance.py records os.path.getsize(), so
+        # running it on a Windows working copy censuses inflated CRLF sizes and writes a provenance
+        # file that fails --check on CI. See the same note in build_crop_stress.py.
+        if open(OUT, encoding="utf-8", newline="").read() != text:
             sys.exit("build_crop_farmer_income.py --check: crop_farmer_income.json drifted — run "
                      "python3 pipeline/build_crop_farmer_income.py")
         print("build_crop_farmer_income.py --check: OK (byte-exact)")
         return
 
-    with open(OUT, "w", encoding="utf-8") as f:
+    # newline="" keeps the file LF on every platform — see the --check comment above.
+    with open(OUT, "w", encoding="utf-8", newline="") as f:
         f.write(text)
     data = json.loads(text)
     print("wrote %s (%d crops, path=%s)" % (OUT, len(data["crops"]), path))

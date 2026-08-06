@@ -87,9 +87,13 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          echo "SFI aggregates CHANGED — regenerating sfi_credit.json + provenance.json."
+          echo "SFI aggregates CHANGED — regenerating sfi_credit.json + re-deriving the fan-out."
+          # sfi_credit is the layer this job owns, so it is built explicitly; everything downstream
+          # is discovered rather than named (macro_book rolls sfi_credit up, which the hand-named
+          # tail below never accounted for). rederive_drift.py iterates the gate's OWN --check set.
           python pipeline/build_sfi_credit.py
-          python pipeline/build_provenance.py
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
           # sanity: the builder's own byte-exact check must pass against the freshly built output
           python pipeline/build_sfi_credit.py --check
           echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -102,8 +106,9 @@ jobs:
           DATA_BRANCH: data/sfi-${{ github.run_id }}
         run: |
           set -euo pipefail
-          git add source-data/fpo_sfi_npl.csv source-data/fpo_sfi_credit.csv \
-                  platform/data/sfi_credit.json platform/data/provenance.json
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list to go stale, and never adds an untracked generated layer.
+          git add -u source-data platform/data
           if git diff --cached --quiet; then
             echo "No net change vs committed layers. No PR opened."
             exit 0

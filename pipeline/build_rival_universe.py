@@ -31,7 +31,12 @@ IN_UNI = os.path.join(ROOT, "source-data", "rival_universe.json")
 IN_REV = os.path.join(ROOT, "source-data", "app_reviews.json")
 OUT = os.path.join(ROOT, "platform", "data", "rival_universe.json")
 
-TIER_ORDER = {"us": 0, "nonbank": 1, "bank": 2}
+# 'broker' sorts last and is COUNTED SEPARATELY on purpose: an online origination platform with no
+# branches is not local competitive pressure, so folding it into the tracked-operator count would
+# overstate the field around our footprint. It is listed rather than omitted because an absent
+# operator invites the same "is X a rival?" question again (this tier exists because of exactly one:
+# WSOL/CarFinn, née SABUY). Any tier not named here sorts to 9 — keep new tiers explicit.
+TIER_ORDER = {"us": 0, "nonbank": 1, "bank": 2, "broker": 3}
 
 
 def build():
@@ -52,6 +57,7 @@ def build():
 
     n_nonbank = sum(1 for o in ops if o["tier"] == "nonbank")
     n_bank = sum(1 for o in ops if o["tier"] == "bank")
+    n_broker = sum(1 for o in ops if o["tier"] == "broker")
     return {
         "meta": {
             "title": doc["meta"]["title"],
@@ -65,7 +71,11 @@ def build():
         "headline": ("%d operators tracked beyond our own network: %d branch-led non-banks and %d "
                      "bank-backed entrants — the bank tier competes through ~2,000 bank branches "
                      "and apps, not storefronts, so it pressures margins before it shows up on a map."
-                     % (n_nonbank + n_bank, n_nonbank, n_bank)),
+                     % (n_nonbank + n_bank, n_nonbank, n_bank)
+                     + ("" if not n_broker else
+                        " A further %d online broker%s is listed but NOT counted here: it originates "
+                        "through a website and runs no branches, so it is not local pressure on the "
+                        "footprint." % (n_broker, "" if n_broker == 1 else "s"))),
         "operators": ops,
     }
 

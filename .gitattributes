@@ -35,3 +35,9 @@
 *.woff      binary
 *.woff2     binary
 *.ttf       binary
+
+# Vendored third-party bundles (platform/vendor/) are byte-for-byte copies of the published
+# npm/CDN files, and their SHA256 is recorded in platform/vendor/README.md so anyone can re-verify
+# them against unpkg or jsdelivr. Line-ending normalisation would silently change those bytes and
+# break that check, so this tree is exempt from every rule above.
+platform/vendor/** -text

@@ -20,6 +20,9 @@ Network puller (live telemetry snapshot) — NOT in the determinism gate.
 """
 import argparse, json, os, sys, time, urllib.request
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lib.regionmap import REGION
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "platform", "data", "thaiwater_rain.json")   # served directly to the frontend
 URL = "https://api-v3.thaiwater.net/api/v1/thaiwater30/public/rain_24h"
@@ -46,12 +49,19 @@ def main():
     if len(rows) < 1000:
         sys.exit("pull_thaiwater_rain.py: only %d stations — likely truncated; not writing." % len(rows))
     prov = {}
+    foreign = {}
     latest_dt = ""
     for r in rows:
         g = r.get("geocode") or {}
         p = ((g.get("province_name") or {}).get("th") or "").strip()
         mm = r.get("rain_24h")
         if not p or not isinstance(mm, (int, float)):
+            continue
+        # Same cross-border gauges as the flood pull — see pull_thaiwater_flood.py. On this layer it
+        # was worse than a miscount: Myanmar rendered SECOND on the Overview's 24h-rainfall table,
+        # above every Thai province but Chiang Mai.
+        if p not in REGION:
+            foreign[p] = foreign.get(p, 0) + 1
             continue
         latest_dt = max(latest_dt, r.get("rainfall_datetime") or "")
         prov.setdefault(p, []).append(float(mm))
@@ -77,6 +87,8 @@ def main():
             "observed_to": latest_dt,
             "n_stations": sum(v["n_stations"] for v in out.values()),
             "n_provinces": len(out),
+            # Stations the feed geocoded outside Thailand, kept visible so the drop is auditable.
+            "foreign_dropped": {k: foreign[k] for k in sorted(foreign)},
         },
         "provinces": {k: out[k] for k in sorted(out)},
     }

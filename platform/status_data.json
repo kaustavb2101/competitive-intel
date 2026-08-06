@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-30T16:24:49+00:00",
-    "commit": "6cf579e"
+    "generated_at": "2026-08-06T16:38:51+00:00",
+    "commit": "810df37"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-07-30",
+    "eta_date": "2026-08-06",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -78,7 +78,7 @@
           "title": "Real loan-tape export → measured portfolio risk",
           "state": "done",
           "priority": 1,
-          "evidence": "platform/data/tape_real.json present — MEASURED real AutoX loan-tape aggregates (382,735 no-PII accounts, built by pipeline/build_tape_layers.py from the owner's loan-level export); the SYNTHETIC bridge (loan_tape_derived.json) is superseded",
+          "evidence": "platform/data/tape_real.json present — MEASURED real AutoX loan-tape aggregates (382,735 no-PII accounts, built by pipeline/build_tape_layers.py from the owner's loan-level export)",
           "owner_side": false
         },
         {
@@ -532,184 +532,184 @@
   ],
   "activity": [
     {
-      "date": "2026-07-30T16:24:49+00:00",
-      "sha": "6cf579e",
-      "summary": "health(deploy): live site-health probe now guards pico_district.json",
+      "date": "2026-08-06T16:38:51+00:00",
+      "sha": "810df37",
+      "summary": "health(deploy): live-only data-freshness guard on the daily-CI price/weather layers",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-06T22:21:25+07:00",
+      "sha": "bcb08a0",
+      "summary": "fix(ci): data pulls re-derive their fan-out by measuring drift, not by keeping a list (#304)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-06T14:24:25+00:00",
+      "sha": "08e5a79",
+      "summary": "docs(progress): log live.html gstatic-preconnect UX fix merge+deploy+verify (PR #303)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-06T21:20:02+07:00",
+      "sha": "d545755",
+      "summary": "ux: add fonts.gstatic.com preconnect on live.html (#303)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-06T10:32:29+00:00",
+      "sha": "db39e97",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the probe-gate self-test ship",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-30T14:39:48+00:00",
-      "sha": "47a647f",
-      "summary": "docs: log ux decision-queue Overview→Macro label fix — merge+deploy+verify (#216)",
+      "date": "2026-08-06T10:30:13+00:00",
+      "sha": "245b7e4",
+      "summary": "test(gate): bring the ~40 deploy probe validators under the determinism gate",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-06T08:44:39+00:00",
+      "sha": "e583254",
+      "summary": "docs(progress): log Explore ▾ mobile-dropdown fix merge+deploy+verify (PR #301)",
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-30T21:34:32+07:00",
-      "sha": "1ba76d5",
-      "summary": "ux: align decision-queue \"Overview →\" label to five-pillar nav (Macro) (#216)",
+      "date": "2026-08-06T15:41:43+07:00",
+      "sha": "029fcb2",
+      "summary": "ux: fix Explore ▾ nav dropdown dragged off-screen on mobile (live/data/status) (#301)",
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-30T20:46:21+07:00",
-      "sha": "da42353",
-      "summary": "feat(acq): go-live district leaderboard on Competition — top-6 อำเภอ where PICO rivals most recently went live (#215)",
+      "date": "2026-08-06T04:19:58+00:00",
+      "sha": "46fe02f",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer_npl site-health probe ship",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-06T04:18:55+00:00",
+      "sha": "d643483",
+      "summary": "health(deploy): site-health probe guards peer_npl.json (last unprobed obj-#2 PEER read on #acq)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-06T03:55:56+00:00",
+      "sha": "b790ae6",
+      "summary": "health(deploy): site-health probe guards pico_competitors.json (last unprobed obj-#2 PICO read on #acq)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-30T20:46:01+07:00",
-      "sha": "61266c8",
-      "summary": "data: live fuel prices (2026-07-29, run 30500267885) (#210)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-30T20:44:54+07:00",
-      "sha": "bdaad00",
-      "summary": "data: ThaiWater flood + rain pulse (2026-07-29, run 30495536913) (#209)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-30T20:44:10+07:00",
-      "sha": "93de7b2",
-      "summary": "data: NABC live prices (2026-07-29, run 30491512321) (#208)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-30T10:22:02+00:00",
-      "sha": "b6b3fdf",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the board_vintage provenance-sync ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-30T10:21:28+00:00",
-      "sha": "bcce9f8",
-      "summary": "service(provenance): surface scenarios.json's MEASURED board_vintage in the Data-room card",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-30T15:21:03+07:00",
-      "sha": "72481a8",
-      "summary": "feat(acq): district-grain operating momentum (go-live date) in pico_district (#213)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-30T08:20:49+00:00",
-      "sha": "198d743",
-      "summary": "docs: log ux-provenance-prose-nav-vocab merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-30T15:15:35+07:00",
-      "sha": "5996118",
-      "summary": "ux: align products provenance prose to five-pillar nav label (Overview→Macro) (#214)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-30T04:49:08+00:00",
-      "sha": "b79c38c",
-      "summary": "docs: log ux-cc-jumplink-nav-vocab-drift merge+deploy+verify (follow-up)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-30T11:45:43+07:00",
-      "sha": "8b1180e",
-      "summary": "ux: align command-center jump-links to five-pillar nav labels (#211)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-30T04:40:06+00:00",
-      "sha": "c2388ef",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the gate-repair hotfix",
+      "date": "2026-08-06T03:34:31+00:00",
+      "sha": "9ebb278",
+      "summary": "docs(progress): log branch-explorer IBM Plex fonts merge+deploy+verify (PR #299)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-30T04:35:46+00:00",
-      "sha": "d75ad4b",
-      "summary": "fix(gate): restore RED master determinism gate to green — realign 3 derived layers PR #207 desynced",
-      "pillar": "deployment"
+      "date": "2026-08-06T10:31:23+07:00",
+      "sha": "baaf329",
+      "summary": "ux: load IBM Plex fonts on branch-explorer.html (#299)",
+      "pillar": "uxui"
     },
     {
-      "date": "2026-07-29T20:38:58+07:00",
-      "sha": "bbf3acb",
-      "summary": "Researching repository structure and navigation patterns (#207)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-29T10:21:05+07:00",
-      "sha": "4891f3d",
-      "summary": "data: ThaiWater flood + rain pulse (2026-07-27, run 30310940436) (#194)",
+      "date": "2026-08-05T23:39:39+00:00",
+      "sha": "70f6d60",
+      "summary": "data: live fuel prices (2026-08-05, run 31056969163)",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-29T10:20:09+07:00",
-      "sha": "aace6e8",
-      "summary": "feat(acq): MEASURED PICO operating-momentum lens (commencement/go-live date) on Competition (#204)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-29T10:19:22+07:00",
-      "sha": "c8c6088",
-      "summary": "data: NABC live prices (2026-07-27, run 30307178352) (#191)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-29T10:18:38+07:00",
-      "sha": "1c49aa1",
-      "summary": "feat(obj#1): widen the measured crop-stress model to cassava + maize (DOAE area × NABC farm-gate) (#188)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-29T10:17:54+07:00",
-      "sha": "c2990b4",
-      "summary": "data: NABC live prices (2026-07-28, run 30401112150) (#205)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-29T10:17:26+07:00",
-      "sha": "23c0af8",
-      "summary": "data: ThaiWater flood + rain pulse (2026-07-28, run 30404660084) (#206)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-29T09:38:38+07:00",
-      "sha": "0e1b1d0",
-      "summary": "assist: occupation income impact + geography x occupation drill + watchlist branch drill (#203)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-29T07:34:30+07:00",
-      "sha": "3d1284b",
-      "summary": "data: macro indicators (2026-07-27, run 30311014810) (#193)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-28T23:40:43+00:00",
-      "sha": "a74e695",
-      "summary": "data: live fuel prices (2026-07-28, run 30408596394)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-28T16:32:40+00:00",
-      "sha": "00ad711",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the SERVICE_AUDIT §4 / R2-weight ship",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-28T16:31:43+00:00",
-      "sha": "42a5c7a",
-      "summary": "docs(service): correct SERVICE_AUDIT §4 (deploy-weight 10x understated) + flag half-done R2 catchment migration (~2.2GB R2-duplicated in git)",
+      "date": "2026-08-05T10:57:42+00:00",
+      "sha": "64f5430",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the measured-catchment-pop ship",
       "pillar": "3d-enrichment"
     },
     {
-      "date": "2026-07-28T14:26:12+00:00",
-      "sha": "5a7344f",
-      "summary": "docs: log ux-skiplink-print-leak merge + deploy-verify (PR #202)",
+      "date": "2026-08-05T17:56:31+07:00",
+      "sha": "1b82e2f",
+      "summary": "market(3d): headline the MEASURED WorldPop catchment population, not the area-weight estimate (#295)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-05T08:30:30+00:00",
+      "sha": "f692def",
+      "summary": "docs(progress): log ux-impact-ladder-bar-aria merge+deploy+verify (PR #294)",
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-28T21:22:51+07:00",
-      "sha": "8f20c23",
-      "summary": "ux: hide skip-link in print — stops it leaking into the PDF brief (#202)",
+      "date": "2026-08-05T15:25:44+07:00",
+      "sha": "8076c0b",
+      "summary": "ux: aria-label the impact-card delinquency ladder bar (a11y) (#294)",
       "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-05T06:35:22+00:00",
+      "sha": "dc3fec5",
+      "summary": "test(gate): cover build_baac_credit.py — the one deterministic builder missing from the determinism gate",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-05T04:26:46+00:00",
+      "sha": "7706efb",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer_scoreboard site-health probe ship",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-05T04:23:39+00:00",
+      "sha": "df5a691",
+      "summary": "health(deploy): site-health probe guards peer_scoreboard.json (last unprobed obj-#2 peer read on #acq)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-05T02:43:00+00:00",
+      "sha": "d07293d",
+      "summary": "docs(progress): log ux-font-preconnect-gstatic merge+deploy+verify (PR #293)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-05T09:38:17+07:00",
+      "sha": "ddb0fc1",
+      "summary": "ux: preconnect fonts.gstatic.com so text paints without a handshake waterfall (#293)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-05T09:33:52+07:00",
+      "sha": "afc941d",
+      "summary": "chore(deck): rebuild EN + TH against the refreshed NABC and ThaiWater data (#292)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-05T09:09:42+07:00",
+      "sha": "ac8ba4b",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-04, run 30956707171) (#291)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-05T08:44:57+07:00",
+      "sha": "569d388",
+      "summary": "data: NABC live prices (2026-08-04, run 30953139408) (#290)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-05T00:38:22+00:00",
+      "sha": "9b8d310",
+      "summary": "test(gate): de-opaque the 19-builder run.sh loop — accurate per-source FAIL messages + grep-visibility",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-05T07:36:06+07:00",
+      "sha": "a4c0de2",
+      "summary": "MCOM deck rework + nameplate history + honest column names (#287)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-04T23:43:50+00:00",
+      "sha": "d991344",
+      "summary": "data: live fuel prices (2026-08-04, run 30960786178)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-04T22:28:32+00:00",
+      "sha": "ec962e6",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after rival_reputation site-health probe ship",
+      "pillar": "market"
     }
   ]
 }

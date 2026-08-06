@@ -10,24 +10,28 @@
     "what_this_is": "A DIRECTIONAL, comparative read on whether title-loan collateral RECOVERY value is firming or softening per province. It is an ESTIMATE built from the signals below — it is NOT a measured loss-given-default or recovery rate, and no price is invented. Use it to triage which provinces' collateral base is trending the wrong way, not as a settlement value.",
     "fields": {
       "gold_yoy": "MEASURED / GLOBAL PROXY — Gold YoY %% from the commodity board (World Bank Pink Sheet GLOBAL gold). Applied NATIONALLY (one global price). A DIRECTION proxy for Thai gold-pawn collateral value, not a Thai gold-shop quote.",
+      "used_veh_yoy": "MEASURED — BoT UVPI used-vehicle price index (2015=100), trailing YoY of the car and truck(=รถกระบะ pickup) series, equal-weight mean. NATIONAL (one national index, same for all provinces). The ACTUAL resale-price direction of the car/pickup title collateral — negative = falling resale value = softening vehicle-title recovery. Does NOT cover motorcycles.",
       "moto_title_share": "MEASURED — motorcycle share of the province DLT registered-vehicle fleet (moto / total), from vehicles_by_province.json. Proxy for how moto-title-heavy the pledgeable collateral base is. null when absent.",
       "collateral_score": "ESTIMATED — province mean of the per-branch collateral segment score 'c' (derive.py segment scoring). Tells you how collateral-reliant the AutoX book is in that province. null when no branch carries it.",
-      "outlook": "ESTIMATED — directional index in ~[-1,+1]. POSITIVE = recovery value firming (gold tailwind dominates), NEGATIVE = softening (moto-title depreciation drag dominates). See meta.formula. NOT a recovery rate."
+      "outlook": "ESTIMATED — directional index in ~[-1,+1]. POSITIVE = recovery value firming, NEGATIVE = softening. A composite of a MEASURED gold direction, a MEASURED used-car/pickup resale-price direction (BoT UVPI), and a structural motorcycle-exposure proxy, combined with the documented weights below. The composite is ESTIMATED; its price legs are measured. NOT a recovery rate."
     },
     "formula": {
       "gold_term": "clamp(gold_yoy / 60, -1, 1)",
+      "veh_price_term": "clamp(used_veh_yoy / 15, -1, 1)",
       "moto_term": "clamp((moto_title_share - 0.5) / 0.3, -1, 1)",
-      "outlook": "round(0.6*gold_term - 0.4*moto_term, 4)",
-      "rationale": "Gold firming lifts pawn/gold-collateral recovery (tailwind, +). A province skewed to motorcycle titles carries more used-vehicle depreciation risk, the highest-loss title collateral (drag, -). collateral_score is shown alongside (not multiplied in) so the outlook stays comparable across provinces while the reader can see actual collateral exposure."
+      "outlook": "round(0.6*gold_term + 0.25*veh_price_term - 0.15*moto_term, 4)",
+      "rationale": "Gold firming lifts pawn/gold-collateral recovery (tailwind, +). Used car/pickup resale prices set the MEASURED direction of vehicle-title recovery value (BoT UVPI; falling prices = drag, -). A province skewed to motorcycle titles carries extra depreciation risk on the slice UVPI cannot price (structural drag, -). The gold:vehicle weight balance is held at the prior 60:40; within the 40, the measured price direction (W_VEH=0.25) leads and the unmeasured moto proxy (W_MOTO=0.15) is demoted from 0.4. collateral_score is shown alongside (not multiplied in) so the outlook stays comparable across provinces while the reader can see actual exposure."
     },
     "provenance": {
       "commodity_board.json": "World Bank Pink Sheet GLOBAL Gold price, YoY %% — MEASURED/GLOBAL, a DIRECTION proxy for Thai gold-pawn collateral, not farm/shop-gate.",
+      "used_vehicle_value.json": "BoT UVPI used-vehicle price index (2015=100), car + truck(=รถกระบะ pickup) series — MEASURED / NATIONAL. Trailing YoY = the actual resale-price direction of car/pickup title collateral. Anchored on the newest period in the data.",
       "vehicles_by_province.json": "DLT registered-vehicle stock by province (data.go.th) — MEASURED. moto/total = motorcycle share of the fleet.",
       "branches.json": "per-branch collateral segment score 'c' (DERIVED by derive.py) — ESTIMATED segment scoring, aggregated to a province mean."
     },
     "caveats": [
       "outlook is an ESTIMATED direction, not a recovery rate or loss-given-default. Do not read it as a settlement value.",
       "gold_yoy is a GLOBAL board move applied to every province — it is not a province-level gold-shop price and it shifts every province's outlook by the same national constant.",
+      "used_veh_yoy is the BoT UVPI NATIONAL used-vehicle price index — one national number applied to every province (like gold), not a province-level resale quote. It prices cars and pickups (its two constituent series) but NOT motorcycles, so the motorcycle slice keeps its structural moto_title_share proxy instead of a measured price.",
       "moto_title_share is the share of the ALL-VEHICLE fleet that is motorcycles, a proxy for the pledgeable collateral mix; it is not AutoX's actual pledged-collateral composition.",
       "collateral_score is an ESTIMATED segment score, shown for exposure context only; it is not multiplied into outlook, so a high-score province with a soft outlook is the worst combination to triage.",
       "Provinces missing a signal carry null for that field and say so in outlook_note; the outlook still computes from the signals that were present."
@@ -35,26 +39,33 @@
   },
   "national": {
     "gold_yoy": 26.1,
+    "used_veh_yoy_car": -8.33,
+    "used_veh_yoy_pickup": -0.37,
+    "used_veh_yoy_blended": -4.35,
+    "used_veh_price_period": "2026-05",
+    "veh_price_term": -0.29,
     "n_provinces": 77,
     "n_with_moto_share": 77,
     "n_with_collateral_score": 77,
-    "n_softening": 6,
-    "n_firming": 71,
-    "exposure_weighted_outlook": 0.136,
+    "n_softening": 0,
+    "n_firming": 77,
+    "exposure_weighted_outlook": 0.1416,
     "most_at_risk_province": "สมุทรสาคร",
-    "headline": "Gold +26.1% YoY (global proxy) is the dominant collateral tailwind. Exposure-weighted national collateral outlook is firming (0.136); 6 of 77 provinces are softening on used-motorcycle-title depreciation."
+    "headline": "Gold +26.1% YoY (global proxy) is the dominant collateral tailwind; used car/pickup resale prices -4.3% YoY to 2026-05 (BoT UVPI, measured) pull the vehicle side the other way. Exposure-weighted national collateral outlook is firming (0.142); 0 of 77 provinces are softening."
   },
   "provinces": [
     {
       "province": "สมุทรสาคร",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.9046,
       "collateral_score": 72.1,
-      "outlook": -0.139,
-      "outlook_note": "Collateral recovery value softening. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 90% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 72 (estimated) sets the book's exposure here.",
+      "outlook": 0.0385,
+      "outlook_note": "Collateral recovery value broadly flat. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 90% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 72 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 1.0,
         "n_branches": 13
       }
@@ -63,12 +74,14 @@
       "province": "แม่ฮ่องสอน",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.8199,
       "collateral_score": 66.0,
-      "outlook": -0.139,
-      "outlook_note": "Collateral recovery value softening. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 82% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 66 (estimated) sets the book's exposure here.",
+      "outlook": 0.0385,
+      "outlook_note": "Collateral recovery value broadly flat. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 82% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 66 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 1.0,
         "n_branches": 4
       }
@@ -77,12 +90,14 @@
       "province": "นราธิวาส",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.7972,
       "collateral_score": 53.7,
-      "outlook": -0.1353,
-      "outlook_note": "Collateral recovery value softening. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 80% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 54 (estimated) sets the book's exposure here.",
+      "outlook": 0.0399,
+      "outlook_note": "Collateral recovery value broadly flat. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 80% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 54 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.9907,
         "n_branches": 11
       }
@@ -91,12 +106,14 @@
       "province": "ปัตตานี",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.7347,
       "collateral_score": 51.9,
-      "outlook": -0.0519,
-      "outlook_note": "Collateral recovery value softening. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 73% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 52 (estimated) sets the book's exposure here.",
+      "outlook": 0.0711,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 73% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 52 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.7823,
         "n_branches": 11
       }
@@ -105,12 +122,14 @@
       "province": "ยะลา",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.7186,
       "collateral_score": 54.6,
-      "outlook": -0.0305,
-      "outlook_note": "Collateral recovery value broadly flat. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 72% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 55 (estimated) sets the book's exposure here.",
+      "outlook": 0.0792,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 72% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 55 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.7287,
         "n_branches": 8
       }
@@ -119,12 +138,14 @@
       "province": "สตูล",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.7072,
       "collateral_score": 53.7,
-      "outlook": -0.0153,
-      "outlook_note": "Collateral recovery value broadly flat. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 71% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 54 (estimated) sets the book's exposure here.",
+      "outlook": 0.0849,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 71% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 54 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.6907,
         "n_branches": 9
       }
@@ -133,12 +154,14 @@
       "province": "พังงา",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.681,
       "collateral_score": 57.8,
-      "outlook": 0.0197,
-      "outlook_note": "Collateral recovery value broadly flat. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 68% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
+      "outlook": 0.098,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 68% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.6033,
         "n_branches": 13
       }
@@ -147,12 +170,14 @@
       "province": "ระนอง",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6728,
       "collateral_score": 57.5,
-      "outlook": 0.0306,
-      "outlook_note": "Collateral recovery value broadly flat. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 67% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
+      "outlook": 0.1021,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 67% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.576,
         "n_branches": 4
       }
@@ -161,12 +186,14 @@
       "province": "ตราด",
       "region": "East",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6572,
       "collateral_score": 57.5,
-      "outlook": 0.0514,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 66% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
+      "outlook": 0.1099,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 66% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.524,
         "n_branches": 13
       }
@@ -175,12 +202,14 @@
       "province": "พิจิตร",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6526,
       "collateral_score": 52.5,
-      "outlook": 0.0575,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 65% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 52 (estimated) sets the book's exposure here.",
+      "outlook": 0.1122,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 65% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 52 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.5087,
         "n_branches": 17
       }
@@ -189,12 +218,14 @@
       "province": "สกลนคร",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6524,
       "collateral_score": 52.5,
-      "outlook": 0.0578,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 65% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 52 (estimated) sets the book's exposure here.",
+      "outlook": 0.1123,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 65% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 52 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.508,
         "n_branches": 30
       }
@@ -203,12 +234,14 @@
       "province": "สุรินทร์",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.651,
       "collateral_score": 55.1,
-      "outlook": 0.0597,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 65% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 55 (estimated) sets the book's exposure here.",
+      "outlook": 0.113,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 65% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 55 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.5033,
         "n_branches": 30
       }
@@ -217,12 +250,14 @@
       "province": "บุรีรัมย์",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6507,
       "collateral_score": 56.8,
-      "outlook": 0.0601,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 65% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 57 (estimated) sets the book's exposure here.",
+      "outlook": 0.1132,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 65% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 57 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.5023,
         "n_branches": 53
       }
@@ -231,12 +266,14 @@
       "province": "ราชบุรี",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6442,
       "collateral_score": 61.4,
-      "outlook": 0.0687,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 64% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 61 (estimated) sets the book's exposure here.",
+      "outlook": 0.1164,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 64% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 61 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.4807,
         "n_branches": 27
       }
@@ -245,12 +282,14 @@
       "province": "มหาสารคาม",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6429,
       "collateral_score": 52.0,
-      "outlook": 0.0705,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 64% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 52 (estimated) sets the book's exposure here.",
+      "outlook": 0.117,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 64% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 52 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.4763,
         "n_branches": 32
       }
@@ -259,12 +298,14 @@
       "province": "พัทลุง",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6419,
       "collateral_score": 54.5,
-      "outlook": 0.0718,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 64% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 54 (estimated) sets the book's exposure here.",
+      "outlook": 0.1175,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 64% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 54 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.473,
         "n_branches": 13
       }
@@ -273,12 +314,14 @@
       "province": "ชลบุรี",
       "region": "East",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6404,
       "collateral_score": 70.3,
-      "outlook": 0.0738,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 64% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 70 (estimated) sets the book's exposure here.",
+      "outlook": 0.1183,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 64% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 70 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.468,
         "n_branches": 103
       }
@@ -287,12 +330,14 @@
       "province": "ตาก",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6352,
       "collateral_score": 61.0,
-      "outlook": 0.0807,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 64% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 61 (estimated) sets the book's exposure here.",
+      "outlook": 0.1209,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 64% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 61 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.4507,
         "n_branches": 9
       }
@@ -301,12 +346,14 @@
       "province": "ภูเก็ต",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6305,
       "collateral_score": 85.7,
-      "outlook": 0.087,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 63% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 86 (estimated) sets the book's exposure here.",
+      "outlook": 0.1233,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 63% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 86 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.435,
         "n_branches": 21
       }
@@ -315,12 +362,14 @@
       "province": "สมุทรสงคราม",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6292,
       "collateral_score": 66.2,
-      "outlook": 0.0887,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 63% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 66 (estimated) sets the book's exposure here.",
+      "outlook": 0.1239,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 63% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 66 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.4307,
         "n_branches": 5
       }
@@ -329,12 +378,14 @@
       "province": "ลำพูน",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6265,
       "collateral_score": 64.1,
-      "outlook": 0.0923,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 63% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
+      "outlook": 0.1253,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 63% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.4217,
         "n_branches": 14
       }
@@ -343,12 +394,14 @@
       "province": "ตรัง",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6263,
       "collateral_score": 56.3,
-      "outlook": 0.0926,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 63% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 56 (estimated) sets the book's exposure here.",
+      "outlook": 0.1254,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 63% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 56 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.421,
         "n_branches": 23
       }
@@ -357,12 +410,14 @@
       "province": "ประจวบคีรีขันธ์",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6256,
       "collateral_score": 62.3,
-      "outlook": 0.0935,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 63% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 62 (estimated) sets the book's exposure here.",
+      "outlook": 0.1257,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 63% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 62 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.4187,
         "n_branches": 33
       }
@@ -371,12 +426,14 @@
       "province": "สมุทรปราการ",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6187,
       "collateral_score": 83.6,
-      "outlook": 0.1027,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 62% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 84 (estimated) sets the book's exposure here.",
+      "outlook": 0.1291,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 62% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 84 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.3957,
         "n_branches": 40
       }
@@ -385,12 +442,14 @@
       "province": "สุโขทัย",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6185,
       "collateral_score": 63.7,
-      "outlook": 0.103,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 62% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
+      "outlook": 0.1292,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 62% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.395,
         "n_branches": 14
       }
@@ -399,12 +458,14 @@
       "province": "มุกดาหาร",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.612,
       "collateral_score": 57.1,
-      "outlook": 0.1117,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 61% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 57 (estimated) sets the book's exposure here.",
+      "outlook": 0.1325,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 61% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 57 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.3733,
         "n_branches": 9
       }
@@ -413,12 +474,14 @@
       "province": "แพร่",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6099,
       "collateral_score": 60.4,
-      "outlook": 0.1145,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 61% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 60 (estimated) sets the book's exposure here.",
+      "outlook": 0.1336,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 61% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 60 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.3663,
         "n_branches": 9
       }
@@ -427,12 +490,14 @@
       "province": "พะเยา",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6079,
       "collateral_score": 68.8,
-      "outlook": 0.1171,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 61% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 69 (estimated) sets the book's exposure here.",
+      "outlook": 0.1346,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 61% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 69 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.3597,
         "n_branches": 11
       }
@@ -441,12 +506,14 @@
       "province": "นครพนม",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6061,
       "collateral_score": 52.2,
-      "outlook": 0.1195,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 61% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 52 (estimated) sets the book's exposure here.",
+      "outlook": 0.1355,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 61% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 52 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.3537,
         "n_branches": 21
       }
@@ -455,12 +522,14 @@
       "province": "น่าน",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6054,
       "collateral_score": 65.6,
-      "outlook": 0.1205,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 61% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 66 (estimated) sets the book's exposure here.",
+      "outlook": 0.1358,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 61% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 66 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.3513,
         "n_branches": 7
       }
@@ -469,12 +538,14 @@
       "province": "บึงกาฬ",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6051,
       "collateral_score": 51.0,
-      "outlook": 0.1209,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 61% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 51 (estimated) sets the book's exposure here.",
+      "outlook": 0.136,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 61% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 51 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.3503,
         "n_branches": 15
       }
@@ -483,12 +554,14 @@
       "province": "ศรีสะเกษ",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6048,
       "collateral_score": 58.8,
-      "outlook": 0.1213,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 60% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 59 (estimated) sets the book's exposure here.",
+      "outlook": 0.1361,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 60% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 59 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.3493,
         "n_branches": 31
       }
@@ -497,12 +570,14 @@
       "province": "สิงห์บุรี",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.6034,
       "collateral_score": 60.6,
-      "outlook": 0.1231,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 60% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 61 (estimated) sets the book's exposure here.",
+      "outlook": 0.1368,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 60% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 61 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.3447,
         "n_branches": 8
       }
@@ -511,12 +586,14 @@
       "province": "นครปฐม",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5943,
       "collateral_score": 71.8,
-      "outlook": 0.1353,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 59% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 72 (estimated) sets the book's exposure here.",
+      "outlook": 0.1413,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 59% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 72 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.3143,
         "n_branches": 22
       }
@@ -525,12 +602,14 @@
       "province": "หนองคาย",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5941,
       "collateral_score": 57.9,
-      "outlook": 0.1355,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 59% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
+      "outlook": 0.1415,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 59% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.3137,
         "n_branches": 15
       }
@@ -539,12 +618,14 @@
       "province": "สุพรรณบุรี",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5939,
       "collateral_score": 59.5,
-      "outlook": 0.1358,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 59% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 60 (estimated) sets the book's exposure here.",
+      "outlook": 0.1416,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 59% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 60 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.313,
         "n_branches": 22
       }
@@ -553,12 +634,14 @@
       "province": "เพชรบุรี",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5932,
       "collateral_score": 57.6,
-      "outlook": 0.1367,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 59% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
+      "outlook": 0.1419,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 59% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.3107,
         "n_branches": 20
       }
@@ -567,12 +650,14 @@
       "province": "ปราจีนบุรี",
       "region": "East",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5899,
       "collateral_score": 54.9,
-      "outlook": 0.1411,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 59% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 55 (estimated) sets the book's exposure here.",
+      "outlook": 0.1436,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 59% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 55 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2997,
         "n_branches": 18
       }
@@ -581,12 +666,14 @@
       "province": "เชียงราย",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5859,
       "collateral_score": 73.5,
-      "outlook": 0.1465,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 59% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 74 (estimated) sets the book's exposure here.",
+      "outlook": 0.1456,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 59% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 74 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2863,
         "n_branches": 22
       }
@@ -595,12 +682,14 @@
       "province": "เพชรบูรณ์",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5842,
       "collateral_score": 55.3,
-      "outlook": 0.1487,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 55 (estimated) sets the book's exposure here.",
+      "outlook": 0.1464,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 55 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2807,
         "n_branches": 23
       }
@@ -609,12 +698,14 @@
       "province": "ร้อยเอ็ด",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5829,
       "collateral_score": 57.1,
-      "outlook": 0.1505,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 57 (estimated) sets the book's exposure here.",
+      "outlook": 0.1471,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 57 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2763,
         "n_branches": 39
       }
@@ -623,12 +714,14 @@
       "province": "นครนายก",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5826,
       "collateral_score": 51.0,
-      "outlook": 0.1509,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 51 (estimated) sets the book's exposure here.",
+      "outlook": 0.1472,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 51 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2753,
         "n_branches": 7
       }
@@ -637,12 +730,14 @@
       "province": "ระยอง",
       "region": "East",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5819,
       "collateral_score": 66.1,
-      "outlook": 0.1518,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 66 (estimated) sets the book's exposure here.",
+      "outlook": 0.1476,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 66 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.273,
         "n_branches": 59
       }
@@ -651,12 +746,14 @@
       "province": "อำนาจเจริญ",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5812,
       "collateral_score": 54.7,
-      "outlook": 0.1527,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 55 (estimated) sets the book's exposure here.",
+      "outlook": 0.1479,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 55 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2707,
         "n_branches": 14
       }
@@ -665,12 +762,14 @@
       "province": "กำแพงเพชร",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.58,
       "collateral_score": 59.7,
-      "outlook": 0.1543,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 60 (estimated) sets the book's exposure here.",
+      "outlook": 0.1485,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 60 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2667,
         "n_branches": 30
       }
@@ -679,12 +778,14 @@
       "province": "นครศรีธรรมราช",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.58,
       "collateral_score": 53.3,
-      "outlook": 0.1543,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 53 (estimated) sets the book's exposure here.",
+      "outlook": 0.1485,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 53 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2667,
         "n_branches": 42
       }
@@ -693,12 +794,14 @@
       "province": "ฉะเชิงเทรา",
       "region": "East",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.578,
       "collateral_score": 58.6,
-      "outlook": 0.157,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 59 (estimated) sets the book's exposure here.",
+      "outlook": 0.1495,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 59 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.26,
         "n_branches": 35
       }
@@ -707,12 +810,14 @@
       "province": "กาญจนบุรี",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5757,
       "collateral_score": 56.5,
-      "outlook": 0.1601,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 56 (estimated) sets the book's exposure here.",
+      "outlook": 0.1507,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 56 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2523,
         "n_branches": 32
       }
@@ -721,12 +826,14 @@
       "province": "นครสวรรค์",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5752,
       "collateral_score": 58.4,
-      "outlook": 0.1607,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
+      "outlook": 0.1509,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 58% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2507,
         "n_branches": 31
       }
@@ -735,12 +842,14 @@
       "province": "อุตรดิตถ์",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5739,
       "collateral_score": 64.1,
-      "outlook": 0.1625,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 57% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
+      "outlook": 0.1516,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 57% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2463,
         "n_branches": 9
       }
@@ -749,12 +858,14 @@
       "province": "อุทัยธานี",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5739,
       "collateral_score": 52.7,
-      "outlook": 0.1625,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 57% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 53 (estimated) sets the book's exposure here.",
+      "outlook": 0.1516,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 57% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 53 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2463,
         "n_branches": 18
       }
@@ -763,12 +874,14 @@
       "province": "ลำปาง",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5732,
       "collateral_score": 64.4,
-      "outlook": 0.1634,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 57% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
+      "outlook": 0.1519,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 57% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.244,
         "n_branches": 18
       }
@@ -777,12 +890,14 @@
       "province": "สระบุรี",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5731,
       "collateral_score": 56.9,
-      "outlook": 0.1635,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 57% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 57 (estimated) sets the book's exposure here.",
+      "outlook": 0.1519,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 57% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 57 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2437,
         "n_branches": 24
       }
@@ -791,12 +906,14 @@
       "province": "ยโสธร",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.568,
       "collateral_score": 55.8,
-      "outlook": 0.1703,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 57% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 56 (estimated) sets the book's exposure here.",
+      "outlook": 0.1545,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 57% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 56 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2267,
         "n_branches": 19
       }
@@ -805,12 +922,14 @@
       "province": "พระนครศรีอยุธยา",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5638,
       "collateral_score": 63.5,
-      "outlook": 0.1759,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 56% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
+      "outlook": 0.1566,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 56% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2127,
         "n_branches": 27
       }
@@ -819,12 +938,14 @@
       "province": "ชัยนาท",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5629,
       "collateral_score": 53.8,
-      "outlook": 0.1771,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 56% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 54 (estimated) sets the book's exposure here.",
+      "outlook": 0.1571,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 56% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 54 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.2097,
         "n_branches": 15
       }
@@ -833,12 +954,14 @@
       "province": "อ่างทอง",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5621,
       "collateral_score": 66.1,
-      "outlook": 0.1782,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 56% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 66 (estimated) sets the book's exposure here.",
+      "outlook": 0.1574,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 56% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 66 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.207,
         "n_branches": 8
       }
@@ -847,12 +970,14 @@
       "province": "อุดรธานี",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5577,
       "collateral_score": 64.4,
-      "outlook": 0.1841,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 56% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
+      "outlook": 0.1597,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 56% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.1923,
         "n_branches": 38
       }
@@ -861,12 +986,14 @@
       "province": "สระแก้ว",
       "region": "East",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5577,
       "collateral_score": 54.0,
-      "outlook": 0.1841,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 56% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 54 (estimated) sets the book's exposure here.",
+      "outlook": 0.1597,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 56% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 54 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.1923,
         "n_branches": 20
       }
@@ -875,12 +1002,14 @@
       "province": "สุราษฎร์ธานี",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.556,
       "collateral_score": 58.4,
-      "outlook": 0.1863,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 56% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
+      "outlook": 0.1605,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 56% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 58 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.1867,
         "n_branches": 43
       }
@@ -889,12 +1018,14 @@
       "province": "กาฬสินธุ์",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5502,
       "collateral_score": 56.0,
-      "outlook": 0.1941,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 55% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 56 (estimated) sets the book's exposure here.",
+      "outlook": 0.1634,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 55% of the DLT fleet (measured) — high used-bike depreciation exposure on title collateral. Collateral segment score 56 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.1673,
         "n_branches": 32
       }
@@ -903,12 +1034,14 @@
       "province": "เชียงใหม่",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5489,
       "collateral_score": 81.5,
-      "outlook": 0.1958,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 55% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 82 (estimated) sets the book's exposure here.",
+      "outlook": 0.164,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 55% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 82 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.163,
         "n_branches": 45
       }
@@ -917,12 +1050,14 @@
       "province": "เลย",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.548,
       "collateral_score": 57.4,
-      "outlook": 0.197,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 55% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 57 (estimated) sets the book's exposure here.",
+      "outlook": 0.1645,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 55% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 57 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.16,
         "n_branches": 21
       }
@@ -931,12 +1066,14 @@
       "province": "อุบลราชธานี",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5458,
       "collateral_score": 63.8,
-      "outlook": 0.1999,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 55% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
+      "outlook": 0.1656,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 55% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.1527,
         "n_branches": 46
       }
@@ -945,12 +1082,14 @@
       "province": "ชัยภูมิ",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5455,
       "collateral_score": 54.3,
-      "outlook": 0.2003,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 55% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 54 (estimated) sets the book's exposure here.",
+      "outlook": 0.1658,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 55% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 54 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.1517,
         "n_branches": 30
       }
@@ -959,12 +1098,14 @@
       "province": "ลพบุรี",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5438,
       "collateral_score": 59.3,
-      "outlook": 0.2026,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 54% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 59 (estimated) sets the book's exposure here.",
+      "outlook": 0.1666,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 54% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 59 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.146,
         "n_branches": 29
       }
@@ -973,12 +1114,14 @@
       "province": "ชุมพร",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5428,
       "collateral_score": 57.1,
-      "outlook": 0.2039,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 54% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 57 (estimated) sets the book's exposure here.",
+      "outlook": 0.1671,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 54% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 57 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.1427,
         "n_branches": 18
       }
@@ -987,12 +1130,14 @@
       "province": "กระบี่",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5423,
       "collateral_score": 62.1,
-      "outlook": 0.2046,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 54% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 62 (estimated) sets the book's exposure here.",
+      "outlook": 0.1673,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 54% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 62 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.141,
         "n_branches": 14
       }
@@ -1001,12 +1146,14 @@
       "province": "จันทบุรี",
       "region": "East",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5401,
       "collateral_score": 62.4,
-      "outlook": 0.2075,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 54% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 62 (estimated) sets the book's exposure here.",
+      "outlook": 0.1684,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 54% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 62 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.1337,
         "n_branches": 25
       }
@@ -1015,12 +1162,14 @@
       "province": "พิษณุโลก",
       "region": "North",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5343,
       "collateral_score": 70.4,
-      "outlook": 0.2153,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 53% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 70 (estimated) sets the book's exposure here.",
+      "outlook": 0.1714,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 53% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 70 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.1143,
         "n_branches": 30
       }
@@ -1029,12 +1178,14 @@
       "province": "สงขลา",
       "region": "South",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5328,
       "collateral_score": 63.5,
-      "outlook": 0.2173,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 53% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
+      "outlook": 0.1721,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 53% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.1093,
         "n_branches": 20
       }
@@ -1043,12 +1194,14 @@
       "province": "ปทุมธานี",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5294,
       "collateral_score": 75.6,
-      "outlook": 0.2218,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 53% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 76 (estimated) sets the book's exposure here.",
+      "outlook": 0.1738,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 53% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 76 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.098,
         "n_branches": 39
       }
@@ -1057,12 +1210,14 @@
       "province": "นครราชสีมา",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5201,
       "collateral_score": 62.4,
-      "outlook": 0.2342,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 52% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 62 (estimated) sets the book's exposure here.",
+      "outlook": 0.1784,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 52% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 62 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.067,
         "n_branches": 81
       }
@@ -1071,12 +1226,14 @@
       "province": "หนองบัวลำภู",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.5197,
       "collateral_score": 60.6,
-      "outlook": 0.2347,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 52% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 61 (estimated) sets the book's exposure here.",
+      "outlook": 0.1786,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 52% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 61 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": 0.0657,
         "n_branches": 10
       }
@@ -1085,12 +1242,14 @@
       "province": "ขอนแก่น",
       "region": "Isan",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.4865,
       "collateral_score": 64.5,
-      "outlook": 0.279,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 49% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
+      "outlook": 0.1953,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 49% of the DLT fleet (measured) — moderate used-bike depreciation exposure on title collateral. Collateral segment score 64 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": -0.045,
         "n_branches": 35
       }
@@ -1099,12 +1258,14 @@
       "province": "นนทบุรี",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.3747,
       "collateral_score": 79.8,
-      "outlook": 0.4281,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 37% of the DLT fleet (measured) — low used-bike depreciation exposure on title collateral. Collateral segment score 80 (estimated) sets the book's exposure here.",
+      "outlook": 0.2511,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 37% of the DLT fleet (measured) — low used-bike depreciation exposure on title collateral. Collateral segment score 80 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": -0.4177,
         "n_branches": 39
       }
@@ -1113,12 +1274,14 @@
       "province": "กรุงเทพมหานคร",
       "region": "Central&BKK",
       "gold_yoy": 26.1,
+      "used_veh_yoy": -4.35,
       "moto_title_share": 0.3675,
       "collateral_score": 90.9,
-      "outlook": 0.4377,
-      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Motorcycles are 37% of the DLT fleet (measured) — low used-bike depreciation exposure on title collateral. Collateral segment score 91 (estimated) sets the book's exposure here.",
+      "outlook": 0.2548,
+      "outlook_note": "Collateral recovery value firming. Gold +26.1% YoY firms pawn/gold-collateral value (global proxy). Used car/pickup resale prices -4.3% YoY (BoT UVPI, measured) — a real drag on vehicle-title recovery value. Motorcycles are 37% of the DLT fleet (measured) — low used-bike depreciation exposure on title collateral. Collateral segment score 91 (estimated) sets the book's exposure here.",
       "components": {
         "gold_term": 0.435,
+        "veh_price_term": -0.29,
         "moto_term": -0.4417,
         "n_branches": 170
       }

@@ -3,6 +3,2031 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-06 — UX loop: `fonts.gstatic.com` preconnect added on `live.html` (PR #303, merged + deployed + verified)
+
+Autonomous UX-improvement run. The clean surgical backlog is exhausted (the remaining open items are all
+"bigger than surgical" content/mandate passes or device-tested-only 3D-page gaps explicitly excluded from
+unattended auto-merge), so this run reviewed the `live.html` route and found a concrete gap: it loads the
+IBM Plex Google Fonts CSS but only preconnected to `fonts.googleapis.com` (the stylesheet host), **missing
+the `fonts.gstatic.com` (font-file host) preconnect**. `ux-font-preconnect-gstatic` (2026-08-05) added that
+warm-up to "all 5 pages that load the Google Fonts CSS" but `live.html` is a 6th such page and was outside
+that scope — so its browser still ran a fresh DNS+TLS handshake to gstatic *after* the stylesheet arrived,
+a render-blocking waterfall that delays first text paint on a page whose content is entirely text/numbers.
+- **Fix:** one head-only line in `platform/live.html` — `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>`
+  right after the googleapis preconnect, matching `province.html` byte-for-byte incl. the explanatory comment.
+  Zero visual/behavioral change (no body/JS/CSS touched). Now all 6 font-loading pages preconnect to gstatic.
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` **122 passed · 0 failed**; headless render of
+  `live.html` self-reviewed (nav/hero/pulse-strip render correctly with IBM Plex loaded, no breakage); no
+  secrets in diff; diff is exactly `platform/live.html` (+1) + the `docs/UXUI_AUDIT.md` backlog entry, no stray files.
+- **Merge + deploy + verify:** PR #303 squash-merged to master (sha `d545755`). Deploy-verified against the
+  master production alias — after propagation, `/live` serves the new gstatic preconnect line and both `/`
+  and `/live` return **HTTP 200** (no regression, no rollback needed). `/live.html` → 308 is the expected
+  Vercel `cleanUrls` redirect to `/live`.
+
+## 2026-08-06 — Intelligence loop: the ~40 deploy probe validators are now under the repo determinism gate
+
+Autonomous market & service intelligence run. Deploy + data room re-confirmed healthy up front (live master
+production alias HTTP 200 on `/` + `/data/meta.json`; `build_provenance.py --check` reproduces byte-exact;
+freshness clean, 0 layers >180d stale; 0 broken data references across the 131 static `data/*.json` refs;
+77/77 province catchments present; every `--check`-capable builder already in the gate; `site-health.yml`
+correctly targets the master production alias).
+
+**The one gap fixed:** `check_site_health.py`'s ~40 deploy probe validators (`_shape_*`) — all hand-authored
+by this intelligence loop over the past weeks to guard each surfaced-but-unprobed exec read — had **no
+repo-gate regression protection**. Every prior audit note said so verbatim ("the gate does not invoke
+`check_site_health.py`, so this probe-script-only change is outside its scope by construction"). The
+consequence: a future edit that broke a validator so it *rejects* the real committed payload (or a page that
+dropped the AutoX wordmark, or a probed data file gone missing) would ship **silently** — caught only by the
+nightly LIVE run as a filed GitHub issue, never by `bash tests/run.sh check`.
+- **Fix:** `tests/run.sh` `phase_check` now runs the SAME code path as the nightly live check, pointed at the
+  local committed tree — `python3 pipeline/check_site_health.py --local platform`. `LocalFetcher` is
+  filesystem-only (pure stdlib, **no network**), so it stays inside the gate's offline/deterministic
+  contract; all 41 probed data files AND the probed pages are git-tracked, so it reproduces on a clean
+  checkout. It FAILs only on a genuine probe/payload regression.
+- **Verified:** gate green **122 passed · 0 failed** (was 121 — the new self-test is the +1, reports `[PASS]`).
+  Negative-tested that it is a real guard, not a no-op: temporarily dropping `meta.json`'s `updated` key made
+  the self-test exit 1 (gate red); `git checkout` restored it to exit 0 (gate green). No `platform/data`
+  file altered — a test-harness change only (like the probe-script-only changes before it), so no provenance
+  regen and no PR/headless render needed.
+- **Why this over another probe:** the audit backlog of "add one more site-health probe" had reached its
+  low-value tail (only secondary graceful-degrading reads remained). Bringing the whole probe LAYER under the
+  gate is strictly higher leverage — it protects all ~40 existing validators AND every future one, for free,
+  from the class of silent breakage the loop has been guarding against one file at a time.
+
+## 2026-08-06 — Intelligence loop: site-health probe now guards peer_npl.json (the last unprobed obj-#2 PEER read on #acq)
+
+Autonomous market & service intelligence run. Data room re-confirmed healthy up front (`build_provenance.py
+--check` reproduces byte-exact — 136 layers · 75 measured · 61 estimated · 0 unlabelled; freshness clean,
+0 layers >180d stale; live master production alias HTTP 200 on `/` + `/data/meta.json`). A render-path
+re-scan for the highest-value surfaced-but-unprobed `data/*.json` read closed **`peer_npl.json`** — the peer
+LOAN-QUALITY benchmark on `#acq` (obj #1 + #2: listed title-lenders' OWN reported NPL ratios from
+RESEARCH_DIGEST §B next to AutoX's MEASURED own-book NPL from the real loan tape). It was the exact read the
+2026-08-05 audit named as the next target.
+- **Why it matters:** `drawPeerNpl` GATES the whole board on a non-empty `.peers` array — a truncated/404
+  CDN deploy silently drops it to a calm "Peer NPL benchmark not available" placeholder with **no phone
+  alert**. And like its `peer_scoreboard` sibling it **cannot self-heal**: the peer figures are off-repo
+  (RESEARCH_DIGEST §B) and the AutoX anchor is owner-side (loan tape), so no CI job re-pulls it — the probe
+  is the only deploy safeguard.
+- `_shape_peer_npl` asserts render shape (the `.peers` gate ≥2 rows, a row `name`/`ticker` label, ≥1 numeric
+  `npl`, the `.autox` anchor's non-blank `name` + numeric `npl_live_os_pct` + `npl_90plus_os_pct`), not
+  values — robust to a future RESEARCH_DIGEST/tape-vintage refresh.
+- **Verified:** real 2,571-byte payload accepted; 12 negatives all reject. Offline `--local platform`
+  131/131 HEALTHY (128 → 131 checks, +3). Determinism gate 121 passed · 0 failed (data integrity 455/455) —
+  probe-script-only (the gate does not invoke `check_site_health.py`; no `platform/data` file altered, so no
+  provenance regen). Emitted the finding to `docs/SERVICE_AUDIT.md`.
+- **Next intelligence task:** the remaining lower-value secondary reads still unprobed — the
+  graceful-degrading rival-pulse promo/review boards and the province deep-dive fetches.
+
+## 2026-08-06 — Integration loop: site-health probe now guards pico_competitors.json (the last unprobed obj-#2 PICO read on #acq)
+
+Autonomous integration run. **First established the CI-doable data-integration backlog is genuinely
+exhausted this run**, so the improvement is deploy-robustness hardening, not a new pull:
+- Backlog items 1 (FPO PICO → competitor census) and 2 (per-branch `branch_cropland`) are already
+  DONE and surfaced (`pico_census`/`pico_competitors`/`pico_district`/`branch_pico` built + consumed
+  in `app.js`+`index.html`; `branch_cropland`/`province_cropland` gated + surfaced in `app.js`+
+  `province.html`). Item 3's DIW/MOT/DBD legs are distilled (`vehicle_*`, `dbd_formation`).
+- The remaining un-distilled gov sources (`excise_moto_tax`/`excise_car_tax`, `osmep_sme_growth`,
+  `baac_credit`, `smebank_credit`) were re-probed live from CI and confirmed **not CI-reachable**:
+  `catalog.excise.go.th` SSL-fails (HTTP 000), `opendata.sme.go.th` HTTP 000, and the data.go.th-only
+  BAAC/SME legs are 403 with their raw caches gitignored/absent. Their unblock stays Thai-IP/owner-side
+  (consistent with NEXT_STEPS §2). **Not faked** — logged and skipped.
+- A determinism-gate coverage sweep found every deterministic data builder is already `--check`-gated
+  (only `build_platform.py`, an HTML assembler, is out, correctly). And a negative-space sweep found
+  no committed MEASURED "dead" layer to wire (every zero-fetch candidate is either an intermediate
+  baked into a surfaced layer, or a deliberately-dormant expansion score out of consolidation scope).
+
+**The gap that WAS real (the ship):** the live-site health probe (`pipeline/check_site_health.py`, the
+nightly `site-health.yml` job that phone-alerts the owner when the Vercel deploy serves a broken/missing
+file) probed the DISTRICT-grain PICO read (`pico_district.json`, `_shape_pico_district`) but NOT its
+PROVINCE-grain sibling `pico_competitors.json` — the `#acq` "where do sub-scale rivals most outnumber
+our footprint?" leaderboard (`drawPicoCompetitors` reads `PICOCOMP.provinces` rows for
+`.outnumber`/`.pico_total`/`.autox_branches`/`.th`). Both are MEASURED FPO-registry-vs-branch-book
+tallies rendered side-by-side on Competition; the render empties gracefully to a "not yet computed"
+note, so a truncated deploy that dropped/emptied the file would have silently blanked the province-grain
+competitive board with **no phone alert** — the exact blind spot the peer_province / competitor_coverage
+/ pico_district probes were added to close (see the 2026-08-04 `df5a691` peer_scoreboard entry, same
+pattern). Added `_shape_pico_competitors` (asserts render shape — non-empty `.provinces`, first row
+numeric `outnumber`/`pico_total`/`autox_branches` + a `.th` name, `meta` present — robust to registry
+growth, not exact counts) and its `DATA_FILES` entry. `pipeline/check_site_health.py` +33, one file.
+
+**Verification:** determinism gate `bash tests/run.sh check` → **121 passed · 0 failed** (unchanged —
+the probe is not gated, and nothing in `platform/data`/the app changed, so no `build_provenance.py`
+regen was owed). Offline probe `check_site_health.py --local platform` → **HEALTHY 128/128** (was
+125/125; +3 pico_competitors checks, all PASS). Negative test of `_shape_pico_competitors` against
+crafted-broken inputs confirmed it catches every failure mode (empty `provinces`, missing `outnumber`,
+missing `meta`, non-object) and returns `None` on the real file. No app behaviour/visual change → direct
+commit to master. **Recommend next:** the CI-reachable data backlog is exhausted; the remaining
+high-value integrations are all Thai-IP/owner-side (commit the FPO PICO / excise / BAAC raw pulls from
+the laptop) or the GISTDA 40m `check-crop` per-branch upgrade (item 4 — big, alters `branch_cropland`
+numbers → wants an attended PR, not an unattended run).
+
+## 2026-08-06 — UX loop: load IBM Plex fonts on branch-explorer.html (PR #299, merged + deployed + verified)
+
+Autonomous UX-improvement run. Closed `ux-branch-explorer-font-not-loaded` — the last font-loading
+inconsistency in the app. `branch-explorer.html` (the per-branch `?lat=&lng=&n=` deck.gl scene)
+declared `font-family:'IBM Plex Sans Thai'` / `'IBM Plex Mono'` across its CSS (33 references) but,
+unlike the other 5 pages, **never loaded the Google Fonts stylesheet** — so its branch-name + panel
+text silently rendered in the `system-ui` fallback, inconsistent with the rest of the app and (per
+CLAUDE.md: "Fonts IBM Plex Sans Thai + IBM Plex Mono") the mandated design standard; Thai branch
+names in particular lost IBM Plex Sans Thai shaping. The backlog had deferred this as a "design call",
+but the page already DECLARES IBM Plex everywhere and the standard is unambiguous, so loading them
+(option a) is the design-correct move, not a toss-up. Added the exact three head lines
+`province.html`/`data.html` use — the `fonts.googleapis.com` + `fonts.gstatic.com`(crossorigin)
+preconnect pairing + the `css2?family=IBM+Plex+Sans+Thai…&IBM+Plex+Mono…&display=swap` stylesheet —
+after the share-metadata block. Head-only, no body/JS/CSS touched; `display=swap` avoids an
+invisible-text flash. `platform/branch-explorer.html` +6.
+
+**Safeguard protocol (all passed):** (a) `bash tests/run.sh check` → **121 passed · 0 failed**;
+(b) headless render of `branch-explorer.html?lat=12.7506&lng=101.038` → scene + left acquisition panel
++ right BASEMAP/LAYERS controls + nav all intact, `data-errors="[]"`, nothing broken (gstatic is
+proxy-blocked in the harness so the swap isn't visible headless, but the fallback is unchanged → no
+regression); (c) no secrets in the diff; (d) 2 files, no stray. **Merge:** squash-merged own PR #299
+→ master `baaf329`. **Deploy-verify:** production alias root **200** and the changed route
+`/branch-explorer` **200** (the `.html` 308 is `cleanUrls`, expected); confirmed the deployed HTML now
+serves the `fonts.googleapis.com/css2` IBM Plex link (build propagated). No rollback needed. (Remote
+feature branch delete hit a transient git-proxy disconnect and was left in place — merged + harmless.)
+**Recommend next:** `ux-viewport-user-scalable-3dpages` (WCAG 1.4.4 — the three deck.gl pages lock
+pinch-zoom; needs `touch-action:none` on the canvas + a real-device gesture test, so it wants an
+attended run, not unattended auto-merge) or `ux-live-chart-mobile-viewbox-responsive` (a responsive
+viewBox for live.html's SVG charts — touches `lineChart()` coordinate math, bigger than surgical).
+
+## 2026-08-05 — Market/Service loop: 3D catchment scene headlines the MEASURED WorldPop catchment population (was the ESTIMATED area-weight fallback)
+
+Autonomous market & service intelligence run. A negative-space sweep surfaced a genuine
+measured-vs-estimated honesty gap on the platform's PRIMARY 3D entry point. `rayong-catchment.html`
+(the building scene for every province) headlined its "people ≤10km" reachable-population stat from
+`branch_population.json` — an **ESTIMATED** area-weight fallback (`meta.measured:false`,
+`method:"areaweight"`, assumes uniform intra-district density) tagged `EST · NSO` — even though the
+**MEASURED** WorldPop-2020 raster count of the *exact same quantity* (population inside each branch's
+10 km circle) already ships committed in `contested_pop.json` `rows[i][0]`, and `app.js`'s branch
+popup ALREADY prefers it (labelled measured/WorldPop). So one branch's catchment population read
+MEASURED in the map popup and a materially-different EST on the 3D card — an internal contradiction.
+The two layers diverge for real: median estimate/measured ratio **0.78** (the fallback under-counts
+~22% at the median), p10 0.47 / p90 1.43, and **351 of 2,015 branches (17%) differ by >2×** — e.g.
+the Rayong สายล่าง branch reads 296,810 (measured) vs 178,638 (estimated).
+
+**Fix (HTML/JS only, CI-doable — `contested_pop.json` is committed + already deployed, 38 KB):** wire
+`contested_pop.json` into the scene's data-fetch batch (appended as a[19]; no existing index shifts)
+and make `branchPop()` prefer `CPOP.rows[i][0]` as the MEASURED 10 km count, keeping
+`branch_population.json` as a null-guarded ESTIMATED fallback and district-NSO population as the last
+resort — a direct port of the already-in-production `app.js` popup logic. The card now tags the figure
+`WorldPop` (measured) with the measured footnote when the raster count is present, and degrades to the
+`EST · NSO` estimate (no crash) if it isn't. Also corrected the two stale comments that called the
+area-weight layer "TRUE ~10km-perimeter" (they predate the measured layer being wired into the app).
+`platform/rayong-catchment.html` +25/−12.
+
+**Verification:** determinism gate `bash tests/run.sh check` → **121 passed · 0 failed**
+(`node --check inline JS of rayong-catchment.html` PASS; validate_data 544/544). A deterministic
+execution test of the REAL `branchPop()` against committed data confirmed all three paths: CPOP
+present → measured value, meas=true (WorldPop tag); CPOP absent → estimated fallback, meas=false
+(EST·NSO tag, no crash); both absent → district NSO. Single caller (`updatePanels`) reads only
+`.v/.scope/.meas`, all provided. The headless GL render of this heaviest 3,631-building scene could
+not produce a frame under the sandbox's software WebGL (a documented render-harness limitation for
+this specific scene — no JS error captured; two escalating attempts simply returned empty), so
+behaviour was verified by the gate + the deterministic function test (a stronger guarantee of the
+exact rendered value than a screenshot), and the change mirrors the already-live `app.js` popup path.
+
+**Decision — branch-base correction:** the container's `origin/master` tracking ref was stale
+(`ee657c3`, a divergent line ~20 commits behind the true tip `f692def`); the first working branch was
+cut off it. Caught before any commit via a PROGRESS_LOG top-entry mismatch, then re-based the
+single-file change onto the fetched true `origin/master` and re-verified (gate green on the correct
+base). No stale history entered master.
+
+**Ship:** safeguard-gated — gate 0-failed, no secrets in diff, surgical single-file code diff, no
+`platform/data` file touched (no provenance regen; the measured figures are READ from committed
+`contested_pop.json`, nothing fabricated). Draft PR + safeguard-gated self-merge + deploy-verify.
+
+## 2026-08-05 — UX loop (a11y): aria-label the impact-card delinquency ladder bar — merged + deployed + verified (PR #294)
+
+Autonomous safeguard-gated UX run. Reviewed `live.html` and the `#home` command center end-to-end
+(both already exhaustively polished; no confirmed regression — the mobile pulse-card "clipping" in a
+390px headless shot was a harness artifact, the layout viewport floors at 500px, `scrollWidth ==
+clientWidth`, no real overflow). Picked the one genuine, fully-verifiable a11y gap: the impact cards'
+whole-book **delinquency ladder bar** (`icLadder` in `app.js`, on the `#home` province/branch drill
+tables + the Assistance/Exposure/Competition strips) carried its Current/X/30–89/90–179/180+ split
+ONLY in a `title` on a bare `<span>` — a hover tooltip, not a reliable accessible NAME — so it was
+silent to screen readers, and the 30–89 + 180+ buckets aren't in any adjacent numeric column.
+Aligned it to the app's OTHER proportion bar (`rz-bar`, already `role="img"` + `aria-label`): factored
+the split into a shared `desc` feeding both the unchanged `title` and a new
+`role="img" aria-label="Delinquency ladder — <desc>"`. WCAG 1.1.1 / 4.1.2. `platform/app.js` +5/−1.
+
+**Safeguards (all passed):** `tests/run.sh check` 121-passed/0-failed (baseline + post-fix);
+headless `#home` render byte-identical to baseline PNG (zero visual change), `data-errors=[]`, all 5
+`.ic-lad` bars carry the new `aria-label`, `title` preserved; no secrets; surgical 2-file diff.
+**Merge+deploy+verify:** squash-merged #294 → master `8076c0b`; after ~90s the production alias
+`competitive-intel-git-master-…vercel.app` returned root **200** and the deployed `app.js` served the
+`aria-label` (fresh cache, age 1s). No rollback needed. (Vercel `/index.html` → `/` is a 308
+`cleanUrls` canonical redirect resolving to 200, not a regression.)
+
+## 2026-08-05 — Integration loop (GATE COVERAGE): gate the objective-#1 `build_baac_credit.py` builder — the one deterministic pipeline builder missing from the determinism gate — committed to master
+
+Autonomous integration run. Two independent sweeps (mine + a `negative-space` agent) converged on the
+same conclusion the last several entries have been circling: **the CI-doable, offline-deterministic
+data-integration backlog is genuinely exhausted.** Verified this run, not assumed:
+- The named integration backlog is shipped — FPO PICO census, per-branch `branch_cropland` (built, gated,
+  surfaced, honestly labelled), and the data.go.th distillations (`dbd_formation`, `debt_source`,
+  `household_risk`) are all live. GISTDA 40m crop (backlog #4) stays blocked — `GISTDA_SPHERE_KEY` is not
+  in the CI env (re-checked: no env var, no `.env`).
+- **Every** `platform/data/*.json` has a consumer (literal `fetch`, `tmliFetch(stem)`, or a
+  dynamically-built `data/<slug>_*.json` basemap path — the naive `grep '<file>.json'` false-positives
+  that a prior negative-space pass tripped on are all dynamic loads, verified). No built-but-unwired
+  layer remains. `provenance.json`: 0 unlabelled, 0 stale >180d, 75 measured / 61 estimated.
+- The one genuinely-open high-value integration — BAAC per-province agri/rural credit penetration
+  (objective #1: an inverse proxy for unmet title-loan demand) — is **owner-side/Thai-IP blocked**: its
+  only input `source-data/datagoth/baac_credit.xlsx` is a `pull_datagoth` (`baac02_2567`) pull off the
+  data.go.th aggregator, which is 403 from CI and has no department-CKAN bypass. Not a CI task.
+- The heavy remaining named item (GISTDA repeated-flood **area** dissolve, NEXT_STEPS #0) was ruled out
+  for a single run: a nationwide shapely `unary_union` over the overlapping per-event polygons (Sukhothai
+  alone returns 202,744) is a multi-hour geometry job with a non-deterministic network input, which
+  NEXT_STEPS itself defers to "a later pass." GISTDA's ArcGIS *is* reachable (HTTP 200), so this stays a
+  clean future data-job — it just isn't well-scoped to one autonomous run.
+
+**Rather than a treadmill probe commit, an integrity-gate audit surfaced a real coverage hole.** A diff of
+every `--check`-capable `pipeline/*.py` against everything `tests/run.sh` references (the `for ing in …`
+loop included, post the 2026-08-05 de-opaque) found that **`build_baac_credit.py` is the one deterministic,
+committed-source-projecting builder absent from the gate entirely.** Its own docstring declares it "Carries
+`--check`; SKIP-passes (exit 3) … same convention as `build_dbd_formation` / `build_pico_census`" — but
+where its sibling `build_dbd_formation` has a proper rc-based gate entry (run.sh:139), BAAC's was never
+added. The consequence is not cosmetic: the moment the owner runs the Thai-IP pull and builds
+`baac_credit.json`, any later drift of that output from `source-data/datagoth/baac_credit.xlsx` (a re-pull,
+or an edit to the builder) would go **undetected** — uniquely among the pipeline's deterministic builders.
+This is the "blocked and forgotten" builder made safe: gated now (SKIP, input absent in CI), byte-exact
+drift-checked automatically the instant it is populated.
+
+- **The fix (`tests/run.sh` only):** one rc-based gate block for `build_baac_credit.py --check`, inserted
+  directly after its closest sibling `build_dbd_formation` (both are `pull_datagoth`/data.go.th builders),
+  mirroring the established OK/SKIP(rc=3)/BAD pattern verbatim — `bad` names the exact drift source
+  (`baac_credit.json drifted from source-data/datagoth/baac_credit.xlsx`), so a future failure points at
+  the right file rather than a shared wrong one.
+- **Safeguards (all pass):** gate `bash tests/run.sh check` → **121 passed · 0 failed** (data-integrity
+  455/455); `build_baac_credit.py --check` registers as **SKIP** (input absent in CI, exit 3) — it does
+  not inflate the pass count, identical to how `build_dbd_formation` behaves today. Test-config only: no
+  `platform/data` file touched (so no `build_provenance.py` regen required), no app/HTML/JS change (so no
+  visual/render risk), no secrets in the diff.
+- **Ship:** test-harness-only, gate green, mirrors a proven pattern exactly, fully confident → auto-commit
+  to master (consistent with the prior gate-hardening commit `9b8d310`, "de-opaque the 19-builder run.sh
+  loop", which likewise shipped straight to master).
+- **Next recommended integration:** the CI-doable, offline-deterministic class is exhausted — the honest
+  remaining unlocks are all owner-side/Thai-IP (BAAC agri-credit pull; a fresh loan-tape vintage) or wait
+  on upstream publishing newer data (DLT frozen at 2026-02-28). The one big CI-reachable *data* job left is
+  the GISTDA flood-area geometry dissolve (network + heavy shapely), which wants its own dedicated run, not
+  an autonomous single-improvement slot. Future autonomous runs should keep favouring audit-surfaced
+  integrity/honesty hardening over probe-per-file treadmill commits until an owner-side unlock lands.
+
+## 2026-08-05 — Intelligence loop (SERVICE / PEER / DEPLOYMENT HEALTH): deploy site-health probe for `peer_scoreboard.json` — the last unprobed obj-#2 PEER read on the Competition surface — committed to master
+
+Autonomous market & service intelligence run. Deploy re-verified green up front (master production alias
+**HTTP 200** on `/` and `/data/meta.json`; `build_provenance.py --check` reproduces byte-exact — 136 layers,
+75 measured · 61 estimated · 0 unlabelled; freshness clean, 0 layers >180d stale). The named planner backlog
+is exhausted at 98% with the one OPEN item owner-side, and the PEER pillar's per-province/per-brand comparison
+(`peer_province.json` — AutoX next to each big-4 rival per province, ratios, outnumbered districts, per-100k-veh
+density) is already deep and probed. So this run took the SERVICE pillar's mandate — audit the platform *as a
+service*, emit to `docs/SERVICE_AUDIT.md`, fix one concrete gap — and a render-path re-scan for the highest-value
+surfaced-but-unprobed `data/*.json` read surfaced a genuine structural blind spot rather than the next file in line.
+
+- **The gap:** `peer_scoreboard.json` (obj #2, MEASURED — the SET listed-peer market scoreboard: market cap /
+  valuation / ROE / net profit for the listed title-lenders, with AutoX's 25% ROE TARGET as the reference line)
+  was the **last unprobed obj-#2 PEER read on the Competition (#acq) surface** — every sibling (`peer_province`,
+  `competitor_coverage`, `rival_reputation`, `rival_threat[_region]`, `pico_district`) is already probed. Two
+  reasons it matters: (1) the render code itself calls it _"the sharpest external benchmark we have"_; (2) unlike
+  the census siblings it **cannot self-heal** — SET (`set.or.th`) is Akamai-blocked from CI (owner-side / Thai-IP
+  refresh only), so a truncated/404 CDN deploy that guts it has no CI job to re-pull it. `drawPeerScore` GATES the
+  whole board on a non-empty `.peers` array and silently drops to a calm _"Listed-peer scoreboard not available"_
+  placeholder with **no phone alert** — the "broken demo" blind spot the sibling competition probes already close.
+- **The fix (`pipeline/check_site_health.py` only):** added `_shape_peer_scoreboard` (fetch + parse + render-shape:
+  the `.peers` gate, a row `name`/`symbol` label, ≥1 numeric `market_cap_bn` [the bold "Mkt cap" column], ≥1 numeric
+  `roe` [the ROE column + bar + the readout's benchmark clause], a non-blank `headline`, and the numeric
+  `autox_roe_target` reference line the readout benchmarks against — **shape not values**, robust to a future SET
+  price/quarter pull) + its `DATA_FILES` registration in the Competition-cluster comment block.
+- **Safeguards (all pass):** (a) gate `bash tests/run.sh check` → **121 passed · 0 failed** (data integrity
+  455/455; the gate does not invoke `check_site_health.py`, so this probe-script-only change is outside its scope
+  by construction). (b) validator self-test: the real 2,360-byte payload accepted, **11 negatives** rejected
+  (non-dict / short-or-non-list `peers` / row-not-dict / row-missing-`name`&`symbol` / no-numeric-`market_cap_bn`
+  / no-numeric-`roe` / blank-`headline` / missing-or-non-numeric-`autox_roe_target`), symbol-only row still
+  accepted. (c) offline `--local platform` → **125/125 HEALTHY** with `peer_scoreboard.json` served + shape-sane
+  (probe coverage 37 → 38 exec layers, 122 → 125 checks). (d) no secrets in the diff (51 insertions, one file);
+  no `platform/data` file altered — probe-script-only, so no provenance regen and no PR/headless render needed.
+- **Ship:** probe-script-only, gate green → auto-commit to master (per the loop's safeguard mandate). No served-
+  asset change, so no visual/app regression risk; the site's rendered pages are untouched.
+- **Deploy-verify:** the live master production alias already serves `peer_scoreboard.json` **HTTP 200** (2,360
+  bytes, byte-matches local) — this change only adds a monitor over it; post-push `/` + the changed file re-checked
+  for 200 (the probe script is not itself a served asset).
+- **Next recommended intelligence task:** the remaining unprobed reads are all lower-value secondary/graceful-
+  degrading layers — `peer_npl.json` (the listed lenders' reported-NPL benchmark, obj #2/#1, next-highest peer
+  read) is the freshest candidate, then the rival-pulse promo/review boards and the province deep-dive fetches.
+  The probe-per-run pattern is nearing genuine exhaustion of the *load-bearing* reads; a future run should weigh a
+  self-maintaining probe-coverage assertion (surfaced-fetch set vs `DATA_FILES`) over adding secondary probes one
+  at a time.
+
+## 2026-08-05 — UX loop: `ux-font-preconnect-gstatic` (perceived-load / font paint) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260805-0215`, squash-merged PR #293 → `ddb0fc1` on master): all 5 pages that load the Google Fonts stylesheet — `index.html`, `data.html`, `status.html`, `province.html`, `rayong-catchment.html` — fetch the IBM Plex Sans Thai + Mono font **files** from `fonts.gstatic.com`, but **no page preconnected to gstatic**: the 3 with a preconnect only warmed `fonts.googleapis.com` (the stylesheet host, not the font-file host), and `province`/`rayong-catchment` had no font preconnect at all. Without the gstatic preconnect the browser only opens the DNS+TLS connection to gstatic *after* the stylesheet arrives — a render-blocking waterfall that delays first text paint, and text (Thai script + mono numbers) is the entire content of this console, so a real perceived-load cost on Thai mobile. Added Google's own recommended pairing `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>` (crossorigin required — fonts are fetched with CORS) after the googleapis preconnect on all 5 pages, plus the googleapis preconnect on the 2 pages that lacked it. Head-only — no body/JS/CSS touched. `platform/{index,data,status,province,rayong-catchment}.html` (+7 lines total) + `docs/UXUI_AUDIT.md` (fix-log entry + 1 new backlog item).
+- **How it was found:** the seven named backlog priorities are all long-since fixed and the remaining open items are all bigger-than-surgical/device-tested, so this run reviewed the page `<head>`s directly and audited the font-loading resource-hint chain — the missing gstatic preconnect (Google's textbook first-paint optimisation) was the one clean surgical, headless-verifiable win.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (455/455 data-integrity + `node --check` on every page's inline JS); gate was already 0-failed on `origin/master` — no provenance/commodities drift to restore this run. (b) headless `render.sh index.html` @ 1100×800: **byte-clean** — light theme, IBM Plex Thai+mono rendering, command center + five-pillar cards all intact, `data-errors="[]"`, Leaflet init OK; the 3 styles.css pages (index/data/status) share the identical single-line edit, so index stands in for all three. The 2 deck.gl pages (province/rayong-catchment) **cannot** be headlessly rendered in this environment's budget — a clean-*base* render of the same page also timed out at 5 min, proving the failure is environmental (swiftshader WebGL init), not this change; the edit is a pure additive `<head>` resource hint that cannot affect a WebGL canvas. (c) no secrets in the diff. (d) diff = 5 HTML head edits + audit doc only, no stray files.
+- **Deploy-verify (PASS, no rollback):** after ~150s the production alias `competitive-intel-git-master-…vercel.app` → **200** on `/`, `/province`, `/rayong-catchment`, `/data`, `/status` (all clean URLs; `.html` → 308 is the expected `cleanUrls` redirect), and the shipped change is confirmed **live**: `grep fonts.gstatic.com` = 1 on all 5 served pages. Session auto-unsubscribed from PR #293 on merge. (Housekeeping: `git push --delete` of the merged branch returned the recurring git-proxy "remote end hung up" sideband artifact — same as prior runs; GitHub prunes the merged branch server-side, harmless.)
+- **New backlog spotted:** `ux-branch-explorer-font-not-loaded` — `branch-explorer.html` declares `font-family:'IBM Plex Sans Thai'/'IBM Plex Mono'` throughout its CSS but never loads the Google Fonts stylesheet, so its text silently falls back to `system-ui` (inconsistent typography vs the rest of the app, and Thai branch names lose IBM Plex Sans Thai shaping). Needs a design call — add the font+preconnect, or confirm the system-font minimalism is deliberate and drop the unused family names — so left for its own run (visual change either way, not folded into this surgical fix). Also noted (out-of-scope observation): `docs/UXUI_AUDIT.md`'s fix-log references a `platform/live.html` that is **not present in the current tree** despite prior-run commits against it — worth a future reconciliation of the audit-doc log vs. the actual page set.
+- **Next recommended:** the surgical-and-headless-verifiable UX queue remains essentially drained; the standing backlog is all bigger-than-surgical or device-tested — `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" expansion language in `build_regional_outlook.py` + app.js as competitive-RISK, mandate-critical, ripples across surfaces), `ux-viewport-user-scalable-3dpages` (drop `maximum-scale=1` on the 3 deck.gl pages + add `touch-action:none`, needs real-device pinch-zoom test), `ux-live-chart-mobile-viewbox-responsive` (narrower `viewBox` on phones — touches `lineChart()` coordinate math). Non-platform: `qa-visual-baseline-stale` wants a deliberate `tests/run.sh baseline` refresh so the visual gate carries signal again. The new `ux-branch-explorer-font-not-loaded` is the freshest surgical-ish candidate once a design call is made. Future runs should keep reviewing individual routes/heads for concrete wins as this one did.
+
+## 2026-08-05 — Integration loop (GATE HARDENING): de-opaque the 19-builder `run.sh` loop — accurate per-source FAIL messages + grep-visibility for the objective-#1 book layers — committed to master
+
+Autonomous integration run. The named data-integration backlog was re-verified **shipped or CI-blocked**:
+FPO PICO census (fully integrated — `branch_pico`/`pico_district`/`pico_competitors`/`rival_universe`, the
+`dpico`/`doutnum` map lenses, the national-readout PICO column), per-branch `branch_cropland` (built, gated,
+surfaced, and honestly labelled — "magnitude MEASURED-corrected to DOAE-2025, SPAM-2010 spatial pattern
+modelled/ESTIMATED, sugarcane uncorrected"), and the data.go.th distillations (DIW factories, MOT vehicle
+layers, `dbd_formation`) are all done. **GISTDA 40m crop (backlog #4) is blocked this run — `GISTDA_SPHERE_KEY`
+is not in the CI env** (verified: no env var, no `.env`); **Excise (`catalog.excise.go.th`) is SSL-blocked from
+CI (HTTP 000)**; DLT frozen / BAAC no-CI-CKAN / data.go.th aggregator 403 remain settled dead ends. So the
+CI-doable data-pull backlog is genuinely exhausted, as the 2026-08-04 entries recorded.
+
+Rather than a treadmill commit, a rigorous gate-coverage audit (all **150** `--check`-capable pipeline
+scripts diffed against everything `tests/run.sh` references, the `for ing in …` loop **included**) surfaced a
+real integrity-gate defect worth fixing: **19 deterministic builders — including the objective-#1 portfolio
+book layers `build_collateral_book`, `build_farm_book`, `build_macro_book`, `build_debt_source`, plus
+`build_tape_layers` over the REAL loan-tape aggregates — were gated only inside an opaque bare-name `for`
+loop.** Two concrete problems: (1) every failure blamed a single shared, **wrong** source
+(`source-data/staging/` "ingest wave") even for the 13 scripts that read committed non-staging
+`source-data/*.json` or committed `platform/data` book layers — so a real drift would misdirect the
+maintainer; and (2) the loop was **invisible to grep-based gate-coverage audits** (`grep "build_X.py --check"`
+returned 0 for all 19), which had just caused a negative-space audit to false-flag all 19 as "missing from the
+gate." Note `source-data/staging/` is now **committed** (21 tracked files, incl. `real_tape_aggregates.json`),
+so the old "staging source absent" skip rationale is obsolete for these.
+
+- **The fix (`tests/run.sh` only):** replaced the bare `for ing in …` loop with a `while read <<'HEREDOC'`
+  driven by an explicit `name|source` table, so each FAIL message now names the builder's ACTUAL source
+  (e.g. `build_debt_source` → `source-data/nso_debt_by_source.json`; `build_macro_book` → its
+  `platform/data` book inputs), the honest SKIP wording drops the false "staging absent — ingest wave"
+  claim, and a header comment lists all 19 as `build_X.py --check` so coverage audits find them. **Behaviour
+  is identical** — same 19 scripts, same `rc 0→ok / rc 3→skip / else→bad` per script, and (heredoc, not a
+  pipe) the loop still runs in the current shell so `ok`/`bad` keep incrementing `pass`/`failc`.
+- **Safeguards:** `bash -n tests/run.sh` clean; `bash tests/run.sh check` → **121 passed · 0 failed**
+  (data validation 455/455) — the SAME totals as the pre-change baseline, confirming no pass/skip/fail
+  moved; all 19 builders still gate green (rc 0, byte-reproduce); `grep "build_collateral_book.py --check"`
+  now returns 1 (was 0). No `platform/data` file, no app/JS/visual change, no secrets in the diff — so no
+  provenance regen or headless render needed; the change is confined to the test harness.
+- **Ship:** test-infra-only, gate green → auto-commit to master (per the loop mandate). No deploy impact
+  (the site's served assets are untouched).
+- **Next recommended integration:** GISTDA 40m satellite crop-area (backlog #4) once `GISTDA_SPHERE_KEY` is
+  exposed to the CI env — it would supersede the SPAM-2010 spatial baseline in `build_branch_cropland.py`
+  with 40m MEASURED values; today it is the single highest-value data unlock still blocked only by a missing
+  key rather than a hard geoblock. Everything else CI-doable is shipped.
+
+## 2026-08-04 — Intelligence loop (SERVICE / DEPLOYMENT HEALTH): deploy site-health probe for `rival_reputation.json` — the unprobed PARENT of the two probed threat layers — committed to master
+
+Autonomous market & service intelligence run. Deploy re-verified green up front (master production alias
+HTTP 200 on `/` and `/data/meta.json`; `build_provenance.py --check` reproduces exactly; planner backlog
+exhausted at 98%, the one OPEN item owner-side). The recent SERVICE-audit history had become a "one probe
+per run" pattern over the front-door layers, so a render-path re-scan looked for the *highest-value* still-
+unprobed read and found a genuine structural blind spot rather than just the next file in line:
+**`rival_reputation.json`** (obj #2, MEASURED sample — review-count-weighted Google rating by brand, the
+`#acq` "rival service reputation" board). It is the shared **parent of both already-probed threat layers**
+(`rival_threat` + `rival_threat_region` consume its ratings) — but those children are **pre-built, committed
+files**, so they keep rendering even when a truncated CDN deploy guts the parent. `drawRivRep` gates its
+board on a non-empty `.by_brand` array and silently drops to a calm "not yet computed" placeholder with no
+phone alert when the file is missing/truncated — the "broken demo" blind spot the sibling competitive probes
+already close. Added `_shape_rival_reputation` to `pipeline/check_site_health.py` (fetch + parse + render-
+shape: the `by_brand` gate, the `brand` column each row renders, ≥1 numeric `rating_wavg`, and the non-blank
+`headline` the readout reads — shape not values, robust to a future rating-vintage refresh).
+
+- **Scope:** `pipeline/check_site_health.py` only (+ `docs/SERVICE_AUDIT.md` audit-run line, this entry). No
+  `platform/data` file, no app/visual change — probe-script-only, so no provenance regen and no PR/headless
+  render needed.
+- **Safeguards:** gate `bash tests/run.sh check` → **121 passed · 0 failed** (data integrity 455/455; the
+  gate does not invoke `check_site_health.py`, so this change is outside its scope by construction);
+  `_shape_rival_reputation` accepts the real payload and rejects **9** malformed shapes (non-dict / missing-
+  or-non-list-or-short `by_brand` / row-not-dict / row-missing-`brand` / no-numeric-`rating_wavg` / blank-or-
+  missing-`headline`); offline `--local platform` → **122/122 HEALTHY** (was 119) with the file served +
+  shape-sane; live alias serves `rival_reputation.json` **HTTP 200** (1,561 B, matches local); no secrets in
+  diff; diff (48 insertions, one probe fn + registry entry) matches intent.
+- **Ship:** safeguard-gated auto-commit to master (probe-script-only). Probe coverage **36 → 37** exec layers.
+- **Deploy-verify:** master production alias re-checked HTTP 200 on `/` and the newly-probed
+  `/data/rival_reputation.json` after the push (the change is a CI probe script, not a served asset, so it
+  does not alter the deployed site — the verify confirms no regression).
+
+## 2026-08-04 — UX loop: real quarter labels on the live.html household-debt chart (PR #289, merged + deployed + verified)
+
+Autonomous UX-improvement run. The backlog's listed items (1–7) and every surgical Open-backlog item are
+already fixed; the remaining open ones are all explicitly flagged bigger-than-surgical / not-for-unattended-
+merge (`qa-visual-baseline-stale`, `ux-acquire-taxonomy-mandate`, `ux-viewport-user-scalable-3dpages`,
+`ux-live-chart-mobile-viewbox-responsive`). So per the mandate I reviewed a route and found a new concrete
+gap: the **household-debt trend chart on `live.html` was the only one of the five charts with cryptic
+relative x-axis labels** (`q-5 … now`, whose `|| 'now'` was dead code) — every other chart (SFI NPL,
+commodity, GDP, daily feeds) shows real time labels. Derived real quarter labels (`24Q3 … 25Q4`) from the
+anchor period the BIS layer stamps (`hd.period`, e.g. `"2025-Q4"`) by back-counting one quarter per point,
+with a fallback to the old relative labels if the anchor is absent/unparseable so the axis never blanks;
+also folded the anchor into the SVG `aria-label`. Against the "concrete, not abstract" mandate the cryptic
+axis was a real clarity gap, and this makes the chart consistent with the other four.
+
+- **Scope:** `platform/live.html` only (+ one-line `docs/UXUI_AUDIT.md` entry). No data files / gated outputs touched.
+- **Safeguards:** `bash tests/run.sh check` → **121 passed, 0 failed** (data validation 455/0); `node --check` clean on all 4 inline blocks; headless render self-reviewed (x-axis now `24Q3 … 25Q4`, rest of page unchanged); no secrets; diff matches intent, no stray files.
+- **Merge:** PR #289 squash-merged to master (`b1775c0`).
+- **Deploy-verify:** after ~90s, `https://competitive-intel-git-master-kaustav-bagchis-projects.vercel.app/` → **200**, `/live` → **200** (`/live.html` → 308, the normal cleanUrls redirect); confirmed the deployed `/live` HTML carries the new label logic (`Real quarter labels` marker present). No rollback needed.
+
+## 2026-08-04 — Integration loop (DECISION, no data change): the two remaining CI "openings" verified as dead ends — DLT collateral is upstream-frozen at its newest vintage, BAAC has no CI-reachable source — committed to master
+
+Autonomous integration run. The stated data-integration backlog (FPO PICO census, per-branch cropland,
+data.go.th distillations, GISTDA 40m crop) is shipped or key-blocked, and the recent loop history is a
+treadmill of one-off provenance/freshness commits. A negative-space sweep surfaced exactly two things that
+still *read* as live openings: (a) refresh the ~5-month-stale DLT vehicle/collateral layers
+(`ev_penetration`/`vehicle_collateral`/`vehicle_mix`/`vehicle_models`), and (b) probe a BAAC department
+CKAN to unblock `build_baac_credit.py` (a complete, `--check`-gated builder whose `baac_credit.json` output
+has never been produced). This run **live-probed both and proved both are dead ends from a cloud IP** — so
+instead of manufacturing a byte-identical "refresh" or re-probing a source that 403s, it records the
+verified negatives with precise recheck triggers, so the survey/loop stops re-flagging them (the treadmill
+this loop keeps hitting). **No app or data-layer change — a settled-decision doc entry only.**
+
+**What was verified (live probes, 2026-08-04):**
+- **DLT is reachable but upstream-frozen — the collateral layers are already at DLT's newest
+  genuinely-complete vintage, not stale by neglect.** `gdcatalog.dlt.go.th` returns HTTP 200 from CI, but
+  its cumulative-stock dataset `dataset_1_1_04` serves ONE resource, `stt_car_fuel_at_25690228.csv` = 28
+  Feb 2026 — exactly the committed `vintage: 2026-02-28`. The first-registration dataset
+  `stat_1_1_01_first_regis_vehicles_car`'s Feb-2026 file (`sttt_car_new_reg_mm_2569_02.csv`) is a
+  **permanent ~6-row stub** (1,031 B, 7 lines) against Jan-2026's 151 KB / ~1,421 rows — re-checked
+  still-a-stub 4 months after its 2026-03-17 last-modified — which is precisely why
+  `build_vehicle_models.py`'s `STUB_FRACTION` rule excludes it and `vehicle_models.json`'s
+  `latest_month: 2026-01` is CORRECT. The monthly-action datasets `dataset_stat_1_008/009` top out at
+  Feb-2569 too. Re-pulling today reproduces byte-identical output; a refresh is worthwhile only once DLT
+  publishes newer files (recheck trigger recorded in `NEXT_STEPS.md` §2).
+- **BAAC has no CI-reachable source.** `data.go.th/api/3/action/package_show?id=baac02_2567` → **HTTP 403**
+  from CI (aggregator geoblock), and BAAC — unlike DIW/DLT — has **no own department CKAN**:
+  `catalog.baac.or.th`, `data.baac.or.th`, `opendata.baac.or.th`, `baac.or.th` all resolve **HTTP 000**.
+  `build_baac_credit.py` stays correctly SKIP-gated; its xlsx is Thai-IP/owner-side only.
+- **Google Trends (`search_demand.json`, the prior entry's #1 follow-up) is 429-blocked from this cloud IP**
+  (pytrends `interest_by_region` → `TooManyRequestsError 429`) — confirmed, not refreshable from CI either.
+
+- **Provenance / honesty:** no numbers touched anywhere; `provenance.json` counts and every data layer are
+  byte-unchanged. The app does not misrepresent the DLT vintages (no machine-readable staleness defect to
+  fix — checked `provenance_sidecar.json` + the app's vintage rendering).
+- **Verification:** `bash tests/run.sh check` → **122 passed · 0 failed** (455 data-validation checks, 0
+  failed) both before and after — the edit is confined to `docs/NEXT_STEPS.md` §2 and this log, which the
+  gate does not derive from, so the green baseline is preserved by construction and re-confirmed.
+- **Next recommended:** the genuine remaining unlocks are all Thai-IP/owner-side (a fresh loan-tape export;
+  the Sabuy Cash Play/Apple/ATC ids per `NEXT_STEPS.md` §0c; DLT once it publishes >Feb-2569 data) or wait
+  on upstream. From CI, prefer a real analytical cross-join over existing committed layers to any further
+  byte-identical "refresh" — the freshness backlog is exhausted.
+
+## 2026-08-04 — Intelligence loop (PEER COMPARISON): rival EXPANSION PACE + loan-book SCALE now structured on `#acq`, no longer prose-only — PR #… → master
+
+Autonomous market & service intelligence run. Deploy re-verified green up front (master production alias
+HTTP 200 on `/`, `/app.js`, `/data/meta.json`; live `meta.updated` + today's `rival_pulse.sentiment_anchor`
+2026-08-03 both match the committed tree — 0 deploy drift), provenance `--check` reproduces exactly, and the
+planner backlog is exhausted (98%, the one OPEN item is owner-side Vercel access-protection). To avoid the
+"add another site-health probe" treadmill the recent history had become, a negative-space sweep over the
+market/peer/service pillars surfaced a **genuine, highest-value gap**: the single most-emphasised competitive
+fact in the research base — that the #1 rival keeps **expanding** into the same districts while AutoX
+**consolidates** — lived only as prose in `docs/RESEARCH_DIGEST.md` §B and one dead meta string
+(`"opened 518 in 2025"`), captured in **zero** structured fields (grepped `opened_20|net_add|loan_book|
+book_yoy` across `platform/data/*.json` + `pipeline/*.py` → only vehicle hits). The `#acq` Competition tab
+therefore showed only STATIC current branch counts (MTC 8,673 › AutoX 2,015 › Tidlor 1,873 › Srisawad 1,138),
+never the DIRECTION behind them — precisely the "margin erosion on the network we already run" read
+objective #2 exists to surface.
+
+**What shipped (the one improvement).** `pipeline/build_competitor_coverage.py` now carries a
+`PEER_FINANCIALS` block (REPORTED, cited per operator from RESEARCH_DIGEST §B FY2025/2025 IR) and folds it
+onto each `national_standing.ranking` row: **loan-book ฿bn** (MTC ฿183.222bn · Tidlor ฿109.586bn +5.4% YoY ·
+Srisawad ฿93.155bn @30 Jun 2025), **branch net-adds** (MTC +518 in 2025 → prior-year 8,155, the ONLY operator
+that disclosed a delta — the others stay honestly blank, never back-computed), plus MTC's 10–15% portfolio
+growth target. AutoX's own row is MEASURED branches + a `"consolidating (no branch-growth target)"` posture and
+a **null** loan-book (its book is not conflated into the REPORTED peer set — no invented ฿70bn). A new
+`expansion_note` + `expansion_label` narrate the read, and `meta.peer_financials_sources` cites every figure
+with its IR URL. `app.js drawCompCoverage` gains a null-safe "**Expansion pace & book scale**" line under the
+existing network-size chain (filters on `loan_book_bn!=null`, so a pre-fold file renders nothing).
+
+- **Provenance / no-fabrication:** every number is a CITED public IR figure (labelled REPORTED, same class as
+  the existing `expected` branch counts); branch net-adds shown only where disclosed; AutoX book left null.
+  `provenance.json` counts unchanged (75 measured / 61 estimated / 0 unlabelled) — only the
+  `competitor_coverage` byte-size cell moved.
+- **Verification (all pass):** `build_competitor_coverage.py --check` byte-exact · `build_provenance.py --check`
+  reproduces exactly · `node --check platform/app.js` OK · `bash tests/run.sh check` → **121 passed · 0 failed**
+  (data validation 455/455). Headless render self-review (chromium 390px + 1280px): **0** JS/page errors from the
+  change, in-browser `fetch('data/competitor_coverage.json')` confirms the new `expansion_note` + `loan_book_bn`
+  fields load; the readout's non-render in the sandbox is an environmental lazy-render/CDN limitation that hits
+  the unchanged network-size anchor line equally (not a regression) — the render expression was additionally
+  verified correct by node-simulation against the committed JSON.
+- **Next recommended:** refresh `search_demand.json` (brand share-of-search, obj #2) — `pulled_at_utc`
+  2026-07-04 is 31d stale while its siblings are 2026-08-03, and its pytrends `geo=TH` source is CI-reachable
+  (not Thai-IP-blocked): `cd pipeline && python3 pull_google_trends.py && python3 build_search_demand.py`.
+
+## 2026-08-04 — Integration loop (provenance honesty): Data-room card now shows `rival_pulse`'s fresher `sentiment_anchor` (2026-08-03) instead of the stale `promos_pulled_at` pull-timestamp (2026-07-19) — committed to master
+
+Autonomous integration run. Re-verified the stated data-integration backlog is exhausted/blocked before
+picking work: **FPO PICO (item #1)** is fully shipped — I re-pulled a fresh `fpo_pico.csv` from
+`catalog.fpo.go.th` (reachable from CI, 2,042 licensed operators, 75/77 provinces, all mapping cleanly to
+the canonical 77) and confirmed all four PICO layers (`pico_census`/`pico_district`/`pico_competitors`/
+`branch_pico`) still reproduce **byte-exact** against it, so the committed census is current, not stale.
+**Per-branch cropland (item #2)** and the **data.go.th distillations (item #3** — DIW factories, MOT/Excise
+vehicles, DBD formation, BAAC/SME-bank credit) are all built + gated + surfaced. **GISTDA 40m crop (item #4)**
+stays blocked: `GISTDA_SPHERE_KEY` is **NOT** in this CI env (reconfirmed this run). So this run took the #1
+recommended follow-up the previous entry left.
+
+**The fix.** `rival_pulse.json` carries two freshness stamps for its two halves: `sentiment_anchor`
+(2026-08-03 — the newest review date IN the pulled data, the MEASURED observation vintage of the sentiment
+ladder, refreshed this morning) and `promos_pulled_at` (2026-07-19 — a pull-run timestamp for the Thai-IP-only
+promo half, honestly older). `build_provenance.py::_vintage_of()` had `promos_pulled_at` in its key list but
+not `sentiment_anchor`, so the Data-room card resolved rival_pulse's vintage to the **staler** 2026-07-19 —
+understating how current the competitive-sentiment read actually is. Added `sentiment_anchor` to the priority
+list among the data-observation keys (ahead of the pull-timestamp keys), with a documenting comment in the
+established style. Only `rival_pulse` carries that key (grep-verified), so no other layer's vintage moves.
+
+- **Effect (exactly one cell):** `provenance.json` rival_pulse row `vintage 2026-07-19 → 2026-08-03`,
+  `age_days 16 → 1`. Semantic diff confirms **1 changed row, 0 others**; measured/estimated/layer counts
+  unchanged (75/61/136). No fabrication — 2026-08-03 is the real newest-review observation date the layer
+  already ships; this shows the fresher of its two honest vintages, exactly like the prior `board_vintage` /
+  `price_asof` / `farmgate_vintage` key fixes.
+- **Verification:** regenerated `provenance.json` (`build_provenance.py`, byte-reproducible); `bash tests/run.sh
+  check` → **123 passed · 0 failed** (+ **455 data-validation checks, 0 failed**); `build_provenance.py --check`
+  reproduces byte-exact in-gate. All SKIPs are pre-existing (absent network inputs / numpy / rasterio). The
+  freshly-pulled `fpo_pico.csv` stays in the gitignored `source-data/datagoth/` cache — not committed.
+- **Next recommended:** the previous entry's *other* thread — extend the social-listening watchlist's blind
+  spot (**Sabuy Cash**, NEXT_STEPS §0c) once its Play/Apple/ATC ids are verified from a Thai IP; or, if a Thai-IP
+  session lands, distill the two `pulled-but-never-distilled` datagoth penetration signals (`baac_credit`,
+  `smebank_credit`) into committed per-province layers (DATAGOTH_CATALOG flags them as the last undistilled sources).
+
+Autonomous market & service intelligence run. The planner backlog is exhausted (98%, the one open item is
+owner-side Vercel access-protection) and the recent loop history is a treadmill of one-off `site-health probe
+guards X.json` commits, so this run took the highest-value **genuinely stale** thing a negative-space freshness
+sweep surfaced: **`rival_pulse.json`'s sentiment half was 16 days old** (`sentiment_anchor` 2026-07-19) while
+every other measured competitive layer was current — and its Google Play source (`pull_app_reviews.py`) is
+explicitly **any-IP / CI-schedulable** (only the promo half needs a Thai IP). Verified Google Play IS reachable
+from this CI runner (AUTOX ratings moved 1004→1020 on a probe), so this is a real MEASURED refresh, not a
+fabrication.
+
+**What shipped (the one improvement).** Re-pulled all 10 title-lender apps' Play store pages
+(`pull_app_reviews.py` → `source-data/app_reviews.json`, 1,786 reviews merged, newest 2026-08-03) and rebuilt the
+three gated layers that derive from it: **`rival_pulse.json`** (the #acq sentiment ladder), **`rival_universe.json`**
+(the 18-operator board's Play-score join) and **`social_themes.json`** (demand-side review mining). Each rebuild is
+`--check` byte-exact. The refresh surfaces **real competitive movement**: the best-rated rival flipped
+**SAWAD 4.65★ → MTC 4.66★** (SAWAD's app rating actually *fell* to 4.58, TIDLOR jumped 4.49→4.58), and AutoX's own
+gap to the leader widened 0.67★ → 0.68★ — all now current on the #acq board instead of frozen at the July pull.
+The promo half (`promos_pulled_at`) correctly stays 2026-07-19 (Thai-IP-only pull, honestly not refreshed).
+
+**Also (a bundled gate-repair, not caused by this change).** The determinism gate flagged
+`build_live_board.py --check` as drifted — a **pre-existing** failure at HEAD (`live_board.json` was not in this
+run's diff; an earlier data-refresh cron committed a 2026-08-03 feed stamp without rebuilding the derived board).
+Rebuilt it (`build_live_board.py`, network-free + byte-reproducible) to reach a 0-failed gate; it now reproduces
+exactly. Noted here so the next caller doesn't re-attribute it to the sentiment refresh.
+
+- **Verification (all pass):** `pull_app_reviews.py` live-pulled 10/10 apps; `build_rival_pulse.py`,
+  `build_rival_universe.py`, `build_social_themes.py`, `build_live_board.py` all `--check` **byte-exact**;
+  `build_provenance.py --check` reproduces exactly (only the four refreshed layers' byte-size cells changed — no
+  count/label/other-layer drift); `bash tests/run.sh check` → **536 passed · 0 failed**. No broken data references
+  (negative-space sweep: 0), no fabrication (every star/review is a Google Play public value).
+- **Provenance note:** `rival_pulse.json`'s Data-room vintage cell still keys on `promos_pulled_at` (2026-07-19,
+  the Thai-IP promo half); the refreshed sentiment observation (2026-08-03) surfaces directly on the #acq ladder.
+  Left the extractor key unchanged this run to keep scope to the one improvement.
+- **Next recommended:** consider having `build_provenance.py::_vintage_of()` prefer `sentiment_anchor` (a
+  data-observation date) over `promos_pulled_at` (a pull timestamp) for `rival_pulse.json`, so the Data-room card
+  reflects the fresher of the layer's two vintages — same class as the prior `board_vintage`/`price_asof` key fixes.
+
+## 2026-08-04 — Integration loop (provenance honesty): corrected `contested_pop.json`'s false "pop10 matches branch_population.json" claim — committed to master
+
+Autonomous integration run. The stated data-integration backlog is exhausted/blocked (FPO PICO,
+per-branch cropland, and the data.go.th distillations are all shipped + surfaced; GISTDA 40m crop
+needs `GISTDA_SPHERE_KEY`, reconfirmed **NOT** in this CI env this run). So this run took the #1
+recommended follow-up left by the previous entry: the second half of the same provenance defect that
+run fixed in the app — the source-side claim in the contested-population layer.
+
+**The bug.** `build_contested_pop.py`'s meta provenance (and its docstring + an inline comment) stated
+that `pop10` — the per-branch 10km WorldPop catchment population — was computed by "the EXACT
+raster-sampling method of build_branch_population.py, **so pop10 matches branch_population.json**." That
+cross-reference is false. `pop10` genuinely IS a direct WorldPop-2020 1km raster sample (this builder
+opens `worldpop_tha_2020_1km.tif` via rasterio and sums cells — MEASURED, correct, and already cleared
+by the provenance audit). But `branch_population.json`'s OWN meta says `method: "areaweight"`,
+`measured: false` — its shipped values are a district-population AREA-WEIGHT estimate, because
+`build_branch_population.py`'s rasterio path was unavailable and it fell back. The two do NOT match and
+differ materially (e.g. branch 0: area-weight 210,389 vs WorldPop 165,523) — the exact discrepancy the
+2026-08-04 app-side fix corrected. The layer was asserting equality with a number it does not equal.
+
+**The fix (build script only — meta text, no numbers).** Reworded the three spots carrying the false
+claim (docstring §METHOD, the pass-2 loop comment, and `meta.provenance.population`) to state the truth:
+`pop10` is a direct WorldPop raster count, and it does NOT match `branch_population.json`, whose shipped
+values are an area-weight fallback that `pop10` only approximates. Rebuilt `contested_pop.json` — the
+`rows` and `top` arrays (every numeric value) are byte-identical to HEAD; only the `meta.provenance`
+string changed.
+
+- **Net effect:** the contested-population layer's provenance stops claiming a false equality; `pop10` is
+  now honestly described as the genuine measured raster count, consistent with the app-side correction.
+- **Not app-visible:** the app reads only `rows`/`top` from `contested_pop.json` (verified by grep);
+  `meta.provenance` is never rendered. No surfaced number, visual, or app behaviour changes — hence a
+  direct commit, not a PR (a safeguard/metadata honesty fix, same class as the recent provenance commits).
+- **Verification (all pass):** installed `rasterio` (absent by default here) so the builder runs;
+  `build_contested_pop.py --check` reproduces byte-exact; `rows`/`top` confirmed identical to HEAD, only
+  `meta.provenance` differs; `build_provenance.py --check` reproduces exactly (the contested_pop byte-size
+  line updated); `bash tests/run.sh check` → **123 passed, 0 failed** (data integrity 455/455).
+- **Next recommended:** the second small follow-up still open from the previous entry — `CLAUDE.md`'s
+  claim that `tests/run.sh check` gates `bake_catchment_heights --check` is stale (that check was removed
+  from `tests/run.sh`); a trivial offline doc fix.
+
+## 2026-08-04 — Integration loop (provenance honesty): branch-popup catchment population now shows the MEASURED WorldPop count, not the ESTIMATED area-weight labelled "measured" — PR (app-visible)
+
+Autonomous integration run. The stated data-integration backlog is exhausted/blocked (FPO PICO, per-branch
+cropland, and the data.go.th distillations are all shipped + surfaced — reconfirmed this run; GISTDA 40m crop
+needs `GISTDA_SPHERE_KEY`, which is **NOT** in this CI env — checked). CI-reachable data refreshes are all
+no-ops or blocked this run: a fresh FPO PICO pull is **byte-exact** (`build_pico_census.py --check` passes →
+registry unchanged since 2026-07-30), and DLT (`gdcatalog.dlt.go.th`), the data.go.th aggregator
+(baac/smebank/diw), DBD (`openapi.dbd.go.th` 403), NSO (`catalog.nso.go.th` 418) and Excise (SSL EOF) all
+fail from this cloud IP. A negative-space sweep confirmed the repo has **no unwired MEASURED layers** and
+effectively complete gate coverage. So this run took the highest-value fully-verifiable item: a **provenance
+honesty bug** surfaced by the provenance audit — a false MEASURED claim on a number shown in every one of the
+2,015 branch popups.
+
+**The bug.** The branch-popup "Catchment ≤10km — measured" block (`platform/app.js` `catchmentPopupHTML`)
+showed a **Catchment population** value taken from `branch_population.json` `.values[i]` and labelled it
+_"population = WorldPop 2020 inside this branch's 10km circle"_ under a "— measured" section header. But that
+file's OWN meta says `measured: false`, `method: "areaweight"`, `population: "ESTIMATED — … WorldPop
+raster/rasterio unavailable; fallback method"` — it is a district-population **area-weight estimate**
+assuming uniform intra-district density, NOT a WorldPop count. The genuinely MEASURED WorldPop-2020 1km-raster
+count for the SAME branch sat right beside it, in `contested_pop.json` `rows[i][0]` (`pop10`, MEASURED per its
+meta, verified + cleared by the provenance audit at its `#exposure` use), used only as a **fallback that was
+never reached** because `BPOP` is populated for all 2,015 branches. The code comments compounded it, claiming
+the two were "the same raster, same method" — they are not, and their values differ materially (e.g. branch 0:
+area-weight 210,389 vs WorldPop 165,523; branch 1: 23,572 vs 33,259). Worse, the "% contested by rivals"
+figure on the same line already used `cp[1]/cp[0]` (WorldPop base) as its denominator, so the displayed
+population and its own contested share were computed on **two different population bases**.
+
+**The fix (app.js only — NO data/HTML/provenance touched).** Flipped the population source priority in
+`catchmentPopupHTML` to prefer the MEASURED WorldPop count (`contested_pop.json` `rows[i][0]`) over the
+area-weight estimate, with `branch_population.json` kept as a defensive fallback. Added a `popMeasured` flag so
+the footer states the honest source per branch — "WorldPop 2020 (1km raster) …" when measured, else "ESTIMATED
+— district population area-weighted …". Since `contested_pop` covers all 2,015 branches, the measured path is
+taken for every branch (verified 2015/2015), so the "— measured" header is now truthful AND the displayed
+population shares the same base as its contested-share denominator. Corrected the four misleading comments
+(`app.js` ~1119, ~1128, ~7082, ~7089) that called `branch_population.json` "TRUE WorldPop 2020 / MEASURED /
+same raster, same method".
+
+- **Net effect:** the catchment population shown in every branch popup changes from an unlabelled-as-such
+  estimate to the true measured WorldPop count (e.g. 210,389 → 165,523 for branch 0), and its provenance label
+  is now honest — directly serving the project's core "measured-vs-estimated honesty" value.
+- **Verification (all pass):** `node --check platform/app.js` OK; a node harness replaying the new selection
+  confirms **2015/2015** branches take the measured path and the value matches `contested_pop` `pop10`;
+  `build_provenance.py --check` reproduces exactly (no data file changed); `bash tests/run.sh check` →
+  **123 passed, 0 failed** (data integrity 455/455); `render` passes all 7 non-3D pages. (The `health`
+  hook-checks are flaky in THIS sandbox — `#db-root` "fails" on `data.html`, which does not even load app.js —
+  so they are environmental settle-timing noise here, unrelated to this edit; CI runs health on Linux.)
+- **Why a PR, not a direct commit.** It changes a surfaced number and its label in every branch popup — an
+  app-visible change — so per the loop's own rule it goes to review rather than straight to master.
+- **Next recommended:** two small follow-ups. (1) `contested_pop.json`'s own meta still claims `pop10`
+  "matches branch_population.json" — false now that BPOP fell back to area-weight; correct that sentence in
+  `build_contested_pop.py` and rebuild. (2) `CLAUDE.md:73` claims `tests/run.sh check` gates
+  `bake_catchment_heights --check`, but that check was removed (`tests/run.sh:71-75`) — drop the stale claim
+  (a trivial offline doc fix flagged by the negative-space sweep).
+
+## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards vehicle_models.json (Macro nameplate panel + collateral pickup verdict) — committed to master
+
+Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open
+item is owner-side Vercel access-protection), and the data room re-confirmed healthy this run: `build_provenance.py
+--check` reproduces exactly, the master production alias serves **HTTP 200** on `/`, `/data/meta.json` and
+`/data/deltas.json` (a transient TLS blip on the first deltas fetch cleared on retry — not a regression), and
+`site-health.yml` correctly targets the master production alias. So this run took the service pillar's standing
+brief — surfaced exec reads that live-degrade with no deploy probe — and closed the highest-value one still open.
+
+**The gap.** A render-path re-scan of surfaced-but-unprobed `data/*.json` reads (75 of them, most secondary or
+graceful-degrading) found the newest wave still uncovered: **`vehicle_models.json`** (the #275/#276 Macro
+"nameplate" wave, obj #1 collateral context — which pickup/PPV models dominate registrations and which are
+growing). It is load-bearing on TWO MEASURED render paths, not one: (1) the "which models, and which are growing"
+nameplate panel (`cb-nameplates`) GATES on `V.plates_last12` then renders the pickup/ppv `.top[]` boards
+(plate/units/share_pct/yoy_pct); (2) the **collateral pickup-definition verdict** (`renderYearTable`) takes this
+layer as the AUTHORITATIVE pickup count on AutoX's own nameplate rule (pickup+PPV nameplates in any class),
+falling back to the registrar's รย.3 truck class only when it is absent. The client loader itself sets
+`VMODELS=null` unless `Array.isArray(v.annual)`, so a truncated/gutted CDN deploy **silently** reverts BOTH
+surfaces to their fallback with no phone alert — the same "broken demo" blind spot the collateral_book /
+macro_book / deltas obj-#1 probes closed for their siblings. It was the last unprobed read from the newest
+surfaced wave.
+
+**The fix (probe-script only — NO app/data/HTML/visual/provenance touched).** Added `_shape_vehicle_models` to
+`pipeline/check_site_health.py` + its `DATA_FILES` entry. Asserts the render contract both paths read (NOT
+values): the `annual` array gate (the client's own `VMODELS` gate) + a `plates_last12` dict carrying non-empty
+`pickup` AND `ppv` groups whose first `.top` row has a string `plate` and numeric `units`/`share_pct` — shape,
+not counts, so a future DLT-vintage refresh that moves the registration numbers stays green.
+
+- **Verification (all pass):** unit-tested — the real 21,829-byte payload accepted; twelve negatives reject
+  non-dict / missing-or-empty-or-non-list `annual` / missing-or-empty `plates_last12` / missing pickup-or-ppv
+  group / empty `.top` / row-missing-`plate` / non-numeric-`units` / missing-`share_pct`. Offline `--local
+  platform` reports **116/116 HEALTHY** with `vehicle_models.json` served + shape-sane; the live master
+  production alias serves it **HTTP 200** (21,829 bytes, matches local). Probe coverage +1 exec check (35 → 36
+  probed data layers). `bash tests/run.sh check` → **121 passed, 0 failed** (data integrity 455/455 — the check
+  phase does not read the site-health probes; unaffected). No `platform/data` file changed → no
+  `build_provenance.py` regen needed. Diff = `pipeline/check_site_health.py` (+57) + this log + SERVICE_AUDIT.
+- **Why a direct commit, not a PR.** Probe-script only — no app behaviour, no visual, no surfaced number, no data
+  layer. It closes a deploy-health blind spot without altering what ships; same safeguard-only direct-to-master
+  path as the recent site-health probe commits.
+- **Next recommended:** probe the two sibling reads from the same nameplate wave still uncovered — `vehicle_brands.json`
+  (`cb-vbrands`, gates on `national.by_type.ry3 && .ry1`, ESTIMATED province split) and `vehicle_mix.json`
+  (`cb-mix`, gates on `national.stock && .new && types.length`, MEASURED) — then the Overview switchboard's
+  multi-source `debt_source`/`farm_household` reads.
+
+## 2026-08-03 — Integration loop (QA-health): un-broke the page-health gate — two stale manifest hooks fixed (NEXT_STEPS §0d.8) — committed to master
+
+Autonomous integration run. The scheduled data-integration backlog is exhausted or blocked (FPO PICO,
+per-branch cropland, and the data.go.th distillations are all shipped + surfaced — reconfirmed this run
+by grep; GISTDA 40m crop needs `GISTDA_SPHERE_KEY`, which is NOT in this CI env — checked). A
+negative-space sweep surfaced `farm_income_impact.json` as the top unwired MEASURED layer, but its
+per-branch array is `basis:"allocation"` (province value copied to every branch, zero within-province
+variance — the exact trap the 2026-08-03 collateral-outlook run already rejected), and surfacing its
+province layer is a surfaced-numbers app change that needs a PR + owner signoff. So this run took the
+cleanest fully-CI-verifiable safeguard fix instead: **NEXT_STEPS §0d item 8 — the page-health gate was
+structurally broken (0 passed / 10 failed), every failure a false `missing #<hook>`.**
+
+**The defect.** `tests/pages.manifest` is the harness's single source of truth for which DOM hooks must
+exist & be non-empty after each page settles. Two rows asserted hooks that the current app no longer
+renders, so `bash tests/run.sh health` failed on EVERY page — a completely non-functional gate that
+could not tell a real regression from its own stale config:
+- `index` asserted `macro,region`. `#region` was the "Segment signals by region" Overview table,
+  **removed 2026-08-01** (owner directive: real numbers, not a score-of-a-score). Confirmed absent from
+  the settled DOM (`grep -c 'id="region"'` → 0). `#macro` (the JS-populated macro strip) still renders.
+- `risk-trend` asserted `trendbaseline`. That element is the SINGLE-VINTAGE placeholder — **empty in the
+  shipped MULTI-vintage state** (currently 2025M12 → 2026M06, so the movers render into `#trendregions`,
+  e.g. "Isan · 601 branches", and `#trendbaseline` stays len 0). The gate reported "#trendbaseline empty"
+  every run.
+
+**The fix (test-config only — NO app/data/HTML/provenance touched).** Repointed the two hooks to the
+elements the pages actually render now — `index` → `macro`, `risk-trend` → `trendregions` — each a
+genuine JS-populated content assertion (both are static-empty in source and filled on render, so a broken
+page still fails the gate; this is not a weakening). Added manifest comments recording why `#region` and
+`#trendbaseline` were dropped and, for the trend row, that the hook should flip back to `trendbaseline`
+if the snapshot history is ever reset to a lone baseline vintage. All 8 remaining rows were re-derived
+against the live settled DOM and confirmed already-correct (national/`map` canvas-backed, acquisition/
+`amptbl,amprtbl`, branch-explorer/`map`, both data-book/`db-root`, and the three 3D pages' `map,kpis,
+v-districts` / `map,focalName,leads,recos` all present) — so no other row needed a change.
+
+- **Verification (all pass):** rendered each page headless (chromium/swiftshader) and ran the real
+  `tests/lib/health.sh` per row — the two fixed pages now pass (`#macro present & non-empty`,
+  `#trendregions present & non-empty`); index/national/risk-trend/acquisition/branch-explorer/
+  data-book×2 **all health-green**; `province-chonburi` also rendered here (30s budget) and passed
+  `map,kpis`. The manifest parser (`grep -vE '^\s*#'`) correctly excludes the new comment lines — the
+  row set is unchanged at 10. `bash tests/run.sh check` → **121 passed, 0 failed** (unaffected — the
+  check phase does not read the manifest). No `platform/data` file changed → no `build_provenance.py`
+  regen needed. Diff = `tests/pages.manifest` + `docs/NEXT_STEPS.md` (§0d.8 marked done) + this log.
+- **Why a direct commit, not a PR.** Test-harness config only — no app behaviour, no visual, no surfaced
+  number, no data layer. It repairs a broken QA safeguard without altering what ships; same
+  safeguard-only direct-to-master path as the recent site-health probe commits.
+- **Note on the sibling open items (unchanged this run):** §0d.7 (the 3 heavy deck.gl pages time out
+  under the CI runner's software GL — they render fine here at a 30s budget, so it is a QA_BUDGET/runner
+  issue, not the pages) and §0d.9 (stale visual-regression baselines) are still open; the health phase
+  will now surface REAL hook regressions on the 7 non-3D pages instead of drowning in false positives.
+- **Next recommended:** surface `farm_income_impact.json`'s PROVINCE layer (measured crop-revenue
+  farm-income shock, obj #1) on `#exposure` as a PR — honest province-grain only, NOT the allocation-basis
+  per-branch array; or refresh the §0d.9 visual baselines now that `health` is trustworthy again.
+
+## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards `deltas.json` (the last unprobed front-door read) — committed to master
+
+Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open
+item is owner-side Vercel access-protection), and the data room re-confirmed healthy this run: **0 surfaced
+layers >180d stale** (oldest ISO-dated `vehicle_collateral.json`/`ev_penetration.json` at 156d), **0 broken
+data references** (all three `data/*`-shaped grep hits resolve to `source-data/…` in comments, not missing
+SPA fetches), and the **live master production alias serves HTTP 200** on `/`, `/data/meta.json` and
+`/data/deltas.json`. So this run took the service pillar's standing brief — surfaced exec reads that
+live-degrade with no deploy probe — and closed the highest-value one still open.
+
+**The gap.** `deltas.json` (the TIME dimension, obj #1 — which segments/branches are getting riskier
+between vintages) was the **last surfaced FRONT-DOOR (#home) read with no site-health probe**. It drives
+BOTH the command-center "Movers" card (`renderHomeMovers` off `DELTAS.region` + `DELTAS.branches`) AND the
+whole Risk-trend (#trend) tab (`.board` YoY re-ratings + the region/branch mover rows). Its failure mode is
+worse than a silent blank: a missing/truncated/404 file drops both surfaces to the CALM string _"Baseline
+captured — trends appear after the next data refresh"_, **masquerading a broken deploy as the normal
+single-vintage baseline state** — real obj-#1 risk movement vanishes with no phone alert.
+
+**The fix.** Added `_shape_deltas` to `pipeline/check_site_health.py` + its `DATA_FILES` entry. Asserts the
+render shape both surfaces read (NOT values): the `baseline` gate, a blank-safe `to` vintage label, and —
+when NOT in baseline mode — a non-empty `branches` movers list carrying `n/comp`, a non-empty `region` list
+carrying `r/d_agri`, and the `board` YoY list the #trend tab reads. It stays GREEN in a legitimate
+single-vintage baseline (`baseline:true`, movers absent by design) so it can never false-alarm if the
+snapshot history is reset. Probe-script-only — no `platform/data` file altered, so no provenance regen.
+
+- **Verification (all pass):** ten unit tests — the real 80-branch/5-region payload AND a `baseline:true`
+  file both accepted; eight negatives reject non-dict / missing-`baseline` / blank-`to` / empty-`branches` /
+  branch-missing-`comp` / empty-`region` / region-missing-`d_agri` / non-list-`board`. Offline
+  `--local platform` → **113/113 HEALTHY** with `deltas.json` shape-sane; live alias serves it **HTTP 200**
+  (16.3 KB). `bash tests/run.sh check` → **121 passed, 0 failed** (data integrity 455/455). Diff =
+  `pipeline/check_site_health.py` (validator + entry) + `docs/SERVICE_AUDIT.md` + this log.
+- **Why a direct commit, not a PR.** No visual/app behaviour change — it only adds a CI/probe validator; no
+  UI, no data, no surfaced number touched. The safeguard-gated direct-to-master path applies.
+- **Next recommended:** the front-door probe coverage is now complete; the next service target is the
+  #trend tab's sibling `snapshots_index.json` (still unprobed — it drives the snapshot selector), or a
+  MARKET-pillar sharpening (needs a PR + owner signoff if it touches surfaced numbers).
+
+## 2026-08-03 — Integration loop: collateral recovery-value outlook is now PRICE-AWARE (measured BoT UVPI) — PR (not committed)
+
+Autonomous integration run. The scheduled data-integration backlog is exhausted or blocked (FPO PICO,
+per-branch cropland, and the data.go.th distillations are all shipped; GISTDA 40m crop needs the
+`GISTDA_SPHERE_KEY` secret which is NOT exposed to this CI session, so its puller can't be built+verified
+here; BAAC credit stays CI-blocked). A negative-space sweep confirmed no high-value MEASURED file sits
+unwired, and surfaced two depth candidates. Candidate 1 (surface `farm_income_impact.json`'s per-branch
+array) was **rejected on inspection**: that array is `basis: "allocation"` — the province number copied
+onto every branch (zero within-province variance), so a per-branch readout would imply a branch grain that
+does not exist. Candidate 2 is this ship.
+
+**The defect fixed (objective #1, honesty + correctness).** `build_collateral_outlook.py` produced the
+per-province collateral RECOVERY-value outlook (the "firming vs softening" read on `#overview` and the
+#home risk card) from gold YoY + a `moto_term` that **assumed** vehicle-title-heavy provinces were
+softening — with NO regard for whether used-vehicle resale prices were actually rising or falling. It
+would have printed "softening on used-motorcycle-title depreciation" in a year when used-vehicle prices
+were RISING. Worse, the app's own note told the reader "**no live Thai used-vehicle price index in this
+data**" and the pickup card said "**No live Thai used-pickup index yet**" — both FALSE since
+`used_vehicle_value.json` (BoT UVPI, 2015=100, car + truck=รถกระบะ pickup series, MEASURED) was committed.
+The measured signal was sitting in the repo, unused, while the layer asserted a direction with no price
+evidence and told the reader the measurement didn't exist.
+
+**The fix.** Folded the MEASURED BoT UVPI used-vehicle price direction into the outlook:
+- `build_collateral_outlook.py` reads `platform/data/used_vehicle_value.json`, computes the trailing YoY
+  of the car and pickup series (newest period IN the data vs the same month a year earlier — anchored on
+  data vintage, never wall clock), equal-weights them into a blended used-vehicle YoY, and maps it to a
+  new `veh_price_term = clamp(used_veh_yoy / 15, -1, 1)` MEASURED national leg. Current read: car −8.33%,
+  pickup −0.37%, blended −4.35% YoY to 2026-05 → veh_price_term −0.29 (a real, measured drag).
+- New formula: `outlook = 0.6*gold_term + 0.25*veh_price_term − 0.15*moto_term`. The gold:vehicle weight
+  balance is held at the prior **60:40**; within the vehicle 0.40, the MEASURED price direction now leads
+  (0.25) and the unmeasured motorcycle structural proxy is DEMOTED (0.15 from 0.40). UVPI does not price
+  motorcycles, so the moto slice keeps its structural exposure proxy — said plainly in `meta.caveats`.
+- New MEASURED fields on `national` (`used_veh_yoy_car/pickup/blended`, `used_veh_price_period`,
+  `veh_price_term`) and per province (`used_veh_yoy`, `components.veh_price_term`); docstring, `meta.fields`
+  / `formula` / `provenance` / `caveats`, and the per-row notes/headline all updated. The composite stays
+  labelled ESTIMATED (it blends measured legs with chosen weights); its price legs are labelled MEASURED.
+- `app.js renderCollatOutlook`: replaced the false "no live index" editorial pickup card with a MEASURED
+  "Used car/pickup resale value" card driven by the new `national` fields (null-safe fallback to the old
+  editorial card when absent); corrected the national-outlook card note and the section read-note to cite
+  the measured UVPI leg and stop claiming no index exists. Motorcycle card now says plainly it is NOT
+  covered by the BoT car/pickup index.
+
+**Why a PR, not a direct commit.** It alters a surfaced card's numbers and the outlook weights are a
+modelling judgment Kaustav should sign off on (he has pushed back before on "made-up" composite knobs) —
+so the mandate's "alters app behaviour / not fully confident → open a PR" path applies.
+
+- **Verification (all pass):** `node --check app.js` OK; `build_collateral_outlook.py --check` reproduces
+  byte-for-byte (77 provinces); `build_provenance.py` regenerated (136 layers · 75 measured / 61 estimated
+  / **0 unlabelled** · 0 without a meta stamp); `bash tests/run.sh check` → **121 passed, 0 failed**
+  (data integrity 455/455); headless render of `index.html#overview` → **no uncaught JS errors**
+  (`data-errors="[]"`), the new MEASURED card + corrected notes present. Diff = `build_collateral_outlook.py`
+  + `app.js` (renderCollatOutlook) + regenerated `collateral_outlook.json` + provenance + this log.
+- **Next recommended:** GISTDA 40m satellite crop-area (`GISTDA_SPHERE_KEY`) — needs the secret plumbed
+  into the CI job's env before a puller can be built and verified; and the GISTDA flooded-AREA dissolve
+  (NEXT_STEPS §0), a shapely geometry job needing a fresh keyed pull.
+
+## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards `rival_threat_region.json` — committed to master
+
+Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open
+item is owner-side Vercel access-protection) and the peer/market/service data room is healthy this run:
+provenance `--check`-reproducible (**136 layers · 75 measured · 61 estimated · 0 unlabelled**), freshness
+clean (oldest dated layer `vehicle_collateral.json` 156 days, **0 layers >180d stale**), the live master
+production alias serves **HTTP 200** on `/`, `/data/meta.json`, `/data/peer_province.json`,
+`/data/competitor_coverage.json` and `/data/rival_threat_region.json`, and `site-health.yml` correctly
+targets the master production alias. Peer comparison is already deep (`peer_province.json` carries the
+per-brand Muangthai/Srisawad/Tidlor/Heng split, rival:AutoX ratio, per-100k-vehicle density and
+districts-outnumbered for all 77 provinces; national standing in `competitor_coverage.json`), so this run
+took the service pillar's own standing brief — **surfaced exec reads that live-degrade SILENTLY with no
+deploy probe** — and found the highest-value one still open: `rival_threat_region.json`.
+
+`rival_threat_region.json` (obj #2 — the per-region density × service JOIN, MEASURED on both axes) is the
+last surfaced **exec FRONT-DOOR** competitive read with no site-health probe. It renders on the
+command-center "Where the network is hardest to defend" card (`renderHomeDefend`, #home — the exec's first
+screen) AND the Competition per-region table (`drawRivThreatRegion`, #acq), both gated on a non-empty
+`.regions` array and both degrading SILENTLY when the file is missing/truncated — the #home card never
+un-hides (`wrap.style.display` stays hidden) and the tab drops to a "not yet computed" placeholder, with
+no phone alert. That is the exact "broken demo" blind spot the `peer_province` / `province_pressure` /
+`competitor_coverage` probes closed for the sibling competitive reads, but on the higher-value front door.
+
+`pipeline/check_site_health.py` now probes it (`_shape_rival_threat_region`: fetch + parse + render-shape —
+asserts the display gate `.regions` is a ≥3-of-5-region list whose first row carries the axes each render
+reads (`region` name, `rivals_vs_autox` density, `rating_wavg` service, `threat_class` defensibility + the
+#home sort key), plus a non-blank top-level `.headline` the Competition readout reads — shape not values,
+robust to a future census/rating vintage shifting the ratios). Verified: fifteen negative tests reject
+non-dict / missing-or-short-`regions` / non-list-`regions` / row-not-dict / each missing/blank row axis /
+missing-or-blank-`headline` while accepting the real payload; the offline `--local platform` path reports
+**110/110 HEALTHY** with `rival_threat_region.json` served (3.8 KB) and shape-sane. Probe coverage
+107 → **110** exec checks. Diff = `check_site_health.py` only (+47 lines) — no `platform/data` file altered,
+so no `build_provenance.py` regeneration required.
+
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **0 failed** (see gate output). (b) no secrets
+  in diff. (c) diff = only `check_site_health.py` + this log, matches intent. (d) provenance/no-fabrication
+  intact — probe asserts shape, not values; no data layer touched. Test/monitoring-infra only, no
+  visual/app behaviour change → committed directly to master (no PR/headless render needed).
+- **Deploy-verify:** live master production alias re-checked HTTP 200 on `/` and `/data/rival_threat_region.json`.
+- **Next recommended:** `rival_threat.json` (the non-region brand-matrix sibling on #acq, `renderRivThreat`)
+  is the matching still-unprobed competitive read; after that the surfaced front-door + #acq competitive
+  reads are essentially all probed. Off the service pillar, the genuinely-valuable blocked integrations
+  remain (BAAC personal-credit **penetration** layer — `build_baac_credit.py` SKIP-only pending the
+  owner-side Thai-IP re-pull; GISTDA flooded-**AREA** dissolve needing a fresh keyed pull).
+
+## 2026-08-03 — Integration loop (service/deploy-health): site-health probe guards `flood_hazard.json` — committed to master
+
+Autonomous integration run. The scheduled integration backlog's top items are all shipped or blocked:
+FPO PICO fold-in (`build_pico_*`, live on the `#map` `dpico`/`doutnum` lenses), per-branch measured
+cropland (`build_branch_cropland.py`, wired via `loadBranchCropland`), and the data.go.th distillations
+(`fpo_pico`/`dbd_newco`/`diw_factories`/`mot_vehicles`/excise → committed layers) are done; the two
+remaining undistilled sources (BAAC / SME-bank credit penetration) stay CI-blocked (gitignored Thai-IP
+cache + `data.go.th` 403 from CI) and GISTDA 40m crop-area needs a live keyed puller. A gate-coverage
+audit also confirmed **no ungated `--check` builder remains** (the 2026-08-03 four-builder run closed the
+last hole; `build_baac_credit` correctly SKIPs on its absent owner-side input). So this run took the
+service pillar's own flagged **"next probe target"** (the 2026-08-03 `farm_book` ship): after
+`collateral_book` / `macro_book` / `farm_book`, `flood_hazard.json` was the remaining surfaced obj-#1 exec
+read **live-fetched with no deploy site-health probe**.
+
+`renderFloodExposure` (the Exposure `#exposure` tab's "Portfolio flood-hazard exposure" panel) gates the
+whole panel on `FLOODHZ && FLOODHZ.length` — where `loadFloodHazard` sets `FLOODHZ = j.branches` (the 0-12
+MAX-flood-frequency array, INDEX-ALIGNED to `branches.json`) — then reads `FLOODHZ[i]` per branch for the
+region/province chronic-flood tables + the frequency-band ladder, plus `floodhzMeta.source` /
+`.data_vintage` for the header citation. It is MEASURED (GISTDA Repeated-Flooding 2005-2016 50k census)
+and **live-degrades SILENTLY**: a missing/truncated CDN deploy just blanks (`host.innerHTML=''`) the
+primary structural-hazard screen with no phone alert — the exact "broken demo" blind spot the
+`collateral_book` / `macro_book` / `farm_book` obj-#1 probes closed for their siblings.
+
+`pipeline/check_site_health.py` now probes it (`_shape_flood_hazard`: fetch + parse + render-shape —
+asserts the display gate `branches` array is a **full-length 2015** index-aligned list carrying numeric
+0-12 frequencies, and `meta` carries non-blank `source`/`data_vintage` — shape not values, robust to a
+future GISTDA-vintage refresh moving the frequencies). Verified: ten tests — the real payload is accepted
+while non-dict / missing-`branches` / empty-`branches` / wrong-length / all-null / out-of-0-12-range /
+missing-`meta` / missing-`source` / blank-`data_vintage` shapes are all rejected. The offline
+`--local platform` path reports **107/107 HEALTHY** with `flood_hazard.json` served (68 KB) and shape-sane.
+Probe coverage 104 → **107** exec checks. Diff = `check_site_health.py` only (+47 lines) — no `platform/data`
+file altered, so no `build_provenance.py` regeneration required.
+
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (data integrity 455/455,
+  exit 0). (b) no secrets in diff. (c) diff = only `check_site_health.py` + this log, matches intent.
+  (d) provenance/no-fabrication intact — probe asserts shape, not values; no data layer touched.
+  Test/monitoring-infra only, no visual/app behaviour change → committed directly to master (no PR/headless
+  render needed).
+- **Next recommended:** the surfaced obj-#1/obj-#2 exec reads are now essentially all probed. The remaining
+  service follow-ups are lower-severity joined columns that vanish silently (`farm_income_impact.json`
+  columns inside the farm book) and, off the service pillar, the genuinely valuable-but-blocked data
+  integrations: the BAAC personal-credit **penetration** layer (`build_baac_credit.py`, written + `--check`-
+  ready but SKIP-only — needs the owner-side `source-data/datagoth/baac_credit.xlsx` re-pulled from a Thai
+  IP and committed) as an inverse formal-credit read beside the household-DTI lens, and the GISTDA flooded-
+  **AREA** dissolve (NEXT_STEPS §0 — a shapely dissolve over the overlapping per-event polygons; the raw
+  geometry is not cached, so it needs a fresh GISTDA pull and is deliberately deferred rather than shipped
+  with a 3-9x-overstated area number).
+
+## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards `farm_book.json` — committed to master
+
+Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open
+item is owner-side Vercel access-protection), so this run took the service pillar's own standing "next
+probe targets" note in `docs/SERVICE_AUDIT.md` (2026-08-02 (c)): after `collateral_book`/`macro_book`
+landed, `farm_book` was the remaining obj-#1 exec read still **live-fetched with no deploy site-health
+probe**. `renderFarmBook` GATES the whole "Farm book — where the crop mix meets our money" Overview
+section on `j.national && j.provinces` (else `host.style.display='none'`), and its load-bearing verdict
+reads `N.farm_os / farm_weighted_mix_pct / neg_provinces / neg_farm_os / neg_share_of_os_pct /
+neg_farm_n / neg_current / book_weighted_mix_pct`, plus the "the crop that MOVED the book is not the crop
+that IS the book" commentary off `j.crops`. It is MEASURED (real loan tape × OAE crop mix × Thai
+farm-gate prices) and **live-degrades SILENTLY** — a missing/truncated CDN deploy just hides the primary
+crop-to-portfolio screen with no phone alert, the exact "broken demo" blind spot the collateral_book /
+macro_book / tape_real obj-#1 probes closed for their siblings.
+
+`pipeline/check_site_health.py` now probes it (`_shape_farm_book`: fetch + parse + render-shape — asserts
+the display gate `national` KPI block with the eight numeric verdict keys, a non-empty province dict, and
+a non-empty `crops` list whose first row carries `en`/`os_share_pct`/`pp_of_book`/`farm_os_alloc`/`yoy` —
+shape not values, robust to a future tape/crop/price vintage refresh). Verified: eight negative tests
+reject non-dict / missing-`national` / non-numeric-KPI / empty-or-missing-`provinces` / empty-`crops` /
+missing-`en` / non-numeric-crop shapes while accepting the real payload; the offline `--local platform`
+path and the **live master production alias** both report **104/104 HEALTHY** with `farm_book.json`
+served HTTP 200 (312 KB) and shape-sane. Probe coverage 103 → **104** exec checks. Diff = `check_site_health.py`
+only (+51 lines) — no `platform/data` file altered, so no `build_provenance.py` regeneration required.
+
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (data integrity 455/455).
+  (b) no secrets in diff. (c) diff = only `check_site_health.py`, matches intent. (d) provenance/no-fabrication
+  intact — probe asserts shape, not values; no data layer touched. Test/monitoring-infra only, no visual/app
+  behaviour change → committed directly to master (no PR/headless render needed).
+- **Deploy-verify (PASS, no rollback):** live alias 200 on `/`, `/app.js`, `/data/branches.json`; the new
+  probe run against the production alias reports `farm_book.json` 200 + shape-sane, 104/104 HEALTHY.
+- **Next recommended:** the sibling `flood_hazard.json` (`renderFloodExposure` on `#exposure`, GISTDA
+  repeated-flood, obj #1) is the next surfaced read still unprobed; and `farm_income_impact.json` (joined
+  into the farm book, columns vanish silently when absent) is a lower-severity follow-up.
+
+## 2026-08-03 — UX loop: legible `live.html` chart labels on mobile (`ux-live-chart-mobile-label-legibility`) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260803-0819`, squash-merged PR #271 → `a718939` on master): the `live.html` "Live board" has five hand-rolled inline-SVG trend charts (System NPL, commodity prices, real-GDP + IMF projection, household debt, accumulated daily feeds). Their axis / band / last-value labels are drawn in fixed viewBox user-units (`.lb-axl` 10px, `.lb-lastv` 11px, `.lb-bandl` 9px) inside a `viewBox="0 0 1000 250"` rendered at `width:100%`. On a phone each chart is a single ~260–350px column, so the viewBox scales to **~0.26** and those labels render at **~2.6px — legible on desktop, effectively invisible on a handset** (verified: the y-axis numbers + x-axis quarter/date labels were unreadable smudges at 390px). Fix: a phones-only `@media(max-width:520px)` block (the band where the scale drops under ~0.5) bumping the three SVG text classes to **18 / 19 / 15** user-px, so at 390px the labels render at ~4.7px (crisp on a retina handset) and at the 500px near-breakpoint ~8.6px — legible and proportionate, no x-label collision (labels sit ~6 apart, ~148 units) and no clipping (last-value labels stay inside the card's `overflow:visible` padding). **Scoped strictly below 520px, so the 520–760 tablet band and all desktop are byte-identical.** CSS-only in the page's inline `<style>`; no JS touched, on-theme (no color/layout change). Diff = `platform/live.html` (+5) + one `docs/UXUI_AUDIT.md` fix-log entry (+ two newly-spotted backlog notes).
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. `node --check` on every page's inline JS + `validate_data.py` 455/0), run on the post-edit tree; gate was already 0-failed on `origin/master` — no provenance/commodities drift to restore this run. (b) headless renders at **390 / 500 / 1000px**, PNGs self-reviewed: at 390px all axis + last-value labels (`4.48%`, `494`, `2.5%`, `87.5% GDP`, `36.69 ฿/L`, the `PROJECTED` band) are now readable (were smudges); 500px proportionate; computed `.lb-axl` font-size stays **10px** at 1000px (desktop unchanged). (c) no secrets in the diff. (d) diff = only the two intended files, no stray files.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and on `/live` (canonical `cleanUrls` path); `/live.html` → **308** (expected `cleanUrls` redirect to `/live`, not a regression). Confirmed the *new* build is serving (not stale cache): after ~100s of propagation the deployed `/live` HTML carries the new marker `@media(max-width:520px){.lb-axl{font-size:18px}`. Change is **live**.
+- **Note:** remote branch deletion again hit the git-proxy limit (`git push --delete` → "remote end hung up"), so `claude/ux-loop-20260803-0819` may remain on origin though PR #271 is merged — harmless, a proxy limitation not a workflow failure.
+- **Next recommended:** the surgical UX backlog stays essentially exhausted. This run added two new backlog notes: `ux-live-chart-mobile-viewbox-responsive` (the ROOT fixed-viewBox limitation — one 1000-wide viewBox can't give optimal labels at both desktop 0.55× and phone 0.26×; the font bump is a floor-raise, a true fix renders a narrower viewBox / JS-measured width on small screens — bigger than surgical) and `ux-live-pulse-tally-gap` (the pulse strip's fresh+aging+stale count omits `reference`/`no-stamp` feeds, so it doesn't reconcile to the live-feed total — surgical, a fourth count or a note). The two long-standing non-surgical items remain: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language as competitive-RISK, not branch expansion) and `ux-viewport-user-scalable-3dpages` (drop the 3D pages' zoom lock + add `touch-action:none`, needs real-device testing). Pipeline-hygiene (`build_provenance.py`/`build_commodities.py` regen in the data-bot path) and `qa-visual-baseline-stale` stay the highest-leverage non-UX work.
+
+## 2026-08-03 — UX loop: `live.html` "Live board" feed-table a11y (`ux-live-feed-table-a11y`) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260803-0217`, squash-merged PR #270 → `1a2a5f1` on master): the newer `live.html` "Live board" page — added *after* both site-wide table-a11y sweeps and, being its own page (not `app.js`, not `data.html`), missed by both — shipped its "Every feed" table (`#lb-table`) with two gaps every other table on the site had already been hardened for. (1) **Keyboard scroll access (WCAG 2.1.1 / axe `scrollable-region-focusable`):** the `.lb-wrapx` horizontal-scroll wrapper had no `role="region"`/`tabindex="0"`/`aria-label`, so a keyboard-only user couldn't scroll it to reach the clipped right-hand columns on a narrow viewport — the exact gap `ux-static-tblwrap-missing-a11y` closed for index.html's ThaiWater wrappers. (2) **Header scope (WCAG 1.3.1):** the six header `<th>` (built in the render JS' `<thead>` string) were bare with no `scope="col"` — the class the completed `ux-table-scope-sweep-appjs` closed everywhere else. Fix: added `role="region" tabindex="0" aria-label="Scrollable table: Every feed"` to the wrapper (matching the site's `"Scrollable table: <heading>"` convention, keyed to the table's "Every feed" H2) + `scope="col"` to all six column headers. Both non-presentational — **zero visual change**. Diff = `platform/live.html` (6 lines) + one `docs/UXUI_AUDIT.md` entry.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. `node --check` on every page's inline JS + `validate_data.py` 455/0), run on the post-edit tree. Gate was already 0-failed on `origin/master` — no provenance/commodities drift to restore this run. (b) headless `render.sh live.html` → pulse strip / nav / header render clean, PNG self-reviewed (nothing visibly broken; headless charts/table paint below the fold, JS parses); both attrs present in the settled DOM (`role="region"…` + all six `<th scope="col">`). (c) no secrets in the diff. (d) diff = only the two intended files, no stray files.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and on `/live` (the canonical `cleanUrls` path); `/live.html` → **308** (expected `cleanUrls` redirect to `/live`, same behavior as `/index.html`→`/`, not a regression). Confirmed the *new* build is serving (not stale cache): the deployed `/live` HTML carries both new markers — `aria-label="Scrollable table: Every feed"` on the wrapper and `scope="col">Feed — what it moves in the book` in the header. Change is **live**.
+- **Note:** remote branch deletion is blocked by the git proxy (`git push --delete` → "remote end hung up"), so `claude/ux-loop-20260803-0217` remains on origin though PR #270 is merged — harmless, a proxy limitation not a workflow failure.
+- **Next recommended:** the surgical UX backlog is now essentially exhausted — the two remaining open items each need a dedicated non-surgical pass: `ux-acquire-taxonomy-mandate` (reframe the surviving `acquire`/"Expand" branch-expansion language in `build_regional_outlook.py` as a competitive-RISK readout, distinguishing forbidden *branch* expansion from allowed *customer* acquisition) and `ux-viewport-user-scalable-3dpages` (drop `maximum-scale=1`/`user-scalable=no` on the 3 deck.gl pages + add `touch-action:none` to the canvas, needs real-device pinch-zoom testing). The recurring pipeline-hygiene fix (fold `build_provenance.py`/`build_commodities.py` regen into the data-bot commit path so master stops arriving gate-drifted) and `qa-visual-baseline-stale` (a deliberate `tests/run.sh baseline` refresh now the five-pillar IA is stable, so `qa.yml`'s visual gate carries signal again) remain the highest-leverage non-UX work.
+
+## 2026-08-03 — Integration loop: close the determinism-gate hole for four ungated `--check` builders — committed to master
+
+Autonomous integration run. The scheduled backlog's top items were already shipped (FPO PICO fold-in —
+`build_pico_census`/`build_pico_district`/`build_pico_competitors`/`build_branch_pico`, all gated and live
+on the `#map` `dpico`/`doutnum` lenses; per-branch measured cropland — `build_branch_cropland.py` gated +
+wired via `loadBranchCropland`), and the remaining data unlocks (BAAC/SME credit penetration, GISTDA 40m
+crop-area) stay CI-blocked (gitignored Thai-IP xlsx / live-network puller). So this run closed a **gate-
+coverage hole** instead: a deterministic-regression audit found four `build_*.py` scripts that carry a
+`--check` and produce **committed, app-consumed** `platform/data` layers but were **not referenced by
+`tests/run.sh`** — meaning a builder regression or a hand-edit to those JSONs would ship silently.
+
+Three of them byte-reproduce right now on a fresh clone (their inputs are committed), so they were entirely
+unprotected:
+- `build_macro_indicators.py` → `macro_indicators.json` (Macro-backdrop card: NESDC GDP / TPSO CPI /
+  BoT current-account + tourist-arrivals).
+- `build_used_vehicle_value.py` → `used_vehicle_value.json` (collateral UVPI, `tmliFetch('used_vehicle_value')`).
+- `build_vehicle_mix.py` → `vehicle_mix.json` (fleet mix, `tmliFetch('vehicle_mix')`).
+
+Added all three to the gate using the established 0/3/else idiom (`ok` / `skip` on absent input / `bad` on
+drift), placed beside their siblings (the two vehicle checks after `build_vehicle_models`; the macro check
+after the staging-ingest loop). Also added `build_vehicle_brands.py` → `vehicle_brands.json` for family
+completeness — its input is the owner-side gitignored DLT raw mirror, so it correctly **SKIPs** in CI (exit
+3), exactly like `build_vehicle_registry`/`build_brand_trends` beside it, and becomes a real check the day
+that mirror is committed. No app/visual/data change — `tests/run.sh` only.
+
+**Safeguard protocol (all passed):** `bash tests/run.sh check` → **121 passed / 0 failed** (was 118; +3 new
+PASS + 1 SKIP), data integrity **455/455**, exit 0. Only `tests/run.sh` + this log touched; no `platform/data`
+file added, so no `build_provenance.py` regeneration required. No secrets in diff. Test-harness-only change,
+so committed straight to master (no PR/headless-render needed). **Next recommended integration:** the BAAC
+personal-credit penetration layer (`build_baac_credit.py`, already written + `--check`-ready but SKIP-only
+here) — it needs the owner-side `source-data/datagoth/baac_credit.xlsx` re-pulled from a Thai IP and the
+distilled output committed; then gate it (same SKIP-safe pattern) and surface it alongside the household-DTI
+lens as an inverse formal-credit-penetration read (objective #1).
+
+## 2026-08-02 — Intelligence loop (service): deploy site-health probe for `macro_book.json` — merged to master
+
+Autonomous market/service-intelligence run. Closed the SERVICE_AUDIT's own flagged "next probe target":
+`macro_book.json` was live-`fetch()`'d by `renderMacroBook` (app.js) yet had **no deploy site-health
+probe**. It is the sibling of `collateral_book` from the #258/#261 macro wave and drives the Overview/Macro
+"CONDITIONS AT OUR GRAIN" geo drill — the one drill that replaced five macro sections (labour / fleet /
+hazard / business-formation / household-debt). `renderMacroBook` GATES the whole block on
+`j.national && j.provinces` (else `host.style.display='none'`), then reads per-lens note verdicts off
+national KPIs (`unemployment_pct`, `electrified_pct`, `diesel_share_pct`, `flood_high`/`flood_stations`,
+`n_dry`/`n_districts`, `new_biz_n`), the 77-province drill table off `j.provinces`, and the header NPL
+sparkline off `j.npl.series`. So a truncated/failed CDN deploy that dropped or corrupted it would silently
+hide the primary conditions-at-our-grain screen with **no phone alert** — the same "broken demo" blind spot
+the `collateral_book` / `collateral_flow` / `tape_real` obj-#1 probes closed for their siblings.
+
+Added `_shape_macro_book` to `pipeline/check_site_health.py`: fetch + parse + render-shape (asserts the
+display gate — `national` KPI block with the 8 numeric keys the notes read, a non-empty 77-province drill
+whose rows carry `region`/`os`, and the `npl.series` sparkline array — **shape not values**, robust to a
+future tape/DLT/ThaiWater vintage refresh moving the numbers). Verified: eight negative tests reject
+non-dict / missing-`national` / non-numeric-KPI / missing-`provinces` / empty-`provinces` / province-row-
+missing-`region` / empty-`npl.series` / missing-`npl` shapes while accepting the real payload; the offline
+`--local platform` path reports **101/101 HEALTHY** with `macro_book.json` served (779 KB) and shape-sane.
+Probe coverage 98 → **101** checks.
+
+**Safeguard protocol (all passed):** `bash tests/run.sh check` **118 passed / 0 failed**; data integrity
+**455/455**; no secrets in diff; 2 files touched (probe + this log), no stray files. Change is a CI/monitor
+script only — no app/visual behaviour altered, so no PR/headless-render needed. **Note for the next run:**
+the freshly-cloned container's local `master`/`origin/master` refs were stale (pointed at `ee657c3`, #219,
+2026-07-30); the authoritative remote (`git ls-remote origin master`) was already at `6c96aff` (#264). Work
+was based on the real remote tip, not the stale local ref. Next probe targets from the audit: `farm_book`
+and `flood_hazard`.
+
+## 2026-08-02 — UX loop: guard `pillCard` foot arrow against doubling — merged + deployed (PR #265, `c3b8694`)
+
+Autonomous UX-loop run. Closed the open backlog item `ux-pillar-foot-arrow-doubled` (polish/robustness).
+The command-center five-pillar band's `pillCard` (app.js) appended a literal `" →"` to the `foot` label
+with no guard (`${foot||''} →`), so a future caller passing a `foot` already ending in `→` would render a
+doubled `→ →`. Hardened the one template line to strip any trailing arrow before re-appending the canonical
+one: `${(foot||'').replace(/\s*→\s*$/,'')} →`. Idempotent — all five current callers pass plain labels
+(Macro / Data book / Assistance radar / Risk exposure / Competition), so **zero visual change today**.
+
+**Safeguard protocol (all passed):** `bash tests/run.sh check` **118 passed / 0 failed**; headless `#home`
+render self-reviewed (`data-errors=[]`, each pill foot shows exactly one `→`, band otherwise identical); no
+secrets in diff; 2 files touched (1-line JS fix + 1 docs line), no stray files. **Squash-merged** own PR #265
+(`c3b8694`, branch deleted). **Deploy verified:** production alias `/` → 200, changed route `/index.html`
+(follows `cleanUrls` 308) → 200, `/app.js` → 200, and the new guard is live in the deployed `app.js` (old
+line gone). **No rollback.** Recommend next: `ux-viewport-user-scalable-3dpages` (WCAG 1.4.4 — but needs a
+device-tested run, not unattended auto-merge) or a fresh route review, since the surgical backlog is now thin.
+
+## 2026-08-02 — Owner review: 17-point Macro-tab markup + stale-data audit + a visual-overflow gate — merged to master (PR #262, `286e450`)
+
+Kaustav marked up the live Macro tab against a PDF ahead of the MCOM presentation on Wednesday
+2026-08-05 and returned 17 numbered points, three more raised mid-review, and a stale-data question.
+The governing principle he set, which reshaped several of the fixes: **the Macro tab is EXTERNAL
+data; the loan book belongs in Acquisition (`data.html`).**
+
+**The 17 points.**
+1. Removed the "WHAT THIS TAB SAYS TODAY" summary band.
+2. Removed the duplicated "CURRENT SITUATION" inflation + USD/THB block.
+3. The macro card grid stays in the DOM `hidden` rather than deleted; the compact chip strip now
+   carries a PERIOD on every chip plus a plain-language gloss on the jargon ones (co-pay, informal
+   work, self-employed, agri jobs, household debt, policy rate).
+4. Dropped the `฿/month` commodity-belt column — it multiplied an ESTIMATED per-commodity
+   sensitivity by a MEASURED province farm-income base and printed the product as a household baht
+   figure, reading far more precise than anything actually measured; the % beside it carries the same
+   information. Built a new crop→farm-income engine instead: `pipeline/build_farm_income_impact.py`
+   → `platform/data/farm_income_impact.json`, revenue-weighted (area × yield × price), price AND
+   margin bases, 5 crops with measured cost (cassava, maize, oil palm, rice, rubber), 77/77 provinces
+   reconcile. Added 6- and 12-month reference points to the charts, including car-sales/resale.
+5. "IMF macro outlook" table → "Macro backdrop · Thailand": measured Thai official series first
+   (NESDC quarterly GDP, TPSO/Ministry of Commerce monthly CPI, NSO LFS unemployment) with the IMF
+   projection alongside and a computed overtaken-flag. Government debt and current account keep the
+   IMF figure and say so in the row — no Thai GDP-share series is pulled for debt, and BoT's current
+   account is monthly USD, not comparable to an annual GDP share.
+6. Farm-book region table carries the point-4 income engine (price + margin columns; branch rows
+   are an equal-split ALLOCATION and labelled as one).
+7. Crop table dropped the allocated farm-baht column, its book share, and "moved the book" — all
+   three spread the province farm book over planted-area mix, but the tape records an OCCUPATION
+   never a crop, so they were allocations of an allocation. Replaced with MARGIN SHOCK from the new
+   engine (measured inputs only); kept cost/kg, margin/rai, dominant-in.
+8. Drought moved into the hazard section.
+9. Resale chart: 6/12-month views, month labels, finer gridlines, hover values.
+10. The three UVPI tiles got the same 6/12/24-month treatment.
+11. Fleet mix restated on AutoX's own pickup definition (PU = pickup + PPV nameplate in ANY
+    registration class — a double-cab files as รย.1 "passenger car" but is a pickup); starred
+    restatement row shows 116,586 units / 4.78% against 3.02% on รย.3 alone. Excluded the `2026-02`
+    catalog stub month (18 rows against a 195,074 median).
+12. Resilience windows now graded on the trailing window itself (first vs latest month, in points
+    per year, so every window sits on one scale).
+13/16/17. Our-book tables, recovery-value headroom, and the OUR O/S / ACCTS / OUR 90% columns moved
+    out of Macro into Acquisition (`data.html`, new `#db-collatbook`) — the governing principle above.
+14. Year-table bars got real colours. Root cause was a bug: `var(--muted)` is undefined in
+    `styles.css` (only `--mid`/`--dim` exist), so `background:var(--muted)` painted transparent — 11
+    sites across `app.js`, all meaning "neutral".
+15. Stock cards moved beside the year table.
+
+**Raised mid-review, not on the original 17.**
+- Macro-chip overbleed: `.mcell{white-space:nowrap}` was inherited by the `.mgl` gloss, so
+  `flex-basis:100%` gave the gloss its own row and `nowrap` then forbade it from wrapping.
+- "Why is this still here?" — removed the FACTORS block; it was the third telling of one story on a
+  single tab.
+- "Do you need any other tools to do a better scanning/reviewing job?" — answer was no new tools, a
+  standing check instead: `tests/visual_overflow.js`, 11 routes × 2 viewports (1440×900, 390×844),
+  flags BLEED/CLIP/PAGEX/COLLIDE, exit 0 clean / 1 findings / 2 cannot-run. Not yet wired into
+  `tests/run.sh` or CI — run by hand so far.
+- "The comments and the table don't jive" (ThaiWater rain table) — three real faults: it ranked by
+  the single wettest gauge while the column beside it reported province-wide share; a 609mm/24h
+  reading (Thai record ≈ 500mm) with only 4% of that province's stations heavy was leading both the
+  table and the verdict banner; and a "Left:/Right:" note pointed at tables that stack at narrow
+  widths. Now ranked by how widespread the rain is, with a suspect-reading flag and named panels.
+
+**The stale-data finding** ("why are figures still 2025? isn't there more current data?"). Three
+chips were hand-written constants in `meta.json` that nothing refreshed, and the one measured
+inflation figure was a World Bank ANNUAL average. The board read Thailand in deflation (−0.13%) while
+Ministry of Commerce had MEASURED +2.79% for May 2026 — a sign flip on a headline number. GDP showed
+an IMF projection (1.6% "slowing") with no period, as though it were an outturn. Closed at the source
+with six new keyless pulls — `pull_tpso_cpi.py`, `pull_nesdc_gdp.py`, `pull_bot_policy_rate.py`,
+`pull_bot_current_account.py`, `pull_bot_tourist_arrivals.py`, `pull_nso_lfs_status.py` — folded by
+the new `pipeline/build_macro_indicators.py` into `platform/data/macro_indicators.json`;
+`build_labour_context.py` gained an NSO quarterly override. Chip strip now shows: inflation +2.79%
+(TPSO, 2026-05), GDP +2.8% (NESDC 2026-Q1, labelled a measured quarter not a projection, prior
+quarter +2.5%), tourists 32.16M trailing 12 months (BoT, 2025-07→2026-06), self-employed 50.24% and
+agri jobs 27.32% +661k YoY (NSO LFS 2026-Q1) — each editorial twin deleted by the same code that
+renders the measured card, so the next pull moves the page.
+
+DELIBERATELY NOT SHOWN: `indicators.current_account`. Measured, but April 2026 alone prints −7,591
+USD million on a series whose trailing twelve months net to roughly +847M; on a strip that's scanned
+not read, one month reads as a national crisis. No trailing-sum is persisted in `platform/data` yet,
+so the chip waits for that builder rather than shipping the alarming half of the truth — carried to
+`docs/NEXT_STEPS.md` as an open item.
+
+STILL STALE, blocker named rather than left silent: informal work 63.2% (2024) — NSO's own Informal
+Employment Survey tops out at 2566/2023, older than what's already shown, so nothing fresher is
+published. Co-pay ฿44bn has no confirmed vintage; the chip now renders a dashed-italic "no date"
+marker instead of sitting undated beside nine dated ones.
+
+**The layout audit's own findings** (`tests/visual_overflow.js`'s first real run): 28 findings down
+to clean. Headline fix — `.tbl-wrap` (hyphenated) had never matched a CSS rule (the guard rail is
+spelled `.tblwrap`), so ten call sites had no overflow container at all and the Assistance-occupation
+table pushed a 390px phone out to 636px of horizontal scroll; aliased the two spellings in CSS rather
+than renamed, so they can't drift apart again. `.db-cards` used a hard `minmax(300px,1fr)` inside a
+258px phone container, now `minmax(min(300px,100%),1fr)`. `.cc-row .l` needed
+`overflow-wrap:anywhere` for a long English word squeezed by a nowrap value column. The audit itself
+was wrong twice and was fixed rather than worked around: eleven `<summary>` "5px wider" findings were
+arithmetic, not geometry (scrollWidth/clientWidth are integers rounded from a fractional layout —
+confirmed by absolutely-positioning the caret out of flow, which held the false reading at exactly
+5px); and the vertical branch fired on every text node because IBM Plex Sans Thai's vertical metrics
+give every string a ~1.5em natural line box, Latin included — with `overflow-y:visible` and no clamp
+that's leading, not loss. The Y branch now only fires where overflow is actually contained; two
+line-height edits made on the false reading were reverted (neither element was broken).
+
+**Verification.** `bash tests/run.sh check` on the WSL uv cpython-3.11.15 mirror (authoritative —
+Windows CPython 3.14 produces false float drift on this repo); `build_regional_outlook.py` rebuilt
+byte-exact; provenance regenerated on the LF mirror; `node --check` on every page's JS on Windows;
+`tests/visual_overflow.js` clean across 11 routes × 2 viewports; a fresh no-cache Playwright pass
+confirmed every chip's value, period and source, no duplicate chips, no console errors.
+
+**Status — committed on `feat/macro-review-17pt`, PR open.** 36 files (14 modified + 22 new across
+`pipeline/`, `platform/`, `source-data/`, `tests/`, `docs/`). The determinism gate and the provenance
+regeneration were both run on the WSL uv cpython-3.11.15 mirror, which is the authoritative
+environment — Windows CPython 3.14 produces false float drift on this repo. `build_regional_outlook.py`
+was the one real drift and was rebuilt byte-exact; `validate_data.py` then passed 455/455. Six items
+came out of the review still open — see `docs/NEXT_STEPS.md` §0d.
+
+## 2026-08-02 — Intelligence loop (deploy-health, obj #1): site-health probe now guards `collateral_book.json` — merged to master
+
+Autonomous market & service intelligence loop, safeguard-gated auto-merge. The `plan_cycle.py` backlog
+still shows every autonomous pillar item done (98%, the one open item owner-side), so this run took a
+fresh **service/deploy-health** finding: a render-path re-scan of the recently-landed **#258/#261
+macro/collateral wave** found several new SPA-fetched layers still with **no deploy probe** — the
+highest-value of them being **`collateral_book.json`**, the Overview/Macro tab's **section-leading
+collateral read** (obj #1). `renderCollateralBook` GATES the whole "Collateral value — what the titles
+are worth, and what we hold against them" section on `j.national && j.types` (else the section hides
+itself), and its load-bearing verdict sentence reads `N.os / N.core_share_pct / N.ltv_proxy_pct /
+N.ticket / N.eval_avg` plus the 8-row collateral-type table. It is MEASURED (real loan tape × DLT
+registrations) and live-degrades **SILENTLY** — a missing/truncated file after a deploy just hides the
+primary obj-#1 collateral-value screen with no phone alert, the exact "broken demo" blind spot the
+`collateral_flow` / `truck_flow` / `tape_real` probes closed for their sibling obj-#1 reads.
+
+**Fix.** Added `_shape_collateral_book` (asserts the display gate + verdict render shape — `national`
+with numeric `os/ltv_proxy_pct/ticket/eval_avg/core_share_pct` and a non-empty `types` table whose rows
+carry `type/tier/os_share_pct` — shape not values, robust to a future tape/DLT vintage refresh) plus its
+`DATA_FILES` entry. Probe coverage **97 → 98** exec checks.
+
+**Verified.** Eight negative tests confirm the validator rejects non-dict / missing-`national` /
+non-numeric-KPI / missing-`types` / empty-`types` / missing-`type` / missing-`tier` shapes (not
+vacuously passing) while accepting the real payload; the offline `--local platform` path and the **live
+master production alias** both report **98/98 HEALTHY** with `collateral_book.json` served HTTP 200 (632
+KB) and shape-sane. Determinism gate **0 failed**; this change touches only the CI probe script + docs
+(no `platform/data` file, no gated `--check` golden), so provenance is unaffected and reproduces exactly
+(135 layers · 0 blank-vintage · 0 unlabelled). No app-visual change → committed straight to master per
+the safeguard protocol. `site-health.yml` re-confirmed correctly targeting the master production alias.
+Findings recorded in `docs/SERVICE_AUDIT.md` (2026-08-02 (c)). **Next recommended intelligence task:**
+continue closing the #258/#261-wave probe gap — the sibling unprobed exec reads are `macro_book.json`
+(the Macro tab's lensed backdrop table, `renderMacroBook` gates on `.national && .provinces`) and
+`farm_book.json` (the Macro farm block), plus `flood_hazard.json` (obj-#1 GISTDA hazard).
+
+## 2026-08-02 — Integration loop (objective #1): surface the already-built GISTDA flood layer as a portfolio flood-exposure readout on `#exposure` — PR (app-visual)
+
+Autonomous integration & improvement loop. The GISTDA repeated-flood layer (`flood_hazard.json`)
+shipped 2026-08-02 as a per-branch popup flag, but its portfolio dimension was going unused — the
+last entry's own "next recommended integration" was to surface it as a book-level flood-exposure
+read. Did exactly that. Verified the higher backlog items are already built and gated first: FPO-PICO
+(`pico_census.json`/`branch_pico.json`), branch-cropland (`branch_cropland.json`), and the
+DIW/MOT/DBD distillations are all present; the only un-distilled datagoth sources (BAAC/SME-bank
+credit **penetration**) are blocked from the cloud IP (data.go.th 403 from CI, per DATAGOTH_CATALOG)
+so they cannot be built here — skipped, not faked.
+
+**What & why (objective #1 — collateral / borrower-cashflow recovery risk):** the exec Risk tab
+(`#exposure`) showed segment/crop/drought concentration but never answered "how much of the book
+sits on ground that floods repeatedly". Added a **"Portfolio flood-hazard exposure"** readout that
+joins the MEASURED per-branch `flood_hazard.json` frequencies (`FLOODHZ[i]`, index-aligned to `DATA`)
+to each branch's region/province **client-side — no recompute, no builder/golden change**. Headline:
+**1,848 of 2,015 branches (92%)** sit in a district that flooded in ≥1 of the 12 years 2005-2016, and
+**685 (34%)** in a CHRONIC zone (≥7/12 yrs). A by-region table (Isan 312 chronic / 52%, North 131 /
+42%, Central&BKK 110 / 19%, South 76 / 30%, East 56 / 21%) and a top-12 chronic-provinces table.
+
+**Provenance discipline:** labelled MEASURED (`TAG_M`) with a method box that states it is a *hazard
+flag* (did the ground flood, how often), NOT a flooded-area or loss estimate — no area is claimed
+(the source polygons overlap, the trap NEXT_STEPS §0 documents), and it is distinct from the LIVE
+ThaiWater water-level pulse. Lazy + graceful: absent file → renders nothing, wired-once so no
+re-trigger loop.
+
+**Verification:** `bash tests/run.sh check` → **116 passed, 0 failed** (data integrity 455/455); this
+change touches only `app.js` (no `platform/data` file), so the `--check` goldens and provenance are
+unaffected. Headless render of `index.html#exposure` → `data-errors="[]"`, the block populates with
+the exact figures above (region rows match a standalone Python tally byte-for-byte). App-visual →
+shipped as a **PR**, not a direct commit.
+
+**Next recommended integration:** the flooded-AREA number still needs the GISTDA polygon download +
+shapely per-district dissolve (NEXT_STEPS §0 remainder); OR distill the blocked BAAC/SME-bank credit
+**penetration** layer once a Thai-IP re-pull commits the raw CSVs (DATAGOTH_CATALOG open item).
+
+## 2026-08-02 — Intelligence loop (deploy-health, obj #2): site-health probe now guards `contested_pop.json` + `exit_whitespace.json` — merged to master
+
+Autonomous market & service intelligence loop, safeguard-gated auto-merge. The formal `plan_cycle.py`
+backlog shows every autonomous pillar item done (98%, the one open item owner-side), so this run took a
+genuine **service/deploy-health** finding surfaced by a fresh render-path audit: the nightly live
+site-health probe (`pipeline/check_site_health.py`) covered **27 of the ~88** SPA-fetched `data/*.json`
+layers, and **two surfaced exec reads still had no deploy probe** — each live-degrades SILENTLY (no phone
+alert) when its file is missing/truncated after a deploy:
+
+- **`contested_pop.json`** — the command-center (`#home`) "MOST CONTESTED GROUND" front-door lead
+  (`renderHomeWhitespace` reads `CPOP.top`) **and** the National-map contested lens (index-aligned
+  `.rows[i]=[pop10, contested_pop]`, obj #2).
+- **`exit_whitespace.json`** — the Competition (`#acq`) rival-fragility board under the Q1-2026 BoT
+  registration deadline (`drawExitWhitespace` reads `.districts` + `meta.competitor_census`, obj #2,
+  ESTIMATED) — the last surfaced `#acq` competitive read with no probe.
+
+**Fix.** Added `_shape_contested_pop` (asserts the `.top` leaderboard shape AND the exact **2015**
+index-aligned `.rows` length a truncated build would silently misalign) and `_shape_exit_whitespace`
+(asserts a non-empty ~928-amphoe `.districts` board carrying the sort key + component split + the
+`meta.competitor_census` block the readout headline reads — shape not values, robust to census growth),
+plus their two `DATA_FILES` entries. Probe coverage **27 → 29** exec layers.
+
+**Verified.** Negative tests confirm the validators reject empty / short / mis-aligned shapes (not
+vacuously passing); the offline `--local platform` path and the **live master production alias** both
+report **95/95 HEALTHY** with both new files served HTTP 200 and shape-sane. Determinism gate **115
+passed · 0 failed** (data integrity 448/448); this change touches only the CI probe script + docs (no
+`platform/data` file, no gated `--check` golden), so provenance is unaffected and reproduces exactly
+(130 layers · 435 files · 70 measured · 60 estimated · 0 unlabelled). No app-visual change → committed
+straight to master per the safeguard protocol. Fresh scan re-confirmed the rest of the data room clean:
+0 broken references, 0 genuine orphan signal layers. Findings recorded in `docs/SERVICE_AUDIT.md`
+(2026-08-02 (b)). **Next recommended intelligence task:** continue closing the probe gap — the highest-value
+remaining unprobed exec reads are `segment_exposure.json` (`#exposure` obj-#1 concentration) and
+`province_stress_index.json` (the obj-#1 parent of the front-door `province_pressure` synthesis).
+
+## 2026-08-02 — Integration loop (objective #1): GISTDA repeated-flood hazard → per-district & per-branch MEASURED flag (`flood_hazard.json`) — PR (app-visual)
+
+Autonomous integration & improvement loop. Shipped NEXT_STEPS §0, the top OPEN backlog item that was
+verified-reachable but never built (backlog #1 FPO-PICO and #2 branch-cropland were confirmed already
+built, gated, and surfaced). GISTDA's ArcGIS "Repeated Flooding 2005-2016" FeatureServer is open from
+CI (no key, re-verified 2026-08-02), so the flood-hazard census is now a MEASURED portfolio-risk layer.
+
+**What & why (objective #1 — collateral / PD risk):** where the ground under a branch's book floods
+repeatedly, the collateral (title vehicles) and borrower cash-flow (farm/shop) carry a chronic
+recovery hazard. The layer answers "how many of the 12 years 2005-2016 did this branch's district
+flood" (`flood_freq` 1-12) per district AND per branch. Result: **1,848 / 2,015 branches** sit in a
+repeat-flood district, **685** in a CHRONIC one (≥7/12 yrs); 75 provinces flooded, Ayutthaya 16/16
+districts (classic flood-plain sanity check).
+
+**The MAX-not-SUM discipline (the trap NEXT_STEPS §0 warned about):** the GISTDA polygons OVERLAP
+(per-event, not dissolved), so any flooded-AREA total is a 3-9x overstatement artifact. This layer
+claims **no area** — only the per-district `MAX(flood_freq)`, which is immune to overlap, pulled
+server-side. Area is left for a later geometry-dissolve pass.
+
+**Pieces:**
+- `pipeline/pull_flood_hazard.py` — NETWORK (not gated); server-side `MAX(flood_freq)` grouped by
+  district in one call (838 flood-affected districts, < the 1000 maxRecordCount; bails loudly on
+  `exceededTransferLimit`) → committed `source-data/gistda_flood_hazard.json` (144 KB, re-pullable).
+  Committed so the builder's `--check` runs for REAL in CI (not a skip like the Thai-IP pulls).
+- `pipeline/build_flood_hazard.py` — DETERMINISTIC, network-free, `--check`-gated. Joins onto
+  `amphoe.json` (Thai name first, English fallback — amphoe.json stores ~86 districts in English) →
+  `platform/data/flood_hazard.json` {meta, by_province, by_district, branches[freq]}. Per-branch flag
+  via the `branch_amphoe` index. 825/838 districts resolve; the 13 unresolved are ALL zero-branch —
+  asserted at build time (`UnresolvedBranchError`), so no branch silently loses a real flood flag.
+- App: a MEASURED branch-popup line on `#map` ("Repeat-flood yrs (GISTDA 2005–16)"), lazy-loaded +
+  null-guarded, mirroring the branch_density/fuel popup-line pattern. Distinct from the LIVE
+  `thaiwater_flood.json` water-level pulse — this is the STRUCTURAL hazard.
+- Gate: `build_flood_hazard.py --check` in `tests/run.sh`; `flood_hazard.json` registered in the
+  index-alignment + fingerprint gates and given a dedicated `check_flood_hazard` in `validate_data.py`
+  (freq int 0..12, by_district 1..12, length == branches); `build_provenance.py` re-run → classified
+  **measured** (130 layers, 70 measured / 60 estimated / 0 unlabelled).
+
+**Verification:** `bash tests/run.sh check` → **116 passed, 0 failed** (all 8 new flood assertions
+green, `--check` byte-exact). `#map` renders `data-errors="[]"`; `health.sh` on the national page →
+all checks pass incl. `#map present`. The one render FAIL (`rayong-catchment.html`, a deck.gl WebGL
+scene) and the batch-health flakiness are pre-existing/environmental — that page loads **zero**
+references to app.js, so this app.js-only change cannot reach it. Because the change alters app
+visuals, shipped as a **PR**, not a direct commit.
+
+**Next recommended integration:** the flooded-AREA number (NEXT_STEPS §0 remainder) — download the
+GISTDA polygons and dissolve per district with shapely before claiming any area; OR surface the
+`flood_hazard.json` province rollup on `#overview`/`#exposure` as a portfolio flood-exposure readout
+(the by_province layer is already built and unused in the UI).
+
+## 2026-08-02 — UX loop: scope="col" on the Overview macro-route tables (a11y, WCAG 1.3.1) — merged + deploy-verified (PR #257)
+
+Autonomous UX-improvement loop, safeguard-gated auto-merge. All seven originally-audited backlog items
+(favicon / contrast / theme / map-overlap / province-overflow / branches-lead / isochrone-guard) remain
+fixed, so this run took the highest-priority genuinely-open, auto-merge-safe item: the **fifth slice of
+`ux-table-scope-sweep-appjs`**. The other open backlog items are explicitly out of scope for an unattended
+surgical run (`ux-acquire-taxonomy-mandate` = bigger-than-surgical mandate work; `ux-viewport-user-scalable-3dpages`
+= needs on-device gesture testing).
+
+**Fix.** The ~14 Overview (`#overview`) macro-route tables in `app.js` built their column-header rows as
+inline template literals with bare `<th>` / `<th title="…">` (no `scope="col"`), so a screen reader could
+not reliably associate each data cell with its column header. Added `scope="col"` to every column `<th>`
+(EV-watch/DLT `#region`, drought SPEI, amphoe-crops, province-LFS, DLT vehicle-reg, region-debt, DBD-firms,
+SFI-NPL, ThaiWater flood+rain, informal-debt, and coverage `#estates`/`#mws`/`#cws`) and `scope="colgroup"`
+to the two ThaiWater `colspan="4"` section-title cells. Matches `data.html`'s convention and the four prior
+slices. Diff = 17-for-17 line replacement, scope-only; zero visual change (scope is non-presentational).
+Remaining bare family: the `#acq` rival-pulse/ads/YouTube/sentiment/footprint tables.
+
+**Safeguards (all passed).** (a) `tests/run.sh check` 115-passed/0-failed; (b) headless `index.html#overview`
+render `data-errors=[]`, PNG self-reviewed (layout identical), settled DOM 213 `scope="col"` + 2 `scope="colgroup"`;
+(c) no secrets in diff; (d) diff matches intent, no stray files.
+
+**Merge + deploy-verify.** Squash-merged PR #257 → master (`969a6e6`), branch deleted. Production alias
+`competitive-intel-git-master-…vercel.app`: root **200**, `/app.js` **200**, `/index.html` → **200**
+(the bare 308 is Vercel's configured `cleanUrls` redirect, not a regression). Confirmed the deployed
+`app.js` carries the change (`<th scope="col">Quarter</th>` present) — fresh build, no rollback needed.
+
+**Recommend next.** The last `ux-table-scope-sweep-appjs` slice — the `#acq` rival-pulse/ads/YouTube/
+sentiment/footprint tables — to close the a11y sweep; then `qa-visual-baseline-stale` (a deliberate
+`tests/run.sh baseline` refresh) so the CI visual-regression gate carries signal again now the five-pillar
+IA is stable.
+
+## 2026-08-02 — Intelligence loop (deploy-health): stop the weekly macro-refresh PR landing a red gate (`ci-macro-provenance-lockstep`) — committed to master + deploy-verified
+
+Autonomous market-&-service intelligence loop, safeguard-gated. **Deployment-health pillar.** Found the
+last data-feed workflow still leaking the recurring **provenance-drift** class the progress log has been
+closing feed-by-feed. `.github/workflows/data-macro.yml` (weekly BIS + World Bank macro pull → committed
+`platform/data/macro_indicators.json`) opened its draft PR **without regenerating the two layers that file
+feeds**: `provenance.json` censuses `macro_indicators.json`'s bytes (confirmed — the file is in the
+manifest) and `build_live_board.py` reads it (3 refs), so every macro refresh drifted both and the PR's own
+`bash tests/run.sh check` came up **red** on `build_provenance.py --check` (+ `validate_data.py`'s byte-size
+row) — the PR could never auto-merge green without a manual provenance regen, exactly the drift the
+imf-weo / thaiwater / fuel-price / scenarios / nabc / sfi / search-demand / social-listening feeds already
+fixed in lockstep.
+
+**Fix (mirrors the imf-weo sibling exactly):** inserted a "Rebuild live_board + provenance when
+macro_indicators changed" step between the pull and the commit — `git status --porcelain` guards on the
+file, and on change runs `build_live_board.py` then `build_provenance.py` (deterministic, network-free,
+live_board first so provenance censuses its refreshed bytes); the commit's `git add` now stages
+`macro_indicators.json` + `live_board.json` + `provenance.json` together. CI-config only — no `platform/`
+app/data/visual change, so a direct commit to master (not a PR) per the safeguard rule.
+
+**Safeguard protocol — all passed:** (a) baseline `bash tests/run.sh check` → **115 passed, 0 failed**
+(the workflow YAML is not gate-material, so the gate is unaffected by this change); (b) no secrets in diff
+(the lone `token` hit is the pre-existing `GH_TOKEN: ${{ github.token }}` Actions context ref, unchanged);
+(c) diff = only `.github/workflows/data-macro.yml` + this log entry; (d) provenance / no-fabrication intact —
+no data values touched. **Verification:** confirmed `build_live_board.py --check` and
+`build_provenance.py --check` both reproduce byte-exact on the clean tree; confirmed `macro_indicators.json`
+is in `provenance.json`'s census and read by `build_live_board.py`; a drift simulation (perturb → restore
+via `git checkout`) left the tree clean (verified `git status`). **Deploy-verify:** prod alias `/` → 200,
+`/data/meta.json` → 200, `/data/competitor_coverage.json` → 200 (no app change to regress).
+
+**Next recommended (intelligence):** audit the remaining draft-PR data workflows that commit a
+`platform/data/*` file for the same lockstep gap — spot-check `data-gov-census.yml` (commits
+`source-data/`, likely provenance-safe) and `data-overture.yml`; then a small **shared composite action**
+(`rebuild-provenance-if-changed`) would let every feed reuse one audited regen step instead of the
+copy-pasted block, killing this drift class at the source.
+
+## 2026-08-02 — UX loop (a11y): scope="col" on the district amphoe tables — MERGED + DEPLOYED + VERIFIED (PR #255)
+
+Autonomous UX-improvement loop, safeguard-gated auto-merge. Fourth slice of `ux-table-scope-sweep-appjs`
+(WCAG 1.3.1): the two National (`#map`) district-lens tables `#amptbl` (coverage/whitespace, `drawAmpBoard`)
+and `#amprtbl` (risk proxy, `drawAmpRisk`) built their header rows with bare `<th>` / `<th title>`, so a
+screen reader couldn't reliably tie each data cell to its column header. Added `scope="col"` to all 16
+column-header `<th>` across both rows (incl. the conditional `haveOcc`/`haveComp` headers), matching the
+`data.html` `#ptbl`/`districtTable` convention and the prior search/competition/exposure slices. `platform/app.js`
++ a `docs/UXUI_AUDIT.md` fix-log entry only. Zero visual change (`scope` is non-presentational).
+
+**Safeguard protocol — all passed:** (a) `bash tests/run.sh check` → **113 passed, 0 failed** (no gate
+drift this run); (b) headless render of `index.html#map` (1100×900) `data-errors="[]"`, Leaflet initialised,
+map/lens-pills/controls/legend intact, self-reviewed — no visible regression (blank basemap expected);
+(c) no secrets in diff; (d) diff = 16 scoped `<th>`, no data cells, no stray files. Squash-merged to master
+(`36bb129`). **Deploy-verify:** prod alias `/` → 200, `/app.js` → 200 (deployed `app.js` confirmed to carry
+the scoped `#amptbl` header — merge is live, not stale cache), `/index.html` → 308 → 200 (expected `cleanUrls`
+redirect). No rollback needed. NOTE: the merged branch's remote ref could not be deleted — the CCR git proxy
+rejects ref-deletion pushes ("Everything up-to-date"); harmless (branch is fully merged). Remaining sweep
+families (Overview/commodity-board `#region` + `#acq` rival-pulse/ads/YouTube tables) still tracked under
+`ux-table-scope-sweep-appjs`.
+
+## 2026-08-02 — intelligence loop (SERVICE): three MEASURED survey/registry layers had their real vintage dropped from the exec Data-room card — `_vintage_of` now scans `latest_year_ce` + `span`
+
+Autonomous market & service intelligence loop, SERVICE pillar. The service audit's standing freshness
+sweep caught the #248 macro/agri data wave: it landed four new live-fetched layers, and **three of
+them stamp their freshness under a key `build_provenance.py::_vintage_of()` never scanned**, so each
+showed **blank** in the Command-center Data-room card despite being MEASURED and carrying a real
+data-vintage:
+
+- `debt_source.json` (NSO household debt-by-source survey) → `latest_year_ce = 2023` (an **integer**)
+- `vehicle_fleet.json` (DLT registered-vehicle stock) → `latest_year_ce = 2025` (an **integer**)
+- `farm_household.json` (OAE farm-household cash P&L survey) → `span = "2562/63..2566/67"` (BE crop-years)
+
+`_vintage_of()` now scans `latest_year_ce` (with int→str coercion — a bare calendar year is exactly
+the `vintage_individual='2025'` NSO-year precedent, just stored as an int) and `span`, both appended
+**last** so any ISO/observation key still wins. `_parse_vintage` leaves all three age-blank — a bare
+year or a BE crop-year window is never coerced into a false age — so the vintage cell surfaces the
+layer's own committed label while the freshness pulse's age math correctly ignores them. The fourth
+new layer, `crop_mix.json`, correctly **stays blank**: it is a first-order DERIVED layer (province area
+× Thai farm-gate YoY × NSO income) inheriting freshness from its measured inputs — the honest ABSENT
+state, not a bug.
+
+- **Safeguards (all pass):** a diff of the regenerated `provenance.json` touches **only these three
+  vintage cells** (`'' → 2023`, `'' → 2025`, `'' → 2562/63..2566/67`); the 127-layer counts
+  (68 measured · 59 estimated · 0 unlabelled), labels, sources, files block, and the freshness block
+  (n_dated 24 / n_undated 103) are byte-identical. `build_provenance.py --check` reproduces exactly;
+  determinism gate **113 passed · 0 failed**, data integrity **448/448**; `node --check` clean;
+  no secrets in the diff; no fabrication — every value read from the layer's own committed `meta`.
+  `app.js` is byte-unchanged (the three values render through the existing `L.vintage` cell path that
+  already serves 24 other layers), so no new render path — same class as the `board_vintage` /
+  `farmgate_vintage` / `price_asof` vintage-surfacing fixes, shipped the same way (direct commit).
+- **Files:** `pipeline/build_provenance.py` (+2 scan keys, int coercion, comment), regenerated
+  `platform/data/provenance.json` (3 cells), `docs/SERVICE_AUDIT.md` + this log.
+- **Recommend next:** re-verify the DLT `vehicle_fleet` / `vehicle_registry` freshness pair reconciles
+  now that both surface a vintage, and continue the standing sweep as new layers land (any future
+  survey layer stamping only a year/`span` is now covered).
+
+## 2026-08-01 — UX loop: scope="col" on the 15 Exposure render-path tables (merged + deployed + verified)
+
+Autonomous UX-improvement loop, one surgical fix. Third slice of `ux-table-scope-sweep-appjs`
+(a11y, WCAG 1.3.1) on the objective-#1 portfolio-risk route: `renderExposureTape` + `renderExposure`
+built 15 column-header rows as inline template literals with bare `<th>` (no `scope="col"`) — the
+real-tape bucket/restructuring/LTV/occupation/NPAT-frontier/collateral tables, the concentration
+tables (`#expoprov`/`#expotbl`/contested/twin-outlier/scenario-shock), the vintage + branch-audit
+tables, and the two risk-trend delta tables the same pass builds (`#trendboard`/`#trendbranches`).
+Added `scope="col"` to every `<th>` (incl. dynamic per-age-band collateral headers), matching
+`data.html`'s scoped convention and the primary-search + competition slices. **Zero visual change**
+(non-presentational attribute) — 22 header lines in `platform/app.js` + one audit entry.
+
+- **Safeguards (all pass):** `tests/run.sh check` 113 passed / 0 failed; headless `#exposure` render
+  identical, settled DOM `data-errors=[]` with 100 `scope="col"` present; `node --check` clean; no
+  secrets; diff matches intent, no stray files.
+- **Ship:** PR #250 (squash-merged to master as `cf9cef3`). *Branch cleanup note:* the git proxy
+  refused the delete-push (`send-pack disconnect`, 3×); the merged branch remains but is harmless.
+- **Deploy-verify:** production alias root **HTTP 200**, `/app.js` **HTTP 200**, and the deployed
+  `app.js` confirmed to carry the `scope="col"` fix (grep hit). `/index.html` → 308 is the configured
+  `cleanUrls` redirect, not a regression. No rollback needed.
+- **Recommend next:** the last bare-`<th>` families are `renderOverview` (the `#region` +
+  DLT-vehicle/agri/water commodity-board tables) and the district `#amptbl`/`#amprisk` family —
+  natural fourth/fifth slices to finish `ux-table-scope-sweep-appjs`.
+
+## 2026-08-02 — Macro audit: a decision band on top, and three numbers that were saying the wrong thing
+
+Owner ask, ahead of MCOM: *"management needs the headlines, but working team needs branch level
+guidance on execution… perform deep audit of the macro tab… ensure all numbers are correct too. no
+stupid errors."* The band is the headline layer; the rest of this entry is what the audit actually
+found, because two of the three defects had been on the live site for weeks and both were the kind a
+reader spots from the back of the room.
+
+- **The decision band (`renderMacroSoWhat`, `#ov-sowhat`).** The tab already opened with six measured
+  numbers. A number is not an answer — the reader still has to work out which one matters and what to
+  do about it. The new band sits above it: six rows, each a *statement with a consequence*, each
+  jumping into the topic that proves it. It routes through the SAME `showOvPanel` switcher the chips
+  use, so it can never leave two topics open or desync the active chip. Every row is computed from a
+  committed layer and a row whose layer is absent is simply not emitted — it cannot invent a headline.
+- **DEFECT 1 (branch popups, 89 branches) — a rising crop price was being printed as the cause of
+  crop stress.** `build_branch_recommendations.py` rendered *"Agri stress: Rice catchment under
+  pressure (25.4, price 10.8% + dry)"*. But `agri_pressure = (0.6·price_stress + 0.4·drought)·intensity`
+  and `price_stress = max(0, −price_yoy·3)` — so a price that is UP contributes **exactly zero**.
+  Checked across the whole layer: **all 89 stressed branches have `price_stress = 0.0`**, i.e. every
+  one is drought-only, and every one was printing a positive YoY as if it were the pressure. The
+  score was right the whole time; the sentence said the opposite of the arithmetic. It now names the
+  term that actually produced the index and states plainly when the price is not contributing.
+- **DEFECT 2 (the "Bottom line", the most prominent sentence on the tab) — a size artefact reading as
+  a finding.** `top_reg` was `max(regions, key=raw count)`, which the largest region wins by
+  construction, so all three priorities resolved to "Central & Bangkok" and the sentence read like a
+  broken template. Now rate-based (share of a region's OWN branches), which separates them: rival
+  pressure Central & Bangkok 71%, crop stress Central & Bangkok 13%, and thinnest resale market
+  **Northeast · Isan** at 14% — a different map, and the one that matters for recovery.
+- **DEFECT 3 (same sentence) — a product-push clause that contradicts the consolidation pivot.**
+  *"lead with vehicle-title products where collateral density is high."* The identical phrasing had
+  already been deleted from the per-region cards on 2026-07-25 for exactly this reason and was left
+  behind in the headline. Inverted to the risk it actually describes: where the local resale market
+  is **thin**, recovery on an enforced title is weakest. The unrendered `_region_actions` /
+  `_top_action` strings ("Expand", "Grow farm lending", "Push vehicle-title") were corrected too, so
+  a future re-enable cannot reintroduce them.
+- **Two measured household-debt figures now reconcile instead of just coexisting.** BIS 2025-Q4 =
+  87.5% (answer band) and BoT Q2/2568 = 87.0% (Labour section) sat ~400px apart with no relationship
+  stated, and the BoT one rendered as bare "87%" against a precise "87.5%". Both are right — different
+  compilers, different quarters — so the fix is not to delete one: the band's BIS figure now **leads**
+  (newer vintage, carries the trend), the BoT figure is the named domestic cross-check, both print to
+  one decimal, and the 0.5pp gap is labelled definitional. `renderRegionDebt` also load-then-re-renders
+  `MACROIND`, because whichever layer lost the fetch race used to silently drop the whole clause.
+- **Note for the next audit:** the three defects above share a shape — the *computation* was correct
+  and the *sentence describing it* was not. Grep-level review does not catch that class; it needs
+  reading the rendered string against the arithmetic that produced it.
+
+## 2026-08-01 — intelligence-loop (DATA-INTEGRITY): the coastal total-join drift now fails LOUDLY at its source — `build_amphoe.py` asserts `sum(.branches) == len(branch_amphoe) == len(master)`
+
+- **Autonomous intelligence loop, DATA-INTEGRITY pillar.** Re-verified the named integration backlog
+  is exhausted here. In particular the negative-space sweep flagged "11 `--check`-gated build scripts
+  missing from `tests/run.sh`" (tape_layers/region_debt/product_segments/income_impact/scenarios/
+  crop_margin/drought_district/province_lfs/amphoe_crops/impact_cards/commodities) — I built the 11
+  gate lines, then **caught that it was a FALSE POSITIVE and reverted**: `tests/run.sh` already gates
+  exactly those 11 in a `for ing in …; do python3 "$ing.py" --check; done` loop. Both the agent's grep
+  and my own literal `"$b --check"` grep missed it because the loop calls the script through a `$ing`
+  variable, not a literal string. Lesson recorded so the next run doesn't re-flag it: **grep the loop,
+  not just the literal lines.** The only genuinely-absent build (`build_baac_credit.py` →
+  `baac_credit.json`) stays BLOCKED — its `datagoth/baac02_2567` input needs a Thai IP.
+- **The improvement (the coastal-fix entry's explicitly-teed-up next task).** The 2026-08-01
+  coastal-count fix (further below) closed the bug where 15 off-polygon coastal branches were set in
+  `branch_sid` but never appended to `branches_by_poly`, so `amphoe.json`'s per-district `.branches`
+  summed to **2000** while the flat `branch_amphoe` index held **2015** — overstating the rival:AutoX
+  ratio up to **31%** (Phuket 12.62→9.62) three layers downstream. That fix relied on a *downstream*
+  index-alignment check (`rival_density`↔`amphoe`) to catch any regression. This run adds the guard the
+  coastal entry asked for: a source-level invariant in `build_amphoe.py` (right after `branch_amphoe` is
+  computed) asserting `sum(r["branches"] for r in recs) == len(branch_amphoe) == len(master)`, raising
+  `SystemExit` with the three actual counts on any violation. Because the gate's `build_amphoe.py
+  --check` runs `build()`, the whole total-join drift class now fails **at its origin**, not via a
+  coincidental downstream check.
+- **Why it matters (objectives #1 + #2).** `amphoe.json .branches` is the denominator/rollup for the
+  National district lenses, `#exposure` competitor-exposure, `rival_density`, `peer_province` and every
+  rival:AutoX ratio. A silent under-count of AutoX's own branches systematically **overstates** how
+  outnumbered the footprint looks — a competitive-risk read (#2) drawn from a portfolio-count (#1). This
+  makes that specific, already-seen failure impossible to reintroduce unnoticed.
+- **Safeguards — all pass.** (a) **Positive:** `build_amphoe.py --check` → OK, `amphoe.json` reproduces
+  byte-for-byte (928 amphoe) against the current committed vintage; the guard touches no output, only
+  asserts. (b) **Negative:** reintroducing the exact 2026-08-01 bug (dropping the fallback
+  `branches_by_poly[sid0].append(b)`) makes `--check` exit 1 with `INVARIANT VIOLATION:
+  sum(.branches)=2000, len(branch_amphoe)=2015, len(master)=2015` — the guard fires on precisely the
+  drift it targets; source restored, byte-exact again. (c) `bash tests/run.sh check` = **109 passed / 0
+  failed** (data-integrity unchanged — the guard lives inside the already-gated `build_amphoe.py
+  --check`, not a new line). (d) Diff = **one code file, `pipeline/build_amphoe.py`, +19 lines** (a
+  comment + the assertion) plus this log. **No `platform/data` file created or altered** (`amphoe.json`
+  byte-identical → no `build_provenance.py` rebuild needed), **no app.js/HTML change**, no number
+  invented. (e) No secrets in the diff.
+- **Ship.** Direct-to-master (no PR — no rendering/behaviour/visual change; a build-time guard, same
+  class as the prior `check_commodity_board.py` verifier committed direct).
+- **Next recommended intelligence task.** Generalize the guard: several other layers total-join master
+  the same way (`branch_risk`, `branch_labor`, `branch_leads`, `peer_province`, `rival_density`) — a
+  shared `assert_total_join(records, key, expected)` helper reused across those builders would make the
+  whole "per-record count must equal the flat total" invariant a gated property everywhere, not just in
+  `amphoe`. The highest-value OPEN data items remain owner-side/env-gated (Thai-IP `baac_credit` pull;
+  a session-reachable `GISTDA_SPHERE_KEY` for 40m satellite crop-area).
+
+## 2026-08-01 — agri data wave: sugarcane closed on both sides, and three layers that were already on disk
+
+PR #248. Five layers landed, two deliberately not built. Provenance 123 -> 126 (68 measured,
+0 unlabelled). Gate: 109 passed, **0 determinism failures**.
+
+- **SUGARCANE — the ask, closed.** Cane was invisible in three places at once: a MODELLED SPAM-2010
+  belt understating national area ~1.7x, no current Thai price at all, and an OAE snapshot reading
+  **+26.1%** that was stamped BE 2562 = **2019** and of the **wrong sign** against an actual
+  **-17.9%**. Root cause is structural: cane growers register with the **OCSB, not DOAE**, so every
+  registry-based layer here was blind to the crop by construction. `ingest_ocsb_cane.py` pulls OCSB's
+  own CKAN (47 provinces, 11.4m rai, production year 2565/66, 10-year series) plus the announced
+  price series 2020..2025. Sugar is now the board's third-steepest faller the borrower feels, and
+  Thai (-17.9%) is falling **faster** than world (-13.5%).
+- **Decision — the cane price is ADMINISTERED, and the layer says so everywhere.** OCSB announces one
+  national price per season at ~10 CCS. It is therefore not a market quote: it carries no
+  `n_markets`, is tagged `cadence: annual` + ADMINISTERED in the history layer, and its empty
+  province spread is labelled "cannot vary", not "unknown". Do not let a later refactor treat it as
+  a market series beside the NABC dailies.
+- **The assistance radar was reporting ZERO, and the zero was an artefact.** It mapped five crops;
+  all five happened to be rising, so it said "no province is in a falling sector" — true of what it
+  measured, false about the country. Three one-line omissions upstream hid the real fallers: coconut
+  + pineapple AREA sat unread in the DOAE response (`ingest_doae.py` mapped 5 of 19 crop columns),
+  their PRICES sat unread in `nabc_prices.json` (`build_farmgate_prices.py` had 5 of 7 quotable crops
+  allowlisted), and sugarcane had neither. Now eight crops, tripping on **22 provinces / 14,482
+  healthy (Current or X-bucket) farm accounts**. Every belt on the board is now MEASURED; no row
+  points at SPAM.
+- **Thai price HISTORY + PROVINCE SPREAD (new).** `pull_nabc_prices.py` pages ~2,200 daily records
+  per category and kept six numbers, discarding time and place. `pull_nabc_history.py` +
+  `build_thai_price_history.py` keep both: 13 categories, 19 months, 26KB. The product had **no Thai
+  price history anywhere** — every sparkline it drew was a *world* price. The spread is routinely
+  wider than the YoY the board leads with: coconut -77.3% over 18 months with a **37.0%** spread
+  between quoting provinces; rice +12.6% with **22.0%**.
+- **Farm-household P&L (new) — the correction that reframes every price claim here.** OAE surveys
+  farm households directly: **non-farm cash income is 48.8%** of a Thai farm household's cash income,
+  so a crop-price shock reaches roughly the farm half. National means only; carries a scope_warning
+  and must never be joined to a province.
+- **First ingest out of the 7.9GB gdcatalog harvest — "informal debt is not a place, it is a job".**
+  NSO measures in-system vs out-of-system household debt by region and socio-economic class, 7 waves
+  2011-2023, never read until now. Nationally informal debt is only **1.28%** and has **shrunk** from
+  2.94% — no large national pool to convert. It barely varies by region (0.84-1.54%) but varies
+  **5.1x by occupation**: transport & elementary workers 6.50%, farm/forestry/fishery labourers
+  6.36% — squarely this book's borrowers. Level is a **floor** (self-reported to a government
+  interviewer); trend and between-class ranking are the defensible reads.
+- **Decision — DOAE district crop area NOT pulled.** The only district/tambon endpoint
+  (`plants_detail/report_select`) is a farmer-RECORD search: ID card, land document, disaster claim.
+  The aggregate webservice is province-grain only (`get_data2dit`; every district variant 404s).
+  Harvesting person-level farm records to obtain a district crop total is not a trade worth making.
+- **Decision — GISTDA flooded AREA not built, and why.** The ArcGIS server is open, no key, and
+  `FL_RepeatedFlooding_GISTDA_50k_Y2005_Y2016` exposes `flood_freq` + `area_rai` + full
+  province/amphoe/tambon keys with server-side statistics. But the polygons **overlap by event**:
+  Sukhothai returns 202,744 polygons summing to 13.2m rai against a ~4.1m rai province, and a naive
+  SUM yields a national figure of 40% of Thailand. Any area number needs a spatial dissolve first.
+  `MAX(flood_freq)` per district is immune to the overlap and is the logged first build.
+- **Trap re-learned — rebuild float-sensitive layers on LINUX, not this laptop.** `branch_agri`,
+  `branch_risk`, `regional_outlook`, `opportunity_score` and `province_risk` were rebuilt on Windows
+  CPython 3.14 during the wave. They reproduced byte-exact *there* and drifted on Linux, which is
+  what CI runs. Rebuilt under the WSL uv cpython-3.11 mirror. A full Linux `--check` sweep over every
+  builder is now clean. Five more builders were also switched to `newline="
+"` writers.
+- **The map libraries are no longer a CDN call.** Four pages fetched deck.gl / Leaflet from
+  `unpkg.com` on every view — including `index.html`, the National map of all 2,015 branches. That
+  put the most-used view in the product behind a third party being reachable from a Thai network,
+  and the failure mode is the worst kind: the page loads, the library doesn't, and the result is a
+  blank canvas indistinguishable from a bug in our code. Both are now committed under
+  `platform/vendor/`, fetched from unpkg AND re-fetched from jsdelivr and byte-compared, with the
+  SHA256s recorded in `platform/vendor/README.md`. `.gitattributes` exempts that tree from eol
+  normalisation — without it git rewrites `leaflet.css` on commit and the hash stops matching
+  upstream. Two consequences worth knowing: (1) `tests/lib/render.sh` used to **sed-swap** the unpkg
+  refs to npm bundles before rendering, so a broken library reference on the real page could pass
+  QA — it now renders the shipped bytes verbatim; (2) the test suite is fully offline, npm was its
+  last network dependency. `tests/run.sh` now asserts no page has drifted back to a
+  unpkg/jsdelivr/cdnjs `<script>`, so the regression fails the gate instead of silently returning.
+- **Trap, corrected — the WSL mirror had no numpy, so `build_branch_peers` was never actually
+  checked there.** The local Linux sweep classified it ENV (missing module) and moved on; CI then
+  failed on it alone, because it sits downstream of the `branch_risk.json` rebuilt in this wave and
+  was still carrying Windows floats. `numpy==2.4.6` (the `qa.yml` pin) is now installed in the
+  mirror. A "skip" in a sweep is not a pass — count the skips.
+- **Gate note.** WSL has no `node` and no `pdfplumber`, so 11 gate entries fail there for environment
+  reasons only; both exist in CI. `node --check` passes on Windows for `app.js` and all 34 inline
+  blocks across 8 pages.
+## 2026-08-01 — intelligence-loop (PEER/MARKET data-correctness): 15 off-polygon coastal branches were dropped from every district count — the rival:AutoX ratio was overstated by up to 31% in 5 provinces
+- **The bug (MEASURED, cross-layer reconciliation):** `amphoe.json`'s flat `branch_amphoe` index total-joined all **2,015** branches (nearest-centroid fallback for branches that PIP-miss every polygon), but the per-record `.branches` COUNT was strict-PIP-only and summed to just **2,000**. `build_amphoe.py` set `branch_sid[i]` for the 15 off-polygon coastal/border branches yet never added them to `branches_by_poly`, so they were silently absent from their district's count — and the shortfall propagated to every layer that rolls up `.branches`: `rival_density.json` (autox summed to 2000) → `peer_province.json` (autox summed to 2000). Rival brand counts reconciled EXACTLY (Muangthai 8931 / Srisawad 5203 / Tidlor 1919 / Heng 450 across all three layers); only AutoX's own denominator was under-counted.
+- **Why it matters (objective #2 — competitive risk on the footprint we run):** the missing 15 were concentrated in **6 coastal districts** (บ้านฉาง/Rayong +5, เมืองภูเก็ต/Phuket +4, สัตหีบ/Chonburi +3, ถลาง/Phuket +1, ดอนสัก/Surat Thani +1, เมืองชุมพร/Chumphon +1 — beaches/islands whose branches fall just outside the generalized coastline polygon). Because the rival:AutoX ratio uses AutoX as the denominator, under-counting AutoX **overstated** how outnumbered AutoX looked. Province-level correction (MEASURED): **Phuket 12.62 → 9.62 (was overstated by 31%)**, Rayong (the pilot province) 4.96 → 4.54, Chonburi 6.37 → 6.18, Surat Thani 10.45 → 10.21, Chumphon 9.06 → 8.56. `n_outnumbered_districts` unchanged (all corrected districts were already AutoX-present, not flipping status) — so this sharpens the ratio without moving the outnumbered-count headline.
+- **The fix:** one functional line in `build_amphoe.py` — the nearest-centroid fallback now also `branches_by_poly[sid0].append(b)`, so `.branches` total-joins all of master and MATCHES `branch_amphoe`. `branch_pip` stays `False` (still flagged as a geometric fallback, not a true PIP). The `measured_at_amphoe` provenance note was updated (both ternary arms) to state honestly that the count includes the nearest-amphoe fallback for the off-polygon coastal branches — the honesty label now describes what the number actually is.
+- **Regeneration chain (all deterministic, `--check`-gated):** `build_amphoe.py` → `rival_density.py` → `peer_province.py`, plus first-order `opportunity_score.py` / `exit_whitespace.py` / `expansion_plan.py`, second-order `rival_threat_region.py` / `province_pressure.py` / `impact_cards.py`, then `build_provenance.py`. `commodities.json` regenerated byte-identical (the impact_cards fields it reads were unaffected). Both `rival_density` and `peer_province` now sum AutoX = **2015**.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **108 passed, 0 failed** (448/448 data-integrity checks, incl. the rival_density↔amphoe index-alignment gate that first flagged the drift). (b) No secrets in the diff. (c) Diff = `pipeline/build_amphoe.py` (1 functional line + provenance-note text) + the 10 regenerated `platform/data/*.json` consequences + this log — no app.js/HTML, no visual/DOM/code-path change (a pure data-value correction flowing through unchanged render code, same class as the provenance/commodities regens committed direct-to-master). (d) Provenance intact — 123 layers, 65 measured / 58 estimated / **0 unlabelled**, labels unchanged (count corrections, never fabrication).
+- **Ship:** direct-to-master (no PR — no rendering/behaviour code changed). Deploy-verify below.
+- **Next recommended intelligence task:** audit the OTHER per-district rollups that read `amphoe.json .branches` (e.g. the National map's district lens, `#exposure` competitor-exposure tables) to confirm they now reflect the corrected coastal counts on-screen; and consider a small `build_amphoe.py` self-check asserting `sum(.branches) == len(branch_amphoe) == len(master)` so this class of total-join drift fails the gate loudly at source rather than surfacing via a downstream index-alignment check.
+
+## 2026-08-01 — intelligence-loop (data-honesty): gate now guards the hand-maintained commodity board against its MEASURED Pink Sheet source (`check_commodity_board.py`) — wires the orphaned `commodities_protein.json`
+
+- **Autonomous intelligence loop, DATA-INTEGRITY pillar.** Re-verified the named integration backlog
+  is exhausted or blocked from this environment: FPO PICO competitor census, `branch_cropland`,
+  `dbd`/`mot`/`diw` layers are all built + gated + wired (per prior entries), and BAAC/SME-bank credit
+  penetration + GISTDA 40m crop-area remain BLOCKED (Thai-IP re-pull / a `GISTDA_SPHERE_KEY` **not in
+  this session's env** — confirmed absent this run). A negative-space sweep found **no unwired app
+  layer**. So this run closed a concrete honesty gap instead.
+- **Finding.** `source-data/commodity_board.json` is the canonical 11-item Pink Sheet board the app
+  renders (`derive.py` → `meta.board`, the Overview commodity board) and that ~10 downstream builders
+  consume (`build_commodities` / `build_crop_stress` / `build_collateral_outlook` / `build_impact_cards`
+  / …). It is **HAND-MAINTAINED**, and its per-commodity `yoy` + `stale` (vintage) are the **MEASURED**
+  World Bank Pink Sheet move — but **nothing enforced** that those numbers still equal the two Pink
+  Sheet source files they are transcribed from: `commodities.json` (five crops) and
+  `commodities_protein.json` (chicken/beef/fishmeal/logs/sawnwood/gold, incl. the **gold-collateral**
+  YoY). So an editor could refresh one source file and leave the board showing a stale, now-wrong
+  MEASURED number — a silent measured-vs-source drift — with no alarm. Separately,
+  `commodities_protein.json` was a **committed input with ZERO consumers** anywhere in the repo (grep-
+  verified) despite being the source of **six of the board's eleven** numbers.
+- **Fix.** Added `pipeline/check_commodity_board.py` (deterministic, network-free): for every board
+  item it asserts `yoy` == source `yoy` and `stale` == source `date`, and **fails loudly on any board
+  label not in its source map** so a newly hand-typed board number can never silently escape the
+  measured-source guard. Wired into `tests/run.sh check` with the gate's `0 ok / 2 drift / 3 absent`
+  idiom, next to the other commodity checks. This gives the orphaned `commodities_protein.json` a
+  genuine consumer and makes the board's measured honesty a gated invariant.
+- **Safeguards — all pass.** (a) `bash tests/run.sh check` = **106 passed / 0 failed** (was 105; the
+  new check is the +1; DATA VALIDATION 448/448 unchanged). (b) Positive test: OK on committed data
+  (all 11 match). Negative tests: a mutated `commodities.json` yoy → exit 2 with the exact
+  drifted item named; an unmapped new board item (`Cassava`) → exit 2 telling the maintainer to add
+  the mapping — source files restored after, tree clean. (c) No secrets in the diff. (d) **No
+  `platform/data` file created or altered, no number invented** — a read-only verifier over three
+  committed files — so no `build_provenance.py` rebuild is required and there is **no app-behaviour or
+  visual change**; committed directly to master per the loop's non-visual rule.
+- **Recommend next.** The board also carries an editorial `cls` (up/flat/stress) and per-item `note`
+  that are NOT guarded — a natural extension is a soft `cls`-vs-`yoy`-sign consistency check (mild
+  negatives are deliberately `flat`, so it needs a tolerance band, not a strict sign function). More
+  broadly, the highest-value OPEN items stay owner-side/env-gated: a session-reachable
+  `GISTDA_SPHERE_KEY` (40m satellite crop-area, supersedes the SPAM baseline) and a Thai-IP re-pull +
+  committed raw CSV to finish BAAC/SME-bank formal-credit **penetration**.
+
+## 2026-08-01 — intelligence-loop (deployment-health): the site-health probe now guards the DATA ROOM honesty census (`provenance.json`)
+
+- **Autonomous intelligence loop, DEPLOYMENT-HEALTH pillar.** All named backlog items remain
+  closed/blocked (plan 98%: the one OPEN item is owner-side Vercel access-protection), and this run
+  re-verified the room is healthy — live master alias HTTP 200 on `/`, `/app.js`, `/status`, and every
+  exec-critical layer (`peer_province`, `competitor_coverage`, `rival_density`, `tape_real`,
+  `household_risk`, `search_demand`, `provenance`); all recent CI workflow runs green (no failing
+  crons); ThaiWater/NABC/fuel live feeds fresh (2026-07-31, on-cadence); determinism gate **105
+  passed / 0 failed**. So this run closed the concrete monitoring gap the prior probe runs teed up.
+- **Finding.** `pipeline/check_site_health.py` guarded ~27 exec-facing layers but **not**
+  `provenance.json` — the source of the Command-center (#home) **DATA ROOM** card, the exec front
+  door's core **measured / estimated / UNLABELLED** honesty census (the "shame board"), the surface
+  the project's whole measured-vs-estimated mandate is judged on. `renderHomeDataRoom` **eager-loads**
+  it on the front door and is **NULL-SAFE**: its guard (`!PROVEN || !Array.isArray(PROVEN.layers) ||
+  !PROVEN.counts`) silently collapses the whole card to a calm "not yet computed" placeholder when the
+  file is missing/truncated. So a truncated CDN deploy that dropped the census would blank the exec's
+  honesty board **with no phone alert** — the exact "broken demo" blind spot this probe exists to
+  catch, and it was the last front-door eager read still unprobed.
+- **Fix.** Added `_shape_provenance` (asserts render SHAPE — `.counts` three-way split + a non-empty
+  `.layers` census table whose first row carries a valid `file` + `cls` chip + `.files.total`; robust
+  to the census growing, a floor guards against a truncated/emptied file — **not** values, so a future
+  vintage adding layers never false-alarms) and registered `data/provenance.json` in `DATA_FILES`.
+  Verified: the local probe now covers it (`--local ../platform` → 89/89, incl. the new
+  `provenance.json shape sane` line); the validator passes the committed file and **catches** every
+  malformed shape (missing counts / empty or truncated layers / missing files.total / bad cls / non-
+  object) with a specific message — a real guard, not a no-op.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` = **105 passed / 0 failed**;
+  `python3 -c ast.parse` clean. (b) No secrets in the diff. (c) Diff = one CI-only file
+  (`check_site_health.py`, +47), matches intent. (d) No-fabrication intact — **no `platform/data`
+  file altered**, no number invented, shape-only assertion; provenance ledger unchanged (nothing to
+  rebuild). No visual/app change (a CI probe, not app.js/HTML/CSS/data), so committed directly to
+  master per the loop's safeguard mandate.
+- **Recommend next.** With every front-door eager read now probed, the remaining deploy-health
+  frontier is the **lazy per-route** reads that still degrade silently (e.g. the province/branch 3D
+  scene data + `data.html` layers). Separately, a SERVICE-pillar win: teach `build_provenance.py`'s
+  freshness block to flag a CI-refreshable live layer that has gone **overdue vs its own cron cadence**
+  (a silent-cron detector), which the current freshness read (age-behind-newest) does not catch.
+
+## 2026-08-01 — UX loop: `scope="col"` on the three primary SPA search-table headers (a11y) — MERGED + deployed (PR #241)
+
+- **Shipped.** First slice of `ux-table-scope-sweep-appjs`. The three primary interactive SPA search
+  tables — `#branches` (`renderBranches`), `#provtbl` (`drawProv`), `#mkttbl` (market) — built their
+  column-header rows as inline template literals with **bare `<th>`** (no `scope="col"`), so on these
+  wide tables a screen reader couldn't reliably associate each data cell with its column header
+  (WCAG 1.3.1). Added `scope="col"` to every `<th>` in the three header rows, matching `data.html`'s
+  already-scoped `#ptbl`/`districtTable` convention. All are column headers, so `scope="col"` is
+  correct throughout. Zero visual change (scope is non-presentational). Only `platform/app.js` (6 lines)
+  + the `docs/UXUI_AUDIT.md` fixed-log/backlog note touched.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` = **103 passed / 0 failed**;
+  `node --check platform/app.js` clean. (b) Headless render of `index.html#branches` = clean — header
+  row, 2,015 branches, lead line and "+146 more rows" cap footer all intact; settled DOM confirms all 9
+  branches `<th>` now carry `scope="col"`. (c) No secrets in the diff. (d) Diff matched intent, no stray
+  files. → squash-merged own PR #241 (`960e96d`), branch deleted.
+- **Deploy-verify.** Production alias root + `app.js` both **HTTP 200** (no regression → no rollback).
+  Note: **PR #240 ("Live board") was merged to master ~80s after #241**, so the master prod alias's
+  newest build is #240's (commit `b864026`), which QUEUED while #241's build was still building.
+  Verified authoritatively via git that #241's commit `960e96d` **is an ancestor of the master tip**
+  and the tip's `app.js` retains the change intact (Branch-header `scope="col"` fragment present, 7
+  scope lines total) — #240 landed on top without touching the edited lines. The change is permanently
+  in master and ships with whichever build (both include it) the alias lands on; at log time both new
+  production builds were still BUILDING/QUEUED, so the alias was transiently serving the prior READY
+  deploy (#238, `9d165bf`) — expected propagation lag, not a failure.
+- **Recommend next.** Continue `ux-table-scope-sweep-appjs`: the `#region`/`#acqtbl`/`#amptbl` families
+  and the competition/exposure tables still have bare `<th>`. Best done as one dedicated mechanical run
+  (many literals) rather than folded into a surgical fix. Separately, the new **`#live` Live board**
+  (#240) is now on master and unaudited by this loop — worth a mobile/overflow + provenance-label pass
+  on a future run.
+
+## 2026-08-01 — intelligence-loop (deployment-health): site-health probes now guard the last three surfaced-but-unprobed exec reads — `rival_density`, `search_demand`, `household_risk_by_province`
+
+- **Autonomous intelligence loop, DEPLOYMENT-HEALTH pillar.** The named data-integration backlog is
+  closed for CI-reachable sources (verified this run): `fpo_pico` → pico census/district/competitors +
+  per-branch PICO exposure (with National-map `dpico`/`doutnum` lenses), `branch_cropland` +
+  `province_cropland`, `dbd_newco`/`mot_vehicles`/`diw_factories` layers — all built, gated, wired, and
+  provenance-labelled (120 layers, 0 unlabelled). The remaining named items are BLOCKED from this
+  environment: BAAC/SME-bank credit needs a Thai-IP re-pull + committed raw CSV (`build_baac_credit.py`
+  is orphaned pending that), and GISTDA 40m crop-area needs `GISTDA_SPHERE_KEY`, which is **not in this
+  session's env**. So this run took the DEPLOY-HEALTH remit the last two runs established and closed the
+  concrete monitoring gap the 2026-08-01 `province_pressure` run itself teed up.
+- **Finding.** `pipeline/check_site_health.py` guarded ~24 exec-facing layers but **not** the three the
+  prior run flagged as the next probe targets — each renders on a default-reachable nav route and
+  **live-degrades SILENTLY** when its file is missing (calm placeholder / hidden map lens), so a
+  truncated CDN deploy that guts one blanks its exec read with **no phone alert**:
+  - `rival_density.json` — the `#acq` district-outnumbered board (obj #2), the district-grain sibling of
+    the already-probed `peer_province` province board (`drawRivalDensity` reads `.records` +
+    per-row `autox`/`rivals`/`by_brand`);
+  - `search_demand.json` — the `#acq` share-of-search board (obj #2, ESTIMATED; `drawSearchDemand` reads
+    `.provinces` → `.th`/`.demand`/`.autox_share`/`.best_rival`);
+  - `household_risk_by_province.json` — the obj-#1 household **debt-to-income** hero map lens (MEASURED,
+    NSO SES 2566; `loadHhRisk`/`hhriskVal` read `.provinces` → `.province`/`.debt_to_income`).
+- **Fix.** Added `_shape_rival_density`, `_shape_search_demand`, `_shape_household_risk` (each asserts
+  render SHAPE, not values — robust to a future census/SES vintage shifting counts) and registered the
+  three files in `DATA_FILES`. The two absent-able layers (`search_demand`, `household_risk`) mirror the
+  app's own `meta.absent` guard: an honest source-absent state returns OK (a valid empty shape), so the
+  probe fires only on a real truncation. One-file diff: `pipeline/check_site_health.py`. **No `platform/`,
+  no data, no app-behaviour/visual change** — monitoring-only, so no provenance rebuild and no headless
+  render needed; direct-to-master per the loop's non-visual rule.
+- **Safeguards (all pass).** (a) `py_compile` OK. (b) `check_site_health.py --local platform` → **86/86
+  passed** (was 77; +9 for the three new files' fetch/parse/shape), the three new probes green on
+  committed data. (c) Negative test: each shape fn rejects `{}`, an empty list, and a partial-row file,
+  and the two absent-able fns return OK on `meta.absent` — so the probes catch truncation without
+  false-alarming on the honest empty state. (d) `bash tests/run.sh check` → **0 failed** (the health
+  probe is a live-site check, not in the determinism gate, so the gate count is unchanged). (e) No
+  secrets in the diff (stdlib probe code only); diff scoped to the one probe file + this log.
+- **Next recommended intelligence task.** The exec-facing deploy-health sweep is now essentially
+  complete across both objectives. The highest-value OPEN items are all owner-side/env-gated: (1) set
+  `GISTDA_SPHERE_KEY` as a session-reachable secret to build the 40m satellite crop puller (item 4,
+  supersedes the SPAM baseline in `branch_cropland`); (2) a Thai-IP re-pull + committed raw CSV to
+  finish BAAC/SME-bank formal-credit **penetration** (item 3 remainder); (3) the R2 catchment migration
+  (`SERVICE_AUDIT.md`). Absent those, the remaining CI-safe monitoring increments are the second-tier
+  layers (e.g. `dbd_formation`, `sfi_credit` is already probed) — diminishing returns vs. the front-door
+  reads now all covered.
+
+## 2026-08-01 — intelligence-loop (deployment-health): site-health probe now guards `province_pressure.json` (the front-door cross-objective thesis) — committed + deployed + verified
+
+- **Autonomous intelligence loop, DEPLOYMENT-HEALTH pillar.** The autonomy backlog reads 98% (only the
+  one owner-side access-protection item open), so this run took the SERVICE/DEPLOY-HEALTH remit: audited
+  the live deployment + data room and closed one concrete monitoring gap. Baseline verified first —
+  determinism gate **103 passed, 0 failed** on latest master (`b60160d`); production alias 200 on `/`,
+  `/app.js`, `data/meta.json`, `data/branches.json`, `data/competitor_coverage.json`; **no broken
+  static data references** (102 `data/*.json` refs across every page — all present); freshness healthy
+  (live layers refresh daily, structural layers appropriately older). Two prompt-flagged items were
+  already correct and needed no change: `site-health.yml` already monitors the master production alias,
+  and `peer_province.json` (per-province per-brand peer board — pillar #1's headline ask) is already
+  built + wired + probed.
+- **Finding.** `pipeline/check_site_health.py` guards ~24 exec-facing layers (branches, meta, amphoe,
+  the obj-#1 Overview flow cards, `peer_province`, `competitor_coverage`, `pico_district`, the `#acq`
+  rival-pulse trio, `#sim` scenarios…) but **not `province_pressure.json`** — the deterministic JOIN of
+  portfolio risk (obj #1, `province_stress_index` composite) × competitive risk (obj #2, `peer_province`
+  rival:AutoX ratio). It is the one layer that fuses BOTH standing objectives, and it renders on the
+  **exec front door**: `renderHomeThesis` reads `meta.n_double_pressure` to gate the "N provinces both
+  stressed and outgunned" thesis clause and `meta.worst_province.province_th` for its tail. Both of its
+  parents are probed, but the join that actually renders was not — a truncated CDN deploy that gutted it
+  would silently drop the front-door intersection clause with **no phone alert**, the exact "broken demo"
+  blind spot the peer / coverage / flow-card probes were added to catch.
+- **Fix.** Added `_shape_province_pressure` (asserts render shape, not values — a `provinces` list ≥70
+  with the joined axes `stress_pctile`/`contest_pctile` + `double_pressure` flag, plus the meta gate
+  `n_double_pressure:int` and `worst_province.province_th`; robust to a future SES/census vintage
+  shifting counts) and registered `data/province_pressure.json` in `DATA_FILES` right after its
+  `peer_province` parent. One-file diff: `pipeline/check_site_health.py` +48 lines. **No `platform/`,
+  no data, no app-behaviour/visual change** — a monitoring-only change, so no provenance rebuild and no
+  headless render needed; direct-to-master per the loop's non-visual rule.
+- **Safeguards (all pass).** (a) `bash tests/run.sh check` → **103 passed, 0 failed** (unchanged from
+  baseline — the health probe is a live-site check, not in the determinism gate). (b) no secrets in the
+  diff (stdlib probe code only). (c) diff matches intent (one health probe for the one unguarded
+  front-door layer). (d) no-fabrication intact — the probe invents no numbers, asserts structure only.
+  Additional verification: `py_compile` OK; `check_site_health.py --local platform` → **77/77 passed**
+  (was 74; +3 for the new file's fetch/parse/shape) with the new probe green on committed data; and
+  `--base-url <master prod alias>` → **77/77 passed**, confirming the DEPLOYED `province_pressure.json`
+  already matches the asserted shape so the nightly CI probe won't false-alarm.
+- **Next recommended intelligence task.** Continue the deployment-health sweep — the remaining
+  surfaced-but-unprobed layers are `rival_density.json` (the `#acq` district-outnumbered board),
+  `search_demand.json` (share-of-search), and `household_risk_by_province.json` (the obj-#1 DTI lens).
+  Each is a same-pattern one-probe increment. Beyond monitoring, the biggest open SERVICE item remains
+  owner-side and unchanged: finishing the R2 catchment migration (`git rm` the 74 R2-served
+  `*_catchment.json`, ~2.2 GB, keeping the 3 pilots) — architecturally significant, deferred to owner
+  review per `docs/SERVICE_AUDIT.md`.
+
+## 2026-08-01 — ux-loop: wrap long Thai tokens in the five-pillar cards (PR #239, merged + deployed + verified)
+
+- **Autonomous UX loop.** All seven original `docs/UXUI_AUDIT.md` findings are long since fixed, so this
+  run reviewed routes directly (headless renders of `#home`/`#assist`/`#acq` at 760px + a DOM-defect
+  sweep: 0 duplicate IDs, 0 missing `alt`, 0 empty `href="#"`) and found one new surgical gap.
+- **Finding `ux-pillar-narrow-overflow-wrap`.** The command-center five-pillar summary band's `.pill`
+  cards (`renderHomePillars`) render measured Thai branch/province names — Acquisition "densest branch
+  book: NAME", Competitor read, Assistance radar #1. Thai has no inter-word spaces, so a long name is a
+  single unbreakable token, and each `.pill` is `overflow:hidden`, so on a narrow phone that token would
+  be silently **clipped** at the card edge rather than wrapping. The sibling `.cc-hero-card` verdict card
+  already guards this exact case (`overflow-wrap:anywhere` on `.cc-hero-big`/`.cc-hero-sub`,
+  `ux-cc-hero-card-narrow-overflow`); the five-pillar band showed the same content class but was never
+  given the treatment.
+- **Fix.** Added `overflow-wrap:anywhere` to `.pill-big` + `.pill-read` in `styles.css` (both
+  five-pillar-only classes; the map lens `.pill.lens` shares the base `.pill` but not these text
+  children, so lens pills are untouched). CSS-only, additive — space-separated content is unaffected, so
+  zero visual change on the current data.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` = **102 passed / 0 failed** with the
+  change; (b) headless `#home` post-change render is **byte-identical** to pre-change (`data-errors=[]`),
+  `#assist`/`#acq` self-reviewed; (c) no secrets in the diff; (d) diff scoped to `styles.css` +
+  `UXUI_AUDIT.md` only. Squash-merged own PR #239.
+- **Deploy verified.** Master auto-deployed to Vercel; production alias `/` → **200**, `styles.css` →
+  **200** with `overflow-wrap:anywhere` present on both `.pill-big` and `.pill-read` (fix is live).
+  `index.html` → 308 is the expected `cleanUrls` redirect to `/`. No regression, no rollback.
+
+## 2026-08-01 — fix(gate): realign commodities.json + provenance.json to committed sources (master was RED again)
+
+- **Master's determinism gate was RED** at `bc08233`: `102 → 99 passed, 3 failed`. Two coupled failures,
+  same root cause as the earlier `046090d` realign:
+  1. `build_commodities.py --check` drifted — the NABC daily-price bot (#234) refreshed
+     `source-data/farmgate_prices.json` to `2026-07-31`, but the wave-2 feature merge (#231, `bc08233`)
+     landed a `commodities.json` still carrying `farmgate_vintage: 2026-07-30`. The *only* delta on
+     regeneration was that one vintage string (`2026-07-30` → `2026-07-31`) — a straight re-read of the
+     already-committed farm-gate source, not a new pull.
+  2. `validate_data.py` — three standalone `provenance.json` rows recorded stale byte sizes vs disk
+     (`commodities.json` 5259→5260, `thaiwater_flood.json` 7140→7142, `thaiwater_rain.json` 9060→9034);
+     the ThaiWater pull (#236) and the commodities drift had moved on-disk sizes the census never re-read.
+- **Not a workflow bug.** `data-nabc-prices.yml` already rebuilds `commodities.json` + `provenance.json`
+  in lockstep; the drift came from a *later* feature PR merging a stale `commodities.json` over the
+  bot's fresh one while `farmgate_prices.json` stayed fresh — a merge-order artifact, not a missing
+  rebuild step. Nothing in the workflow needed changing.
+- **Deterministic realignment only** — every changed value is a re-read of an already-committed source;
+  no check weakened, nothing fabricated, no data vintage swapped. Regenerated `build_commodities.py`
+  then `build_provenance.py`. `bash tests/run.sh check` now **102 passed / 0 failed** (448/448
+  data-integrity, 0 remaining byte mismatches). Committed straight to master to unblock the gate.
+
+## 2026-08-01 — Owner directive: Wave 2 (commodity-driven proactive assistance), all six NAVIGATION_MAP structural items, and the branch-name join that was silently losing 4.3% of the book — PR
+
+- **Merged first:** PR #229 (Pantip + YouTube listening, say/hear theme engine, real-tape doc correction). The `provenance.json` conflict was resolved by the rule, not by hand: rebase onto master FIRST, drop both provenance-only commits, regenerate on the WSL LF mirror under cpython-3.11.15. `build_provenance.py` records `os.path.getsize()` and rebuilds the census from the tree it runs in, so a hand-resolved provenance silently REVERTS whichever layers the other side refreshed — with no conflict marker, and master only goes red afterwards.
+- **Wave 2 — `pipeline/build_assist_radar_price.py` → `platform/data/assist_price_radar.json` (obj #1).** The owner ask was "proactively assist Current-bucket customers in a sector facing downward price pressure". Built literally that screen is EMPTY: every Thai farm-gate series with province exposure is UP (cassava +57.3%, rubber +38.0%, palm +31.8%, sugarcane +26.1%, rice +12.4%, maize +11.3%). The prior lens said so in prose and stopped there. This answers the question underneath, which IS answerable: for each crop, how many farm accounts are CURRENT or only X-bucket in provinces that depend on it — the book that would need calling IF the price turned. **44,569 Current+X farm accounts across 67 provinces; rice carries 30,104 of them across 47 provinces (฿4.9bn).** `tripped` is empty and the panel says so plainly.
+  - **Validation that the bucket arithmetic is right:** Current% derived as `100 − early − roll − dpd90p` yields 1,269 current / 522 X for บุรีรัมย์ — identical to the tape's own `assistance_radar` `tier2_current_exposed`/`tier1_slipping`, which are computed independently upstream. So the derivation is not a reinterpretation of the tape.
+  - Three surfaces: the `#assist` panel (replacing the prose-only lens), the `#overview` commodity drill (who carries the price — Agriculture/เกษตรกร — the farm-income effect and ฿/month per belt province, plus the assistable Current+X count), and the drill's province crop strip (the farmer's cash beside the world price; it carried Pink Sheet YoY only, which is the world's number, not the household's).
+- **All six NAVIGATION_MAP §3 items closed — three were MISDIAGNOSED, and the corrections matter more than the original notes:**
+  1. `acq*` → `comp*` (the Competition VIEW) and `gap*` (the coverage-gap board inside it) — two things were hiding under one prefix. Route untouched (`#acq`, `data-v="acq"`, `v-acq`, the `acq:` keys, `KNOWN_GO`) because it is load-bearing in bookmarks. `reAcq`→`reAmphoe`: it redraws the amphoe board, so the old name pointed at the wrong thing entirely.
+  2. Overview's 24-`<h2>` wall → six `<details class="ovsec">` + `#ovjump`, content UNMOVED (DOM order byte-identical, so no renderer changed target). The jump-nav handler now delegates on `.jumpnav [data-jump]` instead of binding `#compjump` by id, so the next pillar to adopt the pattern cannot silently get dead chips.
+  4. `data.html` badges: the loan book is `฿` everywhere (it was `L` nationally and `฿` at province level) and `L` belongs to Lens rankings alone. Verified in-browser: ฿/R/P/L, zero collisions.
+  5. **"Four unread layers" — only ONE was unread.** `pico_census` is read by four builders, `provenance_sidecar` by `build_provenance`, `rayong_province` by three builders and it is gated in `tests/run.sh`; those three are pipeline INPUTS that live under `platform/data`, not orphaned UI layers. Only `catchments_r2` was genuinely unread — and its silence was causing a real lie: `rayong-catchment.html` could not consult it, so EVERY failure printed "3D buildings for X haven't been pulled yet", which is **false for 74 of 77 provinces** (all are served from R2; only 3 are also in git). The page now distinguishes "not pulled" from "didn't load" and uses the manifest's own `baseUrl` as a CDN fallback.
+- **Item 6 — the branch-name join, and it was bigger than the note said.** `norm_branch()` was copy-pasted into three scripts and kept in sync by a comment. It left **95 of 1,974 tape branch names (4.8%) unmatched**, and the failures were formatting, not absence: **79** paren-vs-space (`ชุมพร(วังไผ่)` vs `ชุมพร วังไผ่`), **5** `/` vs `_` in address numbers, **1** zero-width space hiding in a master name, **1** a master typo putting a space INSIDE `สาขา` — which defeats a single-pass regex, because at `ส` the alternation cannot match `สาขา` when the next character is a space. Two passes fix that one for free.
+  - **Blast radius, which was invisible:** 16,598 accounts / **฿2.02bn (4.34% of the whole book)** sat in an `(unjoined)` province bucket that no page enumerates — so it neither corrupted a province's number nor showed up as a caveat; it simply vanished from every province and region rollup. And `make_call_lists.py` dropped those farm accounts before province targeting, so **those farmers could never appear on an assistance-pilot call list.** Real people, silently excluded — the one place this defect had a live human consequence rather than a reporting gap.
+  - **Shipped:** `pipeline/branchkey.py` — ONE definition (`norm_branch`, `master_index`, `join_report`), imported by all three call sites. Unmatched **95 → 9 (99.54% matched)**; the ingest's own join **95.66% → 99.44%**; unjoined accounts **16,598 → 2,126**; **+14,472 accounts / +฿1.78bn** placed into real provinces; branch drill rows **1,879 → 1,965**.
+  - **Deliberately NOT auto-matched (the residual 9):** ~4 genuine spelling divergences between the two systems (บึงสามัคคี vs บึงสามัคคึ, สรรพาวุธ vs สรรพวุธ) — a rule that "fixed" these would be fuzzy matching, and fuzzy-matching a branch books accounts to the wrong province; ~4 carrying a disambiguating suffix on one side only (`นิคม` vs `นิคม 304`, `พยัคฆภูมิพิสัย` vs `พยัคฆภูมิพิสัย 2`) that need the owner to say whether each is one branch or two; and `ฝ่ายบริหารความสัมพันธ์กับธุรกิจ`, a head-office booking bucket correctly absent from the master.
+  - **Collision guard, not a blind regex widening.** Broadening the key made two master rows collapse onto one — `บ้านกลาง (เพชรบูรณ์)` / `บ้านกลาง เพชรบูรณ์`, a latent master duplicate the tighter rule had been accidentally masking. `master_index()` reports every collision and flags whether the colliding rows DISAGREE on geography (this pair does not, so it is cosmetic). The silence is fixed too: `impact_cards.json` now carries `meta.branch_name_join` naming every unmatched branch, and `make_call_lists.py` prints the excluded farm accounts to stderr instead of `continue`-ing past them.
+  - **The real fix is upstream:** `loan_tape_schema.md` already specifies a `branch_id` column equal to the master's `code`. The 2026-07-21 export carried only a free-text name, which is the whole reason this normalisation exists.
+- **Vintage guard (deliberate).** Re-running the ingest meant reading the owner's xlsx, which is dated after the committed aggregate. Verified BEFORE committing that `n_accounts` (382,735), `mob_anchor` (2026-07), the whole `headline` string and the entire `bucket_ladder` are **byte-identical** — only the geography moved. Swapping a data vintage under cover of a bugfix would have been invisible in the diff.
+- **Verified:** every tape-dependent builder rebuilt and `--check` byte-exact — `build_tape_layers`, `build_impact_cards`, `build_income_impact`, `build_scenarios`, `build_product_segments`, `build_peer_npl`, `build_assist_radar_price`, and `build_commodities` (found because its belt `exposure.book_accounts` reads the tape; its own consumers `build_crop_stress`/`build_crop_margin`/`build_crop_farmer_income`/`build_farmgate_prices` re-checked after). `tests/validate_data.py` 448/448. `tests/nav_consistency.py` clean. `node --check` clean on `app.js` and on all six inline blocks of `rayong-catchment.html`. Headless: 11/11 routes render with **0 console errors**; branch rows now reconcile to **100.0%** of their province total in every sampled province — they would have EXCEEDED it had the ingest not been re-run alongside. No CRLF in any regenerated file. `build_branch_agri`/`build_branch_risk`/`build_opportunity_score`/`build_regional_outlook`/`build_platform` fail `--check` on this Windows box **on a clean tree too** — pre-existing environment float drift, not this change; CI is the arbiter.
+- **Also settled:** TikTok DROPPED in writing (`docs/NEXT_STEPS.md` §0c) as a closed question rather than a deferred gap — no key-free public API, the scrapers that exist break constantly and read as bot traffic, and its text layer is captions and comments, the same material YouTube already gives us through a supported keyed API. LINE recorded as a permanent blind spot (closed messaging, no public corpus at any price); Meta Ad Library as proven useless for Thailand against a live token. Sabuy Cash added to the Pantip watch **Latin-string only** — its Thai trading name and its Play/Apple/ATC ids are exact keys that must be looked up from a Thai IP and must never be guessed, because a guessed Thai string returns silent false matches.
+- **Owner actions outstanding:** set the `YOUTUBE_API_KEY` repo secret (the weekly social job warns and skips without it); rotate the YouTube + Meta keys (both were pasted into chat); confirm the four ambiguous branch names above; and ask for the `branch_id` column on the next tape export, which retires this whole class of defect.
+
+## 2026-07-31 — Intelligence loop (PEER COMPARISON): the per-province peer board now reads the **rival field's CONCENTRATION** — is the big-4 field one dominant brand or a fragmented split? — a competitive-risk texture `leader`/`autox_rank` hide (obj #2) — PR, render-verified, self-merged
+
+- **State verified first (empirical):** fresh on `origin/master` `edf5e08`; baseline `bash tests/run.sh check` → **100 passed, 0 failed** (448/448 data integrity, green before touching anything). Live master alias HTTP 200 on `/` + `/data/meta.json`. Autonomy plan 98% with the single open item owner-side (Vercel access protection); the CI new-data well stays dry (data.go.th / DLT live / competitor sites geo-blocked). The last ~5 intelligence runs were all site-health probes (pure-CI renewable, now thin) — so this run took a genuine PEER-COMPARISON analytical improvement from committed MEASURED data instead of another probe.
+- **The gap (concrete):** `peer_province.json` already carried per-brand rival counts, the `leader` (top operator incl. AutoX), `autox_rank`, and the regional lead rollup — but **nothing on how lopsided the RIVAL field itself is**. `leader`/`autox_rank` can name AutoX or Muangthai as top while saying nothing about whether the *other* competitors are a single dominant brand or a fragmented split. That distinction is a real competitive risk on the existing network (obj #2): where one rival owns a majority of the field, that single competitor sets the local pricing/terms AutoX competes against; a fragmented field spreads the margin pressure across several. It was uncomputed.
+- **Shipped (measured-derived, deterministic, `--check`-reproducible):**
+  - `pipeline/build_peer_province.py` (+70) — per province, `rival_top_brand` + `rival_top_share` (the single big-4 brand holding the most of the rival field, AutoX excluded, and its 0–1 share of all rival branches; deterministic census-order tie-break; null where the province has no rivals). National rollup gated on a **SUBSTANTIAL field** (≥10 big-4 branches, so a 1–2-branch field can't score a meaningless 100%): `n_provinces_rival_concentrated` (top rival brand holds a majority ≥50%), `rival_concentration_by_brand` (which brand dominates them), `most_rival_concentrated_province`, plus the two floors as meta. Full provenance + caveat + record_format + console line added.
+  - `platform/app.js` (+15) — one gated prose sentence in the Competition (`#acq`) per-province peer summary (degrades to '' on a pre-fold layer) + a matching MEASURED-derived method-box bullet.
+- **The finding (MEASURED):** the rival field is **single-brand-dominated in 66 of 77** substantial-field provinces — **Muangthai alone owns a majority in 63** of them, Srisawad in 3. So AutoX competes not against a fragmented big-4 field but against **one dominant national rival** whose pricing effectively sets the terms in most provinces. Most lopsided: **นราธิวาส**, where **Srisawad holds 88%** of its 49 big-4 rival branches (a Southern Srisawad stronghold, invisible in the Muangthai-led national tally).
+- **Verified:** `build_peer_province.py --check` byte-exact after regen; `build_provenance.py` re-censused (**118 layers · 60 measured · 58 estimated**, only the `peer_province.json` byte-row moved — semantic diff confirms no other row / no measured-vs-estimated count changed); `node --check platform/app.js` clean; full `bash tests/run.sh check` → **100 passed, 0 failed**. Headless render `index.html#acq` (440×2600) → settled DOM `data-errors="[]"`, the new prose renders correctly ("single-brand-dominated in **66** of 77 … usually **Muangthai** … Most lopsided: **นราธิวาส**, where **Srisawad** holds **88%**"), region cards intact, no overflow.
+- **Safeguards (all pass):** (a) gate 0-failed. (b) no secrets in diff (0 pattern hits beyond the pre-existing legitimate `SITE_PASSWORD`). (c) diff = builder + app.js + peer_province.json (regenerated) + provenance.json (1 row re-censused) + this log — no stray files. (d) provenance/no-fabrication intact — every new value is pure arithmetic on already-MEASURED per-brand counts, labelled MEASURED-derived; nothing invented. **Alters app behaviour → PR + render self-review, then self-merge.**
+- **Next recommended intelligence task:** surface `rival_top_brand`/`rival_top_share` per row (a compact "field: X NN%" chip under the Leads column) so the concentration reads at province grain, not only in the summary; or extend the same concentration read to the district board (`rival_density.json`) where the pricing-setter is even more local. Higher-value unlocks remain owner/Thai-IP-side (the provenance-merge branch-protection guard; a Thai-IP FPO/BAAC re-pull; the Akamai-blocked SET scoreboard; the ~2.2 GB R2 catchment untrack).
+
+## 2026-07-31 — Integration loop (DEPLOYMENT HEALTH): the live site-health probe now guards `sfi_credit.json` — a truncated deploy that hides the Overview MEASURED state-bank NPL backdrop now pages the owner — direct-to-master (CI-probe only)
+
+- **State verified first (empirical):** fresh on `origin/master` `718391a` (HEAD == origin/master after `git reset --hard`); baseline `bash tests/run.sh check` → **100 passed, 0 failed** (448/448 data validation, green before touching anything).
+- **Backlog re-verified (not re-done):** integration items #1 (FPO PICO → `pico_census`/`pico_district`/`pico_competitors`/`branch_pico`), #2 (`build_branch_cropland.py` → `branch_cropland.json`, rendered in the branch popup via `croplandPopupHTML` + surfaced in `province.html`), and #3's reachable halves (MOT vehicles, DBD formation) are all **shipped + surfaced**. **CI new-data well re-probed live this run and confirmed dry:** `catalog.fpo.go.th` 200 + `datagov.mot.go.th` 200 (both already the committed byte-identical source of truth), while `openapi.dbd.go.th` 403, `data.go.th` 403, `catalog.excise.go.th` connect-fail, `opendata.sme.go.th` **TLS handshake fail (curl exit 35)** — so the smebank/MSME penetration distillation (item #3 remainder) + BAAC (`build_baac_credit.py` exists but its `baac_credit.xlsx` input is gitignored + Thai-IP-only) stay owner/Thai-IP-blocked. Item #4 (GISTDA 40m) stays key-blocked (`GISTDA_SPHERE_KEY` absent from CI). No new gov data was pullable, so this run took the highest-value **unblocked** hardening.
+- **The gap (concrete, fixed):** the live site-health probe (`check_site_health.py`) covers the front-door (`decision_queue`/`impact_cards`/`province_risk`/`branch_risk`/`tape_real`), the `#sim` engine (`scenarios`), the full Competition (`#acq`) surface (`peer_province`/`competitor_coverage`/`pico_district` + the rival-pulse trio), and three of the four eager **Overview** (`#overview`) macro/flow cards (`collateral_flow`/`truck_flow`/`region_debt`) — but had **no** entry for `sfi_credit.json`, the MEASURED state-bank (SFI) system NPL backdrop (`renderSfi`, obj #1 — "the closest public read on the household + farm repayment stress AutoX's borrowers sit inside"). It was the **last eager Overview macro card with no deploy probe**: `renderSfi` hides the whole block on `!SFI || !meta.latest || latest.npl_ratio == null` and renders the quarter table from `.series[]`, so a truncated/failed CDN deploy that emptied or truncated `sfi_credit.json` would **silently hide the NPL backdrop on a default nav route with no phone alert** — the exact "broken demo" blind spot the sibling Overview flow-card probes already close.
+- **Shipped:** `pipeline/check_site_health.py` (+~40) — a new `_shape_sfi_credit()` validator (mirrors the real render reads exactly: a non-empty `.series` list whose first row carries a non-empty `period` + numeric `npl_ratio`, plus `meta.latest` a dict with a numeric `npl_ratio` + non-empty `period` — the exact hide-gate reads) + its `DATA_FILES` entry. Asserts **shape, not counts/values** (robust to a future FPO quarter being appended). **No `platform/data` file touched → no provenance regen; `check_site_health.py` is not a gate input.**
+- **Verified:** `python3 -m py_compile` clean; `--local platform` probe now **HEALTHY 74/74** (was 71/71, +3: fetch/parse/shape for `sfi_credit`). **11 negative tests** confirm every gut-mode FAILS (missing/empty/non-list `series`, `series[0]` missing numeric `npl_ratio` / missing `period`, missing `meta`/`meta.latest`, `latest.npl_ratio` missing/null, `latest` missing `period`) and the real file passes. Full `bash tests/run.sh check` → **0-failed** (probe is not a gate input; re-ran to confirm no regression).
+- **Safeguards (all pass):** (a) gate **0-failed**. (b) no secrets in diff (0 pattern hits beyond the pre-existing legitimate `SITE_PASSWORD`). (c) diff = `check_site_health.py` + this log only — no stray files, no data/app/visual mutation. (d) provenance/no-fabrication intact — the probe reads only shapes the frontend already reads; nothing invented. **CI-probe script, no visual/app behaviour change → direct-to-master** (matches how the site-health probe is maintained — the `competitor_coverage`/`scenarios`/rival-pulse-trio probe ships; no PR/render needed).
+- **Next recommended integration task:** every eager default-route render (`#home`/`#overview`/`#acq`/`#sim`) is now deploy-probed — the pure-CI site-health renewable is essentially exhausted at the exec-facing grain (a remaining thin candidate: probe the `thaiwater_flood`/`thaiwater_rain` acute-pulse pair on Overview if it becomes an always-eager read). Higher-value unlocks remain **owner/Thai-IP-side**: the provenance-**merge** regression guard (require PR branches up-to-date before merge — a branch-protection setting) so a stale-base provenance regen can't re-drop a census row on master; a Thai-IP FPO/BAAC/SME-bank re-pull to finish item #3's penetration signals; `GISTDA_SPHERE_KEY` into a workflow `env:` for the 40m cropland puller (item #4); the ~2.2 GB R2 catchment untrack.
+
+## 2026-07-31 — Intelligence loop (DEPLOYMENT HEALTH): the live site-health probe now guards `competitor_coverage.json`'s **`national_standing`** block — a truncated deploy that drops the exec headline peer claim ("AutoX runs the 2nd-largest title-loan branch network") now pages the owner — direct-to-master (CI-probe only)
+
+- **State verified first (empirical):** fresh on `origin/master` `2ad6426` (HEAD == origin/master after fetch); baseline `bash tests/run.sh check` → **100 passed, 0 failed** (448/448 data validation, verified green before touching anything). Live production re-verified green — the master alias serves **HTTP 200** on `/`, `/app.js`, `/data/meta.json`. Autonomy plan is 98% with the single open item owner-side (Vercel access protection), and the CI new-data well stays dry (data.go.th aggregator / DLT live / competitor sites all geo-blocked from CI).
+- **Fresh SERVICE scan this run (all clean, tree now 118 layers — the audit doc was stale at 115):** provenance **118 layers · 60 measured · 58 estimated · 0 unlabelled**, `--check`-reproducible. Freshness: a full re-scan of all **84 undated** layers' committed `meta` for date-shaped keys *outside* the extractor's list found **zero** genuine dropped data-vintages — the 7 candidates are all the already-documented accepted-blank set (`note_be_to_ce` explainer, `mob_anchor` methodology param ×2, and the `retrieved`/`cost_ingested`/`verified` pull-stamps the convention deprioritizes). Broken references: cross-checked all **103** distinct `data/*.json` fetch refs in `platform/*.html` + `app.js` → **0 unresolved**. So the freshness-key and broken-ref wells are dry; the one concrete gap left was a probe blind spot.
+- **The gap (concrete, fixed):** `check_site_health.py::_shape_competitor_coverage`'s own docstring says it reads "`meta.national_standing` for AutoX's own network-scale rank" — but the validator code only asserted `.brands`, the first brand's `found`, and `meta.totals.found`. It **never asserted `national_standing`**. That block powers the single most exec-visible peer-comparison line on Competition (`drawCompCoverage`, `app.js:2777-2793`): *"Nationally, AutoX runs the 2nd-largest title-loan branch network …"* plus the MEASURED-footprint reframe. The render **gates the entire readout** on `ns && ns.autox_rank && Array.isArray(ns.ranking)` and maps each row's `.operator` + `.branches`, so a truncated/partial deploy that dropped `national_standing` would **silently vanish the headline peer claim with no phone alert** — the exact "broken demo" blind spot the sibling `#acq` probes already close.
+- **Shipped:** `pipeline/check_site_health.py` (+23/−1) — extended `_shape_competitor_coverage` to also assert `meta.national_standing` is a dict with an `int autox_rank ≥ 1`, a non-empty `ranking` list whose first row carries a truthy `operator` + numeric `branches`, and that an `AutoX` row is present (the own-network anchor). Mirrors the render's reads exactly; asserts **shape, not counts** (robust to roster/rank changes). **No `platform/data` file touched → no provenance regen; `check_site_health.py` is not a gate input.**
+- **Verified:** `python3 -m py_compile` clean; `--local platform` probe still **HEALTHY 71/71** (this tightens an existing validator, adds no new DATA_FILES row). **11 negative tests** confirm every gut-mode FAILS (drop `national_standing`, non-dict, missing/zero `autox_rank`, empty/non-list `ranking`, ranking row missing `operator`/`branches`, ranking with no AutoX row) and the real file passes — plus the two pre-existing checks (missing `brands`, missing `totals`) still fire. Full `bash tests/run.sh check` → **100 passed, 0 failed** (probe is not a gate input; re-ran to confirm no regression).
+- **Safeguards (all pass):** (a) gate **0-failed**. (b) no secrets in diff (0 pattern hits). (c) diff = `check_site_health.py` + `docs/SERVICE_AUDIT.md` + this log — no stray files, no data/app/visual mutation. (d) provenance/no-fabrication intact — the probe asserts only shapes the frontend already reads; `national_standing` is read from the committed file, nothing invented. **CI-probe script, no visual/app behaviour change → direct-to-master** (matches how the site-health probe is maintained — the rival-pulse-trio probe ship `6ad6220`; no PR/render needed).
+- **Next recommended intelligence task:** with `national_standing` now guarded, the `competitor_coverage` probe covers every exec-facing read on that layer; the whole Competition (`#acq`) + front-door surface is deploy-probed. Remaining pure-CI renewables are thin — a probe for `contested_pop.json` (`#acq` rival-catchment-overlap read) if it becomes a default-route render. Higher-value unlocks remain owner/Thai-IP-side: the **provenance-merge regression guard** (require PR branches up-to-date before merge — a branch-protection setting, owner-side) so a stale-base provenance regen can't re-drop another PR's census row on master; a Thai-IP FPO/BAAC re-pull; the Akamai-blocked SET peer scoreboard refresh; the ~2.2 GB R2 catchment untrack.
+
+## 2026-07-31 — Integration loop (DEPLOYMENT HEALTH): the determinism gate was **RED on master** again — regenerated the drifted `provenance.json` byte-census, AND closed the recurring price-bot half of this class at its source (NABC + fuel workflows now rebuild `commodities.json` in lockstep) — direct-to-master
+
+- **State verified first (empirical):** fresh detached checkout on `origin/master` `d3efaee` (HEAD == origin/master after fetch). Baseline `bash tests/run.sh check` → **98 passed, 2 failed** — the authoritative determinism gate is **RED on master right now**, so every 6-hourly data-bot PR is failing the same CI gate. This is the highest-value OPEN item, so I fixed it (plus its recurring price-bot cause) rather than adding a new surface.
+- **Root cause A — the current red (provenance byte-census drift from three un-regenerated merges):** `tests/validate_data.py`'s standalone-row byte check (`os.path.getsize` vs the recorded `bytes`) and the gated `build_provenance.py --check` were both RED because three recent feature/data merges each landed a `provenance.json` built on a branch that lacked the others' changes, so the committed census was stale three ways:
+  - **`rival_pulse.json`** grew **41,984 → 63,215 B** (PR #222, iOS/Apple-TH app sentiment) — census never rebuilt.
+  - **`thaiwater_flood.json`** (7,133 → 7,140 B) and **`thaiwater_rain.json`** (9,027 → 9,060 B) drifted (the #221 ThaiWater bot pull) — census overwritten by a later merge.
+  - **`branch_pico.json`** (171,819 B, MEASURED per-branch licensed-PICO exposure) was **dropped entirely** — the 2026-07-31 gate-fix `046090d` had censused it (118 layers / 60 measured), but PR #223 (`b5d6039`) regenerated provenance from a branch predating that fix and **re-dropped** it on merge, reverting the ledger to 117 / 59. A classic provenance-merge regression.
+  - **Fix:** re-ran `python3 pipeline/build_provenance.py` — a deterministic, network-free re-census reading only committed bytes. The regenerated ledger: **118 layers · 60 measured · 58 estimated · 0 unlabelled · 423 files · 0 without a meta stamp**; byte-mismatched rows now **0**; `reference_date` moves `2026-07-30 → 2026-07-31` because the freshest committed vintage is now ThaiWater's `2026-07-31 05:20` (the freshness `age_days` are "days behind the freshest committed layer", `max(vintage)` — deterministic, **no wall-clock read**, `build_provenance.py:386`). Nothing computed or invented — every changed cell is a straight re-read of an already-committed file's bytes/meta. No check weakened.
+- **Root cause B — the recurring price-bot half (prevention, so this stops coming back):** `build_commodities.py` reads `source-data/farmgate_prices.json` (embeds `meta.pulled` as `commodities.meta.farmgate_vintage` + each crop's local YoY/price) and `platform/data/fuel_prices.json` (embeds `headline.diesel`). The **NABC** daily bot (`data-nabc-prices.yml`) refreshed farmgate + rebuilt the branch-agri/farm-gate/crop chains + provenance but **not** commodities; the **fuel** daily bot (`data-fuel-prices.yml`) refreshed fuel + rebuilt fuel_prices + provenance but **not** commodities. So every price refresh drifted `commodities.json` and turned `build_commodities.py --check` RED on merge — the `qa-commodities-gate-drift` the loop kept restoring by hand, and the **standing owner-side recommendation** logged after every prior restore was *"the data-bot workflows should append a `build_commodities.py` regen + commit step."* Implemented that:
+  - `.github/workflows/data-nabc-prices.yml` — inserted `python pipeline/build_commodities.py` into the price-changed rebuild chain (after `build_crop_farmer_income.py`, before `build_provenance.py`) + added `platform/data/commodities.json` to the `git add`.
+  - `.github/workflows/data-fuel-prices.yml` — inserted `build_commodities.py` after `build_fuel_prices.py`, before `build_provenance.py` + added `commodities.json` to its `git add`. This bot AUTO-MERGES on a green gate, so the fix flips it from "red gate → draft-PR fallback" to a clean auto-merge on every diesel move.
+  - Both carry an inline comment recording *why* commodities must be rebuilt in lockstep. **Scope check:** commodities' only daily-refreshed inputs are farmgate (NABC) + fuel; `income_impact.json`'s `crop_mix` is loaded but **never used** in the output (dead read), so the **energy-prices** bot needs no change; **ThaiWater** touches only flood/rain and already regens provenance. NABC + fuel are the complete offender set. Confirmed the linkage live before editing: `commodities.meta.farmgate_vintage` (`2026-07-30`) == `farmgate_prices.meta.pulled`; `commodities.fuel.diesel_thb_l` (`36.69`) == `fuel_prices.headline.diesel`.
+- **Verified:** post-regen byte-mismatched provenance rows = **0**; both edited workflows parse as valid YAML (`yaml.safe_load`); `build_commodities.py --check` byte-exact; full `bash tests/run.sh check` → **0-failed** (was 2-failed on master).
+- **Safeguards (all pass):** (a) gate **0-failed**. (b) no secrets in diff (0 pattern hits; the only `password` token in the tree is the pre-existing legitimate `SITE_PASSWORD`). (c) diff = `provenance.json` (regenerated census) + the two workflow YAMLs + this log — no stray files, no app/visual mutation, no source-data change. (d) provenance/no-fabrication intact — the census is a re-read of committed bytes; the workflow edits only ensure an existing deterministic builder runs when its input changes. **Gate-restore + CI-workflow hardening, no visual change → direct-to-master** (matches how the recurring gate-drift restore lands).
+- **Next recommended:** the commodities half of this drift is now closed at the source for both daily price bots. The provenance-**merge** half (a feature PR regenerating provenance off a stale base, re-dropping another PR's census row — the branch_pico regression here) is NOT yet prevented — worth a `qa.yml` guard that runs `build_provenance.py --check` on every PR so a stale census is caught before merge, not after. Higher-value data unlocks remain owner/key-side (a Thai-IP FPO/BAAC/DBD re-pull for the `baac_credit`/`smebank_credit` penetration signal; `GISTDA_SPHERE_KEY` into a workflow `env:` for the 40m cropland puller; the ~2.2 GB R2 catchment untrack).
+
+## 2026-07-31 — Intelligence loop (DEPLOYMENT HEALTH): the live site-health probe now guards the always-on Competition rival-pulse trio (`rival_pulse` / `rival_ads` / `rival_youtube`) — a truncated deploy that guts the rival sentiment / paid-media / video boards now pages the owner — direct-to-master (CI-probe only)
+
+- **State verified first (empirical):** fresh on `origin/master` `2421694` (HEAD == origin/master after fetch); baseline `bash tests/run.sh check` → **0-failed** (verified green before touching anything). Autonomy plan reports 98% with the single open item owner-side (Vercel access protection), and the CI new-data well stays dry (data.go.th aggregator / DLT live / competitor sites all geo-blocked from CI), so this run took the **explicit next-recommended pure-CI hardening** logged by both the 2026-07-30 `scenarios.json` probe run and the `#acq` ad-copy-wrap run: *"add the always-on Competition rival-pulse layers (`rival_pulse` / `rival_ads` / `rival_youtube`, shipped #217) to the live site-health probe."*
+- **The gap:** the live site-health probe (`check_site_health.py`) covers the front-door (`decision_queue` / `impact_cards` / `province_risk` / `branch_risk` / `tape_real`), the Overview flow cards, the `#sim` scenario engine, and the **province- + district-grain** Competition reads (`peer_province` / `competitor_coverage` / `pico_district`) — but had **no** entry for the three always-on rival-pulse layers that power the rest of the Competition (`#acq`) surface: `rival_pulse` (app-store sentiment ladder + promo feed, `drawRivalPulse`), `rival_ads` (Google paid-media creative board, `drawRivalAds`), `rival_youtube` (video board, `drawRivalVideo`). All three are live-fetched into `#acq`; each drops to a "not yet pulled" placeholder when its list is empty. They were the **last** live-fetched `#acq` reads with no deploy probe — a truncated/failed CDN deploy that emptied any one would silently blank its board with **no phone alert**, the exact "broken demo" blind spot the sibling `#acq` probes already close.
+- **Shipped:** `pipeline/check_site_health.py` (+82) — three new validators (`_shape_rival_pulse` / `_shape_rival_ads` / `_shape_rival_youtube`) that mirror the real render reads exactly (non-empty `.sentiment` list with a `brand` + numeric `score` first row and a `.promos` list; non-empty `.brands` list with a `brand` + numeric `n_creatives` first row; non-empty `.channels` list with a `brand` first row and a `subscribers` key — the render tolerates a null subscribers cell, so the probe asserts the key exists rather than a numeric value) + their three `DATA_FILES` entries. All three assert **shape, not counts** (robust to roster growth). **No `platform/data` file touched → no provenance regen; `check_site_health.py` is not a gate input.**
+- **Verified:** `python3 -m py_compile` clean; `--local platform` probe now **HEALTHY: 71/71** (was 62/62, +9: fetch/parse/shape × 3 layers). Negative tests confirm every validator FAILS on each gut-mode (empty list, missing `score` / `n_creatives` / `subscribers`, missing `promos`, non-dict) and passes the real files. Full `bash tests/run.sh check` → **0-failed** (probe is not a gate input; re-ran to confirm no regression).
+- **Safeguards (all pass):** (a) gate **0-failed**. (b) no secrets in diff (0 pattern hits; the only `password` token in the tree is the pre-existing legitimate `SITE_PASSWORD`). (c) diff = `check_site_health.py` + this log only — no stray files, no data/app/visual mutation. (d) provenance/no-fabrication intact — the probe reads only shapes the frontend already reads; nothing invented. **CI-probe script, no visual/app behaviour change → direct-to-master** (matches how the site-health probe is maintained — the `scenarios.json` / `pico_district.json` probe ships; no PR/render needed).
+- **Next recommended intelligence task:** every live-fetched read on the four default-reachable nav routes (`#home` / `#overview` / `#acq` / `#sim`) is now deploy-probed. Pure-CI renewables left: give the `licence_momentum` district ranking the same `#acq` leaderboard treatment app.js gives `operating_momentum`. Higher-value unlocks remain owner/Thai-IP-side (a Thai-IP FPO/BAAC re-pull; the Akamai-blocked SET peer scoreboard; the ~2.2 GB R2 catchment untrack). Standing flag for the owner: the `qa-commodities-gate-drift` recurs on every NABC/ThaiWater/fuel data-bot run — those workflows should append a `build_commodities.py` + `build_provenance.py` regen + commit step.
+
+## 2026-07-31 — Integration loop (DEPLOYMENT HEALTH): the determinism gate was **RED on master** — realigned `commodities.json` + `provenance.json` to their already-committed sources (recurring `qa-commodities-gate-drift`, this time compounded by an un-censused new layer) — direct-to-master
+
+- **State verified first (empirical):** fresh detached checkout, fetched → `origin/master` `b23ebb2` (HEAD == origin/master after fetch; the local `origin/master` ref was merely stale at `ee657c3` — re-fetched and confirmed HEAD is on the true production line, not a divergent fork). Baseline `bash tests/run.sh check` → **101 passed, 2 failed** — the authoritative determinism gate is **RED on master right now**, so every 6-hourly data-pull cron PR is failing the same CI gate. This is the highest-value OPEN item across all pillars, so I fixed it rather than adding another analytical surface.
+- **Backlog re-verified (not re-done):** integration items #1 (FPO PICO registry) and #2 (`build_branch_cropland.py`) are shipped + surfaced (`pico_census`/`pico_district`/`pico_competitors`/`branch_pico`/`branch_cropland`/`province_cropland`). Item #3's MOT-vehicle distillation is DONE (`build_vehicle_registry.py`/`build_vehicle_fleet.py`; both `--check` byte-exact against a **fresh CI pull** of `mot_vehicles.csv` → no newer gov data). CI reachability probed live: **`fpo_pico` 200 + `mot_vehicles` 200** (both already the committed source of truth, byte-identical), everything else blocked (`excise` SSL-EOF, `dbd_newco` 403, `osmep`/`diw_factories` via data.go.th 403/reset) — the CI new-data well is dry. Item #4 (GISTDA 40m) stays key-blocked (`GISTDA_SPHERE_KEY` absent from CI).
+- **Root cause (three real, already-committed drifts the data bots left un-regenerated):**
+  - `build_commodities.py --check` — `commodities.json` recorded `meta.farmgate_vintage 2026-07-29`, one refresh behind the committed `source-data/farmgate_prices.json` (`meta.pulled 2026-07-30`, NABC data-bot #220). Regenerated: the **only** leaf that changed is `farmgate_vintage 2026-07-29 → 2026-07-30` (a straight read of the committed source's own `pulled` stamp, `build_commodities.py:116`); **zero** commodity prices/YoY/exposure values changed (1 of 203 leaves).
+  - `build_provenance.py --check` — `provenance.json` drifted three ways: (a) it never censused **`branch_pico.json`**, the MEASURED per-branch licensed-PICO exposure layer shipped by PR #218 (`af23cfd`) — so the ledger read **117 layers / 59 measured** while the tree carries 118 / 60; (b) it recorded `commodities.json`'s stale vintage; (c) it recorded `fuel_prices.json` `vintage 2026-07-29` while the committed fuel data-bot refresh (`769b2ab`) had already bumped it to `2026-07-30`. Regenerated last (it censuses every layer's byte size + meta): **118 layers · 60 measured · 58 estimated · 0 unlabelled · 423 files · 0 without a meta stamp**.
+- **This is a deterministic realignment, not a fix of substance** — every changed value is a straight re-read of a source already committed by a prior data-bot/feature commit; **no check was weakened, nothing was fabricated.** Same class as the 2026-07-30 `qa-commodities-gate-drift` restore (which the NABC/ThaiWater/fuel bots keep re-triggering because their workflows refresh staging/layer inputs without a downstream `build_commodities.py` + `build_provenance.py` regen + commit step).
+- **Verified:** `build_commodities.py --check` + `build_provenance.py --check` both byte-exact after regen; full `bash tests/run.sh check` → **103 passed, 0 failed** (448/448 data-integrity). Fresh-CI-pull `--check` of both reachable gov sources (FPO, MOT) confirms no newer data was silently missed.
+- **Safeguards (all pass):** (a) gate **0-failed**. (b) no secrets in diff (0 pattern hits; the only `password` token in the tree is the pre-existing legitimate `SITE_PASSWORD`). (c) diff = `commodities.json` + `provenance.json` + this log — no stray files, no app/visual/behaviour change, no source-data mutation. (d) provenance/no-fabrication intact — three committed source stamps surfaced + one committed layer censused, nothing computed or invented. **Data-realignment + provenance-sync, no visual change → direct-to-master** (matches how the recurring gate-drift restore lands; no PR/render needed).
+- **Next recommended:** flag to the owner that this drift recurs on **every** data-bot run — the NABC/ThaiWater/fuel workflows should append a `python3 pipeline/build_commodities.py && python3 pipeline/build_provenance.py` regen + commit step so the integration loop stops having to restore the gate by hand. Higher-value data unlocks remain owner/key-side (a Thai-IP FPO/BAAC/DBD re-pull; `GISTDA_SPHERE_KEY` into a workflow `env:` for the 40m cropland puller; the ~2.2 GB R2 catchment untrack).
+
+## 2026-07-30 — Intelligence loop (DEPLOYMENT HEALTH): the live site-health probe now guards `scenarios.json` — a truncated deploy that guts the `#sim` scenario engine now pages the owner — direct-to-master (CI-script only)
+
+- **State verified first (empirical):** fresh on `origin/master` `ee657c3`; baseline `bash tests/run.sh check` → **98 passed, 0 failed** (446/446 data-integrity). Live production re-verified green — the master alias serves **HTTP 200** on `/`, `/app.js`, `/data/meta.json`, `/data/branches.json`; `site-health.yml` correctly targets that alias (no fix needed). `check_site_health.py --local platform` **HEALTHY 59/59**; **0 broken data references** (the three unresolved `data/*.json` strings — `perimeter_counts`/`rayong_trees`/`fuel_stations` — are code comments citing `source-data/*` paths, none a live `fetch()`). Autonomy plan is 98% (1 open item owner-side) and the CI new-data well is dry, so this run took the **explicit next-recommended pure-CI hardening** logged by the 2026-07-30 board_vintage service run: *"probe `scenarios.json` (`#sim`) shape in the same file."*
+- **The gap:** the live site-health probe (`check_site_health.py`) covers the front-door (`decision_queue`/`impact_cards`/`province_risk`/`branch_risk`/`tape_real`), the Overview flow cards, and all three Competition (`#acq`) reads (`peer_province`/`competitor_coverage`/`pico_district`) — but had **no** entry for `scenarios.json`, the LIVE/stress scenario engine that powers the whole `#sim` nav route (`renderScenarios`, `tmliFetch('scenarios')`, reads `.scenarios[]` → `kind`/`title`/`headline`/`vintage` per card). It was the last default-reachable nav route with no deploy probe: a truncated/failed CDN deploy that emptied `scenarios.json` would silently drop the engine to its "not yet computed" placeholder with **no phone alert** — the exact "broken demo" blind spot the Competition + obj-#1 flow-card probes already close for their routes.
+- **Shipped:** `pipeline/check_site_health.py` (+~30) — a new `_shape_scenarios()` validator (mirrors the real render reads: non-empty `.scenarios` list, first scenario a dict with non-empty `kind`/`title`/`headline`; robust to scenario-count growth — asserts shape, not `==6`) + its `DATA_FILES` entry. **No `platform/data` file touched → no provenance regen.**
+- **Verified:** `python3 -m py_compile` clean; `--local platform` probe now **HEALTHY: 62/62** (was 59/59, +3: fetches/parses/shape). Negative tests confirm the validator FAILS on every gut-mode (empty `scenarios`, missing key, non-list, first-card missing `kind`, empty `headline`, non-dict) and passes the real file. Full `bash tests/run.sh check` → **98 passed, 0 failed** (probe is not a gate input; ran to confirm no regression).
+- **Safeguards (all pass):** (a) gate **0-failed**. (b) no secrets in diff (the only `password` hits are the pre-existing legitimate `SITE_PASSWORD` Basic-Auth code). (c) diff = `check_site_health.py` + this log only — no stray files, no data/app/visual mutation. (d) provenance/no-fabrication intact — the probe reads only shapes the frontend already reads; nothing invented. **CI-probe script, no visual/app behaviour change → direct-to-master** (matches how the site-health probe is maintained — the `pico_district` probe ship `6cf579e`; no PR/render needed).
+- **Next recommended intelligence task:** every default-reachable nav route (`#home`/`#overview`/`#acq`/`#sim`) is now live-probed. Pure-CI renewables left: give the `licence_momentum` district ranking the same `#acq` leaderboard treatment app.js gives `operating_momentum`; add the always-on Competition rival-pulse layers (`rival_pulse`/`rival_ads`/`rival_youtube`, shipped #217) to the probe. Higher-value unlocks remain owner/Thai-IP-side (a Thai-IP FPO/BAAC re-pull; the Akamai-blocked SET peer scoreboard; the ~2.2 GB R2 catchment untrack).
+
 ## 2026-07-30 — UX loop: wrap the rival ad-copy sub-tables so `#acq` never overflows on mobile — safeguard-gated auto-merge (PR #219, MERGED + DEPLOY-VERIFIED)
 
 - **Picked:** all 7 originally-listed audit backlog items (isochrone-guard, #map lens/zoom overlap, province stat-chip overflow, theme-persist, WCAG contrast, favicon, #branches lead) re-verified **already fixed** in current code. Reviewed the newest merged feature (#217 rival paid-media pulse, Competition/`#acq`) for un-audited regressions and found one: the per-operator **ad-copy sub-tables** (`<table class="tbl">` inside each brand's `<details>`, rendered into `#pulseadsmsgs` by `drawRivalAds`) are injected via `innerHTML` **after boot**, so the boot-time `wrapTables()` never reached them. They landed in the house `.tblwrap` scroll box **only if** `drawRivalPulse`'s own `wrapTables()` happened to win the race between the three independent `#acq` fetches (`rival_pulse`/`rival_ads`/`rival_youtube`) — non-deterministic. Unwrapped, a wide sub-table can push the Competition page sideways on mobile: the exact failure `ux-acq-promo-mobile-overflow` closed for the promo tables.
@@ -2847,3 +4872,99 @@ Kaustav deploys).
 - **Safeguards (all pass):** (a) `bash tests/run.sh check` → **96 passed, 0 failed** (incl. `node --check` on every page's inline JS + 446 data-integrity checks). (b) headless `render.sh index.html#exposure` → `data-errors="[]"`; settled DOM confirms "(Macro → IMF macro outlook)" with zero remaining "Overview →" stragglers; PNG self-reviewed (layout intact, nav shows "Macro"). (c) no secrets in the one-word diff. (d) diff = only `platform/app.js` + `docs/UXUI_AUDIT.md`, no stray files.
 - **Deploy-verify (PASS, no rollback):** production deployment `dpl_6qpgvvbDuWDsEKM7BcLQgn8BXTZt` = state **READY**, target production, commit SHA `5996118`, aliased to `competitive-intel-git-master-…vercel.app`. Production alias → **200** on `/` and `/app.js` (no regression; `/index.html` → 308 is the expected `cleanUrls` redirect). The immutable per-deployment URL serves the corrected "(Macro → IMF macro outlook)" at 200 — build confirmed live. The production **alias** briefly still served the old string (Vercel edge CDN caches the static `app.js` on path, ignoring the `?cb=` query-buster); it catches up on cache expiry — normal propagation, not a rollback condition.
 - **Next recommended:** the sibling `ux-decision-queue-golabel-nav-vocab` remains (the decision-queue "Overview →" is a `pipeline/build_decision_queue.py:73` `GO_LABEL` constant → needs a pipeline edit + gated-data regen, out of scope for a `platform/`-only surgical run). Standing bigger-than-surgical backlog unchanged: `ux-table-scope-sweep-appjs` (mechanical `scope="col"` sweep of ~40 SPA `<th>`), `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language as competitive-RISK), `ux-viewport-user-scalable-3dpages` (needs real-device pinch-zoom test). Non-platform: `qa-visual-baseline-stale` wants a deliberate `tests/run.sh baseline` refresh.
+
+## 2026-07-30 — Integration loop: per-branch LICENSED-PICO rival exposure (`branch_pico.json`) — PR (visual change)
+- **Improvement:** new MEASURED per-branch competitive layer `platform/data/branch_pico.json` + a one-line branch-popup readout. Closes a real objective-#2 gap: the per-branch rival picture (`build_rival_pressure.py` / `compPopupHTML`) counts only the big-4 store-locator networks (Muangthai/Srisawad/Tidlor/Heng, from `competitors_census.json`) and was **blind to licensed PICO-finance (พิโกไฟแนนซ์) operators** — AutoX's most direct small-ticket rural rival class, which until now was only ever read at the province/district AGGREGATE (`pico_competitors.json` / `pico_district.json`, on `#acq`), never attached to the individual branch.
+- **What it does:** `pipeline/build_branch_pico.py` (deterministic, network-free, `--check` byte-exact) attaches to each of the 2,015 branches the count of licensed PICO operators registered in that branch's **own district (อำเภอ)**, split head/branch office + newly-licensed. Result: **1,512 branches sit in a district with ≥1 licensed PICO operator; 503 in a genuine-zero district; 516 distinct PICO districts covered.**
+- **Canonical join (no fuzzy name matching):** branch *i* → `amphoe.json`'s `branch_amphoe[i]` (the authoritative point-in-polygon district assignment) → `amphoe[]['province_th'|'name']` → `pico_district.by_district['province_th|amphoe']`. Both sides share `amphoe.json`'s 928-district identity, so a district absent from `by_district` is an **HONEST ZERO**, never a name mismatch. Builder self-checks head+branch ≤ total and fails loud on an out-of-range index.
+- **Honesty labelling:** MEASURED (FPO licensed-operator registry), but **district grain, not a km radius** (the registry carries an address, not coordinates) — stated in both the `meta.caveats` and the popup line ("in อำเภอ"). Registry = licensed service points, not live-storefront geocodes.
+- **Surfacing:** one compact popup line under the existing Competitors / Rival-pressure block (`picoLineHTML`), lazy-loaded on the same warm path as the other per-branch layers, fully null-guarded (absent file → line omitted, nothing fabricated). Color ramp: ≥8 agri-red · >0 gold · 0 merchant-teal.
+- **Gate wiring:** `build_branch_pico.py --check` added to `tests/run.sh`; `branch_pico.json` registered in `validate_data.py`'s index-alignment gate (length == 2015) and branches-fingerprint gate (tamper-evident order/identity); `build_provenance.py` auto-registered it as **measured** (118 layers, 60 measured / 58 estimated / 0 unlabelled).
+- **Verification:** `bash tests/run.sh check` → **99 passed, 0 failed** (was 98; +1 builder `--check`) with **448 data-integrity checks, 0 failed** (was 446; +2: alignment + fingerprint). `node --check platform/app.js` OK. `picoLineHTML` unit-tested in isolation across all branches (high/mid/small/zero/absent/malformed) → correct well-formed HTML + null-guard. Chromium render gate skipped: the new line only renders on branch-tap (a static DOM dump wouldn't exercise it) and the `.cache/node_modules` render deps aren't installed.
+- **Shipped as a PR (not direct-to-master):** the change adds a visible branch-popup line, so per the loop's "alters app behaviour/visuals → open a PR" rule it goes as a draft PR for review/deploy-verify rather than a direct commit.
+- **Next recommended:** consider a MEASURED per-branch PICO **lens** on the National map (the layer is already index-aligned, so a `pico`-keyed choropleth over the 2,015 dots is a small follow-up), and folding the district PICO count into the `#exposure` competitor-exposure tables so the segment view reflects the small-ticket rival class too.
+
+## 2026-07-31 — UX loop: UTF-8 BOM on CSV exports so Excel renders Thai (`ux-csv-utf8-bom`) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260731-0217`, squash-merged PR #225 → `37cd2ae` on master): all four client-side CSV exports built their Blob as UTF-8 **without a byte-order mark** — `acqCSV`→`autox_catchment_coverage.csv`, the district-coverage export→`autox_district_coverage.csv`, `#mktcsv`→`autox_market_assessment.csv`, `ccBriefCSV`→`autox_command_center_brief.csv`. Every one carries Thai text (`province_th`, measured Thai district/branch names incl. `สาขา…`, Thai crop labels e.g. `อำนาจเจริญ`). Microsoft Excel on Windows — the exec's tool in Thailand (Kaustav/board download these briefs) — does not auto-detect a BOM-less UTF-8 CSV; it decodes with the legacy locale codepage, so all Thai columns open as **mojibake**. Fix: prepend the UTF-8 BOM as a leading Blob array element (`new Blob(['\ufeff', csv], {…})`) at all four sites (explicit `\ufeff` escape in source, no raw BOM char). Excel now auto-detects UTF-8; Sheets/LibreOffice/`csv` parsers already ignore a leading BOM, so nothing else regresses. 4 one-line `platform/app.js` edits + one `docs/UXUI_AUDIT.md` fix-log entry.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **99 passed, 0 failed** (incl. `node --check` on every page's inline JS + 448 data-integrity checks). (b) headless `render.sh index.html` → `data-errors="[]"`, PNG self-reviewed (command-center hero/pillars/Thai text all intact — behavioural export change only, zero visual change); functional check — the emitted Blob begins with bytes **`EF BB BF`** (Node `Blob.arrayBuffer()` on `new Blob(['\ufeff','province,…อำนาจเจริญ…'])`). (c) no secrets in the diff. (d) diff = only `platform/app.js` + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/app.js` (no regression). The deployed `app.js` still differs from HEAD by **exactly** the 4 additive BOM lines and nothing else — the master-alias edge CDN caches the static `app.js` on path, so it lags until cache expiry (same documented propagation behaviour as PR #214 / `ux-provenance-prose-nav-vocab`); the merged master build itself contains the fix. Not a rollback condition.
+- **Next recommended:** the surgical numbered-audit backlog (#1–#8) is fully closed; remaining backlog items are all explicitly bigger-than-surgical or non-`platform/`: `ux-table-scope-sweep-appjs` (mechanical `scope="col"` sweep of ~40 SPA `<th>` — a good dedicated mechanical run), `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language in `build_regional_outlook.py` as competitive-RISK, ripples across national/regional/province + app.js), `ux-viewport-user-scalable-3dpages` (needs real-device pinch-zoom test — not auto-mergeable), and non-platform `qa-visual-baseline-stale` (a deliberate `tests/run.sh baseline` refresh so the visual gate carries signal again). Recommend the `scope="col"` sweep next — mechanical, verifiable, real a11y value, and safely auto-mergeable.
+
+## 2026-07-31 — UX loop: unique aria-label per scrollable-table region (`ux-tblwrap-region-unique-name`) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260731-0810`, squash-merged PR #226 → `93f1b10` on master): `wrapTables()` (app.js) wrapped every wide `.tbl` in a `role="region" tabindex="0"` scroll container but gave **all of them the identical `aria-label="Scrollable data table"`**. Since a named `region` is a landmark, on table-dense routes (`#acq` ~28 tables, `#overview`, `#exposure`) a screen-reader user navigating by region heard the same name dozens of times with no way to tell which table they'd landed on — an **axe `landmark-unique`** failure (WCAG 1.3.1). Fix: new `tableSectionLabel()` helper walks back/up to the table's nearest preceding heading (`h1`–`h6`; last heading in a preceding sibling block = closest) and names each region `"Scrollable table: <section heading>"`, with a de-dup counter (`(2)`,`(3)`…) seeded from already-labelled wrappers so names stay unique across `wrapTables()`'s idempotent boot + post-`drawRivalPulse`/`drawRivalAds` calls. Screen-reader-only — zero visual change. `platform/app.js` +30/−1 + one `docs/UXUI_AUDIT.md` fix-log line + one new backlog item.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **100 passed, 0 failed** (incl. `node --check` on every page's inline JS + 448 data-integrity checks). (b) headless `render.sh index.html` → `data-errors="[]"`, PNG self-reviewed (command-center hero/pillars/Thai text all intact — visually identical); DOM-dump check confirmed **77 wrappers, every `aria-label` unique and descriptive** (repeated ad-copy sub-tables correctly disambiguated to "…newest first (2)…(5)"; two farmer-margin tables → "…(2)"). (c) no secrets in the diff. (d) diff = only `platform/app.js` + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/app.js`; `/index.html` → 308 (expected `cleanUrls` redirect to `/`, not a regression). Polled the deployed `app.js` until the edge CDN served the new build — `tableSectionLabel` present (2 matches) after ~60s. The merged master build carries the fix.
+- **New backlog item discovered:** `ux-static-tblwrap-missing-a11y` — the two ThaiWater tables in `index.html` (~L508–509) ship pre-wrapped in a **static** `.tblwrap`, so `wrapTables()` skips them (idempotent guard) and they never get the `role`/`tabindex`/`aria-label` attrs — unlabelled, not keyboard-reachable. Surgical fix logged in the audit backlog.
+- **Next recommended:** `ux-table-scope-sweep-appjs` — the mechanical `scope="col"` sweep of the ~40 SPA `<th>` header cells in app.js (a natural companion to this landmark-name fix; both are table-a11y, verifiable via DOM dump, and safely auto-mergeable). Then `ux-static-tblwrap-missing-a11y` (tiny) and, once the front door is IA-stable, a deliberate `tests/run.sh baseline` refresh so `qa.yml`'s visual gate carries signal again.
+
+## 2026-07-31 — UX loop: name the static ThaiWater scroll regions (`ux-static-tblwrap-missing-a11y`) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260731-2100`, squash-merged PR #228 → `461b83c` on master): the two ThaiWater tables on `#overview` (`#thaiwater-flood-tbl` / `#thaiwater-rain-tbl`, `index.html` L508–509) ship pre-wrapped in a **static** `<div class="tblwrap">`, so `wrapTables()`'s idempotent "already wrapped" guard skipped them — they never received the `role="region" tabindex="0" aria-label="…"` attrs every JS-wrapped scroll region gets (unlabelled, not keyboard-reachable). This was the lone gap left after `ux-tblwrap-region-unique-name` (PR #226) named all the dynamic ones — and that run flagged it as a backlog item. Fix: added the three attrs to both static wrappers with unique descriptive names (`"Scrollable table: Live flood pulse"` / `"…Live rain pulse"`), matching `wrapTables()`'s `"Scrollable table: <heading>"` convention; `wrapTables()` already seeds its de-dup set from static `.tblwrap[aria-label]` wrappers, so names stay collision-free. WCAG 2.1.1 / axe `scrollable-region-focusable` + `landmark-unique`. Attrs only — 2 lines in `platform/index.html` + one `docs/UXUI_AUDIT.md` fix-log entry.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **100 passed, 0 failed** (incl. `node --check` on every page's inline JS + 448 data-integrity checks). (b) headless `render.sh index.html` → front door renders clean, `data-errors="[]"`, PNG self-reviewed (command-center hero/nav/Thai text intact); DOM-dump check confirmed both wrappers now carry `role="region" tabindex="0" aria-label="Scrollable table: Live flood/rain pulse"`. (c) no secrets in the diff. (d) diff = only `platform/index.html` + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/`; `/index.html` → **308** (expected `cleanUrls` redirect to `/`, not a regression). A cache-busting fetch (`/?cb=…`, bypassing the edge cache) confirmed the merged build **serves the new `aria-label` attr** (grep count = 1); the plain `/` briefly still served the CDN-cached prior build (same documented path-cache lag as PR #225/#226) — not a rollback condition.
+- **Housekeeping note:** the merged feature branch `claude/ux-loop-20260731-2100` could not be deleted from the remote — repeated `git push origin --delete` failed with sideband disconnects on the git proxy (network, not a merge problem). Harmless (fully merged into master); worth a manual delete when the proxy is stable.
+- **Next recommended:** the surgical numbered-audit backlog (#1–#8) and the standalone scroll-region a11y items are now fully closed. Remaining backlog is all explicitly bigger-than-surgical or non-`platform/`: `ux-table-scope-sweep-appjs` (mechanical `scope="col"` sweep of ~40 SPA `<th>` — the best next auto-mergeable run: mechanical, DOM-verifiable, real a11y value), `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language in `build_regional_outlook.py` as competitive-RISK — ripples across national/regional/province + app.js, needs a dedicated pass), `ux-viewport-user-scalable-3dpages` (needs real-device pinch-zoom test — not auto-mergeable), and non-platform `qa-visual-baseline-stale` (deliberate `tests/run.sh baseline` refresh so the visual gate carries signal again). Recommend the `scope="col"` sweep next.
+
+## 2026-07-31 — UX loop: per-branch tab title in `branch-explorer.html` (`ux-branch-explorer-doctitle`) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260731-2010`, squash-merged PR #233 → `8a3c5e7` on master): `branch-explorer.html` (the per-branch `?lat=&lng=&n=` deck.gl scene) was the **one 3D page that never updated `document.title`** — it shipped a static `<title>Branch 3D Explorer — AutoX · เงินไชโย</title>`, so every branch opened in the explorer shared one tab name (indistinguishable in browser history, bookmarks, multiple open tabs; silent to screen readers on load). Same gap `ux-doctitle-per-route` closed for the SPA and that `province.html` / `rayong-catchment.html` already handle for their scenes — this page was the straggler. Fix: set an initial title from the URL `?n=` name right after `NM` is parsed (so the tab reflects the branch before the fetch resolves), then refine it inside `loadPanel()` to the matched record's measured name + province (`(best.n||NM) · best.v — AutoX · เงินไชโย`, mirroring province.html); both wrapped in `try/catch`, static `<title>` stands when `?n=` absent. Title-only — zero visual/scene change. 5 lines in `platform/branch-explorer.html` + one `docs/UXUI_AUDIT.md` fix-log entry.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **101 passed, 0 failed** (incl. `node --check` on every page's inline JS + 448 data-integrity checks). (b) headless `render.sh 'branch-explorer.html?lat=12.7506&lng=101.038&n=<Rayong branch>'` → scene + left panel + controls render clean, settled `<title>` = `เงินไชโยสาขายายร้า · ระยอง — AutoX · เงินไชโย` (name + province, refined by `loadPanel`), `data-errors="[]"`, `data-deck="1"`; PNG self-reviewed (blank basemap expected — cartocdn blocked headless). (c) no secrets in the diff. (d) diff = only `platform/branch-explorer.html` + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/`; `/branch-explorer.html` → **308** (expected `cleanUrls` redirect) → `/branch-explorer` → **200**. No regression.
+- **Next recommended:** `ux-table-scope-sweep-appjs` — the mechanical `scope="col"` sweep of the ~544 bare `<th>` SPA header cells built as template literals in `app.js` (mechanical, DOM-verifiable, real a11y value; deserves its own dedicated mechanical run given the line-count). After that: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language in `build_regional_outlook.py` as competitive-RISK — needs a careful national/regional/province + app.js pass), `ux-viewport-user-scalable-3dpages` (real-device pinch-zoom test — not auto-mergeable), and non-platform `qa-visual-baseline-stale` (deliberate `tests/run.sh baseline` refresh so `qa.yml`'s visual gate carries signal again).
+
+## 2026-08-01 — UX loop: `scope="col"` on the four Competition (#acq) tables (`ux-table-scope-competition-tables`) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260801-1411`, squash-merged PR #247 → `1cd3743` on master): second slice of `ux-table-scope-sweep-appjs` (a11y, WCAG 1.3.1 Info and Relationships). The four Competition (`#acq`) route tables — `#searchtbl` (brand share-of-search, `drawSearchDemand`), `#compcovtbl` (competitor census-coverage, `drawCompCoverage`), `#rivdentbl` (districts where AutoX is outnumbered, `drawRivalDensity`), `#peerprovtbl` (province competitor-exposure, `drawPeerProvince`) — built their header rows as inline template literals with bare `<th>`, so on these wide multi-column rival tables a screen reader couldn't reliably associate each data cell with its column header. `#acq` is the objective-#2 competitive-risk route and the most table-dense surface — the natural next slice after the primary search trio (`ux-table-scope-primary-search-tables`, PR earlier same day). Fix: added `scope="col"` to every `<th>`, **including the peer-province table's dynamic per-brand / PICO / saturation / district-lost headers** (`bh`/`ph`/`sh`/`dh`), all of which are column headers — matching `data.html`'s already-scoped `#ptbl`/`districtTable` convention. Non-presentational — zero visual change. Clean 1:1 replacement (22 lines each side) in `platform/app.js` + one `docs/UXUI_AUDIT.md` fix-log entry + backlog progress note.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **108 passed, 0 failed** (incl. `node --check` on every page's inline JS + 448 data-integrity checks). (b) headless `render.sh index.html#acq` → route renders clean (risk-lens header, region cards, rivals lines, Thai text intact), `data-errors="[]"`, `data-leaflet="1"`, and the settled DOM carried **43 live `scope="col"` attrs** on the competition tables; PNG self-reviewed (nothing visibly broken). (c) no secrets in the diff (the lone `grep` hit was the literal word "token" inside a `theme-token colors` code comment). (d) diff = only `platform/app.js` + `docs/UXUI_AUDIT.md` for the fix.
+- **Pre-existing gate drift restored (separate labelled commit `6dbfa8f`):** the gate came up **107/2** on `origin/master` (before my change) with `build_provenance.py --check` + validate_data.py's "standalone provenance rows record the real byte size" red — PR #244's live-board daily-feed commit added a new MEASURED data file without regenerating the `--check`-gated `provenance.json` (same recurring class as `qa-commodities-gate-drift`, confirmed identical in the PR's CI log). Per the gate's own instruction ("REAL DATA ISSUES FOUND — do not weaken the checks; fix the data") and the commodities precedent, regenerated `provenance.json` deterministically — the ONLY change is the census catching up to the committed tree (122→123 layers, 64→65 measured, 427→428 files, refreshed byte sizes/freshness); **zero risk/exposure/price values changed**. That restored `tests/run.sh check` to 0-failed. Logged as `qa-provenance-gate-drift` in the audit backlog.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/app.js`; `/index.html` → **308** (expected `cleanUrls` redirect to `/`, not a regression). Confirmed the change is **live**: the deployed `app.js` carries `scope="col"` on all three signature competition headers (Google-Trends / "Census completeness" / "Which single big-4…") — 56 total scoped headers in the served build.
+- **Housekeeping note:** the merged feature branch `claude/ux-loop-20260801-1411` could not be deleted from the remote — repeated `git push origin --delete` / `:branch` failed with sideband disconnects on the git proxy (network, not a merge problem — same recurring issue documented for PR #228). Harmless (fully merged into master); worth a manual delete when the proxy is stable.
+- **Next recommended:** continue `ux-table-scope-sweep-appjs` with the remaining `#region`/`#amptbl` families + the exposure/overview tables (mechanical, DOM-verifiable, safely auto-mergeable) — or, since the data bots keep leaving `provenance.json`/`commodities.json` drifted on master and every UX-loop run must restore them first, a small **pipeline fix to fold a `build_provenance.py` + `build_commodities.py` regen step into the data-bot commit path** would stop the recurring gate drift at its source (bigger than a surgical UX run, but high leverage). After the scope sweep: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language as competitive-RISK — needs a dedicated pass), `ux-viewport-user-scalable-3dpages` (real-device pinch-zoom test — not auto-mergeable), and non-platform `qa-visual-baseline-stale` (deliberate `tests/run.sh baseline` refresh).
+
+## 2026-08-02 — UX loop: `scope="col"` on the 11 remaining `#acq` rival tables (`ux-table-scope-acq-tables`) — merged + deployed + verified — **CLOSES the app.js scope sweep**
+- **Shipped** (branch `claude/ux-loop-20260802-1417`, squash-merged PR #260 → `ad6f3a2` on master): **final slice of `ux-table-scope-sweep-appjs`** (a11y, WCAG 1.3.1 Info and Relationships). The Competition (`#acq`) route's remaining 11 rival-intelligence tables — SET peer scoreboard (`drawPeerScore`), iOS + Google Play sentiment ladders (`drawRivalIos`/`drawRivalPulse`), paid-media pulse + per-brand ad-copy sub-tables (`drawRivalAds`), YouTube cadence (`drawRivalVideo`), Pantip threads (`drawPantip`), social-theme + call-to-action (`drawSocialThemes`), operator universe/footprint (`drawRivalUniverse`), reputation (`drawRivRep`), and threat + threat-by-region (`drawRivThreat`/`drawRivThreatRegion`) — built their header rows as inline template literals with bare `<th>` / `<th title="…">`, so a screen reader couldn't reliably associate each data cell with its column header. Fix: added `scope="col"` to **all 83 `<th>`** across the 11 tables (incl. the empty leading cell in the universe table, `<th scope="col"></th>`), matching `data.html`'s already-scoped `#ptbl`/`districtTable` convention. Edit confined to lines **3632–4535** (`drawPeerScore`…`drawRivThreatRegion`); one `scope="col"` per header, no other bytes changed. Non-presentational — zero visual change. Clean 59/59 line replacement in `platform/app.js` + one `docs/UXUI_AUDIT.md` fix-log entry + backlog closure note. **This was the last bare-`<th>` family in the SPA** — every app.js SPA table header is now `scope="col"`, so `ux-table-scope-sweep-appjs` is DONE/CLOSED.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **117 passed, 0 failed** (incl. `node --check` on every page's inline JS + `validate_data.py` 455/0). The gate was already **0-failed on `origin/master` before my change** this run — no provenance/commodities drift to restore (unlike the last two runs). (b) headless `render.sh index.html#acq` → route renders clean (risk-lens header, region cards, Thai text intact), `data-errors="[]"`, **86 live `scope="col"` attrs** in the settled `#acq` DOM; PNG self-reviewed (nav/header/region cards all intact, nothing visibly broken). (c) no secrets in the diff. (d) diff = only `platform/app.js` (every changed line a bare-`<th>`→`scope="col"` swap, confined to the intended function range) + `docs/UXUI_AUDIT.md`.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/app.js`; `/index.html` → **308** (expected `cleanUrls` redirect to `/`, not a regression). Polled the edge CDN until the new build served — the deployed `app.js` carries the new `scope="col">Operator`/`scope="col">Backing` universe-table markers (2 matches) after ~90s. Change is **live**.
+- **Next recommended:** with the SPA `<th>` sweep now fully closed, the highest-leverage remaining work is the **pipeline hygiene fix** — fold a `build_provenance.py` + `build_commodities.py` regen step into the data-bot commit path so master stops arriving gate-drifted (it happened to be clean this run, but the last two UX-loop runs had to restore it first). Bigger than a surgical UX run but stops a recurring class. Remaining surgical UX backlog is thin: `ux-pillar-foot-arrow-doubled` (cosmetic robustness, harmless today) is the only small auto-mergeable item left; `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language as competitive-RISK) and `ux-viewport-user-scalable-3dpages` (real-device pinch-zoom test) each need a dedicated non-surgical pass; `qa-visual-baseline-stale` needs a deliberate `tests/run.sh baseline` refresh once the front door is IA-stable.
+
+## 2026-08-03 — UX loop: active nav pill scrolls into view in the mobile nav strip (`ux-nav-active-pill-scroll`) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260803-1417`, squash-merged PR #273 → `de29bf5` on master): the `#nav` is a `position:fixed`, `flex-wrap:nowrap`, `overflow-x:auto` **horizontal scroll strip** (`styles.css:213`), so on a phone the pillar pills overflow and scroll sideways — but `showTab` (app.js) only toggled the `.on` class + `aria-current` on the active pill and **never scrolled it into the visible portion of the strip**. A route reached via a content jump-link (`#main-content a[data-v]` cards / "Next in the story" footers), a deep-link on load, or a `hashchange` could leave its "you are here" highlight scrolled off-screen — the classic mobile-tab wayfinding gap. Fix: a guarded `t.scrollIntoView({block:'nearest',inline:'nearest'})` on the selected pill inside the existing `showTab` forEach, scoped with `t.closest('#nav')` so it fires **only** for pills still in the strip. **Caught a mid-run upstream change:** master had (since my stale base) widened the `showTab` selector to `'#nav a[data-v],#navMoreMenu a[data-v]'` so the re-parented More-menu items (`map`/`sim`, moved to `<body>`) also get the `.on`/`aria-current` highlight; the `closest('#nav')` guard correctly excludes those from the scroll (scrolling a `<body>`-level fixed dropdown item would be meaningless). `inline:'nearest'` scrolls only the nav horizontally; `block:'nearest'` is a no-op on the always-visible fixed nav (and the trailing `window.scrollTo(0,0)` resets any vertical nudge). One-line change in `platform/app.js` + a `docs/UXUI_AUDIT.md` fix-log entry + one new low-priority backlog note.
+- **Rebase note:** the branch was first cut from a **stale local `master`** (the session-start `git pull` had failed on a divergent-branches config default, so local master never advanced past `a0f3ecc` while origin was ~50 commits ahead). The first push/PR/merge attempt hit a **merge conflict**; caught it, `git reset --hard origin/master`, re-applied the fix onto the current `showTab` (with the new dual selector + the `closest('#nav')` guard), re-verified the full gate + renders on the correct base, and force-pushed. No stale-base code reached master.
+- **Safeguards (all pass, on the correct base):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. `node --check` on every page's inline JS + data-integrity checks); gate was already 0-failed on `origin/master` before my change — no provenance/commodities drift to restore this run. (b) headless `render.sh` @ 390×844: default `#home` **unchanged** (brand + Home visible at `scrollLeft:0`, no scroll needed); deep-linked `#acq` scrolls the strip toward the active Competition pill; `#sim` (a re-parented More-menu route) renders clean with the guard correctly skipping the scroll; all three `data-errors="[]"`; PNGs self-reviewed (nav/header/content intact, nothing visibly broken). (c) no secrets in the diff. (d) diff = only `platform/app.js` (one line) + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/app.js`; `/index.html` → **308** (expected `cleanUrls` redirect to `/`, not a regression). Polled the edge CDN until the new build served — the deployed `app.js` carries the `closest('#nav')` guard after ~80s. Change is **live**.
+- **Next recommended:** the highest-leverage remaining item is still the **pipeline hygiene fix** — fold a `build_provenance.py` + `build_commodities.py` regen step into the data-bot commit path so master stops arriving gate-drifted (clean this run, but a recurring class). The surgical UX backlog is now thin: `ux-nav-active-pill-deeplink-fontreflow` (re-run the pill scroll on `document.fonts.ready` so deep-links reveal fully — small, auto-mergeable, spotted this run) is the natural next surgical pick. Larger dedicated passes remain: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language as competitive-RISK), `ux-viewport-user-scalable-3dpages` (real-device pinch-zoom test — not auto-mergeable), and non-platform `qa-visual-baseline-stale` (deliberate `tests/run.sh baseline` refresh). **Housekeeping:** the remote branch delete returned a sideband disconnect (git-proxy network, not a merge problem — same recurring issue as PR #260); the branch is fully merged, harmless, worth a manual delete when the proxy is stable.
+
+## 2026-08-03 — UX loop: live.html pulse strip reconciles (`ux-live-pulse-tally-gap`) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260803-1200`, squash-merged PR #278 → `e7a2c45` on master): `live.html`'s "lead-with-the-answer" pulse strip showed **Live feeds: 20** then **Current 15 / Aging 0 / Stale 0** — but the three freshness counts only tallied feeds with a `fresh_days` cadence **and** a parseable stamp, so the 5 feeds classed `reference` (no cadence, 3) or `no stamp` (2) were counted in **none** and 15+0+0 ≠ 20; the 5-feed gap sat unexplained on an exec strip whose entire purpose is honest numbers. Fix: added a fourth freshness bucket — a `tally.lb_ref` counter (the `forEach` `else` branch now captures every non-fresh/aging/stale feed) and a **"Reference"** pulse card right after Stale in `var(--dim)` (matching the existing `.lb-ref`/`.lb-nostamp` badge color, line 47), subtext "no cadence or stamp — don't age". Now **Current + Aging + Stale + Reference = Live feeds** (15+0+0+5 = 20). `.lb-pulse` is `auto-fit,minmax(132px,1fr)` so the 7th card reflows cleanly; zero change to any other surface. Change confined to `platform/live.html` + a one-line `docs/UXUI_AUDIT.md` fix-log entry.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. `node --check` on every page's extracted inline JS + 455 data-integrity checks); gate was already 0-failed on `origin/master` before the change — no provenance/commodities drift to restore this run. (b) headless `render.sh live.html` @ 1100×900: strip reads `20 · 15 · 0 · 0 · 5 · 7 · 187`, the four freshness buckets reconcile to Live feeds, the Reference card renders dim/neutral and reflows onto row 1, `data-errors="[]"`, PNG self-reviewed (nothing visibly broken). (c) no secrets in the diff. (d) diff = only `platform/live.html` (7 lines) + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/live` (first check, ~15s); deployed `/live` HTML confirmed to carry the new `lb_ref` tally + "Reference" card (not a stale cache). Change is **live**.
+- **Next recommended:** the highest-leverage remaining item is still the **pipeline hygiene fix** — fold a `build_provenance.py` + `build_commodities.py` regen step into the data-bot commit path so master stops arriving gate-drifted (clean this run, but a recurring class). Remaining surgical UX backlog is now thin: `ux-nav-active-pill-deeplink-fontreflow` (re-run the active-pill scroll on `document.fonts.ready` so deep-links reveal fully — small, auto-mergeable) is the natural next surgical pick; `ux-live-chart-mobile-viewbox-responsive` (narrower SVG viewBox on phones so chart geometry+text scale together) and `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language as competitive-RISK) each need a dedicated non-surgical pass; `ux-viewport-user-scalable-3dpages` needs a real-device pinch-zoom test (not auto-mergeable); `qa-visual-baseline-stale` needs a deliberate `tests/run.sh baseline` refresh once the front door is IA-stable.
+
+## 2026-08-04 — UX loop: ux-nav-active-pill-deeplink-fontreflow (mobile wayfinding) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260804-0214`, squash-merged PR #283 → `cb75f4e` on master): completed `ux-nav-active-pill-scroll`'s deep-link case. On a deep-link-on-load to an off-screen route (e.g. `#acq` at 390px), `showTab`'s active-nav-pill `scrollIntoView` fires before the async IBM Plex web font settles, scrolling against narrower fallback-font pill widths; once the font loads the pills widen and the active pill can end up only partially revealed. Added a one-line `document.fonts.ready` re-scroll of the active `#nav a[data-v].on` pill in `boot()` (not `showTab` — so it fires ONCE per page load on the deep-link path, an idempotent no-op for the dominant already-loaded interactive-nav case). Feature-detected (`document.fonts&&document.fonts.ready`) + double `try/catch`; reuses showTab's exact `scrollIntoView({block:'nearest',inline:'nearest'})`. `platform/app.js` (+7) + a one-line `docs/UXUI_AUDIT.md` fix-log entry.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. `node --check` on every page's inline JS + 455 data-integrity checks). (b) headless `render.sh index.html#acq` @ 390×844 → `data-errors="[]"`; PNG self-reviewed — Competition route active, content intact, nav scrolled toward the active region, no visible breakage. (c) no secrets in diff. (d) diff = only `platform/app.js` + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** after the build, the production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/app.js` (route not regressed). The merge commit `cb75f4e` on `origin/master` is confirmed to carry the fix (`git show origin/master:platform/app.js` grep = 1). The **deployed** `app.js` still served the pre-fix bytes at verify time — the known Vercel edge-CDN path-cache lag on the static `app.js` (documented in prior runs); it catches up on cache expiry, and since the route returns 200 with a valid working app this is normal propagation, not a rollback condition.
+- **Next recommended:** the standing bigger-than-surgical / device-tested backlog is unchanged and is what remains: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language in `build_regional_outlook.py` as competitive-RISK, not branch expansion — mandate-critical, ripples across national/regional/province + app.js, needs a dedicated pass), `ux-viewport-user-scalable-3dpages` (drop `maximum-scale=1` on the 3 deck.gl pages + add `touch-action:none` — needs real-device pinch-zoom test, not headless-verifiable), and `ux-live-chart-mobile-viewbox-responsive` (narrower `viewBox` on small screens — touches `lineChart()` coordinate math). Non-platform: `qa-visual-baseline-stale` wants a deliberate `tests/run.sh baseline` refresh so the visual gate carries signal again. The surgical-and-headless-verifiable queue is now essentially drained — the next runs should either tackle one of the above as a dedicated (non-unattended for the device-tested ones) effort or discover fresh issues by route review.
+
+## 2026-08-04 — Intelligence loop: deploy-health probe guards `rival_threat.json` (#acq rival threat matrix) — merged + deployed + verified
+- **Shipped** (direct to master): a nightly deploy-health probe for `data/rival_threat.json`, the brand-level density × service **rival threat matrix** on the Competition (#acq) surface (obj #2). This was the ONE surfaced competitive read the existing `rival_threat_region` probe's own comment explicitly named as its unprobed sibling. `drawRivThreat` gates the whole board on a non-empty `.brands` array and, per row, renders `.brand` (name), `.footprint_vs_autox` (the ×AutoX ratio — the board's primary quantitative column) and `.threat_class` (the Threat column + its risk-colour), plus `.headline` for the readout. Like every other competitive read it **degrades silently** — a missing/truncated CDN deploy drops the board to its "Rival threat matrix not yet computed" placeholder with **no phone alert** — the same "broken demo" blind spot the peer_province / competitor_coverage / rival_threat_region probes closed. Added `_shape_rival_threat` (asserts the brands gate + the brand/threat_class columns each row renders + at least one numeric ×AutoX ratio + the readout headline; shape not values, robust to a future census/rating vintage) and registered it in `DATA_FILES` next to its region sibling. `pipeline/check_site_health.py` (+48) + this log entry only — no `platform/data` file added/altered, so no provenance regen needed.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (455/455 data-integrity). (b) offline self-test `python3 check_site_health.py --local platform` → **119/119 PASS**, the new `rival_threat.json` fetch/parse/shape rows green; negative tests confirm the validator fires on empty `.brands`, missing `.headline`, and non-dict inputs (passes only the real file). (c) no secrets in the diff (secret scan clean). (d) diff = only `pipeline/check_site_health.py` (+48, one validator + one registry line) + this log entry; no data fabricated (the probe validates shape, never writes numbers).
+- **Deploy-verify (PASS, no rollback):** the change is a CI-only script (nightly `site-health.yml`), not app/visual behaviour, so it does not affect the served bundle. Independently confirmed the LIVE production alias `competitive-intel-git-master-…vercel.app` is healthy this run — **200** on `/`, `/app.js`, `/data/meta.json`, `/data/province_stress_index.json`, and the newly-guarded `/data/rival_threat.json`.
+- **Next recommended intelligence task:** continue the deploy-health sweep with the remaining unprobed **surfaced** competitive/risk reads — `province_stress_index.json` (obj #1 peer benchmark + the structural household-leverage read on #home, and the un-probed PARENT of the already-guarded `province_pressure` synthesis) is the highest-value next pick; `rival_pressure.json` and `rival_universe.json` (both #acq boards) follow. Many committed `data/*.json` are fetched by app.js but not yet probed (see the diff list this run); prioritise by front-door / default-route render prominence.
+
+## 2026-08-04 — UX loop: `ux-live-series-switcher-group-role` (live.html a11y) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260804-0812`, squash-merged PR #285 → `aefdb0f` on master): `live.html`'s two series-switcher button groups — `#lb-cmdbtns` (commodity-price selector, `drawC`'s card) and `#lb-fhbtns` (daily-feed selector, `drawF`'s card) — are single-select control sets whose `.lb-sb` buttons already carry `aria-pressed`, but the containing `.lb-seriesbtns` divs had **no `role="group"`/`aria-label`**, so a screen reader announced a bare run of toggle buttons with no cue about what set they belong to (WCAG 4.1.2 Name/Role/Value). Same gap `ux-chip-aria-pressed` closed for the SPA's `.chip` groups; live.html's switchers were added after that sweep and missed it. Added `role="group" aria-label="Commodity price series"` / `"Daily feed series"` to the two container template strings, matching the house `role="group"`+`aria-label`+`aria-pressed` pattern (`#sortchips`, region-filter chips). Change confined to `platform/live.html` (2 template-string edits, attrs only) + a one-line `docs/UXUI_AUDIT.md` fix-log entry.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. `node --check` on every page's extracted inline JS + 455/455 data-integrity checks); gate was already 0-failed on `origin/master` before the change — no provenance/commodities drift to restore this run. (b) headless `render.sh live.html` @ 1100×900: commodity switcher (RICE active) visually **identical**, settled DOM confirms both `role="group"`/`aria-label` present on `#lb-cmdbtns`/`#lb-fhbtns`, `data-errors="[]"`, PNG self-reviewed (nothing visibly broken). (c) no secrets in the diff. (d) diff = only `platform/live.html` (2 lines) + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/live` (the changed route); `/live.html` → **308** (expected `cleanUrls` redirect to `/live`, not a regression). The merge commit `aefdb0f` on `origin/master` is confirmed to carry the fix (`git show origin/master:platform/live.html` grep = 1). The **deployed** `/live` HTML still served the pre-fix bytes at first verify time — the known Vercel edge-CDN path-cache lag documented in prior runs; the route returns 200 with a valid working app, so this is normal propagation, not a rollback condition. (Housekeeping: the remote branch delete returned a sideband git-proxy disconnect — same recurring proxy issue as PRs #260/#283 — but the branch is fully merged and `origin` reports it gone; harmless.)
+- **Next recommended:** the surgical-and-headless-verifiable UX queue is essentially drained again — the standing backlog is all bigger-than-surgical or device-tested: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language in `build_regional_outlook.py` + app.js as competitive-RISK, not branch expansion — mandate-critical, ripples across surfaces, dedicated pass), `ux-viewport-user-scalable-3dpages` (drop `maximum-scale=1` on the 3 deck.gl pages + add `touch-action:none` — needs real-device pinch-zoom test, not auto-mergeable), and `ux-live-chart-mobile-viewbox-responsive` (narrower `viewBox` on phones so chart geometry+text scale together — touches `lineChart()` coordinate math). Non-platform: `qa-visual-baseline-stale` wants a deliberate `tests/run.sh baseline` refresh so the visual gate carries signal again; and the recurring **pipeline-hygiene** ask stands — fold a `build_provenance.py`/`build_commodities.py` regen step into the data-bot commit path so master stops arriving gate-drifted. Next runs should pick one of these as a dedicated effort (non-unattended for the device-tested ones) or discover fresh issues by route review.
+
+## 2026-08-04 — UX loop: ux-live-aging-pill-contrast (WCAG AA contrast) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260804-1419`, squash-merged PR #286 → `9f011d4` on master): fixed a real WCAG 1.4.3 AA failure on `live.html`'s "Every feed" freshness-board. The **"aging"** pill (`.lb-aging`, `font:600 9.5px` — small text needing 4.5:1) used `--opp` gold, which in LIGHT theme is `#A67714` and measured only **3.68:1** on the light canvas (`--bg #F4F6FA`) / 3.78:1 on row-hover — below AA. This is the board's own "this feed is overdue" flag, so it renders in production whenever a daily feed slips a day. The other three pills already pass in their table context (fresh 4.73:1, stale 5.02:1, ref 5.37:1); the 26px pulse-strip "Aging" count is large text and correctly stays `--opp`. Fix is one scoped CSS line — `html[data-theme="light"] .lb-aging{color:#8A6210}` (≈5.06:1 canvas / 5.19:1 hover, still recognizably gold, distinct from the red stale pill). Light theme only; dark theme's bright `#E6B450` (~8.3:1) untouched; no global `--opp` change so no other gold surface shifts. `platform/live.html` (+5) + `docs/UXUI_AUDIT.md` (fix-log entry) only.
+- **How it was found:** the seven backlog priorities the loop names are all long-since fixed, so this run reviewed `live.html` directly and computed contrast ratios for every freshness pill against its real rendering background with the WCAG relative-luminance formula — the aging pill was the one genuine failure.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. 455 data-integrity checks + `node --check` on every page's inline JS — `live.html` clean). (b) headless `render.sh live.html` → `data-errors="[]"`, default PNG byte-identical (144961 B, the pill class only appears when a feed is overdue); a forced pill-swatch render + a computed-style probe confirm the aging pill resolves to `rgb(138,98,16)`=`#8A6210` in light and unchanged `rgb(230,180,80)`=`#E6B450` in dark, legible and distinct from the red stale pill. (c) no secrets in the CSS-only diff. (d) diff = only `platform/live.html` + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** after ~95s the production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and on the changed route `/live` (its canonical clean URL); `/live.html` → 308 is the expected `cleanUrls` redirect to `/live`, not a regression. Session auto-unsubscribed from PR #286 on merge. The merged branch was not remotely deleted — `git push --delete` returns the known git-proxy "remote end hung up" artifact (same as prior runs; GitHub prunes it server-side), the merge itself succeeded.
+- **Next recommended:** backlog is deep and mostly closed; the remaining open items are all deliberately *bigger-than-surgical* and unsuited to unattended auto-merge — `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" expansion language as competitive-RISK, ripples across national/regional/province + app.js), `ux-viewport-user-scalable-3dpages` (drop the `maximum-scale=1` lock on the 3 deck.gl pages + add `touch-action:none`, needs real-device pinch-zoom testing), `ux-live-chart-mobile-viewbox-responsive` (narrower viewBox on phones so `live.html`'s SVG geometry+labels scale together — touches `lineChart()` coordinate math). Non-platform: `qa-visual-baseline-stale` wants a deliberate `tests/run.sh baseline` refresh so the visual-regression gate carries signal again. Future runs should keep reviewing individual routes for concrete surgical wins as this one did.
+
+## 2026-08-06 — UX loop: ux-navmore-menu-offscreen-mobile (Explore ▾ dropdown, mobile) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260806-0823`, squash-merged PR #301 → `029fcb2` on master): fixed a real mobile **broken-affordance** bug on the three `styles.css`-based secondary pages (`live.html`, `data.html`, `status.html`) — the "Explore ▾" nav dropdown was dragged almost entirely off the LEFT edge of the screen on a phone, making every Explore route (Risk trend / Map view / Provinces 3D / Branches / Market / Simulator / Live board) unreachable there. Root cause: `#nav` carries BOTH `backdrop-filter` (which makes it the containing block for `position:fixed` descendants) AND `overflow-x:auto` (the horizontal swipe strip); unlike `index.html`, these three pages never re-parented `#navMoreMenu` out of the nav, so its `position:fixed;right:10px` resolved against the *scrolled* `#nav` box, not the viewport. Since "Explore ▾" is the last nav item, reaching it on a 390px phone REQUIRES scrolling the strip fully right — so the menu was always dragged left by the scroll amount. Fix mirrors `index.html`'s nav script with a 2-line change per page: `document.body.appendChild(menu)` (re-parent to `<body>`, whose fixed children anchor to the viewport) + `open()` now toggles `.open` on the menu as well as the wrap (so the `.nav-more-menu.open` display selector already in `styles.css` matches once re-parented), plus `&&!menu.contains(e.target)` on the outside-click guard. The three deck.gl pages were deliberately left untouched (their own inline `position:absolute` nav CSS anchors the menu to the button and has no off-left drift; re-parenting would regress them → `display:none`). `platform/{live,data,status}.html` (+9/−6 total) + `docs/UXUI_AUDIT.md` (fix-log entry + one new backlog item).
+- **How it was found:** the seven named backlog priorities are all long-fixed and the remaining open items are all deliberately bigger-than-surgical, so this run reviewed the secondary-page nav and traced the CSS containing-block interaction, then **verified empirically** with Playwright at 390px (`isMobile`, nav scrolled): before = menu `x=-132` (161px wide → ~29px on-screen), `elementFromPoint` on first item = `none` (unclickable); after = `x=219` mobile / `x=1269` desktop 1440px, first item = `menu` (fully on-screen + clickable) on all three pages. Master baseline `render.sh` of the 3D pages confirmed they display fine on master and would regress under the re-parent (menu → `display:none`), so they were excluded.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. `node --check` on live/data/status inline JS + 455/455 data-integrity checks). (b) headless `render.sh` of all three changed pages @ 900×800 read + self-reviewed — nav intact, "Explore ▾" present, content healthy, no visible regression on load (the dropdown only shows on interaction, verified separately by the Playwright interaction check above). (c) no secrets in the diff. (d) diff = only the 3 pages + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** after ~95s the production alias `competitive-intel-git-master-…vercel.app` → **200** on `/`, `/live`, `/data`, `/status` (the three changed routes, canonical clean URLs); `/live.html`/`/data.html`/`/status.html` → 308 is the expected `cleanUrls` redirect and resolves to 200 when followed — not a regression. Session auto-unsubscribed from PR #301 on merge. Remote branch delete returned the recurring git-proxy "remote end hung up" sideband artifact (same as prior runs; GitHub prunes it server-side) — the merge itself succeeded.
+- **Next recommended:** the surgical + headless-verifiable queue is drained again. Standing backlog is all bigger-than-surgical / device-tested and NOT auto-mergeable unattended: **`ux-navmore-3dpages-absolute-overflow`** (NEW this run — the 3 deck.gl pages' own `position:absolute` Explore menu spills ~44px past the RIGHT viewport edge / gets occluded on a 390px phone; needs their inline CSS touched + a `.nav-more-menu.open` selector + real-device test because they mount a WebGL canvas); `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" expansion language in `build_regional_outlook.py` + app.js as competitive-RISK, ripples across surfaces); `ux-viewport-user-scalable-3dpages` (drop `maximum-scale=1` + add `touch-action:none` on the 3 deck.gl pages, needs pinch-zoom device test); `ux-live-chart-mobile-viewbox-responsive` (narrower viewBox on phones, touches `lineChart()` math). Non-platform: `qa-visual-baseline-stale` wants a deliberate `tests/run.sh baseline` refresh so the visual gate carries signal again. Consider batching the two 3D-page nav/viewport items into one device-tested run.

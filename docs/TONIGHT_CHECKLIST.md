@@ -261,23 +261,27 @@ python3 save_competitors.py           # writes the competitor JSON
 
 ---
 
-## 6. Loan tape — the ONE command (objective #1, biggest portfolio-risk unlock)
+## 6. Loan tape — ✅ DONE 2026-07-21, this is now the REFRESH command
 
-When the real export exists (no PII; schema = `pipeline/loan_tape_schema.md`), drop the two files in
-`source-data/` and run **one command**. This flips the four outputs from SYNTHETIC to **measured**.
+The real export landed: **382,735 accounts**. This section is no longer "when a tape exists" — it is
+how to fold in a NEWER one. The old `ingest_loan_tape.py --real` path was retired 2026-07-31.
 
 ```bash
 cd pipeline
-# Export from core banking per the schema -> source-data/loan_tape.json + branch_aum_monthly.json
-python3 ingest_loan_tape.py --tape ../source-data/loan_tape.json \
-                            --aum  ../source-data/branch_aum_monthly.json \
-                            --real
-# It validates (enums/ranges/join-rate/status sanity), FAILS LOUDLY on problems, and on success writes
-# platform/data/loan_tape_derived.json stamped `measured` (not SYNTHETIC):
-#   (a) vintage 90+ aging curves  (b) per-branch ROI/payback  (c) HHI concentration  (d) PD calibration
+# 1. Owner-side: stream the xlsx into committed no-PII aggregates. Raw file never enters the repo.
+python3 ingest_real_tape.py --src "<path to the export xlsx>"
+#    -> source-data/staging/real_tape_aggregates.json   (every cell suppressed below MIN_CELL)
+
+# 2. Project staging into the app layers. Deterministic and gated — --check must reproduce.
+python3 build_tape_layers.py
+#    -> platform/data/tape_real.json + tape_geo_occ.json   (live on #exposure, #trend, data.html)
+
+# 3. Re-run the gate; regenerate provenance LAST and only on the LF mirror.
+bash ../tests/run.sh check
 ```
 
-(Until then, `python3 ingest_loan_tape.py` with no args regenerates from the SYNTHETIC tape.)
+The months-on-book anchor is the newest disbursement year-month **in the data**, never wall clock —
+so re-running on an unchanged export reproduces byte-for-byte.
 
 ---
 

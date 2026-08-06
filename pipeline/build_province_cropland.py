@@ -124,7 +124,9 @@ def main():
                      "python3 pipeline/build_province_cropland.py")
         print("build_province_cropland.py --check: OK (byte-exact)")
         return
-    with open(OUT, "w", encoding="utf-8") as f:
+    # newline="\n": the Windows default translates every \n to \r\n, which inflates the byte sizes
+    # build_provenance.py censuses and diverges the local tree from the LF blob CI actually reads.
+    with open(OUT, "w", encoding="utf-8", newline="\n") as f:
         f.write(payload)
     m = json.loads(payload)["meta"]
     print(f"wrote {OUT} ({m['n_provinces']} provinces, MEASURED DOAE 2568/2025)")

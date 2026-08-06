@@ -429,10 +429,19 @@ def build():
         "provinces": tabs.get("province", {}),
         # geographic tape rollups for the data-book drill-down (region cards / province / branch).
         # regions keyed East/Isan/North/South/Central&BKK (matches regions.json); branches keyed by
-        # booking-branch name (top-N by size, cells n>=30 — larger branches only).
+        # booking-branch name, every branch clearing the n>=30 publication floor.
+        #
+        # This reads branch_FULL, not branch. Both are packed with the same MIN_CELL=30 no-PII
+        # floor, but "branch" is additionally truncated to the network's top 400 by size
+        # (ingest_real_tape.py `capped`). Pointing the drill at the truncated tab silently
+        # discarded ~1,574 branches that clear the floor, so the branch rows summed to barely a
+        # third of their own province totals — Trang published 1 branch of 23, Mae Hong Son none
+        # of 4 despite every one of them holding 111-185 accounts. build_geo_occ() above already
+        # reads branch_full; this is the same correction for the older consumer. It exposes NO
+        # new cell: the floor is unchanged, the cap is simply no longer applied.
         "geo": {"regions": tabs.get("geo_region", {}),
                 "provinces": tabs.get("province", {}),
-                "branches": tabs.get("branch", {}),
+                "branches": tabs.get("branch_full", tabs.get("branch", {})),
                 # impact-cards crosses (2026-07-25): book occupation mix + vehicle mix per GEO
                 # region — the ours-vs-population blocks on the region cards join these against
                 # NSO LFS / DLT fleet. Keys "<occ>|<region>" / "<vehicle>|<region>".

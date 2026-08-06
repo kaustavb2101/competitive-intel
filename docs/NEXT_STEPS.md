@@ -3,6 +3,49 @@
 Ordered by value × unblocked-ness. Each has a concrete first action so Claude Code can just start.
 **For the exact Thai-laptop pulls (copy-pasteable), see `docs/TONIGHT_CHECKLIST.md`.**
 
+## 0. GISTDA repeated-flooding — ✅ SHIPPED (MAX-freq hazard flag, 2026-08-02); area still needs a dissolve (objective #1)
+**DONE (the defensible part):** `pull_flood_hazard.py` pulls the server-side MAX(flood_freq) per
+district and `build_flood_hazard.py` (deterministic, `--check`-gated) projects it into
+`platform/data/flood_hazard.json` — a per-district & per-branch repeated-flood-hazard flag
+(count of the 12 years 2005-2016 the ground flooded, 1-12). 838 flood-affected districts, 825
+joined onto `amphoe.json` (13 unresolved, all zero-branch — asserted at build time); 1,848/2,015
+branches sit in a repeat-flood district, 685 in a CHRONIC one (≥7/12 yrs). Surfaced as a MEASURED
+branch-popup line on `#map`, censused in `provenance.json`. NO area is claimed (see the trap below).
+The remaining open work is purely the flooded-AREA number, which still needs a geometry dissolve.
+
+Probed 2026-08-01. GISTDA's ArcGIS server is **open from this machine, no key**:
+`https://gistdaportal.gistda.or.th/data/rest/services?f=json` lists ~40 folders (FL_Flood, GFlood,
+FR_Fire hotspots + air quality, GWater, Industrial, EEC...).
+
+The one worth having is a **FeatureServer**, so it can be aggregated server-side with no geometry
+download:
+
+    FL_Flood/FL_RepeatedFlooding_GISTDA_50k_Y2005_Y2016/FeatureServer/0
+
+It carries `flood_freq` (how many of the 12 years that ground flooded), `area_rai`, and full
+admin keys — `pv_tn`/`pv_code`, `ap_tn`/`ap_code`, `tb_tn`/`tb_code` — so it joins straight onto
+`amphoe.json`'s 928 districts. `supportsStatistics: true`; a `groupByFieldsForStatistics=pv_tn`
+query returns all 75 flood-affected provinces in one call.
+
+**THE TRAP — do not skip this.** `area_rai` is genuinely each polygon's own area
+(`area_m / 1600` checks out exactly), but the polygons **OVERLAP**: they appear to be per-event,
+not dissolved by frequency. Sukhothai returns 202,744 polygons summing to 13.2m rai against a
+province that is only ~4.1m rai; the tambon of วังลึก alone sums to 364,649 rai from 410 polygons.
+A naive `SUM(area_rai)` therefore overstates flooded area by roughly 3-9x, and the national total
+it produces (129.9m rai = 40% of Thailand) is an artifact, not a finding. **Any flooded-AREA number
+off this service needs a real spatial dissolve first** — that is a geometry job (shapely over the
+downloaded polygons per district), not a query parameter.
+
+What IS defensible without any dissolve, because it is immune to overlap:
+- `MAX(flood_freq)` per district — "this district contains ground that flooded in 11 of 12 years".
+  A clean branch-hazard flag, one grouped query, no area claim.
+- the count of districts at each max-frequency band.
+
+Deliberately NOT built on 2026-08-01 rather than shipped with a suspect area number. ✅ The
+MAX(flood_freq) group-by (joined onto `amphoe.json` via Thai/English name, NOT `ap_code` — the app's
+amphoe identity is name-keyed) shipped 2026-08-02 as `build_flood_hazard.py`. **Area is still left
+for a later pass that dissolves geometry** (shapely over the downloaded polygons per district).
+
 ## 0a. Fold the MEASURED TMLI province layers into the risk read  ⟶ NOW UNBLOCKED (objective #1)
 The data.go.th / NSO / NESDC datasets that the sandbox is BLOCKED from pulling are now vendored
 (measured, from the Thai-network TMLI platform) and projected into clean province-keyed layers — no
@@ -63,15 +106,103 @@ Rayong was the pilot template; the goal was the same deep-dive for every provinc
   province (Places, brand × province) so the deep-dive isn't competitor-blind outside Rayong; then
   template the "what impacts them" narrative by region (EEC-East, agri-Isan, tourism-South…).
 
-## 0b. Get a REAL loan tape  ⟶ highest-leverage data unlock for objective #1 (portfolio risk)
-The loan-tape bridge is built and proven on SYNTHETIC data; it flips to measured the moment a real
-export lands. Until then the four portfolio-risk outputs are stamped SYNTHETIC.
-- ✅ **Done:** the no-PII contract (`pipeline/loan_tape_schema.md`), deterministic synthetic generator
-  (`make_synthetic_tape.py`), and the validating ingest (`ingest_loan_tape.py`) that computes vintage
-  90+ aging, branch ROI/payback, HHI concentration, and proxy-vs-actual PD calibration.
-- **Next concrete step:** Kaustav exports two no-PII files from core banking per the schema
-  (`loan_tape.json` + `branch_aum_monthly.json`, join on branch `code`), drops them in `source-data/`,
-  and runs the one command in TONIGHT_CHECKLIST §loan-tape. The platform then stamps `measured`.
+## 0b. ✅ CLOSED 2026-07-21 — the REAL loan tape landed
+Was "the highest-leverage data unlock for objective #1". It is done: **382,735 real accounts**
+ingested. Nothing here is synthetic any more.
+- `ingest_real_tape.py` streams the owner-side xlsx into no-PII aggregates
+  (`source-data/staging/real_tape_aggregates.json`); the raw file never enters the repo and every
+  published cell is suppressed below `MIN_CELL` accounts.
+- `build_tape_layers.py` (deterministic, `--check`-gated) projects staging into
+  `platform/data/tape_real.json` + `tape_geo_occ.json`, live on `#exposure`, `#trend`, `data.html`.
+- The synthetic-era bridge (`ingest_loan_tape.py` → `loan_tape_derived.json`) was **retired
+  2026-07-31** — superseded, zero consumers in the app.
+
+**The remaining owner-side unlock is now a refresh cadence, not an unlock:** the tape is a
+point-in-time export, so the question is how often a new one lands, not whether one exists.
+
+## 0c. Social listening — which channels we watch, and which we decided NOT to  (objective #2)
+
+The voice-of-customer corpus behind `#acq` (`social_themes.json`, `rival_pulse.json`). Settled
+2026-08-01 so the channel list stops being re-litigated.
+
+**Watched, working, and on the weekly job** (`.github/workflows/data-social-listening.yml`):
+- Google Play reviews (`pull_app_reviews.py`) — any IP, no key. 10 apps.
+- Apple App Store reviews (`pull_apple_reviews.py`) — any IP, no key. 10 apps.
+- YouTube comments (`pull_youtube_comments.py`) — any IP, **needs the `YOUTUBE_API_KEY` repo secret**;
+  the job warns loudly and skips without it. **← still unset; this is the one owner action left here.**
+- Pantip forum threads (`pull_pantip.py`) — proven from a Thai residential IP. Whether it works from a
+  GitHub runner is answered automatically by the first scheduled run (the job captures the exit code
+  into the PR body). Exits 3 and writes nothing when the response is not the Thai-IP response, so a
+  block can never be laundered into "the market went quiet".
+- The rivals' own promo pages (`pull_rival_promos.py`) — **THAI IP ONLY**, deliberately excluded from
+  CI; Cloudflare blocks datacenter IPs. Run from the laptop; the committed snapshot is reused meanwhile.
+
+**Decided AGAINST — do not build these:**
+- **TikTok — DROPPED (owner decision, 2026-08-01).** Not a gap to close later; a closed question. It
+  has no key-free public API, the scrapers that exist break constantly and read as bot traffic, and
+  the content is video whose text layer is captions and comments — the same material YouTube already
+  gives us through a supported, keyed API. The cost is recurring maintenance for a channel that
+  largely duplicates one we have.
+- **LINE — permanent blind spot.** Closed messaging; no public corpus exists at any price. Where a
+  rival's LINE OA promotion matters, it surfaces on their own promo page, which we already pull.
+- **Meta Ad Library — proven useless for this market.** No Thai commercial/credit ad coverage; tested
+  against a live token. See the `meta-ad-library-no-thailand` note. Google Ads Transparency is the
+  working paid-media channel instead (`pull_google_ads.py`).
+
+**Open item — Sabuy Cash.** Added to the Pantip watchlist 2026-08-01 with the LATIN string only
+(`pipeline/pull_pantip.py`, key `SABUY`). It is deliberately absent from the app-sentiment ladders and
+the ad-transparency pull, because each needs an id that cannot be looked up from this network and must
+not be guessed: **Play package name**, **Apple app id**, **Google ATC advertiser id** (`AR…`). Verify
+all three from the Thai IP, then extend `pull_app_reviews.py` `APPS`, `pull_apple_reviews.py` `APPS`,
+`pull_google_ads.py` `ADVERTISERS`, and the Thai search term in `pull_pantip.py` `BRANDS["SABUY"]`.
+
+## 0d. Macro-tab owner review follow-ups (2026-08-02) — six open items, ahead of the 2026-08-05 MCOM deck
+The 17-point markup + stale-data audit landed (see `docs/PROGRESS_LOG.md`, 2026-08-02) but is **not
+yet committed or merged** — working tree only, branch `feat/macro-review-17pt`. Six items came out of
+that review still open:
+1. Persist a trailing-12-month current-account aggregate in `build_macro_indicators.py` so the chip
+   can ship without reading as a crisis (April 2026 alone is -7,591 USD million; the trailing 12
+   months net to roughly +847M).
+2. Government debt has no Thai replacement pulled (PDMO not investigated) — the row still shows IMF.
+3. Unemployment's vintage was not re-verified this session (`labour_context.json` → `unemployment`,
+   still 2025).
+4. Co-pay ฿44bn: source and period unconfirmed. Candidate lead is "ไทยช่วยไทย พลัส" (cabinet-approved
+   2026-05-19, government portion ~ ฿49.6bn at its two-month mark) but it doesn't cleanly match
+   ฿44bn, so it was left rather than guessed.
+5. ~~`tests/visual_overflow.js` is not yet wired into `tests/run.sh` or CI — run by hand only.~~
+   **DONE 2026-08-03** — `tests/run.sh overflow` (also in `all`), and a line in qa.yml's
+   "Render + health + visual" step. Wired the day after PR #259 shipped a Risk-tab panel that pushed
+   a 390px phone to 494px of horizontal page scroll with every gate green. It sits in the
+   **non-blocking** step for now, so a finding is visible in the log but does not red-gate a merge;
+   promoting it to the blocking gate is a deliberate follow-up once it has a few clean runs behind it
+   (it also fails on any uncaught console error, which is a wider net than layout alone).
+6. The TH/EN language switch was deferred by the owner to Thursday 2026-08-06 (lower priority than
+   the 2026-08-05 deck).
+7. **OPEN — the three heavy 3D pages fail their headless render in CI.** `province-rayong`,
+   `province-chonburi` and `rayong-catchment` (all deck.gl/WebGL) each burn ~4 minutes on the runner
+   and then FAIL, on both master and PR runs — confirmed on the #262 master run (8 passed, 3 failed)
+   and the #266 branch run (9 passed, 2 failed). This is what exposed the qa.yml bug fixed alongside
+   it: the step's `bash -e` shell aborted at `render`, so `health` and `visual` had not been running
+   in CI at all, and the step still reported green because it is `continue-on-error`. Each phase now
+   runs independently, so the render failures are visible as warning annotations — **but they are not
+   fixed**. They render fine locally, so the suspect is the runner's software GL under the QA_BUDGET
+   timeout, not the pages. Diagnose from the uploaded `qa-renders` artifact before touching the pages.
+8. ~~**OPEN — the page-health manifest hooks are stale.**~~ **DONE 2026-08-03.** Re-derived the hook
+   column against the live settled DOM. Only two rows were actually wrong: `index` asserted `#region`
+   (the "Segment signals by region" table removed 2026-08-01) → repointed to `#macro` (the JS-populated
+   macro strip); `risk-trend` asserted `#trendbaseline` (the single-vintage placeholder, empty in the
+   shipped multi-vintage state) → repointed to `#trendregions` (the region-mover list). The other 8 rows
+   (national/`map`, acquisition/`amptbl,amprtbl`, branch-explorer/`map`, both data-book/`db-root`, the
+   three 3D pages) were verified already-correct against rendered output and left unchanged. `health`
+   now passes on all 7 non-3D pages (was 0/10, all false `missing #<hook>`). Test-config only — no app
+   change. NOTE the earlier list here (`#map` national/branch-explorer, `#amprtbl` acquisition) was from
+   an older render-failing state; those hooks were confirmed fine this pass.
+9. **OPEN — the visual-regression baselines are stale to the point of being noise.** Now that
+   `visual` runs it reports 0/10: five pages at `mean_diff` 175-212 against a tolerance of 12 (the
+   app has been rebuilt several times over since the PNGs were taken) and three with no baseline at
+   all (`acquisition`, `data-book`, `data-book-province`). Either refresh with
+   `tests/run.sh baseline` after a deliberate review of each PNG, or retire the phase — as written it
+   cannot tell a regression from the accumulated intended change.
 
 ## 1. Deploy to Vercel and verify production  ⟶ do first
 - `cd platform && npx vercel --prod` (link to team "Kaustav Bagchi's projects"
@@ -86,6 +217,33 @@ export lands. Until then the four portfolio-risk outputs are stamped SYNTHETIC.
 ## 2. Unblock the gov data from the Thai IP  ⟶ biggest data win, only possible locally
 The whole reason to be in Claude Code on Kaustav's laptop. **Exact copy-pasteable commands live in
 `docs/TONIGHT_CHECKLIST.md`** — this is the summary of what and why.
+
+> **SETTLED 2026-08-04 — two CI "openings" verified as dead ends (stop re-flagging them; this is what
+> was re-checked so the autonomous loop doesn't re-probe every run).** A negative-space sweep kept
+> surfacing (a) refreshing the DLT vehicle/collateral layers and (b) probing a BAAC department CKAN as
+> live openings. Both were probed from CI this date and are **not actionable from a cloud IP** — not
+> because of a geoblock we can route around, but because the upstream data itself is frozen / absent:
+> - **DLT collateral layers are already at DLT's newest genuinely-complete vintage — NOT stale by
+>   neglect.** `gdcatalog.dlt.go.th` IS reachable from CI (HTTP 200), but: `dataset_1_1_04` (cumulative
+>   stock → `ev_penetration.json`, `vehicle_collateral.json`, `vehicle_mix.json` stock) serves a single
+>   resource `stt_car_fuel_at_25690228.csv` = **28 Feb 2026**, exactly the committed `vintage`;
+>   `stat_1_1_01_first_regis_vehicles_car`'s `sttt_car_new_reg_mm_2569_02.csv` (Feb-2026) is a **permanent
+>   ~6-row stub** (1KB vs Jan's 151KB/~1,421 rows) — re-verified still-a-stub 4 months after its
+>   2026-03-17 last-modified — so `vehicle_models.json`'s `latest_month: 2026-01` is CORRECT, not a
+>   laggard; the monthly-action datasets `dataset_stat_1_008/009` top out at Feb-2569. A DLT refresh is
+>   worthwhile ONLY once newer files land. **Precise recheck trigger:** a `stt_car_fuel_at_2569MMDD.csv`
+>   dated after 2569-02-28 on `dataset_1_1_04`, OR a `sttt_car_new_reg_mm_2569_03.csv` (or later) that is
+>   **>20 rows** (not a stub) on `stat_1_1_01_first_regis_vehicles_car`. Until then, re-pulling produces
+>   byte-identical output — do not "refresh" it.
+> - **BAAC personal-credit (`build_baac_credit.py`) has NO CI-reachable source.** Its only source is the
+>   data.go.th aggregator (`package_show?id=baac02_2567`, HTTP **403** from CI), and BAAC has **no own
+>   department CKAN** — `catalog/data/opendata/…baac.or.th` all resolve **HTTP 000** (unlike the DIW/DLT
+>   dept-CKAN breakthrough, there is no BAAC equivalent to bypass to). The builder stays correctly
+>   SKIP-gated; the xlsx is **Thai-IP / owner-side only**. Do not re-probe a BAAC CKAN from CI.
+>
+> Net: the CI-doable, offline-deterministic data backlog is genuinely **exhausted** as of this date —
+> the remaining unlocks are all Thai-IP/owner-side (below) or wait on the upstream publishing newer data.
+
 - ✅ **Partly done (prior session):** DIW factories (66,100, all 77 prov) + a first DLT vehicle / NSO
   employment fold-in landed via `autox_dgt_ingest.py` → `ingest_gov.py`. Vehicles/crops are still only
   partial-province; widen them.

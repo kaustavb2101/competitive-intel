@@ -51,9 +51,12 @@ def _pct(n, tot):
 def _region_actions(t, tot):
     """Ranked regional actions from the per-branch rec tallies t (kind→count)."""
     cand = []
+    # NOT rendered today (the per-region cards came out 2026-07-25) but kept in the layer, so the
+    # wording has to survive a re-enable: every sentence here is a risk read on the network we already
+    # run — no expand, no grow, no product lead (CLAUDE.md). Corrected 2026-08-02 with the headline.
     if t.get("acquire"):
-        cand.append((t["acquire"], {"i": "📈", "tone": "good", "k": "acquire",
-            "t": "Expand — %d branches (%d%%) sit on prime white-space with thin competition; lead the region's acquisition here." % (t["acquire"], _pct(t["acquire"], tot))}))
+        cand.append((t["acquire"], {"i": "🟢", "tone": "good", "k": "acquire",
+            "t": "Low competitive pressure — %d branches (%d%%) face thin rival presence; least margin pressure in the region." % (t["acquire"], _pct(t["acquire"], tot))}))
     if t.get("defend"):
         cand.append((t["defend"], {"i": "⚔️", "tone": "warn", "k": "defend",
             "t": "Defend the book — %d branches (%d%%) face 3+ rival branches within 2 km; hold share on service and turnaround." % (t["defend"], _pct(t["defend"], tot))}))
@@ -62,10 +65,10 @@ def _region_actions(t, tot):
             "t": "De-risk agri — %d branches (%d%%) sit in stressed crop catchments; tighten agri exposure and watch collections." % (t["agri_stress"], _pct(t["agri_stress"], tot))}))
     if t.get("agri_tail"):
         cand.append((t["agri_tail"], {"i": "🌿", "tone": "good", "k": "agri_tail",
-            "t": "Grow farm lending — %d branches (%d%%) enjoy a crop-price tailwind; collections favourable, room to lend." % (t["agri_tail"], _pct(t["agri_tail"], tot))}))
+            "t": "Farm cash improving — %d branches (%d%%) sit under a crop-price tailwind; expect agri arrears here to hold." % (t["agri_tail"], _pct(t["agri_tail"], tot))}))
     if t.get("collateral"):
         cand.append((t["collateral"], {"i": "🚙", "tone": "good", "k": "collateral",
-            "t": "Push vehicle-title — %d branches (%d%%) have prime collateral density; lead with vehicle-title products." % (t["collateral"], _pct(t["collateral"], tot))}))
+            "t": "Strong recovery values — %d branches (%d%%) sit in a prime-density vehicle market; enforced titles resell locally." % (t["collateral"], _pct(t["collateral"], tot))}))
     cand.sort(key=lambda x: -x[0])
     return [c[1] for c in cand]
 
@@ -76,8 +79,8 @@ def _top_action(t, tot):
     if not acts:
         return None
     a = acts[0]
-    short = {"acquire": "Expand", "defend": "Defend", "agri_stress": "De-risk agri",
-             "agri_tail": "Grow farm lending", "collateral": "Push vehicle-title"}
+    short = {"acquire": "Low rival pressure", "defend": "Defend", "agri_stress": "De-risk agri",
+             "agri_tail": "Farm cash improving", "collateral": "Strong recovery values"}
     return {"i": a["i"], "k": a["k"], "tone": a["tone"], "label": short.get(a["k"], a["k"])}
 
 
@@ -300,12 +303,33 @@ def build():
         backdrop = ("Deleveraging backdrop (household debt %s%% and falling) eases borrower risk across the existing book. "
                     % hh.get("value")) if hh["yoy_change"] < 0 else \
                    ("Rising household leverage (%s%% of GDP) argues for caution on new exposure. " % hh.get("value"))
-    top_reg = lambda kind: max(regions, key=lambda x: x["tallies"].get(kind, 0))["name"] if regions else "—"
-    # Risk lens on the network we already run — NO branch open/expand recommendations (see CLAUDE.md).
-    # Priority triad: competitive risk (defend the most rival-pressed branches) + portfolio (product
-    # lead where collateral is deepest, de-risk the agri-stressed tail).
-    headline = backdrop + "Priority: defend the branches under heaviest rival pressure (most in %s), lead with vehicle-title products where collateral density is high (most in %s), and de-risk agri-stressed branches (most in %s)." % (
-        top_reg("defend"), top_reg("collateral"), top_reg("agri_stress"))
+    # RATE, not raw count (fixed 2026-08-02 during the Macro audit). This used to be
+    # `max(regions, key=count)`, which the largest region wins by construction — so the single most
+    # prominent sentence on the Macro tab named "Central & Bangkok" for all three priorities and read
+    # as a broken template rather than a finding. Share of a region's OWN branches is the comparable
+    # quantity, and it separates the three: rival pressure and crop stress do concentrate in Central,
+    # but collateral depth is a different map entirely.
+    def _rate_reg(kind, thinnest=False):
+        if not regions:
+            return ("—", 0)
+        share = lambda x: (x["tallies"].get(kind, 0) / x["n"]) if x.get("n") else 0.0
+        r = min(regions, key=share) if thinnest else max(regions, key=share)
+        return (r["name"], _pct(r["tallies"].get(kind, 0), r["n"]))
+
+    d_reg, d_pct = _rate_reg("defend")
+    a_reg, a_pct = _rate_reg("agri_stress")
+    c_reg, c_pct = _rate_reg("collateral", thinnest=True)
+    # Risk lens on the network we already run — NO branch open/expand and NO product-lead calls
+    # (see CLAUDE.md). The old third clause ("lead with vehicle-title products where collateral
+    # density is high") was a product push; the same phrasing had already been deleted from the
+    # per-region cards in 2026-07-25 and was left behind here. Inverted to the risk it actually
+    # describes: where the resale market is THIN, recovery on an enforced title is weakest.
+    headline = backdrop + (
+        "Priority: rival pressure is heaviest in %s (%d%% of its branches face 3+ rival branches within "
+        "2 km); crop-catchment stress concentrates in %s (%d%% of its branches); and the resale market "
+        "behind the collateral is thinnest in %s (only %d%% of its branches sit in a prime-density "
+        "vehicle market), where recovery on an enforced title is weakest." % (
+            d_reg, d_pct, a_reg, a_pct, c_reg, c_pct))
 
     return {
         "meta": {

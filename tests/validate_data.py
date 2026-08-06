@@ -1835,6 +1835,57 @@ def check_branch_density(n_branches):
         ok("branch_density records sane (buildings_10km>=0 int, bucket known)")
 
 
+def check_flood_hazard(n_branches):
+    # PER-BRANCH & PER-DISTRICT REPEATED-FLOOD HAZARD (MEASURED, GISTDA 2005-2016), projected by
+    # build_flood_hazard.py from source-data/gistda_flood_hazard.json. branches[] is a bare int
+    # array (flood_freq 0-12) index-aligned to branches.json. Optional file: SKIP-PASS when absent.
+    hdr("flood_hazard.json (optional)")
+    if not exists("flood_hazard.json"):
+        ok("flood_hazard.json absent — skipped (optional; run build_flood_hazard.py to populate)")
+        return
+    try:
+        d = load("flood_hazard.json")
+    except Exception as e:
+        fail("flood_hazard.json loads", repr(e))
+        return
+    ok("flood_hazard.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label"):
+        fail("flood_hazard meta/provenance present (generated_by + label)",
+             "meta missing generated_by/label")
+    else:
+        ok("flood_hazard meta/provenance present (generated_by + MEASURED label)")
+
+    recs = d.get("branches")
+    if not isinstance(recs, list):
+        fail("flood_hazard has a 'branches' list", "got %s" % type(recs).__name__)
+        return
+    if n_branches is not None and len(recs) != n_branches:
+        fail("flood_hazard length == branches.json length",
+             "flood_hazard=%d branches=%d" % (len(recs), n_branches))
+    else:
+        ok("flood_hazard length == branches.json length (%d)" % len(recs))
+
+    bad = [("#%d flood_freq=%r not an int in 0..12" % (i, f))
+           for i, f in enumerate(recs) if not isinstance(f, int) or f < 0 or f > 12]
+    if bad:
+        fail("flood_hazard records sane (flood_freq int 0..12)", first_n(bad))
+    else:
+        ok("flood_hazard records sane (flood_freq int 0..12)")
+
+    # by_district freq values must also stay within the 0..12 census range
+    bd = d.get("by_district")
+    if not isinstance(bd, dict):
+        fail("flood_hazard has a 'by_district' map", "got %s" % type(bd).__name__)
+    else:
+        offd = [("%s=%r" % (k, v)) for k, v in bd.items() if not isinstance(v, int) or v < 1 or v > 12]
+        if offd:
+            fail("flood_hazard by_district freq in 1..12", first_n(offd))
+        else:
+            ok("flood_hazard by_district freq in 1..12 (%d districts)" % len(bd))
+
+
 def check_fuel_prices():
     # LIVE Thai retail fuel prices (Bangchak, MEASURED daily pull), projected by
     # build_fuel_prices.py from source-data/fuel_prices.json. National-scope (not per-branch).
@@ -4152,6 +4203,8 @@ _INDEX_ALIGNED_LAYERS = (
     ("occupation_risk.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("poi_relevance.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("branch_density.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
+    ("flood_hazard.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
+    ("branch_pico.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("branch_labor.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("branch_occupations.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("macro_exposure.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
@@ -4223,6 +4276,8 @@ _FINGERPRINTED_LAYERS = (
     "occupation_risk.json",      # build_occupation_risk.py
     "poi_relevance.json",        # build_poi_relevance.py
     "branch_density.json",       # build_branch_density.py
+    "flood_hazard.json",         # build_flood_hazard.py
+    "branch_pico.json",          # build_branch_pico.py
     "branch_peers.json",         # build_branch_peers.py
     "branch_leads.json",         # build_branch_leads.py
     "rival_pressure.json",       # build_rival_pressure.py
@@ -4412,6 +4467,7 @@ def main():
     check_occupation_risk(n)
     check_poi_relevance(n)
     check_branch_density(n)
+    check_flood_hazard(n)
     check_fuel_prices()
     check_branch_labor(n)
     check_branch_risk(n)

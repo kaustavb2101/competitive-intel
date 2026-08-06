@@ -19,8 +19,12 @@
 <meta name="twitter:title" content="AutoX · เงินไชโย — Credit Intelligence">
 <meta name="twitter:description" content="Competitive-risk and portfolio-risk readouts across all 2,015 AutoX title-loan branches. Numbers tagged measured or estimated.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><!-- font files load from gstatic; preconnect avoids a DNS+TLS handshake waterfall before text paints -->
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<!-- Leaflet is VENDORED (platform/vendor/leaflet/), not loaded from unpkg. The national map is the
+     product's most-used view and it must not depend on a third-party CDN being reachable from a Thai
+     network. leaflet.css resolves its sprites RELATIVE to itself, so images/ must stay beside it. -->
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -37,7 +41,16 @@
        demoted to an optional "Map view" under More) → ③ Assistance (who needs help now) → ④ Risk
        (portfolio stress, live book vs 180+ legacy) → ⑤ Competitor (rival pressure). Routing is by
        data-v (order-independent); the sequence is the narrative. Data-book-first (owner 2026-07-25):
-       the branch/network surface is the data book, not the 2,015-dot Leaflet map. -->
+       the branch/network surface is the data book, not the 2,015-dot Leaflet map.
+
+       ONE JOURNEY (2026-07-31): the nav order and the in-page "Next in the story" chain used to
+       disagree — nav ran Home→Macro→Acquisition→Assistance→Risk→Competition while the story chain
+       ran Home→Macro→Risk→Trend→Competition, skipping Acquisition entirely and leaving Assistance
+       with no inbound link at all. Two orders meant neither could be learned. They are now the same
+       order, and every pillar has exactly one inbound and one outbound step:
+         Home → ① Macro → ② Acquisition (data.html) → ③ Assistance → ④ Risk → (Risk trend) → ⑤ Competition → Explore.
+       If you add or reorder a pillar, move its story-next link with it or the two drift apart again;
+       tests/nav_consistency.py fails the gate if any page's nav stops matching this one. -->
   <a data-v="home" class="on" href="#home" aria-current="page">Home</a>
   <span class="nav-sep" aria-hidden="true"></span>
   <a data-v="overview" href="#overview" title="① Macro — the backdrop moving the book (rates, commodities, fuel, collateral outlook)">Macro</a>
@@ -47,18 +60,31 @@
   <a data-v="acq" href="#acq" title="⑤ Competitor — rival pressure on the network we already run">Competition</a>
   <span class="nav-sep" aria-hidden="true"></span>
   <div class="nav-more" id="navMore">
-    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
-    <!-- More = 2 items (owner sign-off 2026-07-25). Retired from the menu, routes kept alive for
-         old links: Data book ↗ (duplicate of Acquisition), Risk trend (embedded in the impact
-         cards' trend chips/columns), Provinces·Market·Branches (inside the data-book drill),
-         Status (footer, "Build status (internal)"). -->
-    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">Explore ▾</button>
+    <!-- EXPLORE (was "More", 2 items) = the TOOLS tier: everything that is not a step in the
+         five-pillar journey above. Renamed + refilled 2026-07-31 because the 2026-07-25 cleanup
+         dropped Provinces / Market / Branches / Risk trend from the menu without giving them a
+         replacement link — they kept rendering but became reachable only by typed URL. Every
+         route the app builds is now reachable from the nav; nothing is half-retired.
+         Branches points at the DATA BOOK's browse-all, not the #branches route: data.html?branches
+         does strictly more (sort/filter/search every feature, drill into any branch) and is the
+         canonical branch list, so the menu has ONE branch door, not two. #branches stays alive
+         for old bookmarks. -->
+    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="Explore views">
+      <a data-v="trend" href="#trend" role="menuitem" title="The time dimension of Risk — which segments and branches are getting riskier between vintages">Risk trend</a>
       <a data-v="map" href="#map" role="menuitem" title="Optional spatial view — 2,015 branch dots on a map">Map view</a>
-      <a data-v="sim" href="#sim" role="menuitem">Simulator</a>
+      <a data-v="provinces" href="#provinces" role="menuitem" title="One click into any province's 3D building scene">Provinces 3D</a>
+      <a href="data.html?branches" role="menuitem" title="All 2,015 branches in the data book — sort, filter and search every measured feature">Branches ↗</a>
+      <a data-v="market" href="#market" role="menuitem" title="Per-province measured market numbers (factories, informal workforce, pickup stock, weakest crop price) + CSV">Market assessment</a>
+      <a data-v="sim" href="#sim" role="menuitem" title="Client-side portfolio what-if — rate, price and drought levers">Simulator</a>
+      <a href="live.html" role="menuitem" title="Every live feed — freshness against each source's own cadence, plus the four with real stored history">Live board</a>
     </div>
   </div>
+  <button id="printTab" class="no-print" title="Print or save this tab as PDF — summary + every supporting table, nothing collapsed"
+    aria-label="Print this tab with its full supporting data"
+    style="margin-left:auto;flex:none;background:none;border:1px solid var(--line);color:var(--mid);border-radius:8px;height:30px;padding:0 10px;cursor:pointer;font-size:11.5px;white-space:nowrap">⎙ Print tab</button>
   <button id="themeToggle" title="Toggle light / dark" aria-label="Toggle light or dark theme" aria-pressed="false"
-    style="margin-left:auto;flex:none;background:none;border:1px solid var(--line);color:var(--mid);border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px">☾</button>
+    style="flex:none;margin-left:8px;background:none;border:1px solid var(--line);color:var(--mid);border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px">☾</button>
 </nav>
 <script>
 (function(){var b=document.getElementById('themeToggle');if(!b)return;
@@ -105,12 +131,13 @@
 <div id="updated" style="display:none"></div>
 
 <main id="main-content" tabindex="-1">
-  <!-- Fail honestly when JS is off / a CDN script is fully blocked: this is a Leaflet+deck.gl SPA,
-       so <main> would otherwise render blank with no explanation. Themed to the default console. -->
+  <!-- Fail honestly when JS is off: this is a Leaflet+deck.gl SPA, so <main> would otherwise render
+       blank with no explanation. Themed to the default console. (The map libraries themselves are
+       vendored now — only the webfont and the basemap tiles are still third-party.) -->
   <noscript>
     <div style="max-width:640px;margin:48px auto;padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55">
       <strong style="color:var(--hi);display:block;margin-bottom:6px">This dashboard needs JavaScript enabled.</strong>
-      AutoX · เงินไชโย Credit Intelligence is an interactive map &amp; charting app that builds entirely in the browser. Enable JavaScript (and allow the map/font CDNs) to load it.
+      AutoX · เงินไชโย Credit Intelligence is an interactive map &amp; charting app that builds entirely in the browser. Enable JavaScript to load it.
     </div>
   </noscript>
   <!-- COMMAND CENTER (daily-use front door) -->
@@ -204,14 +231,13 @@
         <div class="cc-card-b" id="cc-defend-body"></div>
       </div>
 
-      <!-- RECOMMENDATION BY REGION (data/regional_outlook.json) — the per-branch recs rolled up to
-           the 5 regions: each region's #1 action + branch count. Leads the front door with the
-           regional answer; full detail on the Overview. Null-safe: absent file → card hidden. -->
-      <div class="cc-card cc-card-wide" id="cc-regions" style="display:none">
-        <div class="cc-card-h"><span class="cc-dot" style="background:var(--accent)"></span>Recommendation by region
-          <a class="cc-link no-print" data-v="overview" href="#overview">Macro →</a></div>
-        <div class="cc-card-b" id="cc-regions-body"></div>
-      </div>
+      <!-- DELETED 2026-07-31: the "Recommendation by region" card. It was RETIRED on 2026-07-25 for
+           consolidation-pivot compliance — its per-region actions were grow / product-push ("Grow farm
+           lending", "Push vehicle-title") which the product does not make — but the retirement left the
+           markup, a render stub that only hid it, and two call sites behind. Dead weight that read as a
+           live card in every inventory of this page. Do NOT re-add per-region recommendations from
+           regional_outlook.json to the front door; that file stays on disk only for its .national
+           headline, which renderNationalOutlook() still uses. -->
 
       <!-- WATCHLIST -->
       <div class="cc-card cc-card-wide" id="cc-watch">
@@ -232,8 +258,8 @@
     </div>
     <p class="lead cc-provenance"><b>Provenance:</b> coverage-gap &amp; risk scores are estimated screens (0–100, OSM/price/DLT-based) — not site surveys or measured default rates. Branch &amp; POI counts and the DLT vehicle mix are measured; the commodity board is World Bank GLOBAL price direction (proxy, not Thai farm-gate); the diesel-pickup outlook is an editorial watch. Confirm any competitive read against a local check.</p>
     <div class="story-next no-print">
-      <span class="story-next-lab">Next in the story</span>
-      <a data-v="overview" href="#overview">The backdrop — the macro &amp; collateral forces moving the book →</a>
+      <span class="story-next-lab">Next in the story · ① of ⑤</span>
+      <a data-v="overview" href="#overview">Macro — the backdrop moving the book →</a>
     </div>
   </section>
 
@@ -277,13 +303,21 @@
     <p class="lead">Accounts late but under 30dpd — the last cheap place to intervene before roll. The drought-triggered assistance radar names the provinces where farm households are slipping under measured OAE SPEI stress.</p>
     <div class="tbl-wrap"><div id="assist-radar"></div></div>
 
+    <h2>What a farm household actually earns — the ground under every price number</h2>
+    <p class="lead">Before reading any crop-price move: OAE surveys farm households directly, and the survey says <b>roughly half</b> a farm household's cash income is <b>non-farm</b> — wages, remittances, off-season work that no crop price touches. A price shock reaches the farm half. <b>MEASURED</b> national survey means, 5 crop years. <span class="sub">National, not per-province — a backdrop and a sanity check on the modelled per-province income, never a per-province input.</span></p>
+    <div class="tbl-wrap"><div id="assist-household"></div></div>
+
+    <h2>Proactive assistance — the healthy farm book, by the crop price it rides on</h2>
+    <p class="lead">The radar above is <b>drought</b> — who is already slipping. This is the <b>price</b> side, and it looks forward: farm accounts that are <b>Current or only in the X bucket</b>, grouped by the crop their province depends on. Until 1 Aug 2026 this said "nothing has tripped", because it mapped five crops and all five were rising — an artefact of what was wired, not a reading of the market. It now maps <b>eight</b>: coconut and pineapple came from the DOAE registry columns we were not reading, and sugarcane from OCSB, the register of record for cane. All three are <b>falling</b>, and the list is no longer empty. <b>MEASURED</b> tape counts × MEASURED planted-area shares × MEASURED Thai farm-gate prices. <span class="sub">Not a forecast — livestock and fisheries are still unmapped, having no planted area to join on.</span></p>
+    <div class="tbl-wrap"><div id="assist-price"></div></div>
+
     <h2>Restructuring — did it hold?</h2>
     <p class="lead">Against the <b>Normal</b> baseline, are the restructured books curing or re-defaulting? <b>TDR</b> and <b>Pre-emptive</b> accounts carry far higher 90+/180+ — the signal to change the cure test, not roll again. <span class="sub">Skip = payment holiday.</span></p>
     <div class="tbl-wrap"><div id="assist-restr"></div></div>
 
     <p class="lead cc-provenance"><b>Provenance:</b> MEASURED real loan tape aggregates (no-PII, cells ≥30; raw stays on the owner's disk). Delinquency and OS shares are measured; the hit-list score and the radar priority order are estimated orderings over those measured inputs. Point-in-time tape — true roll/cure rates need month-over-month drops.</p>
     <div class="story-next no-print">
-      <span class="story-next-lab">Next in the story</span>
+      <span class="story-next-lab">Next in the story · ④ of ⑤</span>
       <a data-v="exposure" href="#exposure">Risk — where the book sits in stress, live book vs the 180+ legacy →</a>
     </div>
   </section>
@@ -293,103 +327,248 @@
     <!-- National outlook narrative (data/regional_outlook.json) — situation → factors → regional
          impact → recommendation by region → nationwide. Rendered by renderNationalOutlook();
          null-safe: absent file → the block stays empty and the rest of the Overview reads as before. -->
+    <!-- Pillar heading (2026-07-31): the nav says "Macro" but this tab used to open straight into
+         content, so you landed with no confirmation you were where you clicked. Every pillar now
+         announces itself with the same ①–⑤ marker the nav tooltips use. -->
+    <h2 class="opp" style="margin-bottom:4px">① Macro — the backdrop moving the book</h2>
+    <p class="lead">Rates, commodities, fuel, collateral values, drought and labour — the forces that move
+      the book before any of it shows up in delinquency. Every number is tagged <b>measured</b> or
+      <b>estimated/proxy</b>.</p>
+
+    <!-- DECISION BAND (2026-08-02). The band below is six MEASURED numbers; a number is not an answer.
+         This is the sentence version — each row states a finding AND its consequence, and jumps to the
+         topic that proves it. It is the MCOM slide: read six lines, then follow the arrow into the
+         evidence. Rendered by renderMacroSoWhat(); every row is computed from a committed layer and a
+         row whose layer is absent is simply not emitted, so it can never invent a headline. -->
+    <div class="sowhat" id="ov-sowhat" aria-label="What this tab says today"></div>
+
+    <!-- ANSWER BAND (2026-08-01). The tab used to open into prose and then 13 screens of tables with
+         nothing ranked. This is the answer first: six MEASURED numbers, each with its move, its
+         cadence, and its trend where a trend actually exists on disk. Everything below is the
+         evidence for it. Deliberately NO composite/derived figures here — rendered by
+         renderAnswerBand(); null-safe, a tile whose source is absent is simply not emitted. -->
+    <div class="answerband" id="ov-answer" aria-label="Macro headline numbers"></div>
+    <p class="lead sub" id="ov-answer-note" style="margin:2px 0 10px"></p>
+
     <div id="outlook"></div>
 
-    <!-- 2-col dashboard: macro KPI cards + regulatory card BESIDE the commodity board (fills widescreen). -->
-    <div class="dash2">
-      <div class="dash2-side">
-        <h2>Macro overlay — current conditions</h2>
-        <div class="grid macro" id="macro"></div>
+    <!-- TOPIC SWITCHER (2026-08-01). data-exclusive turns this jump-nav into a segmented control:
+         exactly ONE panel below is open at a time, so the six topics stop stacking vertically.
+         That stacking — not the length of any single topic — was what made this tab a 17-screen
+         scroll: you passed five subjects you did not ask for to reach the sixth. Folding helped
+         and was not enough, because the tab still rendered every topic in sequence.
+         The nav markup stays <a data-jump> so the ONE delegated .jumpnav handler keeps serving
+         this and Competition's #compjump alike; data-exclusive is the only opt-in. -->
+    <nav class="jumpnav ovswitch-nav no-print" id="ovjump" data-exclusive="1"
+         aria-label="Choose a Macro topic — one shows at a time">
+      <a class="chip" href="#overview" data-jump="sec-ov-macro">Conditions &amp; commodities</a>
+      <a class="chip" href="#overview" data-jump="sec-ov-agri">Farm households</a>
+      <a class="chip" href="#overview" data-jump="sec-ov-collateral">Collateral value</a>
+      <a class="chip" href="#overview" data-jump="sec-ov-conditions">Conditions at our grain</a>
+    </nav>
 
-        <!-- IMF WEO macro backdrop (data/imf_weo.json, pull_imf_weo.py) — Thailand growth/inflation/
-             unemployment/debt with ASEAN peer benchmark. Null-safe: absent file → nothing renders. -->
-        <div id="ov-imfweo"></div>
-      </div>
-      <div class="dash2-main">
-        <h2>Commodity board — the segments diverge</h2>
+    <div class="ovswitch" id="ovswitch">
+    <details class="ovsec" id="sec-ov-macro" open>
+    <summary><h2 class="opp">Conditions, commodities &amp; what moves each province</h2><span class="ovsec-what">Answer band, commodity board with 5-year price trends, IMF backdrop</span></summary>
+
+    <!-- SINGLE COLUMN since 2026-08-01. This was a .dash2 two-column grid (360px side rail +
+         wide main). Once the duplicate legacy commodity tables came out of the main column it held
+         only the "Key read" callout (169px) beside a 2,340px side rail — 2,171px of dead
+         whitespace — and the narrow rail was forcing the ten macro KPI cards to ~2 per row
+         (1,590px of stacked tiles). Full width they auto-fit ~9 per row (~340px). Reading order is
+         now headline KPIs → commodity board → IMF backdrop (context last). -->
+        <!-- COMPACT SINCE 2026-08-02 (owner review, point 7): "this will be seen once and never
+             looked at again as it's the least dynamic. I think it can take up less space somewhere."
+             The ten-to-thirteen KPI tiles were ~340px wide x ~110px tall each — two full rows of
+             screen before the reader reached anything that changes. They are now a single-line
+             strip (label / value / signed delta, with a sparkline where we hold a series), and the
+             full cards with their sources sit one click away in the <details> below. Nothing is
+             dropped: compactMacro() reads the SAME .mcard nodes the three producers already write,
+             so the strip cannot drift from the cards. -->
+        <h3 class="ovsub">Macro overlay — current conditions</h3>
+        <div class="mstrip" id="macrostrip" aria-label="Macro indicators, compact"></div>
+        <!-- #macro STAYS IN THE DOM BUT IS NO LONGER SHOWN (owner review 2026-08-02, point 3):
+             "the big cards take up space and don't have much to offer". Two full rows of ~340x110px
+             tiles restating what the strip above already says in one line.
+             It is NOT deleted, because it is not a display — it is the DATA SOURCE. compactMacro()
+             reads these .mcard nodes to build the strip, so removing the container would empty the
+             strip too. Three separate producers (META editorial, renderMacroIndicators,
+             renderLabourContext) write into it and none of them need to change.
+             What the cards carried and the strip did not — the period and the source — now rides on
+             the chips themselves, so nothing is lost by hiding this. -->
+        <div class="grid macro" id="macro" hidden></div>
+
+        <h3 class="ovsub">Commodity board — the segments diverge</h3>
         <div class="insight" id="ov-keyread">
           <b>Key read:</b> "farmers" are not one segment. Crop households (rice, rubber, sugar, palm) and
           livestock/forestry households move on different price cycles — see the board for current directions.
         </div>
-        <div class="cols2">
-          <div><h2>Crops · under pressure</h2><table class="tbl" id="board-crops"></table></div>
-          <div><h2>Protein · forestry · firming</h2><table class="tbl" id="board-other"></table></div>
-        </div>
-
-        <!-- Province macro watchlist (data/macro_sensitivity.json) — hidden until the layer loads;
-             omitted gracefully when the file is absent. Cards reuse the .mcard commodity styling. -->
-        <div id="mwatch-wrap" style="display:none">
-          <h2>Macro watchlist · what moves each province's book <span class="sub" style="text-transform:none;letter-spacing:0">— estimated proxy</span></h2>
-          <p class="lead">The macro driver moving the most branches per province — real global price moves (World Bank, proxy for Thai farm-gate) × measured crop shares / rain, scaled by <b>estimated</b> segment scores. Headwind provinces listed first. <b>Press a card to list the affected branches.</b></p>
-          <div class="grid macro" id="mwatch"></div>
-          <div id="mwatch-drill"></div>
-        </div>
-      </div>
-    </div>
+        <!-- REMOVED 2026-08-01 (owner: "the macro page is still very long") — the legacy
+             "Crops · under pressure" / "Protein · forestry · firming" split tables (#board-crops,
+             #board-other). They listed the SAME ten commodities as the commodities board below
+             (Rice, Rubber, Sugar, Palm oil, Maize, Chicken, Beef, Fishmeal, Logs, Sawnwood) off the
+             same Pink Sheet vintage — the tab was rendering its commodity data twice. The board
+             below strictly supersedes them: it adds Gold, the 5-year price trend, the Thai
+             farm-gate move, the divergence between world and local, the book accounts exposed in
+             each crop's belt, and a per-crop drill. 418px of duplicate tables plus two headings.
+             The "Key read" callout above is NOT duplicated and stays. -->
+        <!-- REMOVED 2026-08-01 (owner directive: no derived/composite metrics on Macro) — the province
+             "macro watchlist" card grid (macro_sensitivity.json). It ranked headwind-first then by
+             branches-hit, but with every mapped commodity currently UP there were ZERO headwind
+             provinces, so the primary sort key was constant and the order degenerated into the
+             branch-count leaderboard (BKK 170 · ชลบุรี 103 · นครราชสีมา 81 …) presented as macro
+             exposure. It also claimed rice was Bangkok's #1 driver at 164/170 branches, and covered
+             only 59 of 77 provinces. The LAYER stays — loadMacroSens() still feeds the branch drill
+             and the cluster brief with real per-branch numbers; it is only this Overview card grid,
+             and the estimated composite behind its ranking, that is gone. -->
 
     <!-- Commodities board upgrade (data/commodities.json) — global Pink Sheet YoY × Thai farm-gate
          YoY × book exposure (who's-exposed drill). Null-safe: absent file → nothing renders. -->
     <div id="ov-commodities"></div>
 
-    <h2 class="collat">Collateral outlook · vehicle-title value watch</h2>
+    <!-- IMF WEO macro backdrop (data/imf_weo.json, pull_imf_weo.py) — Thailand growth/inflation/
+         unemployment/debt with ASEAN peer benchmark. Null-safe: absent file → nothing renders.
+         Moved below the board 2026-08-01: it is context for the numbers above, not a headline. -->
+    <div id="ov-imfweo"></div>
+    </details>
+
+    <details class="ovsec" id="sec-ov-agri">
+    <summary><h2 class="opp">Farm households — segments, crops, margin &amp; drought</h2><span class="ovsec-what">Crop stress, farm-gate vs OAE cost margin, district drought, planted-area exposure</span></summary>
+
+    <!-- REMOVED 2026-08-01 (owner directive: real numbers, not derived scores) — the "Segment signals
+         by region" table. Its Agri-PD / Elevated / Merchant / Collateral columns were counts of
+         branches above a threshold on an ESTIMATED composite (crop price stress × drought net of a
+         livestock buffer; vendor ecosystem + footfall; vehicle density) — a score of a score. The
+         MEASURED primitives underneath it are all still on this tab and are what the reader wants
+         anyway: OAE planted area by province, OAE farm-gate price vs OAE production cost, OAE SPEI
+         drought by district, and DLT vehicle density. META.region is untouched and still feeds the
+         Command-center risk readout. -->
+
+    <!-- THE FARM BLOCK (data/farm_book.json, build_farm_book.py) — one block where this section used
+         to carry four separate farm tables. Rendered by renderFarmBook() + renderFarmCrops():
+           · the 4-level geo drill (national → region → all 75 provinces → our branches), ranked by
+             OUTSTANDING BAHT rather than by the retired `agri_stress` composite;
+           · the by-crop lens underneath it — the old farmer-margin table, widened from the 5 crops
+             with an OAE cost row to all 8 the mix prices, and joined to the loan book.
+         ABSORBED AND REMOVED 2026-08-02 (owner review): the crop-mix panel + its 77-bar rank strip
+         ("doesn't give much utility apart from looking cool"), the crop-household stress table and
+         its agri_stress index ("an estimated measure that has been made up"), and the standalone
+         farmer-margin table ("expand to cover what we have on data AND consolidate with above
+         tables"). Their MEASURED content survives as columns; only the composite was dropped.
+         Null-safe: absent file → the whole block hides itself, nothing else on the tab changes. -->
+    <div id="cropmix-wrap"></div>
+    <!-- MOVED TO THE HAZARD SECTION 2026-08-02 (owner review, point 8: "Move drought into the
+         hazard section"). District drought and district crop × drought now sit under "Conditions at
+         our grain" beside the flood columns they are read against; this section keeps the crop and
+         margin story. -->
+    </details>
+
+    <details class="ovsec" id="sec-ov-collateral">
+    <summary><h2 class="collat">Collateral outlook — what the titles are worth</h2><span class="ovsec-what">The collateral book to 100%, all provinces, every brand, resale-market flow, recovery headroom, EV watch</span></summary>
+
+    <h3 class="ovsub collat">Collateral outlook · vehicle-title value watch</h3>
     <p class="lead">What is happening to the value of what AutoX lends against — <b>vehicle titles</b> (pickups, cars, motorcycles) (portfolio objective #1). Directions are an <b>editorial / estimated watch</b>; the vehicle-mix shares are <b>measured</b> (DLT) — see note.</p>
     <div class="grid macro" id="collat-outlook"></div>
     <p class="lead" id="collat-note"></p>
 
-    <h2 class="collat">Diesel-pickup collateral · diesel share &amp; national brand mix</h2>
-    <div class="verdict v-warn" id="dcollat-verdict" style="display:none"></div>
-    <div class="grid macro" id="dcollat-brand"></div>
-    <p class="lead" id="dcollat-note"></p>
-    <table class="tbl" id="dcollattbl"></table>
+    <!-- THE COLLATERAL BOOK (data/collateral_book.json, build_collateral_book.py) — one block where
+         this section carried five. Rendered by renderCollateralBook(): the full 8-type mix to 100%,
+         the 4-level geo drill (national → region → all 77 provinces → our branches) with the DLT
+         collateral base as province columns, every brand we hold, and the resale market the book
+         recovers into.
+         ABSORBED AND REMOVED 2026-08-02 (owner review): the diesel-share table + brand tiles
+         (points 8, 10 — "its not all provinces. This is the weakness of top ten lists"), the
+         "most motorcycle-heavy provinces" mix table (point 12 — "full mix to 100% and all
+         provinces", and it ranked by the class that is 5.8% of the money), the truck-fleet block
+         (point 18 — "why isn't it in the collateral section?") and the used-collateral pulse
+         (point 19). Null-safe: absent file → the whole block hides itself. -->
+    <div id="collat-book"></div>
+
     <!-- New-pickup inflow TREND (data/brand_trends.json, DLT first registrations) — the TIME dimension
          the diesel-share snapshot above lacks: how fast the future used-pickup collateral pool is
          being replenished at source. Obj #1, collateral outlook. Rendered by renderBrandTrends();
          hidden until the layer loads (null-safe). -->
+    <!-- STOCK THEN FLOW, PAIRED (owner review 2026-08-02, point 15: "Why is this here? It should be
+         close to point 14's table"). The two blocks were already adjacent in the source, but in the
+         wrong order and separated by the year table's long footnote, so the stock cards read as an
+         orphan rather than as the denominator for the table above them.
+         They are the same question at two tenses — what is PARKED (stock) and what is ENTERING
+         (flow) — and the gap between the two shares is the actual finding: pickup is 15.7% of the
+         registered fleet and a fraction of that of new registrations, i.e. a collateral pool that is
+         ageing and not being refilled. Stock now comes first and states the base; the inflow trend
+         follows and says how fast it is being replenished. -->
+    <div id="vehreg-wrap" style="display:none">
+      <h3 class="ovsub collat">Collateral base · registered-vehicle stock (MOT, measured)</h3>
+      <p class="lead" id="vehreg-note"></p>
+      <div class="grid macro" id="vehreg-cards"></div>
+    </div>
     <div id="btrend-wrap" style="display:none">
-      <h2 class="collat">New-pickup inflow trend · the future used-collateral pool <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h2>
+      <h3 class="ovsub collat">New-pickup inflow trend · the future used-collateral pool <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h3>
       <div class="verdict v-warn" id="btrend-verdict" style="display:none"></div>
       <p class="lead" id="btrend-note"></p>
       <table class="tbl" id="btrendtbl"></table>
     </div>
-    <div id="vehreg-wrap" style="display:none">
-      <h2 class="collat">Collateral base · registered-vehicle stock (MOT, measured)</h2>
-      <p class="lead" id="vehreg-note"></p>
-      <div class="grid macro" id="vehreg-cards"></div>
-    </div>
 
-    <h2 class="collat">Collateral mix · most motorcycle-heavy provinces</h2>
-    <p class="lead" id="collatmix-note"></p>
-    <table class="tbl" id="collatmixtbl"></table>
+    <!-- MOVED TO ACQUISITION 2026-08-02 (owner review, point 16: "Move this to acquisition").
+         Recovery-value headroom is OUR BOOK measured against the collateral — outstanding per
+         account vs appraised value per account, and how far resale can fall before the gap closes.
+         That is a balance-sheet question, and this tab is external data. The full three-table
+         collateral book (mix to 100%, every brand on a title, the shock ladder) now renders on
+         data.html under "The collateral book"; renderRecoverySensitivity() and its #recovery-*
+         mounts were removed from this page rather than hidden, so nothing renders into a void. -->
 
-    <h2 class="collat">Collateral recovery-value sensitivity · illustrative</h2>
-    <p class="lead" id="recovery-note"></p>
-    <div class="grid macro" id="recovery-cards"></div>
-    <table class="tbl" id="recoverytbl"></table>
+    <!-- MOVED 2026-08-02 to the "Conditions at our grain" drill below (owner point 15: "very good
+         data, just presentation should be better. Always think of the roll-up mentioned in point
+         13."). The EV table was a national top-ten of provinces by BEV share, disconnected from any
+         book. It is now the "Vehicles & EV" lens on the four-level drill — every province, rolled
+         into regions and a national row, ranked by OUR outstanding, with lent-vs-value in the same
+         table. That is what makes electrification a collateral question rather than a statistic:
+         Central & Bangkok is 4.63% electrified against Isan's 0.90%, and Central is also where our
+         tickets are largest. -->
+    </details>
 
-    <h2 class="collat">EV transition · used-collateral value watch <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h2>
-    <p class="lead" id="ev-note"></p>
-    <div class="grid macro" id="ev-cards"></div>
-    <table class="tbl" id="evtbl"></table>
+    <details class="ovsec" id="sec-ov-conditions">
+    <summary><h2 class="opp">Conditions at our grain — labour, vehicles, hazard, business, debt</h2><span class="ovsec-what">One four-level drill: national → region → province → branch, all provinces, ranked by our outstanding</span></summary>
 
-    <h2>Segment signals by region</h2>
-    <table class="tbl" id="region"></table>
-    <p class="lead">Agri-PD = crop price stress × drought, net of livestock buffer · Merchant demand = vendor ecosystem + footfall · Collateral = vehicle density.</p>
+    <!-- FIVE SECTIONS BECAME ONE, 2026-08-02. Retired here and rebuilt as lenses on a single
+         geo drill (renderMacroBook / build_macro_book.py):
+           * "Labour & household debt"   -> Labour lens (point 16) + Household debt lens (point 17)
+           * "Business & credit backdrop"-> Business formation lens (point 20); the state-bank NPL
+                                            table is now the sparkline in this block's header (21)
+           * "Live hazard - flood & rain"-> Hazard lens, now carrying DROUGHT beside flood (22)
+           * the EV table, from Collateral above -> Vehicles & EV lens (15)
 
-    <h2 class="risk">Crop-household stress · worst provinces</h2>
-    <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
-    <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
-    <p class="lead" id="cstress-note"></p>
-    <table class="tbl" id="cstresstbl"><tbody class="skel-rows" aria-hidden="true"><tr><td><span class="skel skel-line skel-w70"></span></td></tr><tr><td><span class="skel skel-line skel-w55"></span></td></tr><tr><td><span class="skel skel-line skel-w40"></span></td></tr></tbody></table>
-    <!-- Farmer margin (data/crop_margin.json) — the income side of the same crops the stress table
-         prices: does the MEASURED farm-gate price clear OAE's MEASURED production cost? Margin
-         arithmetic is DERIVED (two vintages differ — read direction, not decimals). Obj #1: the
-         cash-flow cushion behind the agri-PD book. Rendered by renderCropMargin(); hidden until load. -->
-    <div id="margin-wrap" style="display:none">
-      <h2 class="risk">Farmer margin · farm-gate price vs OAE cost <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED inputs · DERIVED margin</span></h2>
-      <div class="verdict" id="margin-verdict" style="display:none"></div>
-      <p class="lead" id="margin-note"></p>
-      <table class="tbl" id="margintbl"></table>
-    </div>
+         The owner's comments on all five were versions of one comment. Point 16: "What value does
+         this have?" Point 17: "what do we get out of it if its only regional level? We have more
+         granular datasets no?" Point 20: "Follow point 13 for format of data drilldowns." Point 21:
+         "This can be a small graph somewhere, doesn't need its own section." Point 22: "This entire
+         section can be made into small graphs or a combined table... Hazard should also include
+         draught."
+
+         What they had in common: each table was pinned at whatever grain its own source publishes
+         at, and none of them sat next to our book. A province unemployment rate is a statistic; the
+         same rate beside the baht we have lent into that province is an exposure. So every lens
+         leads with our measured outstanding and rolls up national -> region -> province -> branch.
+
+         On point 17 specifically: there is no province household-debt table to find. The BoT
+         publishes none, and the per-household figures trace to the 2019 socio-economic survey. The
+         debt lens says that in the table rather than spreading a regional number across provinces
+         it was never measured at.
+
+         AMENDED 2026-08-02 (owner review, point 17: "take our O/S, accts and our 90% out of those
+         tables"). Every lens used to LEAD with our outstanding — that was the original point of the
+         block, macro next to exposure. This tab is external data, so the book columns came off all
+         five lenses and the branch rows; the ORDERING is still by our outstanding, so the largest
+         exposures still lead, and the drill footnote says so. The book itself reads in Acquisition. -->
+    <div id="macro-book"></div>
+
+    <!-- DROUGHT, MOVED HERE 2026-08-02 (owner review, point 8). It used to live under Farm households,
+         two sections away from the flood stations it has to be read against — and a province can be
+         wet and dry at once, in different districts, which is the whole reason they belong together.
+         The Hazard lens on the drill above already carries drought at PROVINCE grain (n_dry,
+         dry_share_pct, n_extreme, SPEI); these two blocks sharpen it to DISTRICT grain: which
+         districts are driest, and which crop in which district carries the most rai under drought.
+         Both are MODELLED SPEI over MEASURED OAE planted area — labelled as such on the tables. -->
     <!-- District drought (OAE SPEI) — a MODELLED per-amphoe sharpening of the province-grain drought
          read above (obj #1). Rendered from data/drought_district.json; hidden gracefully if absent. -->
     <div id="drought-district-wrap" style="display:none">
@@ -402,90 +581,27 @@
          crop in WHICH district carries the largest rai exposure under drought — the crop-named, portfolio-
          actionable read behind the agri-PD book. Rendered by renderAmphoeCrops(); hidden if absent. -->
     <div id="amphoe-crops-wrap" style="display:none">
-      <h2 class="risk">District crop × drought exposure <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED area · MODELLED drought</span></h2>
+      <h3 class="ovsub risk">District crop × drought exposure <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED area · MODELLED drought</span></h3>
       <div class="verdict v-warn" id="amphoe-crops-verdict"></div>
       <p class="lead" id="amphoe-crops-note"></p>
       <table class="tbl" id="amphoe-crops-tbl"></table>
     </div>
-    <!-- Provincial labour stress (data/province_lfs.json) — MEASURED NSO LFS 2026 Q1, all 77 provinces
-         (obj #1). Headline unemployment is uniformly low in Thailand, so the discriminator is the
-         seasonal-waiting share (agri off-season idle labour) that marks where borrower cash-flow is
-         most seasonal. Rendered by renderProvinceLfs(); hidden gracefully until the layer loads. -->
-    <div id="lfs-wrap" style="display:none">
-      <h2 class="risk">Provincial labour stress <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED · NSO LFS 2026 Q1</span></h2>
-      <p class="lead" id="lfs-note"></p>
-      <table class="tbl" id="lfstbl"></table>
-    </div>
-    <!-- Regional household-debt backdrop (data/region_debt.json) — MEASURED Bank of Thailand regional
-         letters over NSO SES (obj #1). Household leverage is a direct portfolio-risk backdrop: where
-         borrower households carry the most debt, an income shock bites soonest. BoT publishes no routine
-         province table, so region is the honest grain; the debt-per-household cut is the most recent
-         common vintage (SES 2566/2023). Rendered by renderRegionDebt(); hidden gracefully until load. -->
-    <div id="regdebt-wrap" style="display:none">
-      <h2 class="risk">Regional household-debt backdrop <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · BoT over NSO SES</span></h2>
-      <div class="verdict" id="regdebt-verdict" style="display:none"></div>
-      <p class="lead" id="regdebt-note"></p>
-      <table class="tbl" id="regdebttbl"></table>
-    </div>
-    <!-- Logistics-SME (hauler) pulse (data/truck_flow.json) — MEASURED DLT truck registration actions,
-         trailing-12m vs the prior 12m (obj #1). An owner-operator hauler is a classic heavy-title
-         borrower; a contracting truck fleet = that segment's cash flow thinning, and a two-for-one on
-         obj #1 (borrower livelihood AND used-truck collateral). Nationally the fleet is still growing,
-         so the card leads with that cushion then names the province pockets where new-truck demand is
-         contracting. Rendered by renderTruckFlow(); hidden gracefully until the layer loads. -->
-    <div id="truckflow-wrap" style="display:none">
-      <h2 class="risk">Logistics-SME pulse · truck-fleet flow <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT registrations</span></h2>
-      <div class="verdict" id="truckflow-verdict" style="display:none"></div>
-      <p class="lead" id="truckflow-note"></p>
-      <table class="tbl" id="truckflowtbl"></table>
-    </div>
-    <!-- Used-collateral pulse (data/collateral_flow.json) — MEASURED DLT car-law registration actions
-         (dataset_stat_1_008: motorcycle/car/pickup, the title-loan collateral classes), trailing-12m,
-         aggregated to the 5 macro regions (obj #1). Motorcycles are ~50% of the book; the card reads
-         where that core collateral is most liquid (used-market transfers = how fast repossessed units
-         clear) and where the base is attriting fastest (permanent deregistrations). REGION grain on
-         purpose — per-province ratios are confounded by central metro registration, which regional
-         aggregation cancels. Rendered by renderCollateralFlow(); hidden gracefully until the layer loads. -->
-    <div id="collflow-wrap" style="display:none">
-      <h2 class="risk">Used-collateral pulse · moto / car / pickup <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT registrations</span></h2>
-      <div class="verdict" id="collflow-verdict" style="display:none"></div>
-      <p class="lead" id="collflow-note"></p>
-      <table class="tbl" id="collflowtbl"></table>
-    </div>
-    <div id="dbdform-wrap" style="display:none">
-      <h2 class="risk">Business-formation pulse · small-business borrower base <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · DBD registry</span></h2>
-      <div class="verdict" id="dbdform-verdict" style="display:none"></div>
-      <p class="lead" id="dbdform-note"></p>
-      <table class="tbl" id="dbdformtbl"></table>
-    </div>
-    <!-- SFI system credit-quality backdrop (data/sfi_credit.json) — MEASURED quarterly NPL ratio of
-         Thailand's Specialized Financial Institutions (GSB/BAAC/GHB/SME/EXIM/Islamic Bank), from the
-         FPO open-data aggregates. Obj #1 leading-indicator BACKDROP: GSB (household) + BAAC (rural/agri)
-         system NPL is the closest public read on the repayment stress AutoX's borrowers sit inside — a
-         macro tide, NOT AutoX's own book and NOT per-province. Rendered by renderSfi(); hidden until the
-         layer loads. -->
-    <div id="sfi-wrap" style="display:none">
-      <h2 class="risk">Credit-quality backdrop · state-bank system NPL <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED · FPO / SFI aggregates</span></h2>
-      <div class="verdict" id="sfi-verdict" style="display:none"></div>
-      <p class="lead" id="sfi-note"></p>
-      <table class="tbl" id="sfitbl"></table>
-    </div>
-    <!-- Live flood + rain pulse (data/thaiwater_flood.json + thaiwater_rain.json) — MEASURED live
-         ThaiWater telemetry (keyless api-v3.thaiwater.net; refreshed daily by data-thaiwater.yml).
-         The ACUTE obj-#1 counterpart to the slower crop-stress drought read: water on the ground /
-         arriving is an immediate collections + collateral event, days before it shows in any monthly
-         series. Two station-aggregate reads — river/reservoir water LEVEL (flood) and 24h RAINFALL —
-         per province. Rendered by renderThaiwater(); hidden gracefully until BOTH layers load. -->
-    <div id="thaiwater-wrap" style="display:none">
-      <h2 class="risk">Live flood &amp; rain pulse <span class="tag" style="color:var(--accent);border:1px solid var(--accent)">MEASURED · ThaiWater (live)</span></h2>
+
+    <!-- The live 24h RAIN pulse is kept (it is same-day telemetry and genuinely "nice to know", in
+         the owner's words) but demoted out of its own section: the flood and drought columns that
+         drive decisions are in the drill above. -->
+    <details id="thaiwater-wrap" class="mfull" style="display:none">
+      <summary>Live 24-hour rainfall by province · measured ThaiWater telemetry</summary>
       <div class="verdict v-warn" id="thaiwater-verdict" style="display:none"></div>
       <p class="lead" id="thaiwater-note"></p>
-      <div class="tblwrap"><table class="tbl" id="thaiwater-flood-tbl"></table></div>
-      <div class="tblwrap" style="margin-top:10px"><table class="tbl" id="thaiwater-rain-tbl"></table></div>
-    </div>
+      <div class="tblwrap" role="region" tabindex="0" aria-label="Scrollable table: Live rain pulse"><table class="tbl" id="thaiwater-rain-tbl"></table></div>
+    </details>
+    </details>
+    </div><!-- /.ovswitch -->
+
     <div class="story-next no-print">
-      <span class="story-next-lab">Next in the story · risk 1 of 2</span>
-      <a data-v="exposure" href="#exposure">Portfolio risk — where the book sits in stress →</a>
+      <span class="story-next-lab">Next in the story · ② of ⑤</span>
+      <a href="data.html">Acquisition — the network in the data book, all 2,015 branches →</a>
     </div>
   </section>
 
@@ -507,20 +623,20 @@
   <!-- COMPETITION — competitive-risk read on the EXISTING network: rival density, contested markets,
        brand share-of-search, segment competitor exposure. NO open/close/where-to-open recommendations. -->
   <section class="view" id="v-acq">
-    <h2 class="opp" style="margin-bottom:4px">Competitive risk · where rivals pressure the existing network</h2>
+    <h2 class="opp" style="margin-bottom:4px">⑤ Competition — where rivals pressure the existing network</h2>
     <p class="lead">A risk lens on the branches AutoX <b>already runs</b> — where the rival field is densest, where
       we are outnumbered, where our brand loses share-of-search, and which segments carry the most competitor
       exposure. Every number is tagged <b>measured</b> or <b>estimated/proxy</b>. This tab makes <b>no</b> open /
       close / expansion recommendations.</p>
 
-    <div id="acq-impact"></div><!-- impact-card drill, competition ranking (most-outgunned first) -->
+    <div id="competition-impact"></div><!-- impact-card drill, competition ranking (most-outgunned first) -->
 
-    <nav class="jumpnav no-print" id="acqjump" aria-label="Jump to section within Competition">
-      <a class="chip" href="#acq" data-acq="sec-search">Brand &amp; search</a>
-      <a class="chip" href="#acq" data-acq="sec-presence">Market presence</a>
-      <a class="chip" href="#acq" data-acq="sec-pulse">Rival pulse</a>
-      <a class="chip" href="#acq" data-acq="sec-comp">Rival density</a>
-      <a class="chip" href="#acq" data-acq="sec-segments">Segment exposure</a>
+    <nav class="jumpnav no-print" id="compjump" aria-label="Jump to section within Competition">
+      <a class="chip" href="#acq" data-jump="sec-search">Brand &amp; search</a>
+      <a class="chip" href="#acq" data-jump="sec-presence">Market presence</a>
+      <a class="chip" href="#acq" data-jump="sec-pulse">Rival pulse</a>
+      <a class="chip" href="#acq" data-jump="sec-comp">Rival density</a>
+      <a class="chip" href="#acq" data-jump="sec-segments">Segment exposure</a>
     </nav>
 
     <!-- REMOVED (strategy pivot): the former branch-growth regional-headroom allocation + the sequenced
@@ -534,7 +650,7 @@
          be honestly relabelled as a risk signal. Restore-and-reframe if you'd rather keep it. -->
 
     <!-- 2 · BRAND SHARE-OF-SEARCH — how AutoX's brand demand compares to rivals, province by province. -->
-    <details class="acqsec" id="sec-search" open>
+    <details class="compsec" id="sec-search" open>
     <summary><h2 class="opp">Brand share-of-search vs rivals · title-loan search interest by province <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
     <p class="lead">Google Trends relative search-interest (0–100) for title-loan intent terms
       (<span class="mono" lang="th">จำนำทะเบียนรถ</span> · <span class="mono" lang="th">สินเชื่อรถแลกเงิน</span>), plus <b>share-of-search</b> —
@@ -545,60 +661,96 @@
     </details>
 
     <!-- 1.5 · MARKET & DIGITAL PRESENCE — listed-peer SET scoreboard + share-of-mind framing. -->
-    <details class="acqsec" id="sec-presence">
+    <details class="compsec" id="sec-presence">
     <summary><h2 class="opp">Market &amp; digital presence · listed-peer scoreboard &amp; share of mind <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2></summary>
     <p class="lead">How our rivals show up where AutoX largely does <b>not</b> — in the <b>capital market</b>, on the <b>map</b>, and in <b>search</b>. AutoX is <b>unlisted</b> (an SCBX subsidiary) and near-invisible on Google Maps, so this is a competitive-presence read, not an AutoX scoreboard.</p>
 
-    <h3 class="acqsub">Listed-peer market scoreboard <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · SET</span></h3>
+    <h3 class="compsub">Listed-peer market scoreboard <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · SET</span></h3>
     <p class="lead">Pulled autonomously from the <b>Stock Exchange of Thailand</b>: market value, valuation and returns for the three listed title-lenders. Their <b>ROE ladder</b> is the sharpest external benchmark we have — AutoX's stated <b>25% ROE target</b> is the reference line. Market cap &amp; net profit are directly comparable; read ROE with the holding-company caveat in the method note.</p>
     <div class="insight" id="peerscorereadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="peerscoretbl"></table>
 
-    <h3 class="acqsub" style="margin-top:18px">Share of mind · the presence gap</h3>
+    <h3 class="compsub" style="margin-top:18px">Share of mind · the presence gap</h3>
     <p class="lead">Three ways a title-lender shows up: <b>search</b> (share-of-search, above), <b>map</b> (Google review reputation, in the competitor thesis below), and <b>market</b> (the SET scoreboard). AutoX leads <b>none</b> today — unlisted, thin on Google Maps, mid-pack on search — a digital-presence gap on the acquisition side, distinct from branch density and worth an ops/marketing push.</p>
     </details>
 
+    <!-- 1.55 · THE POOL OUTSIDE THE SYSTEM — NSO household survey, in-system vs informal debt. The
+         one measured, independent read of the borrower population this product has: by region, by
+         socio-economic class, seven waves. Own section, open, because it corrects a strategy
+         assumption rather than decorating one. -->
+    <details class="compsec" id="sec-informal" open>
+    <summary><h2 class="opp">The pool outside the banking system · in-system vs informal household debt <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · NSO</span></h2></summary>
+    <p class="lead">A non-bank title lender competes for households borrowing <b>outside the formal system</b>. The National Statistical Office measures that directly — <b lang="th">หนี้ในระบบ</b> vs <b lang="th">หนี้นอกระบบ</b>, by region and by socio-economic class, across seven survey waves 2011–2023. It sat in the local gov-data harvest unread, and what it says is not what a "big informal pool" story would predict.</p>
+    <div class="tbl-wrap"><div id="acq-debtsource"></div></div>
+    </details>
+
     <!-- 1.6 · RIVAL PULSE — what rivals are running right now + measured customer sentiment (incl. our own app). -->
-    <details class="acqsec" id="sec-pulse" open>
+    <details class="compsec" id="sec-pulse" open>
     <summary><h2 class="opp">Rival pulse · live promotions &amp; voice of customer <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2></summary>
     <p class="lead">The always-on watch: <b>what the rivals are promoting right now</b> (pulled from their own websites, new items flagged on every refresh) and <b>what customers say</b> — Google Play star ratings and dated reviews for the rivals' apps <b>and our own เงินไชโย app</b>, side by side. Stars, histograms and promo dates are <b>measured</b>; the detractor theme buckets are an <b>estimated</b> keyword read over 1–2★ reviews.</p>
 
-    <h3 class="acqsub">Voice of customer · app sentiment ladder <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Google Play</span></h3>
+    <h3 class="compsub">Voice of customer · app sentiment ladder <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Google Play</span></h3>
     <div class="insight" id="pulsesentreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="pulsesenttbl"></table>
 
-    <h3 class="acqsub" style="margin-top:18px">Live rival promotions &amp; campaigns <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · rivals' own sites</span></h3>
+    <h3 class="compsub" style="margin-top:18px">The same customers on iPhone <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Apple App Store (TH)</span></h3>
+    <p class="lead sub">iOS skews to the higher-income borrower — the one whose collateral is a car rather than a motorcycle — so it is read as that slice, not as the market. Apple publishes <b>no review dates, no star histogram and no developer replies</b>, so there is deliberately no 90-day trend or reply rate here; those live in the Google Play ladder above. The <b>star rating</b> is the whole rating population; the <b>1–2★ of written sample</b> column is only the people who wrote something, who skew heavily negative — use it to rank operators against each other, never as the share of customers who are unhappy.</p>
+    <div class="insight" id="pulseiosreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span></div></div>
+    <table class="tbl" id="pulseiostbl"></table>
+    <div id="pulseiosnote"></div>
+
+    <h3 class="compsub" style="margin-top:18px">Live rival promotions &amp; campaigns <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · rivals' own sites</span></h3>
     <div class="insight" id="pulsepromoreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span></div></div>
     <div id="pulsepromolandscape"></div>
     <details id="pulsepromorawwrap" style="margin-top:10px"><summary class="sub" style="cursor:pointer">Raw promo feed (line items, by brand)</summary><div id="pulsepromolist"></div></details>
 
-    <h3 class="acqsub" style="margin-top:18px">Paid online ads · what the rivals are running on Google <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Google Ads Transparency</span></h3>
+    <h3 class="compsub" style="margin-top:18px">Paid online ads · what the rivals are running on Google <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Google Ads Transparency</span></h3>
     <p class="lead">Every ad creative Google lists for each lender in Thailand, with the dates it ran — so this is <b>how hard each rival is pushing paid acquisition right now</b>, who is still live today, and how fast they cycle creative. Counts, run-lengths and formats are <b>measured</b>. Google publishes spend and impressions only for election ads, so these are <b>share-of-volume</b> figures — <b>never</b> a spend ranking: a rival running fewer but longer creatives is not necessarily spending less. Meta's ad library is <b>not</b> an option here — its credit-ad slice excludes Thailand.</p>
     <div class="insight" id="pulseadsreadout" style="border-left-color:var(--collat)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="pulseadstbl"></table>
-    <h4 class="acqsub" style="margin-top:14px;font-size:13px">Advertised rates · what the field is quoting in its own ads</h4>
+    <h4 class="compsub" style="margin-top:14px;font-size:13px">Advertised rates · what the field is quoting in its own ads</h4>
     <div id="pulseadsrates"></div>
-    <h4 class="acqsub" style="margin-top:14px;font-size:13px">What each operator is actually saying · ad copy, newest first</h4>
+    <h4 class="compsub" style="margin-top:14px;font-size:13px">What each operator is actually saying · ad copy, newest first</h4>
     <div id="pulseadsmsgs"></div>
     <p class="lead sub" id="pulseadsnote" style="margin-top:6px"></p>
 
-    <h3 class="acqsub" style="margin-top:18px">Video pulse · what the field is publishing on YouTube <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · YouTube Data API</span></h3>
+    <h3 class="compsub" style="margin-top:18px">Video pulse · what the field is publishing on YouTube <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · YouTube Data API</span></h3>
     <p class="lead">The organic half of rival marketing, <b>including our own เงินไชโย channel</b> as the control: audience size, how often each operator publishes, how its recent videos actually perform, and what its titles push. Subscriber counts are <b>rounded by YouTube itself</b> at scale, so read them as bands. A channel with <b>few subscribers but very high median views</b> is buying paid video placement rather than earning reach — that gap is called out. Title themes use the <b>same</b> keyword lexicon as the ad copy above, so paid and organic messaging are comparable (<b>estimated</b>).</p>
     <div class="insight" id="pulsevidreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="pulsevidtbl"></table>
     <p class="lead sub" id="pulsevidnote" style="margin-top:6px"></p>
 
-    <h3 class="acqsub" style="margin-top:18px">The full จำนำทะเบียน field · every material operator <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED · public reports</span></h3>
+    <h3 class="compsub" style="margin-top:18px">Pantip · what borrowers say about each lender, unprompted <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED text</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED volume</span></h3>
+    <p class="lead">Pantip is where Thai borrowers discuss lenders <b>at length and unprompted</b> — no review form asking them to rate anything. The say/hear gap below blends this into one axis; here it stays split by brand, in the borrowers' own words.
+      <b>Read the ranking, not the multiple.</b> Volume is Pantip's own reported total per search term, because search itself is <b>capped at 10 threads per term</b> — so the threads we retrieved are a ceiling we hit, never a measure of how much a brand is discussed. Several rival names are also ordinary Thai (<span class="mono" lang="th">สมหวัง</span> means "wish fulfilled"; <span class="mono" lang="th">ศรีสวัสดิ์</span> is also a district of Kanchanaburi), so those totals count far more than the lender — <b>match rate</b> measures how loose each one is, and it runs from 6% to 100%. It is itself measured on the friendliest slice, so every estimate here leans <b>high</b>.
+      <b>PDPA:</b> no author name, member id, handle or profile link is read at any stage, identifiers are scrubbed from the text too, and quotes are short and unattributed.</p>
+    <div class="insight" id="pantipreadout" style="border-left-color:var(--collat)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="pantiptbl"></table>
+    <h4 class="compsub" style="margin-top:14px;font-size:13px">In borrowers' own words — including about us</h4>
+    <p class="lead sub">Verbatim, unattributed, and chosen only for carrying a theme and naming the brand. Nothing is filtered for being unflattering.</p>
+    <div id="pantipquotes"></div>
+    <p class="lead sub" id="pantipnote" style="margin-top:6px"></p>
+
+    <h3 class="compsub" style="margin-top:18px">Say / hear gap · what the field advertises vs what customers raise <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED counts</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED themes</span></h3>
+    <p class="lead">Every channel above read on <b>one axis</b>. Everything customers wrote (forum posts, app reviews, comments under the rivals' videos) and everything lenders published (ad creatives, promo pages) counted against the <b>same</b> Thai phrase list — so "what the industry keeps saying" and "what customers actually raise" can be compared directly. Document <b>counts are measured</b> and re-derivable by hand; the phrase list ships inside <code>social_themes.json</code>. The <b>theme buckets are estimated</b> editorial judgement — a theme absent from the list reads as zero, so absence is not evidence of absence. Read the <b>ordering</b>, not the size of each gap: an ad exists to make a claim while a comment is an unprompted reaction, so the two denominators differ in kind.</p>
+    <div class="insight" id="themesreadout" style="border-left-color:var(--collat)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="themestbl"></table>
+    <h4 class="compsub" style="margin-top:14px;font-size:13px">What the ads ask people to do — paid mechanic vs what they actually do by hand</h4>
+    <p class="lead sub">Counted over <b>paid</b> supply only (ad creatives + promo pages), because a call to action is a campaign mechanic. The <b>organic</b> column is the same phrase counted in the lenders' own unpaid forum replies — customer <b>service</b>, not a campaign. Read the two together: the field answers people conversationally by hand, and never buys it.</p>
+    <table class="tbl" id="themectatbl"></table>
+    <p class="lead sub" id="themesnote" style="margin-top:6px"></p>
+
+    <h3 class="compsub" style="margin-top:18px">The full จำนำทะเบียน field · every material operator <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED · public reports</span></h3>
     <p class="lead">Beyond the big-4 branch census: the <b>whole</b> title-loan field, including the <b>bank-backed entrants</b> — TISCO's สมหวัง (800+ branches), KBank's เงินให้ใจ (rides ~800 K-branches), Krungsri's Car4Cash, KTC พี่เบิ้ม, GSB's เงินดีดี / มีที่มีเงิน, ttb and KKP — plus the listed regionals (TURBO, SAK, MICRO, AMANAH). Footprints are each company's <b>own public claim</b> (cited in the data); app scores join live from the <b>measured</b> Play ladder above.</p>
     <div class="insight" id="pulseunireadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span></div></div>
     <table class="tbl" id="pulseunitbl"></table>
     </details>
 
     <!-- 1 · COMPETITOR THESIS — coverage + rival density + rival fragility, collapsed by default. -->
-    <details class="acqsec" id="sec-comp">
+    <details class="compsec" id="sec-comp">
     <summary><h2 class="opp">Competitor thesis · coverage, rival density &amp; rival fragility <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
 
-    <h3 class="acqsub">Competitor coverage · how complete is our rival census?</h3>
+    <h3 class="compsub">Competitor coverage · how complete is our rival census?</h3>
     <p class="lead">Our competitor map is now a <b>MEASURED, near-complete</b> census: Muangthai, Srisawad and Tidlor are pulled
       from each operator's <b>official store-locator</b> (16,053 real branches); only Heng remains a Google/Overture sample.
       This panel shows <b style="color:var(--merch)">found</b> (locations we hold, measured) vs <b style="color:var(--gold)">expected</b>
@@ -607,14 +759,14 @@
     <div class="insight" id="compcovreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="compcovtbl"></table>
 
-    <h3 class="acqsub" style="margin-top:18px">Where rivals own ground · districts where AutoX is outnumbered <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
+    <h3 class="compsub" style="margin-top:18px">Where rivals own ground · districts where AutoX is outnumbered <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
     <p class="lead">The full official-locator census (16,393 rival branches) makes this concrete: the districts where the big-4
       out-station AutoX the most. Ranked by raw branch deficit — <b>defend or concede deliberately</b>. These are measured
       counts (point-in-district), not a proxy.</p>
     <div class="insight" id="rivdenreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="rivdentbl"></table>
 
-    <h3 class="acqsub" style="margin-top:18px">Per-province peer comparison · AutoX vs each rival brand <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
+    <h3 class="compsub" style="margin-top:18px">Per-province peer comparison · AutoX vs each rival brand <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
     <p class="lead">The same census, rolled up to the 77 provinces with the <b>brand split kept intact</b> — so you can read AutoX
       against <b>Muangthai</b>, <b>Srisawad</b>, <b>Tidlor</b> and <b>Heng</b> <b>one brand at a time</b>, not just the merged total.
       Ranked by raw branch deficit. Muangthai/Srisawad/Tidlor are near-complete official-locator networks; Heng is a Google/Overture
@@ -622,7 +774,7 @@
     <div class="insight" id="peerprovreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="peerprovtbl"></table>
 
-    <h3 class="acqsub" style="margin-top:18px">Peer loan quality · listed rivals' reported NPL vs our measured book <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
+    <h3 class="compsub" style="margin-top:18px">Peer loan quality · listed rivals' reported NPL vs our measured book <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
     <p class="lead">Beyond how many branches each rival runs, this is <b>how well their books perform</b> — the
       NPL ratios the listed title-lenders <b>report themselves</b> (FY2025 / 2025 IR), now shown next to
       <b>AutoX's own book quality, measured from the real loan tape</b>. The spread tracks <b>collateral mix</b>:
@@ -632,7 +784,7 @@
     <div class="insight" id="peernplreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="peernpltbl"></table>
 
-    <h3 class="acqsub" style="margin-top:18px">Rival service reputation · measured Google ratings by brand <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · sample</span></h3>
+    <h3 class="compsub" style="margin-top:18px">Rival service reputation · measured Google ratings by brand <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · sample</span></h3>
     <p class="lead">A <b>quality</b> read the density map can't give: the <b>Google rating and review count</b> customers leave on the
       rival branches we've located (a sample of the census, review-count-weighted so a 5★ with three reviews can't outweigh a
       4.2★ with hundreds). Where a rival is <b>both dense and well-liked</b>, share is hardest to take; a weak rating in a
@@ -640,7 +792,7 @@
     <div class="insight" id="rivrepreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="rivreptbl"></table>
 
-    <h3 class="acqsub" style="margin-top:18px">Rival threat matrix · footprint × service quality per brand <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">MIXED · footprint EST · service MEASURED</span></h3>
+    <h3 class="compsub" style="margin-top:18px">Rival threat matrix · footprint × service quality per brand <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">MIXED · footprint EST · service MEASURED</span></h3>
     <p class="lead">The density board says <b>where</b> rivals are; the reputation board says <b>how good</b> they are. This joins the two per
       brand — national <b>footprint</b> (branches vs the ~2,015 AutoX runs; company-IR headline, with the measured census count alongside)
       next to the <b>measured Google service rating</b> — so you can read at a glance which rival is the strongest <b>combined</b> threat to the
@@ -649,7 +801,7 @@
     <div class="insight" id="rivthreatreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="rivthreattbl"></table>
 
-    <h3 class="acqsub" style="margin-top:18px">Rival threat by region · where our branches actually sit <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
+    <h3 class="compsub" style="margin-top:18px">Rival threat by region · where our branches actually sit <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
     <p class="lead">AutoX defends a <b>footprint</b>, not a brand — so the same join, localised to the five regions our branches sit in.
       How <b>outgunned</b> we are on the ground (measured rivals:AutoX census ratio, plus the share of our districts where rivals lead)
       next to how <b>well-liked</b> the rival field is there (measured Google rating). Rivals outnumber us several-fold <b>everywhere</b>, so
@@ -659,7 +811,7 @@
     <div class="insight" id="rivthreatregreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="rivthreatregtbl"></table>
 
-    <h3 class="acqsub" style="margin-top:18px">Sub-scale rivals vs our footprint · licensed PICO-finance operators per province <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
+    <h3 class="compsub" style="margin-top:18px">Sub-scale rivals vs our footprint · licensed PICO-finance operators per province <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
     <p class="lead">Beyond the big-4 title lenders, a <b>distinct small-ticket competitor class</b>: licensed
       <b>PICO-finance</b> (<span class="mono" lang="th">พิโกไฟแนนซ์</span>) operators — counted straight from the
       <b>FPO government licence registry</b> (2,042 operators) and set against our own branch count, province by
@@ -669,7 +821,7 @@
     <div class="insight" id="picocompreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="picocomptbl"></table>
 
-    <h3 class="acqsub" style="margin-top:18px">Rival fragility · where the competitor field thins under the Q1-2026 BoT deadline</h3>
+    <h3 class="compsub" style="margin-top:18px">Rival fragility · where the competitor field thins under the Q1-2026 BoT deadline</h3>
     <div class="insight" style="border-left-color:var(--accent)"><b>Regulatory shake-out (Q1 2026):</b> under the BoT responsible-lending
       framework (notification 25680030) auto title-loan operators need a personal-loan licence (≥฿50m capital, 28% interest cap). The
       <b>registration window closes Q1 2026</b> — non-compliant, sub-scale / informal lenders risk <b>forced exit</b>. Tighter supervision
@@ -687,41 +839,41 @@
     </details>
 
     <!-- 3 · SEGMENT coverage & competitor exposure — every segment + district table, collapsed by default. -->
-    <details class="acqsec" id="sec-segments">
+    <details class="compsec" id="sec-segments">
     <summary><h2 class="opp">Segment coverage &amp; competitor exposure · estates · merchant · collateral · districts</h2></summary>
     <p class="lead">Descriptive coverage-and-rival tables for the existing network — how thin AutoX's presence is against demand,
       and where rivals sit — as a <b>competitive-exposure read</b>. These are <b>not</b> open-a-branch recommendations.</p>
 
-    <h3 class="acqsub">Industrial-estate coverage · worker lending</h3>
+    <h3 class="compsub">Industrial-estate coverage · worker lending</h3>
     <p class="lead">AutoX branches within 10km of each major estate. Low = thin coverage of that factory-worker base.</p>
     <table class="tbl" id="estates"></table>
 
-    <h3 class="acqsub">Merchant coverage · small sellers</h3>
+    <h3 class="compsub">Merchant coverage · small sellers</h3>
     <p class="lead">High vendor demand (markets + footfall + population) with ≤4 AutoX branches within 10km — thin merchant coverage.</p>
     <table class="tbl" id="mws"></table>
 
-    <h3 class="acqsub">Collateral-rich coverage</h3>
+    <h3 class="compsub">Collateral-rich coverage</h3>
     <p class="lead">Dense vehicle-commerce + gold trade (title/gold demand), ≤5 AutoX within 10km — thin coverage of collateral-rich demand.</p>
     <table class="tbl" id="cws"></table>
 
-    <h3 class="acqsub">Catchment coverage &amp; rival score v2 · around existing branches</h3>
+    <h3 class="compsub">Catchment coverage &amp; rival score v2 · around existing branches</h3>
     <p class="lead"><b>★ Coverage-gap score</b> is an <b>estimated screen</b> (0–100), not a site survey:
       <b>demand</b> (footfall + DIW factory workers + province pickups + precomputed demand)
       × <b>own-AutoX headroom</b> (fewer of our branches ≤10km = thinner coverage)
       × <b>competitor-proxy headroom</b> (fewer banks+ATMs ≤10km — an OSM financial-density proxy, <i>not</i> a lender census). Computed client-side, CSV-exportable.
       The <b>Rivals ≤5km</b> column adds a <b>measured</b> count of actual competitor branches (Srisawad, Muangthai, Tidlor, Heng) from Google Places — a <b>lower bound</b>, not a registry — so a catchment can be read as <b>thinly-covered AND undercompeted</b> (<b>✦</b> = high coverage-gap with zero nearby rivals). Populated by <span class="mono">pipeline/pull_competitors.py</span>; blank until that runs.</p>
-    <div class="insight" id="acqreadout" style="border-left-color:var(--gold)">Computing the screen…</div>
+    <div class="insight" id="gapreadout" style="border-left-color:var(--gold)">Computing the screen…</div>
 
-    <h4 class="acqsub2">Region ranking · average coverage gap</h4>
-    <table class="tbl" id="acqregions"></table>
+    <h4 class="compsub2">Region ranking · average coverage gap</h4>
+    <table class="tbl" id="gapregions"></table>
 
-    <h4 class="acqsub2">Top catchments</h4>
-    <div class="chips" id="acqchips"></div>
-    <button id="acqcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
-    <table class="tbl" id="acqboard"><tbody id="acqtbl"></tbody></table>
-    <p class="lead" id="acqcompnote" style="margin-top:6px"></p>
+    <h4 class="compsub2">Top catchments</h4>
+    <div class="chips" id="gapchips"></div>
+    <button id="gapcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
+    <table class="tbl" id="gapboard"><tbody id="gaptbl"></tbody></table>
+    <p class="lead" id="gapcompnote" style="margin-top:6px"></p>
 
-    <h3 class="acqsub">District coverage-gap leaderboard · all 928 amphoe</h3>
+    <h3 class="compsub">District coverage-gap leaderboard · all 928 amphoe</h3>
     <p class="lead">The catchment screen above ranks <i>around our existing branches</i>. This ranks <b>every district in Thailand</b> —
       including the <b id="ampzero" class="mono" style="color:var(--gold)"></b> amphoe with <b>no AutoX branch at all</b> — so the widest
       coverage gaps surface. <b>★ Coverage-gap</b> (0–100, est) = a district demand proxy (POI footfall + DIW workers, both
@@ -733,7 +885,7 @@
     <button id="ampcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
     <table class="tbl" id="amptbl"></table>
 
-    <h3 class="acqsub risk">Most-stressed districts · risk readout</h3>
+    <h3 class="compsub risk">Most-stressed districts · risk readout</h3>
     <p class="lead">Top districts by an <b>ESTIMATED</b> risk proxy (0–100): agri crop-stress + province unemployment
       (<b>MEASURED · NSO Labour Force Survey</b>), plus collateral / merchant pressure where we have branches inside the
       amphoe. <b>Agri stress and unemployment are province-inherited</b> (every district takes its province value), so this
@@ -751,7 +903,7 @@
   <section class="view" id="v-exposure">
     <!-- VERDICT card (generated from segment_exposure.json; omitted gracefully if absent) -->
     <div class="verdict v-risk" id="expo-verdict" style="display:none"></div>
-    <h2 class="risk">Portfolio exposure · concentration read</h2>
+    <h2 class="risk">④ Risk — portfolio exposure &amp; concentration</h2>
     <p class="lead">How much of the book sits in stressed-crop, drought-proxy or weak-segment areas. <b>Book proxy = branch count</b> (no per-branch ฿ balance in this data) — read as exposure of the <i>footprint</i>, not the loan book. All three are <b>estimated proxies</b>, labelled inline.</p>
 
     <div id="exposure-impact"></div><!-- impact-card drill, risk ranking (NPL-live first) -->
@@ -764,34 +916,34 @@
       <div id="expo-tape-books" class="grid macro" style="margin-bottom:14px"></div>
       <div class="dash2">
         <div class="dash2-side">
-          <h3 class="acqsub">Bucket ladder · Current → NPL → legacy</h3>
+          <h3 class="compsub">Bucket ladder · Current → NPL → legacy</h3>
           <p class="lead" style="font-size:12px">Accounts &amp; outstanding at each stage. The 180+ bar is legacy workout stock, held apart.</p>
           <table class="tbl" id="expo-tape-ladder"></table>
         </div>
         <div class="dash2-main">
-          <h3 class="acqsub">Restructuring · did it hold?</h3>
+          <h3 class="compsub">Restructuring · did it hold?</h3>
           <p class="lead" style="font-size:12px">Against the Normal baseline — are Pre-emptive / TDR books curing or re-defaulting? TDR at 50.8% 90+, NPAT-negative.</p>
           <table class="tbl" id="expo-tape-restr"></table>
         </div>
       </div>
       <div class="dash2">
         <div class="dash2-side">
-          <h3 class="acqsub">LTV at origination → delinquency</h3>
+          <h3 class="compsub">LTV at origination → delinquency</h3>
           <table class="tbl" id="expo-tape-ltv"></table>
         </div>
         <div class="dash2-main">
-          <h3 class="acqsub">Occupation → delinquency &amp; return</h3>
+          <h3 class="compsub">Occupation → delinquency &amp; return</h3>
           <table class="tbl" id="expo-tape-occ"></table>
         </div>
       </div>
       <div class="dash2">
         <div class="dash2-side">
-          <h3 class="acqsub">Risk × return · occupation × region <span class="sub">(NPAT frontier)</span></h3>
+          <h3 class="compsub">Risk × return · occupation × region <span class="sub">(NPAT frontier)</span></h3>
           <p class="lead" style="font-size:12px">Profitably risky (price covers the risk) vs unprofitably safe. NPAT margin is per account, ฿/yr basis as exported.</p>
           <table class="tbl" id="expo-tape-frontier"></table>
         </div>
         <div class="dash2-main">
-          <h3 class="acqsub">Collateral book · brand × age at origination</h3>
+          <h3 class="compsub">Collateral book · brand × age at origination</h3>
           <p class="lead" style="font-size:12px">Average appraised value by collateral-age band per brand — the measured depreciation read — beside each cell's 30+dpd.</p>
           <table class="tbl" id="expo-tape-coll"></table>
         </div>
@@ -819,8 +971,8 @@
       </div>
     </div>
     <div class="story-next no-print">
-      <span class="story-next-lab">Next in the story · still risk 1</span>
-      <a data-v="trend" href="#trend">Portfolio risk — what is getting riskier over time →</a>
+      <span class="story-next-lab">Still ④ Risk · the time dimension</span>
+      <a data-v="trend" href="#trend">Risk trend — what is getting riskier over time →</a>
     </div>
   </section>
 
@@ -913,12 +1065,12 @@
       <h2 class="risk" style="margin-top:6px">The real book over time · vintage read <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · real loan tape</span></h2>
       <div class="dash2">
         <div class="dash2-side">
-          <h3 class="acqsub">Disbursement year → 90+dpd today</h3>
+          <h3 class="compsub">Disbursement year → 90+dpd today</h3>
           <p class="lead" style="font-size:12px">Same-age comparison matters: young vintages look better only because they're young. Bands are months-on-book at the data's own anchor.</p>
           <table class="tbl" id="trend-tape-vint"></table>
         </div>
         <div class="dash2-main">
-          <h3 class="acqsub">Branch audit list · worst 90+dpd (≥100 accounts)</h3>
+          <h3 class="compsub">Branch audit list · worst 90+dpd (≥100 accounts)</h3>
           <p class="lead" style="font-size:12px">"Risky branch" ≠ "risky market" — these are the branches whose book underperforms; cross-read with the peer-twin lens before acting.</p>
           <table class="tbl" id="trend-tape-audit"></table>
         </div>
@@ -986,8 +1138,8 @@
       <table class="tbl" id="trendbranches"></table>
     </div>
     <div class="story-next no-print">
-      <span class="story-next-lab">Next in the story · risk 2 of 2</span>
-      <a data-v="acq" href="#acq">Competitive risk — rival pressure on the network →</a>
+      <span class="story-next-lab">Next in the story · ⑤ of ⑤</span>
+      <a data-v="acq" href="#acq">Competition — rival pressure on the network →</a>
     </div>
   </section>
 
@@ -1024,23 +1176,23 @@
       <p class="lead">Where and what collateral the book concentrates on — collateral <b>type</b> economics, the geographic mix, and the branches most over-indexed on a single brand. No-PII aggregates (cells ≥30 accounts). Cost structure: yield 23.99% (Land 15%) − opex 8% − CoF 2.5%.</p>
       <div class="dash2">
         <div class="dash2-side">
-          <h3 class="acqsub">Collateral type · economics &amp; risk</h3>
+          <h3 class="compsub">Collateral type · economics &amp; risk</h3>
           <p class="lead" style="font-size:12px">Gross spread before credit loss. Land = thin margin (4.5%) but lowest risk (5.9% 90+).</p>
           <table class="tbl" id="mkt-coll-econ"></table>
         </div>
         <div class="dash2-main">
-          <h3 class="acqsub">Densest branch collateral books</h3>
+          <h3 class="compsub">Densest branch collateral books</h3>
           <p class="lead" style="font-size:12px">Largest single-brand book at a branch — where the network is most concentrated on one make.</p>
           <table class="tbl" id="mkt-coll-branch"></table>
         </div>
       </div>
       <div class="dash2">
         <div class="dash2-side">
-          <h3 class="acqsub">Collateral type × region</h3>
+          <h3 class="compsub">Collateral type × region</h3>
           <table class="tbl" id="mkt-coll-region"></table>
         </div>
         <div class="dash2-main">
-          <h3 class="acqsub">Collateral age at origination → risk</h3>
+          <h3 class="compsub">Collateral age at origination → risk</h3>
           <table class="tbl" id="mkt-coll-age"></table>
         </div>
       </div>
@@ -1053,7 +1205,10 @@
     enrichment loop and served as data files. Provenance: World Bank Pink Sheet (prices), OAE planting-area
     (crops), WFP/HDX (drought), UNFPA (population), OpenStreetMap (13 POI layers), IMF/OECD/BoT/MOTS (macro).
     Pending the data.go.th run: DIW factories, DLT vehicle registrations.
-    <span class="no-print" style="color:var(--dim)">· <a href="/status" style="color:var(--dim)">Build status (internal)</a></span>
+    <!-- One name for /status. It used to be called "Build status (internal)" here, "Autonomy plan"
+         in its <title> and "Autonomy plan — project manager" in its own <h1> — three names for one
+         page. The page IS the autonomy plan, so that is the name everywhere. -->
+    <span class="no-print" style="color:var(--dim)">· <a href="/status" style="color:var(--dim)">Autonomy plan (internal)</a></span>
   </div>
 </main>
 
@@ -1066,7 +1221,7 @@
   <div id="msheet-body"></div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="vendor/leaflet/leaflet.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
