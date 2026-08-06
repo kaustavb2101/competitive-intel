@@ -44,42 +44,22 @@ jobs:
           # upstream prices reproduce byte-stable.
           python pipeline/pull_nabc_prices.py --stamp "$(date -u +%F)"
 
-      - name: Rebuild branch_agri + its downstream layers when prices changed
+      - name: Re-derive every layer the price pull left stale
         run: |
-          # The live crop YoY is embedded in the rec text of branch_recommendations.json and
-          # rolled up into regional_outlook.json, and every hash lives in provenance.json — so
-          # rebuilding branch_agri alone leaves those three drifted and the gate goes red on
-          # merge (the exact fix-up work that was recurring after every price refresh). Rebuild
-          # the whole deterministic, network-free downstream chain, in dependency order.
-          if git status --porcelain -- source-data/nabc_prices.json | grep -q .; then
-            echo "prices changed — rebuilding branch_agri + farmgate chain + downstream recs/outlook + provenance"
-            python pipeline/build_branch_agri.py
-            python pipeline/build_branch_recommendations.py
-            python pipeline/build_regional_outlook.py
-            # NABC prices ALSO feed the farm-gate price layer and its crop-stress / crop-margin /
-            # farmer-income consumers (build_farmgate_prices.py reads nabc_prices.json; the three crop
-            # builders prefer that farm-gate layer). Omitting them left farmgate_prices.json drifted and
-            # the gate red on merge (the recurring fix-up after a price refresh). Rebuild that chain too,
-            # in dependency order (farmgate FIRST, then its consumers), before provenance.
-            python pipeline/build_farmgate_prices.py
-            python pipeline/build_crop_stress.py
-            python pipeline/build_crop_margin.py
-            python pipeline/build_crop_farmer_income.py
-            # The unified commodities board (commodities.json) embeds farmgate's pulled date as its
-            # meta.farmgate_vintage and each crop's local YoY/price straight from farmgate_prices.json
-            # (build_commodities.py reads that file). Refreshing farmgate WITHOUT rebuilding commodities
-            # left commodities.json drifted and build_commodities.py --check RED on merge — the exact
-            # recurring qa-commodities-gate-drift the integration loop kept restoring by hand. Rebuild
-            # it here (after farmgate, before provenance, which censuses commodities.json's bytes/meta).
-            python pipeline/build_commodities.py
-            # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
-            # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
-            # which then censuses its bytes.
-            python pipeline/build_live_board.py
-            python pipeline/build_provenance.py
-          else
-            echo "prices unchanged — nothing to rebuild."
-          fi
+          # A price refresh moves far more than the file it writes. This step used to carry a
+          # hand-written list of downstream builders and that list went stale three times — its
+          # comments grew into a changelog of forgotten layers, and on 2026-08-04 it STILL missed
+          # eight (crop_mix, farm_book, occupation_risk, farm_income_impact, branch_risk,
+          # assist_price_radar, branch_peers, province_risk), so the PR arrived red-gated again.
+          #
+          # rederive_drift.py replaces the list with a fixed-point loop over the determinism gate's
+          # OWN --check set: run them all, rebuild whatever reports drift, repeat until nothing
+          # does. Its coverage is therefore the gate's coverage — the set that can turn CI red —
+          # and a builder added to the gate is picked up with no edit here. Provenance is rebuilt
+          # last, after the fan-out settles. Replayed against this job's 2026-08-04 output it
+          # reproduced all nine hand-fixed layers byte-for-byte in three passes.
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
 
       - name: Commit to a data branch + open a draft PR
         env:
@@ -87,12 +67,10 @@ jobs:
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/nabc-${{ github.run_id }}
         run: |
-          git add source-data/nabc_prices.json platform/data/branch_agri.json \
-                  platform/data/branch_recommendations.json platform/data/regional_outlook.json \
-                  source-data/farmgate_prices.json platform/data/crop_stress.json \
-                  platform/data/crop_margin.json platform/data/crop_farmer_income.json \
-                  platform/data/commodities.json \
-                  platform/data/live_board.json platform/data/provenance.json
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list to go stale — and without adding the deliberately
+          # uncommitted generated layers (branch_fuel/branch_cropland/…), which stay untracked.
+          git add -u source-data platform/data
           if git diff --cached --quiet; then
             echo "No change vs committed data (same upstream prices). No PR opened."
             exit 0
@@ -114,7 +92,9 @@ jobs:
             echo "computed from the daily series. build_branch_agri.py prefers this live YoY over the OAE"
             echo "snapshot (per-crop, OAE fallback for crops NABC lacks). Nothing fabricated."
             echo
-            echo "Downstream layers embedding the crop YoY (branch_recommendations, regional_outlook) and the provenance manifest are rebuilt in lockstep, so the determinism gate stays green. Run \`bash tests/run.sh check\` after merge."
+            cat /tmp/rederived.md
+            echo
+            echo "Run \`bash tests/run.sh check\` after merge."
           } > /tmp/pr_body.md
           gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
             --title "data: NABC live prices ($STAMP, run ${{ github.run_id }})" \
