@@ -488,6 +488,11 @@ INGESTS
   # instead, next to the change that caused it.
   ( cd "$PIPE" && python3 rederive_drift.py --selftest >/dev/null 2>&1 ) && ok "rederive_drift.py --selftest" || bad "rederive_drift.py --selftest (it can no longer read the --check set out of tests/run.sh — the data-pull workflows would silently stop re-deriving; fix RE_EXPLICIT/RE_HEREDOC in pipeline/rederive_drift.py)"
 
+  # resolve_derived_conflicts.sh auto-resolves merge conflicts and the committee/auto-merge jobs call
+  # it before pushing STRAIGHT TO MASTER, so its two abort paths are the only thing between an
+  # unattended job and a wrongly-resolved conflict in source-data/ or in code. Fixture-based, seconds.
+  bash "$REPO/tests/test_resolve_derived_conflicts.sh" >/dev/null 2>&1 && ok "resolve_derived_conflicts.sh (16 fixture cases)" || bad "resolve_derived_conflicts.sh fixture tests (run: bash tests/test_resolve_derived_conflicts.sh)"
+
   node --check "$PLATFORM/app.js" >/dev/null 2>&1 && ok "node --check app.js" || bad "node --check app.js (syntax error)"
 
   # every page: extract each inline <script> (that has no src) and node --check it.

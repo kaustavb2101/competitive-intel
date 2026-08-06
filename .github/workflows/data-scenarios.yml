@@ -57,11 +57,26 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "data: refresh scenarios.json ($(date -u +%F), run ${{ github.run_id }})" \
                      -m "Rebuilt by .github/workflows/data-scenarios.yml from the live measured signals. Full 'bash tests/run.sh check' passed 0-failed before this auto-merge."
-          if bash tests/run.sh check; then
+          # Sync to the base BEFORE gating — gating a tree and then changing it makes the gate
+          # result a lie. This was `git pull --rebase`, which conflicts on provenance.json every
+          # time the base moved (a phone session, another data job) and killed the job outright.
+          git fetch -q origin "$BASE_BRANCH"
+          SYNCED=1
+          bash pipeline/resolve_derived_conflicts.sh "origin/$BASE_BRANCH" || SYNCED=0
+          if [ "$SYNCED" -eq 1 ] && bash tests/run.sh check; then
             echo "Gate green — auto-merging to $BASE_BRANCH."
-            git pull --rebase origin "$BASE_BRANCH"
-            git push origin "HEAD:$BASE_BRANCH"
-            echo "Scenarios refreshed on $BASE_BRANCH."
+            for attempt in 1 2 3; do
+              git push origin "HEAD:$BASE_BRANCH" && { echo "Scenarios refreshed on $BASE_BRANCH."; exit 0; }
+              echo "push rejected (base moved) — re-syncing, attempt $attempt"
+              git fetch -q origin "$BASE_BRANCH"
+              bash pipeline/resolve_derived_conflicts.sh "origin/$BASE_BRANCH" || break
+            done
+            echo "Could not land after 3 attempts — falling back to a draft PR."
+            git checkout -b "$DATA_BRANCH"; git push origin "$DATA_BRANCH"
+            printf 'Automated weekly scenario refresh (run %s) — could not auto-land (base kept moving).\n' \
+              "${{ github.run_id }}" > /tmp/pr_body.md
+            gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+              --title "data: scenario refresh ($(date -u +%F)) [could not auto-land]" --body-file /tmp/pr_body.md
           else
             echo "Gate RED — falling back to a draft PR for review."
             git checkout -b "$DATA_BRANCH"
