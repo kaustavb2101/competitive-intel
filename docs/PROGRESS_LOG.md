@@ -42,6 +42,32 @@ carried per-province yield — the farm-household income lever. A province below
   MEASURED readout on the province deep-dive or the Overview collateral outlook. That's an app-visual change,
   so it should go via a PR with the render+health gate, not a master commit. The layer is now the first-class,
   gate-protected input that surfacing needs.
+## 2026-08-06 — UX loop: `.fb-h4` tag pill wraps so it stops bleeding out on mobile #overview (PR #307, merged + deployed + verified)
+
+Autonomous UX-improvement run. The named backlog is exhausted (remaining open items are all "bigger than
+surgical" content/mandate passes or device-tested-only 3D-page gaps excluded from unattended auto-merge), so
+this run reviewed routes with the project's own standing overflow audit (`tests/visual_overflow.js`) — which
+normally **skips** in the gate because the sandbox `node_modules` has no `playwright`. Running it against the
+global Playwright install (`/opt/node22/lib/node_modules`) surfaced a real, unguarded defect on the
+**`#overview` (Macro)** route at 390px: the collateral-book sub-headings (`.fb-h4` in `#collat-book`) pair a
+title with a `white-space:nowrap` provenance `.tag` pill in a `display:flex` container with **no `flex-wrap`**,
+so the longest heading forced the un-wrappable tag inline and **bled 49px past its box**, pushing the document
+to **393px wide (3px sideways page scroll / PAGEX)** on a phone.
+- **Fix:** one declaration — `flex-wrap:wrap` on `.fb-h4` (`platform/styles.css` L1751) so the tag drops to its
+  own line below the title on narrow viewports. Desktop (title+tag fit on one line) is a no-op by flex-wrap semantics.
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` **124 passed · 0 failed** (data validation 455/455);
+  Playwright at true mobile 390px/DSF2 → heading `right=344`, `scrollWidth==clientWidth==390` (PAGEX gone), and the
+  full `visual_overflow.js` audit **clean across all 11 routes** at mobile (was PAGEX 1 + BLEED 1 on macro); PNG
+  self-review confirmed the tag pill wraps cleanly with its rounded `var(--collat)` border intact; no secrets in
+  diff; diff is exactly `platform/styles.css` (+1 char) + the `docs/UXUI_AUDIT.md` entries, no stray files.
+- **Merge + deploy + verify:** PR #307 squash-merged to master (sha `e70893f`). Deploy-verified against the master
+  production alias — the deployed `styles.css` now carries `…gap:8px;flex-wrap:wrap}` and both `/` (hosts `#overview`)
+  and `/styles.css` return **HTTP 200** (no regression, no rollback needed). `/index.html` → 308 is the expected
+  Vercel `cleanUrls` redirect to `/`.
+- **New backlog item logged:** `qa-visual-overflow-not-in-ci` — the overflow audit that caught this silently skips in
+  the gate (no `playwright` in `node_modules`) despite a usable global install; wiring the phase to that global would
+  give the loop a real automated bleed/clip/page-x gate. Left for its own run (test infra, not `platform/`).
+
 ## 2026-08-06 — UX loop: `fonts.gstatic.com` preconnect added on `live.html` (PR #303, merged + deployed + verified)
 
 Autonomous UX-improvement run. The clean surgical backlog is exhausted (the remaining open items are all
