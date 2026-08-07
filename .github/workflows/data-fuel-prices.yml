@@ -35,33 +35,23 @@ jobs:
         run: python pipeline/pull_fuel_prices.py --stamp "$(date -u +%F)"
       - name: Reproject to platform/data when prices changed
         run: |
-          # pull_fuel_prices writes only the source; the committed derived layer
-          # (platform/data/fuel_prices.json) + the provenance manifest must be rebuilt in
-          # lockstep or the determinism gate goes red on merge. Both builders are
-          # deterministic + network-free re-projections.
           if git status --porcelain -- source-data/fuel_prices.json | grep -q .; then
-            echo "prices changed — rebuilding platform/data/fuel_prices.json + commodities.json + provenance.json"
-            python pipeline/build_fuel_prices.py
-            # The unified commodities board (commodities.json) embeds the retail diesel price straight
-            # from fuel_prices.json (build_commodities.py reads it as the cost line). Refreshing fuel
-            # WITHOUT rebuilding commodities left commodities.json drifted and build_commodities.py
-            # --check RED — the recurring qa-commodities-gate-drift. Rebuild it before provenance
-            # (which censuses commodities.json's bytes/meta).
-            python pipeline/build_commodities.py
-            # Append today's pump price to the accumulated series BEFORE the board is rebuilt.
-            # The Bangchak API publishes only today's number, so this row is the only record of it
-            # that will ever exist — miss the append and that day is gone from the diesel line for
-            # good. Keyed on the file's own meta.pulled, so a re-run the same day is a no-op.
+            # Append today's pump price to the accumulated series FIRST. The Bangchak API publishes
+            # only today's number, so this row is the only record of it that will ever exist — miss
+            # the append and that day is gone from the diesel line for good. Keyed on the file's own
+            # meta.pulled, so a re-run the same day is a no-op. It is an APPEND, not a
+            # re-derivation, which is why the fixed-point driver below deliberately never runs it.
             python pipeline/append_history.py
-            python pipeline/build_feed_history.py
-            # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
-            # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
-            # which then censuses its bytes.
-            python pipeline/build_live_board.py
-            python pipeline/build_provenance.py
           else
-            echo "prices unchanged — nothing to rebuild."
+            echo "prices unchanged — nothing to append."
           fi
+          # Everything else a fuel refresh touches is a pure re-derivation, and the hand-named list
+          # that used to live here (fuel_prices, commodities, feed_history, live_board, provenance)
+          # is the same shape of list that went stale three times on the NABC job.
+          # rederive_drift.py iterates the determinism gate's OWN --check set to a fixed point, so
+          # the gate below sees a tree that is already consistent.
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
       - name: Gate, then auto-merge to the base branch (draft PR only on gate failure)
         env:
           GH_TOKEN: ${{ github.token }}
@@ -72,9 +62,9 @@ jobs:
           # went provenance-stale every day. Same pattern as committee-cycle.yml — run the FULL
           # determinism gate first; 0-failed earns a direct rebase+push to the base branch. Only a
           # RED gate falls back to a draft PR for human eyes.
-          git add source-data/fuel_prices.json platform/data/fuel_prices.json platform/data/commodities.json \
-                  source-data/feed_history.json platform/data/feed_history.json \
-                  platform/data/live_board.json platform/data/provenance.json
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list to go stale, and never adds an untracked generated layer.
+          git add -u source-data platform/data
           if git diff --cached --quiet; then
             echo "No change vs committed prices. Nothing to merge."; exit 0
           fi
@@ -83,12 +73,31 @@ jobs:
           H="$(python -c "import json;h=json.load(open('source-data/fuel_prices.json'))['headline'];print('diesel B%s/L, gasohol95 B%s/L'%(h['diesel'],h['gasohol95']))")"
           git commit -m "data: live fuel prices ($(date -u +%F), run ${{ github.run_id }})" \
                      -m "Pulled by .github/workflows/data-fuel-prices.yml — Bangchak retail ($H). Full 'bash tests/run.sh check' passed 0-failed before this auto-merge."
-          if bash tests/run.sh check; then
+          # The base may have advanced since checkout — another data job, or a phone session. This
+          # used to be `git pull --rebase`, which conflicts on provenance.json EVERY time that
+          # happens (a single-line census of 441 files that both sides regenerate) and killed the
+          # job outright. resolve_derived_conflicts.sh takes the base's side of the generated layers
+          # and recomputes them, which cannot conflict because it never merges. It runs BEFORE the
+          # gate on purpose: gating a tree and then changing it would make the gate result a lie.
+          git fetch -q origin "$BASE_BRANCH"
+          SYNCED=1
+          bash pipeline/resolve_derived_conflicts.sh "origin/$BASE_BRANCH" || SYNCED=0
+          if [ "$SYNCED" -eq 1 ] && bash tests/run.sh check; then
             echo "Gate green — auto-merging to $BASE_BRANCH."
-            # master may have advanced since checkout — rebase before pushing.
-            git pull --rebase origin "$BASE_BRANCH"
-            git push origin "HEAD:$BASE_BRANCH"
-            echo "Fuel prices landed on $BASE_BRANCH ($H)."
+            # Re-sync and retry: the base can move again between the gate and the push.
+            for attempt in 1 2 3; do
+              git push origin "HEAD:$BASE_BRANCH" && { echo "Fuel prices landed on $BASE_BRANCH ($H)."; exit 0; }
+              echo "push rejected (base moved) — re-syncing, attempt $attempt"
+              git fetch -q origin "$BASE_BRANCH"
+              bash pipeline/resolve_derived_conflicts.sh "origin/$BASE_BRANCH" || break
+            done
+            echo "Could not land after 3 attempts — falling back to a draft PR."
+            git checkout -b "$DATA_BRANCH"
+            git push origin "$DATA_BRANCH"
+            printf 'Automated daily fuel-price pull (run %s) from `%s` — could not auto-land (base kept moving).\n\n**Headline:** %s\n' \
+              "${{ github.run_id }}" "$BASE_BRANCH" "$H" > /tmp/pr_body.md
+            gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+              --title "data: live fuel prices ($(date -u +%F)) [could not auto-land]" --body-file /tmp/pr_body.md
           else
             echo "Gate RED — falling back to a draft PR for review."
             git checkout -b "$DATA_BRANCH"
