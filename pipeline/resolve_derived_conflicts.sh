@@ -22,12 +22,14 @@
 #   conflicts confined to platform/data/**  -> take master's side, re-derive, done.
 #   a conflict ANYWHERE else                -> a real disagreement. Abort untouched, leave it to a human.
 #
-# source-data/ is deliberately NOT auto-resolved even though some of it is derived. It also holds the
-# raw pulls, and two of those (source-data/feed_history.json and its platform twin) are ACCUMULATORS
-# for feeds that publish only "now" — ThaiWater gauges, the Bangchak pump price. Taking either side
-# whole silently deletes a day of telemetry that cannot be re-pulled, because the file exists
-# precisely because the API has no archive. That needs a date-keyed union by a human who can see what
-# each side added, so a source-data conflict aborts rather than guessing.
+# source-data/ is deliberately NOT auto-resolved as a class, because it holds the raw pulls and
+# taking either side whole would silently drop one. The ONE exception is
+# source-data/feed_history.json, an accumulator for feeds that publish only "now" — ThaiWater
+# gauges, the Bangchak pump price — where the API has no archive and the committed file is the only
+# copy of yesterday. Picking a side there deletes a day of telemetry that cannot be re-pulled; the
+# correct answer is a date-keyed union, which merge_feed_history.py does exactly (and refuses when
+# the two sides report DIFFERENT values for the same series on the same date). Everything else
+# under source-data/ still aborts rather than guessing.
 #
 #     bash pipeline/resolve_derived_conflicts.sh [base-ref]      # default origin/master
 #
@@ -71,33 +73,37 @@ if [ -z "$CONFLICTS" ]; then
 else
   OUTSIDE="$(echo "$CONFLICTS" | grep -v '^platform/data/' || true)"
 
-  # APPEND-AT-TOP LOGS. docs/PROGRESS_LOG.md is reverse-chronological and nobody edits anyone
-  # else's entry, so two branches always collide there on independent top insertions — the same
-  # non-disagreement as provenance.json, one file up. merge_append_log.py unions them, but only
-  # after PROVING the merge was purely additive; anything else it refuses (exit 3) and the file
-  # stays in OUTSIDE, where it aborts the run exactly as before.
-  if [ -n "$OUTSIDE" ] && [ -f pipeline/merge_append_log.py ]; then
+  # APPEND-ONLY FILES. Two of them collide on every concurrent branch for the same reason:
+  #   docs/PROGRESS_LOG.md        both sides insert a new entry at the top of a reverse-chron log
+  #   source-data/feed_history.json  both sides append a day to an accumulator whose sources
+  #                               publish only "now" and keep no archive
+  # Neither is a disagreement — each side holds something the other never saw. The two mergers
+  # union them, but each does a real 3-way merge per entry / per (series, date) first and REFUSES
+  # (exit 3) if both sides changed the same one differently. Anything they refuse stays in OUTSIDE
+  # and aborts the run exactly as before, so no contested text or measurement is ever auto-decided.
+  if [ -n "$OUTSIDE" ]; then
     REMAINING=""
     STAGE="$(mktemp -d)"
     while IFS= read -r f; do
       [ -z "$f" ] && continue
+      MERGER=""
       case "$f" in
-        docs/PROGRESS_LOG.md)
-          git show ":1:$f" > "$STAGE/base"   2>/dev/null || : > "$STAGE/base"
-          git show ":2:$f" > "$STAGE/ours"   2>/dev/null || : > "$STAGE/ours"
-          git show ":3:$f" > "$STAGE/theirs" 2>/dev/null || : > "$STAGE/theirs"
-          if python3 pipeline/merge_append_log.py --base "$STAGE/base" --ours "$STAGE/ours" \
-                                                  --theirs "$STAGE/theirs" --out "$f"; then
-            git add -- "$f"
-            echo "union-merged $f (append-at-top log — kept both sides' entries, newest first)"
-          else
-            REMAINING="${REMAINING}${f}
-"
-          fi
-          ;;
-        *) REMAINING="${REMAINING}${f}
-" ;;
+        docs/PROGRESS_LOG.md)          MERGER=pipeline/merge_append_log.py ;;
+        source-data/feed_history.json) MERGER=pipeline/merge_feed_history.py ;;
       esac
+      if [ -n "$MERGER" ] && [ -f "$MERGER" ]; then
+        git show ":1:$f" > "$STAGE/base"   2>/dev/null || : > "$STAGE/base"
+        git show ":2:$f" > "$STAGE/ours"   2>/dev/null || : > "$STAGE/ours"
+        git show ":3:$f" > "$STAGE/theirs" 2>/dev/null || : > "$STAGE/theirs"
+        if python3 "$MERGER" --base "$STAGE/base" --ours "$STAGE/ours" \
+                             --theirs "$STAGE/theirs" --out "$f"; then
+          git add -- "$f"
+          echo "union-merged $f (append-only — kept both sides' rows)"
+          continue
+        fi
+      fi
+      REMAINING="${REMAINING}${f}
+"
     done <<EOF
 $OUTSIDE
 EOF
