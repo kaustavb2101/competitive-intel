@@ -153,15 +153,16 @@ grep -q "the entry both sides start from" docs/PROGRESS_LOG.md && ok "kept the s
 [ -z "$(git status --porcelain)" ] && ok "committed the merge" || no "left a dirty tree"
 
 echo
-echo "=== 9. an EDITED shared log entry is a real conflict and must still ABORT ==="
-# The union is only valid because the file is append-only. If a side reworded someone else's entry
-# that assumption is void, and this must fall back to the human path rather than silently picking.
+echo "=== 9. BOTH sides rewording one shared entry is a real conflict and must still ABORT ==="
+# The union is safe because each pre-existing entry gets its own 3-way merge. One side editing an
+# old entry is taken; both sides editing it differently is a disagreement about the same words and
+# has to reach a human rather than being silently decided.
 setup
 git checkout -q -B mobile master
-printf '# PROGRESS LOG\n\nReverse-chronological.\n\n## 2026-08-06 — master entry\n\nm\n\n## 2026-08-01 — the entry both sides start from\n\nbody\n' > docs/PROGRESS_LOG.md
+printf '# PROGRESS LOG\n\nReverse-chronological.\n\n## 2026-08-06 — master entry\n\nm\n\n## 2026-08-01 — the entry both sides start from\n\nMASTER REWORD\n' > docs/PROGRESS_LOG.md
 git commit -qam mobile
 git checkout -q -B laptop master
-printf '# PROGRESS LOG\n\nReverse-chronological.\n\n## 2026-08-06 — branch entry\n\nb\n\n## 2026-08-01 — the entry both sides start from\n\nREWORDED\n' > docs/PROGRESS_LOG.md
+printf '# PROGRESS LOG\n\nReverse-chronological.\n\n## 2026-08-06 — branch entry\n\nb\n\n## 2026-08-01 — the entry both sides start from\n\nBRANCH REWORD\n' > docs/PROGRESS_LOG.md
 git commit -qam laptop
 BEFORE=$(git rev-parse HEAD)
 bash pipeline/resolve_derived_conflicts.sh mobile >/dev/null 2>&1; rc=$?
@@ -171,7 +172,7 @@ bash pipeline/resolve_derived_conflicts.sh mobile >/dev/null 2>&1; rc=$?
 
 echo
 echo "=== 10. merge_append_log.py's own unit cases ==="
-python3 pipeline/merge_append_log.py --selftest >/dev/null 2>&1 && ok "--selftest (9 cases)" || no "--selftest failed"
+python3 pipeline/merge_append_log.py --selftest >/dev/null 2>&1 && ok "--selftest (13 cases)" || no "--selftest failed"
 
 echo
 echo "==================== $PASS passed, $FAIL failed ===================="
