@@ -3372,6 +3372,19 @@ function drawCompCoverage(){
           `of ${fp.n_ranked} — points on the ground: ${fchain}. ${TAG_M} `+
           `<span class="sub">Every number here is measured (own network + rivals' official locators); a locator counts a group's whole retail network, beyond its listed-entity IR count, so Srisawad's full footprint overtakes AutoX even though AutoX leads on cited branch count. Heng excluded (locator Cloudflare-blocked → lower bound).</span></div>`;
       }
+      // BOOK PER BRANCH — the raw book-scale chain (peers' bigger books) reframed as a STRUCTURAL
+      // intensity read: how much book each door carries. AutoX book = MEASURED (real loan tape,
+      // current outstanding); peer books = REPORTED (cited IR). Null-safe (older data has no block).
+      const bi=ns.book_intensity;
+      if(bi&&bi.autox_rank&&Array.isArray(bi.ranking)){
+        const bchain=bi.ranking.map(o=>{
+          const nm=o.operator==='AutoX'?'<b style="color:var(--accent)">AutoX</b>':o.operator;
+          const tag=o.operator==='AutoX'?'◆':'★';
+          return `${nm} <span class="mono">฿${o.book_per_branch_m}m</span>${tag}`;
+        }).join(' &rsaquo; ');
+        nstxt+=`<div style="margin-top:6px"><b>Book per branch — a structural intensity read</b>: ${bchain}. ${TAG_M} ${TAG_E} `+
+          `<span class="sub">${bi.insight||''} AutoX book is <b>measured</b> (real loan tape ◆, current outstanding); peer books are <b>reported</b> IR (★). Structural density, not profitability, NPL or market share; Heng excluded (no cited book).</span></div>`;
+      }
     }
     ro.innerHTML=`<b>The census is now the near-complete rival network.</b> ${ttxt} ${TAG_M} ${TAG_E}${nstxt}`+
       methodBox(null,
