@@ -105,11 +105,32 @@ def _fold_current_account(indicators):
     if not latest or latest.get("current_account") is None:
         return
     period = latest["period"]
-    indicators["current_account"] = {
-        "value": latest["current_account"], "period": period, "unit": "USD million",
+    prelim = d["meta"].get("preliminary_periods") or []
+    entry = {
+        "latest_month": {"value": latest["current_account"], "period": period,
+                         "preliminary": period in prelim},
         "source": "Bank of Thailand — Balance of Payments (summary), monthly",
-        "preliminary": period in (d["meta"].get("preliminary_periods") or []),
     }
+    # A single month of the current account swings hard (April 2026 alone printed -7,591 USD
+    # million); the honest exec headline is the rolling twelve-month NET, so the chip carries a
+    # trailing sum, not a season. Computed here, deterministically, from the MEASURED monthly
+    # series already committed in source-data/bot_current_account.json — no new pull.
+    series = (d.get("series") or {}).get("current_account") or {}
+    periods = sorted(series.keys())
+    if len(periods) >= 12:
+        window = periods[-12:]
+        total = sum(series[p] for p in window)
+        entry["trailing_12m"] = {
+            "value": round(total, 2), "period_end": window[-1], "period_start": window[0],
+        }
+        entry["value"] = entry["trailing_12m"]["value"]
+        entry["period"] = window[-1]
+        entry["unit"] = "USD million (trailing 12mo)"
+    else:
+        entry["value"] = latest["current_account"]
+        entry["period"] = period
+        entry["unit"] = "USD million (single month)"
+    indicators["current_account"] = entry
 
 
 def _fold_tourist_arrivals(indicators):

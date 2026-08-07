@@ -1823,12 +1823,18 @@ function renderMacroIndicators(){
     cards.push([`Tourists`, `${tr.value}M`,
       `arrivals, trailing 12 months${win} · ${srcShort(tr.source)} ${tr.period}`]);
   }
-  // NOT SHOWN: indicators.current_account. It is MEASURED and it is on the board's own data file,
-  // but it is a SINGLE MONTH — April 2026 printed −7,591 USD million on a series whose trailing
-  // twelve months net to roughly +847M. On a strip that is scanned rather than read, that one month
-  // reads as a national crisis; monthly trade swings that hard routinely. The honest version is a
-  // trailing sum, and no trailing sum is persisted in platform/data yet, so the chip waits for the
-  // builder rather than shipping the alarming half of the truth.
+  // Current account: a SINGLE month swings hard (April 2026 printed −7,591 USD million and on a
+  // scanned strip reads as a national crisis), so the chip carries the rolling twelve-month NET,
+  // which the builder now persists as trailing_12m off the MEASURED BoT series. A trailing surplus
+  // is the honest headline; the alarming single month stays out of the exec strip. Falls back to
+  // the single month only if a trailing sum is absent (short series).
+  const ca=I.current_account, c12=ca&&ca.trailing_12m;
+  if(ca&&ca.value!=null){
+    const surplus=ca.value>=0;
+    const win=(c12&&c12.period_start&&c12.period_end)?` (${c12.period_start} → ${c12.period_end})`:'';
+    cards.push([`Current account`, `${surplus?'+':'−'}${Math.abs(Math.round(ca.value)).toLocaleString()}`,
+      `USD mn · ${c12?'trailing 12 months':'latest month'}${win} · ${surplus?'surplus':'deficit'} · ${srcShort(ca.source)} BoP ${ca.period}`]);
+  }
   // Owner review 2026-08-02, point 6: "USD/THB cannot be a static number. This number is probably
   // updated real-time everyday on any other platform." It was a World Bank ANNUAL average sitting on
   // a board of monthly and quarterly indicators. pull_macro.py now takes the ECB daily reference

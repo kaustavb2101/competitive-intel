@@ -3,6 +3,40 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-07 — Integration loop: ship the withheld Current-Account macro chip on a trailing-12mo net (PR)
+
+Autonomous integration/improvement run. The prompt's data-integration backlog (items 1–4: FPO PICO
+census, per-branch cropland, data.go.th distillation, GISTDA 40m satellite) is DONE or CI-blocked, and
+the CI-reachable *data pulls* are exhausted. A negative-space sweep surfaced the highest-value CLEAN,
+deterministic, network-free lever: **the MEASURED current-account chip that has been deliberately
+withheld from the Overview macro strip** — the owner-review §0d item 1 follow-up.
+
+- **The gap:** `build_macro_indicators.py._fold_current_account` surfaced only `meta.latest` — a SINGLE
+  month (April 2026 = **−7,591 USD million**), which on a scanned exec strip reads as a national crisis.
+  `app.js` therefore carried a five-line `// NOT SHOWN: indicators.current_account` block explaining the
+  chip "waits for the builder rather than shipping the alarming half of the truth" — the honest headline
+  is a trailing sum, and none was persisted. The MEASURED monthly BoT Balance-of-Payments series (256
+  months, 2005-01→2026-04) was already committed in `source-data/bot_current_account.json`; its trailing
+  twelve months net to **+846.57 USD million** (a surplus), exactly the owner-note "roughly +847M".
+- **The fix (mirrors the existing `_fold_tourist_arrivals` pattern in the same file):**
+  `_fold_current_account` now computes a `trailing_12m` block (sum of the last 12 periods of
+  `series['current_account']`, deterministic, network-free) and sets `value`/`period`/`unit` to the
+  trailing net, keeping `latest_month` for reference. `app.js` (`renderMacroIndicators`) replaces the
+  NOT-SHOWN comment with a "Current account +847" chip — subtitle "USD mn · trailing 12 months
+  (2025-05 → 2026-04) · surplus · Bank of Thailand BoP 2026-04". Falls back to the single month only on
+  a <12-month series.
+- **Verification.** `bash tests/run.sh check` → **124 passed / 0 failed** (data-integrity 455/455);
+  `build_macro_indicators.py --check` byte-exact after regen; `build_provenance.py` regenerated (136
+  layers, 0 unlabelled); `node --check platform/app.js` clean. Headless render of `index.html` confirms
+  the settled DOM carries `Current account +847` in the macro strip with no uncaught error — non-alarming
+  surplus, not the −7,591 single month. Nothing else on the board changed (all other chips byte-identical).
+- **Decision — shipped as a draft PR, not a direct master commit,** because it adds a visible chip to the
+  exec Overview macro board. The number is MEASURED (BoT BoP monthly series); only the aggregation window
+  (trailing-12mo net vs single month) changed, computed deterministically from the committed series.
+- **Next integration:** CI-reachable data pulls remain exhausted; the still-open objective-#1 lever is the
+  GISTDA flooded-**area** dissolve (NEXT_STEPS §0 — needs a real shapely geometry dissolve over overlapping
+  per-event polygons, a heavier multi-step job than one clean run affords).
+
 ## 2026-08-07 — Intelligence loop: extend the live freshness guard to the fuel-price daily-CI layer
 
 Autonomous market & service intelligence run. Data room re-confirmed healthy up front (live master
