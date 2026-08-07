@@ -54,6 +54,14 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          # Stash the resolver OUTSIDE the tree before touching it. The loop below checks out each PR
+          # branch, which overwrites the working tree with that branch's files — and a branch cut
+          # before the resolver existed does not contain it, so calling `pipeline/...` after checkout
+          # gives "No such file or directory" and every such PR is skipped. Run master's copy instead:
+          # it is the version we want applied regardless of what the branch carries.
+          RESOLVER="$RUNNER_TEMP/resolve_derived_conflicts.sh"
+          cp pipeline/resolve_derived_conflicts.sh "$RESOLVER"
+
           # headRepositoryOwner filters out forks — we cannot push to those.
           PRS=$(gh pr list --state open --base master --limit 50 \
                   --json number,headRefName,headRepositoryOwner \
@@ -80,7 +88,7 @@ jobs:
             # so one PR with a real conflict would stop every later PR from being refreshed.
             # Putting it in a condition context is what keeps -e from firing.
             rc=0
-            bash pipeline/resolve_derived_conflicts.sh origin/master || rc=$?
+            bash "$RESOLVER" origin/master || rc=$?
             if [ "$rc" -eq 0 ]; then
               if git push origin "HEAD:$BRANCH"; then
                 echo "- #$NUM \`$BRANCH\` — merged master + re-derived, mergeable again" >> "$GITHUB_STEP_SUMMARY"
