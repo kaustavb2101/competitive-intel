@@ -3,45 +3,31 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
-## 2026-08-06 — Integration loop: distilled the unused OAE yearbook into a MEASURED per-province crop YIELD layer
+## 2026-08-07 — UX loop: aria-label on the 3 deck.gl pages' theme toggle (PR #314, merged + deployed)
 
-Autonomous integration run. Re-verified the prompt's backlog before picking: items 1 (FPO PICO → competitor
-census) and 2 (per-branch `branch_cropland`) are already DONE + surfaced; item 3's CI-reachable legs
-(DIW/vehicle/DBD) are distilled; item 4 (GISTDA 40m crop) needs `GISTDA_SPHERE_KEY`, which is a repo secret
-NOT present in this shell (only injected into Actions steps), so a real crop pull can't be produced or
-verified here. A DBD refresh was probed live and is now **403 from CI** even for the already-committed month
-(openapi.dbd.go.th blocking datacenter IPs) — logged, not faked. A negative-space sweep then surfaced the
-real gap: **`source-data/staging/oae_agstats.json` (303 KB, committed, retrieved 2026-07-20) had ZERO
-consumers** — measured OAE per-province crop area/yield/production sitting unused.
+Autonomous UX-improvement loop, safeguard-gated auto-merge. The original 7-item audit backlog is fully
+closed and the remaining "Open backlog" items are all flagged unsuitable for unattended auto-merge
+(device-tested gesture pages, bigger-than-surgical mandate/viewBox work, or test-infra), so this run
+reviewed the nav chrome and found a fresh surgical a11y gap.
 
-**Shipped:** `pipeline/build_oae_agstats.py` → `platform/data/oae_agstats.json` (58 KB). A clean,
-canonical-77-province-keyed MEASURED layer: per-province AREA · **YIELD (kg/rai)** · PRODUCTION for the six
-major field crops (rice main+second season, maize, cassava, sugarcane, oil palm, rubber), each with its
-latest measured year, a multi-year `yield_trend_pct`, a national-benchmark block, and the 10-year national
-farm-gate price series (with YoY). **Why yield specifically:** the existing crop layers already cover
-per-province AREA (DOAE 2568 → `branch_cropland`) and PRICE (NABC/OAE cascade → `crop_stress`), but nothing
-carried per-province yield — the farm-household income lever. A province below the national yield benchmark
-(or on a multi-year yield decline) is a direct crop-household repayment-capacity signal for the agri book
-(objective #1). It scores nothing; it is a verbatim yearbook read.
+- **The gap (WCAG 4.1.2 Name/Role/Value):** the theme-toggle button on the three deck.gl pages
+  (`province.html`, `rayong-catchment.html`, `branch-explorer.html`) carried only `title` + `aria-pressed`
+  with the `☾`/`☀` glyph as its content and **no `aria-label`**. In the accessible-name computation,
+  element content beats `title`, so a screen reader announced the button by its moon/sun glyph character
+  — and `sync()` flips that glyph on every toggle, so the announced name changed with state. The three
+  `styles.css` pages (index/data/status) already carry `aria-label="Toggle light or dark theme"`.
+- **The fix (3 pages, one attribute each):** added the identical `aria-label` (between `title=` and
+  `aria-pressed=`, byte-for-byte matching the canonical markup) so all six toggle buttons now expose the
+  same stable accessible name; `aria-pressed` still conveys light/dark state. SR-only — zero visual change.
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` = **0 failed** (exit 0; `node --check
+  inline JS` PASS on all three changed pages); headless render of `province.html?p=rayong` — settled DOM
+  shows the aria-label, PNG self-reviewed (nav/panels/3D scene intact, toggle unchanged); no secrets;
+  diff = exactly the 3 attrs + one `docs/UXUI_AUDIT.md` line.
+- **Merge + deploy + verify:** squash-merged as `2c61967`; master auto-deployed to Vercel; after
+  propagation the prod alias `/` and the changed routes (`/province`, `/rayong-catchment`,
+  `/branch-explorer`) all return **HTTP 200**, and a cache-busted fetch confirms the deployed
+  `/province` now serves `aria-label="Toggle light or dark theme"` on the toggle. No rollback needed.
 
-- **Honesty / normalisation, all documented in `meta.gaps`:** region-total/national-total rows excluded
-  (nationals feed the benchmark block); 5 provinces arriving with a doubled sara-am vowel (`ำา`→`ำ`, a PDF
-  parse artifact) repaired before mapping so they aren't silently dropped; `อื่น ๆ` (others) rows counted
-  unmapped, never guessed; BE→CE year conversion for the rice tables; area BASIS differs by crop
-  (planted/harvested/standing — pinned per crop) so comparisons stay same-crop-only.
-- **Provenance guard caught a real mislabel:** the first build classified as ESTIMATED because the source
-  text "no modelling or synthesis" contains the substring "SYNTH" (an `EST_MARKER`). Reworded to
-  "not modelled, not derived" → correctly MEASURED. `provenance.json`: 137 layers · **76 measured** (was
-  75) · 61 estimated · **0 unlabelled**.
-- **Verified:** `bash tests/run.sh check` green — **123 passed · 0 failed** (was 122; the new
-  `build_oae_agstats.py --check` is the +1), data integrity 455/455, `check_site_health.py --local` accepts
-  all committed payloads. Because the input is git-committed (not a re-pullable cache), `--check` ALWAYS
-  runs in the gate — a stronger guard than the SKIP-on-absent crop builders. No app code touched (pure data
-  layer + gate + provenance), so committed straight to master.
-- **Next recommended integration:** SURFACE this layer — a per-province "crop yield vs national benchmark"
-  MEASURED readout on the province deep-dive or the Overview collateral outlook. That's an app-visual change,
-  so it should go via a PR with the render+health gate, not a master commit. The layer is now the first-class,
-  gate-protected input that surfacing needs.
 ## 2026-08-07 — Intelligence loop (PEER COMPARISON): book-per-branch structural intensity on #acq
 
 Autonomous market & service intelligence run. The competitor board's national-standing block already
@@ -486,6 +472,88 @@ pinch-zoom; needs `touch-action:none` on the canvas + a real-device gesture test
 attended run, not unattended auto-merge) or `ux-live-chart-mobile-viewbox-responsive` (a responsive
 viewBox for live.html's SVG charts — touches `lineChart()` coordinate math, bigger than surgical).
 
+## 2026-08-06 — Integration loop: surface the MEASURED debt-PURPOSE (consumption-vs-productive) read on #acq (PR, visual change)
+
+Autonomous integration run. **First re-confirmed the CI-doable DATA-pull backlog is genuinely
+exhausted** (consistent with the last ~6 runs): backlog items 1–2 (FPO PICO → competitor census,
+`branch_cropland`) are DONE and surfaced; item 3's excise/BAAC/SME legs are not CI-reachable
+(Thai-IP/owner-side); **item 4 (GISTDA 40m `check-crop`) is blocked this run — `GISTDA_SPHERE_KEY`
+is NOT present in this CI env** (I did not fake it). A negative-space sweep also confirmed the
+STRUCTURAL backlog is dry (every deterministic builder is `--check`-gated; no offline-rebuildable
+stale layer; no fetched-but-unbuilt layer; the only "dead" top-level layers are deliberate
+intermediates). So the improvement is surfacing MEASURED data already committed but hidden, not a new pull.
+
+**The gap (objective #1, portfolio risk):** `debt_source.json` (NSO SES household debt, MEASURED,
+7 waves 2011–2023) carries a full debt-**purpose** split — `agri_debt`, `business_debt`,
+`consumption_debt`, `in_system` — on every `national`/`by_region`/`by_class` row, but
+`renderDebtSource()` (`platform/app.js`) rendered only the informal-share cut + `agri_pct` ("For
+farming"). The production-vs-consumption mix — which is a direct credit-quality read for a
+title-lender, since consumption debt has **no income stream of its own to service it**, unlike a
+loan taken to farm or run a business — was committed but never shown.
+
+**Ship (app.js only, +national purpose lead + one table column):**
+- A national lead read: **consumption is 36% of the average household's debt — already more than the
+  22% borrowed productively (farming 14% + business 8%)**; the rest (~42%) is housing/education etc.
+  (honest: the three named purposes don't sum to 100%, the residual is stated, not hidden).
+- A **"For consumption"** column on the by-class table beside "For farming", coloured a risk cue
+  (`--agri` red) when the consumption share is ≥45% of the book. It runs **23–66%** across classes —
+  heaviest among wage-labour households (Farm/forestry/fishery labourer 66%, no productive asset),
+  lightest among farm operators whose borrowing is majority productive (59–68% farming). All values
+  computed in JS from the committed debt figures, so they stay correct across a vintage refresh.
+
+**Verified:** `bash tests/run.sh check` → **121 passed · 0 failed** (455/455 data integrity;
+`node --check` on app.js clean); no `platform/data` file added → no `build_provenance.py` regen owed.
+Headless render of `index.html#acq` (chromium-direct harness) → `data-errors="[]"`, the new column +
+lead present, rendered values exact (36% / 14% / 8% / 23–66% / correct heaviest class). Overflow
+audit SKIPs (playwright not installed in CI) but the new column lives inside the existing `.tblwrap`
+horizontal-scroll region, so it cannot cause page-x overflow by construction. **This CHANGES app
+visuals → opened a draft PR rather than committing to master.**
+
+**Recommend next:** item 4 (GISTDA 40m per-branch crop) once `GISTDA_SPHERE_KEY` is available to the
+runner — it's the highest-value remaining data upgrade but needs the secret + attended review (it
+alters `branch_cropland` numbers). Otherwise the remaining unlocks are all Thai-IP/owner-side
+(commit the FPO PICO / excise / BAAC raw pulls from the laptop; distill `smebank_credit`/`baac_credit`
+penetration once their raw CSVs are committed).
+
+## 2026-08-06 — Integration loop: distilled the unused OAE yearbook into a MEASURED per-province crop YIELD layer
+
+Autonomous integration run. Re-verified the prompt's backlog before picking: items 1 (FPO PICO → competitor
+census) and 2 (per-branch `branch_cropland`) are already DONE + surfaced; item 3's CI-reachable legs
+(DIW/vehicle/DBD) are distilled; item 4 (GISTDA 40m crop) needs `GISTDA_SPHERE_KEY`, which is a repo secret
+NOT present in this shell (only injected into Actions steps), so a real crop pull can't be produced or
+verified here. A DBD refresh was probed live and is now **403 from CI** even for the already-committed month
+(openapi.dbd.go.th blocking datacenter IPs) — logged, not faked. A negative-space sweep then surfaced the
+real gap: **`source-data/staging/oae_agstats.json` (303 KB, committed, retrieved 2026-07-20) had ZERO
+consumers** — measured OAE per-province crop area/yield/production sitting unused.
+
+**Shipped:** `pipeline/build_oae_agstats.py` → `platform/data/oae_agstats.json` (58 KB). A clean,
+canonical-77-province-keyed MEASURED layer: per-province AREA · **YIELD (kg/rai)** · PRODUCTION for the six
+major field crops (rice main+second season, maize, cassava, sugarcane, oil palm, rubber), each with its
+latest measured year, a multi-year `yield_trend_pct`, a national-benchmark block, and the 10-year national
+farm-gate price series (with YoY). **Why yield specifically:** the existing crop layers already cover
+per-province AREA (DOAE 2568 → `branch_cropland`) and PRICE (NABC/OAE cascade → `crop_stress`), but nothing
+carried per-province yield — the farm-household income lever. A province below the national yield benchmark
+(or on a multi-year yield decline) is a direct crop-household repayment-capacity signal for the agri book
+(objective #1). It scores nothing; it is a verbatim yearbook read.
+
+- **Honesty / normalisation, all documented in `meta.gaps`:** region-total/national-total rows excluded
+  (nationals feed the benchmark block); 5 provinces arriving with a doubled sara-am vowel (`ำา`→`ำ`, a PDF
+  parse artifact) repaired before mapping so they aren't silently dropped; `อื่น ๆ` (others) rows counted
+  unmapped, never guessed; BE→CE year conversion for the rice tables; area BASIS differs by crop
+  (planted/harvested/standing — pinned per crop) so comparisons stay same-crop-only.
+- **Provenance guard caught a real mislabel:** the first build classified as ESTIMATED because the source
+  text "no modelling or synthesis" contains the substring "SYNTH" (an `EST_MARKER`). Reworded to
+  "not modelled, not derived" → correctly MEASURED. `provenance.json`: 137 layers · **76 measured** (was
+  75) · 61 estimated · **0 unlabelled**.
+- **Verified:** `bash tests/run.sh check` green — **123 passed · 0 failed** (was 122; the new
+  `build_oae_agstats.py --check` is the +1), data integrity 455/455, `check_site_health.py --local` accepts
+  all committed payloads. Because the input is git-committed (not a re-pullable cache), `--check` ALWAYS
+  runs in the gate — a stronger guard than the SKIP-on-absent crop builders. No app code touched (pure data
+  layer + gate + provenance), so committed straight to master.
+- **Next recommended integration:** SURFACE this layer — a per-province "crop yield vs national benchmark"
+  MEASURED readout on the province deep-dive or the Overview collateral outlook. That's an app-visual change,
+  so it should go via a PR with the render+health gate, not a master commit. The layer is now the first-class,
+  gate-protected input that surfacing needs.
 ## 2026-08-05 — Market/Service loop: 3D catchment scene headlines the MEASURED WorldPop catchment population (was the ESTIMATED area-weight fallback)
 
 Autonomous market & service intelligence run. A negative-space sweep surfaced a genuine
@@ -705,6 +773,53 @@ so the old "staging source absent" skip rationale is obsolete for these.
   exposed to the CI env — it would supersede the SPAM-2010 spatial baseline in `build_branch_cropland.py`
   with 40m MEASURED values; today it is the single highest-value data unlock still blocked only by a missing
   key rather than a hard geoblock. Everything else CI-doable is shipped.
+
+## 2026-08-05 — Integration loop (PROVENANCE HONESTY): crop-stress "Price YoY" captions corrected — MEASURED Thai farm-gate, not "World Bank global proxy" (PR)
+
+Autonomous integration run. With the named CI-doable data-integration backlog confirmed exhausted
+(FPO PICO census, per-branch `branch_cropland`, and the data.go.th distillations all shipped; GISTDA
+40m crop key absent from CI env — re-verified `${GISTDA_SPHERE_KEY:-NO}`; BAAC/DLT/loan-tape all
+owner-side or upstream-frozen), a `negative-space` sweep surfaced a genuine **provenance mislabel in
+the wrong direction** on objective #1.
+
+**The gap.** `platform/data/crop_stress.json`'s `price_stress` field was migrated to **MEASURED Thai
+farm-gate** prices — `meta.price_sources` confirms all 8 priced crops (cassava, coconut, maize, oil
+palm, pineapple, rice, rubber, sugarcane) use NABC live daily / OAE farm-gate YoY, and **zero** fall
+back to the World Bank Pink Sheet global proxy in the current vintage. But three UI reads still
+captioned that same measured value as an ESTIMATED *global* signal:
+- `app.js:6541` (Risk-trend baseline board lead) — "crop-price direction (World Bank global proxy)"
+- `app.js:6542` (that board's "Price YoY" column tooltip) — "global proxy"
+- `app.js:7182` (branch-popup crop-stress lens) — "Price YoY · WB global proxy", sitting directly
+  under the correctly-labelled "Dominant crop (OAE · measured)" — so the measured price read *weaker*
+  than the measured crop beside it.
+
+For an owner who values provenance honesty, **under-selling measured data erodes trust as much as
+over-selling it**, and the caption was factually false for the shipped vintage.
+
+**Fix (caption/doc only — no data pull, no `platform/data` file touched, gate stays green).**
+- `app.js:6541/6542/7182` → the price provenance now reads "MEASURED Thai farm-gate · NABC/OAE"
+  (the branch-popup line now matches its measured siblings), with the column tooltip stating the
+  World Bank global proxy is a **fallback only, for unpriced crops (none in current vintage)** — the
+  exact truth of `crop_stress.json` `meta.price_sources`/`meta.caveats`. The composite `agri_stress`
+  itself is still labelled a proxy (`${TAG_E}`) — only the *price input's* provenance was corrected.
+- `CLAUDE.md:88` build_crop_stress bullet → `price_stress [MEASURED Thai farm-gate … global proxy
+  fallback only]`.
+- **Deliberately NOT touched:** the **Market tab** reads (`app.js:7885`/`7943`, "weakest crop = World
+  Bank global price direction proxy, region-attributed") are correct — they read the region roll-up
+  off `meta.json`'s global board, a genuinely still-global source, not `crop_stress.json`. Left as-is.
+  `build_crop_stress.py`'s internal comments accurately describe the NABC>OAE>global *fallback
+  mechanism* and were left unchanged.
+
+**Verification.** Determinism gate `bash tests/run.sh check` → **121 passed · 0 failed** (data
+validation 455/455) both before and after; `node --check platform/app.js` PASS. `cstressPopupHTML`
+confirmed wired at `app.js:7655` (the live, on-demand branch-popup path — the primary user-facing
+win). The `renderTrendBaseline` board (6541/6542) is the single-vintage baseline path, dormant in the
+current multi-vintage shipped state, but corrected for when it does render. Headless renders of
+`#home`/`#trend` did not trigger these conditional/on-demand paths (board is vintage-gated; popup is
+click-gated), so the change was verified by the gate's `node --check` (syntax) + call-site wiring +
+the surgical string-only diff — no layout or logic touched.
+
+**Ship:** visible caption change → draft PR (not a direct master commit), per the visual-change rule.
 
 ## 2026-08-04 — Intelligence loop (SERVICE / DEPLOYMENT HEALTH): deploy site-health probe for `rival_reputation.json` — the unprobed PARENT of the two probed threat layers — committed to master
 

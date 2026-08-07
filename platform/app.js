@@ -3145,7 +3145,10 @@ function renderThaiwater(){
    varies by region (1.3-1.5%) but varies 5x by occupation, and the two most exposed classes are
    exactly the ones this book lends to. Leads with that, and carries the under-reporting caveat
    next to the number rather than in a footnote, because the level is a floor and the ranking
-   is the only defensible read. */
+   is the only defensible read.
+   Second read (obj #1): the same file carries the debt PURPOSE split (agri/business/consumption
+   per household). Consumption debt — no income stream of its own to service it — is the higher-PD
+   slice, so its per-class share is surfaced beside "For farming" as a portfolio-risk cue. */
 function renderDebtSource(){
   const host=document.getElementById('acq-debtsource'); if(!host) return;
   tmliFetch('debt_source').then(j=>{
@@ -3157,21 +3160,35 @@ function renderDebtSource(){
     const all=(j.by_class||[]).find(r=>r.cls==='รวม')||n1;
     const mult=all.informal_pct?(top.informal_pct/all.informal_pct):null;
     const maxInf=Math.max(...cls.map(r=>r.informal_pct||0),1);
+    // Debt PURPOSE (obj #1 portfolio-risk read): consumption debt is the slice with no income
+    // stream of its own to service it, unlike a loan taken to farm or run a business. NSO records
+    // it per class; pct = consumption_debt / total. Coloured a risk cue when it is ≥45% of the book.
+    const consPct=r=>(r.total&&r.consumption_debt!=null)?r.consumption_debt/r.total*100:null;
     const rows=cls.map(r=>{
       const w=Math.max((r.informal_pct||0)/maxInf*90,1);
+      const cp=consPct(r);
       return `<tr><td><b>${r.cls_en}</b></td>
         <td class="mono">${B(r.total)}</td>
         <td class="mono">${B(r.informal)}</td>
         <td><span class="mono" style="color:${(r.informal_pct||0)>=3?'var(--agri)':'var(--dim)'}"><b>${r.informal_pct}%</b></span>
           <svg width="92" height="9" viewBox="0 0 92 9" aria-hidden="true" style="vertical-align:middle;margin-left:6px"><rect x="0" y="1" width="${w.toFixed(1)}" height="7" rx="1.5" fill="${(r.informal_pct||0)>=3?'var(--agri)':'var(--line)'}"/></svg></td>
-        <td class="mono sub">${r.agri_pct==null?'—':r.agri_pct+'%'}</td></tr>`;}).join('');
+        <td class="mono sub">${r.agri_pct==null?'—':r.agri_pct+'%'}</td>
+        <td class="mono">${cp==null?'—':`<span style="color:${cp>=45?'var(--agri)':'var(--dim)'}"><b>${Math.round(cp)}%</b></span>`}</td></tr>`;}).join('');
+    // National purpose mix (the average household's book) for the lead read.
+    const pn=(()=>{const t=n1.total||0,f=x=>t?Math.round((x||0)/t*100):0;
+      return {cons:f(n1.consumption_debt),agri:f(n1.agri_debt),bus:f(n1.business_debt)};})();
+    const prodNat=pn.agri+pn.bus, otherNat=Math.max(0,100-pn.cons-prodNat);
+    const consVals=cls.map(r=>consPct(r)).filter(v=>v!=null);
+    const consMax=consVals.length?Math.max(...consVals):null, consMin=consVals.length?Math.min(...consVals):null;
+    const consMaxCls=consVals.length?cls[cls.map(consPct).indexOf(consMax)]:null;
     const regs=(j.by_region||[]).map(r=>`<tr><td><b>${r.region_en}</b></td>
         <td class="mono">${B(r.total)}</td><td class="mono sub">${B(r.informal)}</td>
         <td class="mono">${r.informal_pct}%</td>
         <td class="sub mono">${(r.informal_series||[]).map(s=>s.informal_pct+'%').join(' → ')}</td></tr>`).join('');
     host.innerHTML=`<p class="lead" style="margin:0 0 10px"><b>Informal debt is not a place, it is a job.</b> Nationally it is only <b>${n1.informal_pct}%</b> of the average household's debt and it has <b>shrunk</b> from ${n0.informal_pct}% in ${n0.year_ce} to ${n1.informal_pct}% in ${n1.year_ce}. But it barely moves between regions (${(j.by_region||[]).length?Math.min(...j.by_region.map(r=>r.informal_pct))+'–'+Math.max(...j.by_region.map(r=>r.informal_pct))+'%':'—'}) and varies <b>${mult?mult.toFixed(1)+'×':''}</b> between occupations — the most exposed being <b style="color:var(--agri)">${top.cls_en} at ${top.informal_pct}%</b>, which is squarely this book's borrower.</p>
       <div class="cb-gap cb-assist" style="margin:0 0 10px"><b>Read the level as a floor.</b> ${M.under_reporting_caveat||''}</div>
-      <table class="tbl"><tr><th scope="col">Household type (NSO class)</th><th scope="col">Debt / household</th><th scope="col">Outside the system</th><th scope="col">Share outside</th><th scope="col" class="sub" title="share of that household's debt borrowed for farming">For farming</th></tr>${rows}</table>
+      <div class="cb-gap cb-assist" style="margin:0 0 10px"><b>What the debt is for is a risk read too.</b> <b style="color:var(--agri)">Consumption is ${pn.cons}%</b> of the average household's debt — more than the <b>${prodNat}%</b> borrowed productively (farming ${pn.agri}% + business ${pn.bus}%); most of the rest (${otherNat}%) is for housing, education and the like. Consumption is the slice with no income of its own to service it, and it runs <b>${consMin!=null?Math.round(consMin)+'–'+Math.round(consMax)+'%':'—'}</b> across these classes — heaviest among wage-labour households${consMaxCls?` (${consMaxCls.cls_en})`:''}, lightest where borrowing funds a farm or business.</div>
+      <table class="tbl"><tr><th scope="col">Household type (NSO class)</th><th scope="col">Debt / household</th><th scope="col">Outside the system</th><th scope="col">Share outside</th><th scope="col" class="sub" title="share of that household's debt borrowed for farming">For farming</th><th scope="col" class="sub" title="MEASURED — share of that household's debt borrowed to consume (not to farm or run a business): the slice with no income stream of its own to service it. NSO SES purpose split.">For consumption</th></tr>${rows}</table>
       <details style="margin-top:10px"><summary class="sub">By region — and how the informal share moved across the seven survey waves</summary>
         <table class="tbl" style="margin-top:8px"><tr><th scope="col">Region</th><th scope="col">Debt / household</th><th scope="col" class="sub">Outside</th><th scope="col">Share</th><th scope="col" class="sub">${(nat||[]).map(x=>x.year_ce).join(' → ')}</th></tr>${regs}</table></details>
       <p class="lead sub" style="margin:8px 0 0"><b>Reading:</b> ${M.scope_warning||''} ${M.label||''}</p>`;
@@ -6563,8 +6580,8 @@ function renderTrendBaseline(deltas){
   if(CSTRESS_LIST&&CSTRESS_LIST.length){
     const top=CSTRESS_LIST.slice(0,6);
     html+=`<h2 class="risk" style="margin-top:18px">Worst crop-household stress now ${TAG_E}</h2>`+
-      `<p class="lead">Agri-stress proxy (0–100) per province — crop-price direction (World Bank global proxy) × drought × crop dependence.</p>`+
-      `<table class="tbl"><tr><th>#</th><th>Province</th><th>Region</th><th>Dominant crop</th><th title="planting-area-weighted crop-price YoY, global proxy">Price YoY</th><th>Agri-stress ▲</th><th>Trend</th></tr>`+
+      `<p class="lead">Agri-stress proxy (0–100) per province — crop-price direction (MEASURED Thai farm-gate · NABC/OAE) × drought × crop dependence.</p>`+
+      `<table class="tbl"><tr><th>#</th><th>Province</th><th>Region</th><th>Dominant crop</th><th title="planting-area-weighted crop-price YoY — MEASURED Thai farm-gate (NABC live / OAE); World Bank global proxy is fallback only, for unpriced crops (none in current vintage)">Price YoY</th><th>Agri-stress ▲</th><th>Trend</th></tr>`+
       top.map((w,i)=>{const sv=Math.round((w.agri_stress||0)*100); const sc=sv>=60?'var(--agri)':sv>=40?'var(--gold)':'var(--merch)';
         const crop=(w.crop_mix&&w.crop_mix[0]&&w.crop_mix[0].crop)||'—';
         return `<tr><td class="mono sub">${i+1}</td><td><b>${w.th}</b></td><td class="sub">${w.region||''}</td>`+
@@ -7204,7 +7221,7 @@ function cstressPopupHTML(d,sec,r){
   return sec('Crop-household stress — ESTIMATED triage')
     + r('Agri-stress (0–100) · est', `<span style="color:${sc}">▲ ${sv}</span>`, sc)
     + (dom?r('Dominant crop (OAE · measured)', `${dom.crop} ${Math.round((dom.share||0)*100)}%`, '#c7cedd'):'')
-    + r('Price YoY · WB global proxy', (p.price_stress>0?'+':'')+p.price_stress+'%', p.price_stress<0?'var(--agri)':'var(--merch)')
+    + r('Price YoY · Thai farm-gate (measured)', (p.price_stress>0?'+':'')+p.price_stress+'%', p.price_stress<0?'var(--agri)':'var(--merch)')
     + r('Rainfall % of normal · measured', (c.rain_pct_of_normal!=null?c.rain_pct_of_normal+'%':'n/a'), c.rain_pct_of_normal!=null&&c.rain_pct_of_normal<85?'var(--gold)':'var(--merch)');
 }
 // Household debt-to-income block for a branch popup — the MEASURED NSO SES province balance-sheet
@@ -10913,6 +10930,62 @@ function renderAssistPriceLens(){
   });
 }
 
+/* PROACTIVE ASSIST · BRANCH DRILL — data/assist_branch_radar.json.
+   The province lens above says WHERE the falling-crop exposure is; this says WHOSE book it is, so
+   the readout ends on something a person can act on. Ranking is by the branch's modelled cane share
+   of its own catchment — an ESTIMATED comparison BETWEEN branches, never a fact about one. The only
+   per-branch account counts shown are the tape's own measured cells; the rest stay blank on
+   purpose, because a province number divided down would read like a measurement. */
+function renderAssistBranchLens(){
+  const host=document.getElementById('assist-branch'); if(!host) return;
+  tmliFetch('assist_branch_radar').then(j=>{
+    if(!j||!Array.isArray(j.provinces)||!j.provinces.length){
+      tmliNote(host,'The branch drill needs <b>data/assist_branch_radar.json</b> — not built for this vintage. The province lens above is unaffected.');
+      return;
+    }
+    const N=n=>Number(n).toLocaleString(), m=j.meta||{};
+    const all=[];
+    j.provinces.forEach(p=>(p.branches||[]).forEach(b=>all.push(Object.assign({},b,{
+      prov:p.th, region:p.region, provCX:p.n_current_x, fall:(p.falling||[])[0]||{}}))));
+    if(!all.length){ tmliNote(host,'No branch could be ranked for this vintage — see the coverage note in the layer.'); return; }
+
+    // Rank by ABSOLUTE exposed hectares. Share alone put a branch with 48% cane and SEVEN hectares
+    // of it at the top — concentration, not exposure. Share stays as a column, not the sort.
+    const ranked=all.slice().sort((a,b)=>(b.exposed_crop_ha||0)-(a.exposed_crop_ha||0)
+                                       ||(b.exposure_share||0)-(a.exposure_share||0)
+                                       ||String(a.name).localeCompare(String(b.name)));
+    const top=ranked.slice(0,20);
+    const topMeas=top.filter(b=>b.n_farm!=null);
+    const topAcc=topMeas.reduce((a,b)=>a+(b.n_farm||0),0);
+    const gaps=j.provinces.filter(p=>!(p.branches||[]).length);
+
+    const rows=top.map(b=>`<tr>
+        <td><b>${b.name||'—'}</b></td>
+        <td class="sub">${b.prov||''} <span class="mono sub">${b.region||''}</span></td>
+        <td class="mono"><b>${b.exposed_crop_ha==null?'—':N(b.exposed_crop_ha)}</b></td>
+        <td class="mono sub">${b.exposure_share==null?'—':Math.round(b.exposure_share*100)+'%'}</td>
+        <td class="mono">${b.n_farm==null
+            ? '<span class="sub" title="this branch’s farm cell did not clear the tape’s ≥30 floor, so no per-branch count is published — use the province total">—</span>'
+            : '<b>'+N(b.n_farm)+'</b>'}</td>
+        <td class="mono sub">${b.early_pct==null?'—':b.early_pct+'%'}</td>
+        <td class="mono sub">${N(b.provCX)}</td></tr>`).join('');
+
+    const lead=`<b style="color:var(--agri)">${N(m.n_branches_ranked)} branches</b> sit inside the ${N(m.n_provinces)} falling-crop provinces. The <b>20 most exposed</b> are below; <b>${N(topMeas.length)}</b> of them publish a farm-account count, <b>${N(topAcc)}</b> accounts between them. Start there — these borrowers are still <b>Current or X-bucket</b>, and the price that hits them is already announced.`;
+
+    host.innerHTML=`<p class="lead" style="margin:0 0 10px">${lead}</p>
+      <table class="tbl"><tr>
+        <th>Branch</th><th>Province</th>
+        <th title="modelled hectares of the FALLING crop around this branch — the size of the farm economy taking the price cut. ESTIMATED (SPAM), ranks branches against each other">Exposed ha</th>
+        <th class="sub" title="that as a share of the branch&#39;s catchment cropland — concentration, not size: 48% of seven hectares is not a big exposure">Share of catchment</th>
+        <th title="MEASURED farm accounts at this branch — shown only where the tape&#39;s own cell cleared the ≥30 floor">Farm accounts here</th>
+        <th class="sub" title="X-bucket (pre-30dpd) share at this branch">X %</th>
+        <th class="sub" title="the whole province&#39;s Current + X farm accounts — the solid number to work">Province Current+X</th></tr>${rows}</table>
+      ${gaps.length?`<p class="lead sub" style="margin:10px 0 0"><b>Not rankable:</b> ${gaps.map(p=>`<b>${p.th}</b>`).join(' · ')} — ${gaps[0].coverage_note||''}</p>`:''}
+      <p class="lead sub" style="margin:10px 0 0"><b>Reading:</b> the ranking column is <b>ESTIMATED</b> — a SPAM spatial crop model over a 10km catchment, which is the right shape for ordering branches and the wrong thing to quote about a single borrower. The account counts are <b>MEASURED</b> where shown and deliberately blank where the branch cell fell under the tape's ≥30 floor. ${(m.n_branches_with_measured_accounts!=null&&m.n_branches_ranked)?`<b>${N(m.n_branches_with_measured_accounts)} of ${N(m.n_branches_ranked)}</b> branches here have a published count.`:''} Sugarcane's move is the <b>OCSB announced season price</b>, not a daily quote — administered nationally, so it is certain and every cane household takes it, but it is season-over-season rather than live.</p>`;
+    wrapTables();
+  });
+}
+
 function renderAssist(){
   if(!document.getElementById('v-assist')) return;
   loadTapeReal().then(()=>{
@@ -10953,6 +11026,7 @@ function renderAssist(){
 
     renderFarmHousehold();
     renderAssistPriceLens();
+    renderAssistBranchLens();
 
     // restructuring — did it hold?
     const ORD=['Normal','Skip','Pre-emptive','TDR'];

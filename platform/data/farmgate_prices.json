@@ -1,24 +1,16 @@
 {
   "meta": {
     "title": "Measured Thai farm-gate crop prices (portfolio risk, objective #1)",
-    "generated_by": "pipeline/build_farmgate_prices.py",
-    "label": "MEASURED — Thai prices for RAW farm commodities in farm-gate product forms (paddy, fresh cassava root, whole palm bunch, raw rubber sheet, maize, coconut, cannery pineapple, cane). Nothing modelled. Every commodity carries its own `source`: all are daily market averages EXCEPT sugarcane, whose price is administered rather than quoted.",
+    "generated_by": "build_farmgate_platform.py",
     "source": "NABC Agricultural Data Service (agriapi.nabc.go.th) — daily market prices, national average across quoting markets, pulled by pipeline/pull_nabc_prices.py (REACHABLE from a Thai IP and from cloud runners; verified live 2026-07-12). Sugarcane only: OCSB announced cane price via pipeline/ingest_ocsb_cane.py — Thailand sets one national cane price per season, so cane is quoted by no market and cannot come from NABC.",
-    "farmgate_note": "OAE's ราคาที่เกษตรกรขายได้ (price-farmers-received) series is not exposed as a machine-readable price resource on catalog.oae.go.th (only value-of-production datasets remain; the price series moved to the geo-blocked data.go.th aggregator). NABC's quoted products ARE the raw farm commodities farmers sell, so this stands in for farm-gate as the reachable measured Thai price layer — replacing the World Bank Pink Sheet GLOBAL proxy for price_stress. It is a national daily average, not a per-province farm-gate census.",
-    "vintage": "2026-08-05",
+    "label": "MEASURED — Thai prices for RAW farm commodities in farm-gate product forms (paddy, fresh cassava root, whole palm bunch, raw rubber sheet, maize, coconut, cannery pineapple, cane). Nothing modelled. Every commodity carries its own `source`: all are daily market averages EXCEPT sugarcane, whose price is administered rather than quoted.",
     "pulled": "2026-08-05",
-    "upstream": "source-data/nabc_prices.json",
-    "crops_covered": [
-      "cassava",
-      "coconut",
-      "maize",
-      "oilpalm",
-      "pineapple",
-      "rice",
-      "rubber",
-      "sugarcane"
-    ],
-    "consumer": "pipeline/build_crop_stress.py prefers these measured Thai YoY values over the World Bank GLOBAL Pink Sheet proxy for matching crops; the GLOBAL proxy remains the graceful fallback when this layer is absent."
+    "vintage": "2026-08-05",
+    "unit": "บาท/ตัน (THB/tonne)",
+    "n_commodities": 8,
+    "provenance": "Verbatim projection of source-data/farmgate_prices.json (pipeline/build_farmgate_prices.py, refreshed daily by .github/workflows/data-nabc-prices.yml). No recomputation — every price carried through unchanged.",
+    "not_the_world_price": "This is the DOMESTIC Thai farm-gate price in ฿/tonne, updated daily. It is not the World Bank Pink Sheet rice quote shown beside it on the Live board, which is a GLOBAL price in $/mt on a monthly vintage. Different quantity, currency and clock — do not read them as two versions of one number.",
+    "borrower_read": "What a farm household's crop actually sells for is what decides whether it can service a title loan. A falling farm-gate price is portfolio pressure before it is ever a delinquency."
   },
   "commodities": {
     "cassava": {

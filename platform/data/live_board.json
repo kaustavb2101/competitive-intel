@@ -158,6 +158,30 @@
    "what": "the cost line under every vehicle-collateral borrower — pickups and trucks run on it"
   },
   {
+   "aging_days": 7,
+   "cadence": "daily",
+   "file": "farmgate_prices.json",
+   "fresh_days": 2,
+   "group": "Farm income",
+   "history": {
+    "file": "thai_price_history.json",
+    "kind": "thai_farmgate",
+    "note": "19 months, 2025-01 → 2026-07, 14 commodities — NABC Thai farm-gate, 6 provinces quoting",
+    "points": 19,
+    "series": "Rice"
+   },
+   "key": "farmgate_prices",
+   "label": "Rice · Thai farm-gate",
+   "measured": true,
+   "source": "NABC Agricultural Data Service (agriapi.nabc.go.th) — daily market prices, national average across quoting markets, pulled by pipeline/pull_nabc_prices.py (REACHABLE from a Thai IP",
+   "stamp": "2026-08-05",
+   "stamp_iso": "2026-08-05",
+   "stamp_kind": "pulled",
+   "unit": "฿/tonne",
+   "value": 17721.67,
+   "what": "what a borrower's crop actually sells for at home, today — the number behind farm repayment capacity, not the world price beside it"
+  },
+  {
    "aging_days": 75,
    "cadence": "monthly",
    "file": "commodity_history.json",
@@ -178,7 +202,7 @@
    "stamp_kind": "vintage",
    "unit": "$/mt",
    "value": 494.0,
-   "what": "the price that sets crop-household cash flow, and the agri book behind it"
+   "what": "the GLOBAL benchmark in $/mt, monthly — context for the Thai farm-gate price above it, not a substitute for it"
   },
   {
    "aging_days": 7,
@@ -416,11 +440,11 @@
  "meta": {
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
-  "history_note": "A trend line is drawn only where a stored series exists. 7 of 20 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 195,
+  "history_note": "A trend line is drawn only where a stored series exists. 8 of 21 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
+  "history_points": 214,
   "missing_files": [],
-  "n_feeds": 20,
-  "n_with_history": 7,
+  "n_feeds": 21,
+  "n_with_history": 8,
   "source": "Per-feed stamps read from each platform/data layer's own meta block (pulled / as_of / vintage / updated). No value is re-derived here."
  }
 }

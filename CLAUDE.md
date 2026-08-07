@@ -85,7 +85,7 @@ timeseries `--check` plus `node --check` on every page's JS.*
 - `build_amphoe.py` — **district (amphoe) intelligence engine**: scores all 928 amphoe polygons
   (incl. 0-branch coverage gaps) → `platform/data/amphoe.json` (whitespace + risk_proxy + raw components).
 - `build_crop_stress.py` — per-province crop-household stress (objective #1) → `platform/data/crop_stress.json`
-  (crop mix, price_stress [GLOBAL proxy], drought, agri_stress + components).
+  (crop mix, price_stress [MEASURED Thai farm-gate — NABC live / OAE; World Bank GLOBAL proxy is fallback only, for unpriced crops], drought, agri_stress + components).
 - `build_exit_whitespace.py` — **competitor-fragility cue** (objective #2, regulatory-shakeout lens) →
   `platform/data/exit_whitespace.json`. ESTIMATED PROXY: per-amphoe read of where the surviving big-4
   rival field is thinnest / most exposed if marginal sub-scale operators exit under the Q1-2026 BoT
