@@ -70,14 +70,52 @@ if [ -z "$CONFLICTS" ]; then
   echo "clean merge — re-deriving anyway (an auto-merged generated file is not a rebuilt one)."
 else
   OUTSIDE="$(echo "$CONFLICTS" | grep -v '^platform/data/' || true)"
+
+  # APPEND-AT-TOP LOGS. docs/PROGRESS_LOG.md is reverse-chronological and nobody edits anyone
+  # else's entry, so two branches always collide there on independent top insertions — the same
+  # non-disagreement as provenance.json, one file up. merge_append_log.py unions them, but only
+  # after PROVING the merge was purely additive; anything else it refuses (exit 3) and the file
+  # stays in OUTSIDE, where it aborts the run exactly as before.
+  if [ -n "$OUTSIDE" ] && [ -f pipeline/merge_append_log.py ]; then
+    REMAINING=""
+    STAGE="$(mktemp -d)"
+    while IFS= read -r f; do
+      [ -z "$f" ] && continue
+      case "$f" in
+        docs/PROGRESS_LOG.md)
+          git show ":1:$f" > "$STAGE/base"   2>/dev/null || : > "$STAGE/base"
+          git show ":2:$f" > "$STAGE/ours"   2>/dev/null || : > "$STAGE/ours"
+          git show ":3:$f" > "$STAGE/theirs" 2>/dev/null || : > "$STAGE/theirs"
+          if python3 pipeline/merge_append_log.py --base "$STAGE/base" --ours "$STAGE/ours" \
+                                                  --theirs "$STAGE/theirs" --out "$f"; then
+            git add -- "$f"
+            echo "union-merged $f (append-at-top log — kept both sides' entries, newest first)"
+          else
+            REMAINING="${REMAINING}${f}
+"
+          fi
+          ;;
+        *) REMAINING="${REMAINING}${f}
+" ;;
+      esac
+    done <<EOF
+$OUTSIDE
+EOF
+    rm -rf "$STAGE"
+    OUTSIDE="$(echo "$REMAINING" | grep -v '^$' || true)"
+    CONFLICTS="$(git diff --name-only --diff-filter=U)"
+  fi
+
   if [ -n "$OUTSIDE" ]; then
     echo "REAL CONFLICT — outside the generated layers, leaving it for a human:" >&2
     echo "$OUTSIDE" | sed 's/^/  /' >&2
     git merge --abort
     exit 2
   fi
-  echo "$(echo "$CONFLICTS" | wc -l) generated layer(s) conflicted — taking $BASE's side, then re-deriving:"
-  echo "$CONFLICTS" | sed 's/^/  /'
+  if [ -n "$CONFLICTS" ]; then
+    echo "$(echo "$CONFLICTS" | wc -l) generated layer(s) conflicted — taking $BASE's side, then re-deriving:"
+    echo "$CONFLICTS" | sed 's/^/  /'
+  fi
   # --theirs is the side being merged IN, i.e. the base. Whatever it holds is about to be
   # recomputed anyway; this only needs to produce a resolved index the re-derive can overwrite.
   echo "$CONFLICTS" | while IFS= read -r f; do
