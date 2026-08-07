@@ -692,6 +692,53 @@ so the old "staging source absent" skip rationale is obsolete for these.
   with 40m MEASURED values; today it is the single highest-value data unlock still blocked only by a missing
   key rather than a hard geoblock. Everything else CI-doable is shipped.
 
+## 2026-08-05 — Integration loop (PROVENANCE HONESTY): crop-stress "Price YoY" captions corrected — MEASURED Thai farm-gate, not "World Bank global proxy" (PR)
+
+Autonomous integration run. With the named CI-doable data-integration backlog confirmed exhausted
+(FPO PICO census, per-branch `branch_cropland`, and the data.go.th distillations all shipped; GISTDA
+40m crop key absent from CI env — re-verified `${GISTDA_SPHERE_KEY:-NO}`; BAAC/DLT/loan-tape all
+owner-side or upstream-frozen), a `negative-space` sweep surfaced a genuine **provenance mislabel in
+the wrong direction** on objective #1.
+
+**The gap.** `platform/data/crop_stress.json`'s `price_stress` field was migrated to **MEASURED Thai
+farm-gate** prices — `meta.price_sources` confirms all 8 priced crops (cassava, coconut, maize, oil
+palm, pineapple, rice, rubber, sugarcane) use NABC live daily / OAE farm-gate YoY, and **zero** fall
+back to the World Bank Pink Sheet global proxy in the current vintage. But three UI reads still
+captioned that same measured value as an ESTIMATED *global* signal:
+- `app.js:6541` (Risk-trend baseline board lead) — "crop-price direction (World Bank global proxy)"
+- `app.js:6542` (that board's "Price YoY" column tooltip) — "global proxy"
+- `app.js:7182` (branch-popup crop-stress lens) — "Price YoY · WB global proxy", sitting directly
+  under the correctly-labelled "Dominant crop (OAE · measured)" — so the measured price read *weaker*
+  than the measured crop beside it.
+
+For an owner who values provenance honesty, **under-selling measured data erodes trust as much as
+over-selling it**, and the caption was factually false for the shipped vintage.
+
+**Fix (caption/doc only — no data pull, no `platform/data` file touched, gate stays green).**
+- `app.js:6541/6542/7182` → the price provenance now reads "MEASURED Thai farm-gate · NABC/OAE"
+  (the branch-popup line now matches its measured siblings), with the column tooltip stating the
+  World Bank global proxy is a **fallback only, for unpriced crops (none in current vintage)** — the
+  exact truth of `crop_stress.json` `meta.price_sources`/`meta.caveats`. The composite `agri_stress`
+  itself is still labelled a proxy (`${TAG_E}`) — only the *price input's* provenance was corrected.
+- `CLAUDE.md:88` build_crop_stress bullet → `price_stress [MEASURED Thai farm-gate … global proxy
+  fallback only]`.
+- **Deliberately NOT touched:** the **Market tab** reads (`app.js:7885`/`7943`, "weakest crop = World
+  Bank global price direction proxy, region-attributed") are correct — they read the region roll-up
+  off `meta.json`'s global board, a genuinely still-global source, not `crop_stress.json`. Left as-is.
+  `build_crop_stress.py`'s internal comments accurately describe the NABC>OAE>global *fallback
+  mechanism* and were left unchanged.
+
+**Verification.** Determinism gate `bash tests/run.sh check` → **121 passed · 0 failed** (data
+validation 455/455) both before and after; `node --check platform/app.js` PASS. `cstressPopupHTML`
+confirmed wired at `app.js:7655` (the live, on-demand branch-popup path — the primary user-facing
+win). The `renderTrendBaseline` board (6541/6542) is the single-vintage baseline path, dormant in the
+current multi-vintage shipped state, but corrected for when it does render. Headless renders of
+`#home`/`#trend` did not trigger these conditional/on-demand paths (board is vintage-gated; popup is
+click-gated), so the change was verified by the gate's `node --check` (syntax) + call-site wiring +
+the surgical string-only diff — no layout or logic touched.
+
+**Ship:** visible caption change → draft PR (not a direct master commit), per the visual-change rule.
+
 ## 2026-08-04 — Intelligence loop (SERVICE / DEPLOYMENT HEALTH): deploy site-health probe for `rival_reputation.json` — the unprobed PARENT of the two probed threat layers — committed to master
 
 Autonomous market & service intelligence run. Deploy re-verified green up front (master production alias
