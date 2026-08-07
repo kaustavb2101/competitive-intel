@@ -37,6 +37,35 @@ withheld from the Overview macro strip** — the owner-review §0d item 1 follow
   GISTDA flooded-**area** dissolve (NEXT_STEPS §0 — needs a real shapely geometry dissolve over overlapping
   per-event polygons, a heavier multi-step job than one clean run affords).
 
+## 2026-08-07 — UX loop: close the noscript-fallback gap on live.html (PR #312, merged + deployed)
+
+Autonomous UX-improvement run. All 8 original `docs/UXUI_AUDIT.md` findings and every discovered
+surgical item are closed; the remaining open backlog items are explicitly deferred (device-tested
+gesture work, test-infra, or bigger-than-surgical), so per the loop rule I reviewed the routes myself
+and found a new concrete, headless-verifiable improvement.
+
+- **The gap (`ux-noscript-fallback-live`):** `live.html` (the "Live board" nav route) was the ONLY
+  `styles.css` nav page with no `<noscript>` banner. It was added *after* the
+  `ux-noscript-fallback-databook-status` sweep and so was missed. It builds its entire content — the
+  freshness pulse strip, feed tables, and five inline-SVG trend charts — in the browser via JS, so a
+  JS-off visitor (or one with a blocked font CDN) got a blank `<main>` with no explanation, while
+  `index.html` / `data.html` / `status.html` + the 3 deck.gl pages all already explain themselves.
+- **The fix (platform/ only, +7 lines across 2 files):** added the house themed `<noscript>` banner
+  (console vars `--panel`/`--line`/`--accent`/`--txt`/`--hi`, both themes) as the first child of
+  `<main>` in `live.html`, page-appropriate copy, link back to the front door; one-line audit entry.
+  Renders ONLY with JS off (zero change for normal users; JS-on render identical). Now all 7
+  shareable routes carry the fallback.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` → **124 passed, 0 failed**.
+  (b) headless render of `live.html` self-reviewed — JS-on render identical (banner correctly hidden),
+  pulse strip + charts + nav intact. (c) no secrets in diff. (d) diff = 2 files / +7 lines, no stray
+  files.
+- **Merge + deploy + verify.** PR #312 squash-merged to master (sha `07a6696`); Vercel auto-deploy.
+  Post-deploy: production alias `/` **HTTP 200**, changed route `/live` **HTTP 200**, `/live.html`
+  **308** (expected `cleanUrls` redirect to `/live`, itself 200) — no regression, no rollback.
+- **Note:** the merged branch `claude/ux-loop-20260807-0812` could not be deleted from the remote
+  (repeated transient `git push :branch` disconnects; no branch-delete MCP tool available). Cosmetic
+  only — the squash-merge landed cleanly. Worth a later cleanup.
+
 ## 2026-08-07 — Intelligence loop: extend the live freshness guard to the fuel-price daily-CI layer
 
 Autonomous market & service intelligence run. Data room re-confirmed healthy up front (live master
