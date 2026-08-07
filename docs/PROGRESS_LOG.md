@@ -3,6 +3,43 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-07 — Integration loop: ESTIMATED→MEASURED PICO cross-check on the #acq exit-whitespace board (PR #306, merged)
+
+Autonomous integration/improvement run. A negative-space sweep surfaced the one genuinely high-value
+CI-doable lever that is NOT a network pull: the competitor-exit white-space board on Competition
+(`#acq`, objective #2) inferred sub-scale rival presence *purely from big-4 ABSENCE* and its own caveat
+admitted *"we do NOT census the sub-scale operators that would exit."* CLAUDE.md flagged the same
+blocker (*"a true rival-fragility index needs a sub-scale-operator census — blocked Thai-IP registry
+pull"*). **That census had since landed and gone stale as a blocker:** `pico_district.json` is a
+per-district tally of licensed PICO-finance (พิโกไฟแนนซ์) operators from the FPO registry (MEASURED,
+97.6% district resolution) — exactly the sub-scale non-bank lender class the thesis is about.
+
+- **The change (additive, rankings untouched):** `build_exit_whitespace.py` joins `pico_district.json`
+  by `province_th|amphoe` (exact — both key off `amphoe.json`; all 518 PICO districts matched, 0 orphans)
+  and adds a MEASURED `components.pico_operators` count per district + a `meta.pico_crosscheck` provenance
+  block. `app.js` (`drawExitWhitespace`) renders a new "PICO ops ≤district meas" column beside the
+  ESTIMATED "sub-scale residual", plus a readout line (top district's measured count + how many of the
+  928 districts have the inference corroborated by a real PICO field — 516).
+- **Deliberately does NOT feed `exit_capture_score` or change rankings** (byte-identical). Whether a
+  marginal operator will EXIT is still an inference, and licensed PICO operators are compliant — so this
+  measures sub-scale rival *presence*, not who will exit. The score stays ESTIMATED; the new column is
+  MEASURED. Honest value: e.g. บางนา and อุทัย score high on the inferred residual (72) yet measure **0**
+  PICO operators (the cue rests on big-4 absence alone there), while วัฒนา (80 inferred / **9** measured)
+  is corroborated. Caveat, docstring, and provenance labels updated to match.
+- **Verification:** `bash tests/run.sh check` green (98→124 passed · 0 failed after the mid-flight master
+  merge; data-integrity 455/455); `build_exit_whitespace.py --check` + `build_provenance.py --check`
+  reproduce byte-exact; `node --check platform/app.js` clean; the `drawExitWhitespace` render path
+  exercised against the real layer. Provenance regenerated (136 layers, 0 unlabelled).
+- **Decision — shipped as a PR, not a direct master commit,** because it alters a visible exec board
+  (new column + readout). Opened draft #306. Resolved one master-merge conflict along the way (only the
+  two generated files `exit_whitespace.json` + `provenance.json`, both regenerated from merged sources
+  rather than hand-merged); the repo's `pr-autoresolve` automation then kept the branch mergeable through
+  the hourly master churn. Owner marked it ready and **merged it (squash `20fad0c`)**.
+- **Next integration:** CI-reachable *data pulls* remain exhausted (excise/BAAC/SME confirmed
+  non-CI-reachable; the rest are Thai-IP/owner-side). The remaining honest levers are the same
+  ESTIMATED→MEASURED grounding pattern elsewhere, plus the still-open objective-#1 GISTDA flooded-**area**
+  dissolve (NEXT_STEPS §0 — only the overlap-immune MAX-frequency flag ships today).
+
 ## 2026-08-07 — Integration loop (deployment health): site-health probe now guards `branch_cropland.json` (committed to master)
 
 Autonomous integration/improvement run. Verified the flagship data-integration backlog (docs/NEXT_STEPS +
