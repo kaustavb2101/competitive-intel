@@ -2136,6 +2136,10 @@ function renderOverview(){
   // the crop mix → farm income correction (obj #1). Leads this section: it is the number the crop
   // tables underneath it explain. Null-safe: absent layer → nothing renders.
   renderFarmBook();
+  // per-province MEASURED crop YIELD vs the national benchmark (data/oae_agstats.json, obj #1) — the
+  // productivity/income lever the price-only (crop_stress/farm_book) and area-only (branch_cropland)
+  // crop layers do not carry. Sits in the farm section under the farm book. Null-safe: absent → hides.
+  renderCropYield();
   // RETIRED 2026-08-02 from this tab — renderCropStress (the agri_stress 0-100 composite, owner:
   // "an estimated measure that has been made up. Difficult to relate.") and renderCropMargin (the
   // 5-crop farmer-margin table). Both are now INSIDE renderFarmBook: the stress table's measured
@@ -9638,6 +9642,63 @@ function renderMacroBook(){
    biggest DRAG under a heading promising the biggest DRIVER, so ร้อยเอ็ด read "Sugarcane 5% of land"
    while rice — 91.7% of the land — supplied +11.4pp of its +11.8% move. Now the mix is ranked by
    absolute contribution and the drag is named as a drag. */
+
+/* ---------- per-province MEASURED crop YIELD vs the national benchmark (data/oae_agstats.json) ----
+   Surfaces the one crop dimension the price-only layers (crop_stress / farm_book) and the area-only
+   layer (branch_cropland) do NOT carry: productivity. A material crop whose measured yield is FALLING
+   squeezes farm-household repayment capacity independent of any price move — a direct objective-#1
+   income lever. MEASURED, OAE Agricultural Statistics of Thailand 2567/2024 yearbook (a straight read
+   of the published provincial tables). Null-safe: absent/short file → the block hides, nothing else on
+   the tab changes. Main-season rice carries no national benchmark yield or multi-year trend in this
+   yearbook layer (published as planted area only), so this read covers the five upland/cash crops;
+   paddy's income story stays in the farm book above. Only crops on ≥50,000 rai are ranked, so a
+   micro-plot's swing (e.g. 185 rai of oil palm in the wrong region) can never lead the table. */
+function renderCropYield(){
+  const wrap=$('#cropyield-wrap'); if(!wrap) return;
+  tmliFetch('oae_agstats').then(j=>{
+    const bp=j&&j.by_province, nat=j&&j.national;
+    if(!bp||!nat){ wrap.style.display='none'; return; }
+    const BENCH=[['maize','Maize'],['cassava','Cassava'],['sugarcane','Sugarcane'],['oilpalm','Oil palm'],['rubber','Rubber']];
+    const AREA_FLOOR=50000; // rai (~80 km²) — rank a province only where the crop is a material presence
+    const rows=[];
+    BENCH.forEach(([k,disp])=>{
+      const ny=nat[k]&&nat[k].yield_kg_rai; if(!ny) return;
+      Object.keys(bp).forEach(prov=>{
+        const r=bp[prov]&&bp[prov][k];
+        if(!r||r.yield_trend_pct==null||r.yield_kg_rai==null||r.area_rai==null) return;
+        if(r.area_rai<AREA_FLOOR) return;
+        rows.push({prov,crop:disp,y:r.yield_kg_rai,vs:(r.yield_kg_rai/ny-1)*100,t:r.yield_trend_pct});
+      });
+    });
+    if(!rows.length){ wrap.style.display='none'; return; }
+    wrap.style.display='';
+    rows.sort((a,b)=>a.t-b.t);
+    const top=rows.slice(0,10), nFall=rows.filter(r=>r.t<0).length;
+    const m=j.meta||{}, vint=m.vintage_be?`OAE ${m.vintage_be} yearbook`:'OAE yearbook';
+    const natLine=BENCH.filter(([k])=>nat[k]&&nat[k].yield_kg_rai)
+      .map(([k,disp])=>`<b>${disp}</b> ${icN(nat[k].yield_kg_rai)}<span class="sub"> kg/rai (${nat[k].year})</span>`).join(' · ');
+    wrap.innerHTML=`<h3 class="ovsub risk">Crop productivity — yield vs the national benchmark
+        <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · ${vint}</span></h3>
+      <div class="verdict"><b>${nFall} of ${rows.length} material crop-in-province blocks are farming a falling yield.</b>
+        Yield (kg/rai) is the productivity lever the price-only and area-only crop layers do not carry: a material crop whose measured yield is sliding squeezes farm-household repayment capacity independent of any price move (objective&nbsp;#1).
+        The steepest measured declines are below — each a province where a crop on ≥${icN(AREA_FLOOR)} rai has lost yield across OAE's measured years.
+        <span class="sub">National benchmark yield — ${natLine}. Compare a province only to the SAME crop's benchmark; the area basis differs by crop (planted / harvested / standing).</span></div>
+      <table class="tbl"><tr><th scope="col">#</th><th scope="col">Province</th><th scope="col">Crop</th>
+        <th scope="col" title="MEASURED yield, kg per rai (OAE)">Yield kg/rai</th>
+        <th scope="col" title="this province's yield against the national benchmark for the same crop">vs national</th>
+        <th scope="col" title="multi-year yield direction across OAE's measured years — negative = productivity falling">Yield trend ▼</th></tr>`+
+      top.map((r,i)=>{
+        const tc=r.t<0?'var(--agri)':r.t>0?'var(--merch)':'var(--dim)';
+        const vc=r.vs<0?'var(--gold)':'var(--merch)';
+        return `<tr><td class="mono sub">${i+1}</td><td><b>${r.prov}</b></td><td class="sub">${r.crop}</td>`+
+          `<td class="mono">${icN(r.y)}</td>`+
+          `<td class="mono" style="color:${vc}">${r.vs>0?'+':''}${r.vs.toFixed(0)}%</td>`+
+          `<td>${barHTML(Math.min(Math.abs(r.t)*3,100),tc)} <span class="mono" style="color:${tc}">${r.t>0?'+':''}${r.t.toFixed(1)}%</span></td></tr>`;
+      }).join('')+`</table>`+
+      `<p class="lead sub">Main-season rice carries no national benchmark yield or multi-year trend in this yearbook layer (published as planted area only), so this productivity read covers the five upland/cash crops — cassava, sugarcane, maize, oil palm, rubber; paddy's income story stays in the farm book above. ${provChip('m','measured','OAE '+(m.vintage_be||'')+' yearbook')}</p>`;
+  });
+}
+
 function renderFarmBook(){
   const host=document.getElementById('cropmix-wrap'); if(!host) return;
   // POINT 4b/6, 2026-08-02: the crop -> farm-income engine (build_farm_income_impact.py) is joined

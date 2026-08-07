@@ -465,6 +465,13 @@
          tables"). Their MEASURED content survives as columns; only the composite was dropped.
          Null-safe: absent file → the whole block hides itself, nothing else on the tab changes. -->
     <div id="cropmix-wrap"></div>
+    <!-- CROP PRODUCTIVITY — per-province MEASURED yield vs the national benchmark + multi-year yield
+         trend (data/oae_agstats.json, build_oae_agstats.py, OAE 2567/2024 yearbook). Objective #1: the
+         productivity/income lever the price-only (crop_stress / farm_book) and area-only
+         (branch_cropland) crop layers do not carry — a material crop whose measured yield is falling
+         squeezes farm-household repayment capacity independent of price. Rendered by renderCropYield();
+         null-safe (absent → the block hides, nothing else on the tab changes). -->
+    <div id="cropyield-wrap" style="display:none"></div>
     <!-- MOVED TO THE HAZARD SECTION 2026-08-02 (owner review, point 8: "Move drought into the
          hazard section"). District drought and district crop × drought now sit under "Conditions at
          our grain" beside the flood columns they are read against; this section keeps the crop and
