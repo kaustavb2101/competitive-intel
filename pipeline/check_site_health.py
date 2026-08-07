@@ -35,6 +35,7 @@
 
 import argparse
 import base64
+import calendar
 import json
 import os
 import sys
@@ -547,6 +548,48 @@ def _shape_peer_scoreboard(d):
     return None
 
 
+def _shape_peer_npl(d):
+    # The peer LOAN-QUALITY benchmark (peer_npl.json, obj #1 + #2) — the listed
+    # title-lenders' OWN reported NPL ratios (docs/RESEARCH_DIGEST.md §B, FY2025 /
+    # 2025 IR) shown next to AutoX's MEASURED own-book NPL from the real loan tape.
+    # The last surfaced obj-#2 peer read on the Competition surface with no deploy
+    # probe. Like peer_scoreboard it CANNOT self-heal — its peer figures come from
+    # an off-repo research doc and the AutoX anchor from the owner-side tape, neither
+    # of which any CI job re-pulls — so a truncated/404 CDN deploy that guts it has no
+    # job to restore it. drawPeerNpl GATES the whole board on a non-empty .peers array
+    # (else it silently drops to the calm "Peer NPL benchmark not available" placeholder
+    # with NO phone alert), and per row renders p.name/p.ticker + p.npl (numeric — the
+    # bar, the colour band, the label, AND the readout's best/worst spread clause) +
+    # p.collateral + p.source. The distinct MEASURED AutoX row renders .autox.name +
+    # .npl_live_os_pct (numeric, .toFixed(2) — bar + readout) + .npl_90plus_os_pct
+    # (numeric, .toFixed(1)). Asserts render shape (the peers gate + row label + a
+    # numeric npl column + the AutoX anchor's two numeric NPL fields), not values —
+    # robust to a future RESEARCH_DIGEST / tape-vintage refresh moving the ratios.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    peers = d.get("peers")
+    if not isinstance(peers, list) or len(peers) < 2:
+        return "missing/short 'peers' list (expected the reported title-lender NPL rows)"
+    p0 = peers[0]
+    if not isinstance(p0, dict):
+        return "first peers row is not an object"
+    if not ((isinstance(p0.get("name"), str) and p0["name"].strip())
+            or (isinstance(p0.get("ticker"), str) and p0["ticker"].strip())):
+        return "first peers row missing 'name'/'ticker' (peer-NPL row label render)"
+    if not any(isinstance(p, dict) and isinstance(p.get("npl"), (int, float)) for p in peers):
+        return "no peer carries a numeric 'npl' (the reported-NPL bar + colour band + spread clause)"
+    ax = d.get("autox")
+    if not isinstance(ax, dict):
+        return "missing 'autox' MEASURED self-anchor block (the distinct own-tape row)"
+    if not (isinstance(ax.get("name"), str) and ax["name"].strip()):
+        return "autox anchor missing 'name' (the MEASURED own-book row label)"
+    if not isinstance(ax.get("npl_live_os_pct"), (int, float)):
+        return "autox anchor missing/non-numeric 'npl_live_os_pct' (the measured NPL-live bar + readout)"
+    if not isinstance(ax.get("npl_90plus_os_pct"), (int, float)):
+        return "autox anchor missing/non-numeric 'npl_90plus_os_pct' (the strict-90+ readout figure)"
+    return None
+
+
 def _shape_province_pressure(d):
     # The cross-objective SYNTHESIS layer (province_pressure.json) — the
     # deterministic JOIN of portfolio risk (province_stress_index composite,
@@ -675,6 +718,38 @@ def _shape_pico_district(d):
     r0 = tr[0]
     if not isinstance(r0, list) or len(r0) < 3:
         return "top_recent[0] not a [district, recent, total] row"
+    return None
+
+
+def _shape_pico_competitors(d):
+    # The PROVINCE-grain sibling of pico_district (obj #2): "where do sub-scale
+    # rivals most outnumber our own footprint?" app.js live-fetches it
+    # (loadPicoCompetitors -> PICOCOMP) and drawPicoCompetitors renders the
+    # #acq "sub-scale rivals per province vs our footprint" leaderboard off
+    # PICOCOMP.provinces, each row read for .outnumber (sort key + the pressure
+    # column), .pico_total, .autox_branches and .th (the row name). Both counts
+    # are MEASURED tallies (FPO PICO licence registry vs the AutoX branch book).
+    # pico_district (the district grain) is already probed; this closes the same
+    # "a truncated deploy silently blanks the Competition surface with no phone
+    # alert" blind spot for the province grain it renders alongside. The render
+    # empties gracefully to a "not yet computed" note on an absent/empty file,
+    # so a probe is exactly how a broken deploy would otherwise stay invisible.
+    # Robust to registry growth (asserts render shape, not exact counts).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        return "missing/empty 'provinces' list (leaderboard render read)"
+    r0 = provs[0]
+    if not isinstance(r0, dict):
+        return "provinces[0] not an object"
+    for k in ("outnumber", "pico_total", "autox_branches"):
+        if not isinstance(r0.get(k), (int, float)):
+            return "provinces[0].%s missing/not numeric (leaderboard render read)" % k
+    if not r0.get("th"):
+        return "provinces[0].th missing (row name render read)"
+    if not isinstance(d.get("meta"), dict):
+        return "missing 'meta' object (provenance/momentum block the readout reads)"
     return None
 
 
@@ -1212,6 +1287,94 @@ def _shape_vehicle_models(d):
     return None
 
 
+def _shape_rival_pressure(d):
+    # The per-branch rival-pressure layer (rival_pressure.json, obj #2, MEASURED
+    # geometry over the merged competitor census — pipeline/build_rival_pressure.py).
+    # It is load-bearing on TWO render paths and was the last surfaced obj-#2
+    # competitive read still with no deploy probe: (1) the Risk-trend (#trend) "Most
+    # besieged branches" board — drawSiegeTable renders RIVP.besieged.slice(0,10)
+    # (the branches with >=3 rivals within 2 km) and, when it is missing/empty, drops
+    # the whole board to a "Rival pressure not yet computed." placeholder; (2) the
+    # per-branch popup line (rivalPressureLineHTML reads RIVP.branches[i], INDEX-
+    # ALIGNED to branches.json — nearest-rival km per brand in .d aligned to .brands,
+    # plus the 2 km / 5 km counts n2/n5). The client loader itself sets RIVP=null
+    # unless BOTH .branches and .brands are arrays, so a truncated/gutted CDN deploy
+    # silently reverts both surfaces to their fallback with NO phone alert — the same
+    # "broken demo" blind spot the rival_density / rival_threat / rival_threat_region
+    # probes closed for the sibling obj-#2 competitive reads. Asserts the render
+    # contract (the client .branches/.brands gate + the 2015-branch index-aligned
+    # popup array + the .besieged board rows) as SHAPE not values, robust to a future
+    # competitor-census refresh moving the counts.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    brands = d.get("brands")
+    if not isinstance(brands, list) or not brands:
+        return "missing/empty 'brands' array (client RIVP gate: Array.isArray(j.brands))"
+    recs = d.get("branches")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'branches' array (client RIVP gate + popup RIVP.branches[i] read)"
+    if len(recs) != 2015:
+        return "expected 2015 branch records (index-aligned to branches.json), got %d" % len(recs)
+    r0 = recs[0]
+    if not isinstance(r0, dict):
+        return "first 'branches' record is not an object"
+    for k in ("n2", "n5"):
+        if not isinstance(r0.get(k), (int, float)) or isinstance(r0.get(k), bool):
+            return "first branch record missing numeric '%s' (popup 2/5 km-count render read)" % k
+    if not isinstance(r0.get("d"), list):
+        return "first branch record missing 'd' list (per-brand nearest-rival km, aligned to .brands)"
+    bes = d.get("besieged")
+    if not isinstance(bes, list) or not bes:
+        return "missing/empty 'besieged' list (#trend Most-besieged board render read)"
+    b0 = bes[0]
+    if not isinstance(b0, dict):
+        return "first 'besieged' row is not an object"
+    if not isinstance(b0.get("i"), int) or isinstance(b0.get("i"), bool):
+        return "first besieged row missing integer 'i' (branch index the board row keys on)"
+    if not (isinstance(b0.get("name"), str) and b0["name"].strip()):
+        return "first besieged row missing 'name' (board branch-label render read)"
+    if not isinstance(b0.get("n2"), (int, float)) or isinstance(b0.get("n2"), bool):
+        return "first besieged row missing numeric 'n2' (board rivals-<=2km column render read)"
+    return None
+
+
+def _shape_branch_cropland(d):
+    # The per-branch crop-AREA layer (branch_cropland.json, obj #1 — SPAM-2010
+    # spatial pattern rescaled per province to the DOAE farmer-registry MEASURED
+    # 2025 planted area, pipeline/build_branch_cropland.py). It is the only
+    # per-branch absolute crop-hectares read the app carries, index-aligned to
+    # branches.json, and it renders the MEASURED-CORRECTED "crop area within 10km"
+    # block in every branch popup (croplandPopupHTML reads croplandRec(d)=CROPLAND[i]
+    # -> .crop_ha gate + the per-crop .ha[] magnitudes, labelled off croplandMeta.crops).
+    # The client loader sets CROPLAND=null on any fetch/parse failure and the popup
+    # helper returns '' whenever the record is missing, so a truncated/404 CDN deploy
+    # silently drops the crop-area block from every popup with NO phone alert — the
+    # same "broken demo" blind spot the flood_hazard / farm_book / branch_labor obj-#1
+    # probes closed for their siblings, and this layer (backlog item #2's shipped
+    # integration) was the last surfaced per-branch obj-#1 read with no deploy probe.
+    # Asserts the render contract (the meta.crops label list + the 2015-branch
+    # index-aligned array + the .crop_ha gate and .ha[] magnitudes the popup reads)
+    # as SHAPE not values, robust to a future DOAE-vintage / SPAM refresh moving areas.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    crops = d.get("meta", {}).get("crops") if isinstance(d.get("meta"), dict) else None
+    if not isinstance(crops, list) or not crops:
+        return "missing/empty meta.crops label list (popup per-crop row labels)"
+    recs = d.get("branches")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'branches' array (client CROPLAND gate + popup CROPLAND[i] read)"
+    if len(recs) != 2015:
+        return "expected 2015 branch records (index-aligned to branches.json), got %d" % len(recs)
+    r0 = recs[0]
+    if not isinstance(r0, dict):
+        return "first 'branches' record is not an object"
+    if not isinstance(r0.get("ha"), list):
+        return "first branch record missing 'ha' list (per-crop hectares, popup .ha[j] render read)"
+    if not isinstance(r0.get("crop_ha"), (int, float)) or isinstance(r0.get("crop_ha"), bool):
+        return "first branch record missing numeric 'crop_ha' (popup crop-area gate/total render read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -1286,6 +1449,18 @@ DATA_FILES = [
     # Asserts render shape (the peers gate + row label + numeric mkt-cap/ROE columns +
     # headline + the ROE reference line), not values — robust to a future SET pull.
     ("data/peer_scoreboard.json", _shape_peer_scoreboard, ".peers (listed title-lenders) with market_cap_bn/roe + .headline + .autox_roe_target (#acq listed-peer scoreboard)"),
+    # The peer LOAN-QUALITY benchmark (peer_npl.json, obj #1 + #2) — the listed
+    # title-lenders' OWN reported NPL ratios next to AutoX's MEASURED own-book NPL
+    # from the real loan tape. The last surfaced obj-#2 peer read on the Competition
+    # surface with no deploy probe, and like peer_scoreboard it CANNOT self-heal (peer
+    # figures from off-repo RESEARCH_DIGEST §B, the AutoX anchor from the owner-side
+    # tape — no CI job re-pulls either), so a truncated/404 CDN deploy that guts it
+    # silently drops the board to the calm "Peer NPL benchmark not available"
+    # placeholder with no phone alert. drawPeerNpl gates on a non-empty .peers array,
+    # per row reading .name/.ticker + .npl (the bar/colour/spread), plus the distinct
+    # MEASURED .autox row (.name + .npl_live_os_pct + .npl_90plus_os_pct). Asserts
+    # render shape, not values — robust to a future RESEARCH_DIGEST / tape refresh.
+    ("data/peer_npl.json", _shape_peer_npl, ".peers reported-NPL rows (name/ticker + npl) + .autox MEASURED anchor (npl_live_os_pct/npl_90plus_os_pct) (#acq peer loan-quality board)"),
     # The district-grain competitive layer (obj #2) that sharpens the Competition
     # surface below province level: the "Top go-live districts (recent/total)"
     # go-live leaderboard + the provincial-capital clustering clause both render
@@ -1294,6 +1469,7 @@ DATA_FILES = [
     # truncated deploy that guts the recently-shipped go-live leaderboard fires a
     # phone alert instead of silently blanking the อำเภอ reads.
     ("data/pico_district.json", _shape_pico_district, ".top_districts + meta.operating_momentum.top_recent (go-live leaderboard)"),
+    ("data/pico_competitors.json", _shape_pico_competitors, ".provinces leaderboard rows (outnumber/pico_total/autox_branches/th) — #acq province-grain sub-scale-rival board"),
     # The LIVE/stress scenario engine (#sim) — the last default-reachable nav
     # route with no probe. renderScenarios reads .scenarios[] (kind/title/
     # headline per card); an empty/truncated build drops the whole engine to its
@@ -1441,7 +1617,106 @@ DATA_FILES = [
     # probes closed for their siblings. Asserts the .annual gate + the pickup/ppv
     # nameplate-board shape, not values — robust to a future DLT-vintage refresh.
     ("data/vehicle_models.json", _shape_vehicle_models, ".annual year table + .plates_last12 pickup/ppv boards (Macro nameplate panel + collateral pickup verdict)"),
+    # The per-branch rival-pressure layer (rival_pressure.json, obj #2, MEASURED) —
+    # the last surfaced obj-#2 competitive read with no deploy probe. It drives the
+    # Risk-trend (#trend) "Most besieged branches" board (drawSiegeTable reads
+    # .besieged) AND the per-branch popup line (rivalPressureLineHTML reads the
+    # .branches index-aligned array). The client sets RIVP=null unless BOTH .branches
+    # and .brands are arrays, so a truncated CDN deploy silently reverts both surfaces
+    # to their fallback with no phone alert — the same blind spot the rival_density /
+    # rival_threat / rival_threat_region probes closed for their obj-#2 siblings.
+    ("data/rival_pressure.json", _shape_rival_pressure, ".brands + 2015-branch index-aligned .branches + .besieged board rows (#trend Most-besieged board + per-branch popup)"),
+    # The per-branch crop-AREA layer (branch_cropland.json, obj #1) — the last
+    # surfaced per-branch read with no deploy probe. It renders the MEASURED-
+    # corrected "crop area within 10km" block in every branch popup
+    # (croplandPopupHTML, index-aligned to branches.json), and the client sets
+    # CROPLAND=null on any fetch failure so a truncated/404 CDN deploy silently
+    # drops the block from every popup with no phone alert — the same blind spot
+    # the flood_hazard / branch_labor obj-#1 probes closed for their siblings.
+    ("data/branch_cropland.json", _shape_branch_cropland, ".meta.crops + 2015-branch index-aligned .branches with ha[]/crop_ha (per-branch crop-area popup block)"),
 ]
+
+
+# ---------------------------------------------------------------------------
+# DATA FRESHNESS — the one class of breakage the ~40 shape validators above
+# CANNOT catch. Every check_site_health probe asserts a file's SHAPE; none
+# asserts its VINTAGE. So if a data-refresh cron silently freezes (upstream
+# API drops, a workflow secret rotates, a pull script starts erroring), the
+# last-good file keeps serving, still passes every shape probe, and ships
+# green forever — the deploy looks healthy while the numbers quietly rot,
+# with no phone alert. This closes that blind spot for the DAILY,
+# CI-REFRESHED, CI-REACHABLE price/weather layers, where a lagging vintage is
+# an unambiguous "the cron broke" signal (not an owner-side / Thai-IP data gap).
+#
+# WHY LIVE-ONLY (HttpFetcher, never --local): freshness is inherently a
+# function of wall-clock "now", so it CANNOT be part of the deterministic repo
+# gate (tests/run.sh runs --local and must reproduce byte-for-byte on any
+# date). The nightly probe is exactly where it belongs — it already runs
+# against the real deployment with a real clock. The --local path skips this
+# block entirely, so the gate's output is unchanged.
+#
+# FALSE-ALARM-PROOF: a layer is FAILED only when its vintage parses cleanly AND
+# is older than a generous per-layer TTL (14 days — ~2 weeks of missed daily
+# runs, well past any weekend/holiday upstream gap; only a genuinely stuck cron
+# reaches it). Any fetch / parse / missing-key case is recorded as a non-fatal
+# "not evaluated" note, never a failure — the fetch + shape probes already own
+# "does the file serve and parse". EXCLUDED by design: owner-side / Thai-IP /
+# monthly-or-slower layers (rival_pulse promos, search_demand, dbd_formation,
+# the annual DLT vehicle stock), whose lag is a known constraint, not a break.
+FRESHNESS_LAYERS = [
+    # (rel_path, meta_key, max_age_days, cron/source note)
+    ("data/commodities.json", "farmgate_vintage", 14,
+     "NABC farm-gate + fuel, daily CI (data-nabc-prices.yml / data-fuel-prices.yml)"),
+    ("data/thai_price_history.json", "vintage", 14,
+     "Thai daily price history (rebuilt with the daily price pulls)"),
+    ("data/thaiwater_flood.json", "pulled", 14,
+     "ThaiWater flood pulse, daily CI (data-thaiwater.yml)"),
+    ("data/thaiwater_rain.json", "pulled", 14,
+     "ThaiWater rain pulse, daily CI (data-thaiwater.yml)"),
+]
+
+
+def _parse_iso_day(s):
+    """Parse a 'YYYY-MM-DD' (optionally with a trailing time) vintage to an
+    epoch (UTC midnight). Returns None if it does not start with an ISO day."""
+    if not isinstance(s, str):
+        return None
+    head = s.strip()[:10]
+    try:
+        t = time.strptime(head, "%Y-%m-%d")
+    except (ValueError, TypeError):
+        return None
+    return calendar.timegm(t)
+
+
+def _freshness_result(vintage_str, max_age_days, now_epoch):
+    """PURE + deterministic given its inputs (unit-testable offline). Returns
+    (ok, detail). ok is False ONLY for a cleanly-parsed vintage older than the
+    TTL; an unparseable/absent vintage yields ok=True with a 'not evaluated'
+    note so freshness never fires a false alarm."""
+    epoch = _parse_iso_day(vintage_str)
+    if epoch is None:
+        return True, "vintage %r not an ISO day — freshness not evaluated" % (vintage_str,)
+    age_days = (now_epoch - epoch) / 86400.0
+    if age_days > max_age_days:
+        return False, ("vintage %s is %.0f days old (> %d-day TTL) — the refresh "
+                       "cron may be stuck" % (str(vintage_str)[:10], age_days, max_age_days))
+    return True, "vintage %s, %.0f days old (TTL %d)" % (str(vintage_str)[:10], age_days, max_age_days)
+
+
+def run_freshness_checks(fetcher, now_epoch, record):
+    """Live-only vintage-lag guard over FRESHNESS_LAYERS. Records via `record`."""
+    for rel, key, max_age, note in FRESHNESS_LAYERS:
+        try:
+            body = fetcher.fetch(rel)
+            parsed = json.loads(body.decode("utf-8"))
+            vintage = parsed.get("meta", {}).get(key)
+        except Exception as e:
+            record("%s fresh (%s)" % (rel, note), True,
+                   "freshness not evaluated (%r)" % e)
+            continue
+        ok, detail = _freshness_result(vintage, max_age, now_epoch)
+        record("%s fresh (%s)" % (rel, note), ok, detail)
 
 
 # ---------------------------------------------------------------------------
@@ -1529,6 +1804,12 @@ def run_checks(fetcher):
             record("%s shape sane (%s)" % (rel, expect), False, err)
         else:
             record("%s shape sane (%s)" % (rel, expect), True)
+
+    # --- data freshness (LIVE ONLY) ---
+    # Runs against the real deployment with a real clock; the deterministic
+    # --local gate path (LocalFetcher) skips it so the repo gate is unaffected.
+    if isinstance(fetcher, HttpFetcher):
+        run_freshness_checks(fetcher, time.time(), record)
 
     return results
 

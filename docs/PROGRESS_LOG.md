@@ -3,6 +3,253 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-07 — Integration loop (deployment health): site-health probe now guards `branch_cropland.json` (committed to master)
+
+Autonomous integration/improvement run. Verified the flagship data-integration backlog (docs/NEXT_STEPS +
+the run prompt's items 1–4) is **done or CI-blocked**, so nothing new could be *pulled* this run:
+- **#1 FPO PICO competitor registry — DONE.** `fpo_pico` is distilled into `pico_census.json` /
+  `pico_district.json` / `pico_competitors.json` / `branch_pico.json` (MEASURED, canonical-77-keyed) and
+  wired into `build_rival_density.py`; all surfaced on `#acq` and already deploy-probed.
+- **#2 per-branch crop layer — DONE (and hardened this run, see below).** `build_branch_cropland.py` →
+  `branch_cropland.json` builds under the gate (`--check`, SKIPs cleanly if `doae_planted_area.json` is
+  absent), is in `provenance.json`, and renders the MEASURED-corrected crop-area block in every branch popup.
+- **#3 data.go.th distillation — DONE for the CI-reachable sources, BLOCKED for the rest.** `dbd_newco` →
+  `dbd_formation.json`, `mot_vehicles` → vehicle layers, `diw_factories` → factory layers all shipped. The
+  undistilled `baac_credit` / `smebank_credit` cannot be rebuilt from CI — the raw datagoth cache is gitignored
+  (absent from a fresh clone) and the data.go.th aggregator is 403 from cloud IPs (per DATAGOTH_CATALOG.md).
+- **#4 GISTDA 40m satellite crop-area — BLOCKED here.** `GISTDA_SPHERE_KEY` is **unset in this CI env**, so no
+  puller can authenticate. Skipped, not faked (logged for a keyed/owner-side run).
+
+So this run took the highest-value CLEAN, deterministic, zero-fabrication improvement left: **closing the
+deploy-health blind spot on `branch_cropland.json`** — backlog item #2's own shipped obj-#1 layer, and the
+last surfaced *per-branch* read with no site-health probe.
+- **Why it matters:** `branch_cropland.json` is the only per-branch absolute crop-hectares layer, index-aligned
+  to `branches.json`. It renders the MEASURED-corrected "crop area within 10km" block in every branch popup
+  (`croplandPopupHTML` → `croplandRec(d)=CROPLAND[i]`, gated on `.crop_ha`, per-crop `.ha[]` labelled off
+  `croplandMeta.crops`). The client loader sets `CROPLAND=null` on any fetch/parse failure and the popup helper
+  returns `''` when the record is missing — so a truncated/404 CDN deploy **silently drops the crop block from
+  every popup with no phone alert**, the exact "broken demo" blind spot the sibling `flood_hazard` /
+  `branch_labor` / `rival_pressure` probes exist to catch.
+- **Change:** one file of substance — `pipeline/check_site_health.py` (+`_shape_branch_cropland` asserting the
+  render contract: non-empty `meta.crops` + the 2015-branch index-aligned `.branches` array + `ha[]`/`crop_ha`
+  on each record — SHAPE not values, robust to a DOAE/SPAM vintage refresh; + its `DATA_FILES` entry). Plus a
+  one-word `tests/run.sh` comment fix (the self-test's "41 probed data files" count had drifted; genericized to
+  stop re-drift). **No data file altered → no provenance rebuild; no app behaviour/visual change → committed
+  straight to master, not a PR.**
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` → **124 passed · 0 failed** (data validation
+  455/455; `check_site_health.py --local` self-test accepts the committed payload → **137/137**). Negative-tested
+  the validator directly: it rejects truncated `.branches` (index misalignment), a first record missing `crop_ha`
+  or `ha`, empty `meta.crops`, and a missing `.branches` array — proving it is not a no-op. No secrets in diff.
+- **Next recommended integration:** the remaining CI-doable data backlog is genuinely exhausted (all Thai-IP /
+  owner-side / keyed). Continue the deploy-health sweep on the last surfaced-but-unprobed obj-#1 reads
+  (`branch_peers.json` peer-twin board on `#trend`, `segment_exposure.json` on `#exposure`), OR run the GISTDA
+  40m crop pull once `GISTDA_SPHERE_KEY` is available in the run environment.
+
+## 2026-08-06 — Intelligence loop (deployment health): site-health probe now guards `rival_pressure.json` (committed to master, deployed + verified)
+
+Autonomous market/service-intelligence run. The `plan_cycle.py` backlog is exhausted (49 done, the 1 open
+item is owner-side), so this run took the DEPLOYMENT-HEALTH pillar's own standing pattern — the commit history
+is a methodical series of "site-health probe guards X.json" additions — and closed the **last surfaced obj-#2
+competitive read still with no deploy probe**. Method: diffed the SPA-fetched `data/*.json` set against the
+45 files `pipeline/check_site_health.py` probes; cross-checked that the three fetched-but-missing paths
+(`apple_reviews`/`fuel_stations`/`perimeter_counts`) are comment/string references to `source-data/`, **not**
+live 404s (data room clean, matching SERVICE_AUDIT §3); and confirmed the live production alias + `meta.json`
+serve 200. That left **`rival_pressure.json`** — the MEASURED per-branch rival-pressure layer
+(`build_rival_pressure.py`) — fetched but unprobed while its obj-#2 siblings `rival_density` / `rival_threat`
+/ `rival_threat_region` all carry probes.
+- **Why it matters:** the layer is load-bearing on two render paths and degrades SILENTLY. (1) The Risk-trend
+  (`#trend`) "Most besieged branches" board — `drawSiegeTable` reads `.besieged`; missing/empty drops the whole
+  board to a "Rival pressure not yet computed." placeholder. (2) The per-branch popup line
+  (`rivalPressureLineHTML` reads the `.branches` array, **index-aligned to branches.json**). The client sets
+  `RIVP=null` unless BOTH `.branches` and `.brands` are arrays, so a truncated CDN deploy silently reverts both
+  surfaces to their fallback with **no phone alert** — the exact "broken demo" blind spot the sibling probes close.
+- **Change:** one file (`pipeline/check_site_health.py`, +60). Added `_shape_rival_pressure` (asserts the client
+  `.branches`/`.brands` gate + the 2015-branch index-aligned `.branches` array + the `.besieged` board rows —
+  SHAPE not values, robust to a census refresh moving counts) and its `DATA_FILES` registry entry. **No data
+  file altered → no provenance rebuild, no fabrication (zero numbers added); no visual/app change → no PR.**
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` **124 passed · 0 failed** (data validation
+  455/455; `check_site_health.py --local` deploy-probe self-test accepts the committed payload → **134/134**;
+  `rival_pressure.json branches_fingerprint matches branches.json`). Negative-tested the validator directly: it
+  rejects empty `.besieged` (board gutted), truncated `.branches` (index misalignment), missing `.brands`
+  (client gate), and a besieged row missing `name` — proving it is not a no-op. No secrets in diff.
+- **Next recommended intelligence task:** continue the same deploy-health sweep — the next surfaced-but-unprobed
+  reads are `branch_peers.json` (obj-#1 peer-twin outlier board on `#trend`) and `segment_exposure.json`
+  (obj-#1 segment×collateral concentration on `#exposure`), both of which degrade silently on a truncated deploy.
+
+## 2026-08-06 — UX loop: `.fb-h4` tag pill wraps so it stops bleeding out on mobile #overview (PR #307, merged + deployed + verified)
+
+Autonomous UX-improvement run. The named backlog is exhausted (remaining open items are all "bigger than
+surgical" content/mandate passes or device-tested-only 3D-page gaps excluded from unattended auto-merge), so
+this run reviewed routes with the project's own standing overflow audit (`tests/visual_overflow.js`) — which
+normally **skips** in the gate because the sandbox `node_modules` has no `playwright`. Running it against the
+global Playwright install (`/opt/node22/lib/node_modules`) surfaced a real, unguarded defect on the
+**`#overview` (Macro)** route at 390px: the collateral-book sub-headings (`.fb-h4` in `#collat-book`) pair a
+title with a `white-space:nowrap` provenance `.tag` pill in a `display:flex` container with **no `flex-wrap`**,
+so the longest heading forced the un-wrappable tag inline and **bled 49px past its box**, pushing the document
+to **393px wide (3px sideways page scroll / PAGEX)** on a phone.
+- **Fix:** one declaration — `flex-wrap:wrap` on `.fb-h4` (`platform/styles.css` L1751) so the tag drops to its
+  own line below the title on narrow viewports. Desktop (title+tag fit on one line) is a no-op by flex-wrap semantics.
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` **124 passed · 0 failed** (data validation 455/455);
+  Playwright at true mobile 390px/DSF2 → heading `right=344`, `scrollWidth==clientWidth==390` (PAGEX gone), and the
+  full `visual_overflow.js` audit **clean across all 11 routes** at mobile (was PAGEX 1 + BLEED 1 on macro); PNG
+  self-review confirmed the tag pill wraps cleanly with its rounded `var(--collat)` border intact; no secrets in
+  diff; diff is exactly `platform/styles.css` (+1 char) + the `docs/UXUI_AUDIT.md` entries, no stray files.
+- **Merge + deploy + verify:** PR #307 squash-merged to master (sha `e70893f`). Deploy-verified against the master
+  production alias — the deployed `styles.css` now carries `…gap:8px;flex-wrap:wrap}` and both `/` (hosts `#overview`)
+  and `/styles.css` return **HTTP 200** (no regression, no rollback needed). `/index.html` → 308 is the expected
+  Vercel `cleanUrls` redirect to `/`.
+- **New backlog item logged:** `qa-visual-overflow-not-in-ci` — the overflow audit that caught this silently skips in
+  the gate (no `playwright` in `node_modules`) despite a usable global install; wiring the phase to that global would
+  give the loop a real automated bleed/clip/page-x gate. Left for its own run (test infra, not `platform/`).
+
+## 2026-08-06 — UX loop: `fonts.gstatic.com` preconnect added on `live.html` (PR #303, merged + deployed + verified)
+
+Autonomous UX-improvement run. The clean surgical backlog is exhausted (the remaining open items are all
+"bigger than surgical" content/mandate passes or device-tested-only 3D-page gaps explicitly excluded from
+unattended auto-merge), so this run reviewed the `live.html` route and found a concrete gap: it loads the
+IBM Plex Google Fonts CSS but only preconnected to `fonts.googleapis.com` (the stylesheet host), **missing
+the `fonts.gstatic.com` (font-file host) preconnect**. `ux-font-preconnect-gstatic` (2026-08-05) added that
+warm-up to "all 5 pages that load the Google Fonts CSS" but `live.html` is a 6th such page and was outside
+that scope — so its browser still ran a fresh DNS+TLS handshake to gstatic *after* the stylesheet arrived,
+a render-blocking waterfall that delays first text paint on a page whose content is entirely text/numbers.
+- **Fix:** one head-only line in `platform/live.html` — `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>`
+  right after the googleapis preconnect, matching `province.html` byte-for-byte incl. the explanatory comment.
+  Zero visual/behavioral change (no body/JS/CSS touched). Now all 6 font-loading pages preconnect to gstatic.
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` **122 passed · 0 failed**; headless render of
+  `live.html` self-reviewed (nav/hero/pulse-strip render correctly with IBM Plex loaded, no breakage); no
+  secrets in diff; diff is exactly `platform/live.html` (+1) + the `docs/UXUI_AUDIT.md` backlog entry, no stray files.
+- **Merge + deploy + verify:** PR #303 squash-merged to master (sha `d545755`). Deploy-verified against the
+  master production alias — after propagation, `/live` serves the new gstatic preconnect line and both `/`
+  and `/live` return **HTTP 200** (no regression, no rollback needed). `/live.html` → 308 is the expected
+  Vercel `cleanUrls` redirect to `/live`.
+
+## 2026-08-06 — Intelligence loop: the ~40 deploy probe validators are now under the repo determinism gate
+
+Autonomous market & service intelligence run. Deploy + data room re-confirmed healthy up front (live master
+production alias HTTP 200 on `/` + `/data/meta.json`; `build_provenance.py --check` reproduces byte-exact;
+freshness clean, 0 layers >180d stale; 0 broken data references across the 131 static `data/*.json` refs;
+77/77 province catchments present; every `--check`-capable builder already in the gate; `site-health.yml`
+correctly targets the master production alias).
+
+**The one gap fixed:** `check_site_health.py`'s ~40 deploy probe validators (`_shape_*`) — all hand-authored
+by this intelligence loop over the past weeks to guard each surfaced-but-unprobed exec read — had **no
+repo-gate regression protection**. Every prior audit note said so verbatim ("the gate does not invoke
+`check_site_health.py`, so this probe-script-only change is outside its scope by construction"). The
+consequence: a future edit that broke a validator so it *rejects* the real committed payload (or a page that
+dropped the AutoX wordmark, or a probed data file gone missing) would ship **silently** — caught only by the
+nightly LIVE run as a filed GitHub issue, never by `bash tests/run.sh check`.
+- **Fix:** `tests/run.sh` `phase_check` now runs the SAME code path as the nightly live check, pointed at the
+  local committed tree — `python3 pipeline/check_site_health.py --local platform`. `LocalFetcher` is
+  filesystem-only (pure stdlib, **no network**), so it stays inside the gate's offline/deterministic
+  contract; all 41 probed data files AND the probed pages are git-tracked, so it reproduces on a clean
+  checkout. It FAILs only on a genuine probe/payload regression.
+- **Verified:** gate green **122 passed · 0 failed** (was 121 — the new self-test is the +1, reports `[PASS]`).
+  Negative-tested that it is a real guard, not a no-op: temporarily dropping `meta.json`'s `updated` key made
+  the self-test exit 1 (gate red); `git checkout` restored it to exit 0 (gate green). No `platform/data`
+  file altered — a test-harness change only (like the probe-script-only changes before it), so no provenance
+  regen and no PR/headless render needed.
+- **Why this over another probe:** the audit backlog of "add one more site-health probe" had reached its
+  low-value tail (only secondary graceful-degrading reads remained). Bringing the whole probe LAYER under the
+  gate is strictly higher leverage — it protects all ~40 existing validators AND every future one, for free,
+  from the class of silent breakage the loop has been guarding against one file at a time.
+
+## 2026-08-06 — Intelligence loop: site-health probe now guards peer_npl.json (the last unprobed obj-#2 PEER read on #acq)
+
+Autonomous market & service intelligence run. Data room re-confirmed healthy up front (`build_provenance.py
+--check` reproduces byte-exact — 136 layers · 75 measured · 61 estimated · 0 unlabelled; freshness clean,
+0 layers >180d stale; live master production alias HTTP 200 on `/` + `/data/meta.json`). A render-path
+re-scan for the highest-value surfaced-but-unprobed `data/*.json` read closed **`peer_npl.json`** — the peer
+LOAN-QUALITY benchmark on `#acq` (obj #1 + #2: listed title-lenders' OWN reported NPL ratios from
+RESEARCH_DIGEST §B next to AutoX's MEASURED own-book NPL from the real loan tape). It was the exact read the
+2026-08-05 audit named as the next target.
+- **Why it matters:** `drawPeerNpl` GATES the whole board on a non-empty `.peers` array — a truncated/404
+  CDN deploy silently drops it to a calm "Peer NPL benchmark not available" placeholder with **no phone
+  alert**. And like its `peer_scoreboard` sibling it **cannot self-heal**: the peer figures are off-repo
+  (RESEARCH_DIGEST §B) and the AutoX anchor is owner-side (loan tape), so no CI job re-pulls it — the probe
+  is the only deploy safeguard.
+- `_shape_peer_npl` asserts render shape (the `.peers` gate ≥2 rows, a row `name`/`ticker` label, ≥1 numeric
+  `npl`, the `.autox` anchor's non-blank `name` + numeric `npl_live_os_pct` + `npl_90plus_os_pct`), not
+  values — robust to a future RESEARCH_DIGEST/tape-vintage refresh.
+- **Verified:** real 2,571-byte payload accepted; 12 negatives all reject. Offline `--local platform`
+  131/131 HEALTHY (128 → 131 checks, +3). Determinism gate 121 passed · 0 failed (data integrity 455/455) —
+  probe-script-only (the gate does not invoke `check_site_health.py`; no `platform/data` file altered, so no
+  provenance regen). Emitted the finding to `docs/SERVICE_AUDIT.md`.
+- **Next intelligence task:** the remaining lower-value secondary reads still unprobed — the
+  graceful-degrading rival-pulse promo/review boards and the province deep-dive fetches.
+
+## 2026-08-06 — Integration loop: site-health probe now guards pico_competitors.json (the last unprobed obj-#2 PICO read on #acq)
+
+Autonomous integration run. **First established the CI-doable data-integration backlog is genuinely
+exhausted this run**, so the improvement is deploy-robustness hardening, not a new pull:
+- Backlog items 1 (FPO PICO → competitor census) and 2 (per-branch `branch_cropland`) are already
+  DONE and surfaced (`pico_census`/`pico_competitors`/`pico_district`/`branch_pico` built + consumed
+  in `app.js`+`index.html`; `branch_cropland`/`province_cropland` gated + surfaced in `app.js`+
+  `province.html`). Item 3's DIW/MOT/DBD legs are distilled (`vehicle_*`, `dbd_formation`).
+- The remaining un-distilled gov sources (`excise_moto_tax`/`excise_car_tax`, `osmep_sme_growth`,
+  `baac_credit`, `smebank_credit`) were re-probed live from CI and confirmed **not CI-reachable**:
+  `catalog.excise.go.th` SSL-fails (HTTP 000), `opendata.sme.go.th` HTTP 000, and the data.go.th-only
+  BAAC/SME legs are 403 with their raw caches gitignored/absent. Their unblock stays Thai-IP/owner-side
+  (consistent with NEXT_STEPS §2). **Not faked** — logged and skipped.
+- A determinism-gate coverage sweep found every deterministic data builder is already `--check`-gated
+  (only `build_platform.py`, an HTML assembler, is out, correctly). And a negative-space sweep found
+  no committed MEASURED "dead" layer to wire (every zero-fetch candidate is either an intermediate
+  baked into a surfaced layer, or a deliberately-dormant expansion score out of consolidation scope).
+
+**The gap that WAS real (the ship):** the live-site health probe (`pipeline/check_site_health.py`, the
+nightly `site-health.yml` job that phone-alerts the owner when the Vercel deploy serves a broken/missing
+file) probed the DISTRICT-grain PICO read (`pico_district.json`, `_shape_pico_district`) but NOT its
+PROVINCE-grain sibling `pico_competitors.json` — the `#acq` "where do sub-scale rivals most outnumber
+our footprint?" leaderboard (`drawPicoCompetitors` reads `PICOCOMP.provinces` rows for
+`.outnumber`/`.pico_total`/`.autox_branches`/`.th`). Both are MEASURED FPO-registry-vs-branch-book
+tallies rendered side-by-side on Competition; the render empties gracefully to a "not yet computed"
+note, so a truncated deploy that dropped/emptied the file would have silently blanked the province-grain
+competitive board with **no phone alert** — the exact blind spot the peer_province / competitor_coverage
+/ pico_district probes were added to close (see the 2026-08-04 `df5a691` peer_scoreboard entry, same
+pattern). Added `_shape_pico_competitors` (asserts render shape — non-empty `.provinces`, first row
+numeric `outnumber`/`pico_total`/`autox_branches` + a `.th` name, `meta` present — robust to registry
+growth, not exact counts) and its `DATA_FILES` entry. `pipeline/check_site_health.py` +33, one file.
+
+**Verification:** determinism gate `bash tests/run.sh check` → **121 passed · 0 failed** (unchanged —
+the probe is not gated, and nothing in `platform/data`/the app changed, so no `build_provenance.py`
+regen was owed). Offline probe `check_site_health.py --local platform` → **HEALTHY 128/128** (was
+125/125; +3 pico_competitors checks, all PASS). Negative test of `_shape_pico_competitors` against
+crafted-broken inputs confirmed it catches every failure mode (empty `provinces`, missing `outnumber`,
+missing `meta`, non-object) and returns `None` on the real file. No app behaviour/visual change → direct
+commit to master. **Recommend next:** the CI-reachable data backlog is exhausted; the remaining
+high-value integrations are all Thai-IP/owner-side (commit the FPO PICO / excise / BAAC raw pulls from
+the laptop) or the GISTDA 40m `check-crop` per-branch upgrade (item 4 — big, alters `branch_cropland`
+numbers → wants an attended PR, not an unattended run).
+
+## 2026-08-06 — UX loop: load IBM Plex fonts on branch-explorer.html (PR #299, merged + deployed + verified)
+
+Autonomous UX-improvement run. Closed `ux-branch-explorer-font-not-loaded` — the last font-loading
+inconsistency in the app. `branch-explorer.html` (the per-branch `?lat=&lng=&n=` deck.gl scene)
+declared `font-family:'IBM Plex Sans Thai'` / `'IBM Plex Mono'` across its CSS (33 references) but,
+unlike the other 5 pages, **never loaded the Google Fonts stylesheet** — so its branch-name + panel
+text silently rendered in the `system-ui` fallback, inconsistent with the rest of the app and (per
+CLAUDE.md: "Fonts IBM Plex Sans Thai + IBM Plex Mono") the mandated design standard; Thai branch
+names in particular lost IBM Plex Sans Thai shaping. The backlog had deferred this as a "design call",
+but the page already DECLARES IBM Plex everywhere and the standard is unambiguous, so loading them
+(option a) is the design-correct move, not a toss-up. Added the exact three head lines
+`province.html`/`data.html` use — the `fonts.googleapis.com` + `fonts.gstatic.com`(crossorigin)
+preconnect pairing + the `css2?family=IBM+Plex+Sans+Thai…&IBM+Plex+Mono…&display=swap` stylesheet —
+after the share-metadata block. Head-only, no body/JS/CSS touched; `display=swap` avoids an
+invisible-text flash. `platform/branch-explorer.html` +6.
+
+**Safeguard protocol (all passed):** (a) `bash tests/run.sh check` → **121 passed · 0 failed**;
+(b) headless render of `branch-explorer.html?lat=12.7506&lng=101.038` → scene + left acquisition panel
++ right BASEMAP/LAYERS controls + nav all intact, `data-errors="[]"`, nothing broken (gstatic is
+proxy-blocked in the harness so the swap isn't visible headless, but the fallback is unchanged → no
+regression); (c) no secrets in the diff; (d) 2 files, no stray. **Merge:** squash-merged own PR #299
+→ master `baaf329`. **Deploy-verify:** production alias root **200** and the changed route
+`/branch-explorer` **200** (the `.html` 308 is `cleanUrls`, expected); confirmed the deployed HTML now
+serves the `fonts.googleapis.com/css2` IBM Plex link (build propagated). No rollback needed. (Remote
+feature branch delete hit a transient git-proxy disconnect and was left in place — merged + harmless.)
+**Recommend next:** `ux-viewport-user-scalable-3dpages` (WCAG 1.4.4 — the three deck.gl pages lock
+pinch-zoom; needs `touch-action:none` on the canvas + a real-device gesture test, so it wants an
+attended run, not unattended auto-merge) or `ux-live-chart-mobile-viewbox-responsive` (a responsive
+viewBox for live.html's SVG charts — touches `lineChart()` coordinate math, bigger than surgical).
+
 ## 2026-08-05 — Market/Service loop: 3D catchment scene headlines the MEASURED WorldPop catchment population (was the ESTIMATED area-weight fallback)
 
 Autonomous market & service intelligence run. A negative-space sweep surfaced a genuine
@@ -4813,3 +5060,10 @@ Kaustav deploys).
 - **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. 455 data-integrity checks + `node --check` on every page's inline JS — `live.html` clean). (b) headless `render.sh live.html` → `data-errors="[]"`, default PNG byte-identical (144961 B, the pill class only appears when a feed is overdue); a forced pill-swatch render + a computed-style probe confirm the aging pill resolves to `rgb(138,98,16)`=`#8A6210` in light and unchanged `rgb(230,180,80)`=`#E6B450` in dark, legible and distinct from the red stale pill. (c) no secrets in the CSS-only diff. (d) diff = only `platform/live.html` + `docs/UXUI_AUDIT.md`, no stray files.
 - **Deploy-verify (PASS, no rollback):** after ~95s the production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and on the changed route `/live` (its canonical clean URL); `/live.html` → 308 is the expected `cleanUrls` redirect to `/live`, not a regression. Session auto-unsubscribed from PR #286 on merge. The merged branch was not remotely deleted — `git push --delete` returns the known git-proxy "remote end hung up" artifact (same as prior runs; GitHub prunes it server-side), the merge itself succeeded.
 - **Next recommended:** backlog is deep and mostly closed; the remaining open items are all deliberately *bigger-than-surgical* and unsuited to unattended auto-merge — `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" expansion language as competitive-RISK, ripples across national/regional/province + app.js), `ux-viewport-user-scalable-3dpages` (drop the `maximum-scale=1` lock on the 3 deck.gl pages + add `touch-action:none`, needs real-device pinch-zoom testing), `ux-live-chart-mobile-viewbox-responsive` (narrower viewBox on phones so `live.html`'s SVG geometry+labels scale together — touches `lineChart()` coordinate math). Non-platform: `qa-visual-baseline-stale` wants a deliberate `tests/run.sh baseline` refresh so the visual-regression gate carries signal again. Future runs should keep reviewing individual routes for concrete surgical wins as this one did.
+
+## 2026-08-06 — UX loop: ux-navmore-menu-offscreen-mobile (Explore ▾ dropdown, mobile) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260806-0823`, squash-merged PR #301 → `029fcb2` on master): fixed a real mobile **broken-affordance** bug on the three `styles.css`-based secondary pages (`live.html`, `data.html`, `status.html`) — the "Explore ▾" nav dropdown was dragged almost entirely off the LEFT edge of the screen on a phone, making every Explore route (Risk trend / Map view / Provinces 3D / Branches / Market / Simulator / Live board) unreachable there. Root cause: `#nav` carries BOTH `backdrop-filter` (which makes it the containing block for `position:fixed` descendants) AND `overflow-x:auto` (the horizontal swipe strip); unlike `index.html`, these three pages never re-parented `#navMoreMenu` out of the nav, so its `position:fixed;right:10px` resolved against the *scrolled* `#nav` box, not the viewport. Since "Explore ▾" is the last nav item, reaching it on a 390px phone REQUIRES scrolling the strip fully right — so the menu was always dragged left by the scroll amount. Fix mirrors `index.html`'s nav script with a 2-line change per page: `document.body.appendChild(menu)` (re-parent to `<body>`, whose fixed children anchor to the viewport) + `open()` now toggles `.open` on the menu as well as the wrap (so the `.nav-more-menu.open` display selector already in `styles.css` matches once re-parented), plus `&&!menu.contains(e.target)` on the outside-click guard. The three deck.gl pages were deliberately left untouched (their own inline `position:absolute` nav CSS anchors the menu to the button and has no off-left drift; re-parenting would regress them → `display:none`). `platform/{live,data,status}.html` (+9/−6 total) + `docs/UXUI_AUDIT.md` (fix-log entry + one new backlog item).
+- **How it was found:** the seven named backlog priorities are all long-fixed and the remaining open items are all deliberately bigger-than-surgical, so this run reviewed the secondary-page nav and traced the CSS containing-block interaction, then **verified empirically** with Playwright at 390px (`isMobile`, nav scrolled): before = menu `x=-132` (161px wide → ~29px on-screen), `elementFromPoint` on first item = `none` (unclickable); after = `x=219` mobile / `x=1269` desktop 1440px, first item = `menu` (fully on-screen + clickable) on all three pages. Master baseline `render.sh` of the 3D pages confirmed they display fine on master and would regress under the re-parent (menu → `display:none`), so they were excluded.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. `node --check` on live/data/status inline JS + 455/455 data-integrity checks). (b) headless `render.sh` of all three changed pages @ 900×800 read + self-reviewed — nav intact, "Explore ▾" present, content healthy, no visible regression on load (the dropdown only shows on interaction, verified separately by the Playwright interaction check above). (c) no secrets in the diff. (d) diff = only the 3 pages + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** after ~95s the production alias `competitive-intel-git-master-…vercel.app` → **200** on `/`, `/live`, `/data`, `/status` (the three changed routes, canonical clean URLs); `/live.html`/`/data.html`/`/status.html` → 308 is the expected `cleanUrls` redirect and resolves to 200 when followed — not a regression. Session auto-unsubscribed from PR #301 on merge. Remote branch delete returned the recurring git-proxy "remote end hung up" sideband artifact (same as prior runs; GitHub prunes it server-side) — the merge itself succeeded.
+- **Next recommended:** the surgical + headless-verifiable queue is drained again. Standing backlog is all bigger-than-surgical / device-tested and NOT auto-mergeable unattended: **`ux-navmore-3dpages-absolute-overflow`** (NEW this run — the 3 deck.gl pages' own `position:absolute` Explore menu spills ~44px past the RIGHT viewport edge / gets occluded on a 390px phone; needs their inline CSS touched + a `.nav-more-menu.open` selector + real-device test because they mount a WebGL canvas); `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" expansion language in `build_regional_outlook.py` + app.js as competitive-RISK, ripples across surfaces); `ux-viewport-user-scalable-3dpages` (drop `maximum-scale=1` + add `touch-action:none` on the 3 deck.gl pages, needs pinch-zoom device test); `ux-live-chart-mobile-viewbox-responsive` (narrower viewBox on phones, touches `lineChart()` math). Non-platform: `qa-visual-baseline-stale` wants a deliberate `tests/run.sh baseline` refresh so the visual gate carries signal again. Consider batching the two 3D-page nav/viewport items into one device-tested run.
