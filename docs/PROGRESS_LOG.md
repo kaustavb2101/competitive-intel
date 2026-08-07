@@ -3,6 +3,48 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-07 — Integration loop (deployment health): site-health probe now guards `branch_cropland.json` (committed to master)
+
+Autonomous integration/improvement run. Verified the flagship data-integration backlog (docs/NEXT_STEPS +
+the run prompt's items 1–4) is **done or CI-blocked**, so nothing new could be *pulled* this run:
+- **#1 FPO PICO competitor registry — DONE.** `fpo_pico` is distilled into `pico_census.json` /
+  `pico_district.json` / `pico_competitors.json` / `branch_pico.json` (MEASURED, canonical-77-keyed) and
+  wired into `build_rival_density.py`; all surfaced on `#acq` and already deploy-probed.
+- **#2 per-branch crop layer — DONE (and hardened this run, see below).** `build_branch_cropland.py` →
+  `branch_cropland.json` builds under the gate (`--check`, SKIPs cleanly if `doae_planted_area.json` is
+  absent), is in `provenance.json`, and renders the MEASURED-corrected crop-area block in every branch popup.
+- **#3 data.go.th distillation — DONE for the CI-reachable sources, BLOCKED for the rest.** `dbd_newco` →
+  `dbd_formation.json`, `mot_vehicles` → vehicle layers, `diw_factories` → factory layers all shipped. The
+  undistilled `baac_credit` / `smebank_credit` cannot be rebuilt from CI — the raw datagoth cache is gitignored
+  (absent from a fresh clone) and the data.go.th aggregator is 403 from cloud IPs (per DATAGOTH_CATALOG.md).
+- **#4 GISTDA 40m satellite crop-area — BLOCKED here.** `GISTDA_SPHERE_KEY` is **unset in this CI env**, so no
+  puller can authenticate. Skipped, not faked (logged for a keyed/owner-side run).
+
+So this run took the highest-value CLEAN, deterministic, zero-fabrication improvement left: **closing the
+deploy-health blind spot on `branch_cropland.json`** — backlog item #2's own shipped obj-#1 layer, and the
+last surfaced *per-branch* read with no site-health probe.
+- **Why it matters:** `branch_cropland.json` is the only per-branch absolute crop-hectares layer, index-aligned
+  to `branches.json`. It renders the MEASURED-corrected "crop area within 10km" block in every branch popup
+  (`croplandPopupHTML` → `croplandRec(d)=CROPLAND[i]`, gated on `.crop_ha`, per-crop `.ha[]` labelled off
+  `croplandMeta.crops`). The client loader sets `CROPLAND=null` on any fetch/parse failure and the popup helper
+  returns `''` when the record is missing — so a truncated/404 CDN deploy **silently drops the crop block from
+  every popup with no phone alert**, the exact "broken demo" blind spot the sibling `flood_hazard` /
+  `branch_labor` / `rival_pressure` probes exist to catch.
+- **Change:** one file of substance — `pipeline/check_site_health.py` (+`_shape_branch_cropland` asserting the
+  render contract: non-empty `meta.crops` + the 2015-branch index-aligned `.branches` array + `ha[]`/`crop_ha`
+  on each record — SHAPE not values, robust to a DOAE/SPAM vintage refresh; + its `DATA_FILES` entry). Plus a
+  one-word `tests/run.sh` comment fix (the self-test's "41 probed data files" count had drifted; genericized to
+  stop re-drift). **No data file altered → no provenance rebuild; no app behaviour/visual change → committed
+  straight to master, not a PR.**
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` → **124 passed · 0 failed** (data validation
+  455/455; `check_site_health.py --local` self-test accepts the committed payload → **137/137**). Negative-tested
+  the validator directly: it rejects truncated `.branches` (index misalignment), a first record missing `crop_ha`
+  or `ha`, empty `meta.crops`, and a missing `.branches` array — proving it is not a no-op. No secrets in diff.
+- **Next recommended integration:** the remaining CI-doable data backlog is genuinely exhausted (all Thai-IP /
+  owner-side / keyed). Continue the deploy-health sweep on the last surfaced-but-unprobed obj-#1 reads
+  (`branch_peers.json` peer-twin board on `#trend`, `segment_exposure.json` on `#exposure`), OR run the GISTDA
+  40m crop pull once `GISTDA_SPHERE_KEY` is available in the run environment.
+
 ## 2026-08-06 — Intelligence loop (deployment health): site-health probe now guards `rival_pressure.json` (committed to master, deployed + verified)
 
 Autonomous market/service-intelligence run. The `plan_cycle.py` backlog is exhausted (49 done, the 1 open

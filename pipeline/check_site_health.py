@@ -1338,6 +1338,43 @@ def _shape_rival_pressure(d):
     return None
 
 
+def _shape_branch_cropland(d):
+    # The per-branch crop-AREA layer (branch_cropland.json, obj #1 — SPAM-2010
+    # spatial pattern rescaled per province to the DOAE farmer-registry MEASURED
+    # 2025 planted area, pipeline/build_branch_cropland.py). It is the only
+    # per-branch absolute crop-hectares read the app carries, index-aligned to
+    # branches.json, and it renders the MEASURED-CORRECTED "crop area within 10km"
+    # block in every branch popup (croplandPopupHTML reads croplandRec(d)=CROPLAND[i]
+    # -> .crop_ha gate + the per-crop .ha[] magnitudes, labelled off croplandMeta.crops).
+    # The client loader sets CROPLAND=null on any fetch/parse failure and the popup
+    # helper returns '' whenever the record is missing, so a truncated/404 CDN deploy
+    # silently drops the crop-area block from every popup with NO phone alert — the
+    # same "broken demo" blind spot the flood_hazard / farm_book / branch_labor obj-#1
+    # probes closed for their siblings, and this layer (backlog item #2's shipped
+    # integration) was the last surfaced per-branch obj-#1 read with no deploy probe.
+    # Asserts the render contract (the meta.crops label list + the 2015-branch
+    # index-aligned array + the .crop_ha gate and .ha[] magnitudes the popup reads)
+    # as SHAPE not values, robust to a future DOAE-vintage / SPAM refresh moving areas.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    crops = d.get("meta", {}).get("crops") if isinstance(d.get("meta"), dict) else None
+    if not isinstance(crops, list) or not crops:
+        return "missing/empty meta.crops label list (popup per-crop row labels)"
+    recs = d.get("branches")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'branches' array (client CROPLAND gate + popup CROPLAND[i] read)"
+    if len(recs) != 2015:
+        return "expected 2015 branch records (index-aligned to branches.json), got %d" % len(recs)
+    r0 = recs[0]
+    if not isinstance(r0, dict):
+        return "first 'branches' record is not an object"
+    if not isinstance(r0.get("ha"), list):
+        return "first branch record missing 'ha' list (per-crop hectares, popup .ha[j] render read)"
+    if not isinstance(r0.get("crop_ha"), (int, float)) or isinstance(r0.get("crop_ha"), bool):
+        return "first branch record missing numeric 'crop_ha' (popup crop-area gate/total render read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -1589,6 +1626,14 @@ DATA_FILES = [
     # to their fallback with no phone alert — the same blind spot the rival_density /
     # rival_threat / rival_threat_region probes closed for their obj-#2 siblings.
     ("data/rival_pressure.json", _shape_rival_pressure, ".brands + 2015-branch index-aligned .branches + .besieged board rows (#trend Most-besieged board + per-branch popup)"),
+    # The per-branch crop-AREA layer (branch_cropland.json, obj #1) — the last
+    # surfaced per-branch read with no deploy probe. It renders the MEASURED-
+    # corrected "crop area within 10km" block in every branch popup
+    # (croplandPopupHTML, index-aligned to branches.json), and the client sets
+    # CROPLAND=null on any fetch failure so a truncated/404 CDN deploy silently
+    # drops the block from every popup with no phone alert — the same blind spot
+    # the flood_hazard / branch_labor obj-#1 probes closed for their siblings.
+    ("data/branch_cropland.json", _shape_branch_cropland, ".meta.crops + 2015-branch index-aligned .branches with ha[]/crop_ha (per-branch crop-area popup block)"),
 ]
 
 
