@@ -26,6 +26,7 @@ setup(){
   git init -q; git config user.email t@t; git config user.name t; git config commit.gpgsign false
   cp "$SRC" pipeline/resolve_derived_conflicts.sh
   cp "$HERE/../pipeline/merge_append_log.py" pipeline/merge_append_log.py
+  cp "$HERE/../pipeline/merge_feed_history.py" pipeline/merge_feed_history.py
   printf '# PROGRESS LOG\n\nReverse-chronological.\n\n## 2026-08-01 — the entry both sides start from\n\nbody\n' > docs/PROGRESS_LOG.md
   # stand-in for rederive_drift.py: provenance is a deterministic census of source-data
   cat > pipeline/rederive_drift.py <<'PY'
@@ -171,8 +172,53 @@ bash pipeline/resolve_derived_conflicts.sh mobile >/dev/null 2>&1; rc=$?
 [ -z "$(git status --porcelain)" ] && ok "no merge left half-applied" || no "left a dirty tree"
 
 echo
-echo "=== 10. merge_append_log.py's own unit cases ==="
-python3 pipeline/merge_append_log.py --selftest >/dev/null 2>&1 && ok "--selftest (13 cases)" || no "--selftest failed"
+echo "=== 10. the feed_history accumulator unions instead of blocking ==="
+# The one source-data/ file that is auto-resolved, and only because picking a side DESTROYS data:
+# ThaiWater and the pump price publish only "now", so a day dropped here cannot be re-pulled.
+fh(){ # <date> <value> [<date> <value>] -> write source-data/feed_history.json
+  python3 - "$@" <<'PY'
+import json, sys
+a = sys.argv[1:]
+pts = {a[i]: float(a[i+1]) for i in range(0, len(a), 2)}
+d = sorted(pts)
+json.dump({"meta": {"n_points": len(d), "n_series": 1},
+           "series": {"flood": {"label": "L", "unit": "u", "cadence": "daily", "source": "s",
+                                "path": "p", "dates": d, "values": [pts[x] for x in d],
+                                "first_seen": d[0], "n": len(d)}}},
+          open("source-data/feed_history.json", "w", newline="\n"), indent=1, sort_keys=True)
+PY
+}
+setup
+fh 2026-08-04 132; python3 pipeline/rederive_drift.py >/dev/null; git add -A; git commit -qm "base history"
+git checkout -q -B mobile master; fh 2026-08-04 132 2026-08-05 136
+python3 pipeline/rederive_drift.py >/dev/null; git commit -qam mobile
+git checkout -q -B laptop master; fh 2026-08-04 132 2026-08-06 140
+python3 pipeline/rederive_drift.py >/dev/null; git commit -qam laptop
+bash pipeline/resolve_derived_conflicts.sh mobile >/dev/null 2>&1; rc=$?
+[ "$rc" -eq 0 ] && ok "exit 0 (unioned, not escalated)" || no "exit $rc, expected 0"
+DATES=$(python3 -c "import json;print(','.join(json.load(open('source-data/feed_history.json'))['series']['flood']['dates']))")
+[ "$DATES" = "2026-08-04,2026-08-05,2026-08-06" ] && ok "kept every day from both sides" || no "dates are $DATES"
+VALS=$(python3 -c "import json;print(','.join(str(v) for v in json.load(open('source-data/feed_history.json'))['series']['flood']['values']))")
+[ "$VALS" = "132.0,136.0,140.0" ] && ok "values stayed aligned to their dates" || no "values are $VALS"
+
+echo
+echo "=== 11. two DIFFERENT readings for the same day is contested and must ABORT ==="
+# Not hypothetical: this is what raising the pull cadence above once a day would produce.
+setup
+fh 2026-08-04 132; python3 pipeline/rederive_drift.py >/dev/null; git add -A; git commit -qm "base history"
+git checkout -q -B mobile master; fh 2026-08-04 132 2026-08-05 136
+python3 pipeline/rederive_drift.py >/dev/null; git commit -qam mobile
+git checkout -q -B laptop master; fh 2026-08-04 132 2026-08-05 999
+python3 pipeline/rederive_drift.py >/dev/null; git commit -qam laptop
+BEFORE=$(git rev-parse HEAD)
+bash pipeline/resolve_derived_conflicts.sh mobile >/dev/null 2>&1; rc=$?
+[ "$rc" -eq 2 ] && ok "exit 2 (needs a human)" || no "exit $rc, expected 2"
+[ "$(git rev-parse HEAD)" = "$BEFORE" ] && ok "branch left untouched" || no "branch was modified"
+
+echo
+echo "=== 12. the mergers' own unit cases ==="
+python3 pipeline/merge_append_log.py   --selftest >/dev/null 2>&1 && ok "merge_append_log --selftest (13 cases)"   || no "merge_append_log --selftest failed"
+python3 pipeline/merge_feed_history.py --selftest >/dev/null 2>&1 && ok "merge_feed_history --selftest (11 cases)" || no "merge_feed_history --selftest failed"
 
 echo
 echo "==================== $PASS passed, $FAIL failed ===================="
