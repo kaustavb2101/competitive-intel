@@ -259,6 +259,53 @@ serve 200. That left **`rival_pressure.json`** — the MEASURED per-branch rival
 - **Next recommended intelligence task:** continue the same deploy-health sweep — the next surfaced-but-unprobed
   reads are `branch_peers.json` (obj-#1 peer-twin outlier board on `#trend`) and `segment_exposure.json`
   (obj-#1 segment×collateral concentration on `#exposure`), both of which degrade silently on a truncated deploy.
+## 2026-08-07 — Integration loop (deploy-health): site-health probes guard the collateral board's last two unprobed reads — `vehicle_mix.json` + `vehicle_brands.json` — committed to master
+
+Autonomous integration run. **First re-confirmed the CI-doable data-INTEGRATION backlog is exhausted or
+blocked this run**, so the improvement is deploy-robustness hardening (not a new pull):
+- Backlog items 1 (FPO PICO → competitor census) and 2 (per-branch `branch_cropland`) are DONE + surfaced;
+  item 3's CI-reachable legs (DIW/MOT/DBD → `vehicle_*`, `dbd_formation`) are distilled. Item 4 (GISTDA
+  40m satellite crop) needs `GISTDA_SPHERE_KEY`, which is **NOT in this session's env** (checked
+  `env | grep GISTDA` → empty) — so its puller cannot be built+verified here; unchanged from prior runs.
+  The un-distilled gov legs (excise/osmep/baac/smebank) remain CI-unreachable (Thai-IP/owner-side).
+- So this run closed the **explicit "next recommended" from the 2026-08-04 log**: the two sibling
+  collateral-board reads from the DLT nameplate wave that `vehicle_models`'s probe left uncovered.
+
+**The gap.** The collateral board (`#overview`, obj #1 — vehicle titles are ~75% of the book) surfaces
+`vehicle_mix.json` (`cb-mix`, MEASURED — DLT stock-vs-new-registration fleet mix by class) and
+`vehicle_brands.json` (`cb-vbrands`, national brand mix MEASURED, province split ESTIMATED) via
+`tmliFetch(...)`. Both **self-hide** (`display='none'`) on a truncated/404 CDN deploy with **no phone
+alert** — the same silent "broken demo" blind spot the `vehicle_models` / `collateral_book` / `deltas`
+probes closed for their siblings. And like those, neither **self-heals from CI**: the DLT stock/brand
+files are annual off-cadence pulls, so no daily cron re-publishes them — the deploy probe is the only
+safeguard. Grep confirmed they were the last two surfaced reads from that wave with no `_shape_*` validator.
+
+**The fix.** Added `_shape_vehicle_mix` + `_shape_vehicle_brands` to `pipeline/check_site_health.py` and
+their `DATA_FILES` entries. Each asserts the exact render contract its panel GATES on, as **SHAPE not
+values** (robust to a future DLT-vintage refresh moving the counts):
+- `vehicle_mix`: `national.stock`/`national.new` non-empty maps (first row carries numeric `share_pct`) +
+  a non-empty `types` class list whose row carries `id`/`label`/boolean `has_stock` — i.e. the client's
+  `!NAT.stock||!NAT.new||!TY.length` display gate plus the cells the rows render.
+- `vehicle_brands`: `national.by_type.ry3` and `.ry1` each a non-empty `brands` list whose row carries a
+  string `brand` + numeric `count`/`share_pct` — i.e. the client's `!NB.ry3||!NB.ry1` gate — plus a
+  `provinces` object for the ESTIMATED province split.
+
+- **Verification (all pass):** unit-tested — both real payloads accepted (`vehicle_mix` 215,984 B;
+  `vehicle_brands` 282,140 B) and **18 negatives all reject** (non-dict / missing-or-empty stock/new /
+  share-less stock row / empty-or-key-less types / non-bool has_stock; missing national/by_type/ry3 /
+  empty ry1 brands / brand-less or non-numeric-count brand row / non-dict provinces). Offline
+  `--local platform` → **137/137 HEALTHY** (was 131; +6 = 2 files × fetch/parse/shape). Determinism gate
+  `bash tests/run.sh check` → **124 passed · 0 failed** (data integrity 455/455); the `--local` deploy-probe
+  self-test — now under the gate since 2026-08-06 — reports `[PASS]`, so the new validators are themselves
+  regression-protected. No `platform/data` file changed → no `build_provenance.py` regen needed. Diff =
+  `pipeline/check_site_health.py` (+88) + this log; no secrets in diff.
+- **Why a direct commit, not a PR.** Probe-script only — no app behaviour, no visual, no surfaced number,
+  no data layer. Closes a deploy-health blind spot without altering what ships; same safeguard-only
+  direct-to-master path as the recent site-health probe commits (`vehicle_models`, `peer_npl`, `deltas`).
+- **Next recommended:** the collateral/nameplate wave's deploy-probe coverage is now complete. The next
+  service target is the Overview switchboard's remaining multi-source reads (`debt_source`/`farm_household`)
+  or the province deep-dive fetches; the next DATA target stays owner-side/Thai-IP (GISTDA 40m crop once
+  the secret is in-session; the excise/baac/smebank legs) — nothing new is CI-unblocked this run.
 
 ## 2026-08-06 — UX loop: `.fb-h4` tag pill wraps so it stops bleeding out on mobile #overview (PR #307, merged + deployed + verified)
 
