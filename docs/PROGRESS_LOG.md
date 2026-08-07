@@ -3,6 +3,119 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-07 — Intelligence loop (PEER COMPARISON): book-per-branch structural intensity on #acq
+
+Autonomous market & service intelligence run. The competitor board's national-standing block already
+ranked AutoX vs the big-4 on branch-network SIZE (measured own network vs reported IR) and on measured
+store-locator FOOTPRINT — but it showed each **peer's** loan book without AutoX's own, and nobody
+computed **book carried per branch**, the read that turns "peers have bigger books" into a structural
+statement about operating model.
+
+- **The gap:** AutoX's ranking row carried no `loan_book_bn`, so the book-scale chain rendered peers
+  only; there was no per-branch normalisation. Book-per-branch is the cleanest structural peer read for
+  objective #2 (margin/competitive pressure on the network we already run).
+- **The fix (`build_competitor_coverage.py` + `app.js`, +108 lines):** added `_book_intensity()` →
+  `national_standing.book_intensity`. AutoX book is **MEASURED** — `tape_real.json`
+  `bucket_ladder.book_total.os_sum` = ฿46.572bn current outstanding from the real loan-level export;
+  each peer's book is **REPORTED** (cited FY2025 / 2025 IR, already in `PEER_FINANCIALS`). Book ÷
+  branch-network size gives ฿m/branch, ranked desc, with an auto-derived insight and a mixed-basis
+  caveat (loan-tape snapshot vs peer IR dates; own-network vs listed-entity branch counts; a structural
+  density read, NOT profitability, NPL or market share). Heng excluded (no cited book/branch count —
+  never invented). Surfaced on **#acq** as a new null-safe line under the footprint reframe, AutoX
+  figure tagged ◆ measured, peers ★ reported.
+- **The read:** Srisawad ฿81.9m › Tidlor ฿58.5m › **AutoX ฿23.1m** › Muangthai ฿21.1m per branch. AutoX
+  runs a dense, thin-per-branch model — closest to market-leader MTC, and 2.5–3.5× below Tidlor/Srisawad,
+  which run far fewer, much larger branches. AutoX competes on network density and per-branch throughput,
+  not per-branch scale.
+- **Verify:** `build_competitor_coverage.py --check` reproduces byte-exact; `build_provenance.py` →
+  0 unlabelled (136 layers); `node --check app.js` clean; `bash tests/run.sh check` = **124 passed,
+  0 failed** (455/455 data checks); headless render of `index.html#acq` = `data-errors="[]"`, new block
+  present. Ships to production via master auto-deploy.
+
+## 2026-08-07 — UX loop: close the noscript-fallback gap on live.html (PR #312, merged + deployed)
+
+Autonomous UX-improvement run. All 8 original `docs/UXUI_AUDIT.md` findings and every discovered
+surgical item are closed; the remaining open backlog items are explicitly deferred (device-tested
+gesture work, test-infra, or bigger-than-surgical), so per the loop rule I reviewed the routes myself
+and found a new concrete, headless-verifiable improvement.
+
+- **The gap (`ux-noscript-fallback-live`):** `live.html` (the "Live board" nav route) was the ONLY
+  `styles.css` nav page with no `<noscript>` banner. It was added *after* the
+  `ux-noscript-fallback-databook-status` sweep and so was missed. It builds its entire content — the
+  freshness pulse strip, feed tables, and five inline-SVG trend charts — in the browser via JS, so a
+  JS-off visitor (or one with a blocked font CDN) got a blank `<main>` with no explanation, while
+  `index.html` / `data.html` / `status.html` + the 3 deck.gl pages all already explain themselves.
+- **The fix (platform/ only, +7 lines across 2 files):** added the house themed `<noscript>` banner
+  (console vars `--panel`/`--line`/`--accent`/`--txt`/`--hi`, both themes) as the first child of
+  `<main>` in `live.html`, page-appropriate copy, link back to the front door; one-line audit entry.
+  Renders ONLY with JS off (zero change for normal users; JS-on render identical). Now all 7
+  shareable routes carry the fallback.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` → **124 passed, 0 failed**.
+  (b) headless render of `live.html` self-reviewed — JS-on render identical (banner correctly hidden),
+  pulse strip + charts + nav intact. (c) no secrets in diff. (d) diff = 2 files / +7 lines, no stray
+  files.
+- **Merge + deploy + verify.** PR #312 squash-merged to master (sha `07a6696`); Vercel auto-deploy.
+  Post-deploy: production alias `/` **HTTP 200**, changed route `/live` **HTTP 200**, `/live.html`
+  **308** (expected `cleanUrls` redirect to `/live`, itself 200) — no regression, no rollback.
+- **Note:** the merged branch `claude/ux-loop-20260807-0812` could not be deleted from the remote
+  (repeated transient `git push :branch` disconnects; no branch-delete MCP tool available). Cosmetic
+  only — the squash-merge landed cleanly. Worth a later cleanup.
+
+## 2026-08-07 — Intelligence loop: extend the live freshness guard to the fuel-price daily-CI layer
+
+Autonomous market & service intelligence run. Data room re-confirmed healthy up front (live master
+production alias **HTTP 200** on `/`, `/app.js`, `/data/meta.json`; `build_provenance.py --check`
+byte-exact; `check_site_health.py --local` **137/137 HEALTHY**; every daily-CI price/weather vintage
+fresh; the only lagging layers are the known monthly/Thai-IP ones, honestly labelled). The plan
+(`AUTONOMY_PLAN.md`) is 98% done with only 1 owner-side item open, so the value was in **closing a
+structural coverage gap**, not another shape probe.
+
+- **The gap:** the 2026-08-06 (c) run added a **live-only freshness guard** (`FRESHNESS_LAYERS` in
+  `pipeline/check_site_health.py`) that FAILs → nightly GitHub issue → phone alert when a daily-CI
+  layer's `meta` vintage exceeds a 14-day TTL (a stuck-cron signal the ~40 shape probes structurally
+  cannot see). Its set covered `commodities.json` (NABC farm-gate), `thai_price_history.json` and the
+  two ThaiWater layers — but **missed `fuel_prices.json`**, a DAILY, CI-refreshed, CI-reachable
+  (Bangchak retail oil-price API, `data-fuel-prices.yml`), MEASURED, live-`fetch()`'d (`app.js:11315`)
+  layer. Because `commodities.json` keys freshness on `farmgate_vintage` (a **distinct** upstream from
+  Bangchak), a Bangchak fuel-API failure while NABC stays up would leave `fuel_prices.json` silently
+  frozen, still green on every probe, no alert — exactly the class the guard exists to close.
+- **The fix (probe-script-only):** added `("data/fuel_prices.json", "pulled", 14, …)` to
+  `FRESHNESS_LAYERS`. `pulled` is a reliable signal — `pull_fuel_prices.py` stamps `meta.pulled=<today>`
+  every run and the workflow re-derives + commits `platform/data/fuel_prices.json` daily, so `pulled`
+  advances each successful cron (fuel commits on 08-05 and 08-07 confirm cadence ≪ TTL); a >14d lag is
+  an unambiguous stuck-pull signal, not a flat-price week.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` → **0 failed** (byte-unchanged: the
+  `--local` path skips the live freshness block, so the gate output is identical). (b) no secrets in
+  diff. (c) diff = `check_site_health.py` (+6/−1) + two doc entries; no `platform/data` file altered, so
+  no provenance regen / no PR / no headless render needed. (d) provenance/no-fabrication intact — no
+  number added; a date threshold read from each layer's own committed `meta`.
+- **Proven a real guard, not a no-op:** against the LIVE production `fuel_prices.json` the pure
+  `_freshness_result` PASSes today (`2026-08-07`, 0 days old) and FAILs under an injected +40-day clock
+  (">14-day TTL — the refresh cron may be stuck"); the full live `run_freshness_checks` PASSes all 5
+  layers (fuel included) against the deployment right now.
+
+## 2026-08-07 — UX loop: skip-to-main-content bypass link on status.html (PR #310, merged + deployed)
+
+Autonomous UX-improvement run. The `docs/UXUI_AUDIT.md` backlog's original findings (#1–8) and the long
+discovered tail are fixed; the remaining open items are explicitly flagged unsuitable for unattended
+auto-merge (device-tested 3D pages, test-infra changes outside `platform/`). So per the loop's fallback
+("review a route, find a new concrete improvement") a route sweep found the gap: `status.html` was the
+**only** `styles.css` nav page missing the "Skip to main content" bypass link (WCAG 2.4.1 Bypass Blocks,
+Level A) that `index.html`/`data.html`/`live.html` all carry — its `#nav` has ~9 focusable stops on every
+visit with no keyboard/SR bypass, and `<main>` had no skip target.
+
+- **The change (surgical, `platform/` only):** added the compact `data.html` skip-link block after
+  `<body>` (off-screen until keyboard focus; styles.css `.skip-link` already styles it accent + hides in
+  print) + `id="main-content" tabindex="-1"` on `<main>`. Zero visual change for pointer users.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` → **124 passed / 0 failed** (incl.
+  `node --check` on status.html inline JS). (b) headless mobile render (390×844) self-reviewed: layout
+  intact, skip-link correctly invisible, skip-link + `id="main-content"` present in settled DOM. (c) no
+  secrets in diff. (d) diff exactly status.html (+3/−1) + one UXUI_AUDIT line; no stray files.
+- **Merge + deploy + verify.** Squash-merged PR #310 → master (`90018ea`). Vercel auto-deploy verified:
+  production root **HTTP 200** and `/status` route **HTTP 200**; a live `curl` of `/status` confirms the
+  deployed page carries both `Skip to main content` and `id="main-content"` (change is live, not just a
+  200). No rollback needed. All four styles.css nav pages now expose the bypass link consistently.
+
 ## 2026-08-07 — Integration loop: ESTIMATED→MEASURED PICO cross-check on the #acq exit-whitespace board (PR #306, merged)
 
 Autonomous integration/improvement run. A negative-space sweep surfaced the one genuinely high-value
@@ -112,6 +225,53 @@ serve 200. That left **`rival_pressure.json`** — the MEASURED per-branch rival
 - **Next recommended intelligence task:** continue the same deploy-health sweep — the next surfaced-but-unprobed
   reads are `branch_peers.json` (obj-#1 peer-twin outlier board on `#trend`) and `segment_exposure.json`
   (obj-#1 segment×collateral concentration on `#exposure`), both of which degrade silently on a truncated deploy.
+## 2026-08-07 — Integration loop (deploy-health): site-health probes guard the collateral board's last two unprobed reads — `vehicle_mix.json` + `vehicle_brands.json` — committed to master
+
+Autonomous integration run. **First re-confirmed the CI-doable data-INTEGRATION backlog is exhausted or
+blocked this run**, so the improvement is deploy-robustness hardening (not a new pull):
+- Backlog items 1 (FPO PICO → competitor census) and 2 (per-branch `branch_cropland`) are DONE + surfaced;
+  item 3's CI-reachable legs (DIW/MOT/DBD → `vehicle_*`, `dbd_formation`) are distilled. Item 4 (GISTDA
+  40m satellite crop) needs `GISTDA_SPHERE_KEY`, which is **NOT in this session's env** (checked
+  `env | grep GISTDA` → empty) — so its puller cannot be built+verified here; unchanged from prior runs.
+  The un-distilled gov legs (excise/osmep/baac/smebank) remain CI-unreachable (Thai-IP/owner-side).
+- So this run closed the **explicit "next recommended" from the 2026-08-04 log**: the two sibling
+  collateral-board reads from the DLT nameplate wave that `vehicle_models`'s probe left uncovered.
+
+**The gap.** The collateral board (`#overview`, obj #1 — vehicle titles are ~75% of the book) surfaces
+`vehicle_mix.json` (`cb-mix`, MEASURED — DLT stock-vs-new-registration fleet mix by class) and
+`vehicle_brands.json` (`cb-vbrands`, national brand mix MEASURED, province split ESTIMATED) via
+`tmliFetch(...)`. Both **self-hide** (`display='none'`) on a truncated/404 CDN deploy with **no phone
+alert** — the same silent "broken demo" blind spot the `vehicle_models` / `collateral_book` / `deltas`
+probes closed for their siblings. And like those, neither **self-heals from CI**: the DLT stock/brand
+files are annual off-cadence pulls, so no daily cron re-publishes them — the deploy probe is the only
+safeguard. Grep confirmed they were the last two surfaced reads from that wave with no `_shape_*` validator.
+
+**The fix.** Added `_shape_vehicle_mix` + `_shape_vehicle_brands` to `pipeline/check_site_health.py` and
+their `DATA_FILES` entries. Each asserts the exact render contract its panel GATES on, as **SHAPE not
+values** (robust to a future DLT-vintage refresh moving the counts):
+- `vehicle_mix`: `national.stock`/`national.new` non-empty maps (first row carries numeric `share_pct`) +
+  a non-empty `types` class list whose row carries `id`/`label`/boolean `has_stock` — i.e. the client's
+  `!NAT.stock||!NAT.new||!TY.length` display gate plus the cells the rows render.
+- `vehicle_brands`: `national.by_type.ry3` and `.ry1` each a non-empty `brands` list whose row carries a
+  string `brand` + numeric `count`/`share_pct` — i.e. the client's `!NB.ry3||!NB.ry1` gate — plus a
+  `provinces` object for the ESTIMATED province split.
+
+- **Verification (all pass):** unit-tested — both real payloads accepted (`vehicle_mix` 215,984 B;
+  `vehicle_brands` 282,140 B) and **18 negatives all reject** (non-dict / missing-or-empty stock/new /
+  share-less stock row / empty-or-key-less types / non-bool has_stock; missing national/by_type/ry3 /
+  empty ry1 brands / brand-less or non-numeric-count brand row / non-dict provinces). Offline
+  `--local platform` → **137/137 HEALTHY** (was 131; +6 = 2 files × fetch/parse/shape). Determinism gate
+  `bash tests/run.sh check` → **124 passed · 0 failed** (data integrity 455/455); the `--local` deploy-probe
+  self-test — now under the gate since 2026-08-06 — reports `[PASS]`, so the new validators are themselves
+  regression-protected. No `platform/data` file changed → no `build_provenance.py` regen needed. Diff =
+  `pipeline/check_site_health.py` (+88) + this log; no secrets in diff.
+- **Why a direct commit, not a PR.** Probe-script only — no app behaviour, no visual, no surfaced number,
+  no data layer. Closes a deploy-health blind spot without altering what ships; same safeguard-only
+  direct-to-master path as the recent site-health probe commits (`vehicle_models`, `peer_npl`, `deltas`).
+- **Next recommended:** the collateral/nameplate wave's deploy-probe coverage is now complete. The next
+  service target is the Overview switchboard's remaining multi-source reads (`debt_source`/`farm_household`)
+  or the province deep-dive fetches; the next DATA target stays owner-side/Thai-IP (GISTDA 40m crop once
+  the secret is in-session; the excise/baac/smebank legs) — nothing new is CI-unblocked this run.
 
 ## 2026-08-06 — UX loop: `.fb-h4` tag pill wraps so it stops bleeding out on mobile #overview (PR #307, merged + deployed + verified)
 

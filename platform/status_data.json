@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-06T22:25:36+00:00",
-    "commit": "89585c8"
+    "generated_at": "2026-08-07T10:23:25+00:00",
+    "commit": "c962cd2"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-06",
+    "eta_date": "2026-08-07",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -532,6 +532,90 @@
   ],
   "activity": [
     {
+      "date": "2026-08-07T10:23:25+00:00",
+      "sha": "c962cd2",
+      "summary": "feat(#acq): book-per-branch structural peer intensity (measured AutoX vs reported peers)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-07T08:24:34+00:00",
+      "sha": "ec9bf69",
+      "summary": "docs(progress): log the live.html noscript UX fix (PR #312, merged + deployed)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-07T15:21:37+07:00",
+      "sha": "07a6696",
+      "summary": "ux: add noscript fallback banner to live.html (#312)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-07T04:22:57+00:00",
+      "sha": "e24e7cf",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the fuel-freshness guard ship",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-07T04:22:06+00:00",
+      "sha": "5987a9b",
+      "summary": "health(deploy): freshness guard covers fuel_prices.json (last uncovered daily-CI price layer)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-07T02:20:24+00:00",
+      "sha": "6413ead",
+      "summary": "docs(progress): log the status.html skip-link UX fix (PR #310, merged + deployed)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-07T09:16:53+07:00",
+      "sha": "90018ea",
+      "summary": "ux: add skip-to-main-content bypass link to status.html (#310)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-07T01:42:40+00:00",
+      "sha": "3f6f9fc",
+      "summary": "data: live fuel prices (2026-08-07, run 31138620794)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-07T00:58:10+00:00",
+      "sha": "6c02f4b",
+      "summary": "docs(progress): log the exit-whitespace MEASURED PICO cross-check (PR #306 merged)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-07T07:48:26+07:00",
+      "sha": "20fad0c",
+      "summary": "feat(#acq): ground exit-whitespace with MEASURED PICO operator count (#306)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-07T07:31:15+07:00",
+      "sha": "ff266a9",
+      "summary": "fix(ci): pr-autoresolve skipped every PR cut before the resolver existed",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-07T00:27:26+00:00",
+      "sha": "caa5052",
+      "summary": "health(deploy): site-health probe guards branch_cropland.json (last unprobed per-branch obj-#1 read)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-07T07:03:42+07:00",
+      "sha": "e12eac2",
+      "summary": "fix(ci): one real conflict no longer stops pr-autoresolve refreshing the rest",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-06T22:26:07+00:00",
+      "sha": "eb35f18",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival_pressure site-health probe ship",
+      "pillar": "market"
+    },
+    {
       "date": "2026-08-06T22:25:36+00:00",
       "sha": "89585c8",
       "summary": "health(deploy): site-health probe guards rival_pressure.json (last unprobed obj-#2 per-branch competitive read)",
@@ -626,90 +710,6 @@
       "sha": "b790ae6",
       "summary": "health(deploy): site-health probe guards pico_competitors.json (last unprobed obj-#2 PICO read on #acq)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-06T03:34:31+00:00",
-      "sha": "9ebb278",
-      "summary": "docs(progress): log branch-explorer IBM Plex fonts merge+deploy+verify (PR #299)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-06T10:31:23+07:00",
-      "sha": "baaf329",
-      "summary": "ux: load IBM Plex fonts on branch-explorer.html (#299)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-05T23:39:39+00:00",
-      "sha": "70f6d60",
-      "summary": "data: live fuel prices (2026-08-05, run 31056969163)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-05T10:57:42+00:00",
-      "sha": "64f5430",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the measured-catchment-pop ship",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-05T17:56:31+07:00",
-      "sha": "1b82e2f",
-      "summary": "market(3d): headline the MEASURED WorldPop catchment population, not the area-weight estimate (#295)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-05T08:30:30+00:00",
-      "sha": "f692def",
-      "summary": "docs(progress): log ux-impact-ladder-bar-aria merge+deploy+verify (PR #294)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-05T15:25:44+07:00",
-      "sha": "8076c0b",
-      "summary": "ux: aria-label the impact-card delinquency ladder bar (a11y) (#294)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-05T06:35:22+00:00",
-      "sha": "dc3fec5",
-      "summary": "test(gate): cover build_baac_credit.py — the one deterministic builder missing from the determinism gate",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-05T04:26:46+00:00",
-      "sha": "7706efb",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer_scoreboard site-health probe ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-05T04:23:39+00:00",
-      "sha": "df5a691",
-      "summary": "health(deploy): site-health probe guards peer_scoreboard.json (last unprobed obj-#2 peer read on #acq)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-05T02:43:00+00:00",
-      "sha": "d07293d",
-      "summary": "docs(progress): log ux-font-preconnect-gstatic merge+deploy+verify (PR #293)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-05T09:38:17+07:00",
-      "sha": "ddb0fc1",
-      "summary": "ux: preconnect fonts.gstatic.com so text paints without a handshake waterfall (#293)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-05T09:33:52+07:00",
-      "sha": "afc941d",
-      "summary": "chore(deck): rebuild EN + TH against the refreshed NABC and ThaiWater data (#292)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-05T09:09:42+07:00",
-      "sha": "ac8ba4b",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-04, run 30956707171) (#291)",
-      "pillar": "data-integration"
     }
   ]
 }

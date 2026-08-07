@@ -491,7 +491,7 @@ INGESTS
   # resolve_derived_conflicts.sh auto-resolves merge conflicts and the committee/auto-merge jobs call
   # it before pushing STRAIGHT TO MASTER, so its two abort paths are the only thing between an
   # unattended job and a wrongly-resolved conflict in source-data/ or in code. Fixture-based, seconds.
-  bash "$REPO/tests/test_resolve_derived_conflicts.sh" >/dev/null 2>&1 && ok "resolve_derived_conflicts.sh (19 fixture cases)" || bad "resolve_derived_conflicts.sh fixture tests (run: bash tests/test_resolve_derived_conflicts.sh)"
+  bash "$REPO/tests/test_resolve_derived_conflicts.sh" >/dev/null 2>&1 && ok "resolve_derived_conflicts.sh (35 fixture cases)" || bad "resolve_derived_conflicts.sh fixture tests (run: bash tests/test_resolve_derived_conflicts.sh)"
 
   node --check "$PLATFORM/app.js" >/dev/null 2>&1 && ok "node --check app.js" || bad "node --check app.js (syntax error)"
 
