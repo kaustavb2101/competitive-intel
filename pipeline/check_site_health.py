@@ -35,6 +35,7 @@
 
 import argparse
 import base64
+import calendar
 import json
 import os
 import sys
@@ -1286,6 +1287,175 @@ def _shape_vehicle_models(d):
     return None
 
 
+def _shape_rival_pressure(d):
+    # The per-branch rival-pressure layer (rival_pressure.json, obj #2, MEASURED
+    # geometry over the merged competitor census — pipeline/build_rival_pressure.py).
+    # It is load-bearing on TWO render paths and was the last surfaced obj-#2
+    # competitive read still with no deploy probe: (1) the Risk-trend (#trend) "Most
+    # besieged branches" board — drawSiegeTable renders RIVP.besieged.slice(0,10)
+    # (the branches with >=3 rivals within 2 km) and, when it is missing/empty, drops
+    # the whole board to a "Rival pressure not yet computed." placeholder; (2) the
+    # per-branch popup line (rivalPressureLineHTML reads RIVP.branches[i], INDEX-
+    # ALIGNED to branches.json — nearest-rival km per brand in .d aligned to .brands,
+    # plus the 2 km / 5 km counts n2/n5). The client loader itself sets RIVP=null
+    # unless BOTH .branches and .brands are arrays, so a truncated/gutted CDN deploy
+    # silently reverts both surfaces to their fallback with NO phone alert — the same
+    # "broken demo" blind spot the rival_density / rival_threat / rival_threat_region
+    # probes closed for the sibling obj-#2 competitive reads. Asserts the render
+    # contract (the client .branches/.brands gate + the 2015-branch index-aligned
+    # popup array + the .besieged board rows) as SHAPE not values, robust to a future
+    # competitor-census refresh moving the counts.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    brands = d.get("brands")
+    if not isinstance(brands, list) or not brands:
+        return "missing/empty 'brands' array (client RIVP gate: Array.isArray(j.brands))"
+    recs = d.get("branches")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'branches' array (client RIVP gate + popup RIVP.branches[i] read)"
+    if len(recs) != 2015:
+        return "expected 2015 branch records (index-aligned to branches.json), got %d" % len(recs)
+    r0 = recs[0]
+    if not isinstance(r0, dict):
+        return "first 'branches' record is not an object"
+    for k in ("n2", "n5"):
+        if not isinstance(r0.get(k), (int, float)) or isinstance(r0.get(k), bool):
+            return "first branch record missing numeric '%s' (popup 2/5 km-count render read)" % k
+    if not isinstance(r0.get("d"), list):
+        return "first branch record missing 'd' list (per-brand nearest-rival km, aligned to .brands)"
+    bes = d.get("besieged")
+    if not isinstance(bes, list) or not bes:
+        return "missing/empty 'besieged' list (#trend Most-besieged board render read)"
+    b0 = bes[0]
+    if not isinstance(b0, dict):
+        return "first 'besieged' row is not an object"
+    if not isinstance(b0.get("i"), int) or isinstance(b0.get("i"), bool):
+        return "first besieged row missing integer 'i' (branch index the board row keys on)"
+    if not (isinstance(b0.get("name"), str) and b0["name"].strip()):
+        return "first besieged row missing 'name' (board branch-label render read)"
+    if not isinstance(b0.get("n2"), (int, float)) or isinstance(b0.get("n2"), bool):
+        return "first besieged row missing numeric 'n2' (board rivals-<=2km column render read)"
+    return None
+
+
+def _shape_branch_cropland(d):
+    # The per-branch crop-AREA layer (branch_cropland.json, obj #1 — SPAM-2010
+    # spatial pattern rescaled per province to the DOAE farmer-registry MEASURED
+    # 2025 planted area, pipeline/build_branch_cropland.py). It is the only
+    # per-branch absolute crop-hectares read the app carries, index-aligned to
+    # branches.json, and it renders the MEASURED-CORRECTED "crop area within 10km"
+    # block in every branch popup (croplandPopupHTML reads croplandRec(d)=CROPLAND[i]
+    # -> .crop_ha gate + the per-crop .ha[] magnitudes, labelled off croplandMeta.crops).
+    # The client loader sets CROPLAND=null on any fetch/parse failure and the popup
+    # helper returns '' whenever the record is missing, so a truncated/404 CDN deploy
+    # silently drops the crop-area block from every popup with NO phone alert — the
+    # same "broken demo" blind spot the flood_hazard / farm_book / branch_labor obj-#1
+    # probes closed for their siblings, and this layer (backlog item #2's shipped
+    # integration) was the last surfaced per-branch obj-#1 read with no deploy probe.
+    # Asserts the render contract (the meta.crops label list + the 2015-branch
+    # index-aligned array + the .crop_ha gate and .ha[] magnitudes the popup reads)
+    # as SHAPE not values, robust to a future DOAE-vintage / SPAM refresh moving areas.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    crops = d.get("meta", {}).get("crops") if isinstance(d.get("meta"), dict) else None
+    if not isinstance(crops, list) or not crops:
+        return "missing/empty meta.crops label list (popup per-crop row labels)"
+    recs = d.get("branches")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'branches' array (client CROPLAND gate + popup CROPLAND[i] read)"
+    if len(recs) != 2015:
+        return "expected 2015 branch records (index-aligned to branches.json), got %d" % len(recs)
+    r0 = recs[0]
+    if not isinstance(r0, dict):
+        return "first 'branches' record is not an object"
+    if not isinstance(r0.get("ha"), list):
+        return "first branch record missing 'ha' list (per-crop hectares, popup .ha[j] render read)"
+    if not isinstance(r0.get("crop_ha"), (int, float)) or isinstance(r0.get("crop_ha"), bool):
+        return "first branch record missing numeric 'crop_ha' (popup crop-area gate/total render read)"
+    return None
+
+
+def _shape_vehicle_mix(d):
+    # The collateral board's fleet-mix panel (`cb-mix`, obj #1 — vehicle titles are
+    # ~75% of the book, so the stock-vs-new-registration gap by DLT class is a direct
+    # read on the collateral pool AutoX lends against and recovers into). MEASURED
+    # throughout (DLT gdcatalog dataset_1_1_04 stock + red-plate new registrations).
+    # The client (`tmliFetch('vehicle_mix')`) GATES the whole panel on
+    # `!NAT.stock || !NAT.new || !TY.length` and otherwise `display='none'` with NO
+    # phone alert, so a truncated/404 CDN deploy silently drops the fleet-mix read to
+    # nothing — the same "broken demo" blind spot the vehicle_models / collateral_book
+    # probes closed for their siblings. And like them it CANNOT self-heal from CI: the
+    # DLT stock file is an annual off-cadence pull, so no daily cron re-publishes it —
+    # the probe is the only deploy safeguard. Asserts the render contract the panel
+    # reads — the national stock/new maps + the `types` class list — as SHAPE not
+    # values, robust to a future DLT-vintage refresh moving the registration counts.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'national' object (cb-mix panel display gate: !NAT.stock||!NAT.new)"
+    for k in ("stock", "new"):
+        m = nat.get(k)
+        if not isinstance(m, dict) or not m:
+            return "national.%s missing/empty (cb-mix display gate reads NAT.%s)" % (k, k)
+        r0 = next(iter(m.values()))
+        if not isinstance(r0, dict) or not isinstance(r0.get("share_pct"), (int, float)) or isinstance(r0.get("share_pct"), bool):
+            return "national.%s first row missing numeric 'share_pct' (cb-mix share cell render read)" % k
+    types = d.get("types")
+    if not isinstance(types, list) or not types:
+        return "missing/empty 'types' array (cb-mix display gate: !TY.length)"
+    t0 = types[0]
+    if not isinstance(t0, dict):
+        return "types[0] is not an object (cb-mix class-row render read)"
+    if not (isinstance(t0.get("id"), str) and t0["id"].strip()):
+        return "types[0] missing 'id' (cb-mix class-row keys NAT.stock[t.id])"
+    if not (isinstance(t0.get("label"), str) and t0["label"].strip()):
+        return "types[0] missing 'label' (cb-mix class-row DLT-label render read)"
+    if not isinstance(t0.get("has_stock"), bool):
+        return "types[0] missing boolean 'has_stock' (cb-mix stock-bearing vs LTA divider read)"
+    return None
+
+
+def _shape_vehicle_brands(d):
+    # The collateral board's new-nameplate panel (`cb-vbrands`, obj #1 — what the
+    # country is registering NEW becomes the collateral offered next year; pickup is a
+    # two-brand market so pickup residual value is not a diversified exposure). The
+    # NATIONAL brand mix is MEASURED (DLT stat_1_1_01); the province split is ESTIMATED
+    # and labelled so in the UI. The client (`tmliFetch('vehicle_brands')`) GATES the
+    # panel on `!NB.ry3 || !NB.ry1` (NB = national.by_type) and otherwise
+    # `display='none'` with NO phone alert, so a truncated/404 deploy silently drops
+    # it — and, like its vehicle_mix sibling, it CANNOT self-heal from CI (annual DLT
+    # pull, no daily cron), so the probe is the only deploy safeguard. Asserts the gate
+    # both render paths read — the ry3/ry1 by_type groups and their brand rows — as
+    # SHAPE not values, robust to a future DLT-vintage refresh moving the counts.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'national' object (cb-vbrands gate reads national.by_type)"
+    by_type = nat.get("by_type")
+    if not isinstance(by_type, dict):
+        return "missing 'national.by_type' object (cb-vbrands display gate: !NB.ry3||!NB.ry1)"
+    for grp in ("ry3", "ry1"):
+        g = by_type.get(grp)
+        if not isinstance(g, dict):
+            return "national.by_type.%s missing (cb-vbrands display gate)" % grp
+        brands = g.get("brands")
+        if not isinstance(brands, list) or not brands:
+            return "national.by_type.%s.brands missing/empty (cb-vbrands brand-row render read)" % grp
+        b0 = brands[0]
+        if not isinstance(b0, dict):
+            return "national.by_type.%s.brands[0] is not an object" % grp
+        if not (isinstance(b0.get("brand"), str) and b0["brand"].strip()):
+            return "national.by_type.%s.brands[0] missing 'brand' (cb-vbrands row label render read)" % grp
+        for k in ("count", "share_pct"):
+            if not isinstance(b0.get(k), (int, float)) or isinstance(b0.get(k), bool):
+                return "national.by_type.%s.brands[0].%s missing/non-numeric (cb-vbrands cell render read)" % (grp, k)
+    if not isinstance(d.get("provinces"), dict):
+        return "missing 'provinces' object (cb-vbrands ESTIMATED province-split render read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -1528,7 +1698,118 @@ DATA_FILES = [
     # probes closed for their siblings. Asserts the .annual gate + the pickup/ppv
     # nameplate-board shape, not values — robust to a future DLT-vintage refresh.
     ("data/vehicle_models.json", _shape_vehicle_models, ".annual year table + .plates_last12 pickup/ppv boards (Macro nameplate panel + collateral pickup verdict)"),
+    # The per-branch rival-pressure layer (rival_pressure.json, obj #2, MEASURED) —
+    # the last surfaced obj-#2 competitive read with no deploy probe. It drives the
+    # Risk-trend (#trend) "Most besieged branches" board (drawSiegeTable reads
+    # .besieged) AND the per-branch popup line (rivalPressureLineHTML reads the
+    # .branches index-aligned array). The client sets RIVP=null unless BOTH .branches
+    # and .brands are arrays, so a truncated CDN deploy silently reverts both surfaces
+    # to their fallback with no phone alert — the same blind spot the rival_density /
+    # rival_threat / rival_threat_region probes closed for their obj-#2 siblings.
+    ("data/rival_pressure.json", _shape_rival_pressure, ".brands + 2015-branch index-aligned .branches + .besieged board rows (#trend Most-besieged board + per-branch popup)"),
+    # The per-branch crop-AREA layer (branch_cropland.json, obj #1) — the last
+    # surfaced per-branch read with no deploy probe. It renders the MEASURED-
+    # corrected "crop area within 10km" block in every branch popup
+    # (croplandPopupHTML, index-aligned to branches.json), and the client sets
+    # CROPLAND=null on any fetch failure so a truncated/404 CDN deploy silently
+    # drops the block from every popup with no phone alert — the same blind spot
+    # the flood_hazard / branch_labor obj-#1 probes closed for their siblings.
+    ("data/branch_cropland.json", _shape_branch_cropland, ".meta.crops + 2015-branch index-aligned .branches with ha[]/crop_ha (per-branch crop-area popup block)"),
+    # The two collateral-board fleet reads from the same DLT wave, both surfaced via
+    # tmliFetch and both self-hiding (display='none') on a truncated/404 deploy with no
+    # phone alert — annual off-cadence pulls, so neither self-heals from CI (probe = the
+    # only deploy safeguard). vehicle_mix is MEASURED; vehicle_brands' national mix is
+    # MEASURED, its province split ESTIMATED and labelled so in the UI.
+    ("data/vehicle_mix.json", _shape_vehicle_mix, ".national stock/new maps + .types class list (collateral fleet-mix panel cb-mix, MEASURED)"),
+    ("data/vehicle_brands.json", _shape_vehicle_brands, ".national.by_type ry3/ry1 brand boards (collateral new-nameplate panel cb-vbrands; national MEASURED, province split ESTIMATED)"),
 ]
+
+
+# ---------------------------------------------------------------------------
+# DATA FRESHNESS — the one class of breakage the ~40 shape validators above
+# CANNOT catch. Every check_site_health probe asserts a file's SHAPE; none
+# asserts its VINTAGE. So if a data-refresh cron silently freezes (upstream
+# API drops, a workflow secret rotates, a pull script starts erroring), the
+# last-good file keeps serving, still passes every shape probe, and ships
+# green forever — the deploy looks healthy while the numbers quietly rot,
+# with no phone alert. This closes that blind spot for the DAILY,
+# CI-REFRESHED, CI-REACHABLE price/weather layers, where a lagging vintage is
+# an unambiguous "the cron broke" signal (not an owner-side / Thai-IP data gap).
+#
+# WHY LIVE-ONLY (HttpFetcher, never --local): freshness is inherently a
+# function of wall-clock "now", so it CANNOT be part of the deterministic repo
+# gate (tests/run.sh runs --local and must reproduce byte-for-byte on any
+# date). The nightly probe is exactly where it belongs — it already runs
+# against the real deployment with a real clock. The --local path skips this
+# block entirely, so the gate's output is unchanged.
+#
+# FALSE-ALARM-PROOF: a layer is FAILED only when its vintage parses cleanly AND
+# is older than a generous per-layer TTL (14 days — ~2 weeks of missed daily
+# runs, well past any weekend/holiday upstream gap; only a genuinely stuck cron
+# reaches it). Any fetch / parse / missing-key case is recorded as a non-fatal
+# "not evaluated" note, never a failure — the fetch + shape probes already own
+# "does the file serve and parse". EXCLUDED by design: owner-side / Thai-IP /
+# monthly-or-slower layers (rival_pulse promos, search_demand, dbd_formation,
+# the annual DLT vehicle stock), whose lag is a known constraint, not a break.
+FRESHNESS_LAYERS = [
+    # (rel_path, meta_key, max_age_days, cron/source note)
+    ("data/commodities.json", "farmgate_vintage", 14,
+     "NABC farm-gate, daily CI (data-nabc-prices.yml)"),
+    ("data/fuel_prices.json", "pulled", 14,
+     "Bangchak retail fuel prices, daily CI (data-fuel-prices.yml) — a DISTINCT "
+     "upstream from the NABC farm-gate that commodities.json keys on, so its own "
+     "cron can freeze while farmgate stays fresh; .pulled advances every daily "
+     "reproject (cadence well under the TTL), so a lag here means the Bangchak pull stuck"),
+    ("data/thai_price_history.json", "vintage", 14,
+     "Thai daily price history (rebuilt with the daily price pulls)"),
+    ("data/thaiwater_flood.json", "pulled", 14,
+     "ThaiWater flood pulse, daily CI (data-thaiwater.yml)"),
+    ("data/thaiwater_rain.json", "pulled", 14,
+     "ThaiWater rain pulse, daily CI (data-thaiwater.yml)"),
+]
+
+
+def _parse_iso_day(s):
+    """Parse a 'YYYY-MM-DD' (optionally with a trailing time) vintage to an
+    epoch (UTC midnight). Returns None if it does not start with an ISO day."""
+    if not isinstance(s, str):
+        return None
+    head = s.strip()[:10]
+    try:
+        t = time.strptime(head, "%Y-%m-%d")
+    except (ValueError, TypeError):
+        return None
+    return calendar.timegm(t)
+
+
+def _freshness_result(vintage_str, max_age_days, now_epoch):
+    """PURE + deterministic given its inputs (unit-testable offline). Returns
+    (ok, detail). ok is False ONLY for a cleanly-parsed vintage older than the
+    TTL; an unparseable/absent vintage yields ok=True with a 'not evaluated'
+    note so freshness never fires a false alarm."""
+    epoch = _parse_iso_day(vintage_str)
+    if epoch is None:
+        return True, "vintage %r not an ISO day — freshness not evaluated" % (vintage_str,)
+    age_days = (now_epoch - epoch) / 86400.0
+    if age_days > max_age_days:
+        return False, ("vintage %s is %.0f days old (> %d-day TTL) — the refresh "
+                       "cron may be stuck" % (str(vintage_str)[:10], age_days, max_age_days))
+    return True, "vintage %s, %.0f days old (TTL %d)" % (str(vintage_str)[:10], age_days, max_age_days)
+
+
+def run_freshness_checks(fetcher, now_epoch, record):
+    """Live-only vintage-lag guard over FRESHNESS_LAYERS. Records via `record`."""
+    for rel, key, max_age, note in FRESHNESS_LAYERS:
+        try:
+            body = fetcher.fetch(rel)
+            parsed = json.loads(body.decode("utf-8"))
+            vintage = parsed.get("meta", {}).get(key)
+        except Exception as e:
+            record("%s fresh (%s)" % (rel, note), True,
+                   "freshness not evaluated (%r)" % e)
+            continue
+        ok, detail = _freshness_result(vintage, max_age, now_epoch)
+        record("%s fresh (%s)" % (rel, note), ok, detail)
 
 
 # ---------------------------------------------------------------------------
@@ -1616,6 +1897,12 @@ def run_checks(fetcher):
             record("%s shape sane (%s)" % (rel, expect), False, err)
         else:
             record("%s shape sane (%s)" % (rel, expect), True)
+
+    # --- data freshness (LIVE ONLY) ---
+    # Runs against the real deployment with a real clock; the deterministic
+    # --local gate path (LocalFetcher) skips it so the repo gate is unaffected.
+    if isinstance(fetcher, HttpFetcher):
+        run_freshness_checks(fetcher, time.time(), record)
 
     return results
 

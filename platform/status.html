@@ -115,6 +115,8 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<script>(function(){var s=document.querySelector('.skip-link');if(!s)return;s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('main-content');if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
 <nav id="nav" aria-label="Main views">
   <span class="nb">AutoX<b>·</b>เงินไชโย</span>
   <!-- This nav was stranded on the PRE-five-pillar labels (Overview / National / Exposure / Trend)
@@ -149,10 +151,15 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
 <script>/* "Explore ▾" nav dropdown — pure UI (copied from index.html) */
 (function(){var wrap=document.getElementById('navMore'),btn=document.getElementById('navMoreBtn'),menu=document.getElementById('navMoreMenu');
  if(!wrap||!btn||!menu)return;
- function open(o){wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
+ /* Re-parent the menu to <body>: #nav has backdrop-filter (making it the containing block for
+    position:fixed children) AND overflow-x:auto, so an in-nav fixed menu is clipped and dragged
+    off-screen by the nav's horizontal scroll on a phone. As a <body> child its fixed top/right
+    anchor to the viewport instead. Matches index.html's nav script. */
+ document.body.appendChild(menu);
+ function open(o){menu.classList.toggle('open',o);wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
  btn.addEventListener('click',function(e){e.stopPropagation();open(!wrap.classList.contains('open'));});
  menu.addEventListener('click',function(){open(false);});
- document.addEventListener('click',function(e){if(!wrap.contains(e.target))open(false);});
+ document.addEventListener('click',function(e){if(!wrap.contains(e.target)&&!menu.contains(e.target))open(false);});
  document.addEventListener('keydown',function(e){if(e.key==='Escape')open(false);});})();
 </script>
 <script>/* theme toggle — shares the autox-theme key with the rest of the site */
@@ -162,7 +169,7 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
  b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});})();
 </script>
 
-<main>
+<main id="main-content" tabindex="-1">
 <noscript>
   <div style="max-width:640px;margin:48px auto;padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55">
     <strong style="color:var(--hi);display:block;margin-bottom:6px">This status page needs JavaScript enabled.</strong>

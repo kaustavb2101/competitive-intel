@@ -3389,6 +3389,19 @@ function drawCompCoverage(){
           `of ${fp.n_ranked} — points on the ground: ${fchain}. ${TAG_M} `+
           `<span class="sub">Every number here is measured (own network + rivals' official locators); a locator counts a group's whole retail network, beyond its listed-entity IR count, so Srisawad's full footprint overtakes AutoX even though AutoX leads on cited branch count. Heng excluded (locator Cloudflare-blocked → lower bound).</span></div>`;
       }
+      // BOOK PER BRANCH — the raw book-scale chain (peers' bigger books) reframed as a STRUCTURAL
+      // intensity read: how much book each door carries. AutoX book = MEASURED (real loan tape,
+      // current outstanding); peer books = REPORTED (cited IR). Null-safe (older data has no block).
+      const bi=ns.book_intensity;
+      if(bi&&bi.autox_rank&&Array.isArray(bi.ranking)){
+        const bchain=bi.ranking.map(o=>{
+          const nm=o.operator==='AutoX'?'<b style="color:var(--accent)">AutoX</b>':o.operator;
+          const tag=o.operator==='AutoX'?'◆':'★';
+          return `${nm} <span class="mono">฿${o.book_per_branch_m}m</span>${tag}`;
+        }).join(' &rsaquo; ');
+        nstxt+=`<div style="margin-top:6px"><b>Book per branch — a structural intensity read</b>: ${bchain}. ${TAG_M} ${TAG_E} `+
+          `<span class="sub">${bi.insight||''} AutoX book is <b>measured</b> (real loan tape ◆, current outstanding); peer books are <b>reported</b> IR (★). Structural density, not profitability, NPL or market share; Heng excluded (no cited book).</span></div>`;
+      }
     }
     ro.innerHTML=`<b>The census is now the near-complete rival network.</b> ${ttxt} ${TAG_M} ${TAG_E}${nstxt}`+
       methodBox(null,
@@ -4823,10 +4836,12 @@ function drawPicoCompetitors(){
 
 /* ---------- competitor-exit white-space · regulatory tailwind (obj #2) ----------
    Surfaces data/exit_whitespace.json (928 districts, built by pipeline/build_exit_whitespace.py).
-   ESTIMATED PROXY: where AutoX could CAPTURE SHARE if marginal sub-scale operators exit under the
-   Q1-2026 BoT registration deadline. We do NOT census the sub-scale operators that would exit (only
-   the big-4 compliant brands), so this is INFERRED from big-4 scarcity × our demand/white-space —
-   labelled ESTIMATED. We don't recompute here; just rank & expose each component. Graceful if absent. */
+   The exit-capture SCORE is an ESTIMATED PROXY: where AutoX could capture share if marginal sub-scale
+   operators exit under the Q1-2026 BoT registration deadline — inferred from big-4 scarcity × demand/
+   white-space (whether an operator actually exits is not measured), labelled ESTIMATED. The
+   pico_operators column IS MEASURED: a per-district tally of licensed PICO-finance operators (FPO
+   registry, pico_district.json) shown beside the inferred residual as a reality-check — it does not
+   feed the score. We don't recompute here; just rank & expose each component. Graceful if absent. */
 let EXITWS=null, exitLoaded=false;
 const EXIT_TOPN=20;
 function renderExitWhitespace(){
@@ -4851,11 +4866,13 @@ function drawExitWhitespace(){
     `<th>District (amphoe)</th><th>Province</th><th>Region</th>`+
     `<th title="AutoX branches inside the district (measured)">AutoX</th>`+
     `<th class="h-opp" title="ESTIMATED — demand the big-4 do NOT cover (demand × thin-big-4). Higher = residual market likely served by sub-scale, exit-prone operators.">Sub-scale residual est</th>`+
+    `<th title="MEASURED — licensed PICO-finance (พิโกไฟแนนซ์) operators inside the district (FPO registry, pico_district.json) — a real sub-scale non-bank lender class. A reality-check on the ESTIMATED residual to its left: >0 = a real sub-scale field backs the inference; 0 = the residual rests on big-4 absence alone. Licensed operators are compliant, so this is rival PRESENCE, not who will exit.">PICO ops ≤district meas</th>`+
     `<th class="h-opp" title="MEASURED — district demand proxy minus AutoX saturation (0–100). Higher = thinner AutoX coverage.">Coverage-gap ★</th>`+
     `<th title="MEASURED — big-4 rival branches inside the district (Google Places, lower bound). Lower = thinner surviving-incumbent footprint.">Big-4 ≤district</th></tr>`+
     top.map((d,i)=>{
       const c=d.components||{};
       const sc=Math.round(d.exit_capture_score||0);
+      const pico=c.pico_operators;
       return `<tr>
         <td class="mono sub">${i+1}</td>
         <td>${barHTML(sc,'var(--accent)')} <span class="mono" style="color:var(--accent)"><b>${sc}</b></span></td>
@@ -4864,17 +4881,25 @@ function drawExitWhitespace(){
         <td class="sub">${d.region||'—'}</td>
         <td class="mono sub">${d.branches==null?'—':d.branches}</td>
         ${cell(c.sub_scale_proxy,'var(--gold)')}
+        <td class="mono" style="color:${pico?'var(--merch)':'var(--sub,#8a93a6)'}">${pico==null?'—':pico}</td>
         ${cell(c.whitespace,'var(--merch)')}
         <td class="mono sub">${c.big4_competitors==null?'—':c.big4_competitors}</td>
       </tr>`;}).join('');
   if(ro){
-    const t=top[0], m=EXITWS.meta||{}, cc=m.competitor_census||{};
+    const t=top[0], m=EXITWS.meta||{}, cc=m.competitor_census||{}, pc=m.pico_crosscheck||{};
     const t0=t.components||{};
     const dl=(m.regulatory_citation||{}).deadline||'Q1 2026';
+    const tpico=t0.pico_operators;
+    const picoLine=(tpico!=null)
+      ? ` MEASURED cross-check: <b style="color:var(--merch)">${tpico}</b> licensed PICO-finance operator${tpico===1?'':'s'} sit here${tpico>0?' — a real sub-scale field backs the inference':' — the residual here rests on big-4 absence alone'}.`
+      : '';
+    const corrob=(pc.n_districts_proxy_corroborated!=null)
+      ? ` Across all ${rows.length} districts, ${pc.n_districts_proxy_corroborated} where the inferred residual is corroborated by a measured PICO field (FPO registry, ${pc.resolution_pct!=null?pc.resolution_pct+'% resolved':'district-grain'}).`
+      : '';
     ro.innerHTML=`<b>Most fragile rival field:</b> <b style="color:var(--accent)">${t.name}</b> (${t.province}, ${t.region}) tops the cue at
       <b style="color:var(--accent)">${Math.round(t.exit_capture_score)}</b>/100 — sub-scale residual ${Math.round(t0.sub_scale_proxy||0)},
-      coverage-gap ${Math.round(t0.whitespace||0)}, big-4 branches ${t0.big4_competitors==null?'—':t0.big4_competitors}.
-      <span class="sub">Top ${top.length} of ${rows.length} districts. ESTIMATED PROXY — inferred from big-4 scarcity (${cc.points_joined||0} censused points, brands: ${(cc.brands_censused||[]).join(' · ')||'—'}) × local demand, NOT a measurement of sub-scale operators. Thesis: registration window closes ${dl}; marginal lenders may exit.</span>`;
+      coverage-gap ${Math.round(t0.whitespace||0)}, big-4 branches ${t0.big4_competitors==null?'—':t0.big4_competitors}.${picoLine}
+      <span class="sub">Top ${top.length} of ${rows.length} districts. The exit-capture SCORE is an ESTIMATED PROXY — inferred from big-4 scarcity (${cc.points_joined||0} censused points, brands: ${(cc.brands_censused||[]).join(' · ')||'—'}) × local demand; whether a marginal lender exits is not measured.${corrob} The PICO count is MEASURED (licensed operators are compliant, so it is sub-scale rival presence, not who will exit). Thesis: registration window closes ${dl}; marginal lenders may exit.</span>`;
   }
 }
 

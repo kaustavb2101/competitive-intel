@@ -47,13 +47,24 @@ jobs:
           git diff --quiet -- source-data/branches_final.json \
             || { echo "::error::census.py modified the master — aborting"; exit 1; }
 
+      - name: Re-derive every layer the census pull left stale
+        run: |
+          # This job had no re-derive step at all — it committed the two raw census artifacts and
+          # left anything computed from them for the gate to catch on merge. rederive_drift.py
+          # iterates the determinism gate's OWN --check set to a fixed point, so whatever those
+          # artifacts feed is rebuilt here rather than discovered as a red PR.
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
+
       - name: Commit census artifacts to a data branch + open a draft PR
         env:
           GH_TOKEN: ${{ github.token }}
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/gov-census-${{ github.run_id }}
         run: |
-          git add source-data/factory_census_national.json source-data/vehicle_census_province.json
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list to go stale, and never adds an untracked generated layer.
+          git add -u source-data platform/data
           if git diff --cached --quiet; then
             echo "No change vs committed census (same upstream). No PR opened."
             exit 0

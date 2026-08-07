@@ -31,27 +31,23 @@ jobs:
           python-version: "3.11"
       - name: Pull IMF WEO (no-ops if Cloudflare blocks the runner)
         run: python pipeline/pull_imf_weo.py
-      - name: Rebuild provenance when the WEO file changed
+      - name: Re-derive every layer the WEO pull left stale
         run: |
-          # imf_weo.json lives in platform/data/, so the provenance manifest censuses it; rebuild in
-          # lockstep or the determinism gate goes red on merge. Deterministic + network-free.
-          if git status --porcelain -- platform/data/imf_weo.json | grep -q .; then
-            echo "WEO changed — rebuilding provenance.json"
-            # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
-            # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
-            # which then censuses its bytes.
-            python pipeline/build_live_board.py
-            python pipeline/build_provenance.py
-          else
-            echo "WEO unchanged (or Cloudflare-blocked no-op) — nothing to rebuild."
-          fi
+          # Was a hand-named pair (live_board, provenance). Naming the downstream layers is the
+          # defect — that list is an unmaintained copy of the dependency graph. rederive_drift.py
+          # iterates the determinism gate's OWN --check set to a fixed point instead, so it covers
+          # whatever the gate covers and no-ops cleanly when the pull was a Cloudflare-blocked no-op.
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
       - name: Open a draft PR when the WEO refreshed
         env:
           GH_TOKEN: ${{ github.token }}
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/imf-weo-${{ github.run_id }}
         run: |
-          git add platform/data/imf_weo.json platform/data/live_board.json platform/data/provenance.json
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list to go stale, and never adds an untracked generated layer.
+          git add -u source-data platform/data
           if git diff --cached --quiet; then echo "unchanged; no PR."; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

@@ -67,15 +67,15 @@ jobs:
           # a wall clock, so re-runs with unchanged upstream data are byte-stable.
           python pipeline/pull_oae_prices.py --stamp "$(date -u +%F)"
 
-      - name: Rebuild crop_stress when the landing file changed
+      - name: Re-derive every layer the OAE pull left stale
         if: ${{ inputs.dry_run != true }}
         run: |
-          if git status --porcelain -- source-data/oae_farmgate_prices.json | grep -q .; then
-            echo "landing file changed — rebuilding platform/data/crop_stress.json"
-            python pipeline/build_crop_stress.py
-          else
-            echo "landing file unchanged — nothing to rebuild."
-          fi
+          # Was `build_crop_stress.py` alone. Farm-gate prices reach a good deal further than that
+          # (the sibling NABC job proved the fan-out is 9 layers deep across two tiers), and any
+          # hand-named list here would drift out of date the same way its did. rederive_drift.py
+          # iterates the determinism gate's OWN --check set to a fixed point instead.
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
 
       - name: Commit to a data branch + open a draft PR
         if: ${{ inputs.dry_run != true }}
@@ -84,8 +84,9 @@ jobs:
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/oae-${{ github.run_id }}
         run: |
-          # Only the two data files this workflow owns — never anything else.
-          git add source-data/oae_farmgate_prices.json platform/data/crop_stress.json
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list to go stale, and never adds an untracked generated layer.
+          git add -u source-data platform/data
           if git diff --cached --quiet; then
             echo "No change vs the committed data (same upstream vintage)."
             echo "Nothing to commit — no PR opened."
