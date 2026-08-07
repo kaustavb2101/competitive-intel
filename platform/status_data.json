@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-07T16:49:16+00:00",
-    "commit": "48a2f2c"
+    "generated_at": "2026-08-07T22:27:38+00:00",
+    "commit": "88d61cb"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,42 @@
   ],
   "activity": [
     {
+      "date": "2026-08-07T22:27:38+00:00",
+      "sha": "88d61cb",
+      "summary": "health(deploy): site-health probe guards segment_exposure.json (last unprobed obj-#1 Exposure read)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-07T22:03:54+00:00",
+      "sha": "bff094c",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-07, run 31222147400)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-07T21:08:40+00:00",
+      "sha": "d0ffc00",
+      "summary": "data: NABC live prices (2026-08-07, run 31218284211)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-07T20:27:03+00:00",
+      "sha": "906b5a1",
+      "summary": "docs(progress): log ux-watchlist-star-aria-label merge + deploy + verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-08T03:24:21+07:00",
+      "sha": "5881782",
+      "summary": "ux: watchlist star toggle buttons expose an accessible name + pressed state (#316)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-07T16:51:28+00:00",
+      "sha": "6bfc999",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the assist-radar probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-07T16:49:16+00:00",
       "sha": "48a2f2c",
       "summary": "health(deploy): site-health probes for the proactive-assistance radar pair",
@@ -673,42 +709,6 @@
       "date": "2026-08-07T14:23:54+00:00",
       "sha": "e4bbef6",
       "summary": "fix(provenance): regenerate after auto-merge of master's tape_geo_occ change",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-07T21:22:19+07:00",
-      "sha": "4bc8313",
-      "summary": "fix(ci): gate the branches autoresolve rewrites — nothing else can",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-07T14:18:08+00:00",
-      "sha": "195515c",
-      "summary": "Merge remote-tracking branch 'origin/master' into fix/crop-stress-price-provenance",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-07T14:17:28+00:00",
-      "sha": "23deee0",
-      "summary": "Merge remote-tracking branch 'origin/master' into data/nabc-31049209416",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-07T14:16:48+00:00",
-      "sha": "3251650",
-      "summary": "Merge remote-tracking branch 'origin/master' into data/thaiwater-31053032481",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-07T14:13:22+00:00",
-      "sha": "08c1a49",
-      "summary": "Merge remote-tracking branch 'origin/master' into feat/debt-purpose-consumption-read",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-07T14:12:42+00:00",
-      "sha": "04ffbbe",
-      "summary": "Merge remote-tracking branch 'origin/master' into data/oae-agstats-crop-yield",
       "pillar": "service"
     }
   ]
