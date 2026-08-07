@@ -1666,7 +1666,12 @@ DATA_FILES = [
 FRESHNESS_LAYERS = [
     # (rel_path, meta_key, max_age_days, cron/source note)
     ("data/commodities.json", "farmgate_vintage", 14,
-     "NABC farm-gate + fuel, daily CI (data-nabc-prices.yml / data-fuel-prices.yml)"),
+     "NABC farm-gate, daily CI (data-nabc-prices.yml)"),
+    ("data/fuel_prices.json", "pulled", 14,
+     "Bangchak retail fuel prices, daily CI (data-fuel-prices.yml) — a DISTINCT "
+     "upstream from the NABC farm-gate that commodities.json keys on, so its own "
+     "cron can freeze while farmgate stays fresh; .pulled advances every daily "
+     "reproject (cadence well under the TTL), so a lag here means the Bangchak pull stuck"),
     ("data/thai_price_history.json", "vintage", 14,
      "Thai daily price history (rebuilt with the daily price pulls)"),
     ("data/thaiwater_flood.json", "pulled", 14,
