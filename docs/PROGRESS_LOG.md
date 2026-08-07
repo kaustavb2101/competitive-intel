@@ -3,6 +3,35 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-07 — Intelligence loop (SERVICE/DEPLOY-HEALTH): deploy probes for the proactive-assistance radar pair
+
+Autonomous market & service intelligence run. Data room re-confirmed healthy up front (live master
+production alias **HTTP 200** on `/`, `/app.js`, `/data/meta.json`, `/data/tape_real.json`;
+`build_provenance.py --check` reproduces byte-exact at **138 layers · 76 measured · 62 estimated ·
+0 unlabelled**; freshness clean, 0 layers >180d stale; `build_peer_npl.py --check` confirms the
+MEASURED AutoX NPL anchor is still in sync with the current real tape). The concrete gap fixed extends
+the live/pre-commit **deploy-health** guard, not a new data layer.
+
+- **The gap:** the two NEWEST surfaced exec reads — `assist_price_radar.json` (the #assist PRICE LENS,
+  obj #1) and `assist_branch_radar.json` (the BRANCH DRILL "call list", shipped in the last commit
+  `f86e075`) — were both live-`fetch()`'d yet had **no deploy site-health probe**. Each `renderAssist…Lens`
+  GATES its whole section on a non-empty array (`.crops` / `.provinces`) and silently drops to a calm
+  _"not built for this vintage"_ placeholder with **no phone alert** if its file is missing/truncated,
+  and **neither self-heals** (their builders have no cron), so a truncated/404 CDN deploy that guts
+  either had no safeguard.
+- **The fix (`pipeline/check_site_health.py`, +104 lines, probe-script-only):** two shape validators
+  (`_shape_assist_price_radar`, `_shape_assist_branch_radar`) + their `DATA_FILES` entries. They assert
+  RENDER SHAPE, not values (the array gate + a row label + the load-bearing counts the lead/columns
+  render), so they're robust to a future tape / farm-gate vintage refresh and stay GREEN in the
+  legitimate "nothing tripped" state; the branch probe deliberately does NOT require
+  `exposed_crop_ha`/`n_farm` to be numeric (both are legitimately null under the tape's ≥30 floor).
+- **Verify:** 13 negative tests reject non-dict / empty-or-non-list gate / blank label / missing
+  load-bearing counts across both files, while the real 127 KB + 263 KB payloads pass and the
+  nothing-tripped state stays green. Offline `--local platform` = **149/149 HEALTHY** (143 → 149,
+  +6). Determinism gate **126 passed · 0 failed** (455/455 data checks; the `--local` self-test
+  accepts the committed payloads). No `platform/data` file altered → no provenance regen, and no
+  visual/app change → no PR/headless render needed. Safeguard protocol passed; committed to master.
+
 ## 2026-08-07 — Integration loop: ship the withheld Current-Account macro chip on a trailing-12mo net (PR)
 
 Autonomous integration/improvement run. The prompt's data-integration backlog (items 1–4: FPO PICO

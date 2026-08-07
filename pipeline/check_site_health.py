@@ -1456,6 +1456,96 @@ def _shape_vehicle_brands(d):
     return None
 
 
+def _shape_assist_price_radar(d):
+    # The proactive-assistance PRICE LENS (assist_price_radar.json, obj #1) — the
+    # healthy farm book crossed with MEASURED Thai farm-gate price direction: which
+    # provinces hold Current/X-bucket farm accounts riding on a crop whose price is
+    # falling, "the slice to call before collections turn". renderAssistPriceLens
+    # GATES the whole lens on a non-empty .crops array (else it silently drops to the
+    # calm "The price lens needs data/assist_price_radar.json — not built for this
+    # vintage" placeholder with NO phone alert). It is MEASURED (real-tape counts x
+    # planted-area shares x NABC farm-gate YoY) but does NOT self-heal from a broken
+    # deploy: build_assist_radar_price.py has no cron, so a truncated/404 CDN copy
+    # has no CI job to restore it. Per crop it renders .crop + .yoy/.direction +
+    # .n_current_x (the "healthy accounts riding on it" column) + .n_farm_accounts;
+    # per province .th + .tripped + .n_current_x; the readout reads meta.trigger
+    # (.dominant_share/.rule) and the .tripped list. Asserts render shape (the crops
+    # gate + a crop label + a numeric exposed-account column + the provinces list +
+    # the trigger block + the tripped list), not values — robust to a future
+    # tape / farm-gate vintage refresh moving the counts, and it stays green in the
+    # legitimate "nothing tripped" state (tripped may be an empty list).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    crops = d.get("crops")
+    if not isinstance(crops, list) or not crops:
+        return "missing/empty 'crops' list (renderAssistPriceLens gates the lens on it)"
+    c0 = crops[0]
+    if not isinstance(c0, dict):
+        return "first crops row is not an object"
+    if not (isinstance(c0.get("crop"), str) and c0["crop"].strip()):
+        return "first crops row missing 'crop' (the crop-row label render)"
+    if not any(isinstance(c, dict) and isinstance(c.get("n_current_x"), (int, float))
+               and not isinstance(c.get("n_current_x"), bool) for c in crops):
+        return "no crop carries a numeric 'n_current_x' (the healthy-accounts-riding-on-it column)"
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        return "missing/empty 'provinces' list (the by-province call table + the lead read)"
+    if not (isinstance(provs[0], dict) and isinstance(provs[0].get("th"), str) and provs[0]["th"].strip()):
+        return "first provinces row missing 'th' (the province-row label render)"
+    trig = (d.get("meta") or {}).get("trigger")
+    if not isinstance(trig, dict):
+        return "missing meta.trigger block (the readout reads trigger.dominant_share/.rule)"
+    if not isinstance(d.get("tripped"), list):
+        return "missing 'tripped' list (the lead branches on tripped.length; empty is a valid no-distress state)"
+    return None
+
+
+def _shape_assist_branch_radar(d):
+    # The proactive-assistance BRANCH DRILL (assist_branch_radar.json, obj #1) — the
+    # newest surfaced obj-#1 read (the falling-crop radar taken from province down to
+    # BRANCH: "a call list, not a map"). renderAssistBranchLens GATES the whole drill
+    # on a non-empty .provinces array (else it silently drops to the calm "The branch
+    # drill needs data/assist_branch_radar.json — not built for this vintage"
+    # placeholder with NO phone alert), then flattens every province's .branches[] into
+    # the ranked call list. Like its price-lens parent it is MEASURED-where-shown /
+    # ESTIMATED-ranking but does NOT self-heal from a broken deploy (no cron for
+    # build_assist_radar_branch.py), so a truncated/404 CDN copy has no CI job to
+    # restore it. Per branch it renders .name + .exposed_crop_ha (the ranking column,
+    # nullable) + .exposure_share + .n_farm (MEASURED, nullable under the >=30 floor) +
+    # .early_pct; the lead reads meta.n_branches_ranked + meta.n_provinces. Asserts
+    # render shape (the provinces gate + a province label + >=1 branch row carrying a
+    # name + the two numeric meta counts the lead renders), not values — robust to a
+    # future tape / crop-area vintage refresh, and it does NOT require exposed_crop_ha /
+    # n_farm to be numeric (both are legitimately null when a cell falls under the
+    # tape's >=30 floor).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        return "missing/empty 'provinces' list (renderAssistBranchLens gates the drill on it)"
+    p0 = provs[0]
+    if not isinstance(p0, dict):
+        return "first provinces row is not an object"
+    if not (isinstance(p0.get("th"), str) and p0["th"].strip()):
+        return "first provinces row missing 'th' (the province-column label render)"
+    branch = None
+    for p in provs:
+        if isinstance(p, dict) and isinstance(p.get("branches"), list) and p["branches"]:
+            branch = p["branches"][0]
+            break
+    if branch is None:
+        return "no province carries a non-empty 'branches' list (the ranked call list would be empty)"
+    if not isinstance(branch, dict):
+        return "first branches row is not an object"
+    if not (isinstance(branch.get("name"), str) and branch["name"].strip()):
+        return "first branches row missing 'name' (the branch-row label render)"
+    meta = d.get("meta") or {}
+    for k in ("n_branches_ranked", "n_provinces"):
+        if not isinstance(meta.get(k), (int, float)) or isinstance(meta.get(k), bool):
+            return "meta.%s missing/non-numeric (the lead sentence renders it)" % k
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -1722,6 +1812,20 @@ DATA_FILES = [
     # MEASURED, its province split ESTIMATED and labelled so in the UI.
     ("data/vehicle_mix.json", _shape_vehicle_mix, ".national stock/new maps + .types class list (collateral fleet-mix panel cb-mix, MEASURED)"),
     ("data/vehicle_brands.json", _shape_vehicle_brands, ".national.by_type ry3/ry1 brand boards (collateral new-nameplate panel cb-vbrands; national MEASURED, province split ESTIMATED)"),
+    # The proactive-assistance radar PAIR (obj #1) — the two newest surfaced exec reads,
+    # both live-fetched into the Proactive-assist (#assist) surface and both unprobed.
+    # Each GATES its section on a non-empty array (.crops / .provinces) and silently
+    # drops to a calm "not built for this vintage" placeholder with NO phone alert when
+    # its file is missing/truncated, and NEITHER self-heals from CI (build_assist_radar_
+    # price.py / build_assist_radar_branch.py have no cron), so a truncated/404 CDN
+    # deploy that guts either has no job to restore it — exactly the "broken demo" blind
+    # spot the crop_stress / branch_cropland / flood_hazard obj-#1 probes closed for
+    # their siblings. The branch drill is the "falling-crop radar goes to BRANCH — a
+    # call list" ship. Both assert render shape (the gate + a row label + the load-
+    # bearing counts the lead/columns render), not values — robust to a future tape /
+    # farm-gate vintage refresh, and green in the legitimate "nothing tripped" state.
+    ("data/assist_price_radar.json", _shape_assist_price_radar, ".crops falling-price rows (crop/yoy/n_current_x) + .provinces call table + meta.trigger + .tripped (#assist price lens, obj #1)"),
+    ("data/assist_branch_radar.json", _shape_assist_branch_radar, ".provinces[].branches ranked call list (name/exposed_crop_ha/n_farm) + meta.n_branches_ranked/n_provinces (#assist branch drill, obj #1)"),
 ]
 
 
