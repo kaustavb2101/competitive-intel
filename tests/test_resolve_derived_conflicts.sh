@@ -27,6 +27,7 @@ setup(){
   cp "$SRC" pipeline/resolve_derived_conflicts.sh
   cp "$HERE/../pipeline/merge_append_log.py" pipeline/merge_append_log.py
   cp "$HERE/../pipeline/merge_feed_history.py" pipeline/merge_feed_history.py
+  cp "$HERE/../pipeline/pick_newer_stamp.py" pipeline/pick_newer_stamp.py
   printf '# PROGRESS LOG\n\nReverse-chronological.\n\n## 2026-08-01 — the entry both sides start from\n\nbody\n' > docs/PROGRESS_LOG.md
   # stand-in for rederive_drift.py: provenance is a deterministic census of source-data
   cat > pipeline/rederive_drift.py <<'PY'
@@ -214,6 +215,57 @@ BEFORE=$(git rev-parse HEAD)
 bash pipeline/resolve_derived_conflicts.sh mobile >/dev/null 2>&1; rc=$?
 [ "$rc" -eq 2 ] && ok "exit 2 (needs a human)" || no "exit $rc, expected 2"
 [ "$(git rev-parse HEAD)" = "$BEFORE" ] && ok "branch left untouched" || no "branch was modified"
+
+echo
+echo "=== 13. a PULLED snapshot under platform/data/ keeps the NEWER reading, not the base's ==="
+# The failure this pins is silent, which is why it needs a fixture rather than a code comment:
+# thaiwater_flood.json lives under platform/data/ but no builder produces it, so the blanket
+# "take the base's side, it will be recomputed" reverts it to yesterday and the re-derive never
+# notices. The gate still passes — the tree IS self-consistent — and the live card just shows the
+# older reading. Here the branch holds 08-07 and the base holds 08-06; the branch must win.
+pulse(){ printf '{"meta": {"observed_to": "%s", "pulled": "%s"}, "n_high": %s}\n' "$1" "$1" "$2" \
+         > platform/data/thaiwater_flood.json; }
+setup
+pulse 2026-08-05 4; git add -A; git commit -qm "base pulse"
+git checkout -q -B mobile master; pulse 2026-08-06 7
+python3 pipeline/rederive_drift.py >/dev/null; git commit -qam mobile
+git checkout -q -B laptop master; pulse 2026-08-07 9
+python3 pipeline/rederive_drift.py >/dev/null; git commit -qam laptop
+bash pipeline/resolve_derived_conflicts.sh mobile >/dev/null 2>&1; rc=$?
+[ "$rc" -eq 0 ] && ok "exit 0 (resolved, not escalated)" || no "exit $rc, expected 0"
+GOT=$(python3 -c "import json;d=json.load(open('platform/data/thaiwater_flood.json'));print(d['meta']['observed_to'],d['n_high'])")
+[ "$GOT" = "2026-08-07 9" ] && ok "kept the newer 08-07 reading over the base's 08-06" \
+                            || no "kept '$GOT', expected '2026-08-07 9'"
+
+# ...and the reverse: when the BASE is newer, the base still wins. The rule is newer-wins, not
+# always-keep-mine — otherwise a stale branch would clobber a fresher reading already on master.
+setup
+pulse 2026-08-05 4; git add -A; git commit -qm "base pulse"
+git checkout -q -B mobile master; pulse 2026-08-09 11
+python3 pipeline/rederive_drift.py >/dev/null; git commit -qam mobile
+git checkout -q -B laptop master; pulse 2026-08-06 7
+python3 pipeline/rederive_drift.py >/dev/null; git commit -qam laptop
+bash pipeline/resolve_derived_conflicts.sh mobile >/dev/null 2>&1
+GOT=$(python3 -c "import json;d=json.load(open('platform/data/thaiwater_flood.json'));print(d['meta']['observed_to'],d['n_high'])")
+[ "$GOT" = "2026-08-09 11" ] && ok "a stale branch does NOT clobber the newer base reading" \
+                             || no "kept '$GOT', expected '2026-08-09 11'"
+
+# A genuinely generated layer has no observation stamp, so it must take exactly the path it took
+# before this rule existed — base's side, then rebuilt. This is the no-regression guard.
+setup
+diverge mobile source-data/fuel.json  '{"diesel": 37.11}'
+diverge laptop source-data/crops.json '{"rice": 13.5}'
+bash pipeline/resolve_derived_conflicts.sh mobile >/dev/null 2>&1; rc=$?
+[ "$rc" -eq 0 ] && ok "unstamped generated layer still resolves as before" || no "exit $rc"
+python3 pipeline/rederive_drift.py > /dev/null
+git diff --quiet -- platform/data/provenance.json \
+  && ok "provenance reproduces from the merged sources" || no "provenance did not reproduce"
+
+echo
+echo "=== 14. pick_newer_stamp's own unit cases ==="
+setup
+python3 pipeline/pick_newer_stamp.py --selftest >/dev/null 2>&1 \
+  && ok "pick_newer_stamp --selftest (13 cases)" || no "pick_newer_stamp --selftest"
 
 echo
 echo "=== 12. the mergers' own unit cases ==="

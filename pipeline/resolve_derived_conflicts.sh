@@ -124,11 +124,33 @@ EOF
   fi
   # --theirs is the side being merged IN, i.e. the base. Whatever it holds is about to be
   # recomputed anyway; this only needs to produce a resolved index the re-derive can overwrite.
+  #
+  # EXCEPT for the pulled snapshots. thaiwater_flood.json / thaiwater_rain.json live under
+  # platform/data/ but have no builder behind them — they ARE the pull. Taking the base's side of
+  # one reverts it to the older reading, and no re-derive will ever put the newer one back: the
+  # gate stays green because the tree is self-consistent, the live card just quietly shows
+  # yesterday while feed_history (which accumulates separately) keeps today. pick_newer_stamp.py
+  # reads each side's OWN declared observation date and keeps the newer; with no stamp on both
+  # sides it answers "theirs", so every genuinely generated layer takes exactly the path it did
+  # before. Seen for real on 2026-08-07 landing two ThaiWater PRs — four files would have reverted.
+  STAGE2="$(mktemp -d)"
   echo "$CONFLICTS" | while IFS= read -r f; do
     [ -z "$f" ] && continue
-    git checkout --theirs -- "$f" 2>/dev/null || git rm -q -- "$f"
+    SIDE=theirs
+    if [ -f pipeline/pick_newer_stamp.py ]; then
+      git show ":2:$f" > "$STAGE2/ours"   2>/dev/null || : > "$STAGE2/ours"
+      git show ":3:$f" > "$STAGE2/theirs" 2>/dev/null || : > "$STAGE2/theirs"
+      PICKED="$(python3 pipeline/pick_newer_stamp.py --ours "$STAGE2/ours" \
+                       --theirs "$STAGE2/theirs" 2>/tmp/pick_why)" || PICKED=theirs
+      if [ "$PICKED" = "ours" ]; then
+        SIDE=ours
+        echo "  kept OUR $f — $(cat /tmp/pick_why)"
+      fi
+    fi
+    git checkout "--$SIDE" -- "$f" 2>/dev/null || git rm -q -- "$f"
     git add -- "$f" 2>/dev/null || true
   done
+  rm -rf "$STAGE2"
 fi
 
 python3 pipeline/rederive_drift.py || {
