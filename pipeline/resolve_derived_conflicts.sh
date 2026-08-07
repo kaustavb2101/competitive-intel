@@ -35,7 +35,16 @@
 set -uo pipefail
 
 BASE="${1:-origin/master}"
-cd "$(dirname "$0")/.."
+
+# Find the repo from git, NOT from $0. This script is invoked from a copy that lives OUTSIDE the
+# tree it operates on: pr-autoresolve checks out each PR branch in turn, and that replaces the
+# working tree with THAT BRANCH's files — so any branch cut before this script existed deletes the
+# script out from under the loop mid-run. Deriving the root from $0 would then point at whatever
+# directory the surviving copy happens to sit in. Anchoring on the current repo instead makes the
+# script relocatable, which is the property the caller actually needs.
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || ROOT=""
+[ -z "$ROOT" ] && ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT" || { echo "FATAL: cannot enter repo root '$ROOT'." >&2; exit 1; }
 
 if ! git rev-parse --verify --quiet "$BASE" >/dev/null; then
   echo "FATAL: base ref '$BASE' does not exist." >&2
