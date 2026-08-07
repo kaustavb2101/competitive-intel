@@ -496,7 +496,7 @@ INGESTS
   # resolve_derived_conflicts.sh auto-resolves merge conflicts and the committee/auto-merge jobs call
   # it before pushing STRAIGHT TO MASTER, so its two abort paths are the only thing between an
   # unattended job and a wrongly-resolved conflict in source-data/ or in code. Fixture-based, seconds.
-  bash "$REPO/tests/test_resolve_derived_conflicts.sh" >/dev/null 2>&1 && ok "resolve_derived_conflicts.sh (16 fixture cases)" || bad "resolve_derived_conflicts.sh fixture tests (run: bash tests/test_resolve_derived_conflicts.sh)"
+  bash "$REPO/tests/test_resolve_derived_conflicts.sh" >/dev/null 2>&1 && ok "resolve_derived_conflicts.sh (19 fixture cases)" || bad "resolve_derived_conflicts.sh fixture tests (run: bash tests/test_resolve_derived_conflicts.sh)"
 
   node --check "$PLATFORM/app.js" >/dev/null 2>&1 && ok "node --check app.js" || bad "node --check app.js (syntax error)"
 
@@ -542,7 +542,7 @@ INGESTS
   # every critical page carries the AutoX wordmark, and no probed data file is missing/oversized. Added
   # because the ~40 probes are hand-authored by the intelligence loop yet had NO repo-gate guard: a future
   # edit that broke a validator against the real data would ship silently and only surface on the nightly
-  # LIVE run (a filed GitHub issue), not here. All 41 probed data files + the probed pages are git-tracked,
+  # LIVE run (a filed GitHub issue), not here. All probed data files + the probed pages are git-tracked,
   # so this reproduces on a clean checkout; it FAILs only on a genuine probe/payload regression.
   hc_out="$( python3 "$PIPE/check_site_health.py" --local "$PLATFORM" 2>&1 )"; rc=$?
   if [ "$rc" -eq 0 ]; then

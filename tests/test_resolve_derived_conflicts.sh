@@ -116,5 +116,21 @@ bash pipeline/resolve_derived_conflicts.sh master >/dev/null 2>&1; rc=$?
 [ "$rc" -eq 1 ] && ok "exit 1 (refuses to merge over uncommitted work)" || no "exit $rc, expected 1"
 
 echo
+echo "=== 7. runs from a copy OUTSIDE the repo, on a branch that does not contain it ==="
+# This is the pr-autoresolve case, and it shipped broken: that job checks out each PR branch, which
+# replaces the working tree with that branch's files. Every branch cut before the resolver existed
+# therefore loses it mid-loop, and `bash pipeline/resolve_derived_conflicts.sh` died with "No such
+# file or directory" — silently skipping exactly the old PRs that most needed refreshing.
+setup
+OUTSIDE="$(dirname "$R")/resolver-copy.sh"; cp "$SRC" "$OUTSIDE"
+diverge mobile source-data/fuel.json  '{"diesel": 37.11}'
+diverge laptop source-data/crops.json '{"rice": 13.5}'
+git rm -q pipeline/resolve_derived_conflicts.sh; git commit -qm "branch predates the resolver"
+bash "$OUTSIDE" mobile >/dev/null 2>&1; rc=$?
+[ "$rc" -eq 0 ] && ok "exit 0 (found the repo via git, not via \$0)" || no "exit $rc"
+[ ! -e pipeline/resolve_derived_conflicts.sh ] && ok "resolved a branch that still lacks the script" || no "fixture did not reproduce the absence"
+grep -q 37.11 source-data/fuel.json && ok "merged the other session's edit anyway" || no "did not merge"
+
+echo
 echo "==================== $PASS passed, $FAIL failed ===================="
 [ "$FAIL" -eq 0 ]

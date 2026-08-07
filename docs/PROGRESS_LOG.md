@@ -42,6 +42,107 @@ carried per-province yield — the farm-household income lever. A province below
   MEASURED readout on the province deep-dive or the Overview collateral outlook. That's an app-visual change,
   so it should go via a PR with the render+health gate, not a master commit. The layer is now the first-class,
   gate-protected input that surfacing needs.
+## 2026-08-07 — UX loop: skip-to-main-content bypass link on status.html (PR #310, merged + deployed)
+
+Autonomous UX-improvement run. The `docs/UXUI_AUDIT.md` backlog's original findings (#1–8) and the long
+discovered tail are fixed; the remaining open items are explicitly flagged unsuitable for unattended
+auto-merge (device-tested 3D pages, test-infra changes outside `platform/`). So per the loop's fallback
+("review a route, find a new concrete improvement") a route sweep found the gap: `status.html` was the
+**only** `styles.css` nav page missing the "Skip to main content" bypass link (WCAG 2.4.1 Bypass Blocks,
+Level A) that `index.html`/`data.html`/`live.html` all carry — its `#nav` has ~9 focusable stops on every
+visit with no keyboard/SR bypass, and `<main>` had no skip target.
+
+- **The change (surgical, `platform/` only):** added the compact `data.html` skip-link block after
+  `<body>` (off-screen until keyboard focus; styles.css `.skip-link` already styles it accent + hides in
+  print) + `id="main-content" tabindex="-1"` on `<main>`. Zero visual change for pointer users.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` → **124 passed / 0 failed** (incl.
+  `node --check` on status.html inline JS). (b) headless mobile render (390×844) self-reviewed: layout
+  intact, skip-link correctly invisible, skip-link + `id="main-content"` present in settled DOM. (c) no
+  secrets in diff. (d) diff exactly status.html (+3/−1) + one UXUI_AUDIT line; no stray files.
+- **Merge + deploy + verify.** Squash-merged PR #310 → master (`90018ea`). Vercel auto-deploy verified:
+  production root **HTTP 200** and `/status` route **HTTP 200**; a live `curl` of `/status` confirms the
+  deployed page carries both `Skip to main content` and `id="main-content"` (change is live, not just a
+  200). No rollback needed. All four styles.css nav pages now expose the bypass link consistently.
+
+## 2026-08-07 — Integration loop: ESTIMATED→MEASURED PICO cross-check on the #acq exit-whitespace board (PR #306, merged)
+
+Autonomous integration/improvement run. A negative-space sweep surfaced the one genuinely high-value
+CI-doable lever that is NOT a network pull: the competitor-exit white-space board on Competition
+(`#acq`, objective #2) inferred sub-scale rival presence *purely from big-4 ABSENCE* and its own caveat
+admitted *"we do NOT census the sub-scale operators that would exit."* CLAUDE.md flagged the same
+blocker (*"a true rival-fragility index needs a sub-scale-operator census — blocked Thai-IP registry
+pull"*). **That census had since landed and gone stale as a blocker:** `pico_district.json` is a
+per-district tally of licensed PICO-finance (พิโกไฟแนนซ์) operators from the FPO registry (MEASURED,
+97.6% district resolution) — exactly the sub-scale non-bank lender class the thesis is about.
+
+- **The change (additive, rankings untouched):** `build_exit_whitespace.py` joins `pico_district.json`
+  by `province_th|amphoe` (exact — both key off `amphoe.json`; all 518 PICO districts matched, 0 orphans)
+  and adds a MEASURED `components.pico_operators` count per district + a `meta.pico_crosscheck` provenance
+  block. `app.js` (`drawExitWhitespace`) renders a new "PICO ops ≤district meas" column beside the
+  ESTIMATED "sub-scale residual", plus a readout line (top district's measured count + how many of the
+  928 districts have the inference corroborated by a real PICO field — 516).
+- **Deliberately does NOT feed `exit_capture_score` or change rankings** (byte-identical). Whether a
+  marginal operator will EXIT is still an inference, and licensed PICO operators are compliant — so this
+  measures sub-scale rival *presence*, not who will exit. The score stays ESTIMATED; the new column is
+  MEASURED. Honest value: e.g. บางนา and อุทัย score high on the inferred residual (72) yet measure **0**
+  PICO operators (the cue rests on big-4 absence alone there), while วัฒนา (80 inferred / **9** measured)
+  is corroborated. Caveat, docstring, and provenance labels updated to match.
+- **Verification:** `bash tests/run.sh check` green (98→124 passed · 0 failed after the mid-flight master
+  merge; data-integrity 455/455); `build_exit_whitespace.py --check` + `build_provenance.py --check`
+  reproduce byte-exact; `node --check platform/app.js` clean; the `drawExitWhitespace` render path
+  exercised against the real layer. Provenance regenerated (136 layers, 0 unlabelled).
+- **Decision — shipped as a PR, not a direct master commit,** because it alters a visible exec board
+  (new column + readout). Opened draft #306. Resolved one master-merge conflict along the way (only the
+  two generated files `exit_whitespace.json` + `provenance.json`, both regenerated from merged sources
+  rather than hand-merged); the repo's `pr-autoresolve` automation then kept the branch mergeable through
+  the hourly master churn. Owner marked it ready and **merged it (squash `20fad0c`)**.
+- **Next integration:** CI-reachable *data pulls* remain exhausted (excise/BAAC/SME confirmed
+  non-CI-reachable; the rest are Thai-IP/owner-side). The remaining honest levers are the same
+  ESTIMATED→MEASURED grounding pattern elsewhere, plus the still-open objective-#1 GISTDA flooded-**area**
+  dissolve (NEXT_STEPS §0 — only the overlap-immune MAX-frequency flag ships today).
+
+## 2026-08-07 — Integration loop (deployment health): site-health probe now guards `branch_cropland.json` (committed to master)
+
+Autonomous integration/improvement run. Verified the flagship data-integration backlog (docs/NEXT_STEPS +
+the run prompt's items 1–4) is **done or CI-blocked**, so nothing new could be *pulled* this run:
+- **#1 FPO PICO competitor registry — DONE.** `fpo_pico` is distilled into `pico_census.json` /
+  `pico_district.json` / `pico_competitors.json` / `branch_pico.json` (MEASURED, canonical-77-keyed) and
+  wired into `build_rival_density.py`; all surfaced on `#acq` and already deploy-probed.
+- **#2 per-branch crop layer — DONE (and hardened this run, see below).** `build_branch_cropland.py` →
+  `branch_cropland.json` builds under the gate (`--check`, SKIPs cleanly if `doae_planted_area.json` is
+  absent), is in `provenance.json`, and renders the MEASURED-corrected crop-area block in every branch popup.
+- **#3 data.go.th distillation — DONE for the CI-reachable sources, BLOCKED for the rest.** `dbd_newco` →
+  `dbd_formation.json`, `mot_vehicles` → vehicle layers, `diw_factories` → factory layers all shipped. The
+  undistilled `baac_credit` / `smebank_credit` cannot be rebuilt from CI — the raw datagoth cache is gitignored
+  (absent from a fresh clone) and the data.go.th aggregator is 403 from cloud IPs (per DATAGOTH_CATALOG.md).
+- **#4 GISTDA 40m satellite crop-area — BLOCKED here.** `GISTDA_SPHERE_KEY` is **unset in this CI env**, so no
+  puller can authenticate. Skipped, not faked (logged for a keyed/owner-side run).
+
+So this run took the highest-value CLEAN, deterministic, zero-fabrication improvement left: **closing the
+deploy-health blind spot on `branch_cropland.json`** — backlog item #2's own shipped obj-#1 layer, and the
+last surfaced *per-branch* read with no site-health probe.
+- **Why it matters:** `branch_cropland.json` is the only per-branch absolute crop-hectares layer, index-aligned
+  to `branches.json`. It renders the MEASURED-corrected "crop area within 10km" block in every branch popup
+  (`croplandPopupHTML` → `croplandRec(d)=CROPLAND[i]`, gated on `.crop_ha`, per-crop `.ha[]` labelled off
+  `croplandMeta.crops`). The client loader sets `CROPLAND=null` on any fetch/parse failure and the popup helper
+  returns `''` when the record is missing — so a truncated/404 CDN deploy **silently drops the crop block from
+  every popup with no phone alert**, the exact "broken demo" blind spot the sibling `flood_hazard` /
+  `branch_labor` / `rival_pressure` probes exist to catch.
+- **Change:** one file of substance — `pipeline/check_site_health.py` (+`_shape_branch_cropland` asserting the
+  render contract: non-empty `meta.crops` + the 2015-branch index-aligned `.branches` array + `ha[]`/`crop_ha`
+  on each record — SHAPE not values, robust to a DOAE/SPAM vintage refresh; + its `DATA_FILES` entry). Plus a
+  one-word `tests/run.sh` comment fix (the self-test's "41 probed data files" count had drifted; genericized to
+  stop re-drift). **No data file altered → no provenance rebuild; no app behaviour/visual change → committed
+  straight to master, not a PR.**
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` → **124 passed · 0 failed** (data validation
+  455/455; `check_site_health.py --local` self-test accepts the committed payload → **137/137**). Negative-tested
+  the validator directly: it rejects truncated `.branches` (index misalignment), a first record missing `crop_ha`
+  or `ha`, empty `meta.crops`, and a missing `.branches` array — proving it is not a no-op. No secrets in diff.
+- **Next recommended integration:** the remaining CI-doable data backlog is genuinely exhausted (all Thai-IP /
+  owner-side / keyed). Continue the deploy-health sweep on the last surfaced-but-unprobed obj-#1 reads
+  (`branch_peers.json` peer-twin board on `#trend`, `segment_exposure.json` on `#exposure`), OR run the GISTDA
+  40m crop pull once `GISTDA_SPHERE_KEY` is available in the run environment.
+
 ## 2026-08-06 — Intelligence loop (deployment health): site-health probe now guards `rival_pressure.json` (committed to master, deployed + verified)
 
 Autonomous market/service-intelligence run. The `plan_cycle.py` backlog is exhausted (49 done, the 1 open
