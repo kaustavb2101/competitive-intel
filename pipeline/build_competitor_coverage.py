@@ -39,6 +39,7 @@ REPO = os.path.dirname(ROOT)
 DATA = os.path.join(REPO, "platform", "data")
 OUT  = os.path.join(DATA, "competitor_coverage.json")
 BRANCHES = os.path.join(DATA, "branches.json")
+TAPE = os.path.join(DATA, "tape_real.json")
 
 # The MERGED full census (official store-locators for Muangthai/Srisawad/Tidlor + Google/Overture
 # sample for Heng — already deduped). For 3 of 4 brands this is now the near-COMPLETE network, so
@@ -152,6 +153,91 @@ def _autox_branch_count():
     return len(d) if isinstance(d, list) else None
 
 
+def _autox_book_bn():
+    """MEASURED AutoX outstanding loan book in ฿bn = tape_real.json bucket_ladder.book_total.os_sum
+    (the whole-book outstanding total from the real loan-level export — comparable in kind to a peer's
+    REPORTED total-loans-outstanding IR figure). Returns None if the tape or the field is absent
+    (stripped sandbox) so the intensity block degrades honestly rather than inventing a book."""
+    if not os.path.exists(TAPE):
+        return None
+    with open(TAPE, encoding="utf-8") as f:
+        d = json.load(f)
+    try:
+        os_sum = d["bucket_ladder"]["book_total"]["os_sum"]
+    except (KeyError, TypeError):
+        return None
+    if not isinstance(os_sum, (int, float)) or os_sum <= 0:
+        return None
+    return round(os_sum / 1e9, 3)
+
+
+def _book_intensity(autox_n, autox_book_bn):
+    """BOOK PER BRANCH — outstanding loan book ÷ branch-network size, for AutoX + each peer that
+    carries a cited book. It reframes the raw book-scale chain (peers' bigger books) as a STRUCTURAL
+    density read: how much book each door carries. AutoX's book is MEASURED (real tape, current
+    outstanding); each peer's is REPORTED (cited FY2025 / 2025 IR). Branch counts follow the network-size
+    ranking (AutoX MEASURED own network; peers REPORTED listed-entity IR). Heng is excluded (no cited
+    book AND no cited branch count — never invented). Returns None when the AutoX book or count is
+    unavailable, so the block degrades honestly."""
+    if not autox_n or not autox_book_bn:
+        return None
+    pool = [{"operator": "AutoX", "book_bn": autox_book_bn, "branches": autox_n,
+             "book_per_branch_m": round(autox_book_bn * 1000.0 / autox_n, 1),
+             "basis": "MEASURED book (real loan tape, current outstanding) / MEASURED own network"}]
+    for b in BRANDS:
+        exp = EXPECTED.get(b)
+        fin = PEER_FINANCIALS.get(b)
+        book = fin.get("loan_book_bn") if fin else None
+        if exp and book:
+            pool.append({"operator": b, "book_bn": book, "branches": exp,
+                         "book_per_branch_m": round(book * 1000.0 / exp, 1),
+                         "basis": "REPORTED book (cited IR) / REPORTED listed-entity IR branches"})
+    # rank by book carried per branch, desc; deterministic tie-break by the fixed pool order.
+    order = ["AutoX"] + BRANDS
+    ranked = sorted(pool, key=lambda o: (-o["book_per_branch_m"], order.index(o["operator"])))
+    for i, o in enumerate(ranked, 1):
+        o["rank"] = i
+    autox_rank = next(o["rank"] for o in ranked if o["operator"] == "AutoX")
+    excluded = [b for b in BRANDS
+                if not (EXPECTED.get(b) and (PEER_FINANCIALS.get(b) or {}).get("loan_book_bn"))]
+    # peers that carry MORE book per branch than AutoX (fewer, larger branches) vs fewer (denser, thinner).
+    heavier = [o["operator"] for o in ranked
+               if o["operator"] != "AutoX" and o["rank"] < autox_rank]
+    lighter = [o["operator"] for o in ranked
+               if o["operator"] != "AutoX" and o["rank"] > autox_rank]
+    autox_ppb = next(o["book_per_branch_m"] for o in ranked if o["operator"] == "AutoX")
+    nearest = min((o for o in ranked if o["operator"] != "AutoX"),
+                  key=lambda o: abs(o["book_per_branch_m"] - autox_ppb), default=None)
+    insight = None
+    if nearest is not None:
+        insight = (
+            "AutoX carries ~฿%.0fm of book per branch — a dense, thin-per-branch model, closest to %s "
+            "(~฿%.0fm)%s. Under margin pressure (objective #2) that is a structural read: AutoX competes "
+            "on network density and per-branch throughput, not per-branch scale."
+            % (autox_ppb, nearest["operator"], nearest["book_per_branch_m"],
+               (", and well below " + " & ".join("%s (~฿%.0fm)" % (o["operator"], o["book_per_branch_m"])
+                for o in ranked if o["operator"] in heavier)) if heavier else "")
+        )
+    return {
+        "autox_rank": autox_rank,
+        "n_ranked": len(ranked),
+        "ranking": ranked,
+        "heavier_per_branch": heavier,
+        "lighter_per_branch": lighter,
+        "excluded_uncited": excluded,
+        "insight": insight,
+        "label": "BOOK PER BRANCH — outstanding loan book ÷ branch-network size. AutoX book is MEASURED "
+                 "(tape_real.json book_total, current outstanding from the real loan-level export); each "
+                 "peer's book is REPORTED (cited FY2025 / 2025 IR). Branch counts as in the network-size "
+                 "ranking (AutoX MEASURED own network; peers REPORTED listed-entity IR).",
+        "caveat": "Mixed observation basis: AutoX is a current loan-tape snapshot while peer books are "
+                  "their latest reported IR figures (FY2025 / 30 Jun 2025), and AutoX branches are the "
+                  "own-network count vs peers' listed-entity IR counts — so book-per-branch is a "
+                  "STRUCTURAL intensity read (how much book each branch carries), NOT profitability, "
+                  "NPL or market share. Heng is excluded (no cited book and no cited branch count).",
+    }
+
+
 def _footprint_measured(autox_n, counts):
     """SECOND, all-MEASURED ranking that complements the IR-count ranking: operators by physical
     POINTS ON THE GROUND — AutoX's own operating network (branches.json) vs each near-complete-locator
@@ -239,6 +325,7 @@ def _national_standing(autox_n, counts):
     # peers named in our brand set that carry NO cited figure -> excluded from the pool, disclosed.
     excluded = [b for b in BRANDS if not EXPECTED.get(b)]
     footprint = _footprint_measured(autox_n, counts)
+    book_intensity = _book_intensity(autox_n, _autox_book_bn())
     # The one-line reframe the exec should read: IR-count basis vs measured-footprint basis can rank
     # AutoX differently, and both are true. Built from the two rankings, never hard-coded.
     insight = None
@@ -261,6 +348,7 @@ def _national_standing(autox_n, counts):
         "behind_autox": behind,
         "excluded_uncited": excluded,
         "footprint_measured": footprint,
+        "book_intensity": book_intensity,
         "reported_vs_measured_insight": insight,
         "basis": "NETWORK SIZE — AutoX's MEASURED own-network branch count vs each peer's REPORTED "
                  "(cited public IR) branch count. A national footprint-scale read, NOT market share.",
@@ -360,6 +448,11 @@ def run(check=False):
             print("  measured footprint (points on the ground): AutoX #%d of %d — %s"
                   % (fp["autox_rank"], fp["n_ranked"],
                      " > ".join("%s %s" % (o["operator"], "{:,}".format(o["points"])) for o in fp["ranking"])))
+        bi = ns.get("book_intensity")
+        if bi:
+            print("  book per branch (structural intensity): AutoX #%d of %d — %s"
+                  % (bi["autox_rank"], bi["n_ranked"],
+                     " > ".join("%s ฿%sm" % (o["operator"], o["book_per_branch_m"]) for o in bi["ranking"])))
     return 0
 
 
