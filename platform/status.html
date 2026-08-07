@@ -115,6 +115,8 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<script>(function(){var s=document.querySelector('.skip-link');if(!s)return;s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('main-content');if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
 <nav id="nav" aria-label="Main views">
   <span class="nb">AutoX<b>·</b>เงินไชโย</span>
   <!-- This nav was stranded on the PRE-five-pillar labels (Overview / National / Exposure / Trend)
@@ -167,7 +169,7 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
  b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});})();
 </script>
 
-<main>
+<main id="main-content" tabindex="-1">
 <noscript>
   <div style="max-width:640px;margin:48px auto;padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55">
     <strong style="color:var(--hi);display:block;margin-bottom:6px">This status page needs JavaScript enabled.</strong>
