@@ -10,13 +10,14 @@ collision that resolve_derived_conflicts.sh already handles, one file up. Workin
 once makes it the normal case: three of the six open PRs on 2026-08-07 were blocked on nothing but
 this. Git cannot know two top-inserted blocks are independent. This can.
 
-THE PRECONDITION (this is what makes automating it safe)
---------------------------------------------------------
-It refuses unless the merge is PURELY ADDITIVE: every block present in the merge BASE must still be
-present, byte-identical, on BOTH sides, and the preamble must be unchanged by at least one side. If
-either side edited, reworded or deleted an existing entry, that is a real disagreement about shared
-text and it exits 3 so a human settles it. Union-merging is only correct for append-only files, so
-the script proves the file was appended to before treating it as one.
+WHAT MAKES THIS SAFE
+--------------------
+New entries are unioned; every entry that already existed in the merge BASE gets a real 3-way merge
+of its own. One side editing an old entry is not a disagreement — it is an ordinary edit, and it is
+taken. BOTH sides changing the same entry differently IS a disagreement about shared words, and
+that exits 3 for a human, as does a repeated heading (which would make block identity meaningless).
+So the script never picks a winner on contested text; it only automates the cases where there is
+demonstrably nothing to contest.
 
 ORDERING
 --------
@@ -80,25 +81,47 @@ def union(base, ours, theirs):
     else:
         return None, "both sides rewrote the preamble differently"
 
+    # Headings are the block identity, so a repeated heading makes the file unreasonable-about.
+    for side, blocks in (("the merge base", blocks_b), ("this branch", blocks_o),
+                         ("the base branch", blocks_t)):
+        heads = [heading(b) for b in blocks]
+        if len(set(heads)) != len(heads):
+            return None, "%s has two entries under the same heading" % side
+
+    by_head_b = {heading(b): b for b in blocks_b}
     by_head_o = {heading(b): b for b in blocks_o}
     by_head_t = {heading(b): b for b in blocks_t}
 
-    # PURELY ADDITIVE, checked both ways: nothing from the base may be dropped or reworded.
-    for b in blocks_b:
-        h = heading(b)
-        for side, table in (("this branch", by_head_o), ("the base branch", by_head_t)):
-            if h not in table:
-                return None, "%s deleted an existing entry: %s" % (side, h[:70])
-            if table[h] != b:
-                return None, "%s edited an existing entry: %s" % (side, h[:70])
+    # Every entry that existed in the base gets a real 3-way merge of its own. Only ONE side
+    # touching it is not a disagreement — it is an ordinary edit, and refusing those would escalate
+    # a merge git itself could do. Both sides changing the same entry differently IS a
+    # disagreement about shared words, and that still goes to a human.
+    resolved = {}
+    for h, b in by_head_b.items():
+        o, t = by_head_o.get(h), by_head_t.get(h)
+        if o == t:
+            resolved[h] = o                 # both agree — including both having deleted it
+        elif o == b:
+            resolved[h] = t                 # only the base branch touched it
+        elif t == b:
+            resolved[h] = o                 # only this branch touched it
+        else:
+            what = "deleted" if o is None or t is None else "reworded"
+            return None, "both sides %s the same entry: %s" % (what, h[:70])
 
-    base_heads = {heading(b) for b in blocks_b}
-    result = list(blocks_t)  # master's file: base blocks + whatever master added, in its own order
+    result = []
+    for b in blocks_t:
+        h = heading(b)
+        if h in by_head_b:
+            if resolved[h] is not None:     # None = a deletion both sides accept
+                result.append(resolved[h])
+        else:
+            result.append(b)                # new on the base branch
 
     for b in blocks_o:
         h = heading(b)
-        if h in base_heads:
-            continue  # already present, unchanged (proven above)
+        if h in by_head_b:
+            continue                        # an existing entry; already resolved above
         if h in by_head_t:
             # Both sides added an entry under the same heading.
             if by_head_t[h] == b:
@@ -155,11 +178,28 @@ def _selftest():
     check("slots by date, not blindly on top", [date_of(x) for x in split_blocks(out2)[1]],
           ["2026-08-05", "2026-08-02", "2026-07-30"])
 
-    # 4/5. a shared entry that either side changed is a REAL conflict, not an append
-    _, err = union(base, pre + mine + blk("2026-08-01", "old entry", "reworded\n"), pre + master + old)
-    check("refuses when this branch edited a shared entry", err is not None, True)
-    _, err = union(base, pre + mine + old, pre + master)
-    check("refuses when the base branch deleted a shared entry", err is not None, True)
+    # 4/5. ONE side editing an old entry is an ordinary edit, not a conflict — take it. This is the
+    # real case that blocked #296/#300: master appended "merged + deployed" to a 2026-08-04 entry.
+    edited = blk("2026-08-01", "old entry", "reworded\n")
+    out4, err = union(base, pre + mine + old, pre + master + edited)
+    check("takes the base branch's edit to an old entry", (err, "reworded" in out4), (None, True))
+    out5, err = union(base, pre + mine + edited, pre + master + old)
+    check("takes this branch's edit to an old entry", (err, "reworded" in out5), (None, True))
+
+    # 6/7. both sides changing the SAME entry differently is a real disagreement
+    _, err = union(base, pre + mine + edited,
+                   pre + master + blk("2026-08-01", "old entry", "differently\n"))
+    check("refuses when both sides reworded one entry", err is not None, True)
+    _, err = union(base, pre + mine + edited, pre + master)
+    check("refuses when one side deletes what the other edited", err is not None, True)
+
+    # 8. a deletion the other side left alone is honoured, not resurrected
+    out8, err = union(base, pre + mine, pre + master + old)
+    check("honours a one-sided deletion", (err, "old entry" in out8), (None, False))
+
+    # 9. a repeated heading makes block identity meaningless — refuse rather than guess
+    _, err = union(base, pre + mine + mine + old, pre + master + old)
+    check("refuses a file with duplicate headings", err is not None, True)
 
     # 6. the same commit reaching both sides must not be duplicated
     same = blk("2026-08-06", "same entry")
