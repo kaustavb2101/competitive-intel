@@ -10919,7 +10919,16 @@ function renderAssistPriceLens(){
         <td class="mono sub">${aodTHB(r.os_thb)}</td>
         <td class="sub" style="font-size:12px">${(r.crops||[]).filter(c=>c.depended_on).map(c=>`${c.crop} <span class="mono" style="color:${priceDirColor(c.direction)}">${c.yoy==null?'—':(c.yoy>0?'+':'')+c.yoy+'%'}</span>`).join(' · ')||'—'}</td></tr>`).join('');
 
-    host.innerHTML=`<p class="lead" style="margin:0 0 10px">${lead}</p>
+    // AS-OF STAMP (owner ask 2026-08-07, "live realtime updates"). A card that says a crop is
+    // falling is only actionable if you know how old that claim is. The date shown is the feed's
+    // OWN observation date, never this machine's clock — so a stalled pull reads as stale instead
+    // of quietly reading as today.
+    const asof=(j.meta&&j.meta.price_vintage)||null;
+    const stampLine = asof
+      ? `<p class="sub" style="margin:0 0 8px"><b>Prices as of ${asof}</b> — NABC market prices, pulled 4× a day; sugarcane is the OCSB announced season price and moves once a season, not daily.</p>`
+      : '';
+
+    host.innerHTML=`${stampLine}<p class="lead" style="margin:0 0 10px">${lead}</p>
       <table class="tbl"><tr>
         <th>Crop</th>
         <th title="Thai farm-gate price, year-on-year — MEASURED NABC daily national average">Farm-gate YoY</th>
@@ -10992,6 +11001,69 @@ function renderAssistBranchLens(){
   });
 }
 
+/* WHAT TO DO WITH THE BRANCH LIST — the action band (owner ask 2026-08-07: "actionable items").
+   Everything above this point is a finding: which provinces, which crops, which branches. This is
+   the decision, and the case for it comes from AutoX's own restructuring ladder rather than from
+   an assertion — the tools still available after an account rolls are measurably worse than the
+   phone call before it.
+
+   THE CAUSALITY CAVEAT IS THE POINT, not a disclaimer bolted on. A TDR account is at 50.8% 90+
+   BECAUSE it was already the worst in the book — that is selection, and the ladder is emphatically
+   NOT evidence that restructuring causes failure. What it does measure is what is LEFT to work with
+   once an account has deteriorated: a last-resort tool that recovers half the time and books a loss
+   per account. That asymmetry is the argument for early contact, and it survives the caveat. The
+   band says so in the copy, because a reader who spots the selection effect themselves and is not
+   told we spotted it will discount the whole panel. */
+function renderAssistAction(){
+  const host=document.getElementById('assist-action'); if(!host) return;
+  tmliFetch('assist_branch_radar').then(j=>{
+    const rs=(TAPE&&TAPE.restructuring&&TAPE.restructuring.by_status)||[];
+    if(!j||!Array.isArray(j.provinces)||!j.provinces.length||!rs.length){ host.innerHTML=''; return; }
+    const N=n=>Number(n).toLocaleString(), m=j.meta||{};
+    const get=s=>rs.find(x=>x.status===s);
+    const norm=get('Normal'), pre=get('Pre-emptive'), tdr=get('TDR');
+    if(!norm||!pre||!tdr){ host.innerHTML=''; return; }
+
+    const cx=j.provinces.reduce((a,p)=>a+(p.n_current_x||0),0);
+    const os=j.provinces.reduce((a,p)=>a+(p.os_thb||0),0);
+    // NPAT per account is a THB figure that flips sign across the ladder — colour it by sign
+    // rather than by row, so "the last-resort tool loses money" reads without being asserted.
+    const money=v=>`<span class="mono" style="color:${v<0?'var(--agri)':'var(--merch)'}">${v<0?'−':''}฿${N(Math.abs(v))}</span>`;
+    const ladder=[
+      ['Normal — never restructured', norm, 'the baseline: what a healthy account does'],
+      ['Pre-emptively restructured', pre, 'already reworked once, before it rolled'],
+      ['TDR — the last resort', tdr, 'reworked after real distress'],
+    ].map(([lab,r,note])=>`<tr>
+        <td><b>${lab}</b><br><span class="sub" style="font-size:12px">${note}</span></td>
+        <td class="mono">${N(r.n)}</td>
+        <td class="mono" style="color:${r.dpd90p_pct>=40?'var(--agri)':r.dpd90p_pct>=20?'#D97A3A':'var(--dim)'}"><b>${r.dpd90p_pct}%</b></td>
+        <td class="mono">${money(r.npat_margin_avg)}</td></tr>`).join('');
+
+    host.innerHTML=`
+      <p class="lead" style="margin:0 0 10px"><b style="color:var(--gold)">Call them while they are still Current.</b>
+        The list above is <b>${N(m.n_branches_ranked)}</b> branches across <b>${N(m.n_provinces)}</b> provinces holding
+        <b>${N(cx)}</b> farm accounts that are Current or only in the X bucket — <b>${aodTHB(os)}</b> of farm book — in a crop
+        whose price is <i>already</i> down. Nothing here has gone wrong yet. That is the whole opportunity.</p>
+      <table class="tbl"><tr>
+        <th>Where the account is in its life</th>
+        <th>Accounts</th>
+        <th title="share of that population at 90+ days past due — MEASURED from the real tape">90+</th>
+        <th title="average NPAT margin per account — MEASURED from the real tape">NPAT per account</th></tr>${ladder}</table>
+      <p class="lead sub" style="margin:10px 0 0"><b>Read the ladder honestly — it is selection, not cause.</b>
+        An account reaches <b>TDR</b> because it was already the worst in the book, so the ${tdr.dpd90p_pct}% is
+        <i>not</i> evidence that restructuring makes accounts fail. What it does measure is what is <b>left to work with</b>
+        after the roll: the last-resort tool recovers barely half the time and books ${money(tdr.npat_margin_avg)} per account,
+        while a never-restructured account sits at ${norm.dpd90p_pct}% and earns ${money(norm.npat_margin_avg)}. Even the
+        <i>early</i> rework is close to free at ${money(pre.npat_margin_avg)}. The cheap options all live before the roll —
+        which is where the ${N(cx)} accounts above still are.</p>
+      <p class="lead sub" style="margin:8px 0 0"><b>What this does not say.</b> It does not pick the treatment — that is a
+        collections call, on an account the tape cannot see the circumstances of. It says <b>who</b> to reach and
+        <b>when</b>: the branches at the top of the list, now, while the price move is announced and the account is current.
+        <b>MEASURED</b> throughout (real no-PII tape, cells ≥30); the branch <i>ordering</i> above is estimated.</p>`;
+    wrapTables();
+  });
+}
+
 function renderAssist(){
   if(!document.getElementById('v-assist')) return;
   loadTapeReal().then(()=>{
@@ -11033,6 +11105,7 @@ function renderAssist(){
     renderFarmHousehold();
     renderAssistPriceLens();
     renderAssistBranchLens();
+    renderAssistAction();
 
     // restructuring — did it hold?
     const ORD=['Normal','Skip','Pre-emptive','TDR'];

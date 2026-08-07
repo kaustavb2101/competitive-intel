@@ -1,4 +1,4 @@
-name: Data — NABC live daily prices (daily)
+name: Data — NABC live daily prices (4x/day)
 
 # Pulls LIVE Thai daily market prices (crops · livestock · fisheries) from the NABC Agricultural
 # Data Service (agriapi.nabc.go.th) — real-time, free, NO API KEY, and REACHABLE from GitHub-hosted
@@ -9,15 +9,28 @@ name: Data — NABC live daily prices (daily)
 # representative product's latest national price + a self-computed YoY. build_branch_agri.py PREFERS
 # this live crop YoY over the OAE snapshot, so the per-branch agri price-stress re-prices to current.
 #
-# Committed to a fresh data/nabc-<run_id> branch and opened as a DRAFT PR back to the branch this ran
-# on (cron uses the default branch). NEVER pushes to a working branch — can't race a session. No-ops
-# cleanly when the upstream prices haven't changed.
+# HOW IT LANDS (changed 2026-08-07, owner ask: "live realtime updates"): it runs the FULL determinism
+# gate and, when that is 0-failed, pushes straight to the base branch — the same auto-merge the fuel
+# job has used since 2026-07-25. A draft PR is now the FALLBACK, opened only when the gate goes red or
+# the base keeps moving. The old draft-PR-every-day path was the reason a "live" feed sat unmerged for
+# days and then arrived provenance-stale; a feed that needs a human to click merge is not a live feed.
+# No-ops cleanly when the upstream prices haven't changed.
 
 on:
   workflow_dispatch:
   schedule:
-    # Daily, 20:15 UTC (= 03:15 Bangkok) — off-minute; NABC posts the prior day's prices overnight.
+    # Four times a day, 6h apart, on :15 to stay clear of the other data-*.yml crons.
+    # 20:15 UTC = 03:15 Bangkok (the original slot — NABC posts the prior day's prices overnight).
+    #
+    # BE HONEST ABOUT WHAT THIS BUYS. NABC publishes ONE price per product per day, so three of these
+    # four runs will usually find nothing and exit at the `git diff --cached --quiet` check. What the
+    # extra runs buy is LATENCY, not resolution: a price posted at 09:00 Bangkok used to wait until
+    # 03:15 the next morning to reach the site, and now waits at most ~6h. It does NOT make the crop
+    # series intraday, and nothing in the app should imply it does.
     - cron: "15 20 * * *"
+    - cron: "15 2 * * *"
+    - cron: "15 8 * * *"
+    - cron: "15 14 * * *"
 
 permissions:
   contents: write
@@ -61,7 +74,7 @@ jobs:
           python pipeline/rederive_drift.py --report-md /tmp/rederived.md
           cat /tmp/rederived.md
 
-      - name: Commit to a data branch + open a draft PR
+      - name: Gate, then auto-merge to the base branch (draft PR only on gate failure)
         env:
           GH_TOKEN: ${{ github.token }}
           BASE_BRANCH: ${{ github.ref_name }}
@@ -72,19 +85,40 @@ jobs:
           # uncommitted generated layers (branch_fuel/branch_cropland/…), which stay untracked.
           git add -u source-data platform/data
           if git diff --cached --quiet; then
-            echo "No change vs committed data (same upstream prices). No PR opened."
+            echo "No change vs committed data (same upstream prices). Nothing to merge."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$DATA_BRANCH"
           STAMP="$(python -c "import json;print(json.load(open('source-data/nabc_prices.json'))['meta'].get('pulled') or 'n/a')")"
           YOY="$(python -c "import json;d=json.load(open('source-data/nabc_prices.json'))['crop_yoy'];print(', '.join('%s %+g%%'%(k,v) for k,v in sorted(d.items())))")"
           git commit -m "data: NABC live prices ($STAMP, run ${{ github.run_id }})" \
-                     -m "Pulled by .github/workflows/data-nabc-prices.yml via pipeline/pull_nabc_prices.py — LIVE Thai daily market prices (agriapi.nabc.go.th). branch_agri.json re-priced to current crop YoY."
+                     -m "Pulled by .github/workflows/data-nabc-prices.yml via pipeline/pull_nabc_prices.py — LIVE Thai daily market prices (agriapi.nabc.go.th). branch_agri.json re-priced to current crop YoY. Full 'bash tests/run.sh check' passed 0-failed before this auto-merge."
+          # The base may have advanced since checkout — another data job, or a phone session.
+          # resolve_derived_conflicts.sh takes the base's side of the generated layers and recomputes
+          # them, which cannot conflict because it never merges. It runs BEFORE the gate on purpose:
+          # gating a tree and then changing it would make the gate result a lie.
+          git fetch -q origin "$BASE_BRANCH"
+          SYNCED=1
+          bash pipeline/resolve_derived_conflicts.sh "origin/$BASE_BRANCH" || SYNCED=0
+          if [ "$SYNCED" -eq 1 ] && bash tests/run.sh check; then
+            echo "Gate green — auto-merging to $BASE_BRANCH."
+            for attempt in 1 2 3; do
+              git push origin "HEAD:$BASE_BRANCH" && { echo "NABC prices landed on $BASE_BRANCH ($YOY)."; exit 0; }
+              echo "push rejected (base moved) — re-syncing, attempt $attempt"
+              git fetch -q origin "$BASE_BRANCH"
+              bash pipeline/resolve_derived_conflicts.sh "origin/$BASE_BRANCH" || break
+            done
+            echo "Could not land after 3 attempts — falling back to a draft PR."
+            REASON="could not auto-land (base kept moving)"
+          else
+            echo "Gate RED — falling back to a draft PR for review."
+            REASON="GATE FAILED, needs review"
+          fi
+          git checkout -b "$DATA_BRANCH"
           git push origin "$DATA_BRANCH"
           {
-            echo "Automated daily NABC live-price pull (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo "Automated NABC live-price pull (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\` — $REASON."
             echo
             echo "**Live crop YoY:** $YOY"
             echo
@@ -93,9 +127,7 @@ jobs:
             echo "snapshot (per-crop, OAE fallback for crops NABC lacks). Nothing fabricated."
             echo
             cat /tmp/rederived.md
-            echo
-            echo "Run \`bash tests/run.sh check\` after merge."
           } > /tmp/pr_body.md
           gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
-            --title "data: NABC live prices ($STAMP, run ${{ github.run_id }})" \
+            --title "data: NABC live prices ($STAMP, run ${{ github.run_id }}) [$REASON]" \
             --body-file /tmp/pr_body.md

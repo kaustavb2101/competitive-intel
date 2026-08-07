@@ -1,4 +1,4 @@
-name: Data — ThaiWater live flood + rain pulse (daily)
+name: Data — ThaiWater live flood + rain pulse (4x/day)
 
 # Refreshes the two LIVE ThaiWater telemetry layers the platform serves directly:
 #   platform/data/thaiwater_flood.json  (pipeline/pull_thaiwater_flood.py) — per-province river/
@@ -21,15 +21,30 @@ name: Data — ThaiWater live flood + rain pulse (daily)
 # accumulates the readings, live_board fingerprints every layer's stamp, and macro_book rolls the flood
 # vintage up. Which layers those are is no longer asserted here; rederive_drift.py measures it per run.
 #
-# Committed to a fresh data/thaiwater-<run_id> branch and opened as a DRAFT PR back to the branch this
-# ran on (cron uses the default branch). NEVER pushes to a working branch — can't race a session.
+# HOW IT LANDS (changed 2026-08-07, owner ask: "live realtime updates"): it runs the FULL determinism
+# gate and, when that is 0-failed, pushes straight to the base branch — the same auto-merge the fuel
+# job has used since 2026-07-25. A draft PR is now the FALLBACK, opened only when the gate goes red or
+# the base keeps moving. Four draft PRs a day waiting on a human click is not a live feed; worse, two
+# same-day pulls sitting in two open PRs is exactly the case merge_feed_history.py REFUSES to
+# auto-resolve (two different readings for one date is a real disagreement, not an append), so the
+# draft-PR path actively breaks at this cadence. Pushing to the base sidesteps it: there is one
+# accumulator and the newer reading updates the day in place.
 # No-ops cleanly when the upstream telemetry is byte-identical to what is committed.
 
 on:
   workflow_dispatch:
   schedule:
-    # Daily, 21:20 UTC (= 04:20 Bangkok) — off-minute, clear of the other data-*.yml crons.
+    # Four times a day, 6h apart, on :20 to stay clear of the other data-*.yml crons.
+    # 21:20 UTC = 04:20 Bangkok (the original slot).
+    #
+    # Unlike the NABC price feed, this one genuinely IS intraday — river levels and 24h rainfall move
+    # through the day, and a flood peak that arrives at noon Bangkok used to reach the site the
+    # following morning. Four pulls is the difference between a same-day collections signal and a
+    # next-day one.
     - cron: "20 21 * * *"
+    - cron: "20 3 * * *"
+    - cron: "20 9 * * *"
+    - cron: "20 15 * * *"
 
 permissions:
   contents: write
@@ -58,10 +73,18 @@ jobs:
       - name: Append tonight's readings to the accumulated series
         run: |
           # ThaiWater serves live telemetry with no archive, so this row is the only lasting record
-          # of it. Dated by the feed's own meta.observed_to — NOT meta.pulled: this job runs at
-          # 21:20 UTC, already the next morning in Bangkok, so pulled would file every reading a day
-          # early. This is an APPEND, not a re-derivation, so it stays an explicit step: the
-          # fixed-point driver below deliberately never runs anything with a side effect like this.
+          # of it. Dated by the feed's own meta.observed_to — NOT meta.pulled: the 21:20 UTC run is
+          # already the next morning in Bangkok, so pulled would file that reading a day early. This
+          # is an APPEND, not a re-derivation, so it stays an explicit step: the fixed-point driver
+          # below deliberately never runs anything with a side effect like this.
+          #
+          # WHAT 4x/DAY MEANS FOR THE DAILY SERIES, said plainly: append_history.put() overwrites a
+          # date it already holds, so the stored value for a day is the LAST reading of that day, not
+          # its peak and not a daily mean. That is a deliberate keep-it-as-it-was choice — switching
+          # to a daily max would silently redefine every point already in the series, including the
+          # ones collected at one-per-day. The live cards read the feed itself, which carries its own
+          # observation stamp, so an intraday peak is visible while it is happening; the history line
+          # is an end-of-day close.
           if git status --porcelain -- platform/data/thaiwater_flood.json platform/data/thaiwater_rain.json | grep -q .; then
             python pipeline/append_history.py
           else
@@ -82,7 +105,7 @@ jobs:
           python pipeline/rederive_drift.py --report-md /tmp/rederived.md
           cat /tmp/rederived.md
 
-      - name: Commit to a data branch + open a draft PR
+      - name: Gate, then auto-merge to the base branch (draft PR only on gate failure)
         env:
           GH_TOKEN: ${{ github.token }}
           BASE_BRANCH: ${{ github.ref_name }}
@@ -93,20 +116,41 @@ jobs:
           # uncommitted generated layers (branch_fuel/branch_cropland/…), which stay untracked.
           git add -u source-data platform/data
           if git diff --cached --quiet; then
-            echo "No change vs committed telemetry. No PR opened."
+            echo "No change vs committed telemetry. Nothing to merge."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$DATA_BRANCH"
           STAMP="$(python -c "import json;print(json.load(open('platform/data/thaiwater_flood.json'))['meta'].get('pulled') or 'n/a')")"
           FLOOD="$(python -c "import json;d=json.load(open('platform/data/thaiwater_flood.json'));p=d['provinces'];w=sorted(p.items(),key=lambda x:(-x[1]['max_level'],-x[1]['pct_high']))[:3];print(', '.join('%s L%d (%d/%d high)'%(k,v['max_level'],v['n_high'],v['n_stations']) for k,v in w))")"
           RAIN="$(python -c "import json;d=json.load(open('platform/data/thaiwater_rain.json'));p=d['provinces'];w=sorted(p.items(),key=lambda x:-x[1]['max_mm'])[:3];print(', '.join('%s %.0fmm'%(k,v['max_mm']) for k,v in w))")"
           git commit -m "data: ThaiWater flood + rain pulse ($STAMP, run ${{ github.run_id }})" \
-                     -m "Pulled by .github/workflows/data-thaiwater.yml via pull_thaiwater_flood.py + pull_thaiwater_rain.py — LIVE keyless ThaiWater telemetry (api-v3.thaiwater.net). provenance.json rebuilt in lockstep."
+                     -m "Pulled by .github/workflows/data-thaiwater.yml via pull_thaiwater_flood.py + pull_thaiwater_rain.py — LIVE keyless ThaiWater telemetry (api-v3.thaiwater.net). provenance.json rebuilt in lockstep. Full 'bash tests/run.sh check' passed 0-failed before this auto-merge."
+          # The base may have advanced since checkout — another data job, or a phone session.
+          # resolve_derived_conflicts.sh takes the base's side of the generated layers and recomputes
+          # them, which cannot conflict because it never merges. It runs BEFORE the gate on purpose:
+          # gating a tree and then changing it would make the gate result a lie.
+          git fetch -q origin "$BASE_BRANCH"
+          SYNCED=1
+          bash pipeline/resolve_derived_conflicts.sh "origin/$BASE_BRANCH" || SYNCED=0
+          if [ "$SYNCED" -eq 1 ] && bash tests/run.sh check; then
+            echo "Gate green — auto-merging to $BASE_BRANCH."
+            for attempt in 1 2 3; do
+              git push origin "HEAD:$BASE_BRANCH" && { echo "ThaiWater pulse landed on $BASE_BRANCH ($FLOOD)."; exit 0; }
+              echo "push rejected (base moved) — re-syncing, attempt $attempt"
+              git fetch -q origin "$BASE_BRANCH"
+              bash pipeline/resolve_derived_conflicts.sh "origin/$BASE_BRANCH" || break
+            done
+            echo "Could not land after 3 attempts — falling back to a draft PR."
+            REASON="could not auto-land (base kept moving)"
+          else
+            echo "Gate RED — falling back to a draft PR for review."
+            REASON="GATE FAILED, needs review"
+          fi
+          git checkout -b "$DATA_BRANCH"
           git push origin "$DATA_BRANCH"
           {
-            echo "Automated daily ThaiWater live-telemetry pull (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo "Automated ThaiWater live-telemetry pull (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\` — $REASON."
             echo
             echo "**Worst flood (water level):** $FLOOD"
             echo "**Wettest (24h rain):** $RAIN"
@@ -116,9 +160,7 @@ jobs:
             echo "determinism gate) — nothing fabricated."
             echo
             cat /tmp/rederived.md
-            echo
-            echo "Run \`bash tests/run.sh check\` after merge."
           } > /tmp/pr_body.md
           gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
-            --title "data: ThaiWater flood + rain pulse ($STAMP, run ${{ github.run_id }})" \
+            --title "data: ThaiWater flood + rain pulse ($STAMP, run ${{ github.run_id }}) [$REASON]" \
             --body-file /tmp/pr_body.md
