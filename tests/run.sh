@@ -143,7 +143,7 @@ phase_check(){
   fi
   ( cd "$PIPE" && python3 build_baac_credit.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_baac_credit.py --check"
-  elif [ "$rc" -eq 3 ]; then skip "build_baac_credit.py --check (source-data/datagoth/baac_credit.xlsx absent — Thai-IP pull_datagoth input, not committed)"
+  elif [ "$rc" -eq 3 ]; then skip "build_baac_credit.py --check (owner-side xlsx absent, layer not generated, or pandas/openpyxl missing — not data drift)"
   else bad "build_baac_credit.py --check (baac_credit.json drifted from source-data/datagoth/baac_credit.xlsx)"
   fi
   ( cd "$PIPE" && python3 build_occupation_income_individual.py --check >/dev/null 2>&1 ); rc=$?
@@ -208,6 +208,11 @@ phase_check(){
   if [ "$rc" -eq 0 ]; then ok "build_fuel_prices.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_fuel_prices.py --check (source-data/fuel_prices.json absent — not data drift)"
   else bad "build_fuel_prices.py --check (fuel_prices.json drifted from source-data/fuel_prices.json)"
+  fi
+  ( cd "$PIPE" && python3 build_farmgate_platform.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_farmgate_platform.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_farmgate_platform.py --check (source-data/farmgate_prices.json absent — not data drift)"
+  else bad "build_farmgate_platform.py --check (platform/data/farmgate_prices.json drifted from source-data/farmgate_prices.json)"
   fi
   ( cd "$PIPE" && python3 build_commodity_history.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_commodity_history.py --check"
