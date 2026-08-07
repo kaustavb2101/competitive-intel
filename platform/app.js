@@ -10919,6 +10919,62 @@ function renderAssistPriceLens(){
   });
 }
 
+/* PROACTIVE ASSIST · BRANCH DRILL — data/assist_branch_radar.json.
+   The province lens above says WHERE the falling-crop exposure is; this says WHOSE book it is, so
+   the readout ends on something a person can act on. Ranking is by the branch's modelled cane share
+   of its own catchment — an ESTIMATED comparison BETWEEN branches, never a fact about one. The only
+   per-branch account counts shown are the tape's own measured cells; the rest stay blank on
+   purpose, because a province number divided down would read like a measurement. */
+function renderAssistBranchLens(){
+  const host=document.getElementById('assist-branch'); if(!host) return;
+  tmliFetch('assist_branch_radar').then(j=>{
+    if(!j||!Array.isArray(j.provinces)||!j.provinces.length){
+      tmliNote(host,'The branch drill needs <b>data/assist_branch_radar.json</b> — not built for this vintage. The province lens above is unaffected.');
+      return;
+    }
+    const N=n=>Number(n).toLocaleString(), m=j.meta||{};
+    const all=[];
+    j.provinces.forEach(p=>(p.branches||[]).forEach(b=>all.push(Object.assign({},b,{
+      prov:p.th, region:p.region, provCX:p.n_current_x, fall:(p.falling||[])[0]||{}}))));
+    if(!all.length){ tmliNote(host,'No branch could be ranked for this vintage — see the coverage note in the layer.'); return; }
+
+    // Rank by ABSOLUTE exposed hectares. Share alone put a branch with 48% cane and SEVEN hectares
+    // of it at the top — concentration, not exposure. Share stays as a column, not the sort.
+    const ranked=all.slice().sort((a,b)=>(b.exposed_crop_ha||0)-(a.exposed_crop_ha||0)
+                                       ||(b.exposure_share||0)-(a.exposure_share||0)
+                                       ||String(a.name).localeCompare(String(b.name)));
+    const top=ranked.slice(0,20);
+    const topMeas=top.filter(b=>b.n_farm!=null);
+    const topAcc=topMeas.reduce((a,b)=>a+(b.n_farm||0),0);
+    const gaps=j.provinces.filter(p=>!(p.branches||[]).length);
+
+    const rows=top.map(b=>`<tr>
+        <td><b>${b.name||'—'}</b></td>
+        <td class="sub">${b.prov||''} <span class="mono sub">${b.region||''}</span></td>
+        <td class="mono"><b>${b.exposed_crop_ha==null?'—':N(b.exposed_crop_ha)}</b></td>
+        <td class="mono sub">${b.exposure_share==null?'—':Math.round(b.exposure_share*100)+'%'}</td>
+        <td class="mono">${b.n_farm==null
+            ? '<span class="sub" title="this branch’s farm cell did not clear the tape’s ≥30 floor, so no per-branch count is published — use the province total">—</span>'
+            : '<b>'+N(b.n_farm)+'</b>'}</td>
+        <td class="mono sub">${b.early_pct==null?'—':b.early_pct+'%'}</td>
+        <td class="mono sub">${N(b.provCX)}</td></tr>`).join('');
+
+    const lead=`<b style="color:var(--agri)">${N(m.n_branches_ranked)} branches</b> sit inside the ${N(m.n_provinces)} falling-crop provinces. The <b>20 most exposed</b> are below; <b>${N(topMeas.length)}</b> of them publish a farm-account count, <b>${N(topAcc)}</b> accounts between them. Start there — these borrowers are still <b>Current or X-bucket</b>, and the price that hits them is already announced.`;
+
+    host.innerHTML=`<p class="lead" style="margin:0 0 10px">${lead}</p>
+      <table class="tbl"><tr>
+        <th>Branch</th><th>Province</th>
+        <th title="modelled hectares of the FALLING crop around this branch — the size of the farm economy taking the price cut. ESTIMATED (SPAM), ranks branches against each other">Exposed ha</th>
+        <th class="sub" title="that as a share of the branch&#39;s catchment cropland — concentration, not size: 48% of seven hectares is not a big exposure">Share of catchment</th>
+        <th title="MEASURED farm accounts at this branch — shown only where the tape&#39;s own cell cleared the ≥30 floor">Farm accounts here</th>
+        <th class="sub" title="X-bucket (pre-30dpd) share at this branch">X %</th>
+        <th class="sub" title="the whole province&#39;s Current + X farm accounts — the solid number to work">Province Current+X</th></tr>${rows}</table>
+      ${gaps.length?`<p class="lead sub" style="margin:10px 0 0"><b>Not rankable:</b> ${gaps.map(p=>`<b>${p.th}</b>`).join(' · ')} — ${gaps[0].coverage_note||''}</p>`:''}
+      <p class="lead sub" style="margin:10px 0 0"><b>Reading:</b> the ranking column is <b>ESTIMATED</b> — a SPAM spatial crop model over a 10km catchment, which is the right shape for ordering branches and the wrong thing to quote about a single borrower. The account counts are <b>MEASURED</b> where shown and deliberately blank where the branch cell fell under the tape's ≥30 floor. ${(m.n_branches_with_measured_accounts!=null&&m.n_branches_ranked)?`<b>${N(m.n_branches_with_measured_accounts)} of ${N(m.n_branches_ranked)}</b> branches here have a published count.`:''} Sugarcane's move is the <b>OCSB announced season price</b>, not a daily quote — administered nationally, so it is certain and every cane household takes it, but it is season-over-season rather than live.</p>`;
+    wrapTables();
+  });
+}
+
 function renderAssist(){
   if(!document.getElementById('v-assist')) return;
   loadTapeReal().then(()=>{
@@ -10959,6 +11015,7 @@ function renderAssist(){
 
     renderFarmHousehold();
     renderAssistPriceLens();
+    renderAssistBranchLens();
 
     // restructuring — did it hold?
     const ORD=['Normal','Skip','Pre-emptive','TDR'];
