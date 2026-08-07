@@ -3,6 +3,28 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-07 — UX loop: skip-to-main-content bypass link on status.html (PR #310, merged + deployed)
+
+Autonomous UX-improvement run. The `docs/UXUI_AUDIT.md` backlog's original findings (#1–8) and the long
+discovered tail are fixed; the remaining open items are explicitly flagged unsuitable for unattended
+auto-merge (device-tested 3D pages, test-infra changes outside `platform/`). So per the loop's fallback
+("review a route, find a new concrete improvement") a route sweep found the gap: `status.html` was the
+**only** `styles.css` nav page missing the "Skip to main content" bypass link (WCAG 2.4.1 Bypass Blocks,
+Level A) that `index.html`/`data.html`/`live.html` all carry — its `#nav` has ~9 focusable stops on every
+visit with no keyboard/SR bypass, and `<main>` had no skip target.
+
+- **The change (surgical, `platform/` only):** added the compact `data.html` skip-link block after
+  `<body>` (off-screen until keyboard focus; styles.css `.skip-link` already styles it accent + hides in
+  print) + `id="main-content" tabindex="-1"` on `<main>`. Zero visual change for pointer users.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` → **124 passed / 0 failed** (incl.
+  `node --check` on status.html inline JS). (b) headless mobile render (390×844) self-reviewed: layout
+  intact, skip-link correctly invisible, skip-link + `id="main-content"` present in settled DOM. (c) no
+  secrets in diff. (d) diff exactly status.html (+3/−1) + one UXUI_AUDIT line; no stray files.
+- **Merge + deploy + verify.** Squash-merged PR #310 → master (`90018ea`). Vercel auto-deploy verified:
+  production root **HTTP 200** and `/status` route **HTTP 200**; a live `curl` of `/status` confirms the
+  deployed page carries both `Skip to main content` and `id="main-content"` (change is live, not just a
+  200). No rollback needed. All four styles.css nav pages now expose the bypass link consistently.
+
 ## 2026-08-07 — Integration loop: ESTIMATED→MEASURED PICO cross-check on the #acq exit-whitespace board (PR #306, merged)
 
 Autonomous integration/improvement run. A negative-space sweep surfaced the one genuinely high-value
