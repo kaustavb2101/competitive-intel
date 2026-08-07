@@ -74,8 +74,13 @@ jobs:
               SKIPPED=$((SKIPPED+1)); echo "::endgroup::"; continue
             fi
 
-            bash pipeline/resolve_derived_conflicts.sh origin/master
-            rc=$?
+            # `|| rc=$?` is load-bearing: Actions runs this block as `bash -e`, and `set -uo
+            # pipefail` above does NOT clear -e. Calling the resolver bare would abort the whole
+            # step the first time it returned 2 — its correct "this one needs a human" signal —
+            # so one PR with a real conflict would stop every later PR from being refreshed.
+            # Putting it in a condition context is what keeps -e from firing.
+            rc=0
+            bash pipeline/resolve_derived_conflicts.sh origin/master || rc=$?
             if [ "$rc" -eq 0 ]; then
               if git push origin "HEAD:$BRANCH"; then
                 echo "- #$NUM \`$BRANCH\` — merged master + re-derived, mergeable again" >> "$GITHUB_STEP_SUMMARY"
