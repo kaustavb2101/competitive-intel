@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-07T04:22:06+00:00",
-    "commit": "5987a9b"
+    "generated_at": "2026-08-07T10:23:25+00:00",
+    "commit": "c962cd2"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,30 @@
   ],
   "activity": [
     {
+      "date": "2026-08-07T10:23:25+00:00",
+      "sha": "c962cd2",
+      "summary": "feat(#acq): book-per-branch structural peer intensity (measured AutoX vs reported peers)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-07T08:24:34+00:00",
+      "sha": "ec9bf69",
+      "summary": "docs(progress): log the live.html noscript UX fix (PR #312, merged + deployed)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-07T15:21:37+07:00",
+      "sha": "07a6696",
+      "summary": "ux: add noscript fallback banner to live.html (#312)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-07T04:22:57+00:00",
+      "sha": "e24e7cf",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the fuel-freshness guard ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-07T04:22:06+00:00",
       "sha": "5987a9b",
       "summary": "health(deploy): freshness guard covers fuel_prices.json (last uncovered daily-CI price layer)",
@@ -686,30 +710,6 @@
       "sha": "b790ae6",
       "summary": "health(deploy): site-health probe guards pico_competitors.json (last unprobed obj-#2 PICO read on #acq)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-06T03:34:31+00:00",
-      "sha": "9ebb278",
-      "summary": "docs(progress): log branch-explorer IBM Plex fonts merge+deploy+verify (PR #299)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-06T10:31:23+07:00",
-      "sha": "baaf329",
-      "summary": "ux: load IBM Plex fonts on branch-explorer.html (#299)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-05T23:39:39+00:00",
-      "sha": "70f6d60",
-      "summary": "data: live fuel prices (2026-08-05, run 31056969163)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-05T10:57:42+00:00",
-      "sha": "64f5430",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the measured-catchment-pop ship",
-      "pillar": "3d-enrichment"
     }
   ]
 }
