@@ -3,30 +3,39 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
-## 2026-08-07 — UX loop: aria-label on the 3 deck.gl pages' theme toggle (PR #314, merged + deployed)
+## 2026-08-07 — Integration loop: ship the withheld Current-Account macro chip on a trailing-12mo net (PR)
 
-Autonomous UX-improvement loop, safeguard-gated auto-merge. The original 7-item audit backlog is fully
-closed and the remaining "Open backlog" items are all flagged unsuitable for unattended auto-merge
-(device-tested gesture pages, bigger-than-surgical mandate/viewBox work, or test-infra), so this run
-reviewed the nav chrome and found a fresh surgical a11y gap.
+Autonomous integration/improvement run. The prompt's data-integration backlog (items 1–4: FPO PICO
+census, per-branch cropland, data.go.th distillation, GISTDA 40m satellite) is DONE or CI-blocked, and
+the CI-reachable *data pulls* are exhausted. A negative-space sweep surfaced the highest-value CLEAN,
+deterministic, network-free lever: **the MEASURED current-account chip that has been deliberately
+withheld from the Overview macro strip** — the owner-review §0d item 1 follow-up.
 
-- **The gap (WCAG 4.1.2 Name/Role/Value):** the theme-toggle button on the three deck.gl pages
-  (`province.html`, `rayong-catchment.html`, `branch-explorer.html`) carried only `title` + `aria-pressed`
-  with the `☾`/`☀` glyph as its content and **no `aria-label`**. In the accessible-name computation,
-  element content beats `title`, so a screen reader announced the button by its moon/sun glyph character
-  — and `sync()` flips that glyph on every toggle, so the announced name changed with state. The three
-  `styles.css` pages (index/data/status) already carry `aria-label="Toggle light or dark theme"`.
-- **The fix (3 pages, one attribute each):** added the identical `aria-label` (between `title=` and
-  `aria-pressed=`, byte-for-byte matching the canonical markup) so all six toggle buttons now expose the
-  same stable accessible name; `aria-pressed` still conveys light/dark state. SR-only — zero visual change.
-- **Safeguard protocol (all passed):** `bash tests/run.sh check` = **0 failed** (exit 0; `node --check
-  inline JS` PASS on all three changed pages); headless render of `province.html?p=rayong` — settled DOM
-  shows the aria-label, PNG self-reviewed (nav/panels/3D scene intact, toggle unchanged); no secrets;
-  diff = exactly the 3 attrs + one `docs/UXUI_AUDIT.md` line.
-- **Merge + deploy + verify:** squash-merged as `2c61967`; master auto-deployed to Vercel; after
-  propagation the prod alias `/` and the changed routes (`/province`, `/rayong-catchment`,
-  `/branch-explorer`) all return **HTTP 200**, and a cache-busted fetch confirms the deployed
-  `/province` now serves `aria-label="Toggle light or dark theme"` on the toggle. No rollback needed.
+- **The gap:** `build_macro_indicators.py._fold_current_account` surfaced only `meta.latest` — a SINGLE
+  month (April 2026 = **−7,591 USD million**), which on a scanned exec strip reads as a national crisis.
+  `app.js` therefore carried a five-line `// NOT SHOWN: indicators.current_account` block explaining the
+  chip "waits for the builder rather than shipping the alarming half of the truth" — the honest headline
+  is a trailing sum, and none was persisted. The MEASURED monthly BoT Balance-of-Payments series (256
+  months, 2005-01→2026-04) was already committed in `source-data/bot_current_account.json`; its trailing
+  twelve months net to **+846.57 USD million** (a surplus), exactly the owner-note "roughly +847M".
+- **The fix (mirrors the existing `_fold_tourist_arrivals` pattern in the same file):**
+  `_fold_current_account` now computes a `trailing_12m` block (sum of the last 12 periods of
+  `series['current_account']`, deterministic, network-free) and sets `value`/`period`/`unit` to the
+  trailing net, keeping `latest_month` for reference. `app.js` (`renderMacroIndicators`) replaces the
+  NOT-SHOWN comment with a "Current account +847" chip — subtitle "USD mn · trailing 12 months
+  (2025-05 → 2026-04) · surplus · Bank of Thailand BoP 2026-04". Falls back to the single month only on
+  a <12-month series.
+- **Verification.** `bash tests/run.sh check` → **124 passed / 0 failed** (data-integrity 455/455);
+  `build_macro_indicators.py --check` byte-exact after regen; `build_provenance.py` regenerated (136
+  layers, 0 unlabelled); `node --check platform/app.js` clean. Headless render of `index.html` confirms
+  the settled DOM carries `Current account +847` in the macro strip with no uncaught error — non-alarming
+  surplus, not the −7,591 single month. Nothing else on the board changed (all other chips byte-identical).
+- **Decision — shipped as a draft PR, not a direct master commit,** because it adds a visible chip to the
+  exec Overview macro board. The number is MEASURED (BoT BoP monthly series); only the aggregation window
+  (trailing-12mo net vs single month) changed, computed deterministically from the committed series.
+- **Next integration:** CI-reachable data pulls remain exhausted; the still-open objective-#1 lever is the
+  GISTDA flooded-**area** dissolve (NEXT_STEPS §0 — needs a real shapely geometry dissolve over overlapping
+  per-event polygons, a heavier multi-step job than one clean run affords).
 
 ## 2026-08-07 — Intelligence loop (PEER COMPARISON): book-per-branch structural intensity on #acq
 
@@ -219,6 +228,31 @@ last surfaced *per-branch* read with no site-health probe.
   owner-side / keyed). Continue the deploy-health sweep on the last surfaced-but-unprobed obj-#1 reads
   (`branch_peers.json` peer-twin board on `#trend`, `segment_exposure.json` on `#exposure`), OR run the GISTDA
   40m crop pull once `GISTDA_SPHERE_KEY` is available in the run environment.
+
+## 2026-08-07 — UX loop: aria-label on the 3 deck.gl pages' theme toggle (PR #314, merged + deployed)
+
+Autonomous UX-improvement loop, safeguard-gated auto-merge. The original 7-item audit backlog is fully
+closed and the remaining "Open backlog" items are all flagged unsuitable for unattended auto-merge
+(device-tested gesture pages, bigger-than-surgical mandate/viewBox work, or test-infra), so this run
+reviewed the nav chrome and found a fresh surgical a11y gap.
+
+- **The gap (WCAG 4.1.2 Name/Role/Value):** the theme-toggle button on the three deck.gl pages
+  (`province.html`, `rayong-catchment.html`, `branch-explorer.html`) carried only `title` + `aria-pressed`
+  with the `☾`/`☀` glyph as its content and **no `aria-label`**. In the accessible-name computation,
+  element content beats `title`, so a screen reader announced the button by its moon/sun glyph character
+  — and `sync()` flips that glyph on every toggle, so the announced name changed with state. The three
+  `styles.css` pages (index/data/status) already carry `aria-label="Toggle light or dark theme"`.
+- **The fix (3 pages, one attribute each):** added the identical `aria-label` (between `title=` and
+  `aria-pressed=`, byte-for-byte matching the canonical markup) so all six toggle buttons now expose the
+  same stable accessible name; `aria-pressed` still conveys light/dark state. SR-only — zero visual change.
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` = **0 failed** (exit 0; `node --check
+  inline JS` PASS on all three changed pages); headless render of `province.html?p=rayong` — settled DOM
+  shows the aria-label, PNG self-reviewed (nav/panels/3D scene intact, toggle unchanged); no secrets;
+  diff = exactly the 3 attrs + one `docs/UXUI_AUDIT.md` line.
+- **Merge + deploy + verify:** squash-merged as `2c61967`; master auto-deployed to Vercel; after
+  propagation the prod alias `/` and the changed routes (`/province`, `/rayong-catchment`,
+  `/branch-explorer`) all return **HTTP 200**, and a cache-busted fetch confirms the deployed
+  `/province` now serves `aria-label="Toggle light or dark theme"` on the toggle. No rollback needed.
 
 ## 2026-08-06 — Intelligence loop (deployment health): site-health probe now guards `rival_pressure.json` (committed to master, deployed + verified)
 
