@@ -166,6 +166,40 @@ def _n(x):
     return len(x) if isinstance(x, (list, dict)) else None
 
 
+# NABC quotes each commodity in its own trade unit and can change a category's quoted product. The
+# board therefore reads the unit out of the data rather than asserting one: hardcoding "฿/tonne"
+# would keep printing it against a per-kg number if rice ever moved to a kg-quoted product, which
+# is a wrong number rather than a missing one.
+_THB_UNIT = {"บาท/ตัน": "฿/tonne", "บาท/กก.": "฿/kg", "บาท/ร้อยผล": "฿/100 fruit"}
+
+
+def _farmgate_rice(d):
+    price = dig(d, "commodities.rice.price")
+    unit = dig(d, "commodities.rice.unit")
+    return price, _THB_UNIT.get(unit, unit or "")
+
+
+def _thai_price_history():
+    """History block for the Thai farm-gate row, read from the file instead of hardcoded.
+
+    The four static history dicts below carry a literal point count that has to be bumped by hand
+    when the series grows. This series gains a month every month, so a literal would start
+    under-reporting it immediately. Returns None if the file is absent, which leaves the row with
+    the usual honest no-history line rather than a broken link."""
+    doc = read("thai_price_history.json") or {}
+    series = doc.get("series") or {}
+    rice = series.get("Rice") or {}
+    n = rice.get("n_months") or len(rice.get("months") or [])
+    if not n:
+        return None
+    return {
+        "file": "thai_price_history.json", "kind": "thai_farmgate", "series": "Rice", "points": n,
+        "note": "%d months, %s → %s, %d commodities — NABC Thai farm-gate, %d provinces quoting"
+                % (n, rice.get("first_month"), rice.get("last_month"), len(series),
+                   rice.get("n_provinces") or 0),
+    }
+
+
 REGISTRY = [
     # ---- daily -------------------------------------------------------------
     dict(key="fuel_prices", file="fuel_prices.json", cadence="daily",
@@ -186,6 +220,15 @@ REGISTRY = [
                          "of " + str(sum((p or {}).get("n_stations", 0)
                                          for p in (d.get("provinces") or {}).values()))), measured=True,
          hist_series="flood_high"),
+    # The DOMESTIC farm-gate price. It sorts directly above "Rice · world price" in the same group,
+    # which is deliberate — they are the two rice numbers on this page and a reader should see them
+    # together and see that they differ. ฿/tonne daily vs $/mt monthly keeps them apart at a glance.
+    dict(key="farmgate_prices", file="farmgate_prices.json", cadence="daily",
+         label="Rice · Thai farm-gate", group="Farm income",
+         what="what a borrower's crop actually sells for at home, today — the number behind farm "
+              "repayment capacity, not the world price beside it",
+         pick=_farmgate_rice, measured=True,
+         history=_thai_price_history),
 
     # ---- weekly / monthly --------------------------------------------------
     dict(key="rival_ads", file="rival_ads.json", cadence="weekly",
@@ -203,7 +246,8 @@ REGISTRY = [
          pick=lambda d: (_n(d.get("demand")), "demand themes"), measured=True),
     dict(key="commodity_history", file="commodity_history.json", cadence="monthly",
          label="Rice · world price", group="Farm income",
-         what="the price that sets crop-household cash flow, and the agri book behind it",
+         what="the GLOBAL benchmark in $/mt, monthly — context for the Thai farm-gate price above "
+              "it, not a substitute for it",
          pick=lambda d: (dig(d, "series.rice.values.-1"), "$/mt"), measured=True,
          history=dict(file="commodity_history.json", kind="commodity", points=60,
                       note="60 months, 11 series — World Bank Pink Sheet")),
@@ -352,7 +396,9 @@ def build():
             "unit": unit,
             "measured": bool(spec.get("measured")),
             "source": ((doc.get("meta") or {}).get("source") or "")[:180],
-            "history": spec.get("history"),
+            # A callable history block is read from its own file at build time, so a growing series
+            # cannot be under-reported by a literal that nobody remembered to bump.
+            "history": spec["history"]() if callable(spec.get("history")) else spec.get("history"),
         }
         # A feed with an accumulated series gets a real history block — same shape as the ones
         # whose publisher ships history, because by this point it IS the same thing: dated
