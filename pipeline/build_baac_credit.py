@@ -64,6 +64,17 @@ def _int(v):
 
 
 def build():
+    try:
+        import pandas as pd  # noqa: F401  (checked here so a missing dep exits 3, not 1)
+    except ImportError as e:
+        # An absent optional dependency is an ENVIRONMENT gap, exactly like an absent input — not
+        # data drift. Exiting 1 here made tests/run.sh print "baac_credit.json drifted from
+        # baac_credit.xlsx" on any machine without pandas, which is a confident claim about data
+        # made by a builder that never read any. Exit 3 is what the gate already understands as
+        # "cannot check this here", and it keeps the failure honest about which kind it is.
+        print("build_baac_credit.py: SKIP (%s — install pandas + openpyxl to check this layer)" % e,
+              file=sys.stderr)
+        sys.exit(3)
     import pandas as pd
     # header=1 skips the title row; nrows=77 stops before the ~15 documentation rows. Select value
     # columns BY POSITION — the general-debt header has a brittle double space inside it.

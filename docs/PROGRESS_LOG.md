@@ -42,6 +42,31 @@ carried per-province yield — the farm-household income lever. A province below
   MEASURED readout on the province deep-dive or the Overview collateral outlook. That's an app-visual change,
   so it should go via a PR with the render+health gate, not a master commit. The layer is now the first-class,
   gate-protected input that surfacing needs.
+## 2026-08-07 — UX loop: aria-label on the 3 deck.gl pages' theme toggle (PR #314, merged + deployed)
+
+Autonomous UX-improvement loop, safeguard-gated auto-merge. The original 7-item audit backlog is fully
+closed and the remaining "Open backlog" items are all flagged unsuitable for unattended auto-merge
+(device-tested gesture pages, bigger-than-surgical mandate/viewBox work, or test-infra), so this run
+reviewed the nav chrome and found a fresh surgical a11y gap.
+
+- **The gap (WCAG 4.1.2 Name/Role/Value):** the theme-toggle button on the three deck.gl pages
+  (`province.html`, `rayong-catchment.html`, `branch-explorer.html`) carried only `title` + `aria-pressed`
+  with the `☾`/`☀` glyph as its content and **no `aria-label`**. In the accessible-name computation,
+  element content beats `title`, so a screen reader announced the button by its moon/sun glyph character
+  — and `sync()` flips that glyph on every toggle, so the announced name changed with state. The three
+  `styles.css` pages (index/data/status) already carry `aria-label="Toggle light or dark theme"`.
+- **The fix (3 pages, one attribute each):** added the identical `aria-label` (between `title=` and
+  `aria-pressed=`, byte-for-byte matching the canonical markup) so all six toggle buttons now expose the
+  same stable accessible name; `aria-pressed` still conveys light/dark state. SR-only — zero visual change.
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` = **0 failed** (exit 0; `node --check
+  inline JS` PASS on all three changed pages); headless render of `province.html?p=rayong` — settled DOM
+  shows the aria-label, PNG self-reviewed (nav/panels/3D scene intact, toggle unchanged); no secrets;
+  diff = exactly the 3 attrs + one `docs/UXUI_AUDIT.md` line.
+- **Merge + deploy + verify:** squash-merged as `2c61967`; master auto-deployed to Vercel; after
+  propagation the prod alias `/` and the changed routes (`/province`, `/rayong-catchment`,
+  `/branch-explorer`) all return **HTTP 200**, and a cache-busted fetch confirms the deployed
+  `/province` now serves `aria-label="Toggle light or dark theme"` on the toggle. No rollback needed.
+
 ## 2026-08-07 — Intelligence loop (PEER COMPARISON): book-per-branch structural intensity on #acq
 
 Autonomous market & service intelligence run. The competitor board's national-standing block already
