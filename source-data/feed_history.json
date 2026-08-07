@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 72,
+  "n_points": 79,
   "n_series": 6,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -25,11 +25,12 @@
     "2026-08-02",
     "2026-08-03",
     "2026-08-04",
+    "2026-08-05",
     "2026-08-06"
    ],
    "first_seen": "2026-07-11",
    "label": "River stations above their high mark",
-   "n": 13,
+   "n": 14,
    "path": "platform/data/thaiwater_flood.json",
    "source": "ThaiWater live river/reservoir telemetry",
    "unit": "stations",
@@ -45,6 +46,7 @@
     128.0,
     134.0,
     134.0,
+    132.0,
     132.0,
     138.0
    ]
@@ -67,11 +69,13 @@
     "2026-08-01",
     "2026-08-02",
     "2026-08-03",
-    "2026-08-04"
+    "2026-08-04",
+    "2026-08-05",
+    "2026-08-07"
    ],
    "first_seen": "2026-07-05",
    "label": "Diesel · retail pump",
-   "n": 16,
+   "n": 18,
    "path": "source-data/fuel_prices.json",
    "source": "Bangchak retail oil-price API",
    "unit": "฿/L",
@@ -81,6 +85,8 @@
     34.94,
     34.94,
     34.94,
+    36.69,
+    36.69,
     36.69,
     36.69,
     36.69,
@@ -112,11 +118,13 @@
     "2026-08-01",
     "2026-08-02",
     "2026-08-03",
-    "2026-08-04"
+    "2026-08-04",
+    "2026-08-05",
+    "2026-08-07"
    ],
    "first_seen": "2026-07-05",
    "label": "Gasohol 95 · retail pump",
-   "n": 16,
+   "n": 18,
    "path": "source-data/fuel_prices.json",
    "source": "Bangchak retail oil-price API",
    "unit": "฿/L",
@@ -136,7 +144,9 @@
     36.69,
     36.69,
     36.69,
-    36.69
+    36.69,
+    35.99,
+    35.99
    ]
   },
   "rain_heavy_pct": {
@@ -154,11 +164,12 @@
     "2026-08-02",
     "2026-08-03",
     "2026-08-04",
+    "2026-08-05",
     "2026-08-06"
    ],
    "first_seen": "2026-07-10",
    "label": "Provinces with heavy rain somewhere",
-   "n": 13,
+   "n": 14,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "provinces",
@@ -175,6 +186,7 @@
     43.0,
     31.0,
     41.0,
+    29.0,
     36.0
    ]
   },
@@ -193,11 +205,12 @@
     "2026-08-02",
     "2026-08-03",
     "2026-08-04",
+    "2026-08-05",
     "2026-08-06"
    ],
    "first_seen": "2026-07-10",
    "label": "Heaviest 24h rainfall, any gauge",
-   "n": 13,
+   "n": 14,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "mm",
@@ -214,6 +227,7 @@
     608.5,
     180.0,
     138.0,
+    113.8,
     140.5
    ]
   },

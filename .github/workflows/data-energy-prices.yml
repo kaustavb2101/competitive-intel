@@ -36,39 +36,48 @@ jobs:
         run: python pipeline/pull_energy_prices.py
       - name: Rebuild the income/scenario chain + provenance when crude changed
         run: |
-          if git status --porcelain -- source-data/energy_prices.json | grep -q .; then
-            echo "crude baseline changed — rebuilding income_impact -> scenarios -> product_segments -> provenance"
-            python pipeline/build_income_impact.py
-            python pipeline/build_scenarios.py
-            python pipeline/build_product_segments.py
-            # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
-            # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
-            # which then censuses its bytes.
-            python pipeline/build_live_board.py
-            python pipeline/build_provenance.py
-          else
-            echo "crude unchanged — nothing to rebuild."
-          fi
+          # The hand-named chain that used to live here (income_impact -> scenarios ->
+          # product_segments -> live_board -> provenance) is the same shape of list that went stale
+          # three times on the NABC job. rederive_drift.py iterates the determinism gate's OWN
+          # --check set to a fixed point instead, so the gate below sees a consistent tree and this
+          # job auto-merges rather than falling back to a draft PR a human has to finish.
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
       - name: Gate, then auto-merge to the base branch (draft PR only on gate failure)
         env:
           GH_TOKEN: ${{ github.token }}
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/energy-${{ github.run_id }}
         run: |
-          git add source-data/energy_prices.json platform/data/income_impact.json \
-                  platform/data/scenarios.json platform/data/product_segments.json \
-                  platform/data/live_board.json platform/data/provenance.json
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list to go stale, and never adds an untracked generated layer.
+          git add -u source-data platform/data
           if git diff --cached --quiet; then echo "No change vs committed crude. Nothing to merge."; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           H="$(python -c "import json;c=json.load(open('source-data/energy_prices.json'))['crude_avg'];print('crude avg \$%s/bbl (%s), YoY %+.1f%%, YTD %+.1f%%'%(c['latest'],c['date'],c['yoy'],c['ytd']))")"
           git commit -m "data: crude-oil baseline ($(date -u +%F), run ${{ github.run_id }})" \
                      -m "World Bank Pink Sheet — $H. Full 'bash tests/run.sh check' passed 0-failed before this auto-merge."
-          if bash tests/run.sh check; then
+          # Sync to the base BEFORE gating — gating a tree and then changing it makes the gate
+          # result a lie. This was `git pull --rebase`, which conflicts on provenance.json every
+          # time the base moved (a phone session, another data job) and killed the job outright.
+          git fetch -q origin "$BASE_BRANCH"
+          SYNCED=1
+          bash pipeline/resolve_derived_conflicts.sh "origin/$BASE_BRANCH" || SYNCED=0
+          if [ "$SYNCED" -eq 1 ] && bash tests/run.sh check; then
             echo "Gate green — auto-merging to $BASE_BRANCH."
-            git pull --rebase origin "$BASE_BRANCH"
-            git push origin "HEAD:$BASE_BRANCH"
-            echo "Crude baseline landed on $BASE_BRANCH ($H)."
+            for attempt in 1 2 3; do
+              git push origin "HEAD:$BASE_BRANCH" && { echo "Crude baseline landed on $BASE_BRANCH ($H)."; exit 0; }
+              echo "push rejected (base moved) — re-syncing, attempt $attempt"
+              git fetch -q origin "$BASE_BRANCH"
+              bash pipeline/resolve_derived_conflicts.sh "origin/$BASE_BRANCH" || break
+            done
+            echo "Could not land after 3 attempts — falling back to a draft PR."
+            git checkout -b "$DATA_BRANCH"; git push origin "$DATA_BRANCH"
+            printf 'Automated monthly crude-baseline pull (run %s) — could not auto-land (base kept moving).\n\n**%s**\n' \
+              "${{ github.run_id }}" "$H" > /tmp/pr_body.md
+            gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+              --title "data: crude-oil baseline ($(date -u +%F)) [could not auto-land]" --body-file /tmp/pr_body.md
           else
             echo "Gate RED — falling back to a draft PR for review."
             git checkout -b "$DATA_BRANCH"

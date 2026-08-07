@@ -17,6 +17,7 @@
 <meta name="twitter:description" content="Every live feed behind the platform, with per-source freshness and real stored history.">
 <meta name="theme-color" content="#F4F6FA">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><!-- font files load from gstatic; preconnect avoids a DNS+TLS handshake waterfall before text paints -->
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <style>
@@ -132,6 +133,12 @@ html[data-theme="light"] .lb-aging{color:#8A6210}
 </nav>
 
 <main id="main-content" tabindex="-1">
+ <noscript>
+    <div style="max-width:640px;margin:48px auto;padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55">
+      <strong style="color:var(--hi);display:block;margin-bottom:6px">The live board needs JavaScript enabled.</strong>
+      This page builds its freshness pulse, feed tables &amp; trend charts entirely in the browser. Enable JavaScript (and allow the font CDN) to load it, or open the <a href="index.html" style="color:var(--accent)">dashboard front door</a>.
+    </div>
+  </noscript>
  <div class="lb-wrap">
   <h1 class="lb-h1">Live board — what is running, how fresh it is, where it is headed</h1>
   <p class="lb-sub">Every source behind this platform, with the stamp it publishes about itself and
@@ -157,10 +164,15 @@ html[data-theme="light"] .lb-aging{color:#8A6210}
 <script>/* "Explore ▾" nav dropdown — pure UI (copied from index.html, same as every other page) */
 (function(){var wrap=document.getElementById('navMore'),btn=document.getElementById('navMoreBtn'),menu=document.getElementById('navMoreMenu');
  if(!wrap||!btn||!menu)return;
- function open(o){wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
+ /* Re-parent the menu to <body>: #nav has backdrop-filter (making it the containing block for
+    position:fixed children) AND overflow-x:auto, so an in-nav fixed menu is clipped and dragged
+    off-screen by the nav's horizontal scroll on a phone. As a <body> child its fixed top/right
+    anchor to the viewport instead. Matches index.html's nav script. */
+ document.body.appendChild(menu);
+ function open(o){menu.classList.toggle('open',o);wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
  btn.addEventListener('click',function(e){e.stopPropagation();open(!wrap.classList.contains('open'));});
  menu.addEventListener('click',function(){open(false);});
- document.addEventListener('click',function(e){if(!wrap.contains(e.target))open(false);});
+ document.addEventListener('click',function(e){if(!wrap.contains(e.target)&&!menu.contains(e.target))open(false);});
  document.addEventListener('keydown',function(e){if(e.key==='Escape')open(false);});})();
 </script>
 <script>

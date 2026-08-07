@@ -18,6 +18,12 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Branch 3D Explorer — AutoX · เงินไชโย">
 <meta name="twitter:description" content="Per-branch 3D scene — 10km catchment, nearby establishments and a who-works-nearby proxy. Numbers tagged measured or estimated.">
+<!-- Fonts: this page declares IBM Plex Sans Thai/Mono throughout its CSS but never loaded the
+     stylesheet, so text silently fell back to system-ui (inconsistent with the other 5 pages +
+     the mandated design standard, and Thai branch names lost IBM Plex Sans Thai shaping). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><!-- font files load from gstatic; preconnect avoids a DNS+TLS handshake waterfall before text paints -->
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- deck.gl is VENDORED (platform/vendor/), not loaded from unpkg: a 3D scene that silently
      fails because a CDN is unreachable looks identical to a broken page. Pinned 8.9.35 bytes. -->
 <script src="vendor/deck.gl-8.9.35.min.js"></script>

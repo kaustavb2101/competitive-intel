@@ -480,6 +480,19 @@ INGESTS
   # reproduce against the just-verified committed data tree.
   ( cd "$PIPE" && python3 build_provenance.py --check >/dev/null 2>&1 ) && ok "build_provenance.py --check" || bad "build_provenance.py --check (provenance.json drifted from platform/data/*.json — run: python3 pipeline/build_provenance.py)"
 
+  # The data-pull workflows re-derive their fan-out by running rederive_drift.py, which discovers
+  # what to rebuild by PARSING the --check invocations in THIS file. That makes run.sh's syntax load-
+  # bearing for those jobs: reshape the lines above and the parser could quietly match nothing, the
+  # pulls would stop re-deriving, and every data PR would go back to arriving red — with no error
+  # anywhere to say why. --selftest fails if the parse drops below its floor, so that breaks here
+  # instead, next to the change that caused it.
+  ( cd "$PIPE" && python3 rederive_drift.py --selftest >/dev/null 2>&1 ) && ok "rederive_drift.py --selftest" || bad "rederive_drift.py --selftest (it can no longer read the --check set out of tests/run.sh — the data-pull workflows would silently stop re-deriving; fix RE_EXPLICIT/RE_HEREDOC in pipeline/rederive_drift.py)"
+
+  # resolve_derived_conflicts.sh auto-resolves merge conflicts and the committee/auto-merge jobs call
+  # it before pushing STRAIGHT TO MASTER, so its two abort paths are the only thing between an
+  # unattended job and a wrongly-resolved conflict in source-data/ or in code. Fixture-based, seconds.
+  bash "$REPO/tests/test_resolve_derived_conflicts.sh" >/dev/null 2>&1 && ok "resolve_derived_conflicts.sh (35 fixture cases)" || bad "resolve_derived_conflicts.sh fixture tests (run: bash tests/test_resolve_derived_conflicts.sh)"
+
   node --check "$PLATFORM/app.js" >/dev/null 2>&1 && ok "node --check app.js" || bad "node --check app.js (syntax error)"
 
   # every page: extract each inline <script> (that has no src) and node --check it.
@@ -516,6 +529,22 @@ INGESTS
     ok "validate_data.py (platform/data integrity)"
   else
     bad "validate_data.py (platform/data integrity — see report above)"
+  fi
+
+  # deploy-probe self-test: the SAME code path the nightly live site-health check runs (check_site_health.py),
+  # but pointed at the local committed tree (--local platform, LocalFetcher = filesystem only, pure stdlib,
+  # NO network). It asserts every deploy probe validator (_shape_*) still ACCEPTS its real committed payload,
+  # every critical page carries the AutoX wordmark, and no probed data file is missing/oversized. Added
+  # because the ~40 probes are hand-authored by the intelligence loop yet had NO repo-gate guard: a future
+  # edit that broke a validator against the real data would ship silently and only surface on the nightly
+  # LIVE run (a filed GitHub issue), not here. All probed data files + the probed pages are git-tracked,
+  # so this reproduces on a clean checkout; it FAILs only on a genuine probe/payload regression.
+  hc_out="$( python3 "$PIPE/check_site_health.py" --local "$PLATFORM" 2>&1 )"; rc=$?
+  if [ "$rc" -eq 0 ]; then
+    ok "check_site_health.py --local (deploy probe validators accept the committed payloads)"
+  else
+    printf '%s\n' "$hc_out" | grep -E '\[FAIL\]|ERROR|Traceback' | head -12 | sed 's/^/      /'
+    bad "check_site_health.py --local (a deploy probe validator rejects its committed payload — see above)"
   fi
 }
 

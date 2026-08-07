@@ -40,6 +40,16 @@ IN_CROPS = os.path.join(ROOT, "platform", "data", "amphoe_crops.json")
 OUT = os.path.join(ROOT, "platform", "data", "tape_real.json")
 OUT_GEO_OCC = os.path.join(ROOT, "platform", "data", "tape_geo_occ.json")
 
+# Floor for the ESTIMATED branch-level occupation residual. Deliberately NOT min_cell (30), and it
+# was a bare literal 5 in two places until it got a name. min_cell is a DISCLOSURE control on real
+# records; these cells are not records. Each is round(branch residual x province occupation share) —
+# a deterministic function of the branch total and the province mix, both of which are published in
+# this same file and both of which cleared min_cell. Anyone can recompute them, so republishing them
+# reveals nothing new, and raising this to 30 would drop 93% of the estimated cells (6,077 of 6,560)
+# to buy no privacy at all. meta.floor_note states this in the shipped file rather than leaving a
+# reader to infer that meta.min_cell governs every number in it.
+EST_CELL_FLOOR = 5
+
 
 def _rows(tabs, tab, names, top=None, minn=50):
     """Flatten a 'a|b' cross-tab into sorted rows, dropping blank/thin cells."""
@@ -122,12 +132,12 @@ def build_geo_occ(tape):
         cells.sort(key=lambda c: (-c["n"], c["occupation"]))
         n_meas_cells += len(cells)
         resid = bv["n"] - sum(c["n"] for c in cells)
-        if resid >= 5 and prov in prov_occ:
+        if resid >= EST_CELL_FLOOR and prov in prov_occ:
             pool = [(occ, pv) for occ, pv in prov_occ[prov].items() if occ not in meas]
             tot = sum(pv["n"] for _, pv in pool)
             for occ, pv in sorted(pool, key=lambda kv: (-kv[1]["n"], kv[0])):
                 en = int(round(resid * pv["n"] / float(tot))) if tot else 0
-                if en >= 5:
+                if en >= EST_CELL_FLOOR:
                     cells.append(occ_cell(occ, pv, n=en, basis="estimated"))
                     n_est_cells += 1
         branches.append({"branch": br, "prov": prov, "region": g.get("region"),
@@ -149,6 +159,15 @@ def build_geo_occ(tape):
             "n_accounts": tmeta.get("n_accounts"),
             "mob_anchor": tmeta.get("mob_anchor"),
             "min_cell": tmeta.get("min_cell", 30),
+            "estimated_cell_floor": EST_CELL_FLOOR,
+            "floor_note": ("min_cell governs every MEASURED cell in this file and none of them "
+                           "falls below it. ESTIMATED branch cells are published down to %d, which "
+                           "discloses nothing further: each one is round(branch residual x "
+                           "province occupation share), a deterministic function of the branch "
+                           "total and the province mix that are BOTH already published here and "
+                           "both cleared min_cell. A reader can recompute them from this file. "
+                           "They are modelled allocations, not observations of a small group."
+                           % EST_CELL_FLOOR),
             "cells": {"measured_branch": n_meas_cells, "estimated_branch": n_est_cells},
             "triage_note": ("n_watch_xdays = X-days late <30dpd (the pre-emptive assistance "
                             "window); n_rolling_3089 = 30-89dpd roll pipeline; n_at_risk_90p "

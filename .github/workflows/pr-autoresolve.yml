@@ -1,0 +1,113 @@
+name: PR — keep open branches mergeable after master moves
+
+# WHY THIS EXISTS
+# ---------------
+# Work happens here from more than one place at once — a laptop session and a phone session — and
+# platform/data/ is generated but committed (Vercel serves it statically, so it must be). Every
+# branch that touches data regenerates provenance.json, a single-line census of all 441 files. So
+# the moment ANY data change lands on master, every other open PR conflicts on a line nobody wrote,
+# and stays blocked until someone resolves a machine-generated file by hand.
+#
+# The determinism gate proves 132 times per run that everything in platform/data/ reproduces
+# byte-exactly from committed sources. A conflict there is therefore not a disagreement to
+# reconcile — it is two stale copies of a pure function. This job takes master's side and recomputes
+# (pipeline/resolve_derived_conflicts.sh), which cannot conflict because it never merges.
+#
+# WHAT IT WILL NOT TOUCH: any conflict outside platform/data/ — including source-data/, which holds
+# the raw pulls and the feed_history accumulators for sources that publish only "now" and have no
+# archive. Those need a human who can see what each side added. Such a PR is left exactly as it was
+# and reported in the run summary.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  # One at a time: two of these racing would push conflicting merges onto the same PR branches.
+  group: pr-autoresolve
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0                   # need real history to merge PR branches
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"           # match the determinism gate's Python
+
+      - name: Bring every stale open PR up to date
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Stash the resolver OUTSIDE the tree before touching it. The loop below checks out each PR
+          # branch, which overwrites the working tree with that branch's files — and a branch cut
+          # before the resolver existed does not contain it, so calling `pipeline/...` after checkout
+          # gives "No such file or directory" and every such PR is skipped. Run master's copy instead:
+          # it is the version we want applied regardless of what the branch carries.
+          RESOLVER="$RUNNER_TEMP/resolve_derived_conflicts.sh"
+          cp pipeline/resolve_derived_conflicts.sh "$RESOLVER"
+
+          # headRepositoryOwner filters out forks — we cannot push to those.
+          PRS=$(gh pr list --state open --base master --limit 50 \
+                  --json number,headRefName,headRepositoryOwner \
+                  --jq ".[] | select(.headRepositoryOwner.login==\"${GITHUB_REPOSITORY_OWNER}\") | \"\(.number) \(.headRefName)\"")
+          if [ -z "$PRS" ]; then echo "No open PRs. Nothing to do."; exit 0; fi
+
+          echo "## PR auto-resolve" >> "$GITHUB_STEP_SUMMARY"
+          RESOLVED=0; SKIPPED=0; BLOCKED=0
+
+          while read -r NUM BRANCH; do
+            [ -z "${NUM:-}" ] && continue
+            echo "::group::PR #$NUM ($BRANCH)"
+            git checkout -q --force -B "$BRANCH" "origin/$BRANCH" || { echo "cannot check out"; echo "::endgroup::"; continue; }
+            git reset -q --hard "origin/$BRANCH"; git clean -qfd
+
+            if git merge-base --is-ancestor origin/master HEAD; then
+              echo "already up to date."
+              SKIPPED=$((SKIPPED+1)); echo "::endgroup::"; continue
+            fi
+
+            # `|| rc=$?` is load-bearing: Actions runs this block as `bash -e`, and `set -uo
+            # pipefail` above does NOT clear -e. Calling the resolver bare would abort the whole
+            # step the first time it returned 2 — its correct "this one needs a human" signal —
+            # so one PR with a real conflict would stop every later PR from being refreshed.
+            # Putting it in a condition context is what keeps -e from firing.
+            rc=0
+            bash "$RESOLVER" origin/master || rc=$?
+            if [ "$rc" -eq 0 ]; then
+              if git push origin "HEAD:$BRANCH"; then
+                echo "- #$NUM \`$BRANCH\` — merged master + re-derived, mergeable again" >> "$GITHUB_STEP_SUMMARY"
+                RESOLVED=$((RESOLVED+1))
+              else
+                echo "- #$NUM \`$BRANCH\` — resolved but the push was rejected (branch moved mid-run); next master push retries" >> "$GITHUB_STEP_SUMMARY"
+                BLOCKED=$((BLOCKED+1))
+              fi
+            elif [ "$rc" -eq 2 ]; then
+              echo "- #$NUM \`$BRANCH\` — **real conflict outside platform/data/, left untouched for you**" >> "$GITHUB_STEP_SUMMARY"
+              BLOCKED=$((BLOCKED+1))
+            else
+              echo "- #$NUM \`$BRANCH\` — re-derive did not converge, left untouched" >> "$GITHUB_STEP_SUMMARY"
+              BLOCKED=$((BLOCKED+1))
+            fi
+            echo "::endgroup::"
+          done <<< "$PRS"
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "$RESOLVED refreshed · $SKIPPED already current · $BLOCKED need a human" >> "$GITHUB_STEP_SUMMARY"
+          # Never fail the run for a blocked PR — this job is a convenience, not a gate.
+          exit 0
