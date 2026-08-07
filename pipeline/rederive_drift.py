@@ -180,14 +180,31 @@ def main():
     else:
         unresolved.append(("(convergence)", f"still drifting after {MAX_PASSES} passes"))
 
-    # Provenance censuses every other layer's bytes, so it goes last and only if something moved.
-    if rebuilt and not args.dry_run:
+    # Provenance censuses every other layer's BYTES, so it goes last — and ALWAYS, not only when a
+    # builder drifted. Gating it on `rebuilt` was wrong and shipped two red PRs (#297, #308): a
+    # MERGE can change platform/data's bytes with no builder drifting at all. Git takes one side's
+    # provenance.json wholesale while the tree holds the other side's layers, every --check still
+    # passes because each layer does reproduce from its own sources, and the census is quietly
+    # describing files that are no longer there. Ten rows were stale that way. Running it
+    # unconditionally is the only thing that can catch a byte change nobody's --check owns.
+    if not args.dry_run:
+        before = None
+        prov_path = os.path.join(ROOT, "platform", "data", "provenance.json")
+        if os.path.exists(prov_path):
+            with open(prov_path, "rb") as fh:
+                before = fh.read()
         rc, out = _run(PROVENANCE, check=False)
         if rc != 0:
             print(f"  !! {PROVENANCE}.py failed (rc {rc}):\n{out.strip()[:2000]}")
             unresolved.append((PROVENANCE, f"failed to regenerate (rc {rc})"))
         else:
-            rebuilt.append(PROVENANCE)
+            after = None
+            if os.path.exists(prov_path):
+                with open(prov_path, "rb") as fh:
+                    after = fh.read()
+            # Only report it as rebuilt if it actually moved, so "nothing — already clean" stays true.
+            if after != before:
+                rebuilt.append(PROVENANCE)
 
     print(f"\nrebuilt {len(rebuilt)}: {', '.join(rebuilt) if rebuilt else '(nothing — already clean)'}")
     if absent:
