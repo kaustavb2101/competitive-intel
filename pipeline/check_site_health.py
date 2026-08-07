@@ -941,6 +941,52 @@ def _shape_household_risk(d):
     return None
 
 
+def _shape_segment_exposure(d):
+    # The Exposure tab's LEAD read (obj #1 portfolio concentration): renderConcentration
+    # + renderExpoVerdict build the whole board ONLY from segment_exposure.json. The tab
+    # opens with a colored LEAD-WITH-THE-VERDICT card (the most-concentrated region — its
+    # .region/.hhi/.dominant_segment/.n_branches) and a "Portfolio concentration by region"
+    # panel that maps EVERY .regions row (.region + .n_branches + .dominant_segment +
+    # .segment_mix{agri,merchant,collateral} + .hhi), then a national HHI legend line
+    # (.national.hhi/.dominant_segment). renderConcentration GATES the whole board on a
+    # non-empty .regions array — if the file 404s or truncates, host.innerHTML='' and the
+    # verdict card hides, silently blanking the top of the Exposure tab with NO phone alert.
+    # It CANNOT self-heal: the mix/HHI are derived from the ESTIMATED segment proxy scores
+    # off the master by build_segment_exposure.py — a pipeline rebuild, not a CI pull — so a
+    # bad CDN deploy stays broken until someone notices. The last unprobed obj-#1 read on the
+    # Exposure surface; closes the same "broken demo" blind spot the province_risk /
+    # branch_risk / tape_real probes closed. Mirror the render's reads; validate EVERY region
+    # row (a partial truncation must not pass a first-row-only check). Robust to a future
+    # region-count change (asserts >=1, not ==5) and to the estimated scores shifting.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    regions = d.get("regions")
+    if not isinstance(regions, list) or not regions:
+        return "missing/empty 'regions' list (renderConcentration gates the whole board on it)"
+    for r in regions:
+        if not isinstance(r, dict):
+            return "a 'regions' row is not an object"
+        if not (isinstance(r.get("region"), str) and r["region"].strip()):
+            return "a 'regions' row missing 'region' name (the row/verdict label)"
+        if not isinstance(r.get("hhi"), (int, float)) or isinstance(r.get("hhi"), bool):
+            return "region '%s' missing numeric 'hhi' (the concentration bar/verdict)" % r.get("region")
+        if not (isinstance(r.get("dominant_segment"), str) and r["dominant_segment"].strip()):
+            return "region '%s' missing 'dominant_segment' (the dominant-segment read)" % r.get("region")
+        mix = r.get("segment_mix")
+        if not isinstance(mix, dict) or not all(isinstance(mix.get(k), (int, float)) for k in ("agri", "merchant", "collateral")):
+            return "region '%s' missing 'segment_mix' agri/merchant/collateral shares (the stacked mix bar)" % r.get("region")
+        if not isinstance(r.get("n_branches"), (int, float)) or isinstance(r.get("n_branches"), bool):
+            return "region '%s' missing numeric 'n_branches' (rendered in the row + verdict)" % r.get("region")
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'national' object (the national-HHI legend line)"
+    if not isinstance(nat.get("hhi"), (int, float)) or isinstance(nat.get("hhi"), bool):
+        return "national.hhi missing/non-numeric (the 'national HHI …' legend read)"
+    if not (isinstance(nat.get("dominant_segment"), str) and nat["dominant_segment"].strip()):
+        return "national.dominant_segment missing (the 'dominant …' legend read)"
+    return None
+
+
 def _shape_provenance(d):
     # The Command-center (#home) DATA ROOM card — the exec's core measured /
     # estimated / UNLABELLED honesty census (the "shame board"), the surface the
@@ -1567,6 +1613,14 @@ DATA_FILES = [
     ("data/province_risk.json", _shape_province_risk, ".provinces rollup (~77, obj #1 risk verdict)"),
     ("data/branch_risk.json", _shape_branch_risk, ".branches list of 2015 (index-aligned composite risk)"),
     ("data/tape_real.json", _shape_tape_real, "headline + bucket_ladder (MEASURED portfolio truth)"),
+    # The Exposure tab's LEAD read (obj #1): segment_exposure.json drives BOTH the
+    # colored most-concentrated-region verdict card and the "Portfolio concentration
+    # by region" board (renderConcentration/renderExpoVerdict). It gates the whole
+    # board on a non-empty .regions array and CANNOT self-heal (mix/HHI derived from
+    # the estimated segment scores off the master — a pipeline rebuild, not a CI pull),
+    # so a truncated/404 deploy silently blanks the top of #exposure with no phone
+    # alert. Was the last unprobed obj-#1 read on the Exposure surface; closes it.
+    ("data/segment_exposure.json", _shape_segment_exposure, ".regions (mix/HHI per region) + .national HHI (#exposure concentration board)"),
     # Overview (#overview) tab's lead used-collateral pulse card — a default nav
     # route, MEASURED DLT registration flow, obj #1's primary collateral class
     # (moto ~50% of the book). Shipped 2026-07-27 with no probe coverage; a

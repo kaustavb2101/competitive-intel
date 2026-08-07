@@ -3,6 +3,43 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-07 — Intelligence loop (SERVICE/DEPLOY-HEALTH): site-health probe now guards `segment_exposure.json` — the last unprobed obj-#1 read on the Exposure surface
+
+Autonomous market & service intelligence run. Data room + live deploy re-confirmed healthy up front
+(master production alias **HTTP 200** on `/` and `/data/meta.json`; `SERVICE_AUDIT.md` fresh; a
+surfaced-vs-probed diff of every `data/*.json` `fetch()` in `app.js`/`index.html` found **no broken
+references** — the 3 apparent misses were comment/error-string mentions of `source-data/` files, not
+live fetches). The backlog (`plan_cycle.py`) is exhausted (49 done, the 1 open item owner-side), so
+this run continued the standing **deploy-health probe sweep** on the highest-value surfaced-but-unprobed
+exec read.
+
+- **The gap:** `segment_exposure.json` drives the ENTIRE top of the Exposure tab (obj #1 portfolio
+  concentration) — both the colored LEAD-WITH-THE-VERDICT card (most-concentrated region) and the
+  "Portfolio concentration by region" board (`renderConcentration`/`renderExpoVerdict`). The render
+  **gates the whole board on a non-empty `.regions` array** (`host.innerHTML=''` + verdict card hidden
+  when absent), and it **cannot self-heal** — the mix/HHI are derived from the ESTIMATED segment proxy
+  scores off the master by `build_segment_exposure.py` (a pipeline rebuild, not a CI pull). So a
+  truncated/404 CDN deploy would silently blank the top of `#exposure` with **no phone alert** — the
+  exact "broken demo" blind spot the `province_risk`/`branch_risk`/`tape_real` probes already close.
+  It was the last unprobed obj-#1 read on the Exposure surface.
+- **The fix:** added `_shape_segment_exposure` to `pipeline/check_site_health.py` and registered
+  `data/segment_exposure.json` in `DATA_FILES`. The validator mirrors the render's own reads and
+  validates **every** `.regions` row (`.region`/`.hhi`/`.dominant_segment`/`.segment_mix`
+  {agri,merchant,collateral}/`.n_branches`) plus `.national.hhi`/`.dominant_segment` — a partial
+  truncation can't pass a first-row-only check. Robust to a future region-count change (asserts ≥1,
+  not ==5) and to the estimated scores shifting (asserts render shape, not values). No `platform/data`
+  file altered — deploy-health only, so no `build_provenance.py` regen needed.
+- **Verify:** `bash tests/run.sh check` → **127 passed, 0 failed**; `check_site_health.py --local`
+  accepts the committed `segment_exposure.json`; negative unit tests confirm the probe rejects empty
+  `.regions`, a missing `.national`, and a row missing `segment_mix`. Rebased onto the latest
+  `origin/master` (a ThaiWater data commit landed mid-run; no overlap) and re-ran the gate green.
+- **Safeguards:** gate 0-failed · no secrets in diff · diff = intent (one probe + registration,
+  +54 lines, `check_site_health.py` only) · provenance/no-fabrication intact (pipeline-only). Same
+  safeguard-only direct-to-master path as the prior site-health probe commits.
+- **Next recommended intelligence task:** continue the sweep on the remaining high-value
+  surfaced-but-unprobed obj-#1 read `branch_peers.json` (the peer-twin outlier board on `#trend`,
+  which likewise gates its section on a non-empty array and can't self-heal), then `cluster_brief.json`.
+
 ## 2026-08-07 — Intelligence loop (SERVICE/DEPLOY-HEALTH): deploy probes for the proactive-assistance radar pair
 
 Autonomous market & service intelligence run. Data room re-confirmed healthy up front (live master
