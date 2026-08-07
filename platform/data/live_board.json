@@ -213,8 +213,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "15 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 15,
+    "note": "16 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 16,
     "series": "rain_max_mm"
    },
    "key": "thaiwater_rain",
@@ -225,7 +225,7 @@
    "stamp_iso": "2026-08-07",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4405,
+   "value": 4427,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -237,8 +237,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "15 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 15,
+    "note": "16 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 16,
     "series": "flood_high"
    },
    "key": "thaiwater_flood",
@@ -248,8 +248,8 @@
    "stamp": "2026-08-07",
    "stamp_iso": "2026-08-07",
    "stamp_kind": "pulled",
-   "unit": "of 796",
-   "value": 149,
+   "unit": "of 793",
+   "value": 155,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -441,7 +441,7 @@
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
   "history_note": "A trend line is drawn only where a stored series exists. 8 of 21 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 218,
+  "history_points": 220,
   "missing_files": [],
   "n_feeds": 21,
   "n_with_history": 8,

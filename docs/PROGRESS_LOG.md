@@ -3,51 +3,42 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
-## 2026-08-07 — Integration loop: surface the MEASURED crop-YIELD layer that was built-but-never-rendered (PR)
+## 2026-08-07 — Intelligence loop (SERVICE/DEPLOY-HEALTH): site-health probe now guards `segment_exposure.json` — the last unprobed obj-#1 read on the Exposure surface
 
-Autonomous integration/improvement run. The prompt's data-integration backlog (items 1–4: FPO PICO
-census, per-branch cropland, data.go.th distillation, GISTDA 40m satellite) is DONE or CI-blocked, and
-the CI-reachable data *pulls* are exhausted. A negative-space sweep surfaced the cleanest remaining
-high-value lever: **`platform/data/oae_agstats.json` was built, gate-protected, provenance-labelled
-MEASURED — and rendered nowhere.** The run that created it (PROGRESS_LOG 2026-08-04) explicitly closed
-with "next: SURFACE this layer"; that follow-up never shipped.
+Autonomous market & service intelligence run. Data room + live deploy re-confirmed healthy up front
+(master production alias **HTTP 200** on `/` and `/data/meta.json`; `SERVICE_AUDIT.md` fresh; a
+surfaced-vs-probed diff of every `data/*.json` `fetch()` in `app.js`/`index.html` found **no broken
+references** — the 3 apparent misses were comment/error-string mentions of `source-data/` files, not
+live fetches). The backlog (`plan_cycle.py`) is exhausted (49 done, the 1 open item owner-side), so
+this run continued the standing **deploy-health probe sweep** on the highest-value surfaced-but-unprobed
+exec read.
 
-- **The gap:** `oae_agstats.json` (OAE Agricultural Statistics of Thailand 2567/2024 yearbook, MEASURED,
-  a straight read of the published provincial tables) carries per-province **yield (kg/rai)**, area,
-  production and multi-year `yield_trend_pct` for the field crops, plus a national benchmark. Yield is
-  the crop **productivity / income lever** that the price-only layers (`crop_stress`, `farm_book`) and
-  the area-only layer (`branch_cropland`) explicitly do NOT carry — a material crop whose measured yield
-  is falling squeezes farm-household repayment capacity independent of any price move (objective #1). Zero
-  references to the file existed anywhere in the app (grep across `app.js` + every `*.html`); its only
-  mention in the repo was the progress log. It also had no downstream pipeline consumer.
-- **The fix (`platform/app.js` + `index.html`, +68 lines, render-only — no data/layer change):**
-  `renderCropYield()` (called from the Overview render, mounted in the Farm-households section under the
-  farm book at a new null-safe `#cropyield-wrap`). It reads `oae_agstats` via the existing `tmliFetch`,
-  ranks the steepest measured yield **declines** as province × crop rows, and shows yield kg/rai, the
-  province's yield vs the national benchmark, and the multi-year trend. Honesty rails: (a) only crops on
-  **≥50,000 rai** are ranked, so a micro-plot's swing (e.g. 185 rai of oil palm at −82.9% vs national)
-  can never lead the table — verified the floor removes the noise and keeps the real Isan/East cassava &
-  sugarcane belts; (b) the read covers the **five upland/cash crops** (cassava, sugarcane, maize, oil
-  palm, rubber) and the footnote states plainly that main-season rice carries no national benchmark or
-  trend in this yearbook layer (planted area only), so paddy's story stays in the farm book; (c) "compare
-  only to the SAME crop's benchmark; area basis differs by crop" is stated, matching the layer's own
-  `gaps`. Labelled MEASURED with the OAE 2567 vintage. Null-safe: absent/short file → the block hides,
-  nothing else on the tab changes.
-- **The read it produces:** 111 of 153 material crop-in-province blocks are on a falling yield; the
-  steepest are ชลบุรี cassava −20.5% and sugarcane −17.1%, กาฬสินธุ์ / ขอนแก่น / ร้อยเอ็ด cassava −13
-  to −16%. A price-independent productivity squeeze the existing crop tables could not see.
-- **Verify.** `bash tests/run.sh check` → **127 passed / 0 failed** (data-integrity clean); `node --check
-  platform/app.js` clean. Headless render of `index.html` (chromium, software GL) → `data-errors="[]"`,
-  the new block toggles visible and the table populates with the expected rows (matched offline analysis
-  byte-for-byte). No `platform/data` file changed → no rebuild, no `build_provenance.py` regen needed
-  (`oae_agstats.json` is already in `provenance.json`, cls `measured`).
-- **Decision — shipped as a draft PR, not a direct master commit,** because it adds a visible block to
-  the exec Overview. No number is invented: every figure is a verbatim read of the committed MEASURED
-  yearbook layer; only the presentation (rank-by-decline + benchmark join) is new.
-- **Next integration:** add a `check_site_health.py` shape probe for `oae_agstats.json` (matches the
-  deploy-probe convention established this week — the block gates on a non-empty array and silently hides
-  on a truncated/404 deploy). Beyond that, the CI-reachable data backlog stays exhausted; the open
-  objective-#1 lever remains the GISTDA flooded-**area** shapely dissolve (NEXT_STEPS §0).
+- **The gap:** `segment_exposure.json` drives the ENTIRE top of the Exposure tab (obj #1 portfolio
+  concentration) — both the colored LEAD-WITH-THE-VERDICT card (most-concentrated region) and the
+  "Portfolio concentration by region" board (`renderConcentration`/`renderExpoVerdict`). The render
+  **gates the whole board on a non-empty `.regions` array** (`host.innerHTML=''` + verdict card hidden
+  when absent), and it **cannot self-heal** — the mix/HHI are derived from the ESTIMATED segment proxy
+  scores off the master by `build_segment_exposure.py` (a pipeline rebuild, not a CI pull). So a
+  truncated/404 CDN deploy would silently blank the top of `#exposure` with **no phone alert** — the
+  exact "broken demo" blind spot the `province_risk`/`branch_risk`/`tape_real` probes already close.
+  It was the last unprobed obj-#1 read on the Exposure surface.
+- **The fix:** added `_shape_segment_exposure` to `pipeline/check_site_health.py` and registered
+  `data/segment_exposure.json` in `DATA_FILES`. The validator mirrors the render's own reads and
+  validates **every** `.regions` row (`.region`/`.hhi`/`.dominant_segment`/`.segment_mix`
+  {agri,merchant,collateral}/`.n_branches`) plus `.national.hhi`/`.dominant_segment` — a partial
+  truncation can't pass a first-row-only check. Robust to a future region-count change (asserts ≥1,
+  not ==5) and to the estimated scores shifting (asserts render shape, not values). No `platform/data`
+  file altered — deploy-health only, so no `build_provenance.py` regen needed.
+- **Verify:** `bash tests/run.sh check` → **127 passed, 0 failed**; `check_site_health.py --local`
+  accepts the committed `segment_exposure.json`; negative unit tests confirm the probe rejects empty
+  `.regions`, a missing `.national`, and a row missing `segment_mix`. Rebased onto the latest
+  `origin/master` (a ThaiWater data commit landed mid-run; no overlap) and re-ran the gate green.
+- **Safeguards:** gate 0-failed · no secrets in diff · diff = intent (one probe + registration,
+  +54 lines, `check_site_health.py` only) · provenance/no-fabrication intact (pipeline-only). Same
+  safeguard-only direct-to-master path as the prior site-health probe commits.
+- **Next recommended intelligence task:** continue the sweep on the remaining high-value
+  surfaced-but-unprobed obj-#1 read `branch_peers.json` (the peer-twin outlier board on `#trend`,
+  which likewise gates its section on a non-empty array and can't self-heal), then `cluster_brief.json`.
 
 ## 2026-08-07 — Intelligence loop (SERVICE/DEPLOY-HEALTH): deploy probes for the proactive-assistance radar pair
 
@@ -328,6 +319,52 @@ reviewed the nav chrome and found a fresh surgical a11y gap.
   propagation the prod alias `/` and the changed routes (`/province`, `/rayong-catchment`,
   `/branch-explorer`) all return **HTTP 200**, and a cache-busted fetch confirms the deployed
   `/province` now serves `aria-label="Toggle light or dark theme"` on the toggle. No rollback needed.
+
+## 2026-08-07 — Integration loop: surface the MEASURED crop-YIELD layer that was built-but-never-rendered (PR)
+
+Autonomous integration/improvement run. The prompt's data-integration backlog (items 1–4: FPO PICO
+census, per-branch cropland, data.go.th distillation, GISTDA 40m satellite) is DONE or CI-blocked, and
+the CI-reachable data *pulls* are exhausted. A negative-space sweep surfaced the cleanest remaining
+high-value lever: **`platform/data/oae_agstats.json` was built, gate-protected, provenance-labelled
+MEASURED — and rendered nowhere.** The run that created it (PROGRESS_LOG 2026-08-04) explicitly closed
+with "next: SURFACE this layer"; that follow-up never shipped.
+
+- **The gap:** `oae_agstats.json` (OAE Agricultural Statistics of Thailand 2567/2024 yearbook, MEASURED,
+  a straight read of the published provincial tables) carries per-province **yield (kg/rai)**, area,
+  production and multi-year `yield_trend_pct` for the field crops, plus a national benchmark. Yield is
+  the crop **productivity / income lever** that the price-only layers (`crop_stress`, `farm_book`) and
+  the area-only layer (`branch_cropland`) explicitly do NOT carry — a material crop whose measured yield
+  is falling squeezes farm-household repayment capacity independent of any price move (objective #1). Zero
+  references to the file existed anywhere in the app (grep across `app.js` + every `*.html`); its only
+  mention in the repo was the progress log. It also had no downstream pipeline consumer.
+- **The fix (`platform/app.js` + `index.html`, +68 lines, render-only — no data/layer change):**
+  `renderCropYield()` (called from the Overview render, mounted in the Farm-households section under the
+  farm book at a new null-safe `#cropyield-wrap`). It reads `oae_agstats` via the existing `tmliFetch`,
+  ranks the steepest measured yield **declines** as province × crop rows, and shows yield kg/rai, the
+  province's yield vs the national benchmark, and the multi-year trend. Honesty rails: (a) only crops on
+  **≥50,000 rai** are ranked, so a micro-plot's swing (e.g. 185 rai of oil palm at −82.9% vs national)
+  can never lead the table — verified the floor removes the noise and keeps the real Isan/East cassava &
+  sugarcane belts; (b) the read covers the **five upland/cash crops** (cassava, sugarcane, maize, oil
+  palm, rubber) and the footnote states plainly that main-season rice carries no national benchmark or
+  trend in this yearbook layer (planted area only), so paddy's story stays in the farm book; (c) "compare
+  only to the SAME crop's benchmark; area basis differs by crop" is stated, matching the layer's own
+  `gaps`. Labelled MEASURED with the OAE 2567 vintage. Null-safe: absent/short file → the block hides,
+  nothing else on the tab changes.
+- **The read it produces:** 111 of 153 material crop-in-province blocks are on a falling yield; the
+  steepest are ชลบุรี cassava −20.5% and sugarcane −17.1%, กาฬสินธุ์ / ขอนแก่น / ร้อยเอ็ด cassava −13
+  to −16%. A price-independent productivity squeeze the existing crop tables could not see.
+- **Verify.** `bash tests/run.sh check` → **127 passed / 0 failed** (data-integrity clean); `node --check
+  platform/app.js` clean. Headless render of `index.html` (chromium, software GL) → `data-errors="[]"`,
+  the new block toggles visible and the table populates with the expected rows (matched offline analysis
+  byte-for-byte). No `platform/data` file changed → no rebuild, no `build_provenance.py` regen needed
+  (`oae_agstats.json` is already in `provenance.json`, cls `measured`).
+- **Decision — shipped as a draft PR, not a direct master commit,** because it adds a visible block to
+  the exec Overview. No number is invented: every figure is a verbatim read of the committed MEASURED
+  yearbook layer; only the presentation (rank-by-decline + benchmark join) is new.
+- **Next integration:** add a `check_site_health.py` shape probe for `oae_agstats.json` (matches the
+  deploy-probe convention established this week — the block gates on a non-empty array and silently hides
+  on a truncated/404 deploy). Beyond that, the CI-reachable data backlog stays exhausted; the open
+  objective-#1 lever remains the GISTDA flooded-**area** shapely dissolve (NEXT_STEPS §0).
 
 ## 2026-08-06 — Intelligence loop (deployment health): site-health probe now guards `rival_pressure.json` (committed to master, deployed + verified)
 

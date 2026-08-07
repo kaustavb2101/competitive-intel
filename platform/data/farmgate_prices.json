@@ -5,7 +5,7 @@
     "source": "NABC Agricultural Data Service (agriapi.nabc.go.th) — daily market prices, national average across quoting markets, pulled by pipeline/pull_nabc_prices.py (REACHABLE from a Thai IP and from cloud runners; verified live 2026-07-12). Sugarcane only: OCSB announced cane price via pipeline/ingest_ocsb_cane.py — Thailand sets one national cane price per season, so cane is quoted by no market and cannot come from NABC.",
     "label": "MEASURED — Thai prices for RAW farm commodities in farm-gate product forms (paddy, fresh cassava root, whole palm bunch, raw rubber sheet, maize, coconut, cannery pineapple, cane). Nothing modelled. Every commodity carries its own `source`: all are daily market averages EXCEPT sugarcane, whose price is administered rather than quoted.",
     "pulled": "2026-08-07",
-    "vintage": "2026-08-06",
+    "vintage": "2026-08-07",
     "unit": "บาท/ตัน (THB/tonne)",
     "n_commodities": 8,
     "provenance": "Verbatim projection of source-data/farmgate_prices.json (pipeline/build_farmgate_prices.py, refreshed daily by .github/workflows/data-nabc-prices.yml). No recomputation — every price carried through unchanged.",
@@ -19,8 +19,8 @@
       "category_th": "มันสำปะหลัง",
       "price": 3.75,
       "unit": "บาท/กก.",
-      "latest_date": "2026-08-06",
-      "yoy": 59.4,
+      "latest_date": "2026-08-07",
+      "yoy": 61.3,
       "n_markets": 3,
       "source": "NABC daily market average"
     },
@@ -30,8 +30,8 @@
       "category_th": "มะพร้าว",
       "price": 620.0,
       "unit": "บาท/ร้อยผล",
-      "latest_date": "2026-08-06",
-      "yoy": -68.8,
+      "latest_date": "2026-08-07",
+      "yoy": -68.4,
       "n_markets": 5,
       "source": "NABC daily market average"
     },
@@ -41,8 +41,8 @@
       "category_th": "ข้าวโพดเลี้ยงสัตว์",
       "price": 10.2,
       "unit": "บาท/กก.",
-      "latest_date": "2026-08-06",
-      "yoy": 14.4,
+      "latest_date": "2026-08-07",
+      "yoy": 14.9,
       "n_markets": 2,
       "source": "NABC daily market average"
     },
@@ -50,10 +50,10 @@
       "crop_en": "Oil palm (fresh bunch)",
       "product_th": "ผลปาล์มน้ำมันทั้งทะลาย นน. > 15 กก. ขึ้นไป",
       "category_th": "ปาล์มน้ำมัน",
-      "price": 8.53,
+      "price": 8.5,
       "unit": "บาท/กก.",
-      "latest_date": "2026-08-06",
-      "yoy": 26.0,
+      "latest_date": "2026-08-07",
+      "yoy": 25.5,
       "n_markets": 4,
       "source": "NABC daily market average"
     },
@@ -74,8 +74,8 @@
       "category_th": "ข้าวหอมมะลิ",
       "price": 17721.67,
       "unit": "บาท/ตัน",
-      "latest_date": "2026-08-06",
-      "yoy": 13.6,
+      "latest_date": "2026-08-07",
+      "yoy": 13.5,
       "n_markets": 6,
       "source": "NABC daily market average"
     },
@@ -83,11 +83,11 @@
       "crop_en": "Rubber (raw sheet)",
       "product_th": "ยางพาราแผ่นดิบ ชั้น 3",
       "category_th": "ยางพารา",
-      "price": 81.73,
+      "price": 81.71,
       "unit": "บาท/กก.",
-      "latest_date": "2026-08-06",
-      "yoy": 41.4,
-      "n_markets": 5,
+      "latest_date": "2026-08-07",
+      "yoy": 41.6,
+      "n_markets": 4,
       "source": "NABC daily market average"
     },
     "sugarcane": {
@@ -103,13 +103,13 @@
     }
   },
   "crop_yoy": {
-    "cassava": 59.4,
-    "coconut": -68.8,
-    "maize": 14.4,
-    "oilpalm": 26.0,
+    "cassava": 61.3,
+    "coconut": -68.4,
+    "maize": 14.9,
+    "oilpalm": 25.5,
     "pineapple": -18.4,
-    "rice": 13.6,
-    "rubber": 41.4,
+    "rice": 13.5,
+    "rubber": 41.6,
     "sugarcane": -17.9
   }
 }
