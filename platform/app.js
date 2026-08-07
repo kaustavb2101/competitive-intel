@@ -8057,13 +8057,17 @@ function watchToggle(item){
   if(i>=0) a.splice(i,1); else a.push(item);
   watchSave(a);
   // refresh any visible star buttons for this id + the watchlist card
-  document.querySelectorAll(`.cc-star[data-id="${cssEsc(item.id)}"]`).forEach(b=>b.classList.toggle('on',watchHas(item.id)));
+  document.querySelectorAll(`.cc-star[data-id="${cssEsc(item.id)}"]`).forEach(b=>{
+    const has=watchHas(item.id), lab=has?'Remove from watchlist':'Add to watchlist';
+    b.classList.toggle('on',has);
+    b.setAttribute('aria-pressed',String(has)); b.setAttribute('aria-label',lab); b.title=lab;
+  });
   if(document.getElementById('v-home').classList.contains('on')) renderWatchlist();
 }
 function cssEsc(s){return String(s).replace(/["\\]/g,'\\$&');}
 function starBtn(id,item){
-  const on=watchHas(id)?' on':'';
-  return `<button class="cc-star${on} no-print" data-id="${id.replace(/"/g,'&quot;')}" title="Add to watchlist" onclick='event.stopPropagation();ccStar(${JSON.stringify(item).replace(/'/g,"&#39;")})'>★</button>`;
+  const on=watchHas(id), lab=on?'Remove from watchlist':'Add to watchlist';
+  return `<button class="cc-star${on?' on':''} no-print" data-id="${id.replace(/"/g,'&quot;')}" title="${lab}" aria-label="${lab}" aria-pressed="${on?'true':'false'}" onclick='event.stopPropagation();ccStar(${JSON.stringify(item).replace(/'/g,"&#39;")})'>★</button>`;
 }
 function ccStar(item){watchToggle(item);}
 
@@ -11697,7 +11701,7 @@ function renderWatchlist(){
     return;
   }
   box.innerHTML=items.map(w=>{
-    const star=`<button class="cc-star on no-print" data-id="${w.id.replace(/"/g,'&quot;')}" title="Remove from watchlist" onclick='ccStar(${JSON.stringify(w).replace(/'/g,"&#39;")})'>★</button>`;
+    const star=`<button class="cc-star on no-print" data-id="${w.id.replace(/"/g,'&quot;')}" title="Remove from watchlist" aria-label="Remove from watchlist" aria-pressed="true" onclick='ccStar(${JSON.stringify(w).replace(/'/g,"&#39;")})'>★</button>`;
     return ccRow(`${star} ${w.label}`,w.sub||'',w.val||'',w.valSub||'',w.col||'var(--hi)');
   }).join('');
 }
