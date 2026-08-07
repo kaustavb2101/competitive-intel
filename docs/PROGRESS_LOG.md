@@ -3,6 +3,39 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-07 — Intelligence loop: extend the live freshness guard to the fuel-price daily-CI layer
+
+Autonomous market & service intelligence run. Data room re-confirmed healthy up front (live master
+production alias **HTTP 200** on `/`, `/app.js`, `/data/meta.json`; `build_provenance.py --check`
+byte-exact; `check_site_health.py --local` **137/137 HEALTHY**; every daily-CI price/weather vintage
+fresh; the only lagging layers are the known monthly/Thai-IP ones, honestly labelled). The plan
+(`AUTONOMY_PLAN.md`) is 98% done with only 1 owner-side item open, so the value was in **closing a
+structural coverage gap**, not another shape probe.
+
+- **The gap:** the 2026-08-06 (c) run added a **live-only freshness guard** (`FRESHNESS_LAYERS` in
+  `pipeline/check_site_health.py`) that FAILs → nightly GitHub issue → phone alert when a daily-CI
+  layer's `meta` vintage exceeds a 14-day TTL (a stuck-cron signal the ~40 shape probes structurally
+  cannot see). Its set covered `commodities.json` (NABC farm-gate), `thai_price_history.json` and the
+  two ThaiWater layers — but **missed `fuel_prices.json`**, a DAILY, CI-refreshed, CI-reachable
+  (Bangchak retail oil-price API, `data-fuel-prices.yml`), MEASURED, live-`fetch()`'d (`app.js:11315`)
+  layer. Because `commodities.json` keys freshness on `farmgate_vintage` (a **distinct** upstream from
+  Bangchak), a Bangchak fuel-API failure while NABC stays up would leave `fuel_prices.json` silently
+  frozen, still green on every probe, no alert — exactly the class the guard exists to close.
+- **The fix (probe-script-only):** added `("data/fuel_prices.json", "pulled", 14, …)` to
+  `FRESHNESS_LAYERS`. `pulled` is a reliable signal — `pull_fuel_prices.py` stamps `meta.pulled=<today>`
+  every run and the workflow re-derives + commits `platform/data/fuel_prices.json` daily, so `pulled`
+  advances each successful cron (fuel commits on 08-05 and 08-07 confirm cadence ≪ TTL); a >14d lag is
+  an unambiguous stuck-pull signal, not a flat-price week.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` → **0 failed** (byte-unchanged: the
+  `--local` path skips the live freshness block, so the gate output is identical). (b) no secrets in
+  diff. (c) diff = `check_site_health.py` (+6/−1) + two doc entries; no `platform/data` file altered, so
+  no provenance regen / no PR / no headless render needed. (d) provenance/no-fabrication intact — no
+  number added; a date threshold read from each layer's own committed `meta`.
+- **Proven a real guard, not a no-op:** against the LIVE production `fuel_prices.json` the pure
+  `_freshness_result` PASSes today (`2026-08-07`, 0 days old) and FAILs under an injected +40-day clock
+  (">14-day TTL — the refresh cron may be stuck"); the full live `run_freshness_checks` PASSes all 5
+  layers (fuel included) against the deployment right now.
+
 ## 2026-08-07 — UX loop: skip-to-main-content bypass link on status.html (PR #310, merged + deployed)
 
 Autonomous UX-improvement run. The `docs/UXUI_AUDIT.md` backlog's original findings (#1–8) and the long
