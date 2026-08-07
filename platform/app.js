@@ -3145,7 +3145,10 @@ function renderThaiwater(){
    varies by region (1.3-1.5%) but varies 5x by occupation, and the two most exposed classes are
    exactly the ones this book lends to. Leads with that, and carries the under-reporting caveat
    next to the number rather than in a footnote, because the level is a floor and the ranking
-   is the only defensible read. */
+   is the only defensible read.
+   Second read (obj #1): the same file carries the debt PURPOSE split (agri/business/consumption
+   per household). Consumption debt — no income stream of its own to service it — is the higher-PD
+   slice, so its per-class share is surfaced beside "For farming" as a portfolio-risk cue. */
 function renderDebtSource(){
   const host=document.getElementById('acq-debtsource'); if(!host) return;
   tmliFetch('debt_source').then(j=>{
@@ -3157,21 +3160,35 @@ function renderDebtSource(){
     const all=(j.by_class||[]).find(r=>r.cls==='รวม')||n1;
     const mult=all.informal_pct?(top.informal_pct/all.informal_pct):null;
     const maxInf=Math.max(...cls.map(r=>r.informal_pct||0),1);
+    // Debt PURPOSE (obj #1 portfolio-risk read): consumption debt is the slice with no income
+    // stream of its own to service it, unlike a loan taken to farm or run a business. NSO records
+    // it per class; pct = consumption_debt / total. Coloured a risk cue when it is ≥45% of the book.
+    const consPct=r=>(r.total&&r.consumption_debt!=null)?r.consumption_debt/r.total*100:null;
     const rows=cls.map(r=>{
       const w=Math.max((r.informal_pct||0)/maxInf*90,1);
+      const cp=consPct(r);
       return `<tr><td><b>${r.cls_en}</b></td>
         <td class="mono">${B(r.total)}</td>
         <td class="mono">${B(r.informal)}</td>
         <td><span class="mono" style="color:${(r.informal_pct||0)>=3?'var(--agri)':'var(--dim)'}"><b>${r.informal_pct}%</b></span>
           <svg width="92" height="9" viewBox="0 0 92 9" aria-hidden="true" style="vertical-align:middle;margin-left:6px"><rect x="0" y="1" width="${w.toFixed(1)}" height="7" rx="1.5" fill="${(r.informal_pct||0)>=3?'var(--agri)':'var(--line)'}"/></svg></td>
-        <td class="mono sub">${r.agri_pct==null?'—':r.agri_pct+'%'}</td></tr>`;}).join('');
+        <td class="mono sub">${r.agri_pct==null?'—':r.agri_pct+'%'}</td>
+        <td class="mono">${cp==null?'—':`<span style="color:${cp>=45?'var(--agri)':'var(--dim)'}"><b>${Math.round(cp)}%</b></span>`}</td></tr>`;}).join('');
+    // National purpose mix (the average household's book) for the lead read.
+    const pn=(()=>{const t=n1.total||0,f=x=>t?Math.round((x||0)/t*100):0;
+      return {cons:f(n1.consumption_debt),agri:f(n1.agri_debt),bus:f(n1.business_debt)};})();
+    const prodNat=pn.agri+pn.bus, otherNat=Math.max(0,100-pn.cons-prodNat);
+    const consVals=cls.map(r=>consPct(r)).filter(v=>v!=null);
+    const consMax=consVals.length?Math.max(...consVals):null, consMin=consVals.length?Math.min(...consVals):null;
+    const consMaxCls=consVals.length?cls[cls.map(consPct).indexOf(consMax)]:null;
     const regs=(j.by_region||[]).map(r=>`<tr><td><b>${r.region_en}</b></td>
         <td class="mono">${B(r.total)}</td><td class="mono sub">${B(r.informal)}</td>
         <td class="mono">${r.informal_pct}%</td>
         <td class="sub mono">${(r.informal_series||[]).map(s=>s.informal_pct+'%').join(' → ')}</td></tr>`).join('');
     host.innerHTML=`<p class="lead" style="margin:0 0 10px"><b>Informal debt is not a place, it is a job.</b> Nationally it is only <b>${n1.informal_pct}%</b> of the average household's debt and it has <b>shrunk</b> from ${n0.informal_pct}% in ${n0.year_ce} to ${n1.informal_pct}% in ${n1.year_ce}. But it barely moves between regions (${(j.by_region||[]).length?Math.min(...j.by_region.map(r=>r.informal_pct))+'–'+Math.max(...j.by_region.map(r=>r.informal_pct))+'%':'—'}) and varies <b>${mult?mult.toFixed(1)+'×':''}</b> between occupations — the most exposed being <b style="color:var(--agri)">${top.cls_en} at ${top.informal_pct}%</b>, which is squarely this book's borrower.</p>
       <div class="cb-gap cb-assist" style="margin:0 0 10px"><b>Read the level as a floor.</b> ${M.under_reporting_caveat||''}</div>
-      <table class="tbl"><tr><th scope="col">Household type (NSO class)</th><th scope="col">Debt / household</th><th scope="col">Outside the system</th><th scope="col">Share outside</th><th scope="col" class="sub" title="share of that household's debt borrowed for farming">For farming</th></tr>${rows}</table>
+      <div class="cb-gap cb-assist" style="margin:0 0 10px"><b>What the debt is for is a risk read too.</b> <b style="color:var(--agri)">Consumption is ${pn.cons}%</b> of the average household's debt — more than the <b>${prodNat}%</b> borrowed productively (farming ${pn.agri}% + business ${pn.bus}%); most of the rest (${otherNat}%) is for housing, education and the like. Consumption is the slice with no income of its own to service it, and it runs <b>${consMin!=null?Math.round(consMin)+'–'+Math.round(consMax)+'%':'—'}</b> across these classes — heaviest among wage-labour households${consMaxCls?` (${consMaxCls.cls_en})`:''}, lightest where borrowing funds a farm or business.</div>
+      <table class="tbl"><tr><th scope="col">Household type (NSO class)</th><th scope="col">Debt / household</th><th scope="col">Outside the system</th><th scope="col">Share outside</th><th scope="col" class="sub" title="share of that household's debt borrowed for farming">For farming</th><th scope="col" class="sub" title="MEASURED — share of that household's debt borrowed to consume (not to farm or run a business): the slice with no income stream of its own to service it. NSO SES purpose split.">For consumption</th></tr>${rows}</table>
       <details style="margin-top:10px"><summary class="sub">By region — and how the informal share moved across the seven survey waves</summary>
         <table class="tbl" style="margin-top:8px"><tr><th scope="col">Region</th><th scope="col">Debt / household</th><th scope="col" class="sub">Outside</th><th scope="col">Share</th><th scope="col" class="sub">${(nat||[]).map(x=>x.year_ce).join(' → ')}</th></tr>${regs}</table></details>
       <p class="lead sub" style="margin:8px 0 0"><b>Reading:</b> ${M.scope_warning||''} ${M.label||''}</p>`;
