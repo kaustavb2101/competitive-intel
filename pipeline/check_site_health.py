@@ -1375,6 +1375,87 @@ def _shape_branch_cropland(d):
     return None
 
 
+def _shape_vehicle_mix(d):
+    # The collateral board's fleet-mix panel (`cb-mix`, obj #1 — vehicle titles are
+    # ~75% of the book, so the stock-vs-new-registration gap by DLT class is a direct
+    # read on the collateral pool AutoX lends against and recovers into). MEASURED
+    # throughout (DLT gdcatalog dataset_1_1_04 stock + red-plate new registrations).
+    # The client (`tmliFetch('vehicle_mix')`) GATES the whole panel on
+    # `!NAT.stock || !NAT.new || !TY.length` and otherwise `display='none'` with NO
+    # phone alert, so a truncated/404 CDN deploy silently drops the fleet-mix read to
+    # nothing — the same "broken demo" blind spot the vehicle_models / collateral_book
+    # probes closed for their siblings. And like them it CANNOT self-heal from CI: the
+    # DLT stock file is an annual off-cadence pull, so no daily cron re-publishes it —
+    # the probe is the only deploy safeguard. Asserts the render contract the panel
+    # reads — the national stock/new maps + the `types` class list — as SHAPE not
+    # values, robust to a future DLT-vintage refresh moving the registration counts.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'national' object (cb-mix panel display gate: !NAT.stock||!NAT.new)"
+    for k in ("stock", "new"):
+        m = nat.get(k)
+        if not isinstance(m, dict) or not m:
+            return "national.%s missing/empty (cb-mix display gate reads NAT.%s)" % (k, k)
+        r0 = next(iter(m.values()))
+        if not isinstance(r0, dict) or not isinstance(r0.get("share_pct"), (int, float)) or isinstance(r0.get("share_pct"), bool):
+            return "national.%s first row missing numeric 'share_pct' (cb-mix share cell render read)" % k
+    types = d.get("types")
+    if not isinstance(types, list) or not types:
+        return "missing/empty 'types' array (cb-mix display gate: !TY.length)"
+    t0 = types[0]
+    if not isinstance(t0, dict):
+        return "types[0] is not an object (cb-mix class-row render read)"
+    if not (isinstance(t0.get("id"), str) and t0["id"].strip()):
+        return "types[0] missing 'id' (cb-mix class-row keys NAT.stock[t.id])"
+    if not (isinstance(t0.get("label"), str) and t0["label"].strip()):
+        return "types[0] missing 'label' (cb-mix class-row DLT-label render read)"
+    if not isinstance(t0.get("has_stock"), bool):
+        return "types[0] missing boolean 'has_stock' (cb-mix stock-bearing vs LTA divider read)"
+    return None
+
+
+def _shape_vehicle_brands(d):
+    # The collateral board's new-nameplate panel (`cb-vbrands`, obj #1 — what the
+    # country is registering NEW becomes the collateral offered next year; pickup is a
+    # two-brand market so pickup residual value is not a diversified exposure). The
+    # NATIONAL brand mix is MEASURED (DLT stat_1_1_01); the province split is ESTIMATED
+    # and labelled so in the UI. The client (`tmliFetch('vehicle_brands')`) GATES the
+    # panel on `!NB.ry3 || !NB.ry1` (NB = national.by_type) and otherwise
+    # `display='none'` with NO phone alert, so a truncated/404 deploy silently drops
+    # it — and, like its vehicle_mix sibling, it CANNOT self-heal from CI (annual DLT
+    # pull, no daily cron), so the probe is the only deploy safeguard. Asserts the gate
+    # both render paths read — the ry3/ry1 by_type groups and their brand rows — as
+    # SHAPE not values, robust to a future DLT-vintage refresh moving the counts.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'national' object (cb-vbrands gate reads national.by_type)"
+    by_type = nat.get("by_type")
+    if not isinstance(by_type, dict):
+        return "missing 'national.by_type' object (cb-vbrands display gate: !NB.ry3||!NB.ry1)"
+    for grp in ("ry3", "ry1"):
+        g = by_type.get(grp)
+        if not isinstance(g, dict):
+            return "national.by_type.%s missing (cb-vbrands display gate)" % grp
+        brands = g.get("brands")
+        if not isinstance(brands, list) or not brands:
+            return "national.by_type.%s.brands missing/empty (cb-vbrands brand-row render read)" % grp
+        b0 = brands[0]
+        if not isinstance(b0, dict):
+            return "national.by_type.%s.brands[0] is not an object" % grp
+        if not (isinstance(b0.get("brand"), str) and b0["brand"].strip()):
+            return "national.by_type.%s.brands[0] missing 'brand' (cb-vbrands row label render read)" % grp
+        for k in ("count", "share_pct"):
+            if not isinstance(b0.get(k), (int, float)) or isinstance(b0.get(k), bool):
+                return "national.by_type.%s.brands[0].%s missing/non-numeric (cb-vbrands cell render read)" % (grp, k)
+    if not isinstance(d.get("provinces"), dict):
+        return "missing 'provinces' object (cb-vbrands ESTIMATED province-split render read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -1634,6 +1715,13 @@ DATA_FILES = [
     # drops the block from every popup with no phone alert — the same blind spot
     # the flood_hazard / branch_labor obj-#1 probes closed for their siblings.
     ("data/branch_cropland.json", _shape_branch_cropland, ".meta.crops + 2015-branch index-aligned .branches with ha[]/crop_ha (per-branch crop-area popup block)"),
+    # The two collateral-board fleet reads from the same DLT wave, both surfaced via
+    # tmliFetch and both self-hiding (display='none') on a truncated/404 deploy with no
+    # phone alert — annual off-cadence pulls, so neither self-heals from CI (probe = the
+    # only deploy safeguard). vehicle_mix is MEASURED; vehicle_brands' national mix is
+    # MEASURED, its province split ESTIMATED and labelled so in the UI.
+    ("data/vehicle_mix.json", _shape_vehicle_mix, ".national stock/new maps + .types class list (collateral fleet-mix panel cb-mix, MEASURED)"),
+    ("data/vehicle_brands.json", _shape_vehicle_brands, ".national.by_type ry3/ry1 brand boards (collateral new-nameplate panel cb-vbrands; national MEASURED, province split ESTIMATED)"),
 ]
 
 
