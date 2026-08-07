@@ -42,6 +42,35 @@ carried per-province yield — the farm-household income lever. A province below
   MEASURED readout on the province deep-dive or the Overview collateral outlook. That's an app-visual change,
   so it should go via a PR with the render+health gate, not a master commit. The layer is now the first-class,
   gate-protected input that surfacing needs.
+## 2026-08-07 — Intelligence loop (PEER COMPARISON): book-per-branch structural intensity on #acq
+
+Autonomous market & service intelligence run. The competitor board's national-standing block already
+ranked AutoX vs the big-4 on branch-network SIZE (measured own network vs reported IR) and on measured
+store-locator FOOTPRINT — but it showed each **peer's** loan book without AutoX's own, and nobody
+computed **book carried per branch**, the read that turns "peers have bigger books" into a structural
+statement about operating model.
+
+- **The gap:** AutoX's ranking row carried no `loan_book_bn`, so the book-scale chain rendered peers
+  only; there was no per-branch normalisation. Book-per-branch is the cleanest structural peer read for
+  objective #2 (margin/competitive pressure on the network we already run).
+- **The fix (`build_competitor_coverage.py` + `app.js`, +108 lines):** added `_book_intensity()` →
+  `national_standing.book_intensity`. AutoX book is **MEASURED** — `tape_real.json`
+  `bucket_ladder.book_total.os_sum` = ฿46.572bn current outstanding from the real loan-level export;
+  each peer's book is **REPORTED** (cited FY2025 / 2025 IR, already in `PEER_FINANCIALS`). Book ÷
+  branch-network size gives ฿m/branch, ranked desc, with an auto-derived insight and a mixed-basis
+  caveat (loan-tape snapshot vs peer IR dates; own-network vs listed-entity branch counts; a structural
+  density read, NOT profitability, NPL or market share). Heng excluded (no cited book/branch count —
+  never invented). Surfaced on **#acq** as a new null-safe line under the footprint reframe, AutoX
+  figure tagged ◆ measured, peers ★ reported.
+- **The read:** Srisawad ฿81.9m › Tidlor ฿58.5m › **AutoX ฿23.1m** › Muangthai ฿21.1m per branch. AutoX
+  runs a dense, thin-per-branch model — closest to market-leader MTC, and 2.5–3.5× below Tidlor/Srisawad,
+  which run far fewer, much larger branches. AutoX competes on network density and per-branch throughput,
+  not per-branch scale.
+- **Verify:** `build_competitor_coverage.py --check` reproduces byte-exact; `build_provenance.py` →
+  0 unlabelled (136 layers); `node --check app.js` clean; `bash tests/run.sh check` = **124 passed,
+  0 failed** (455/455 data checks); headless render of `index.html#acq` = `data-errors="[]"`, new block
+  present. Ships to production via master auto-deploy.
+
 ## 2026-08-07 — UX loop: close the noscript-fallback gap on live.html (PR #312, merged + deployed)
 
 Autonomous UX-improvement run. All 8 original `docs/UXUI_AUDIT.md` findings and every discovered
