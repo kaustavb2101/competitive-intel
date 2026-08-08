@@ -81,6 +81,71 @@ def _max(doc, group, field):
     return max(vals) if vals else None
 
 
+def _peer_field(doc, symbol, field):
+    """One SET-listed peer's field by ticker symbol, or None when that peer is absent from the pull."""
+    for p in (doc or {}).get("peers") or []:
+        if isinstance(p, dict) and p.get("symbol") == symbol:
+            v = p.get(field)
+            return v if isinstance(v, (int, float)) else None
+    return None
+
+
+def _peer_mcap_bn(doc, symbol):
+    """set_peers.json reports marketCap in raw THB; the board reads peers in billions (peer_scoreboard.json
+    already does this same /1e9 conversion), so match that unit here rather than publish a raw-THB series."""
+    v = _peer_field(doc, symbol, "marketCap")
+    return v / 1e9 if isinstance(v, (int, float)) else None
+
+
+def _brand_share_pct(doc, brand):
+    """National share-of-search for one brand: its Trends value summed over every province, divided by
+    the same sum for all five brands. Brand values share one Trends payload axis (per pull_google_trends.py),
+    so this cross-brand ratio is meaningful even though the underlying numbers are a relative 0-100 index,
+    not query volume. None when the payload is empty or sums to zero (no share is fabricated)."""
+    total, target, seen = 0.0, 0.0, False
+    for b, provs in ((doc or {}).get("brands") or {}).items():
+        if not isinstance(provs, dict):
+            continue
+        for v in provs.values():
+            if isinstance(v, (int, float)):
+                total += v
+                seen = True
+                if b == brand:
+                    target += v
+    return (target / total * 100.0) if seen and total > 0 else None
+
+
+def _app_score(doc, key):
+    v = dig(doc, "apps.%s.stats.score" % key)
+    return v if isinstance(v, (int, float)) else None
+
+
+def _app_1star_pct(doc, key):
+    """Google Play's histogram is [1-star, 2-star, 3-star, 4-star, 5-star] counts; share of the worst
+    bucket is the sentiment-deterioration signal, not the average score alone."""
+    hist = dig(doc, "apps.%s.stats.histogram" % key)
+    if not isinstance(hist, list) or len(hist) != 5:
+        return None
+    vals = [v for v in hist if isinstance(v, (int, float))]
+    if len(vals) != 5:
+        return None
+    total = sum(vals)
+    return (hist[0] / total * 100.0) if total > 0 else None
+
+
+def _promo_live_count(doc, brand):
+    """A promo/news item's last_seen is bumped forward every time a re-pull still finds it on the rival's
+    site; counting items whose last_seen equals THIS pull's own stamp is 'still live now', the same
+    still-running idea as rival_ads_live's n_live, just for the rival-site promo/news feed instead of the
+    Ads Transparency Center."""
+    pulled = dig(doc, "meta.pulled_at")
+    if not isinstance(pulled, str):
+        return None
+    items = (doc or {}).get("items") or []
+    return sum(1 for it in items if isinstance(it, dict)
+               and it.get("brand") == brand and it.get("last_seen") == pulled)
+
+
 # ---------------------------------------------------------------- registry
 # `path` is the file to read, relative to the repo root — this is also the path walked by --from-git,
 # so a feed can only be backfilled if its history was actually committed under that name.
@@ -116,6 +181,106 @@ REGISTRY = [
          label="Rival ad creatives running now", unit="creatives", cadence="weekly",
          source="Google Ads Transparency Center",
          pick=lambda d: sum(b.get("n_live") or 0 for b in (d.get("brands") or [])) or None),
+
+    # ---- SET-listed peers — genuine daily market data, currently pure snapshot ----------------
+    # price_asof is the source's own vintage stamp (a price DATE, not a pull timestamp); using it
+    # keeps two same-day re-pulls from creating two rows even though set_peers.json has been
+    # committed twice for the same 2026-07-17 price date.
+    dict(key="set_mtc_mcap", path="source-data/set_peers.json", stamp=("price_asof",),
+         label="MTC · market cap", unit="฿bn", cadence="daily",
+         source="Stock Exchange of Thailand (set.or.th)",
+         pick=lambda d: _peer_mcap_bn(d, "MTC")),
+    dict(key="set_mtc_pbv", path="source-data/set_peers.json", stamp=("price_asof",),
+         label="MTC · price/book", unit="x", cadence="daily",
+         source="Stock Exchange of Thailand (set.or.th)",
+         pick=lambda d: _peer_field(d, "MTC", "pbRatio")),
+    dict(key="set_tidlor_mcap", path="source-data/set_peers.json", stamp=("price_asof",),
+         label="TIDLOR · market cap", unit="฿bn", cadence="daily",
+         source="Stock Exchange of Thailand (set.or.th)",
+         pick=lambda d: _peer_mcap_bn(d, "TIDLOR")),
+    dict(key="set_tidlor_pbv", path="source-data/set_peers.json", stamp=("price_asof",),
+         label="TIDLOR · price/book", unit="x", cadence="daily",
+         source="Stock Exchange of Thailand (set.or.th)",
+         pick=lambda d: _peer_field(d, "TIDLOR", "pbRatio")),
+    dict(key="set_sawad_mcap", path="source-data/set_peers.json", stamp=("price_asof",),
+         label="SAWAD · market cap", unit="฿bn", cadence="daily",
+         source="Stock Exchange of Thailand (set.or.th)",
+         pick=lambda d: _peer_mcap_bn(d, "SAWAD")),
+    dict(key="set_sawad_pbv", path="source-data/set_peers.json", stamp=("price_asof",),
+         label="SAWAD · price/book", unit="x", cadence="daily",
+         source="Stock Exchange of Thailand (set.or.th)",
+         pick=lambda d: _peer_field(d, "SAWAD", "pbRatio")),
+
+    # ---- search demand — AutoX's own share-of-search vs the same four rivals ------------------
+    dict(key="search_share_autox", path="source-data/google_trends.json", stamp=("pulled_at_utc",),
+         label="AutoX share of brand search (national)", unit="%", cadence="weekly",
+         source="Google Trends (geo=TH) — AutoX vs rival brand terms",
+         pick=lambda d: _brand_share_pct(d, "AutoX")),
+
+    # ---- app-store sentiment — score + 1-star share, AutoX's own app and its three closest ----
+    # SET-listed rivals. Google Play overwrites the histogram on every pull; this is the fix.
+    dict(key="app_autox_score", path="source-data/app_reviews.json", stamp=("pulled_at",),
+         label="AutoX app (Ngern Chaiyo) - Play Store rating", unit="stars", cadence="weekly",
+         source="Google Play (th.co.autox.chaiyo)",
+         pick=lambda d: _app_score(d, "AUTOX")),
+    dict(key="app_autox_1star_pct", path="source-data/app_reviews.json", stamp=("pulled_at",),
+         label="AutoX app · 1-star share", unit="%", cadence="weekly",
+         source="Google Play (th.co.autox.chaiyo)",
+         pick=lambda d: _app_1star_pct(d, "AUTOX")),
+    dict(key="app_tidlor_score", path="source-data/app_reviews.json", stamp=("pulled_at",),
+         label="Tidlor app · Play Store rating", unit="stars", cadence="weekly",
+         source="Google Play (com.ntl.cxm_mobile)",
+         pick=lambda d: _app_score(d, "TIDLOR")),
+    dict(key="app_tidlor_1star_pct", path="source-data/app_reviews.json", stamp=("pulled_at",),
+         label="Tidlor app · 1-star share", unit="%", cadence="weekly",
+         source="Google Play (com.ntl.cxm_mobile)",
+         pick=lambda d: _app_1star_pct(d, "TIDLOR")),
+    dict(key="app_mtc_score", path="source-data/app_reviews.json", stamp=("pulled_at",),
+         label="MTC app · Play Store rating", unit="stars", cadence="weekly",
+         source="Google Play (co.th.muangthaileasing.mtls)",
+         pick=lambda d: _app_score(d, "MTC")),
+    dict(key="app_mtc_1star_pct", path="source-data/app_reviews.json", stamp=("pulled_at",),
+         label="MTC app · 1-star share", unit="%", cadence="weekly",
+         source="Google Play (co.th.muangthaileasing.mtls)",
+         pick=lambda d: _app_1star_pct(d, "MTC")),
+    dict(key="app_sawad_score", path="source-data/app_reviews.json", stamp=("pulled_at",),
+         label="SAWAD app · Play Store rating", unit="stars", cadence="weekly",
+         source="Google Play (com.srisawad.mobileApplications)",
+         pick=lambda d: _app_score(d, "SAWAD")),
+    dict(key="app_sawad_1star_pct", path="source-data/app_reviews.json", stamp=("pulled_at",),
+         label="SAWAD app · 1-star share", unit="%", cadence="weekly",
+         source="Google Play (com.srisawad.mobileApplications)",
+         pick=lambda d: _app_1star_pct(d, "SAWAD")),
+
+    # ---- NABC farm-gate — the two crops with the longest, most consistent daily read -----------
+    # (all five crop_yoy categories are consistently present across every committed vintage; rice
+    # and rubber are picked as the two headline reads. latest_date tracks 'pulled' within a day or
+    # two across every vintage checked, the same ThaiWater-style lag already handled elsewhere.)
+    # Registry `label` strings are printed to a cp1252 console by --show, so these stay
+    # transliterated (Hom Mali rice / RSS3 rubber) even though the dict keys they dig for are the
+    # Thai category names NABC actually publishes (that lookup never touches the console).
+    dict(key="nabc_rice_price", path="source-data/nabc_prices.json", stamp=("pulled",),
+         label="Rice (Hom Mali) - NABC farm-gate", unit="THB/tonne", cadence="daily",
+         source="NABC Agricultural Data Service",
+         pick=lambda d: dig(d, "categories.ข้าวหอมมะลิ.price")),
+    dict(key="nabc_rubber_price", path="source-data/nabc_prices.json", stamp=("pulled",),
+         label="Rubber (raw sheet) - NABC farm-gate", unit="THB/kg", cadence="daily",
+         source="NABC Agricultural Data Service",
+         pick=lambda d: dig(d, "categories.ยางพารา.price")),
+
+    # ---- rival promo/news count — live items per brand on the rival's OWN site -----------------
+    dict(key="rival_promo_live_mtc", path="source-data/rival_promos.json", stamp=("pulled_at",),
+         label="MTC · live promo/news items", unit="items", cadence="weekly",
+         source="muangthaicap.com (own-site pull)",
+         pick=lambda d: _promo_live_count(d, "MTC")),
+    dict(key="rival_promo_live_sawad", path="source-data/rival_promos.json", stamp=("pulled_at",),
+         label="SAWAD · live promo/news items", unit="items", cadence="weekly",
+         source="sawad.co.th (own-site pull)",
+         pick=lambda d: _promo_live_count(d, "SAWAD")),
+    dict(key="rival_promo_live_tidlor", path="source-data/rival_promos.json", stamp=("pulled_at",),
+         label="TIDLOR · live promo/news items", unit="items", cadence="weekly",
+         source="tidlor.com (own-site pull)",
+         pick=lambda d: _promo_live_count(d, "TIDLOR")),
 ]
 
 

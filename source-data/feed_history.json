@@ -4,12 +4,164 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 85,
-  "n_series": 6,
+  "n_points": 164,
+  "n_series": 26,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
  },
  "series": {
+  "app_autox_1star_pct": {
+   "cadence": "weekly",
+   "dates": [
+    "2026-07-19",
+    "2026-07-20",
+    "2026-08-04"
+   ],
+   "first_seen": "2026-07-19",
+   "label": "AutoX app · 1-star share",
+   "n": 3,
+   "path": "source-data/app_reviews.json",
+   "source": "Google Play (th.co.autox.chaiyo)",
+   "unit": "%",
+   "values": [
+    16.016,
+    16.016,
+    14.8622
+   ]
+  },
+  "app_autox_score": {
+   "cadence": "weekly",
+   "dates": [
+    "2026-07-19",
+    "2026-07-20",
+    "2026-08-04"
+   ],
+   "first_seen": "2026-07-19",
+   "label": "AutoX app (Ngern Chaiyo) - Play Store rating",
+   "n": 3,
+   "path": "source-data/app_reviews.json",
+   "source": "Google Play (th.co.autox.chaiyo)",
+   "unit": "stars",
+   "values": [
+    3.98,
+    3.98,
+    3.9802
+   ]
+  },
+  "app_mtc_1star_pct": {
+   "cadence": "weekly",
+   "dates": [
+    "2026-07-19",
+    "2026-07-20",
+    "2026-08-04"
+   ],
+   "first_seen": "2026-07-19",
+   "label": "MTC app · 1-star share",
+   "n": 3,
+   "path": "source-data/app_reviews.json",
+   "source": "Google Play (co.th.muangthaileasing.mtls)",
+   "unit": "%",
+   "values": [
+    4.924,
+    4.9248,
+    4.4155
+   ]
+  },
+  "app_mtc_score": {
+   "cadence": "weekly",
+   "dates": [
+    "2026-07-19",
+    "2026-07-20",
+    "2026-08-04"
+   ],
+   "first_seen": "2026-07-19",
+   "label": "MTC app · Play Store rating",
+   "n": 3,
+   "path": "source-data/app_reviews.json",
+   "source": "Google Play (co.th.muangthaileasing.mtls)",
+   "unit": "stars",
+   "values": [
+    4.6433,
+    4.6433,
+    4.6603
+   ]
+  },
+  "app_sawad_1star_pct": {
+   "cadence": "weekly",
+   "dates": [
+    "2026-07-19",
+    "2026-07-20",
+    "2026-08-04"
+   ],
+   "first_seen": "2026-07-19",
+   "label": "SAWAD app · 1-star share",
+   "n": 3,
+   "path": "source-data/app_reviews.json",
+   "source": "Google Play (com.srisawad.mobileApplications)",
+   "unit": "%",
+   "values": [
+    4.4405,
+    4.4,
+    5.1791
+   ]
+  },
+  "app_sawad_score": {
+   "cadence": "weekly",
+   "dates": [
+    "2026-07-19",
+    "2026-07-20",
+    "2026-08-04"
+   ],
+   "first_seen": "2026-07-19",
+   "label": "SAWAD app · Play Store rating",
+   "n": 3,
+   "path": "source-data/app_reviews.json",
+   "source": "Google Play (com.srisawad.mobileApplications)",
+   "unit": "stars",
+   "values": [
+    4.6489,
+    4.6504,
+    4.5844
+   ]
+  },
+  "app_tidlor_1star_pct": {
+   "cadence": "weekly",
+   "dates": [
+    "2026-07-19",
+    "2026-07-20",
+    "2026-08-04"
+   ],
+   "first_seen": "2026-07-19",
+   "label": "Tidlor app · 1-star share",
+   "n": 3,
+   "path": "source-data/app_reviews.json",
+   "source": "Google Play (com.ntl.cxm_mobile)",
+   "unit": "%",
+   "values": [
+    6.4531,
+    6.447,
+    5.1466
+   ]
+  },
+  "app_tidlor_score": {
+   "cadence": "weekly",
+   "dates": [
+    "2026-07-19",
+    "2026-07-20",
+    "2026-08-04"
+   ],
+   "first_seen": "2026-07-19",
+   "label": "Tidlor app · Play Store rating",
+   "n": 3,
+   "path": "source-data/app_reviews.json",
+   "source": "Google Play (com.ntl.cxm_mobile)",
+   "unit": "stars",
+   "values": [
+    4.485,
+    4.4853,
+    4.5783
+   ]
+  },
   "flood_high": {
    "cadence": "daily",
    "dates": [
@@ -46,7 +198,7 @@
     101.0,
     117.0,
     128.0,
-    134.0,
+    133.0,
     134.0,
     132.0,
     132.0,
@@ -153,6 +305,104 @@
     35.99
    ]
   },
+  "nabc_rice_price": {
+   "cadence": "daily",
+   "dates": [
+    "2026-07-05",
+    "2026-07-16",
+    "2026-07-18",
+    "2026-07-19",
+    "2026-07-20",
+    "2026-07-22",
+    "2026-07-24",
+    "2026-07-26",
+    "2026-07-27",
+    "2026-07-28",
+    "2026-07-29",
+    "2026-07-30",
+    "2026-07-31",
+    "2026-08-02",
+    "2026-08-03",
+    "2026-08-04",
+    "2026-08-07",
+    "2026-08-08"
+   ],
+   "first_seen": "2026-07-05",
+   "label": "Rice (Hom Mali) - NABC farm-gate",
+   "n": 18,
+   "path": "source-data/nabc_prices.json",
+   "source": "NABC Agricultural Data Service",
+   "unit": "THB/tonne",
+   "values": [
+    17671.67,
+    17688.33,
+    17738.33,
+    17738.33,
+    17738.33,
+    17738.33,
+    17738.33,
+    17738.33,
+    17738.33,
+    17738.33,
+    17738.33,
+    17738.33,
+    17738.33,
+    17738.33,
+    17738.33,
+    17738.33,
+    17721.67,
+    17721.67
+   ]
+  },
+  "nabc_rubber_price": {
+   "cadence": "daily",
+   "dates": [
+    "2026-07-05",
+    "2026-07-16",
+    "2026-07-18",
+    "2026-07-19",
+    "2026-07-20",
+    "2026-07-22",
+    "2026-07-24",
+    "2026-07-26",
+    "2026-07-27",
+    "2026-07-28",
+    "2026-07-29",
+    "2026-07-30",
+    "2026-07-31",
+    "2026-08-02",
+    "2026-08-03",
+    "2026-08-04",
+    "2026-08-07",
+    "2026-08-08"
+   ],
+   "first_seen": "2026-07-05",
+   "label": "Rubber (raw sheet) - NABC farm-gate",
+   "n": 18,
+   "path": "source-data/nabc_prices.json",
+   "source": "NABC Agricultural Data Service",
+   "unit": "THB/kg",
+   "values": [
+    81.14,
+    88.16,
+    85.77,
+    85.77,
+    85.77,
+    85.77,
+    84.08,
+    84.08,
+    84.08,
+    84.08,
+    84.08,
+    84.08,
+    84.08,
+    84.08,
+    82.2,
+    81.99,
+    81.71,
+    81.71
+   ]
+  },
   "rain_heavy_pct": {
    "cadence": "daily",
    "dates": [
@@ -189,7 +439,7 @@
     41.0,
     57.0,
     46.0,
-    43.0,
+    42.0,
     31.0,
     41.0,
     29.0,
@@ -256,6 +506,174 @@
    "unit": "creatives",
    "values": [
     368.0
+   ]
+  },
+  "rival_promo_live_mtc": {
+   "cadence": "weekly",
+   "dates": [
+    "2026-07-19",
+    "2026-08-08"
+   ],
+   "first_seen": "2026-07-19",
+   "label": "MTC · live promo/news items",
+   "n": 2,
+   "path": "source-data/rival_promos.json",
+   "source": "muangthaicap.com (own-site pull)",
+   "unit": "items",
+   "values": [
+    11.0,
+    11.0
+   ]
+  },
+  "rival_promo_live_sawad": {
+   "cadence": "weekly",
+   "dates": [
+    "2026-07-19",
+    "2026-08-08"
+   ],
+   "first_seen": "2026-07-19",
+   "label": "SAWAD · live promo/news items",
+   "n": 2,
+   "path": "source-data/rival_promos.json",
+   "source": "sawad.co.th (own-site pull)",
+   "unit": "items",
+   "values": [
+    5.0,
+    5.0
+   ]
+  },
+  "rival_promo_live_tidlor": {
+   "cadence": "weekly",
+   "dates": [
+    "2026-07-19",
+    "2026-08-08"
+   ],
+   "first_seen": "2026-07-19",
+   "label": "TIDLOR · live promo/news items",
+   "n": 2,
+   "path": "source-data/rival_promos.json",
+   "source": "tidlor.com (own-site pull)",
+   "unit": "items",
+   "values": [
+    6.0,
+    6.0
+   ]
+  },
+  "search_share_autox": {
+   "cadence": "weekly",
+   "dates": [
+    "2026-07-04"
+   ],
+   "first_seen": "2026-07-04",
+   "label": "AutoX share of brand search (national)",
+   "n": 1,
+   "path": "source-data/google_trends.json",
+   "source": "Google Trends (geo=TH) — AutoX vs rival brand terms",
+   "unit": "%",
+   "values": [
+    10.1818
+   ]
+  },
+  "set_mtc_mcap": {
+   "cadence": "daily",
+   "dates": [
+    "2026-07-17",
+    "2026-08-07"
+   ],
+   "first_seen": "2026-07-17",
+   "label": "MTC · market cap",
+   "n": 2,
+   "path": "source-data/set_peers.json",
+   "source": "Stock Exchange of Thailand (set.or.th)",
+   "unit": "฿bn",
+   "values": [
+    70.49,
+    74.2
+   ]
+  },
+  "set_mtc_pbv": {
+   "cadence": "daily",
+   "dates": [
+    "2026-07-17",
+    "2026-08-07"
+   ],
+   "first_seen": "2026-07-17",
+   "label": "MTC · price/book",
+   "n": 2,
+   "path": "source-data/set_peers.json",
+   "source": "Stock Exchange of Thailand (set.or.th)",
+   "unit": "x",
+   "values": [
+    1.57,
+    1.65
+   ]
+  },
+  "set_sawad_mcap": {
+   "cadence": "daily",
+   "dates": [
+    "2026-07-17",
+    "2026-08-07"
+   ],
+   "first_seen": "2026-07-17",
+   "label": "SAWAD · market cap",
+   "n": 2,
+   "path": "source-data/set_peers.json",
+   "source": "Stock Exchange of Thailand (set.or.th)",
+   "unit": "฿bn",
+   "values": [
+    41.953,
+    41.5377
+   ]
+  },
+  "set_sawad_pbv": {
+   "cadence": "daily",
+   "dates": [
+    "2026-07-17",
+    "2026-08-07"
+   ],
+   "first_seen": "2026-07-17",
+   "label": "SAWAD · price/book",
+   "n": 2,
+   "path": "source-data/set_peers.json",
+   "source": "Stock Exchange of Thailand (set.or.th)",
+   "unit": "x",
+   "values": [
+    1.08,
+    1.07
+   ]
+  },
+  "set_tidlor_mcap": {
+   "cadence": "daily",
+   "dates": [
+    "2026-07-17",
+    "2026-08-07"
+   ],
+   "first_seen": "2026-07-17",
+   "label": "TIDLOR · market cap",
+   "n": 2,
+   "path": "source-data/set_peers.json",
+   "source": "Stock Exchange of Thailand (set.or.th)",
+   "unit": "฿bn",
+   "values": [
+    56.4706,
+    57.0498
+   ]
+  },
+  "set_tidlor_pbv": {
+   "cadence": "daily",
+   "dates": [
+    "2026-07-17",
+    "2026-08-07"
+   ],
+   "first_seen": "2026-07-17",
+   "label": "TIDLOR · price/book",
+   "n": 2,
+   "path": "source-data/set_peers.json",
+   "source": "Stock Exchange of Thailand (set.or.th)",
+   "unit": "x",
+   "values": [
+    1.56,
+    1.58
    ]
   }
  }
