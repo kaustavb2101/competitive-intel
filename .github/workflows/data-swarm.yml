@@ -1,0 +1,153 @@
+name: Data — market-pulse swarm (any-IP feeds, 4x/day)
+
+# WHY THIS WORKFLOW EXISTS. Today ~17 separate data-*.yml workflows each pull ONE live feed and each
+# opens its OWN pull request. Every one of those PRs touches platform/data/provenance.json (it globs
+# every data file in the repo), so any two landing near each other collide on it — a merge-queue
+# pile-up that has nothing to do with the data itself, purely an artifact of one-workflow-per-feed.
+#
+# This workflow runs pipeline/pull_swarm.py, which pulls the whole any-IP "real-time market pulse"
+# REGISTRY concurrently (ThreadPoolExecutor + subprocess, one puller crashing/timing out never takes
+# down the rest), appends today's readings to the accumulated history, and re-derives whatever went
+# stale + regenerates provenance.json EXACTLY ONCE — see pipeline/rederive_drift.py for why that is a
+# fixed-point loop over the determinism gate's own --check set rather than a hand-kept list. One
+# workflow, one branch, one provenance regen, no collisions. That is the whole point.
+#
+# WHAT RUNS HERE: the ANY-IP half of the registry MINUS set_peers (fuel, ThaiWater flood+rain, NABC,
+# OAE, macro, Google Trends, Play/Apple reviews, rival YouTube, Google Ads Transparency) — see
+# `python pipeline/pull_swarm.py --list` for the full registry with each feed's verified ip scope.
+#
+# WHY set_peers IS EXCLUDED (not because it is Thai-IP — it is not): it is the one feed that needs a
+# headless browser, because set.or.th's JSON API 403s any request that is not same-origin. Installing
+# playwright + chromium + OS deps costs a minute or two of every run, and this job runs 4x/day for a
+# feed whose underlying data only moves once per trading day anyway. It has its own dedicated job,
+# .github/workflows/data-set-peers.yml, on a weekday cron timed after the Bangkok close. Keeping the
+# browser install in exactly one workflow instead of two is the only reason for the --exclude below.
+# The Thai-IP-only feeds (rival_promos, pantip, datagoth, nso_wages, competitor_branches) are
+# deliberately NOT here: their own docstrings say the corporate/gov sites they hit are
+# Cloudflare-geoblocked from any datacenter IP, so a CI runner would just log a wall of skips/failures
+# for no gain. Those stay on Kaustav's Thai laptop (`pull_swarm.py --include-thai`).
+#
+# PR-ONLY, NEVER AUTO-MERGE. Unlike data-thaiwater.yml (which pushes straight to the base branch on a
+# green gate), this job always lands its results in ONE draft pull request — it is consolidating a
+# dozen heterogeneous sources across macro/social/competitive in a single run, so a human reviews the
+# batch before it merges, same discipline as data-search-demand.yml and data-social-listening.yml.
+#
+# WHAT IT PRODUCES (only when something actually changed):
+#   every any-IP feed's raw file (source-data/*.json, platform/data/thaiwater_*.json, ...)
+#   source-data/feed_history.json        (pipeline/append_history.py — accumulated series)
+#   platform/data/swarm_runs.json is NOT produced here — it is source-data/swarm_runs.json, the
+#     swarm's own audit trail (pipeline/pull_swarm.py) — one row per run, capped at the last 60.
+#   whatever pipeline/rederive_drift.py finds stale, plus platform/data/provenance.json (always last)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Four times a day, 6h apart, on :35 — deliberately offset from data-thaiwater.yml (:20) and
+    # data-nabc-prices.yml (:15) so this swarm's checkout/gate never races either of them.
+    - cron: "35 21 * * *"
+    - cron: "35 3 * * *"
+    - cron: "35 9 * * *"
+    - cron: "35 15 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90        # 12 concurrent-ish feeds, the heaviest (google_ads) capped at 40min itself
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Install feed dependencies
+        run: |
+          # google-play-scraper (app_reviews), pytrends (google_trends), openpyxl (oae_prices' XLSX
+          # fallback). Deliberately NO playwright/chromium here — see the set_peers note below.
+          pip install --quiet google-play-scraper==1.2.7 pytrends==4.9.2 openpyxl
+
+      - name: Run the market-pulse swarm (pull, append history, re-derive — one pass)
+        id: swarm
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          # Isolation is pull_swarm.py's own job (one feed failing/timing out never aborts the rest);
+          # here we only make sure a TOTAL swarm failure (every feed failed) does not abort the
+          # workflow either — it still falls through to "nothing to commit" cleanly below.
+          set +e
+          python pipeline/pull_swarm.py --exclude set_peers
+          rc=$?
+          set -e
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning title=Swarm: every feed failed::pull_swarm.py exited $rc — every selected feed failed this run. See the job log's per-feed table above."
+          fi
+
+      - name: Gate (informational — this workflow never auto-merges, so a red gate does not block the PR)
+        id: gate
+        run: |
+          set +e
+          bash tests/run.sh check
+          rc=$?
+          set -e
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          if [ "$rc" -eq 0 ]; then
+            echo "Gate green."
+          else
+            echo "::warning title=Gate red::tests/run.sh check exited $rc — the PR still opens for review, same as every other data-*.yml PR-only job."
+          fi
+
+      - name: Commit to a data branch + open ONE draft PR with every changed feed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/swarm-${{ github.run_id }}
+          SWARM_RC: ${{ steps.swarm.outputs.rc }}
+          GATE_RC: ${{ steps.gate.outputs.rc }}
+        run: |
+          # -u stages TRACKED modifications only, so it follows the swarm + re-derive wherever they
+          # reached without a second hand-kept file list to go stale, and never adds an untracked
+          # generated layer (same discipline as data-thaiwater.yml / data-social-listening.yml).
+          git add -u source-data platform/data
+          if git diff --cached --quiet; then
+            echo "No net change vs committed layers. No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+
+          SUMMARY="$(python -c "import json;d=json.load(open('source-data/swarm_runs.json',encoding='utf-8'));r=d['runs'][-1];print('%d/%d succeeded (%d changed), %d failed, %d timed out, %d skipped' % (r['n_ok'], len(r['feeds']), r['n_changed'], r['n_failed'], r['n_timeout'], r['n_skipped']))")"
+          CHANGED="$(python -c "import json;d=json.load(open('source-data/swarm_runs.json',encoding='utf-8'));r=d['runs'][-1];keys=[f['key'] for f in r['feeds'] if f['status']=='changed'];print(', '.join(keys) if keys else '(none -- only downstream/history layers moved)')")"
+          GATE_LABEL="GATE GREEN"
+          [ "$GATE_RC" != "0" ] && GATE_LABEL="GATE RED — needs review"
+
+          git commit -m "data: market-pulse swarm refresh (run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-swarm.yml via pipeline/pull_swarm.py — every any-IP feed pulled concurrently, isolated per-feed failure, one append_history.py + one rederive_drift.py pass, one provenance.json regen. $SUMMARY."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated market-pulse swarm refresh (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "**Feeds: $SUMMARY**"
+            echo
+            echo "**Changed this run:** $CHANGED"
+            echo
+            echo "**$GATE_LABEL** — \`bash tests/run.sh check\` rc=\`$GATE_RC\`. This job never auto-merges"
+            echo "(it consolidates a dozen heterogeneous sources in one run), so review applies regardless"
+            echo "of gate color; a red gate just means look here first."
+            echo
+            echo "Per-feed rc/status/duration/byte-change is in \`source-data/swarm_runs.json\` (capped at"
+            echo "the last 60 runs) — the swarm's own audit trail. Provenance is MEASURED per source; see"
+            echo "each raw file's own \`meta\` for which. No Thai-IP-only feed ran here (see the workflow"
+            echo "header) — those stay on the laptop via \`pull_swarm.py --include-thai\`."
+            echo
+            echo "Run \`bash tests/run.sh check\` locally before merging if the gate above is red."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: market-pulse swarm refresh (run ${{ github.run_id }}) [$GATE_LABEL]" \
+            --body-file /tmp/pr_body.md

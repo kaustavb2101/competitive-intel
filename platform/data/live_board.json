@@ -86,13 +86,13 @@
    "key": "peer_scoreboard",
    "label": "Listed rival scoreboard",
    "measured": true,
-   "no_history": "one filing round per pull",
+   "no_history": "accumulating — 2 observations since 2026-07-17; the line is drawn once 4 have landed",
    "source": "Stock Exchange of Thailand · set.or.th in-browser JSON API (highlight-data + profile + company-highlight/financial-data)",
    "stamp": null,
    "stamp_iso": null,
    "stamp_kind": null,
    "unit": "listed peers",
-   "value": 4,
+   "value": 6,
    "what": "the listed title lenders' own filings — external benchmark, not a target"
   },
   {

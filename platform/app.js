@@ -3832,8 +3832,8 @@ function drawPeerScore(){
   tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Listed peer</th>`+
     `<th scope="col" title="market capitalisation (SET, price date)">Mkt cap</th>`+
     `<th scope="col" title="year-to-date price change — share-price momentum / investor mindshare">YTD</th>`+
-    `<th scope="col" title="return on equity, latest quarter as SET reports">ROE</th>`+
-    `<th scope="col" title="net profit, latest quarter">Net profit/q</th>`+
+    `<th scope="col" title="return on equity, newest audited full fiscal year (SET quarter code Q9)">ROE</th>`+
+    `<th scope="col" title="net profit, newest audited full fiscal year">Net profit/yr</th>`+
     `<th scope="col" title="price / earnings">P/E</th>`+
     `<th scope="col" title="dividend yield">Div</th></tr>`+
     peers.map((p,i)=>{
@@ -3844,7 +3844,7 @@ function drawPeerScore(){
         <td class="mono"><b>฿${p.market_cap_bn}bn</b></td>
         <td class="mono" style="color:${yc(p.ytd_pct)}">${p.ytd_pct>0?'+':''}${p.ytd_pct}%</td>
         <td class="mono">${roeBar} <b>${p.roe}%</b></td>
-        <td class="mono sub">฿${p.net_profit_q_bn}bn</td>
+        <td class="mono sub">฿${p.net_profit_bn}bn</td>
         <td class="mono sub">${p.pe}</td>
         <td class="mono sub">${p.div_yield}%</td>
       </tr>`;}).join('')+
@@ -3855,9 +3855,11 @@ function drawPeerScore(){
     ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
       (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+
       methodBox(m.roe_caveat||null,
-        [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the latest quarter'}.`,
+        [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the newest audited full year'}.`,
          '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE target is a stated goal shown only as the reference line.',
-         m.roe_caveat||'ROE is each peer’s own SET-reported ratio.']);
+         m.roe_caveat||'ROE is each peer’s own SET-reported ratio.',
+         m.holdco_caveat||null,
+         m.fs_type_caveat||null]);
   }
 }
 
