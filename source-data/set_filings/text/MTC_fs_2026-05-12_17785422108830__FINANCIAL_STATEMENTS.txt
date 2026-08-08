@@ -1,0 +1,288 @@
+
+[SHEET: SFP]
+Muangthai Capital Public Company Limited and its Subsidiaries									
+Statement of financial position									
+			Consolidated				Separate		
+			financial statements				financial statements		
+			31 March		31 December		31 March		31 December
+Assets	Note		2026		2025		2026		2025
+			(Unaudited)				(Unaudited)		
+			(in thousand Baht)						
+Current assets									
+Cash and cash equivalents			7487739		4995363		7316955		4847699
+Current portion of loan receivables									
+and hire purchase receivables	3		80338379		79987136		76854446		76648240
+Other receivables - related parties	2		0		0		5586762		4855528
+Short-term loans	2		264428		277757		264428		277757
+Current portion of long-term loans - related parties	2		0		0		250000		275000
+Current portion of derivative assets			87133		0		87133		0
+Other current assets			378828		416076		345437		386950
+Total current assets			88556507		85676332		90705161		87291174
+Non-current assets									
+Pledged bank deposits			14300		14200		0		0
+Loan receivables and hire purchase receivables	3		96841616		96617607		92556211		92644741
+Investments in subsidiaries			0		0		2002000		2002000
+Long-term loans - related parties	2		0		0		62500		125000
+Land, buildings and equipment			2097845		2115291		2097842		2115288
+Right-of-use assets	2		5568047		5410364		5568047		5410364
+Intangible assets			60041		62737		60036		62729
+Deferred tax assets			1502629		1493225		1469541		1455633
+Derivative assets			327105		0		327105		0
+Other non-current assets	6		216302		992736		216302		992736
+Total non-current assets			106627885		106706160		104359584		104808491
+Total assets			195184392		192382492		195064745		192099665
+Muangthai Capital Public Company Limited and its Subsidiaries									
+Statement of financial position									
+			Consolidated				Separate		
+			financial statements				financial statements		
+			31 March		31 December		31 March		31 December
+Liabilities and equity	Note		2026		2025		2026		2025
+			(Unaudited)				(Unaudited)		
+			(in thousand Baht)						
+Current liabilities									
+Short-term borrowings from financial institutions	4		1139982		2719519		1139982		2719519
+Other payables			1741294		2723579		1681086		2678176
+Current portion of long-term borrowings from									
+financial institutions	5		11166128		9349083		11166128		9349083
+Current portion of debentures	6		34335917		28786229		34335917		28786229
+Current portion of lease liabilities	2		1237372		1229651		1237372		1229651
+Income tax payable			1332791		826809		1248716		780126
+Current portion of derivative liabilities			611072		904518		611072		904518
+Other current liabilities	2		88048		84686		2059452		1673905
+Total current liabilities			51652604		46624074		53479725		48121207
+Non-current liabilities									
+Long-term borrowings from financial institutions	5		22222489		19463800		22222489		19463800
+Debentures	6		70820609		77103754		70820609		77103754
+Lease liabilities	2		4368225		4229166		4368225		4229166
+Derivative liabilities			484208		1660875		484208		1660875
+Non-current provisions for employee benefits			397942		382132		397942		382132
+Other non-current liabilities	6		322800		0		322800		0
+Total non-current liabilities			98616273		102839727		98616273		102839727
+Total liabilities			150268877		149463801		152095998		150960934
+Equity									
+Share capital									
+Authorised share capital									
+(2,120,000,000 ordinary shares, par value at									
+Baht 1 per share)			2120000		2120000		2120000		2120000
+Issued and paid-up share capital									
+(2,120,000,000 ordinary shares, par value at									
+Baht 1 per share)			2120000		2120000		2120000		2120000
+Share premium on ordinary shares			2379843		2379843		2379843		2379843
+Retained earnings									
+Appropriated									
+Legal reserve			212000		212000		212000		212000
+Unappropriated			40754353		38931319		38807585		37151359
+Other components of equity			-550681		-724471		-550681		-724471
+Total equity			44915515		42918691		42968747		41138731
+Total liabilities and equity			195184392		192382492		195064745		192099665
+			0				0		
+
+[SHEET: PL]
+	Muangthai Capital Public Company Limited and its Subsidiaries									
+	Statement of comprehensive income (Unaudited)									
+				Consolidated				Separate		
+				financial statements				financial statements		
+				Three-month period ended				Three-month period ended		
+				31 March				31 March		
+Reference		Note		2026		2025		2026		2025
+				(in thousand Baht)						
+	Revenue									
+	Interest income from loan receivables and hire purchase receivables			7755592		7057768		7420891		6775914
+	Fee and service income			147703		142611		118364		113203
+	Other income	2		33307		42003		156433		146934
+TAS 1.82.1	Total revenue	7		7936602		7242382		7695688		7036051
+	Expenses									
+	Services and administrative expenses	2		3099246		2828712		3089340		2821505
+	Total expenses			3099246		2828712		3089340		2821505
+	Profit from operating activities			4837356		4413670		4606348		4214546
+	Loss arising from derecognition of financial assets measured									
+	at amortised cost and hire purchase receivables			-189960		-246009		-178932		-231840
+TAS 1.82.2	Finance costs	2		-1587550		-1451158		-1587550		-1451158
+	Expected credit loss	3.3		-780705		-751703		-770091		-739497
+TAS 1.85	Profit before income tax			2279141		1964800		2069775		1792051
+TAS 1.82.4, 12.77	Income tax			-456107		-393585		-413549		-358405
+TAS 1.81ก.1	Profit for the period			1823034		1571215		1656226		1433646
+TAS 1.82ก.1	Other comprehensive income									
+TAS 1.82ก.2.2	Items that will be reclassified subsequently to profit or loss									
+TFRS 7.23.3	Gain (Loss) on cash flow hedges			217237		-29423		217237		-29423
+	Income tax relating to items that will be reclassified subsequently									
+TAS 1.91.2	to profit or loss			-43447		5885		-43447		5885
+	Total items that will be reclassified subsequently to profit or loss			173790		-23538		173790		-23538
+TAS 1.81ก.2	Other comprehensive income (expense) for the period, net of tax			173790		-23538		173790		-23538
+TAS 1.81ก.3	Total comprehensive income for the period			1996824		1547677		1830016		1410108
+TAS 1.81ก.1	Profit attributable to:									
+TAS 1.81ข.1.2	Owners of parent			1823034		1571215		1656226		1433646
+TAS 1.81ข.1.1	Non-controlling interests			0		0		0		0
+				1823034		1571215		1656226		1433646
+TAS 1.81ก.3	Total comprehensive income attributable to:									
+TAS 1.81ข.2.2	Owners of parent			1996824		1547677		1830016		1410108
+TAS 1.81ข.2.1	Non-controlling interests			0		0		0		0
+				1996824		1547677		1830016		1410108
+	Earnings per share									
+TAS 33.4	Basic earnings per share (in Baht)			0.8599216981132075		0.7411391509433962		0.781238679245283		0.6762481132075472
+
+[SHEET: CH-Consol FS]
+Muangthai Capital Public Company Limited and its Subsidiaries												
+Statement of changes in equity (Unaudited)												
+		Consolidated financial statements										
+										Other		
+										components		
+						Retained earnings				of equity		
+		Issued and		Share								
+		paid-up		premium on		Legal				Hedging		Total
+		share capital		ordinary shares		reserve		Unappropriated		reserve		equity
+		(in thousand Baht)										
+Three-month period ended 31 March 2025												
+Balance at 1 January 2025		2120000		2379843		212000		32764586		-523255		36953174
+Transactions with owners, recorded directly in equity												
+Distributions to owners of the parent												
+Dividends												0
+Total distributions to owners of the parent		0		0		0		0		0		0
+Total transactions with owners, recorded directly												
+in equity		0		0		0		0		0		0
+Comprehensive income (expense) for the period												
+Profit		0		0		0		1571215		0		1571215
+Other comprehensive income (expense)		0		0		0		0		-23538		-23538
+Total comprehensive income (expense) for the period		0		0		0		1571215		-23538		1547677
+Balance at 31 March 2025		2120000		2379843		212000		34335801		-546793		38500851
+Muangthai Capital Public Company Limited and its Subsidiaries												
+Statement of changes in equity (Unaudited)												
+		Consolidated financial statements										
+										Other		
+										components		
+						Retained earnings				of equity		
+		Issued and		Share								
+		paid-up		premium on		Legal				Hedging		Total
+		share capital		ordinary shares		reserve		Unappropriated		reserve		equity
+		(in thousand Baht)										
+Three-month period ended 31 March 2026												
+Balance at 1 January 2026		2120000		2379843		212000		38931319		-724471		42918691
+Transactions with owners, recorded directly in equity												
+Distributions to owners of the parent												
+Dividends												0
+Total distributions to owners of the parent		0		0		0		0		0		0
+Total transactions with owners, recorded directly												
+in equity		0		0		0		0		0		0
+Comprehensive income (expense) for the period												
+Profit		0		0		0		1823034		0		1823034
+Other comprehensive income (expense)		0		0		0		0		173790		173790
+Total comprehensive income (expense) for the period		0		0		0		1823034		173790		1996824
+Balance at 31 March 2026		2120000		2379843		212000		40754353		-550681		44915515
+
+[SHEET: CH-Separate FS]
+Muangthai Capital Public Company Limited and its Subsidiaries													
+Statement of changes in equity (Unaudited)													
+		Separate financial statements											
+										Other			
+										components			
+						Retained earnings				of equity			
+		Issued and		Share									
+		paid-up		premium on		Legal				Hedging		Total	
+		share capital		ordinary shares		reserve		Unappropriated		reserve		equity	
+		(in thousand Baht)											
+Three-month period ended 31 March 2025													
+Balance at 1 January 2025		2120000		2379843		212000		31538024		-523255		35726612	
+Transactions with owners, recorded directly in equity													
+Distributions to owners													
+Dividends												0	
+Total distributions to owners		0		0		0		0		0		0	
+Total transactions with owners, recorded directly													
+in equity		0		0		0		0		0		0	
+Comprehensive income (expense) for the period													
+Profit		0		0		0		1433646		0		1433646	
+Other comprehensive income (expense)		0		0		0		0		-23538		-23538	
+Total comprehensive income (expense) for the period		0		0		0		1433646		-23538		1410108	
+Balance at 31 March 2025		2120000		2379843		212000		32971670		-546793		37136720	
+Muangthai Capital Public Company Limited and its Subsidiaries													
+Statement of changes in equity (Unaudited)													
+		Separate financial statements											
+										Other			
+										components			
+						Retained earnings				of equity			
+		Issued and		Share									
+		paid-up		premium on		Legal				Hedging		Total	
+		share capital		ordinary shares		reserve		Unappropriated		reserve		equity	
+		(in thousand Baht)											
+Three-month period ended 31 March 2026													
+Balance at 1 January 2026		2120000		2379843		212000		37151359		-724471		41138731	
+Transactions with owners, recorded directly in equity													
+Distributions to owners													
+Dividends												0	
+Total distributions to owners		0		0		0		0		0		0	
+Total transactions with owners, recorded directly													
+in equity		0		0		0		0		0		0	
+Comprehensive income (expense) for the period													
+Profit		0		0		0		1656226		0		1656226	
+Other comprehensive income (expense)		0		0		0		0		173790		173790	
+Total comprehensive income (expense) for the period		0		0		0		1656226		173790		1830016	
+Balance at 31 March 2026		2120000		2379843		212000		38807585		-550681		42968747	
+
+[SHEET: CF]
+Muangthai Capital Public Company Limited and its Subsidiaries									
+Statement of cash flows (Unaudited)									
+			Consolidated				Separate		
+			financial statements				financial statements		
+			Three-month period ended				Three-month period ended		
+			31 March				31 March		
+			2026		2025		2026		2025
+			(in thousand Baht)						
+Cash flows from operating activities									
+Profit before income tax			2279141		1964800		2069775		1792051
+Adjustments to reconcile profit before income tax to cash received (paid)									
+Depreciation and amortisation			408867		389333		408864		389330
+Loss arising from derecognition of financial assets measured									
+at amortised cost and hire purchase receivables			189960		246009		178932		231840
+Expected credit loss			780705		751703		770091		739497
+(Reversal of) impairment loss of assets held for sales			-270		-396		0		0
+Loss on sales of land, building and equipment			3614		2841		3614		2841
+(Gain) loss on sales of assets held for sales			-1724		-5241		458		680
+Non-current provisions for employee benefit			15810		13803		15810		13803
+Gain on lease modification			-23895		-21213		-23895		-21213
+Interest income from loan receivables and hire purchase receivables			-7755592		-7057768		-7420891		-6775914
+Interest income received from loan receivables and hire purchase receivables			7800149		7125666		7465115		6835302
+Other interest income			-14979		-5390		-19646		-15092
+Finance costs			1587550		1451158		1587550		1451158
+			5269336		4855305		5035777		4644283
+Changes in operating assets and liabilities									
+Loan receivables and hire purchase receivables			-1580183		-4265863		-1100783		-4035938
+Other receivables - related parties			0		0		-731287		-113137
+Short-term loans - employees and related parties			13329		4511		13329		4511
+Other current assets			43897		-29477		45871		-37780
+Other non-current assets			776430		-1632		776430		-1632
+Other payables			-553395		-470457		-568200		-474082
+Other current liabilities			3394		-450		385549		-116358
+Other non-current liabilities			322800		0		322800		0
+Net cash from (used in) operating			4295608		91937		4179486		-130133
+Taxes paid			-2976		-5295		-2315		-4658
+Net cash from (used in) operating activities			4292632		86642		4177171		-134791
+Muangthai Capital Public Company Limited and its Subsidiaries									
+Statement of cash flows (Unaudited)									
+			Consolidated				Separate		
+			financial statements				financial statements		
+			Three-month period ended				Three-month period ended		
+			31 March				31 March		
+			2026		2025		2026		2025
+			(in thousand Baht)						
+Cash flows from investing activities									
+Increase in pledged bank deposits			-100		0		0		0
+Proceeds from repayment of long-term loans to related parties			0		0		87500		125000
+Interest income received			0		0		4741		10177
+Acquisition of land, building and equipment			-43664		-58530		-43664		-58530
+Acquisition of intangible assets			-2504		-47		-2504		-47
+Proceeds from sales of land, buildings and equipment			4998		1228		4998		1228
+Net cash (used in) from investing activities			-41270		-57349		51071		77828
+Cash flows from financing activities									
+Net (repayment) proceed of short-term borrowings from financial institutions			-1580000		2811395		-1580000		2811395
+Proceed from long-term borrowings from financial institutions			7306000		4280960		7306000		4280960
+Repayment of long-term borrowings from financial institutions			-3319696		-3350849		-3319696		-3350849
+Proceed from debentures issuance			3000000		5000000		3000000		5000000
+Repayment of debentures redemption			-4943300		-7478500		-4943300		-7478500
+Payment of lease liabilities			-386010		-365809		-386010		-365809
+Interest paid			-1835980		-1497544		-1835980		-1497544
+Net cash used in financing activities			-1758986		-600347		-1758986		-600347
+Net increase (decrease) in cash and cash equivalents			2492376		-571054		2469256		-657310
+Cash and cash equivalents at 1 January			4995363		3126344		4847699		2996624
+Cash and cash equivalents at 31 March			7487739		2555290		7316955		2339314
+			0				0		
+Non-cash transactions									
+Accounts payable on purchase of assets			11918		17305		11918		17305

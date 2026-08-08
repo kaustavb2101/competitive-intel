@@ -1,0 +1,255 @@
+
+[SHEET: Eng5-6]
+Ngernturbo Public Company Limited										
+Statement of Financial Position										
+As at 31 December 2025										
+				Consolidated				Separate		
+				financial statements				financial statements		
+				2025		2024		2025		2024
+		Notes		Baht		Baht		Baht		Baht
+Assets										
+Current assets										
+Cash and cash equivalents		9		239675372		222016604		149752513		164832693
+Current portion of loan receivables		10		3721997981		3845924506		3711251120		3825492794
+Current portion of hire purchase receivables		11		4299		1692154		0		0
+Other current receivables		13		73541145		52460994		156375704		246064322
+Other current assets		14		21690642		21529659		18504136		19450573
+Total current assets				4056909439		4143623917		4035883473		4255840382
+Non-current assets										
+Investments in subsidiaries		15		0		0		59000000		56000000
+Loan receivables		10		7380518887		7283435890		7380518887		7283435890
+Land, buildings and equipment		16		708919486		785674223		708916296		785667520
+Right-of-use assets		17		270063142		318141802		270063142		318141802
+Intangible assets		18		86465574		100569516		86465574		100569516
+Deferred tax assets		19		133800100		138316925		133739093		138226690
+Other non-current assets				40560831		47224141		40560831		47224141
+Non-current assets				8620328020		8673362497		8679263823		8729265559
+Total assets				12677237459		12816986414		12715147296		12985105941
+Director  ______________________________________                Director  ______________________________________										
+	(Mr. Sutach  Ruangsuttipap)                                                                 (Mr. Thanan Limsaiporm)									
+The notes to the consolidated and separate financial statements are an integral part of the financial statements.										
+Ngernturbo Public Company Limited										
+Statement of Financial Position (Cont’d)										
+As at 31 December 2025										
+				Consolidated				Separate		
+				financial statements				financial statements		
+				2025		2024		2025		2024
+		Notes		Baht		Baht		Baht		Baht
+Liabilities and equity										
+Current liabilities										
+Other current payables		20		80637378		82283281		94001810		91670023
+Short-term borrowings from financial institutions		21		30000000		250000000		30000000		250000000
+Short-term borrowings from related parties		21, 33 c)		2114573500		2114573500		2258158706		2370373500
+Current portion of long-term borrowings										
+	from financial institutions	21		2573865391		2764614833		2573865391		2764614833
+Current portion of debentures		22		412656645		70798274		412656645		70798274
+Current portion of lease liabilities				149211640		168077005		149211640		168077005
+Income tax payable				43388168		16536086		22115688		0
+Other current liabilities				31088936		30629217		25138598		26784508
+Total current liabilities				5435421658		5497512196		5565148478		5742318143
+Non-current liabilities										
+Long-term borrowings from financial institutions		21		2822813175		3871272457		2822813175		3871272457
+Debentures		22		504792123		665195728		504792123		665195728
+Lease liabilities				121957289		159767149		121957289		159767149
+Employee benefit obligations		23		11576382		8797008		11562094		8787028
+Other non-current liabilities				3378600		3378600		3378600		3378600
+Total non-current liabilities				3464517569		4708410942		3464503281		4708400962
+Total liabilities				8899939227		10205923138		9029651759		10450719105
+Equity										
+Share capital										
+	Authorised share capital									
+	2,720,000,000 ordinary shares,									
+	at par value of Baht 0.5 each	24		1360000000		1360000000		1360000000		1360000000
+	Issued and paid-up share capital									
+	2,670,000,000 ordinary shares,									
+	at Baht 0.5 each (31 December 2024:									
+	2,222,220,000 ordinary shares, at Baht 0.5 each)	24		1335000000		1111110000		1335000000		1111110000
+Other reserve - share-based payment		25		2141245		0		2141245		0
+Premium on ordinary shares		24		1612652978		1175567420		1612652978		1175567420
+Retained earnings										
+	Appropriated - legal reserve	26		60281000		35781000		54681000		30181000
+	Unappropriated			767223009		288604856		681020314		217528416
+Total equity				3777298232		2611063276		3685495537		2534386836
+Total liabilities and equity				12677237459		12816986414		12715147296		12985105941
+The notes to the consolidated and separate financial statements are an integral part of the financial statements.										
+
+[SHEET: Eng7]
+Ngernturbo Public Company Limited												
+Statement of Comprehensive Income												
+For the year ended 31 December 2025												
+						Consolidated				Separate		
+						financial statements				financial statements		
+						2025		2024		2025		2024
+				Notes		Baht		Baht		Baht		Baht
+Revenues												
+Interest income						2670994517		2595196118		2670689205		2589935126
+Fee and service income				27		62519227		85279781		55940495		67824273
+Sales of goods						27227111		27316219		0		0
+Other income				28		333952272		325420457		319677209		491885428
+Total revenues						3094693127		3033212575		3046306909		3149644827
+Expenses												
+Cost of goods sold						728129		8065526		0		0
+Administrative expenses				29		1475602978		1650716914		1490308134		1678622709
+Expected credit losses						600169154		762453711		599222447		755642046
+Total expenses						2076500261		2421236151		2089530581		2434264755
+Profit before finance costs and												
+	income tax					1018192866		611976424		956776328		715380072
+Finance costs				30		-402058272		-451443490		-403049480		-453473578
+Profit before income tax						616134594		160532934		553726848		261906494
+Income tax (expense) income				31		-113009776		-18968042		-65734950		26331114
+Profit for the year						503124818		141564892		487991898		288237608
+Other comprehensive income:												
+Items that will not be reclassified subsequently												
+	to profit or loss											
+	Remeasurements of post-employment											
+		benefit obligations				0		-1634319		0		-1634319
+	Income tax relating to items that will not be											
+		reclassified subsequently to profit or loss				0		326864		0		326864
+Items that will not be reclassified subsequently												
+	to profit or loss					0		-1307455		0		-1307455
+Total comprehensive income												
+	for the period					503124818		140257437		487991898		286930153
+Earnings per share												
+Basic earnings per share												
+	(Baht per share)			32		0.21467367308425545		0.064		0.20821674747719823		0.13
+Diluted earnings per share												
+	(Baht per share)			32		0.21467367308425545		0.064		0.208		0.13
+The notes to the consolidated and separate financial statements are an integral part of the financial statements.												
+
+[SHEET: Eng8]
+Ngernturbo Public Company Limited																
+Statement of Changes in Equity																
+For the year ended 31 December 2025																
+						Consolidated financial statements										
+						Issued and				Other reserves		Retained earnings				
+						paid-up		Share		- share-based		Appropriated				Total
+						share capital		premium		payments		- legal reserve		unappropriated		equity
+				Notes		Baht		Baht		Baht		Baht		Baht		Baht
+Opening balance at 1 January 2024						1111110000		1175567420		0		21181000		162963235		2470821655
+Dividend payment						0		0		0		0		-15816		-15816
+Transfer to legal reserve				26		0		0		0		14600000		-14600000		0
+Total comprehensive income for the year						0		0		0		0		140257437		140257437
+Closing balance at 31 December 2024						1111110000		1175567420		0		35781000		288604856		2611063276
+Opening balance at 1 January 2025						1111110000		1175567420		0		35781000		288604856		2611063276
+Ordinary shares issued				24		223890000		437085558		0		0		0		660975558
+Dividend payment						0		0		0		0		-6665		-6665
+Transfer to legal reserve				26		0		0		0		24500000		-24500000		0
+Share-based payment				25		0		0		2141245		0		0		2141245
+Total comprehensive income for the year						0		0		0		0		503124818		503124818
+Closing balance at 31 December 2025						1335000000		1612652978		2141245		60281000		767223009		3777298232
+						Separate financial statements										
+						Issued and				Other reserves		Retained earnings (deficits)				
+						paid-up		Share		- share-based		Appropriated				Total
+						share capital		premium		payments		- legal reserve		unappropriated		equity
+				Notes		Baht		Baht		Baht		Baht		Baht		Baht
+Opening balance at 1 January 2024						1111110000		1175567420		0		15681000		-54901737		2247456683
+Transfer to legal reserve				26		0		0		0		14500000		-14500000		0
+Total comprehensive income for the year						0		0		0		0		286930153		286930153
+Closing balance at 31 December 2024						1111110000		1175567420		0		30181000		217528416		2534386836
+Opening balance at 1 January 2025						1111110000		1175567420		0		30181000		217528416		2534386836
+Ordinary shares issued				24		223890000		437085558		0		0		0		660975558
+Transfer to legal reserve				26		0		0		0		24500000		-24500000		0
+Share-based payment				25		0		0		2141245		0		0		2141245
+Total comprehensive income for the year						0		0		0		0		487991898		487991898
+Closing balance at 31 December 2025						1335000000		1612652978		2141245		54681000		681020314		3685495537
+The notes to the consolidated and separate financial statements are an integral part of the financial statements.																
+
+[SHEET: Eng9-10]
+Ngernturbo Public Company Limited												
+Statement of Cash Flows												
+For the year ended 31 December 2025												
+						Consolidated				Separate		
+						financial statements				financial statements		
+						2025		2024		2025		2024
+				Notes		Baht		Baht		Baht		Baht
+Cash flows from operating activities												
+Profit before income tax						616134594		160532934		553726848		261906494
+Adjustments to reconcile profit before income tax												
+	to cash received (paid):											
+	Depreciation and amortisation			29		301022754		350722936		301019241		350700220
+	Expected credit losses					600169154		762453711		599222447		755642046
+	Reversal of loss on diminution											
+		in value of foreclosed assets				-3974279		-10539858		-3956436		-10579590
+	Impairment charge on buildings											
+		and equipment, and right-of-use assets		29		0		15215617		0		15215617
+	Loss on disposals and write-off of buildings											
+		and equipment, and intangible assets				3344702		5448952		3344702		5275037
+	Loss (gain) from lease remeasurement											
+		and termination				-5106272		7599283		-5106272		7599283
+	Employee benefit obligations			23		2779374		1907458		2775066		1897478
+	Interest income					-2670994517		-2595196118		-2670689205		-2589935126
+	Interest received					2679237545		2504596971		2677732097		2497486825
+	Fee and service income			27		-6577444		-17389482		0		0
+	Fee and service received					7186737		18915013		0		0
+	Finance costs					402058272		451443490		403049480		453473578
+	Finance costs paid					-396672393		-449796355		-396706436		-450570684
+	Other interest income					-953752		-1508868		-711706		-1418011
+	Dividend income			28		0		0		-200293335		-375084184
+	Dividend received					0		0		103208649		12922082
+	Income tax paid					-82481642		-58232504		-39131526		-11356022
+	Non-cash employee benefits expense											
+		- share-based payments		25		2141245		0		2141245		0
+Gain from operating activities												
+	before changes in working capital					1447314078		1146173180		1329624859		923175043
+	Changes in working capital:											
+		Loan receivables				-469625081		-1426362211		-478050496		-1406460336
+		Hire purchase receivables				607083		-2305119		0		0
+		Other current receivables				-21252590		39136122		-14703600		17616803
+		Other current assets				-105691839		-87017885		-105441727		-88738688
+		Other non-current assets				6663310		844880		6663310		844880
+		Other current payables				-2569478		-1827871		1733064		3175971
+		Other current liabilities				459722		3950533		-1658806		4766598
+Net cash generated from (used in) operating activities						855905205		-327408371		738166604		-545619729
+The notes to the consolidated and separate financial statements are an integral part of the financial statements.												
+Ngernturbo Public Company Limited												
+Statements of Cash Flows (Cont’d)												
+For the year ended 31 December 2025												
+						Consolidated				Separate		
+						financial statements				financial statements		
+						2025		2024		2025		2024
+				Notes		Baht		Baht		Baht		Baht
+Cash flows from investing activities												
+	Cash paid for investments in subsidiaries			15		0		0		-3000000		0
+	Cash received from short-term loans to											
+		related parties				0		0		0		8150000
+	Cash paid for short-term loans											
+		to related parties				0		0		0		-5000000
+	Cash paid for purchase of building											
+		improvements and equipment				-11777662		-49159046		-11777662		-49159046
+	Cash paid for purchase of intangible assets					-15316210		-10524291		-15316210		-10524291
+	Cash received from sale of equipment					672655		245879		672655		245879
+Net cash used in investing activities						-26421217		-59437458		-29421217		-56287458
+Cash flows from financing activities												
+	Cash received from short-term borrowings											
+		from related parties		33 c)		0		0		87985206		190800000
+	Cash received from short-term borrowings											
+		from financial institutions				360000000		535000000		360000000		535000000
+	Cash paid for short-term borrowings											
+		from financial institutions				-580000000		-985000000		-580000000		-985000000
+	Cash received from long-term borrowings											
+		from financial institutions		21		2328000000		3572900000		2328000000		3572900000
+	Cash paid for long-term borrowings											
+		from financial institutions		21		-3568969520		-3026918535		-3568969520		-3026918535
+	Cash received from issuance of debentures			22		250000000		494300000		250000000		494300000
+	Cash paid for debenture redemption			22		-71000000		0		-71000000		0
+	Cash paid for debentures issuing costs					-3063461		-7991816		-3063461		-7991816
+	Cash paid for principle elements											
+		of lease payments				-187753350		-212182212		-187753350		-212182212
+	Cash received from additional share capital			24		660975558		0		660975558		0
+	Dividends paid			26		-14447		-4492		0		-
+Net cash received from financing activities						-811825220		370102945		-723825567		560907437
+Net increase (decrease) in												
+	cash and cash equivalents					17658768		-16742884		-15080180		-40999750
+Cash and cash equivalents at the beginning												
+	of the year					222016604		238759488		164832693		205832443
+Cash and cash equivalents at the end												
+	of the year			9		239675372		222016604		149752513		164832693
+Non-cash items												
+	Payables for purchase of building											
+		improvements and equipment				2836951		5696128		2836951		5696128
+	Payables from intangible assets purchased					0		12449		0		12449
+	Acquisition of right-of-use assets			17		171041400		231282670		171041400		231282670
+	Lease termination			17		5021892		7147858		5021892		7147858
+	Lease modifications and reassessments			17		29835110		23678881		29835110		23678881
+	Dividends received by offsetting debts			33 c)		0		0		201476904		160073426
+The notes to the consolidated and separate financial statements are an integral part of the financial statements.												
