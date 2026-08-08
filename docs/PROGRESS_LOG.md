@@ -3,6 +3,61 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-08 — Integration loop (obj #1): surfaced the MEASURED per-province crop-yield layer (`oae_agstats.json`) on the Market table — PR (app/visual change)
+
+Autonomous integration run. The scheduled backlog's items 1 (FPO PICO competitor registry) and 2
+(`branch_cropland.json`) are **already shipped and probe-guarded** (verified: `pico_census`/
+`pico_competitors`/`branch_cropland` all live, in `provenance.json`, in `check_site_health.py`), and
+most of item 3's data.go.th distillations already exist (`dbd_formation`, `vehicle_*`, `factory_*`,
+`sme_income`, `baac_credit`/`sfi_credit` builders). A negative-space sweep of every `platform/data/*.json`
+against what `app.js`/`*.html` actually `fetch()` found **`oae_agstats.json`** — a MEASURED, 77-province
+× 7-crop AREA · YIELD (kg/rai) · PRODUCTION (tonnes) layer from the OAE Agricultural Statistics
+2567/2024 yearbook (`build_oae_agstats.py`, gated in `tests/run.sh`, already in `provenance.json`) — was
+**never surfaced anywhere in the app**: a terminal, deterministic, provenance-labelled dead output.
+
+**The gap it fills (obj #1).** The existing agri layers carry crop AREA (`branch_agri`/SPAM, estimated)
+and crop PRICE stress (`crop_stress`, measured Thai farm-gate) but **not yield** — the per-province
+farm-household repayment-capacity lever. A province whose dominant field crop yields *below* national =
+structurally weaker farm cash flow per rai = higher title-loan repayment stress, a signal the area-only
+and price-only layers cannot see.
+
+**What shipped.** Added a MEASURED column to the Market-assessment table (`#market`): each province's
+**dominant field crop** (largest OAE planted/standing area among rice/maize/cassava/sugarcane/oil-palm/
+rubber) and its **yield vs the national production-weighted mean of the SAME crop** — signed %, red below
+national, green above. It sits directly beside the app's weakest existing signal, the ESTIMATED
+World-Bank *global* price-direction proxy ("Weakest crop · est"), so a measured per-province read now
+flanks the region-attributed estimate.
+- **Benchmark = ONE consistent honest definition.** National yield per crop = `Σ production_ton × 1000 ÷
+  Σ area_rai` aggregated from the same measured provincial table. This is a sum of measured provincial
+  values (still MEASURED), covers rice (which the file's own `national` block omits), and keeps a single
+  same-crop / same-area-basis comparison across all six crops — the file's `national` mixes area bases
+  across crops (planted/harvested/standing) and lacks rice, so it is deliberately NOT used for the ratio.
+  Within a single crop every province shares that crop's basis, so the aggregate is valid; the tooltip +
+  `#mktnote` state "compare within a crop only, never across crops" (echoing the layer's own `meta.gaps`).
+- Join is by canonical Thai province name (`PROV.th` ↔ `by_province` key), **verified 77/77 exact** — no
+  province falls through. Null-guarded end to end: absent/failed fetch → the column reads "—" and the rest
+  of the table is unchanged. Column added to the CSV export (`top_field_crop_measured`,
+  `top_crop_yield_kg_rai_measured`, `top_crop_yield_vs_national_pct_measured`) and the Market lead + note.
+
+**Verification (all pass).** (a) `bash tests/run.sh check` → **129 passed, 0 failed** (data-integrity
+455/455) incl. `node --check platform/app.js`. (b) `build_provenance.py --check` reproduces exactly — no
+`platform/data` byte changed (a *surfacing*, not a new layer), so no provenance regen. (c) Headless render
+of `index.html#market`: the new column populates **77/77 provinces, 0 dashes**, credible values (Khon Kaen
+rice −23.4%, Ubon rice −18.2%, Pathum Thani rice +65.9%, Rayong rubber −14.5%), correct red/green, correct
+note; **no app console errors** (the one `ERR_CONNECTION_RESET` is the throwaway test server closing early,
+not a page fetch). (d) Phone-width (390px): **no horizontal page bleed**, the wider table scrolls inside
+its existing `overflow-x:auto` wrapper — no mobile regression.
+
+**Why a PR, not a commit to master:** it changes app behaviour/visuals (a new rendered column), so per the
+loop's ship rule it goes through a draft PR for a look rather than straight to master. Diff = `platform/app.js`
+(loader + `provTopCropYield` helper + table column + CSV) + `platform/index.html` (Market lead line) + this log.
+
+**Next recommended integration:** the same `oae_agstats` per-province yield/production is a natural add to
+the **province deep-dive** (`province.html` / the SPA province card) as a measured crop-economics readout,
+and the province yield-trend (`yield_trend_pct`, present on many crop×province cells) is an unused
+time-direction signal for the Risk-trend surface. Both are per-province drill-downs of the layer now wired
+only at the national-comparison grain.
+
 ## 2026-08-08 — Intelligence loop (deploy health): site-health probes for the two newest Competition (#acq) reads — shipped + gate-green
 
 - **Shipped** (direct to `master`): closed the deploy-health blind spot on the two layers the #319 rival-field wave landed today and left unguarded. Both are live-`fetch()`'d into the Competition (`#acq`) surface (`tmliFetch('rival_book_impact')` app.js:4287, `tmliFetch('rival_watch')` app.js:4168) and neither was in `check_site_health.py::DATA_FILES`, so a truncated/404 CDN deploy that gutted either would silently drop its board to a calm "not built for this vintage" note with **no phone alert** — the exact "broken demo" class the site-health probe exists to catch, and one that neither layer self-heals from (both are pipeline rebuilds off the owner-side loan tape / Thai-IP promo pull, no CI cron to restore a bad deploy).

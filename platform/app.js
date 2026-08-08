@@ -8134,6 +8134,58 @@ function regionWorstCrop(region){
   return worst; // null -> callers render "—"
 }
 function provLookupByName(){ const m={}; (PROV||[]).forEach(p=>m[p.th]=p); return m; }
+
+/* ---------- per-province MEASURED crop yield (data/oae_agstats.json, obj #1) ----------
+   OAE Agricultural Statistics 2567/2024 yearbook, read verbatim: per-province yield (kg/rai),
+   area (rai) and production (tonnes) for the six major field crops. Surfaced on the Market table
+   as each province's DOMINANT field crop (largest planted/standing area) and its measured yield
+   vs the national production-weighted mean of the SAME crop — the farm-household repayment-capacity
+   lever the area-only (branch_agri/SPAM) and price-only (crop_stress) agri layers do NOT carry.
+   Below-national yield = structurally weaker farm cash flow per rai. Null-guarded: absent file →
+   the column stays "—" and the rest of the table reads as before. Keyed by canonical Thai province
+   name (matches PROV.th, verified 77/77). Written by pipeline/build_oae_agstats.py. */
+let OAESTATS=null, OAENAT=null, oaeLoaded=false, oaePromise=null;
+const OAE_FIELD_CROPS=['rice','maize','cassava','sugarcane','oilpalm','rubber'];
+const OAE_CROP_LABEL={rice:'Rice',maize:'Maize',cassava:'Cassava',sugarcane:'Sugarcane',oilpalm:'Oil palm',rubber:'Rubber'};
+function loadOaeStats(){
+  if(oaePromise) return oaePromise;
+  oaeLoaded=true;
+  oaePromise=(async()=>{
+    try{
+      const r=await fetch('data/oae_agstats.json'); if(!r.ok) throw 0;
+      const j=await r.json(); OAESTATS=j.by_province||null;
+      if(OAESTATS){
+        // National benchmark = production-weighted mean yield per crop, aggregated from the same
+        // measured provincial table. ONE consistent same-crop/same-area-basis definition across all
+        // six crops (the file's own `national` omits rice and mixes area bases across crops, so we
+        // don't use it here). A sum of measured provincial values → still MEASURED.
+        OAENAT={};
+        for(const c of OAE_FIELD_CROPS){
+          let a=0,p=0;
+          for(const th in OAESTATS){const rec=OAESTATS[th][c];
+            if(rec&&rec.area_rai>0&&rec.production_ton>0){a+=rec.area_rai;p+=rec.production_ton;}}
+          if(a>0) OAENAT[c]=p*1000/a;
+        }
+      }
+    }catch(e){ OAESTATS=null; OAENAT=null; }
+    return OAESTATS;
+  })();
+  return oaePromise;
+}
+// Province's dominant field crop (largest area) + measured yield vs the national mean of THAT crop.
+// Returns {crop,label,yield,nat,deltaPct} or null when no measured record / benchmark is available.
+function provTopCropYield(th){
+  if(!OAESTATS||!OAENAT) return null;
+  const rec=OAESTATS[th]; if(!rec) return null;
+  let best=null;
+  for(const c of OAE_FIELD_CROPS){const r=rec[c];
+    if(r&&r.area_rai>0&&r.yield_kg_rai>0&&OAENAT[c]>0&&(!best||r.area_rai>best.area))
+      best={crop:c,area:r.area_rai,yield:r.yield_kg_rai};}
+  if(!best) return null;
+  const nat=OAENAT[best.crop];
+  return {crop:best.crop,label:OAE_CROP_LABEL[best.crop],yield:best.yield,nat:nat,
+    deltaPct:Math.round((best.yield/nat-1)*1000)/10};
+}
 function renderMarket(){
   (PROV ? Promise.resolve(PROV) : fetch('data/provinces/index.json').then(r=>r.json()).then(d=>(PROV=d)))
    .then(()=>{
@@ -8145,9 +8197,9 @@ function renderMarket(){
         document.querySelectorAll('#mktchips .chip').forEach(c=>{const on=c===b;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));});
         mktRegion=b.dataset.r; drawMarket();};
       $('#mktsearch').oninput=drawMarket; $('#mktchips').dataset.init='1';
-      $('#mktnote').textContent='Registered factory workers DIW · informal workforce NSO 2024 (some provinces n/a) · vehicles/pickups DLT · weakest crop = World Bank global price direction proxy (not Thai farm-gate), region-attributed.';
+      $('#mktnote').textContent='Registered factory workers DIW · informal workforce NSO 2024 (some provinces n/a) · vehicles/pickups DLT · weakest crop = World Bank global price direction proxy (not Thai farm-gate), region-attributed · Top-crop yield = the province’s largest-area field crop and its MEASURED yield vs the national production-weighted mean (OAE Agricultural Statistics 2567/2024).';
     }
-    drawMarket();
+    loadOaeStats().then(drawMarket);   // populate the measured top-crop-yield column, then draw
     loadTapeReal().then(renderMarketCollateral);   // acquisition lens — collateral concentration
    }).catch(()=>{ $('#mkttbl').innerHTML='<tr><td>Could not load market data.</td></tr>'; });
 }
@@ -8203,8 +8255,8 @@ function drawMarket(){
     .sort((a,b)=>{const an=a.informal==null, bn=b.informal==null;
       if(an!==bn) return an?1:-1; return (b.informal||0)-(a.informal||0);});
   const pct=p=>p.vehicles?Math.round(100*(p.pickup||0)/p.vehicles):0;
-  $('#mkttbl').innerHTML=`<tr><th scope="col">Province</th><th scope="col">Region</th><th class="h-opp" scope="col" title="DIW registered factory workers — distinct from NSO informal/formal labour">Registered factory workers (DIW)</th><th scope="col" title="NSO informal workforce — borrower base proxy">Informal workforce (NSO)</th><th scope="col">Pickups</th><th scope="col">Pickup %</th><th scope="col" title="World Bank global price direction proxy, region-attributed — not Thai farm-gate">Weakest crop (YoY) · est</th></tr>`+
-   rows.map(p=>{const wc=regionWorstCrop(p.region);
+  $('#mkttbl').innerHTML=`<tr><th scope="col">Province</th><th scope="col">Region</th><th class="h-opp" scope="col" title="DIW registered factory workers — distinct from NSO informal/formal labour">Registered factory workers (DIW)</th><th scope="col" title="NSO informal workforce — borrower base proxy">Informal workforce (NSO)</th><th scope="col">Pickups</th><th scope="col">Pickup %</th><th scope="col" title="MEASURED — the province's dominant field crop (largest OAE planted/standing area) and its yield vs the national production-weighted mean of the SAME crop (OAE Agricultural Statistics 2567/2024). Below national = structurally weaker farm cash flow per rai, a repayment-capacity stress flag. Compare within a crop only, never across crops.">Top crop yield vs nat’l · measured</th><th scope="col" title="World Bank global price direction proxy, region-attributed — not Thai farm-gate">Weakest crop (YoY) · est</th></tr>`+
+   rows.map(p=>{const wc=regionWorstCrop(p.region); const cy=provTopCropYield(p.th);
      return `<tr onclick="location.href='${bldgURL(p.slug)}'" tabindex="0" role="link" style="cursor:pointer">
      <td><a href="${bldgURL(p.slug)}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a> <a href="${distURL(p.slug)}" onclick="event.stopPropagation()" title="Extruded district view" class="sub" style="text-decoration:none;margin-left:6px;color:var(--mid,#8A94A8)">▦</a></td>
      <td class="sub">${p.region}</td>
@@ -8212,12 +8264,13 @@ function drawMarket(){
      <td class="mono" style="color:var(--collat)">${naNum(p.informal)}</td>
      <td class="mono">${naNum(p.pickup)}</td>
      <td class="mono sub">${pct(p)}%</td>
+     <td class="mono">${cy?`${cy.label} <span style="color:${cy.deltaPct<0?'var(--agri)':'var(--merch)'}">${cy.deltaPct>0?'+':''}${cy.deltaPct}%</span>`:'<span class="sub">—</span>'}</td>
      <td class="mono" style="color:${wc&&wc.yoy<0?'var(--agri)':'var(--mid)'}">${wc?wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%':'—'}</td></tr>`;}).join('')
-    || `<tr><td colspan="7" class="cc-empty" style="padding:14px 7px">No provinces match “${dqEsc(q)}”${mktRegion==='all'?'':` in ${dqEsc(mktRegion)}`}. Clear the search to see all 77.</td></tr>`;
+    || `<tr><td colspan="8" class="cc-empty" style="padding:14px 7px">No provinces match “${dqEsc(q)}”${mktRegion==='all'?'':` in ${dqEsc(mktRegion)}`}. Clear the search to see all 77.</td></tr>`;
   $('#mktcsv').onclick=()=>{
-    const hdr=['province','province_en','region','branches','registered_factory_workers_diw','informal_workforce_nso','pickups_dlt','pickup_share_pct','vehicles_total','weakest_crop_est','weakest_crop_yoy_est'];
-    const lines=[hdr.join(',')].concat(rows.map(p=>{const wc=regionWorstCrop(p.region);
-      return [p.th,p.en,p.region,p.branches,p.workers,p.informal,p.pickup,pct(p),p.vehicles,wc?wc.lab:'',wc?wc.yoy:'']
+    const hdr=['province','province_en','region','branches','registered_factory_workers_diw','informal_workforce_nso','pickups_dlt','pickup_share_pct','vehicles_total','top_field_crop_measured','top_crop_yield_kg_rai_measured','top_crop_yield_vs_national_pct_measured','weakest_crop_est','weakest_crop_yoy_est'];
+    const lines=[hdr.join(',')].concat(rows.map(p=>{const wc=regionWorstCrop(p.region); const cy=provTopCropYield(p.th);
+      return [p.th,p.en,p.region,p.branches,p.workers,p.informal,p.pickup,pct(p),p.vehicles,cy?cy.label:'',cy?cy.yield:'',cy?cy.deltaPct:'',wc?wc.lab:'',wc?wc.yoy:'']
         .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
     const blob=new Blob(['\ufeff',lines.join('\n')],{type:'text/csv;charset=utf-8;'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
