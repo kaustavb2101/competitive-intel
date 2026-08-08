@@ -3794,7 +3794,7 @@ function drawCreditAnchor(){
   box.innerHTML=head+
     `<div class="sub" style="margin-top:6px">The estimated 0–100 branch-risk score is a <b>triage rank, not a predicted NPL</b> — these BoT figures are the real-world scale it is read against, shown alongside the score, never inside it.</div>`+
     methodBox(m.label||null,
-      [ ...metrics.map(x=>`<b>${x.label}: ${x.display}</b> — ${x.scope}. ${TAG_M} ${x.source} (${x.vintage})${x.source_url?` · <a href="${x.source_url}" target="_blank" rel="noopener" style="color:var(--accent)">source</a>`:''}`),
+      [ ...metrics.map(x=>`<b>${x.label}: ${x.display}</b> — ${x.scope}. ${TAG_M} ${x.source} (${x.vintage})${x.source_url?` · <a href="${x.source_url}" target="_blank" rel="noopener" style="color:var(--accent)">source<span class="sr-only"> (opens in a new tab)</span></a>`:''}`),
         ahp.reason_absent?`<b>Auto hire-purchase NPL:</b> ${ahp.reason_absent}`:null,
         m.source?`Source: ${m.source}. Vintage/pulled ${m.pulled||'—'}.`:null ]);
   if(stats){
@@ -4601,7 +4601,7 @@ function drawRivalPulse(){
             <td style="white-space:nowrap"><span class="tag" style="color:${TYPEC[p.promo_type]||'var(--dim)'};border:1px solid ${TYPEC[p.promo_type]||'var(--dim)'}">${TYPEL[p.promo_type]||p.promo_type}</span></td>
             <td class="mono" style="color:var(--gold);white-space:nowrap">${p.pricing||'<span class="sub">—</span>'}</td>
             <td class="sub" style="font-size:12px">${p.feature||''}</td>
-            <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}${p.is_gone?'<span class="tag" style="color:var(--mid);border:1px solid var(--mid)" title="not seen in the latest pull">NO LONGER LISTED</span> ':''}<a href="${p.url}" target="_blank" rel="noopener" style="font-size:12px">${p.title}</a></td>
+            <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}${p.is_gone?'<span class="tag" style="color:var(--mid);border:1px solid var(--mid)" title="not seen in the latest pull">NO LONGER LISTED</span> ':''}<a href="${p.url}" target="_blank" rel="noopener" style="font-size:12px">${p.title}<span class="sr-only"> (opens in a new tab)</span></a></td>
           </tr>`).join('')}</table>`).join('');
     } else {
       lbox.innerHTML='';
@@ -4624,7 +4624,7 @@ function drawRivalPulse(){
       return `<h4 class="compsub" style="margin:10px 0 4px">${b}${kind}</h4>`+
         `<table class="tbl">${items.map(p=>`<tr>
           <td class="mono sub" style="white-space:nowrap">${p.date||p.first_seen||''}</td>
-          <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}${p.is_gone?'<span class="tag" style="color:var(--mid);border:1px solid var(--mid)" title="not seen in the latest pull">NO LONGER LISTED</span> ':''}<a href="${p.url}" target="_blank" rel="noopener">${p.title}</a>${p.detail?`<div class="sub" style="font-size:11px">${p.detail}</div>`:''}</td>
+          <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}${p.is_gone?'<span class="tag" style="color:var(--mid);border:1px solid var(--mid)" title="not seen in the latest pull">NO LONGER LISTED</span> ':''}<a href="${p.url}" target="_blank" rel="noopener">${p.title}<span class="sr-only"> (opens in a new tab)</span></a>${p.detail?`<div class="sub" style="font-size:11px">${p.detail}</div>`:''}</td>
         </tr>`).join('')}</table>`
         +(hidden?`<p class="sub" style="margin:2px 0 0">+${hidden} more ${b} item(s) not shown — newest 6 per brand, anything new or delisted sorted to the top.</p>`:'');
     }).join('');
