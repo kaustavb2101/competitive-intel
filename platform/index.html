@@ -643,9 +643,25 @@
       exposure. Every number is tagged <b>measured</b> or <b>estimated/proxy</b>. This tab makes <b>no</b> open /
       close / expansion recommendations.</p>
 
+    <!-- Competition's headline numbers, mirroring #overview's band: five MEASURED scalars, each
+         with the thing it is measured against. Rendered by renderAcqAnswerBand(); null-safe, a
+         tile whose layer is absent is simply not emitted, so this can never invent a headline.
+         buildPrintSummary() picks .answerband up generically, so these also lead the printout. -->
+    <div class="answerband" id="acq-answer" aria-label="Competition headline numbers"></div>
+    <p class="lead sub" id="acq-answer-note" style="margin:2px 0 10px"></p>
+
+    <!-- THE ANSWER, FIRST. Every other section on this tab describes the rival field; none of
+         them said what it does to us. renderRivalBookImpact() joins the MEASURED per-district
+         rival counts to the MEASURED real tape and leads with the finding, including the
+         within-province control that halves the raw effect. -->
+    <h2 id="sec-cost">Does the competition actually cost us? <span class="tag">MEASURED both sides</span></h2>
+    <p class="lead">The rest of this tab counts rivals. This asks the question that follows: are branches with more competitors around them carrying a <b>worse book</b>? Rival branch counts (<b>MEASURED</b>, point-in-polygon over 928 districts) joined to the <b>MEASURED</b> real loan tape. <span class="sub">Rivals are not placed at random — they cluster where demand is, and so do our biggest branches. The raw national gradient is mostly that. The within-province split is the honest read, and it is the one to quote.</span></p>
+    <div class="tbl-wrap"><div id="acq-bookcost"></div></div>
+
     <div id="competition-impact"></div><!-- impact-card drill, competition ranking (most-outgunned first) -->
 
     <nav class="jumpnav no-print" id="compjump" aria-label="Jump to section within Competition">
+      <a class="chip" href="#acq" data-jump="sec-cost">Does it cost us?</a>
       <a class="chip" href="#acq" data-jump="sec-search">Brand &amp; search</a>
       <a class="chip" href="#acq" data-jump="sec-presence">Market presence</a>
       <a class="chip" href="#acq" data-jump="sec-pulse">Rival pulse</a>
@@ -680,7 +696,7 @@
     <p class="lead">How our rivals show up where AutoX largely does <b>not</b> — in the <b>capital market</b>, on the <b>map</b>, and in <b>search</b>. AutoX is <b>unlisted</b> (an SCBX subsidiary) and near-invisible on Google Maps, so this is a competitive-presence read, not an AutoX scoreboard.</p>
 
     <h3 class="compsub">Listed-peer market scoreboard <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · SET</span></h3>
-    <p class="lead">Pulled autonomously from the <b>Stock Exchange of Thailand</b>: market value, valuation and returns for the three listed title-lenders. Their <b>ROE ladder</b> is the sharpest external benchmark we have — AutoX's stated <b>25% ROE target</b> is the reference line. Market cap &amp; net profit are directly comparable; read ROE with the holding-company caveat in the method note.</p>
+    <p class="lead">Pulled autonomously from the <b>Stock Exchange of Thailand</b>: market value, valuation and returns for the four listed title-lenders. Their <b>ROE ladder</b> is the sharpest external benchmark we have — AutoX's stated <b>25% ROE target</b> is the reference line. Market cap &amp; net profit are directly comparable; read ROE with the holding-company caveat in the method note.</p>
     <div class="insight" id="peerscorereadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="peerscoretbl"></table>
 
@@ -703,7 +719,15 @@
     <summary><h2 class="opp">Rival pulse · live promotions &amp; voice of customer <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2></summary>
     <p class="lead">The always-on watch: <b>what the rivals are promoting right now</b> (pulled from their own websites, new items flagged on every refresh) and <b>what customers say</b> — Google Play star ratings and dated reviews for the rivals' apps <b>and our own เงินไชโย app</b>, side by side. Stars, histograms and promo dates are <b>measured</b>; the detractor theme buckets are an <b>estimated</b> keyword read over 1–2★ reviews.</p>
 
-    <h3 class="compsub">Voice of customer · app sentiment ladder <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Google Play</span></h3>
+    <!-- WHAT CHANGED, before what's live. Everything else in this section is a snapshot of the
+         rival field right now; this is the only place that says what MOVED since the previous
+         pull. Driven by rival_watch.json, a pure diff layer — it re-counts nothing and emits a
+         movement only where a dated first_seen/last_seen/last_shown field proves it. Rendered by
+         renderRivalWatch(); silent when only one pull vintage exists. -->
+    <h3 class="compsub">What changed since the last pull <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED diff</span></h3>
+    <div id="rivalwatch"></div>
+
+    <h3 class="compsub" style="margin-top:18px">Voice of customer · app sentiment ladder <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Google Play</span></h3>
     <div class="insight" id="pulsesentreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="pulsesenttbl"></table>
 
@@ -762,11 +786,12 @@
 
     <!-- 1 · COMPETITOR THESIS — coverage + rival density + rival fragility, collapsed by default. -->
     <details class="compsec" id="sec-comp">
-    <summary><h2 class="opp">Competitor thesis · coverage, rival density &amp; rival fragility <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
+    <summary><h2 class="opp">Competitor thesis · coverage, rival density &amp; rival fragility <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MOSTLY MEASURED</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">1 ESTIMATED PROXY</span></h2></summary>
 
     <h3 class="compsub">Competitor coverage · how complete is our rival census?</h3>
     <p class="lead">Our competitor map is now a <b>MEASURED, near-complete</b> census: Muangthai, Srisawad and Tidlor are pulled
-      from each operator's <b>official store-locator</b> (16,053 real branches); only Heng remains a Google/Overture sample.
+      from each operator's <b>official store-locator</b>, and <b>Heng now is too</b> (a province-walk of hengleasing.com) —
+      <b>16,503 real branches across all four brands</b>, no sampled layer left.
       This panel shows <b style="color:var(--merch)">found</b> (locations we hold, measured) vs <b style="color:var(--gold)">expected</b>
       (each brand's publicly-reported branch count — <b>ESTIMATED-from-public-reports</b>, cited company IR).
       Coverage &gt;100% is expected — a locator lists every service point beyond the IR headline. Read it as a data-completeness flag, <b>not</b> market share.</p>
@@ -774,7 +799,7 @@
     <table class="tbl" id="compcovtbl"></table>
 
     <h3 class="compsub" style="margin-top:18px">Where rivals own ground · districts where AutoX is outnumbered <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
-    <p class="lead">The full official-locator census (16,393 rival branches) makes this concrete: the districts where the big-4
+    <p class="lead">The full official-locator census (16,503 rival branches) makes this concrete: the districts where the big-4
       out-station AutoX the most. Ranked by raw branch deficit — <b>defend or concede deliberately</b>. These are measured
       counts (point-in-district), not a proxy.</p>
     <div class="insight" id="rivdenreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
@@ -783,8 +808,9 @@
     <h3 class="compsub" style="margin-top:18px">Per-province peer comparison · AutoX vs each rival brand <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
     <p class="lead">The same census, rolled up to the 77 provinces with the <b>brand split kept intact</b> — so you can read AutoX
       against <b>Muangthai</b>, <b>Srisawad</b>, <b>Tidlor</b> and <b>Heng</b> <b>one brand at a time</b>, not just the merged total.
-      Ranked by raw branch deficit. Muangthai/Srisawad/Tidlor are near-complete official-locator networks; Heng is a Google/Overture
-      sample (an under-count). A competitive-pressure read on the network we already run — <b>no</b> open / expand recommendation.</p>
+      Ranked by raw branch deficit. All four are official-locator networks now — locators list every service point, so a brand's
+      count can sit slightly above its headline branch number (Muangthai 8,931 here vs an 8,673 FY2025 headline). A competitive-pressure
+      read on the network we already run — <b>no</b> open / expand recommendation.</p>
     <div class="insight" id="peerprovreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="peerprovtbl"></table>
 
@@ -854,7 +880,7 @@
 
     <!-- 3 · SEGMENT coverage & competitor exposure — every segment + district table, collapsed by default. -->
     <details class="compsec" id="sec-segments">
-    <summary><h2 class="opp">Segment coverage &amp; competitor exposure · estates · merchant · collateral · districts</h2></summary>
+    <summary><h2 class="opp">Segment coverage &amp; competitor exposure · estates · merchant · collateral · districts <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED counts</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED scores</span></h2></summary>
     <p class="lead">Descriptive coverage-and-rival tables for the existing network — how thin AutoX's presence is against demand,
       and where rivals sit — as a <b>competitive-exposure read</b>. These are <b>not</b> open-a-branch recommendations.</p>
 

@@ -160,6 +160,16 @@ def main():
     }
     json.dump(payload, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print("wrote %s — %d items (%d new this pull)" % (OUT, len(items), new))
+    # A raw pull that isn't re-derived leaves the app on the previous vintage AND red-gates the
+    # repo, because every layer downstream of this file still reproduces from the OLD bytes. Name
+    # the whole chain here so the next person doesn't have to rediscover it from a failing gate.
+    print("NEXT — re-derive downstream (all deterministic, all --check gated):\n"
+          "  python3 pipeline/build_rival_pulse.py     # -> platform/data/rival_pulse.json\n"
+          "  python3 pipeline/build_rival_watch.py     # -> platform/data/rival_watch.json (the diff)\n"
+          "  python3 pipeline/build_social_themes.py   # consumes rival_pulse.json\n"
+          "  python3 pipeline/build_scenarios.py       # consumes rival_pulse.json\n"
+          "  python3 pipeline/build_provenance.py      # last, always\n"
+          "Run them on the LF mirror (cpython-3.11), not Windows — see docs/OPERATING_MODEL.md.")
 
 
 if __name__ == "__main__":

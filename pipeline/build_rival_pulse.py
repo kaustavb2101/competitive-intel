@@ -187,7 +187,15 @@ def build():
                 "brand": it["brand"], "kind": it["kind"], "title": it["title"],
                 "detail": it.get("detail"), "date": it.get("date"), "url": it["url"],
                 "first_seen": it.get("first_seen"),
+                "last_seen": it.get("last_seen"),
                 "is_new": it.get("first_seen") == pulled,
+                # an item the newest pull did NOT see any more. "No longer listed" — NOT
+                # "withdrawn": for kind='news' this is usually just pagination roll-off as newer
+                # posts push it off page 1, which says nothing about the rival's offer. It is a
+                # real withdrawal signal only for promo/campaign kinds. Only meaningful once >1
+                # pull exists; on a single vintage last_seen == pulled for every item, so this is
+                # uniformly False rather than falsely True.
+                "is_gone": bool(it.get("last_seen")) and it.get("last_seen") != pulled,
             }
             c = tax.get(it["url"])
             if c and c.get("title") == it["title"]:      # classification is for THIS title
@@ -237,9 +245,15 @@ def build():
         headline += "."
     if promo_items:
         n_new = sum(1 for p in promo_items if p["is_new"])
+        n_gone = sum(1 for p in promo_items if p["is_gone"])
         headline += (" %d rival promotions/campaigns tracked from the rivals' own sites"
                      % len(promo_items))
-        headline += (" (%d new this pull)." % n_new) if n_new else "."
+        bits = []
+        if n_new:
+            bits.append("%d new this pull" % n_new)
+        if n_gone:
+            bits.append("%d no longer listed" % n_gone)
+        headline += (" (%s)." % ", ".join(bits)) if bits else "."
 
     return {
         "meta": {
@@ -252,6 +266,14 @@ def build():
             "sentiment_anchor": anchor,
             "promos_pulled_at": promo_meta.get("pulled_at"),
             "promos_coverage_note": promo_meta.get("coverage_note"),
+            "promos_churn_note": "is_new / is_gone compare each item's own first_seen / last_seen "
+                                 "against this pull's pulled_at. They only carry meaning once more "
+                                 "than one pull exists — on a single vintage every item is new and "
+                                 "none is gone, which is a statement about the pull history, not "
+                                 "about the rivals. is_gone means NO LONGER LISTED, not withdrawn: "
+                                 "for kind='news' it is usually pagination roll-off as newer posts "
+                                 "push an item off the listing page. Read it as a withdrawal signal "
+                                 "only for promo/campaign kinds.",
             "theme_lexicon": {k: kws for k, _, kws in THEMES},
             "note_installs": "installs is Play's public bracket (e.g. 500,000+), not an exact count.",
         },
