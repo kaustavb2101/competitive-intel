@@ -3,6 +3,54 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-08 — Integration loop (SURFACE): the MEASURED OAE per-province crop-YIELD layer is finally shown — "Crop-yield deterioration" readout on `#market` (objective #1)
+
+Autonomous integration run. Verified the stated high-value backlog is already landed and current:
+FPO PICO competitor registry (#1) — `build_pico_census/_district/branch_pico` all reproduce byte-exact
+from a fresh CI pull of `catalog.fpo.go.th` (the 22-May-2026 snapshot is still the newest resource, so
+no refresh); per-branch cropland (#2) is in the gate + surfaced; the data.go.th distillers (#3) exist
+(vehicle_fleet/registry, dbd_formation, baac). GISTDA 40m (#4) stays **blocked** here — `GISTDA_SPHERE_KEY`
+is a repo secret not present in this CI env, so a puller can't be verified. DLT (`gdcatalog.dlt.go.th`,
+empty reply) and DBD (`openapi.dbd.go.th`, HTTP 403) are **not reachable from this cloud IP** this run —
+no fresh-data pull was possible; logged, not faked.
+
+**The gap fixed** — a negative-space sweep found `platform/data/oae_agstats.json` (committed in `23398a2`,
+"distil the unused OAE yearbook") was **built + gate-protected but shown nowhere and read by no downstream
+builder** — an orphaned MEASURED layer. It carries per-province crop AREA · YIELD (kg/rai) · PRODUCTION for
+the six field crops from the OAE Agricultural Statistics yearbook, keyed to the canonical 77 provinces. Its
+own docstring names the intent: per-province **yield** is the farm-household income lever the existing
+area-only / price-only crop layers don't carry, and a **declining** yield is a direct crop-household
+repayment-capacity signal for the agri / vehicle-title book (objective #1, the "getting riskier" TIME
+dimension). The surfacing step was never done.
+
+**What shipped** — a new **"Crop-yield deterioration · what's getting riskier"** readout on the Market
+assessment tab (`#market`), rendered client-side from `oae_agstats.json` (app.js `loadOAEYield` +
+`renderMarketYield`; host `<div id="mkt-yield">` in index.html). For each province it takes its dominant
+upland/industrial field crop — largest measured planted area among the five that carry BOTH a national
+yield benchmark AND a multi-year yield trend (maize/cassava/sugarcane/oilpalm/rubber) — and ranks by the
+steepest MEASURED yield decline, showing yield kg/rai, Δ vs the national benchmark for the same crop, and
+the yield trend with its own measured years. Top of the list is the real 2023–2025 sugarcane-yield collapse
+across the Central & Isan cane belt (Ang Thong −22%, Kanchanaburi −13%, Khon Kaen/Udon −10%) plus cassava
+declines in Isan/North. Honestly labelled MEASURED (OAE yearbook), dominance-by-area stated, the 2–3 yr
+window flagged as direction-not-rate; rice is explicitly excluded (no national yield benchmark in this
+series — it lives in the farm-income engine). Null-safe: the whole block hides when the file is absent.
+
+**Provenance:** MEASURED throughout — a straight read of the OAE yield/area tables; the only derived figures
+are the province-vs-national ratio and the yield trend (latest ÷ earliest measured year), both transparent
+ratios of measured values. No new `platform/data` file (so no `build_provenance.py` rebuild needed) and no
+pipeline/data change — app-only.
+
+**Verify:** `bash tests/run.sh check` green (**131 passed, 0 failed**; data-integrity **455/455**, incl.
+`node --check` on app.js/index.html and `check_site_health --local`). Headless render of `index.html#market`
+(swiftshader): the block populates, `__qa data-errors="[]"` (zero uncaught errors), the existing est.
+global-price crop column still renders — no regression. App-only visual change → shipped as a **draft PR**
+for owner review, not a direct commit.
+
+**Next recommended integration:** GISTDA 40m satellite crop-area (#4) once `GISTDA_SPHERE_KEY` is injected
+into a CI job (build a `check-crop` puller to supersede the SPAM baseline in `build_branch_cropland.py`), or
+the per-province OAE yield could next feed `build_crop_stress.py` as a measured yield-trend component (a
+pipeline change, gate-verified) rather than only a display.
+
 ## 2026-08-08 — Intelligence loop (SERVICE/DEPLOY-HEALTH): live freshness guard now covers `macro_indicators.json` — the last daily/weekly-CI upstream whose independent stall was invisible
 
 Autonomous market & service intelligence run. Data room + live deploy re-confirmed healthy up front

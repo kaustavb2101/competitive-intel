@@ -8149,6 +8149,7 @@ function renderMarket(){
     }
     drawMarket();
     loadTapeReal().then(renderMarketCollateral);   // acquisition lens — collateral concentration
+    loadOAEYield().then(renderMarketYield);        // objective #1 — measured crop-yield deterioration
    }).catch(()=>{ $('#mkttbl').innerHTML='<tr><td>Could not load market data.</td></tr>'; });
 }
 // ACQUISITION LENS — collateral concentration from the real loan tape (TAPE.collateral): where &
@@ -8192,6 +8193,66 @@ function renderMarketCollateral(){
         <td class="mono sub">${v.eval_avg?kk(v.eval_avg):'—'}</td></tr>`).join('');
   }
   wrapTables();   // wrap the dynamically-built tables so wide ones scroll on narrow columns
+}
+/* ---------- MEASURED crop-YIELD deterioration (data/oae_agstats.json) — objective #1 ----------
+   The TIME dimension of portfolio risk: for each province, its DOMINANT upland/industrial field
+   crop (largest measured planted/standing AREA among the five that carry BOTH a national yield
+   benchmark AND a multi-year yield trend — maize/cassava/sugarcane/oilpalm/rubber) and whether
+   that crop's MEASURED yield per rai is FALLING. A declining yield = weaker farm-household cash
+   flow = repayment-capacity pressure on the agri / vehicle-title book in that province. This is
+   the first surface for the OAE yearbook layer (previously built + gate-protected but unshown).
+   MEASURED (a straight read of the OAE yield/area tables); NOT an open/close/expand signal.
+   Rice carries no national yield benchmark in this series — it lives in the farm-income engine,
+   not here. Null-safe: the whole block hides when the file is absent. */
+let OAEYIELD;   // undefined = not fetched; null = fetched-and-absent
+const OAE_BENCH_CROPS={rubber:'Rubber',oilpalm:'Oil palm',cassava:'Cassava',maize:'Maize',sugarcane:'Sugarcane'};
+async function loadOAEYield(){
+  if(OAEYIELD!==undefined) return OAEYIELD;
+  try{ const r=await fetch('data/oae_agstats.json'); OAEYIELD = r.ok ? await r.json() : null; }
+  catch(e){ OAEYIELD=null; }
+  return OAEYIELD;
+}
+function renderMarketYield(){
+  const host=$('#mkt-yield'); if(!host) return;
+  const D=OAEYIELD;
+  if(!D||!D.by_province||!D.national){ host.style.display='none'; return; }
+  const natl=D.national, prov=provLookupByName();
+  const rows=[];
+  Object.keys(D.by_province).forEach(th=>{
+    const crops=D.by_province[th]; let dom=null;
+    Object.keys(OAE_BENCH_CROPS).forEach(c=>{
+      const o=crops[c];
+      if(!o||o.yield_trend_pct==null||!o.area_rai) return;
+      if(!dom||o.area_rai>dom.o.area_rai) dom={c,o};      // dominant = largest measured area
+    });
+    if(!dom) return;
+    const nb=natl[dom.c];
+    const vsNat=(nb&&nb.yield_kg_rai)?Math.round((dom.o.yield_kg_rai/nb.yield_kg_rai-1)*100):null;
+    const p=prov[th]||{};
+    rows.push({th,en:p.en||'',slug:p.slug||'',region:p.region||'',crop:OAE_BENCH_CROPS[dom.c],
+      area:dom.o.area_rai,yld:dom.o.yield_kg_rai,vsNat,trend:dom.o.yield_trend_pct,
+      yrs:dom.o.yield_trend_years||[]});
+  });
+  rows.sort((a,b)=>a.trend-b.trend);                      // steepest measured yield DECLINE first
+  const top=rows.slice(0,12);
+  const sev=t=>t==null?'var(--mid)':t<=-8?'var(--agri)':t<0?'#D97A3A':'var(--merch)';
+  const arrow=t=>t<0?'▼':(t>0?'▲':'●');
+  const rai=v=>v>=1e6?(v/1e6).toFixed(2)+'M rai':v>=1e3?Math.round(v/1e3)+'k rai':v+' rai';
+  const vint=(D.meta&&(D.meta.vintage_ce||D.meta.vintage_be))||'';
+  host.style.display='';
+  host.innerHTML=`<h2 class="risk" style="margin-top:28px">Crop-yield deterioration · what's getting riskier <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · OAE yearbook</span></h2>`
+    +`<p class="lead">Each province's <b>dominant upland/industrial field crop</b> (largest measured planted area among the five that carry a national yield benchmark) and whether its <b>yield per rai is falling</b>. A declining yield is weaker farm-household cash flow — repayment-capacity pressure on the agri / vehicle-title book, not an open/expand cue. Measured OAE yield, over each crop's own years. Rice sits in the farm-income engine (no national yield benchmark in this series).</p>`
+    +`<table class="tbl"><tr><th scope="col">Province</th><th scope="col">Region</th><th scope="col">Dominant field crop</th><th scope="col" title="measured yield, kg per rai">Yield (kg/rai)</th><th scope="col" title="vs national yield for the same crop">vs national</th><th scope="col" title="measured multi-year yield change, latest vs earliest measured year">Yield trend</th></tr>`
+    +top.map(r=>`<tr${r.slug?` onclick="location.href='${bldgURL(r.slug)}'" tabindex="0" role="link" style="cursor:pointer"`:''}>
+      <td><b>${r.th}</b> <span class="sub">${r.en}</span></td>
+      <td class="sub">${r.region}</td>
+      <td>${r.crop} <span class="sub">${rai(r.area)}</span></td>
+      <td class="mono">${Number(r.yld).toLocaleString()}</td>
+      <td class="mono" style="color:${r.vsNat==null?'var(--mid)':r.vsNat<0?'var(--agri)':'var(--merch)'}">${r.vsNat==null?'—':(r.vsNat>0?'+':'')+r.vsNat+'%'}</td>
+      <td class="mono" style="color:${sev(r.trend)}"><b>${arrow(r.trend)}${(r.trend>0?'+':'')+r.trend}%</b> <span class="sub">${r.yrs.length===2?r.yrs[0]+'–'+r.yrs[1]:''}</span></td></tr>`).join('')
+    +`</table>`
+    +`<p class="lead cc-provenance"><b>Provenance:</b> MEASURED — OAE (Office of Agricultural Economics) Agricultural Statistics of Thailand yearbook${vint?', '+vint:''} (yield kg/rai, planted/standing area, keyed to the canonical 77 provinces). Dominance is by measured area among the five benchmarked crops; yield trend = latest vs earliest measured year for that crop (a 2–3 yr window — read as direction, not a rate). Ranked by steepest measured yield decline; ${top.length} of ${rows.length} provinces shown.</p>`;
+  wrapTables();
 }
 let mktRegion='all';
 function drawMarket(){
