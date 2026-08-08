@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-08T04:20:43+00:00",
-    "commit": "e8d1bd4"
+    "generated_at": "2026-08-08T10:17:12+00:00",
+    "commit": "538030f"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,54 @@
   ],
   "activity": [
     {
+      "date": "2026-08-08T10:17:12+00:00",
+      "sha": "538030f",
+      "summary": "health(deploy): site-health probes for the two #319 Competition reads (rival_book_impact, rival_watch)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-08T10:00:24+00:00",
+      "sha": "3bf370c",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-08, run 31251628493)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-08T08:29:25+00:00",
+      "sha": "c9142ec",
+      "summary": "chore(docs): log ux-loop ship — SPA front-door <h1> merged (#321) + deploy-verified",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-08T15:26:11+07:00",
+      "sha": "2b5b799",
+      "summary": "ux: SPA front door gets a real (visually-hidden) <h1> (#321)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-08T12:04:51+07:00",
+      "sha": "91e14c7",
+      "summary": "docs(competition): correct build_rival_density.py's own docstring",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-08T12:02:56+07:00",
+      "sha": "8cf0939",
+      "summary": "feat(competition): what the rival field actually costs the book, one honest census, and a real change-diff (#319)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-08T04:36:00+00:00",
+      "sha": "77e3108",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-08, run 31239635460)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-08T04:24:39+00:00",
+      "sha": "4aa7885",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the macro_indicators freshness-guard ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-08T04:20:43+00:00",
       "sha": "e8d1bd4",
       "summary": "health(deploy): freshness guard now covers macro_indicators.json (last unguarded independent CI upstream)",
@@ -662,54 +710,6 @@
       "sha": "1e53ce5",
       "summary": "chore(derive): re-derive after merging #297",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-07T22:26:34+07:00",
-      "sha": "2e97f6d",
-      "summary": "Merge PR #297 (data/nabc-31049209416) — derived layers replayed, not merged",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-07T22:23:11+07:00",
-      "sha": "9bc0383",
-      "summary": "Merge PR #296 (fix/crop-stress-price-provenance) — derived layers replayed, not merged",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-07T22:16:32+07:00",
-      "sha": "f86e075",
-      "summary": "feat(assist): the falling-crop radar goes from province to BRANCH — a call list, not a map",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-07T15:05:40+00:00",
-      "sha": "78c8bd1",
-      "summary": "Merge remote-tracking branch 'origin/master' into fix/crop-stress-price-provenance",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-07T14:54:10+00:00",
-      "sha": "6cf4992",
-      "summary": "Merge remote-tracking branch 'origin/master' into data/thaiwater-31053032481",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-07T21:50:56+07:00",
-      "sha": "8cc87c4",
-      "summary": "feat(live): the daily Thai farm-gate price is on the Live board",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-07T21:50:56+07:00",
-      "sha": "8ddb1dd",
-      "summary": "fix(gate): a missing pandas is an environment gap, not \"data drifted\"",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-07T21:50:56+07:00",
-      "sha": "b3b9a19",
-      "summary": "fix(pipeline): regenerate provenance ALWAYS, not only when a builder drifted",
-      "pillar": "uxui"
     }
   ]
 }
