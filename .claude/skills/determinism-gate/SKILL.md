@@ -20,9 +20,29 @@ whose numbers cannot be trusted. Do not work around a red gate — diagnose it.
 
 Consequences you must internalise before reading any gate output:
 
-- **A clean mirror run reads `RESULT: N passed, 9 failed`.** Those 9 are the `node --check` steps,
-  failing because WSL has no Node. That is an environment gap, not a defect. A mirror run showing
-  *more* than 9 failures has real drift; a run showing exactly 9 is green.
+- **Never judge a mirror run against a remembered failure count. Run master and diff.**
+  The mirror carries pre-existing environment gaps, and their number changes as the repo grows —
+  a memorised threshold silently turns into a wrong verdict. The only sound test is:
+
+  ```bash
+  git checkout -B _baseline origin/master && git reset --hard origin/master
+  bash tests/run.sh check   # record the FAIL lines
+  # then the same on your branch, and diff the two FAIL sets
+  ```
+
+  **Your branch is clean when its FAIL set is identical to master's** — not when the count is small.
+
+- **Verified baseline, mirror + `origin/master` @ c9142ec, 2026-08-08: `117 passed, 15 failed`.**
+  That is 9 `node --check` steps (WSL has no Node) plus 6 numeric layers — `build_branch_agri`,
+  `build_regional_outlook`, `build_branch_risk`, `build_opportunity_score`, `build_macro_book`,
+  `build_crop_landuse`. Treat this figure as a dated observation, not a constant: re-measure it.
+
+- **Those 6 numeric layers PASS when run individually on a clean tree** (5 OK, `build_crop_landuse`
+  SKIPs at rc=3 for missing shapely/polygons). They fail only *inside* a full gate run, so the cause
+  is something earlier in the sequence perturbing a shared input — an in-gate environment artifact,
+  not real drift in those layers. If you are chasing one of them, reproduce it standalone first; if
+  it passes alone, it is this artifact and not your change.
+
 - **Windows Python 3.14 produces false float drift** on roughly 9 layers (`derive.py`,
   `build_branch_agri.py`, `build_regional_outlook.py`, `build_farmgate_platform.py`,
   `build_branch_risk.py`, `build_opportunity_score.py`, `build_macro_book.py`,
