@@ -109,6 +109,14 @@ FEEDS = [
          label="NABC daily agri prices (crop/livestock/fishery)", cadence="4x/day", ip="any",
          group="macro", out="source-data/nabc_prices.json"),
 
+    # Unscheduled until 2026-08-08 and quietly ageing: no workflow ran it, so source-data/
+    # nabc_agri.json sat 34 days old while build_branch_agri.py and build_crop_farmer_income.py
+    # (both objective-#1 layers) kept reproducing from it. A puller nobody runs is a feed that
+    # goes stale in silence — the registry is what stops that happening again.
+    dict(key="nabc_agri", script="pull_nabc_agri.py", args=["--stamp", STAMP],
+         label="NABC per-province agri production (feeds branch_agri + crop_farmer_income)",
+         cadence="weekly", ip="any", group="macro", out="source-data/nabc_agri.json"),
+
     dict(key="oae_prices", script="pull_oae_prices.py", args=["--stamp", STAMP],
          label="OAE weekly farm-gate prices (measured, replaces the World Bank proxy)",
          cadence="weekly", ip="any", group="macro", out="source-data/oae_farmgate_prices.json",
