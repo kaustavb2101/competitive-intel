@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-07T22:27:38+00:00",
-    "commit": "88d61cb"
+    "generated_at": "2026-08-08T04:20:43+00:00",
+    "commit": "e8d1bd4"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-07",
+    "eta_date": "2026-08-08",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -532,6 +532,36 @@
   ],
   "activity": [
     {
+      "date": "2026-08-08T04:20:43+00:00",
+      "sha": "e8d1bd4",
+      "summary": "health(deploy): freshness guard now covers macro_indicators.json (last unguarded independent CI upstream)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-08T03:49:48+00:00",
+      "sha": "2653467",
+      "summary": "data: NABC live prices (2026-08-08, run 31237778499)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-08T02:51:36+00:00",
+      "sha": "f8e2a1b",
+      "summary": "docs(progress): log ux-doc-lang-parts-nav-brand merge + deploy + verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-08T09:48:38+07:00",
+      "sha": "8c5d778",
+      "summary": "ux: wrap Thai nav brand in lang=\"th\" on the 5 remaining pages (WCAG 3.1.2) (#318)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-07T22:28:04+00:00",
+      "sha": "5a75138",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the segment_exposure probe ship",
+      "pillar": "service"
+    },
+    {
       "date": "2026-08-07T22:27:38+00:00",
       "sha": "88d61cb",
       "summary": "health(deploy): site-health probe guards segment_exposure.json (last unprobed obj-#1 Exposure read)",
@@ -680,36 +710,6 @@
       "sha": "b3b9a19",
       "summary": "fix(pipeline): regenerate provenance ALWAYS, not only when a builder drifted",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-07T14:48:08+00:00",
-      "sha": "274ae0f",
-      "summary": "Merge remote-tracking branch 'origin/master' into feat/debt-purpose-consumption-read",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-07T14:32:53+00:00",
-      "sha": "7b36497",
-      "summary": "docs(progress): log the theme-toggle aria-label UX fix (PR #314, merged + deployed)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-07T14:30:16+00:00",
-      "sha": "5e5f9f5",
-      "summary": "Merge remote-tracking branch 'origin/master' into data/thaiwater-31136725501",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-07T21:29:40+07:00",
-      "sha": "2c61967",
-      "summary": "ux: give the 3 deck.gl pages' theme toggle an aria-label (#314)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-07T14:23:54+00:00",
-      "sha": "e4bbef6",
-      "summary": "fix(provenance): regenerate after auto-merge of master's tape_geo_occ change",
-      "pillar": "service"
     }
   ]
 }
