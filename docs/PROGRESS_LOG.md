@@ -3,6 +3,59 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-08 — Intelligence loop (deploy health): site-health probes for the two newest Competition (#acq) reads — shipped + gate-green
+
+- **Shipped** (direct to `master`): closed the deploy-health blind spot on the two layers the #319 rival-field wave landed today and left unguarded. Both are live-`fetch()`'d into the Competition (`#acq`) surface (`tmliFetch('rival_book_impact')` app.js:4287, `tmliFetch('rival_watch')` app.js:4168) and neither was in `check_site_health.py::DATA_FILES`, so a truncated/404 CDN deploy that gutted either would silently drop its board to a calm "not built for this vintage" note with **no phone alert** — the exact "broken demo" class the site-health probe exists to catch, and one that neither layer self-heals from (both are pipeline rebuilds off the owner-side loan tape / Thai-IP promo pull, no CI cron to restore a bad deploy).
+  - **`_shape_rival_book_impact`** — the MEASURED rival-density × real-loan-tape join (obj #1 + #2). `renderRivalBookImpact` GATES the whole board on `j.within_province`, so the probe asserts that object plus both sides of the contested split (`.more_contested`/`.less_contested` each carrying `n_branches`/`n_accounts`/`rivals_avg`/`dpd90p_pct`/`early_pct`/`avg_balance_thb`) and the three `gap_*` deltas — both sides validated so a partial truncation can't pass a one-side check.
+  - **`_shape_rival_watch`** — the obj-#2 "what changed since the last pull" diff panel. The render is deliberately null-safe on every sub-object, so the real deploy risk is a file that parses (200) but has lost `.promos`/`.ads`; the probe asserts those two load-bearing sub-objects still carry their render-read counts (`promos.n_new`/`n_disappeared`, `ads.n_appeared_brands`). Shape-not-values throughout — green in a legitimately quiet vintage (counts = 0).
+- **How it was found:** the autonomy plan reports no autonomously-completable OPEN items, so this run cross-referenced what `#acq` live-fetches against what `DATA_FILES` probes and found the two #319 layers (committed hours earlier) were the only Competition-surface reads with no deploy probe — the same gap the recent `rival_pulse`/`rival_ads`/`segment_exposure`/`macro_indicators` probe runs have been systematically closing.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **129 passed, 0 failed** (was 127; the two new probes add exactly 2, exercised by the `check_site_health.py --local` gate step which PASSED — validators accept the committed payloads). (b) guard-teeth verified out-of-band: dropping `within_province`, nulling a split field, dropping `promos`, and dropping `ads.n_appeared_brands` each produce a precise FAIL, so the probes catch a truncated deploy rather than rubber-stamping it. (c) no secrets in the diff. (d) diff = only `pipeline/check_site_health.py` (+79) + this log entry; no `platform/data` file altered, so no `build_provenance.py`/PR/headless-render needed (test-infra only, zero app/visual change).
+- **Deploy note:** this changes only the CI/health checker, not the served site — nothing in `platform/` moves, so there is no production surface to re-verify beyond the existing `master` deploy. The probe itself runs against live production nightly (`site-health.yml`, already correctly aliased to `competitive-intel-git-master-…vercel.app`).
+- **Next recommended:** the Competition (#acq) surface is now fully probe-covered. Next intelligence target — sweep the newest `#exposure`/`#overview` reads for any live-fetched layer still outside `DATA_FILES`, or (PLANNING) tighten `plan_cycle.py` so the CEO dashboard reflects the now-complete deploy-probe coverage across `#acq`.
+
+## 2026-08-08 — UX loop (a11y): the SPA front door finally has a real `<h1>` — shipped + deploy-verified
+
+Autonomous UX-improvement run (`claude/ux-loop-20260808-0825` → PR #321, **squash-merged**). The
+`docs/UXUI_AUDIT.md` backlog's numbered findings (1–7) and every surgical "Open backlog" item are
+already fixed; the remaining open items are all explicitly flagged as NOT for unattended auto-merge
+(deck.gl gesture pages needing device testing) or out of `platform/` (test-infra). So this run
+reviewed the front door itself and found a genuine gap.
+
+**The gap fixed — `ux-spa-missing-h1`.** `index.html` (the SPA, the most-used page) had **no
+on-screen `<h1>`**: every visible route title renders as `<h2>` ("Command center", "③ Assistance…",
+the Macro/Risk/Competition section heads), and the only real `<h1>` is the **print-only** masthead
+(`#print-head`, `display:none` off-print). Its on-screen document outline started at `<h2>` with no
+heading-one (axe `page-has-heading-one`, WCAG 1.3.1) — and it was the ONLY nav page missing an
+on-screen h1 (data/status/live render one; rayong-catchment renders `<h1>Call sheet · …</h1>`).
+
+**Fix (surgical, zero visual change).** Added a single visually-hidden
+`<h1 class="sr-only">AutoX · <span lang="th">เงินไชโย</span> — Credit Intelligence</h1>` as the first
+child of `<main>` (h1 = app, h2 = current view — correct hierarchy; `document.title` still carries the
+per-route name), a standard `.sr-only` clip utility in `styles.css` (none existed), and folded
+`.sr-only` into the print `display:none` list so it never co-exists with the print masthead h1.
+Promoting the 11 themed view-title `<h2>`s to `<h1>` was rejected as too broad/visually-risky (would
+need mirroring all `h2` CSS onto `h1`). HTML+CSS only, no JS.
+
+**Safeguard protocol — ALL passed → mandated auto-merge.** (a) `bash tests/run.sh check` **EXIT 0,
+543 passed / 0 failed** incl. `node --check inline JS of index.html`; (b) headless render of
+`index.html` **byte-identical** before/after (174,112 B, `cmp` equal → zero visual change), settled
+DOM has exactly one real `<h1 class="sr-only">`, PNG self-reviewed; (c) no secrets in the diff;
+(d) 3-file surgical diff (`index.html` + `styles.css` + `docs/UXUI_AUDIT.md`), no stray files.
+
+**Deploy-verify (post-merge).** Master auto-deployed to Vercel; production alias
+`competitive-intel-git-master-…vercel.app/` → **HTTP 200**, the `sr-only` `<h1>` and the `.sr-only`
+CSS rule both confirmed **live in production**. No regression → no rollback. (`/index.html` → 308 is
+the expected `cleanUrls` redirect to `/`, not a regression.)
+
+**New backlog logged — `ux-deckgl-missing-h1`.** `province.html` + `branch-explorer.html` render NO
+`<h1>` at all (static or dynamic) — same class, but they're 3D-scene pages whose identity is dynamic
+(focal province/branch), so the fix (promote the panel title / add a route-named h1) needs a
+per-page self-review against each inline CSS — left for its own run.
+
+**Recommend next:** `ux-deckgl-missing-h1` (small, but self-review each deck.gl panel layout), or
+`qa-visual-overflow-not-in-ci` (wire `tests/visual_overflow.js` to the global Playwright so the loop
+gets an automated bleed/clip/page-x gate instead of relying on manual renders).
+
 ## 2026-08-08 — Intelligence loop (SERVICE/DEPLOY-HEALTH): live freshness guard now covers `macro_indicators.json` — the last daily/weekly-CI upstream whose independent stall was invisible
 
 Autonomous market & service intelligence run. Data room + live deploy re-confirmed healthy up front
