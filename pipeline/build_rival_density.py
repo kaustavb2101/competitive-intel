@@ -5,14 +5,17 @@ build_rival_density.py — WHERE COMPETITORS OWN GROUND (objective #2, district 
 
 THE QUESTION THIS ANSWERS
 -------------------------
-Objective #2 is "where to expand". White-space (amphoe.json) says where demand is
-under-served by AutoX. This layer answers the sharper question: in which districts do
-our RIVALS already own the ground? For every one of the 928 amphoe (districts) it puts
-our AutoX branch count next to the MEASURED count of competitor branches, computes the
-rival:AutoX ratio, and flags the two shapes of ceded ground:
-  - OUTNUMBERED         AutoX is present (>=1 branch) but rivals outnumber us.
+Objective #2 is COMPETITIVE RISK on the network AutoX ALREADY RUNS — not branch growth.
+(This docstring said "where to expand" until 2026-08-08; that predates the consolidation
+pivot and was wrong. Nothing here is an open / close / where-to-open recommendation.)
+This layer asks: in which districts do our RIVALS already own the ground? For every one
+of the 928 amphoe (districts) it puts our AutoX branch count next to the MEASURED count
+of competitor branches, computes the rival:AutoX ratio, and flags two shapes of pressure:
+  - OUTNUMBERED         AutoX is present (>=1 branch) but rivals outnumber us — margin
+                        pressure on branches we already operate.
   - ABSENT_RIVAL_DENSE  AutoX has zero branches yet rivals cluster there (>= DENSE_THRESH)
-                        — white-space with incumbents already dug in.
+                        — read as a competitor-strength signal on the surrounding market,
+                        NOT as a site to open.
 
 MEASURED vs ESTIMATED (the data-mandate — stated explicitly, repeated in meta)
 ------------------------------------------------------------------------------
@@ -21,8 +24,8 @@ MEASURED vs ESTIMATED (the data-mandate — stated explicitly, repeated in meta)
                       th_amphoe.geojson — build_amphoe.py). NOT recomputed here.
   MEASURED   rivals   per-district competitor branch count. Every rival is a real pulled
              by_brand branch coordinate from platform/data/competitors_census.json .items
-                      (the MERGED Google Places UNION Overture census, ~4,384 points, no
-                      synthesis). Assigned to a district by the SAME ray-casting point-in-
+                      (the MERGED official store-locator census — all four brands, 16,503
+                      points, no synthesis). Assigned to a district by the SAME ray-casting point-in-
                       polygon join build_amphoe.py uses for AutoX branches (so a rival and a
                       branch at the same spot land in the same district — a fair ratio),
                       with a nearest-centroid fallback for the handful of points that sit
@@ -31,11 +34,15 @@ MEASURED vs ESTIMATED (the data-mandate — stated explicitly, repeated in meta)
   COMPUTED   flag     the OUTNUMBERED / ABSENT_RIVAL_DENSE threshold below. The inputs are
              /EDITORIAL measured; only the DENSE_THRESH cut is a documented judgement.
 
-HONEST LOWER BOUND: the census is a lower bound, not a registry (Google caps ~60 hits/
-query/province; Overture is a sample — public reports put true rival totals far higher, e.g.
-MTC FY2025 = 8,673). So rival counts here UNDER-count: a district flagged outnumbered is
-conservatively outnumbered, and some un-flagged districts are outnumbered in reality. The
-direction of the bias only ever makes AutoX look LESS outnumbered than it is. See meta.gaps.
+NOT A LOWER BOUND ANY MORE (corrected 2026-08-08): all four brands now come from the
+operators' OWN official store-locators, Heng included (pull_heng_locator.py) — that set
+REPLACED the earlier Google/Overture sample rather than being unioned with it, so the old
+"rival counts UNDER-count" caveat is obsolete and has been removed from meta.gaps too.
+A locator lists every service point/sub-branch, so a brand's count can sit slightly ABOVE
+its headline branch number (Muangthai 8,931 here vs an 8,673 FY2025 headline). Read
+"outnumbered" as rival service points vs AutoX branches on one locator basis — like for
+like, not conservative. The remaining real gap: only the 4 big compliant brands are
+censused, so this is big-4 density, not total competitive density. See meta.gaps.
 
 DETERMINISTIC + NETWORK-FREE: no network, no wall clock, no randomness. Byte-exact
 reproducible -> carries --check (the QA gate runs it). Inputs may be absent in a stripped
