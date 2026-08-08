@@ -3,6 +3,48 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-08 — Intelligence loop (service/deploy-health): deploy-shape probe now guards the front-door structural-stress index — shipped to master
+
+Autonomous market & service intelligence run. Backlog is 98% done (1 owner-side item left), so the
+SERVICE/DEPLOY-HEALTH pillar's job is to close deploy blind spots. Freshness coverage over the
+frequent live upstreams is already complete (prior run closed the weekday SET peer scoreboard), so
+this run took the sibling gap the prior run explicitly named next: the live-fetched obj-#1/#2 reads
+that **render but have no `_shape_*` deploy probe**, where a truncated/404 CDN deploy silently blanks
+a card with no phone alert.
+
+**How the target was chosen.** Cross-referenced every `data/*.json` live-`fetch()`'d in `app.js`
+(109) against the `check_site_health.py` shape registry (56 probed). The highest-value unprobed read
+was **`data/province_stress_index.json`** (obj #1, MEASURED NSO legs) — the combined
+**structural-stress index** (household DTI + unemployment). It renders the exec **front-door**
+"Structurally riskiest · household DTI + unemployment" card (`PSTRESS_LIST[0]`, app.js:6099) **and**
+a `#map` lens, and is the **parent** whose `composite_stress` the already-probed `province_pressure`
+join consumes — yet the parent itself was unprobed.
+
+**The gap fixed.** `loadProvinceStress` GATES every render on `PSTRESS_LIST` (built by filtering
+`.provinces` on `composite_stress != null`) being non-empty and degrades **SILENTLY** when the file
+is missing/truncated: PSTRESS stays empty, the lens self-hides, `val()` reads 0, no error, **no phone
+alert** — the exact "broken demo" class the probe exists to catch. It also **cannot self-heal** (its
+DTI + unemployment legs come from NSO SES/LFS folded by a pipeline build, not a CI pull). Added
+`_shape_province_stress_index` + its `CHECKS` registry entry, next to its DTI sibling
+`household_risk`. The probe asserts the composite-bearing rows the render gate is built from + the
+`province` name each row renders, mirrors the builder's honest `meta.absent` guard (absent → OK, not
+an alert — matching the `household_risk`/`search_demand` pattern), and asserts **shape not values**
+(robust to a future SES/LFS vintage shifting the ratios).
+
+**Safeguards (all pass).** (a) `bash tests/run.sh check` → **129 passed, 0 failed**. (b) No secrets
+in the diff. (c) Diff = only `pipeline/check_site_health.py` (+48 lines) + this log + `SERVICE_AUDIT.md`
+— no stray files, no `platform/data` change (→ no provenance regen needed). (d) No fabrication — the
+note describes real render reads (app.js:6099 / loadProvinceStress), the real `composite_stress != null`
+gate, and the real `meta.absent` guard. Offline `--local` probe is **161/161 HEALTHY** (was 158, +3
+fetch/parse/shape) and the new entry PASSes on the committed 77-province payload; the probe runs in
+both the live and `--local` paths (no wall-clock dependency), so the determinism gate exercises it and
+stays byte-unaffected. Probe-script-only, no visual/app change → committed straight to master (no PR /
+headless render required). **Next recommended:** continue the shape-probe sweep down the
+unprobed-but-rendered list — the next obj-#1/#2 candidates are `regional_outlook.json` (the national
+outlook narrative headline) and the `#exposure`/collateral reads still without a deploy probe
+(`collateral_outlook.json`, `vehicle_collateral.json`), so a truncated deploy of one fires an alert
+instead of silently blanking its card.
+
 ## 2026-08-08 — Intelligence loop (service/deploy-health): freshness guard now covers the weekday SET peer scoreboard — shipped to master
 
 Autonomous market & service intelligence run. Backlog is 98% done (1 owner-side item left), so the
