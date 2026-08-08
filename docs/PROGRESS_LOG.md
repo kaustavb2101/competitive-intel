@@ -3,6 +3,57 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-08 — Integration loop: surfaced the orphaned MEASURED crop-YIELD layer as a Risk-tab board (obj #1) — PR (visual change)
+
+Autonomous integration run. The scheduled backlog's headline items (FPO PICO competitor registry →
+`pico_census.json`; per-branch cropland → `branch_cropland.json`; DIW/MOT/DBD distillation) are all
+already built, gated and surfaced; GISTDA satellite crop-area and BAAC/SME-bank credit are blocked
+(re-probed this run: `data.go.th` still 403, `sphere.gistda.or.th` 000, `GISTDA_SPHERE_KEY` absent from
+the CI env — no block has lifted, see `docs/BLOCKED_SOURCES.md`). So a negative-space sweep looked for a
+layer the pipeline **builds but no view renders**, and found exactly one.
+
+**The gap fixed — `platform/data/oae_agstats.json` was orphaned.** Built by `build_oae_agstats.py`
+(committed input `source-data/staging/oae_agstats.json`, deterministic, `--check`-gated), it carries
+**MEASURED** per-province `yield_kg_rai` / `area_rai` / `production_ton` for the 7 credit-relevant crops
+from the OAE Agricultural Statistics yearbook (2567/2024) — but **zero `platform/` code fetched it** (the
+exec data-room card even listed it while no view rendered a number). YIELD is the one agri-income lever
+no surfaced layer carried: `branch_cropland.json` has area, `crop_stress.json` has price, and
+`crop_farmer_income.json` carries measured per-province yield **for rice only** (all other crops fall
+back to the national figure — its own footnote). Yield is the farm-household **repayment-capacity**
+signal (obj #1) — two provinces with equal planted area and a 30% yield gap have very different agri /
+vehicle-title repayment capacity.
+
+**What shipped.** A new **Crop-yield income stress** board on the Risk (`#exposure`) tab, following the
+established `renderFloodExposure`/`renderContestedGround` idiom exactly: a lazy `loadOaeAgstats()`, an
+in-JS DOM host (`#expo-yield`, no `index.html` wiring), graceful absent-file handling, `methodBox` +
+`tbl-wrap` table. For each province it takes the **dominant crop** (largest measured area) and compares
+that crop's measured yield to the **national benchmark of the same crop** (never cross-crop — yield basis
+differs: planted / harvested / standing). Book weight = branch count (join on Thai province name, 77/77).
+Headline: **968 of 2,015 branches (48%) sit in the 35 provinces whose dominant crop yields below the
+national benchmark** — the textbook-correct pattern (rainfed Isan rice + eastern/southern rubber belt:
+Sa Kaeo −32.6%, Nong Khai −30.3%, Roi Et/Buriram/Khon Kaen rice, Rayong/Prachuap rubber).
+
+**Provenance honesty.** Labelled MEASURED (OAE yearbook, read verbatim). The only client-side derivation
+is the national benchmark for main-/second-season rice (which OAE's national row omits) = the
+production-weighted mean of the 77 measured province rows — a method that cross-checks **within ~7%** of
+OAE's published national figure on the five crops that publish one (maize −1.2%, cassava −7.0%,
+sugarcane 0.0%, oil palm −4.6%, rubber −5.6%); the methodBox states this and the within-crop-only rule.
+
+**Safeguards.** (a) `bash tests/run.sh check` → green (see PR). (b) `node --check platform/app.js` OK.
+(c) Headless render on a 390px phone viewport: `#expo-yield` board present, headline + worst-12 rows
+byte-match the Python ground truth, measured chip shown, table wrapped (no horizontal overflow), only a
+pre-existing unrelated `ERR_CONNECTION_RESET` in console (the board loaded fine). (d) No new
+`platform/data` file → no `build_provenance.py` regen needed. (e) Diff = only `platform/app.js` (+114) +
+this log. **Opened as a PR (not committed to master) because it adds a visible board — visual changes go
+through review per the operating model.**
+
+**Next recommended.** With `oae_agstats` surfaced, the built-layer inventory is fully wired (negative
+space confirmed only this one orphan). The remaining integration frontier is all owner-side/blocked
+(BAAC/SME-bank penetration + GISTDA 40m crop-area need a Thai-IP pull or the secret mapped into CI). A
+good next surgical pick: fold the same measured per-province yield into the province deep-dive's existing
+crop-economics panel, replacing its national-fallback yield for the 6 non-rice crops with the measured
+province figure this layer now exposes.
+
 ## 2026-08-08 — Intelligence loop (service/deploy-health): freshness guard now covers the weekday SET peer scoreboard — shipped to master
 
 Autonomous market & service intelligence run. Backlog is 98% done (1 owner-side item left), so the

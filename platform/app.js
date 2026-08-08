@@ -695,6 +695,26 @@ function floodHzRec(d){
   const f=FLOODHZ[i]; return (f==null)?null:f;
 }
 
+/* ---------- per-province MEASURED crop YIELD vs national benchmark (data/oae_agstats.json, obj#1) ----
+   Surfaces the ALREADY-BUILT oae_agstats.json (pipeline/build_oae_agstats.py): per-province measured
+   yield_kg_rai / area_rai / production_ton for the 7 credit-relevant crops, from the OAE Agricultural
+   Statistics of Thailand yearbook (2567/2024). YIELD is the farm-household repayment-capacity lever the
+   area-only (branch_cropland) and price-only (crop_stress) crop layers do NOT carry. Read verbatim, no
+   recompute; the only client-side derivation is the national rice benchmark (which OAE's national row
+   omits) as the production-weighted mean of the measured province rows. Lazy + graceful: absent → nothing. */
+let OAEAG=null, oaeagMeta=null, oaeagLoaded=false, oaeagPromise=null;
+async function loadOaeAgstats(){
+  if(oaeagPromise) return oaeagPromise;
+  oaeagLoaded=true;
+  oaeagPromise=(async()=>{
+    try{ const r=await fetch('data/oae_agstats.json'); if(!r.ok){OAEAG=null;return OAEAG;}
+      const j=await r.json(); oaeagMeta=j.meta||null; OAEAG=(j.by_province&&j.national&&Array.isArray(j.crops))?j:null; }
+    catch(e){ OAEAG=null; oaeagMeta=null; }
+    return OAEAG;
+  })();
+  return oaeagPromise;
+}
+
 /* ---------- per-branch MEASURED-corrected CROP-AREA within 10km (data/branch_cropland.json) ----
    Lazy-loads pipeline/build_branch_cropland.py's output: {meta:{crops[],provenance,...},
    branches:[{ha:[…5 crops], crop_ha, dom, fac:[…]}]}, INDEX-ALIGNED to branches.json. The per-crop
@@ -5814,6 +5834,9 @@ function renderExposure(){
   // OBJECTIVE #1: portfolio flood-hazard exposure — how much of the book sits on repeatedly-flooding
   // ground (MEASURED GISTDA census, joined client-side; no recompute).
   renderFloodExposure();
+  // OBJECTIVE #1: per-province crop-YIELD income stress — MEASURED OAE yearbook yield vs the national
+  // benchmark; the farm-household repayment-capacity lever the area-only / price-only crop layers lack.
+  renderCropYieldStress();
 }
 
 /* ---------- most contested ground · contested population (objective #2, MEASURED) ----------
@@ -5973,6 +5996,97 @@ function renderFloodExposure(){
             `<td class="mono" style="color:${cCol(cs)}">${(100*cs).toFixed(0)}%</td></tr>`;}).join('')+`</table></div>`
         :`<p class="lead sub">No branch sits in a chronic-flood district.</p>`)+
       `</div></div>`;
+}
+
+/* ---------- per-province crop-yield income stress (objective #1, MEASURED) ----------
+   Reads OAEAG (data/oae_agstats.json). For each province we take its DOMINANT crop (the one with the
+   largest measured area) and compare that crop's measured yield to the national benchmark of the SAME
+   crop — never across crops (yield basis differs: planted / harvested / standing). A province whose
+   dominant crop yields below the national norm has structurally weaker farm-household repayment capacity
+   on the agri / vehicle-title book. Book weight = branch count (join on Thai province name, 77/77).
+   Lazy + graceful: absent file → renders nothing. No recompute of the source, only the read + the ranking. */
+const OAE_CROP_LAB={rice:'Rice (main)',rice_second:'Rice (2nd)',maize:'Maize',cassava:'Cassava',sugarcane:'Sugarcane',oilpalm:'Oil palm',rubber:'Rubber'};
+let cropYieldWired=false;
+function cropYieldHost(){
+  let h=document.getElementById('expo-yield');
+  if(h) return h;
+  const anchor=document.getElementById('expo-flood')||document.getElementById('expoprov');
+  if(!anchor||!anchor.parentNode) return null;
+  h=document.createElement('div'); h.id='expo-yield'; h.style.marginTop='18px';
+  anchor.parentNode.insertBefore(h, anchor.nextSibling);
+  return h;
+}
+function renderCropYieldStress(){
+  const host=cropYieldHost(); if(!host) return;
+  if(!OAEAG){
+    if(!cropYieldWired){ cropYieldWired=true; loadOaeAgstats().then(()=>{ if(onExposureView()) renderCropYieldStress(); }); }
+    host.innerHTML=''; return;
+  }
+  if(!DATA||!OAEAG.by_province){ host.innerHTML=''; return; }
+  const byp=OAEAG.by_province, nat=OAEAG.national||{}, crops=OAEAG.crops||[];
+  const provN={}, provR={};
+  DATA.forEach(d=>{const v=d.v||'—'; provN[v]=(provN[v]||0)+1; if(!provR[v])provR[v]=d.r||'';});
+  // national benchmark per crop: OAE's published national yield where it exists; otherwise (main- and
+  // second-season rice, which the national row omits) the production-weighted mean of the measured
+  // province rows — Σ production_ton × 1000 ÷ Σ area_rai.
+  const bench={};
+  crops.forEach(c=>{
+    const pub=nat[c]&&nat[c].yield_kg_rai;
+    if(pub){ bench[c]=pub; return; }
+    let tp=0, ta=0;
+    for(const p in byp){ const rec=byp[p][c]; if(rec&&rec.production_ton&&rec.area_rai){ tp+=rec.production_ton; ta+=rec.area_rai; } }
+    bench[c]=ta?(tp*1000/ta):null;
+  });
+  const rows=[];
+  for(const prov in byp){
+    const cm=byp[prov]; let best=null;
+    for(const c in cm){ const rec=cm[c]; if(bench[c]==null) continue;
+      const ar=rec.area_rai, yv=rec.yield_kg_rai; if(!ar||!yv) continue;
+      if(!best||ar>best.area) best={crop:c,area:ar,yld:yv,bench:bench[c],tr:(rec.yield_trend_pct!=null?rec.yield_trend_pct:null)};
+    }
+    if(!best) continue;
+    best.prov=prov; best.reg=provR[prov]||''; best.nb=provN[prov]||0;
+    best.gap=100*(best.yld-best.bench)/best.bench;
+    rows.push(best);
+  }
+  if(!rows.length){ host.innerHTML=''; return; }
+  rows.sort((a,b)=>a.gap-b.gap);
+  const below=rows.filter(r=>r.gap<0);
+  if(!below.length){ host.innerHTML=''; return; }
+  const N=DATA.length;
+  const nbBelow=below.reduce((s,r)=>s+r.nb,0);
+  const pctBelow=(100*nbBelow/N).toFixed(0);
+  const top=below.slice(0,12);
+  const gcol=g=>g<=-20?'var(--agri)':g<=-10?'var(--gold)':'var(--mid)';
+  const vint=(oaeagMeta&&oaeagMeta.vintage_be)?('พ.ศ. '+oaeagMeta.vintage_be+(oaeagMeta.vintage_ce?' / '+oaeagMeta.vintage_ce:'')):'2567/2024';
+  const srcFull=(oaeagMeta&&oaeagMeta.source)?oaeagMeta.source:'OAE Agricultural Statistics of Thailand yearbook';
+  const src=`<span title="${escHtml(srcFull)}">OAE Agricultural Statistics yearbook</span>`;
+  const trCell=tr=> tr==null? '<span class="sub">—</span>'
+      : (tr<0? `<span style="color:var(--agri)">▼ ${tr.toFixed(1)}%</span>` : `<span style="color:var(--merch)">▲ +${tr.toFixed(1)}%</span>`);
+  host.innerHTML=
+    `<h2 class="risk" style="margin-top:0">Crop-yield income stress ${TAG_M}</h2>`+
+    `<p class="lead"><b>${nbBelow.toLocaleString()} of ${N.toLocaleString()} branches (${pctBelow}%)</b> sit in the `+
+    `<b>${below.length}</b> provinces whose <b>dominant crop yields below the national benchmark</b> — the `+
+    `farm-household repayment-capacity signal the area-only and price-only crop layers can't see. `+
+    `Measured yield, ${src} (${vint}). The pattern is the known one: rainfed Isan rice and the eastern / southern `+
+    `rubber belt yield structurally below the national mean.</p>`+
+    methodBox('Each province is scored on its DOMINANT crop — the one with the largest measured area — comparing that crop’s measured yield to the national benchmark of the SAME crop.',
+      ['Per-province yield is <b>measured</b> — OAE provincial yearbook tables, read verbatim (not modelled).',
+       'National benchmark is OAE’s published national yield; for main- and second-season rice (which the national row omits) it is the production-weighted mean of the 77 measured province rows — a method that lands within ~7% of OAE’s published figure on the five crops that publish one.',
+       'Compare a province only WITHIN its crop — yield basis differs by crop (rice / maize / cassava planted, sugarcane harvested, oil palm / rubber standing), so cross-crop yield comparison is invalid.',
+       'Book weight = branch count (join on province name, 77/77); ▼ trend = the OAE multi-year yield direction where published (perennials only).'])+
+    `<div class="tbl-wrap"><table class="tbl" id="expo-yield-tbl"><tr><th scope="col">#</th><th scope="col">Province</th>`+
+    `<th scope="col">Branches</th><th scope="col">Dominant crop</th>`+
+    `<th scope="col" title="measured province yield, kg per rai">Yield kg/rai</th>`+
+    `<th scope="col" class="h-agri" title="province yield vs the national benchmark of the same crop">vs national</th>`+
+    `<th scope="col" title="OAE multi-year yield direction where published">Trend</th></tr>`+
+    top.map((r,i)=>{const col=gcol(r.gap);
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${escHtml(r.prov)}</b>${r.reg?` <span class="sub">${escHtml(r.reg)}</span>`:''}</td>`+
+        `<td class="mono">${r.nb.toLocaleString()}</td><td class="sub">${OAE_CROP_LAB[r.crop]||r.crop}</td>`+
+        `<td class="mono">${r.yld.toLocaleString()}</td>`+
+        `<td class="mono" style="color:${col}">${r.gap.toFixed(1)}%</td>`+
+        `<td class="mono">${trCell(r.tr)}</td></tr>`;}).join('')+
+    `</table></div>`;
 }
 
 /* ---------- portfolio concentration by region · segment mix + HHI (objective #1) ----------
