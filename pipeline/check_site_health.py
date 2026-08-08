@@ -1592,6 +1592,69 @@ def _shape_assist_branch_radar(d):
     return None
 
 
+def _shape_rival_book_impact(d):
+    # The Competition (#acq) book-cost read (obj #1 + #2, shipped #319) — the one
+    # layer that joins MEASURED per-district rival counts to the MEASURED real loan
+    # tape and asks "what does the rival field actually cost the book?".
+    # renderRivalBookImpact live-fetches it (tmliFetch('rival_book_impact')) and
+    # GATES the whole board on `j.within_province` — if the file 404s/truncates it
+    # drops to a calm "not built for this vintage" note with NO phone alert. It
+    # CANNOT self-heal: the join is a pipeline rebuild off the owner-side tape
+    # (build_rival_book_impact.py, no CI cron), so a bad CDN deploy stays broken
+    # until someone notices. The within-province table reads .more_contested /
+    # .less_contested (each .n_branches/.n_accounts/.rivals_avg/.dpd90p_pct/
+    # .early_pct/.avg_balance_thb) and the three .gap_* deltas; validate both sides
+    # so a partial truncation cannot pass a one-side check. Asserts render shape,
+    # not values — robust to a future tape/rival-density vintage refresh.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    wp = d.get("within_province")
+    if not isinstance(wp, dict):
+        return "missing 'within_province' object (renderRivalBookImpact gates the whole board on it)"
+    for side in ("more_contested", "less_contested"):
+        s = wp.get(side)
+        if not isinstance(s, dict):
+            return "within_province.%s missing/not an object (a table row render read)" % side
+        for k in ("n_branches", "n_accounts", "rivals_avg", "dpd90p_pct", "early_pct", "avg_balance_thb"):
+            if not isinstance(s.get(k), (int, float)) or isinstance(s.get(k), bool):
+                return "within_province.%s.%s missing/non-numeric (the contested-split table render read)" % (side, k)
+    for k in ("gap_dpd90p_pp", "gap_early_pp", "gap_avg_balance_thb"):
+        if not isinstance(wp.get(k), (int, float)) or isinstance(wp.get(k), bool):
+            return "within_province.%s missing/non-numeric (the Gap row render read)" % k
+    return None
+
+
+def _shape_rival_watch(d):
+    # The Competition (#acq) change-diff read (obj #2, shipped #319) — the only
+    # panel on the tab that answers "and what MOVED since the last pull?" instead of
+    # a right-now snapshot. renderRivalWatch live-fetches it (tmliFetch('rival_watch'))
+    # into the "What changed since the last pull" panel at the top of the Rival-pulse
+    # section, off .promos (n_new/n_disappeared + new[]/disappeared[]) and .ads
+    # (n_appeared_brands + appeared[]). The render is deliberately null-safe on every
+    # sub-object (it degrades to a "not built yet" note only when the WHOLE file is
+    # missing), so the deploy risk it guards is a truncated/gutted file — a 200 that
+    # parses but has lost .promos/.ads would silently blank the change panel with no
+    # phone alert, and it CANNOT self-heal (build_rival_watch.py diffs off the
+    # Thai-IP promo pull, no CI cron). Assert the two load-bearing sub-objects carry
+    # their render-read count fields; shape not values, robust to a quiet vintage
+    # (n_new / n_appeared_brands legitimately 0).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    promos = d.get("promos")
+    if not isinstance(promos, dict):
+        return "missing 'promos' object (the 'Rivals' own sites' change block render read)"
+    if not isinstance(promos.get("n_new"), (int, float)) or isinstance(promos.get("n_new"), bool):
+        return "promos.n_new missing/non-numeric (the new-promo count render read)"
+    if not isinstance(promos.get("n_disappeared"), (int, float)) or isinstance(promos.get("n_disappeared"), bool):
+        return "promos.n_disappeared missing/non-numeric (the no-longer-listed count render read)"
+    ads = d.get("ads")
+    if not isinstance(ads, dict):
+        return "missing 'ads' object (the 'Google Ads Transparency' change block render read)"
+    if not isinstance(ads.get("n_appeared_brands"), (int, float)) or isinstance(ads.get("n_appeared_brands"), bool):
+        return "ads.n_appeared_brands missing/non-numeric (the new-creative brand-count render read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -1880,6 +1943,22 @@ DATA_FILES = [
     # farm-gate vintage refresh, and green in the legitimate "nothing tripped" state.
     ("data/assist_price_radar.json", _shape_assist_price_radar, ".crops falling-price rows (crop/yoy/n_current_x) + .provinces call table + meta.trigger + .tripped (#assist price lens, obj #1)"),
     ("data/assist_branch_radar.json", _shape_assist_branch_radar, ".provinces[].branches ranked call list (name/exposed_crop_ha/n_farm) + meta.n_branches_ranked/n_provinces (#assist branch drill, obj #1)"),
+    # The two newest Competition (#acq) reads, shipped together in the #319
+    # rival-field wave and both live-fetched (tmliFetch) into the surface with no
+    # deploy probe — the last unprobed reads on that tab:
+    #  - rival_book_impact: the MEASURED rival-density x real-loan-tape join (obj #1
+    #    + #2), whose whole board GATES on .within_province and cannot self-heal (a
+    #    pipeline rebuild off the owner-side tape, no CI cron);
+    #  - rival_watch: the change-diff panel (obj #2) that answers "what MOVED since
+    #    the last pull", off .promos/.ads — a truncated file that parses but drops a
+    #    sub-object silently blanks the panel, and it cannot self-heal (diffs off the
+    #    Thai-IP promo pull, no CI cron).
+    # Each degrades SILENTLY (a calm "not built for this vintage" note) on a
+    # truncated/404 CDN deploy with no phone alert — the same "broken demo" blind
+    # spot the rival_pulse / rival_ads / peer_province probes closed for their #acq
+    # siblings. Both assert render shape, not values.
+    ("data/rival_book_impact.json", _shape_rival_book_impact, ".within_province more/less-contested split + gap deltas (#acq rival-density x loan-tape book-cost board)"),
+    ("data/rival_watch.json", _shape_rival_watch, ".promos + .ads change-diff counts (#acq 'what changed since the last pull' panel)"),
 ]
 
 
