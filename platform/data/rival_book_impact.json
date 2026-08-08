@@ -1,0 +1,745 @@
+{
+ "meta": {
+  "coverage_note": "1935 of 2015 branches carry BOTH a district rival count and a tape cell at or above the 30-account floor; the rest are absent from this read rather than estimated into it.",
+  "generated_by": "pipeline/build_rival_book_impact.py",
+  "how_to_read": "Read WITHIN-PROVINCE, not RAW. Rivals cluster where demand is, and so do our biggest branches, so the raw national buckets partly measure urbanisation rather than competition — the median catchment population is printed on each bucket so that confound is visible instead of hidden. The within-province split compares each branch only against branches in the same province, which removes the region/urbanisation effect. Neither read is causal.",
+  "label": "MEASURED on both sides — MEASURED rival branch counts per district joined to the MEASURED real no-PII loan tape. The JOIN is exact (province + district); what is not certain is the CAUSATION, and the file publishes a within-province control rather than asking the reader to take the raw cross-section at face value.",
+  "min_cell": 30,
+  "n_accounts_covered": 373673,
+  "n_branches_joined": 1935,
+  "n_branches_total": 2015,
+  "source": "rivals: platform/data/rival_density.json (928 districts, 16,503 rival branches, point-in-polygon join); book: platform/data/tape_geo_occ.json (real tape, branch cells >= 30 accounts); join key: province + district from platform/data/branches.json.",
+  "title": "What competition does to our book",
+  "verdict": "MIXED — and the mix is the finding. Within the same province, more-contested branches run +1.03pp on 90+ but -0.91pp on the early (pre-30dpd) bucket, and carry 6,254 THB more per account. Deeper delinquency alongside a LOWER early bucket is not the shape of \"competition makes borrowers worse\" — it is the shape of a bigger, later-souring ticket. The most likely reading is that we write larger loans to win contested ground, and larger loans fail harder when they fail. That is a PRICING and underwriting question, not a collections one. The raw national gradient is +2.21pp; controlling for province cuts it to +1.03pp, so roughly 53% of the apparent effect was the fact that rivals and our big branches both sit in cities."
+ },
+ "most_contested_branches": [
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 19.46,
+   "early_pct": 17.9,
+   "n_accounts": 447,
+   "name": "เงินไชโยตลาดเซฟวัน",
+   "os_thb": 50182658.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 15.69,
+   "early_pct": 17.82,
+   "n_accounts": 376,
+   "name": "เงินไชโย สาขาหัวทะเล",
+   "os_thb": 39130769.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 28.85,
+   "early_pct": 14.56,
+   "n_accounts": 364,
+   "name": "เงินไชโยถนนช้างเผือก(โคราช)",
+   "os_thb": 50329105.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 12.89,
+   "early_pct": 21.01,
+   "n_accounts": 357,
+   "name": "เงินไชโยจอหอ",
+   "os_thb": 44708614.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 10.85,
+   "early_pct": 20.54,
+   "n_accounts": 258,
+   "name": "เงินไชโยตลาดมะขามเฒ่า",
+   "os_thb": 24094297.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 17.12,
+   "early_pct": 16.22,
+   "n_accounts": 222,
+   "name": "เงินไชโยคลองส่งน้ำ",
+   "os_thb": 25299567.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 14.76,
+   "early_pct": 13.81,
+   "n_accounts": 210,
+   "name": "เงินไชโยหนองปรือ (โคราช)",
+   "os_thb": 24991275.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 7.61,
+   "early_pct": 18.78,
+   "n_accounts": 197,
+   "name": "เงินไชโยตลาดแม่สมบูรณ์",
+   "os_thb": 26462761.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 15.74,
+   "early_pct": 20.81,
+   "n_accounts": 197,
+   "name": "เงินไชโยหนองหญ้างาม",
+   "os_thb": 18413909.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 23.68,
+   "early_pct": 19.47,
+   "n_accounts": 190,
+   "name": "เงินไชโยประตูพลแสน",
+   "os_thb": 26399188.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 15.47,
+   "early_pct": 14.92,
+   "n_accounts": 181,
+   "name": "เงินไชโยหน้า รร.บุญวัฒนา",
+   "os_thb": 21638651.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 26.01,
+   "early_pct": 20.23,
+   "n_accounts": 173,
+   "name": "เงินไชโยชลประทาน",
+   "os_thb": 27985986.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 12.94,
+   "early_pct": 20.59,
+   "n_accounts": 170,
+   "name": "เงินไชโยหนองไผ่ล้อม",
+   "os_thb": 30556221.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 15.06,
+   "early_pct": 13.86,
+   "n_accounts": 166,
+   "name": "เงินไชโยถนนเดชอุดม",
+   "os_thb": 18557360.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 15.85,
+   "early_pct": 19.51,
+   "n_accounts": 164,
+   "name": "เงินไชโยมะเริง",
+   "os_thb": 16661106.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 15.82,
+   "early_pct": 21.52,
+   "n_accounts": 158,
+   "name": "เงินไชโยนครราชสีมา",
+   "os_thb": 19913095.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 8.39,
+   "early_pct": 16.77,
+   "n_accounts": 155,
+   "name": "เงินไชโยตำบลตลาด",
+   "os_thb": 15481251.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 17.14,
+   "early_pct": 15.71,
+   "n_accounts": 140,
+   "name": "เงินไชโยสวนสัตว์โคราช",
+   "os_thb": 15911686.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 17.65,
+   "early_pct": 14.71,
+   "n_accounts": 102,
+   "name": "เงินไชโยจอมสุรางค์",
+   "os_thb": 11333685.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 17.89,
+   "early_pct": 20.0,
+   "n_accounts": 95,
+   "name": "เงินไชโยสาขาตำบลโคกสูง",
+   "os_thb": 11824342.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 21,
+   "district": "เมืองนครราชสีมา",
+   "dpd90p_pct": 20.0,
+   "early_pct": 6.67,
+   "n_accounts": 75,
+   "name": "เงินไชโยแยกกองเมือง",
+   "os_thb": 8876043.0,
+   "prov": "นครราชสีมา",
+   "region": "Isan",
+   "rivals": 176,
+   "top_brands": [
+    [
+     "Muangthai",
+     83
+    ],
+    [
+     "Srisawad",
+     58
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 19,
+   "district": "บางละมุง",
+   "dpd90p_pct": 19.38,
+   "early_pct": 18.6,
+   "n_accounts": 387,
+   "name": "เงินไชโย โรงโป๊ะ",
+   "os_thb": 49524097.0,
+   "prov": "ชลบุรี",
+   "region": "East",
+   "rivals": 153,
+   "top_brands": [
+    [
+     "Muangthai",
+     64
+    ],
+    [
+     "Srisawad",
+     54
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 19,
+   "district": "บางละมุง",
+   "dpd90p_pct": 19.02,
+   "early_pct": 17.87,
+   "n_accounts": 347,
+   "name": "เงินไชโยสาขาซอยสยามคันทรี",
+   "os_thb": 33219831.0,
+   "prov": "ชลบุรี",
+   "region": "East",
+   "rivals": 153,
+   "top_brands": [
+    [
+     "Muangthai",
+     64
+    ],
+    [
+     "Srisawad",
+     54
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 19,
+   "district": "บางละมุง",
+   "dpd90p_pct": 14.29,
+   "early_pct": 11.5,
+   "n_accounts": 287,
+   "name": "เงินไชโย สาขาห้วยใหญ่-ทุ่งคา",
+   "os_thb": 29024597.0,
+   "prov": "ชลบุรี",
+   "region": "East",
+   "rivals": 153,
+   "top_brands": [
+    [
+     "Muangthai",
+     64
+    ],
+    [
+     "Srisawad",
+     54
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  },
+  {
+   "autox_in_district": 19,
+   "district": "บางละมุง",
+   "dpd90p_pct": 14.64,
+   "early_pct": 25.71,
+   "n_accounts": 280,
+   "name": "เงินไชโย วัดสุทธาวาส",
+   "os_thb": 27371200.0,
+   "prov": "ชลบุรี",
+   "region": "East",
+   "rivals": 153,
+   "top_brands": [
+    [
+     "Muangthai",
+     64
+    ],
+    [
+     "Srisawad",
+     54
+    ],
+    [
+     "Tidlor",
+     34
+    ]
+   ]
+  }
+ ],
+ "raw_buckets": [
+  {
+   "avg_balance_thb": 57249,
+   "bucket": "1-2 rivals",
+   "dpd90p_pct": 12.83,
+   "early_pct": 20.43,
+   "hi": 2,
+   "lo": 1,
+   "median_catchment_pop": 19968,
+   "n_accounts": 2853,
+   "n_branches": 9,
+   "os_thb": 163330475.0,
+   "rivals_avg": 1.6
+  },
+  {
+   "avg_balance_thb": 106012,
+   "bucket": "3-5 rivals",
+   "dpd90p_pct": 13.58,
+   "early_pct": 21.89,
+   "hi": 5,
+   "lo": 3,
+   "median_catchment_pop": 17191,
+   "n_accounts": 16737,
+   "n_branches": 99,
+   "os_thb": 1774328163.0,
+   "rivals_avg": 4.24
+  },
+  {
+   "avg_balance_thb": 114592,
+   "bucket": "6-10 rivals",
+   "dpd90p_pct": 14.19,
+   "early_pct": 22.56,
+   "hi": 10,
+   "lo": 6,
+   "median_catchment_pop": 26627,
+   "n_accounts": 45361,
+   "n_branches": 253,
+   "os_thb": 5198022891.0,
+   "rivals_avg": 8.05
+  },
+  {
+   "avg_balance_thb": 124366,
+   "bucket": "11+ rivals",
+   "dpd90p_pct": 15.04,
+   "early_pct": 20.51,
+   "hi": null,
+   "lo": 11,
+   "median_catchment_pop": 103124,
+   "n_accounts": 308722,
+   "n_branches": 1574,
+   "os_thb": 38394493568.0,
+   "rivals_avg": 47.25
+  }
+ ],
+ "within_province": {
+  "gap_avg_balance_thb": 6254,
+  "gap_dpd90p_pp": 1.03,
+  "gap_early_pp": -0.91,
+  "less_contested": {
+   "avg_balance_thb": 120365,
+   "dpd90p_pct": 14.47,
+   "early_pct": 21.44,
+   "n_accounts": 146843,
+   "n_branches": 824,
+   "os_thb": 17674754046.0,
+   "rivals_avg": 16.26
+  },
+  "more_contested": {
+   "avg_balance_thb": 126619,
+   "dpd90p_pct": 15.5,
+   "early_pct": 20.53,
+   "n_accounts": 156910,
+   "n_branches": 764,
+   "os_thb": 19867722484.0,
+   "rivals_avg": 61.84
+  },
+  "n_provinces": 67
+ }
+}
