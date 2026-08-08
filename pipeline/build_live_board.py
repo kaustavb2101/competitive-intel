@@ -305,7 +305,8 @@ REGISTRY = [
     dict(key="search_demand", file="search_demand.json", cadence="weekly",
          label="Brand share of search", group="Competition",
          what="where borrowers look for a lender first, and whether they type our name",
-         pick=lambda d: (_n(d.get("provinces")), "provinces"), measured=True),
+         pick=lambda d: (_n(d.get("provinces")), "provinces"), measured=True,
+         hist_series="search_share_autox"),
     # 'reference', not quarterly: the BoT Regional Letters sit on NSO SES vintages (4-region cut =
     # SES 2019, Northern deep-dive = SES 2023), so this moves when BoT reissues, not each quarter.
     # Ageing it on a quarterly clock would flag a permanently-red feed that is behaving normally.
@@ -324,7 +325,11 @@ REGISTRY = [
     dict(key="peer_scoreboard", file="peer_scoreboard.json", cadence="quarterly",
          label="Listed rival scoreboard", group="Competition",
          what="the listed title lenders' own filings — external benchmark, not a target",
-         pick=lambda d: (_n(d.get("peers")), "listed peers"), measured=True),
+         pick=lambda d: (_n(d.get("peers")), "listed peers"), measured=True,
+         # MTC's own market cap as the representative history line — peer_scoreboard.json is
+         # built straight from source-data/set_peers.json (build_peer_scoreboard.py), the same
+         # file append_history.py now accumulates, so this is the same underlying pull.
+         hist_series="set_mtc_mcap"),
 ]
 
 # Feeds with no stored series, and WHY — shown verbatim on the board so "no trend line" reads as
