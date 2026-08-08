@@ -3,6 +3,43 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-08 — Intelligence loop (SERVICE/DEPLOY-HEALTH): live freshness guard now covers `macro_indicators.json` — the last daily/weekly-CI upstream whose independent stall was invisible
+
+Autonomous market & service intelligence run. Data room + live deploy re-confirmed healthy up front
+(master production alias **HTTP 200** on `/` + `/data/meta.json`; `build_provenance.py --check`
+byte-exact; every daily-CI price/weather layer fresh — commodities farm-gate 0d, fuel 1d, thaiwater
+flood/rain 0d, thai_price_history 6d; the only lagging vintages are the KNOWN owner-side/monthly ones,
+`search_demand` 35d [monthly Google-Trends cron] and `rival_pulse` promos 20d [Thai-IP pull], both
+honestly labelled). The autonomous backlog (`plan_cycle.py`) is exhausted (49 done, the 1 open item
+owner-side) and the deploy-probe shape-sweep has reached its low-value tail, so this run advanced the
+**structural** freshness guard instead of another shape probe.
+
+**The gap fixed** — `check_site_health.py`'s live-only `FRESHNESS_LAYERS` guard (which fires a nightly
+GitHub issue → phone alert when a data-refresh cron silently freezes) covered the 5 daily price/weather
+layers (commodities, fuel, thai_price_history, thaiwater flood/rain) but **missed `macro_indicators.json`**
+— the MEASURED, live-`fetch()`'d (app.js:1788), **obj-#1** national borrower-leverage read (household
+debt-to-GDP · policy/lending rate · CPI · USD/THB). It is refreshed by its OWN **weekly** CI cron
+(`data-macro.yml`, Mondays) from a **distinct keyless cloud upstream** (BIS + World Bank + ECB/Frankfurter
+FX) that none of the guarded price/weather layers touch — so that pull can freeze while every other layer
+stays fresh, every `_shape_*` probe still passes, and the frozen macro backdrop **ships green forever with
+no alert**: exactly the missed class the freshness guard exists to close, one independent upstream short of
+full coverage.
+
+`check_site_health.py`'s `FRESHNESS_LAYERS` now carries `("data/macro_indicators.json", "pulled", 21, …)`.
+**Why `pulled` is a reliable weekly signal (not a flat-week false alarm):** `pull_macro.py --stamp` writes
+`meta.pulled = <today>` on every run, and the USD/THB leg (`usd_thb`, period 2026-08-03) moves daily, so
+the folded file genuinely changes → `git diff --cached` non-empty → commits on every weekly run; a **>21-day
+lag (3 missed Mondays)** is therefore an unambiguous "the macro pull stuck" signal. TTL is deliberately
+looser than the 14-day daily-layer TTL to match the weekly cadence. **Verified:** the pure `_freshness_result`
+PASSes at 5d + at the 21-day edge and FAILs under an injected +40-day clock ("the refresh cron may be
+stuck"); junk/absent vintages stay "not evaluated" (never a false alarm). **Why LIVE-only:** freshness is a
+function of wall-clock "now", so it stays out of the deterministic repo gate — the `--local` path
+(`LocalFetcher`) skips the block, so `tests/run.sh check` is byte-unchanged (**still 152/152 HEALTHY offline**).
+Determinism gate **127 passed · 0 failed** (data integrity 455/455). Probe-script-only — no `platform/data`
+file altered → no provenance regen, no visual/app change → no PR/headless render needed. This completes the
+freshness-coverage set over the repo's independent CI data upstreams. · `pipeline/check_site_health.py`
+(`FRESHNESS_LAYERS`, live-only)
+
 ## 2026-08-08 — Integration loop: wire the built-but-never-surfaced MEASURED crop-YIELD layer (`oae_agstats.json`) onto the Overview farm section (PR)
 
 Autonomous integration/improvement run. The prompt's data-integration backlog (items 1–4: FPO PICO
