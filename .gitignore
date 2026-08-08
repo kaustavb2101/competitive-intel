@@ -54,6 +54,10 @@ source-data/branch_aum_monthly_synthetic.json
 source-data/set_filings/pdf/
 source-data/set_filings/zip/
 
+# 56-1 One Report + Opportunity Day decks (pipeline/pull_investor_docs.py) — re-pullable raw INPUT.
+# The 56-1 PDFs alone are 9-21MB each; the extracted text (text/) + index.json ARE committed.
+source-data/investor_docs/pdf/
+
 # national building vector-tile artifacts (pipeline/build_building_tiles.py) — large, CDN-hosted,
 # NEVER committed. Re-pullable real Overture data; coverage plan + .pmtiles/tiles live here.
 pipeline/tiles_out/
