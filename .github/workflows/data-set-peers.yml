@@ -1,0 +1,113 @@
+name: Data — SET listed-peer scoreboard (weekdays)
+
+# Refreshes the MEASURED listed-peer market & financial scoreboard (obj #2, Competition tab): market
+# cap, valuation, ROE and the full audited-year financial history for the SIX SET-listed Thai
+# title/vehicle-title lenders (MTC, TIDLOR, SAWAD, TURBO, HENG, SAK).
+#   pipeline/pull_set_peers.py       -> source-data/set_peers.json      (raw SET pull, committed artifact)
+#   pipeline/build_peer_scoreboard.py -> platform/data/peer_scoreboard.json (deterministic projection)
+#
+# WHY A BROWSER, AND WHY THIS WORKS ON A GITHUB RUNNER: set.or.th's own JSON API 403s every external
+# request (Akamai bot protection), even with full browser headers — the only reliable path is a real
+# headless browser loading a SET quote page and calling the API SAME-ORIGIN from inside it (see
+# pull_set_peers.py's docstring for the full explanation). This is NOT unproven territory for this
+# repo's CI: .github/workflows/qa.yml already installs headless Chromium via Playwright on
+# ubuntu-latest and drives it successfully (`playwright install --with-deps chromium`) — that job
+# uses the Node client for rendering; this one installs the PYTHON client instead, because
+# pull_set_peers.py drives it via `playwright.sync_api`. Nothing about set.or.th itself is Thai-IP
+# locked (unlike data.go.th/DLT) — Akamai's bot check, not geography, is what the browser bypasses.
+#
+# PR-ONLY, NEVER auto-merge — market data is genuinely different every trading day (price, PE, ROE),
+# so nearly every run has a real diff; a human reviews before it reaches production, same as every
+# other listed-peer / estimated-signal puller in this repo (search-demand, rival-pulse). Committed to
+# a fresh data/set-peers-<run_id> branch and opened as a DRAFT PR back to the branch this ran on.
+# NEVER pushes to a working branch — can't race a concurrent session. No-ops cleanly when nothing
+# (price or fundamentals) actually changed.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekdays only (SET trades Mon-Fri; a weekend run would just re-fetch Friday's closing print).
+    # 11:15 UTC = 18:15 Bangkok — well after the 16:30 Bangkok close, so the day's final price (and
+    # any newly filed quarter) has settled. Off-minute/off-hour from the other data-*.yml jobs.
+    - cron: "15 11 * * 1-5"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Install Playwright (Python client) + Chromium
+        run: |
+          # pull_set_peers.py imports playwright.sync_api — the PYTHON package, not the Node one
+          # qa.yml installs for rendering. Pinned for a reproducible browser build. --with-deps pulls
+          # the OS libs headless Chromium needs on a bare ubuntu-latest box (same flag qa.yml uses).
+          pip install playwright==1.49.1
+          python -m playwright install --with-deps chromium
+
+      - name: Pull the SET listed-peer scoreboard (all 6 peers)
+        run: python pipeline/pull_set_peers.py
+
+      - name: Rebuild peer_scoreboard.json, then re-derive whatever else went stale
+        run: |
+          # peer_scoreboard is the layer this job owns, so it is built explicitly; everything
+          # downstream (provenance.json's fingerprint, live_board.json) is discovered rather than
+          # hand-named — rederive_drift.py iterates the determinism gate's OWN --check set to a
+          # fixed point, the same pattern every other data-*.yml job in this repo uses.
+          python pipeline/build_peer_scoreboard.py
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
+          # sanity: the builder's own byte-exact check must pass against what it just wrote
+          python pipeline/build_peer_scoreboard.py --check
+
+      - name: Commit to a data branch + open a draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/set-peers-${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list to go stale, and never adds an untracked generated layer.
+          git add -u source-data platform/data
+          if git diff --cached --quiet; then
+            echo "No change vs the committed peer data (same trading-day snapshot). No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          TIDLOR_ROE="$(python -c "import json;d=json.load(open('platform/data/peer_scoreboard.json'));print(next((p['roe'] for p in d['peers'] if p['symbol']=='TIDLOR'), 'n/a'))")"
+          PRICE_ASOF="$(python -c "import json;print(json.load(open('platform/data/peer_scoreboard.json'))['meta'].get('price_asof'))")"
+          git commit -m "data: SET listed-peer scoreboard refresh (run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-set-peers.yml via pipeline/pull_set_peers.py (set.or.th, MEASURED). Price as of ${PRICE_ASOF}; TIDLOR ROE ${TIDLOR_ROE}% (its newest audited full year, SET quarter code Q9 — never an interim annualised off a partial year)."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated weekday SET listed-peer scoreboard refresh (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "**Price as of:** $PRICE_ASOF · **TIDLOR ROE:** ${TIDLOR_ROE}% (newest audited full year — not an interim)."
+            echo
+            echo "Provenance: MEASURED — Stock Exchange of Thailand (set.or.th), same-origin in-browser"
+            echo "pull (the external JSON API 403s every request that isn't same-origin). All SIX listed"
+            echo "title/vehicle-title lenders: MTC, TIDLOR, SAWAD, TURBO, HENG, SAK. Each peer's headline"
+            echo "ROE/profit/assets come from its own newest AUDITED FULL YEAR (SET quarter code \`Q9\`),"
+            echo "never a partial-year interim; a row with a null totalRevenue/netProfit is treated as"
+            echo "ABSENT — never rendered as 0, never averaged in. Comparability caveats (TIDLOR's"
+            echo "2025-05-15 holding-company listing; HENG's unconsolidated \`fsType\`) are carried in the"
+            echo "file's own \`meta\` block, not hidden."
+            echo
+            echo "After merge \`bash tests/run.sh check\` gates it byte-exact (\`build_peer_scoreboard.py --check\`)."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: SET listed-peer scoreboard refresh (run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md
