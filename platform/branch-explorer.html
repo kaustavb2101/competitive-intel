@@ -170,6 +170,9 @@ html[data-theme="light"] #mtog button{background:rgba(255,255,255,.97);border-co
  overflow-x:auto;scrollbar-width:none}
 #nav::-webkit-scrollbar{display:none}
 #nav .nb{font:700 13px 'IBM Plex Sans Thai',sans-serif;color:#eef1f7;white-space:nowrap;padding:0 10px 0 4px;flex:none}
+/* visually-hidden page heading — gives the 3D-scene page an <h1> for the document outline
+   (WCAG 1.3.1 / axe page-has-heading-one) with zero visual change; matches styles.css .sr-only */
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 #nav .nb b{color:#E0A93B;margin:0 1px}
 #nav a{flex:none;color:#8a94a8;text-decoration:none;font:500 12.5px 'IBM Plex Sans Thai',sans-serif;
  padding:6px 11px;border-radius:7px;white-space:nowrap}
@@ -275,6 +278,7 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
 </style>
 </head>
 <body>
+  <h1 class="sr-only" id="pageH1">Branch 3D explorer — AutoX · <span lang="th">เงินไชโย</span></h1>
   <noscript>
     <div style="max-width:640px;margin:72px auto;padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55;position:relative;z-index:9999">
       <strong style="color:var(--hi);display:block;margin-bottom:6px">This 3D scene needs JavaScript enabled.</strong>
@@ -381,7 +385,9 @@ const NM  = Q.get('n') ? decodeURIComponent(Q.get('n')) : 'Branch';
 // each set document.title to reflect what's on screen; this page shipped a static title, so every
 // branch shared one tab name. Set an initial title from the URL name; loadPanel() refines it to the
 // matched record's measured name + province once branches.json resolves.
-if(NM && NM!=='Branch'){try{document.title=NM+' — AutoX · เงินไชโย';}catch(e){}}
+if(NM && NM!=='Branch'){try{document.title=NM+' — AutoX · เงินไชโย';}catch(e){}
+  // mirror the initial URL name into the visually-hidden <h1> so the outline names the branch pre-fetch
+  try{var _h1=document.getElementById('pageH1');if(_h1)_h1.textContent=NM+' — AutoX · เงินไชโย';}catch(e){}}
 // Basemap rasters: light (CARTO Positron, the DataProteins white base + DEFAULT) + voyager + dark, all CARTO.
 // deck.gl's TileLayer does NOT expand the {s} subdomain token (Leaflet does) — hardcode a single
 // CARTO host, matching province.html / rayong-catchment.html. Using {s} caused ERR_NAME_NOT_RESOLVED
@@ -963,6 +969,8 @@ async function loadPanel(){
     if(!best){ $('#panel').innerHTML='<div class="note">Branch data unavailable.</div>'; return; }
     // refine the tab title to the matched record: measured branch name + province (matches province.html)
     try{document.title=(best.n||NM)+(best.v?' · '+best.v:'')+' — AutoX · เงินไชโย';}catch(e){}
+    // refine the visually-hidden <h1> to the matched record, in step with the tab title
+    try{var _h1=document.getElementById('pageH1');if(_h1)_h1.textContent=(best.n||NM)+(best.v?' · '+best.v:'')+' — AutoX · เงินไชโย';}catch(e){}
     // re-centre on the matched branch so the scene and panel agree. Use the controlled VIEW so the
     // orbit/intro machinery stays the single source of truth.
     if(deckgl && !isNaN(best.x) && !isNaN(best.y)){
