@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-08T16:23:28+00:00",
-    "commit": "096fbff"
+    "generated_at": "2026-08-08T22:21:49+00:00",
+    "commit": "5788b87"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,36 @@
   ],
   "activity": [
     {
+      "date": "2026-08-08T22:21:49+00:00",
+      "sha": "5788b87",
+      "summary": "health(deploy): shape probe now guards the front-door structural-stress index",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-08T21:54:44+00:00",
+      "sha": "fa0b662",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-08, run 31280275461)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-08T20:28:41+00:00",
+      "sha": "1440ab0",
+      "summary": "docs(progress): log ux-newtab-link-cue ship — merged (#330) + deploy-verified",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-09T03:24:52+07:00",
+      "sha": "dde748b",
+      "summary": "ux: warn SR/keyboard users that external promo & source links open a new tab (#330)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-08T16:26:15+00:00",
+      "sha": "73211bd",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer-scoreboard freshness-guard ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-08T16:23:28+00:00",
       "sha": "096fbff",
       "summary": "health(deploy): freshness guard now covers the weekday SET peer scoreboard",
@@ -679,36 +709,6 @@
       "date": "2026-08-07T16:51:28+00:00",
       "sha": "6bfc999",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the assist-radar probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-07T16:49:16+00:00",
-      "sha": "48a2f2c",
-      "summary": "health(deploy): site-health probes for the proactive-assistance radar pair",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-07T23:30:00+07:00",
-      "sha": "9c8549f",
-      "summary": "fix(resolver): a PULLED snapshot under platform/data/ must keep the NEWER reading",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-07T23:19:00+07:00",
-      "sha": "10362d0",
-      "summary": "feat(assist): say what to do with the falling-crop list, and refresh the feeds 4x a day",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-07T22:52:23+07:00",
-      "sha": "f6f66e7",
-      "summary": "chore(derive): re-derive after landing #298 #309 #308 #311",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-07T22:47:40+07:00",
-      "sha": "4da97fd",
-      "summary": "Merge PR #311 (feat/macro-current-account-chip) — derived layers replayed, not merged",
       "pillar": "feature"
     }
   ]
