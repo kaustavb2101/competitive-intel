@@ -1924,6 +1924,15 @@ FRESHNESS_LAYERS = [
      "ThaiWater flood pulse, daily CI (data-thaiwater.yml)"),
     ("data/thaiwater_rain.json", "pulled", 14,
      "ThaiWater rain pulse, daily CI (data-thaiwater.yml)"),
+    ("data/macro_indicators.json", "pulled", 21,
+     "Thai macro-risk indicators (household debt-to-GDP · policy/lending rate · CPI · "
+     "USD/THB) — obj#1 borrower-leverage backdrop, live-fetch()'d, refreshed by the "
+     "WEEKLY data-macro.yml cron (Mondays) from a DISTINCT keyless cloud upstream "
+     "(BIS + World Bank + ECB/Frankfurter FX) that none of the price/weather layers "
+     "above touch, so its own pull can freeze while they stay fresh. The pull stamps "
+     "meta.pulled every run and the USD/THB leg moves daily, so the folded file "
+     "genuinely changes (→ commits) every weekly run — a >21-day lag (3 missed "
+     "Mondays) is an unambiguous 'the macro pull stuck' signal, not a flat week"),
 ]
 
 
