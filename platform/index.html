@@ -465,6 +465,12 @@
          tables"). Their MEASURED content survives as columns; only the composite was dropped.
          Null-safe: absent file → the whole block hides itself, nothing else on the tab changes. -->
     <div id="cropmix-wrap"></div>
+    <!-- CROP YIELD (data/oae_agstats.json, build_oae_agstats.py) — the MEASURED per-province yield
+         lever, wired in for the first time under the farm book it complements: the book ranks agri
+         exposure by baht and moves it by PRICE; this adds YIELD (revenue per rai), the income lever
+         the price/area tables can't see. Rendered by renderCropYield(); null-safe (absent layer →
+         the block hides itself, nothing else on the tab changes). -->
+    <div id="cropyield-wrap"></div>
     <!-- MOVED TO THE HAZARD SECTION 2026-08-02 (owner review, point 8: "Move drought into the
          hazard section"). District drought and district crop × drought now sit under "Conditions at
          our grain" beside the flood columns they are read against; this section keeps the crop and

@@ -3,6 +3,53 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-08 — Integration loop: wire the built-but-never-surfaced MEASURED crop-YIELD layer (`oae_agstats.json`) onto the Overview farm section (PR)
+
+Autonomous integration/improvement run. The prompt's data-integration backlog (items 1–4: FPO PICO
+census, per-branch cropland, data.go.th distillation, GISTDA 40m) is DONE or CI-blocked and the formal
+planner backlog is exhausted (49 done / 1 owner-side). Rather than another site-health probe (the recent
+cadence, diminishing value), a negative-space sweep surfaced the single highest-value genuinely-open
+**integration** gap: a MEASURED, gate-protected data layer that was built and then **never wired into the
+app** — `platform/data/oae_agstats.json` (`build_oae_agstats.py`). Zero `fetch`/`tmliFetch` references
+anywhere in `app.js`/`index.html`/`*.html`; its `--check` runs in the gate (tests/run.sh:119) so it is
+byte-reproducible, and its input `source-data/staging/oae_agstats.json` is committed, so it reproduces
+offline — a clean one-run close, no Thai IP / owner xlsx needed.
+
+- **The gap (objective #1):** the farm book above it ranks agri exposure by OUTSTANDING BAHT and its
+  crop-mix column moves the book by PRICE; nothing in the app carried **YIELD** (kg/rai) — revenue per
+  rai, the per-province farm-household income lever the price/area tables cannot see. A province whose
+  main field crop yields below the national benchmark AND is on a multi-year decline earns less per rai
+  than the country average and is sliding, so its households service a title loan on structurally thinner
+  cash whatever the price does — a direct crop-household repayment-capacity signal.
+- **The fix:** new `renderCropYield()` in `app.js` (fetches `oae_agstats` via the existing null-safe
+  `tmliFetch`), a `#cropyield-wrap` node placed directly under the farm book in `#sec-ov-agri` (Farm
+  households), and the render call beside `renderFarmBook()`. It surfaces the provinces whose **main
+  field crop** yields below the national benchmark and is falling, in a `.tbl` (auto-wrapped scrollable
+  region → no mobile page-x). Null-safe: absent layer → the whole block hides itself.
+- **HONESTY GUARD (deliberate, this is the interesting part):** a naive below-benchmark leaderboard is a
+  UNIT ARTEFACT — it surfaces climatically-marginal crops (the top of a raw list is northern oil palm at
+  −85% vs the deep-South-dominated national benchmark, on a few hundred rai), the exact "the alarm was an
+  artefact of the unit" trap the owner already caught on the farm book. Three guards, all documented in
+  the code + the panel footnote: (1) each province is compared ONLY to the national benchmark of the
+  SAME crop (yield/area basis differs by crop); (2) a province is flagged on its **largest-area** crop
+  among the five that carry a national yield benchmark (maize/cassava/sugarcane/oil palm/rubber), floored
+  at 20,000 rai so a marginal out-of-zone patch can't raise a false alarm; (3) rice is excluded — the
+  yearbook publishes no national rice-yield benchmark in this layer. The result is 27 real provinces:
+  Prachuap/Phatthalung/Songkhla/Narathiwat rubber heartland, the Central sugarcane belt, Isan cassava —
+  each below its own crop's benchmark and declining.
+- **Verify:** determinism gate `bash tests/run.sh check` → **PASS, 0 failed** (no `platform/data` file
+  changed — only an existing gated layer was wired — so no `build_provenance.py` regen needed and the
+  provenance census is untouched). `node --check app.js` clean. Headless render of `index.html#overview`
+  (chromium/swiftshader): the panel populates with **27 provinces**, top row ประจวบคีรีขันธ์ Rubber
+  162 vs 213 kg/rai (−23.9%, trend −4.1%), tag "MEASURED · OAE yearbook 2567/2024", `data-errors="[]"`
+  (no uncaught JS error). Table auto-wraps in `.tblwrap` (app.js:1531) so it scrolls in its own container.
+- **Decision — shipped as a draft PR, not a direct master commit,** because it adds a visible panel to the
+  exec Overview tab. Every number is MEASURED (OAE yearbook, read verbatim); the only derived figures are
+  the yield-vs-benchmark ratio and the multi-year trend, both transparent ratios of measured values.
+- **Next integration:** CI-reachable data pulls remain exhausted; the still-open objective-#1 data lever
+  is the GISTDA flooded-**area** dissolve (NEXT_STEPS §0 — a heavier shapely geometry job over overlapping
+  per-event polygons, more than one clean run affords).
+
 ## 2026-08-07 — Intelligence loop (SERVICE/DEPLOY-HEALTH): site-health probe now guards `segment_exposure.json` — the last unprobed obj-#1 read on the Exposure surface
 
 Autonomous market & service intelligence run. Data room + live deploy re-confirmed healthy up front
