@@ -3,6 +3,49 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-08 — UX loop (a11y): the SPA front door finally has a real `<h1>` — shipped + deploy-verified
+
+Autonomous UX-improvement run (`claude/ux-loop-20260808-0825` → PR #321, **squash-merged**). The
+`docs/UXUI_AUDIT.md` backlog's numbered findings (1–7) and every surgical "Open backlog" item are
+already fixed; the remaining open items are all explicitly flagged as NOT for unattended auto-merge
+(deck.gl gesture pages needing device testing) or out of `platform/` (test-infra). So this run
+reviewed the front door itself and found a genuine gap.
+
+**The gap fixed — `ux-spa-missing-h1`.** `index.html` (the SPA, the most-used page) had **no
+on-screen `<h1>`**: every visible route title renders as `<h2>` ("Command center", "③ Assistance…",
+the Macro/Risk/Competition section heads), and the only real `<h1>` is the **print-only** masthead
+(`#print-head`, `display:none` off-print). Its on-screen document outline started at `<h2>` with no
+heading-one (axe `page-has-heading-one`, WCAG 1.3.1) — and it was the ONLY nav page missing an
+on-screen h1 (data/status/live render one; rayong-catchment renders `<h1>Call sheet · …</h1>`).
+
+**Fix (surgical, zero visual change).** Added a single visually-hidden
+`<h1 class="sr-only">AutoX · <span lang="th">เงินไชโย</span> — Credit Intelligence</h1>` as the first
+child of `<main>` (h1 = app, h2 = current view — correct hierarchy; `document.title` still carries the
+per-route name), a standard `.sr-only` clip utility in `styles.css` (none existed), and folded
+`.sr-only` into the print `display:none` list so it never co-exists with the print masthead h1.
+Promoting the 11 themed view-title `<h2>`s to `<h1>` was rejected as too broad/visually-risky (would
+need mirroring all `h2` CSS onto `h1`). HTML+CSS only, no JS.
+
+**Safeguard protocol — ALL passed → mandated auto-merge.** (a) `bash tests/run.sh check` **EXIT 0,
+543 passed / 0 failed** incl. `node --check inline JS of index.html`; (b) headless render of
+`index.html` **byte-identical** before/after (174,112 B, `cmp` equal → zero visual change), settled
+DOM has exactly one real `<h1 class="sr-only">`, PNG self-reviewed; (c) no secrets in the diff;
+(d) 3-file surgical diff (`index.html` + `styles.css` + `docs/UXUI_AUDIT.md`), no stray files.
+
+**Deploy-verify (post-merge).** Master auto-deployed to Vercel; production alias
+`competitive-intel-git-master-…vercel.app/` → **HTTP 200**, the `sr-only` `<h1>` and the `.sr-only`
+CSS rule both confirmed **live in production**. No regression → no rollback. (`/index.html` → 308 is
+the expected `cleanUrls` redirect to `/`, not a regression.)
+
+**New backlog logged — `ux-deckgl-missing-h1`.** `province.html` + `branch-explorer.html` render NO
+`<h1>` at all (static or dynamic) — same class, but they're 3D-scene pages whose identity is dynamic
+(focal province/branch), so the fix (promote the panel title / add a route-named h1) needs a
+per-page self-review against each inline CSS — left for its own run.
+
+**Recommend next:** `ux-deckgl-missing-h1` (small, but self-review each deck.gl panel layout), or
+`qa-visual-overflow-not-in-ci` (wire `tests/visual_overflow.js` to the global Playwright so the loop
+gets an automated bleed/clip/page-x gate instead of relying on manual renders).
+
 ## 2026-08-08 — Intelligence loop (SERVICE/DEPLOY-HEALTH): live freshness guard now covers `macro_indicators.json` — the last daily/weekly-CI upstream whose independent stall was invisible
 
 Autonomous market & service intelligence run. Data room + live deploy re-confirmed healthy up front
