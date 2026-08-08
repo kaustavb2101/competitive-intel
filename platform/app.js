@@ -1054,9 +1054,9 @@ async function loadCompetitors(){
   compLoaded=true;
   compPromise=(async()=>{
     const grab=async u=>{ try{const r=await fetch(u); if(!r.ok)return null; return await r.json();}catch(e){return null;} };
-    // Prefer the MERGED full census (official store-locators for Muangthai/Srisawad/Tidlor +
-    // Google/Overture sample for Heng — ~16,393 MEASURED rivals, already deduped). Fall back to the
-    // raw Google∪Overture samples only if the census isn't built.
+    // Prefer the MERGED full census — official store-locators for ALL FOUR brands now, Heng
+    // included (~16,503 MEASURED rivals, already deduped). Fall back to the raw Google∪Overture
+    // samples only if the census isn't built.
     const cen=await grab('data/competitors_census.json');
     let items, srcs;
     if(cen&&Array.isArray(cen.items)&&cen.items.length){
@@ -1574,7 +1574,7 @@ function showTab(v){
   if(v==='exposure'){ renderExposure(); renderProducts(); }
   if(v==='sim'){ renderSim(); renderScenarios(); }
   if(v==='trend') renderTrend();
-  if(v==='acq') loadAmphoe();
+  if(v==='acq'){ loadAmphoe(); renderAcqAnswerBand(); renderRivalBookImpact(); renderRivalWatch(); }
   renderImpactMounts(v);    // Region→Province→Branch drill on Home + the pillar front doors
   closeBranchSheet();   // the mobile branch sheet belongs to the map — never let it cover another tab
   window.scrollTo(0,0);
@@ -3412,7 +3412,7 @@ function drawCompCoverage(){
     ro.innerHTML=`<b>The census is now the near-complete rival network.</b> ${ttxt} ${TAG_M} ${TAG_E}${nstxt}`+
       methodBox(null,
         ['Muangthai, Srisawad &amp; Tidlor are pulled from each operator’s <b>official store-locator</b> (the full network) — coverage ~100%, and &gt;100% is expected because a locator lists every service point beyond the IR “branches” headline (SAWAD group ≈4.6× its listed-entity count).',
-         'Heng is the one exception — still a Google/Overture <b>SAMPLE</b> (its locator is Cloudflare-blocked), so Heng alone is a lower bound.',
+         'Heng is now on the same footing — <b>pull_heng_locator.py</b> province-walks hengleasing.com from a Thai IP, and that official set REPLACED the earlier Google/Overture sample rather than being unioned with it. No sampled layer remains in the census.',
          'Coverage % is a data-completeness flag, <b>not</b> market share.',
          '<b>National standing</b> is read two ways. (1) By branch-network SIZE — AutoX = <b>MEASURED</b> own network; peers = <b>REPORTED</b> cited IR counts (Heng excluded, no cited count). (2) By MEASURED store-locator FOOTPRINT — all points on the ground, AutoX own network vs rivals’ official locators (Heng excluded, its locator is Cloudflare-blocked → lower bound). A locator counts a group’s whole retail network beyond its listed-entity IR figure, so the two rankings can differ — both true. Neither is market share, and both differ from the local per-province density read.']);
   }
@@ -3420,7 +3420,7 @@ function drawCompCoverage(){
 
 /* ---------- where rivals own ground · districts where AutoX is outnumbered ----------
    Surfaces data/rival_density.json (928 districts, pipeline/build_rival_density.py): per-district
-   AutoX vs the FULL official-locator rival census (16,393 measured branches), with a ceded-ground
+   AutoX vs the FULL official-locator rival census (16,503 measured branches), with a ceded-ground
    flag. Objective #2 — the actionable payoff of the full competitor pull. Lazy, graceful if absent. */
 let RIVDEN=null, rivdenLoaded=false;
 const RIVDEN_TOPN=20;
@@ -3500,7 +3500,7 @@ function drawRivalDensity(){
         (top?`, <b>${top[0]}</b> in ${top[1]} of them`:'')+`. `;
     }
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> districts.</b> `+
-      `Ranked by raw branch deficit against the FULL official-locator census (${(m.total_rivals||16393).toLocaleString()} measured rival branches). `+
+      `Ranked by raw branch deficit against the FULL official-locator census (${(m.total_rivals||16503).toLocaleString()} measured rival branches). `+
       `These are the districts where competitors already own the ground — defend or concede deliberately. `+concStr+`${TAG_M}`+
       methodBox(null,
         ['AutoX + rival branch counts are <b>MEASURED</b> (point-in-district); ratio is computed.',
@@ -3749,7 +3749,7 @@ function drawPeerProvince(){
          'The <b>per-100k-vehicle</b> saturation reads title-lender branches against <b>MEASURED</b> DLT registered-vehicle stock (the vehicle collateral base) — a crowding read the raw count can’t give. The three Greater-Bangkok inner-ring provinces are <b>excluded</b> from the most-crowded headline: they register most vehicles centrally at the Bangkok DLT office (a MEASURED NSO labour-force cross-check flags them), which would inflate their density. National saturation is unaffected (vehicle stock is sum-conserved).',
          'The <b>#k/n</b> chip under the AutoX count is AutoX’s <b>rank</b> among the operators present (AutoX + big-4 brands with a branch here) — MEASURED counts, computed position. It sharpens the Leads column: two provinces both led by Muangthai can have AutoX 2nd (defensible) or last of 4 (marginalised).',
          'The <b>Dist. lost</b> column is the share of the province’s districts where the big-4 outnumber AutoX (MEASURED, point-in-district) — a ground-level read the province rank/ratio can’t give: AutoX can rank well in a province overall yet be outnumbered in most of its districts.',
-         'Muangthai / Srisawad / Tidlor are near-complete <b>official-locator</b> networks; Heng is a Google/Overture <b>sample</b> (under-counts).',
+         'All four — Muangthai, Srisawad, Tidlor and Heng — are <b>official-locator</b> networks. A locator lists every service point, so a brand can land slightly above its headline branch count (Muangthai 8,931 here vs an 8,673 FY2025 headline); read it as service points, not as an under-count.',
          'The <b>PICO</b> column is a separate <b>MEASURED</b> class — licensed พิโกไฟแนนซ์ operators from the FPO registry (small-ticket, not part of the big-4 ratio).',
          'The <b>single-brand-dominated</b> read is <b>MEASURED</b>-derived: over provinces with a substantial big-4 field (≥10 rival branches, so a tiny field can’t score a meaningless 100%), it counts those where one rival brand holds a majority of the rival branches — a lopsided field means a single competitor sets local pricing; a split field spreads the pressure. Computed share, MEASURED counts.',
          'Ratio is the merged big-4 count ÷ AutoX — a competitive-pressure signal on the existing network, not an expansion cue.']);
@@ -4138,6 +4138,214 @@ function drawRivalVideo(){
   }
 }
 
+/* ---------- does the competition actually cost us? (obj #2, MEASURED both sides) ----------
+   data/rival_book_impact.json (build_rival_book_impact.py) joins MEASURED per-district rival
+   branch counts to the MEASURED real tape — the two halves of this product that had never been
+   put in the same table. Everything else on #acq counts THEM; this is the only section that
+   says what the rival field does to US.
+
+   The renderer leads with the within-province read, NOT the raw national buckets, because rivals
+   cluster where demand does: the raw gradient is roughly half urbanisation. The raw buckets are
+   still shown, collapsed, with their median catchment population beside them so the confound is
+   visible rather than asserted. Do not reorder these — putting the raw number first would be
+   putting the wrong number first. */
+/* ---------- What changed since the last pull (rival_watch.json) ----------
+   Every other panel on this tab is a snapshot: what the rival field looks like right now. This is
+   the only one that answers "and what MOVED?". rival_watch.json is a pure diff — it re-counts
+   nothing and emits a movement only where a dated field in the source proves it, so the honest
+   states (one vintage only; a channel that structurally cannot show disappearance) are carried
+   through to the reader instead of being smoothed over. */
+/* Rival page titles arrive already HTML-encoded from the source CMS ("&#8211;" for an en-dash), so
+   escaping them straight would print the entity text. Decode once through a detached textarea (which
+   parses entities but never executes markup), then escape — safe against injected markup AND
+   readable. */
+function decEsc(s){
+  const ta=document.createElement('textarea'); ta.innerHTML=String(s==null?'':s);
+  return escHtml(ta.value);
+}
+function renderRivalWatch(){
+  const host=$('#rivalwatch'); if(!host) return;
+  tmliFetch('rival_watch').then(w=>{
+    if(!w){ tmliNote(host,'Rival watch layer not built yet — run <code>pipeline/build_rival_watch.py</code>.'); return; }
+    const P=w.promos||{}, A=w.ads||{}, S=w.search_demand||{};
+    const H=[], li=s=>`<li>${s}</li>`;
+
+    // Promos. n_new on a first-ever pull is a baseline list, not arrivals — the builder says so in
+    // its own note and we surface that rather than printing "22 new" as if it were movement.
+    const baseline=/only promo pull recorded so far/.test(P.note||'');
+    if(P.n_new!=null||P.n_disappeared!=null){
+      const bits=[];
+      if(P.n_new) bits.push(`<b style="color:var(--gold)">${P.n_new}</b> new`);
+      if(P.n_disappeared) bits.push(`<b style="color:var(--mid)">${P.n_disappeared}</b> no longer listed`);
+      H.push(`<p class="lead" style="margin:6px 0 4px"><b>Rivals' own sites</b> (as of ${escHtml(P.as_of||'—')}) — `
+        +(bits.length?bits.join(' · '):'nothing moved')
+        +(baseline?' <span class="sub">— first pull on record, so this is the baseline list, not arrivals.</span>':'')+'</p>');
+      const rows=[];
+      (P.new||[]).slice(0,8).forEach(p=>rows.push(li(
+        `<b style="color:var(--gold)">NEW</b> · <b>${escHtml(p.brand)}</b> — ${decEsc(p.title)} <span class="sub">(${escHtml(p.kind||'')})</span>`)));
+      (P.disappeared||[]).slice(0,8).forEach(p=>rows.push(li(
+        `<b style="color:var(--mid)">GONE</b> · <b>${escHtml(p.brand)}</b> — ${decEsc(p.title)} <span class="sub">(${escHtml(p.kind||'')})</span>`)));
+      if(rows.length) H.push(`<ul class="pr-kv" style="margin:2px 0 8px">${rows.join('')}</ul>`);
+    }
+    // Ads. This channel can show arrival but structurally cannot show a creative going dark, and
+    // saying so is more useful than an empty "0 disappeared".
+    if(A.n_appeared_brands!=null){
+      H.push(`<p class="lead" style="margin:8px 0 4px"><b>Google Ads Transparency</b> (as of ${escHtml(A.as_of||'—')}) — `
+        +`<b style="color:var(--gold)">${A.n_appeared_brands}</b> brand(s) pushed new creative in the trailing 30 days`
+        +(A.n_disappeared_brands?`, <b>${A.n_disappeared_brands}</b> went dark`:'')+'.</p>');
+      const ar=(A.appeared||[]).slice(0,6).map(b=>li(
+        `<b>${escHtml(b.brand)}</b> — ${b.n_new_30d} new creative, ${b.n_live} live `
+        +`<span class="sub">(${b.share_of_volume_pct}% of measured ad volume)</span>`));
+      if(ar.length) H.push(`<ul class="pr-kv" style="margin:2px 0 8px">${ar.join('')}</ul>`);
+    }
+    H.push(`${TAG_M}`+methodBox(null,[
+      P.note?escHtml(P.note):null,
+      A.note?escHtml(A.note):null,
+      S.note?escHtml(S.note):null,
+      (w.meta&&w.meta.how_to_read)?escHtml(w.meta.how_to_read):null,
+    ].filter(Boolean)));
+    host.innerHTML=H.join('');
+  }).catch(()=>tmliNote(host,'Rival watch layer unavailable.'));
+}
+
+/* ---------- Competition answer band (mirrors renderAnswerBand on #overview) ----------
+   Five MEASURED scalars, each paired with the thing it is measured against, so the tab opens with
+   the size of the competitive problem instead of opening with a table of rival counts. Every tile
+   reads a committed layer; a tile whose layer is missing is skipped rather than defaulted, so an
+   absent pull shows as a shorter band, never as a wrong number. No composites, no scores. */
+function renderAcqAnswerBand(){
+  const host=$('#acq-answer'); if(!host) return;
+  Promise.all(['rival_density','rival_book_impact','search_demand','rival_pulse']
+    .map(n=>tmliFetch(n))).then(([den,imp,sd,pulse])=>{
+    const T=[], N=n=>Number(n).toLocaleString();
+
+    // 1. How much of the country is rival-held. The denominator is every district, so the share is
+    //    readable without knowing the census size.
+    const dm=den&&den.meta;
+    if(dm&&dm.n_outnumbered!=null&&dm.n_districts){
+      T.push(abTile({k:'Districts where rivals out-station us',cad:'census',cadCls:'q',
+        v:N(dm.n_outnumbered),unit:` of ${N(dm.n_districts)}`,
+        move:`${Math.round(dm.n_outnumbered/dm.n_districts*100)}% of the country`,
+        moveColor:'var(--agri)',why:'one census vintage · no history yet',
+        sub:'MEASURED official store-locators'}));
+    }
+    // 2. The field size, against our own. Ratio is the point, not either count alone.
+    if(dm&&dm.total_rivals&&dm.total_autox){
+      T.push(abTile({k:'Big-4 rival branches',cad:'census',cadCls:'q',
+        v:N(dm.total_rivals),unit:' branches',
+        move:`${(dm.total_rivals/dm.total_autox).toFixed(1)}× our ${N(dm.total_autox)}`,
+        moveColor:'var(--mid)',why:'one census vintage · no history yet',
+        sub:'MEASURED · all 4 brands, locator basis'}));
+    }
+    // 3. What it costs, WITHIN province. The raw national gradient is roughly double this and is
+    //    mostly confounding; quoting the controlled number here is the whole point of the tile.
+    const wp=imp&&imp.within_province;
+    if(wp&&wp.gap_dpd90p_pp!=null){
+      const g=wp.gap_dpd90p_pp;
+      T.push(abTile({k:'90+ gap · contested vs not',cad:'tape vintage',cadCls:'q',
+        v:(g>0?'+':'')+g.toFixed(2),unit:'pp',
+        move:`same-province split across ${wp.n_provinces} provinces`,
+        moveColor:g>0?'var(--agri)':'var(--merch)',
+        why:'1 tape vintage · needs 2+ for a line',sub:'MEASURED real tape × rival counts'}));
+    }
+    // 4. Brand. Counting provinces we LEAD is the honest framing — an average share would hide that
+    //    the answer is currently zero.
+    const rows=(sd&&sd.provinces)||[];
+    const cmp=rows.filter(r=>r.best_rival&&r.autox_share!=null);
+    if(cmp.length){
+      const lead=cmp.filter(r=>r.autox_share>=r.best_rival.share).length;
+      T.push(abTile({k:'Provinces where we lead share-of-search',cad:'Google Trends',cadCls:'m',
+        v:N(lead),unit:` of ${N(rows.length)}`,
+        move:lead?'':'a rival owns intent in every one',
+        moveColor:lead?'var(--merch)':'var(--agri)',
+        why:'relative index · no stored history',sub:'ESTIMATED share-of-search'}));
+    }
+    // 5. Our own app against the best rival app — the one rival-vs-us number a customer sees.
+    const sent=(pulse&&pulse.sentiment)||[];
+    const us=sent.find(s=>s.own), best=sent.filter(s=>!s.own&&s.score!=null)
+      .sort((a,b)=>b.score-a.score)[0];
+    if(us&&us.score!=null){
+      T.push(abTile({k:'Our app rating · เงินไชโย',cad:'Play Store',cadCls:'d',
+        v:us.score.toFixed(2),unit:'★',
+        move:best?`${(best.score-us.score).toFixed(2)}★ behind ${best.brand} (${best.score.toFixed(2)}★)`:'',
+        moveColor:best&&best.score>us.score?'var(--agri)':'var(--merch)',
+        why:'reviews accumulate · no rating history stored',sub:'MEASURED Google Play'}));
+    }
+
+    if(!T.length){ host.style.display='none'; return; }
+    host.style.display=''; host.innerHTML=T.join('');
+    const n=$('#acq-answer-note');
+    if(n) n.innerHTML='The answer first — how outnumbered the existing network is, what that '
+      +'measurably costs the book, and where the brand stands. The 90+ gap is the <b>within-province</b> '
+      +'figure; the raw national gradient is about double it and is mostly rivals and our big branches '
+      +'both clustering in cities. Everything below this line is the evidence.';
+  }).catch(()=>{ host.style.display='none'; });
+}
+
+function renderRivalBookImpact(){
+  const host=document.getElementById('acq-bookcost'); if(!host) return;
+  tmliFetch('rival_book_impact').then(j=>{
+    if(!j||!j.within_province){
+      tmliNote(host,'This read needs <b>data/rival_book_impact.json</b> — not built for this vintage. The rival-density sections below are unaffected.');
+      return;
+    }
+    const N=n=>Number(n).toLocaleString(), m=j.meta||{}, w=j.within_province;
+    const pp=v=>(v>0?'+':'')+v.toFixed(2)+'pp';
+    const sign=v=>v>0?'var(--agri)':v<0?'var(--merch)':'var(--dim)';
+
+    const side=(a,lab,note)=>`<tr>
+        <td><b>${lab}</b><br><span class="sub" style="font-size:12px">${note}</span></td>
+        <td class="mono">${N(a.n_branches)}</td>
+        <td class="mono">${N(a.n_accounts)}</td>
+        <td class="mono">${a.rivals_avg.toFixed(1)}</td>
+        <td class="mono"><b>${a.dpd90p_pct.toFixed(2)}%</b></td>
+        <td class="mono">${a.early_pct.toFixed(2)}%</td>
+        <td class="mono">฿${N(a.avg_balance_thb)}</td></tr>`;
+
+    const raw=(j.raw_buckets||[]).map(b=>`<tr>
+        <td>${b.bucket}</td>
+        <td class="mono">${N(b.n_branches)}</td>
+        <td class="mono">${N(b.n_accounts)}</td>
+        <td class="mono">${b.dpd90p_pct.toFixed(2)}%</td>
+        <td class="mono">฿${N(b.avg_balance_thb)}</td>
+        <td class="mono sub" title="the confound: rival count and catchment size rise together">${N(b.median_catchment_pop)}</td></tr>`).join('');
+
+    const top=(j.most_contested_branches||[]).slice(0,12).map(b=>`<tr>
+        <td><b>${b.name}</b> <span class="sub mono">${b.prov}</span></td>
+        <td class="mono"><b>${N(b.rivals)}</b> <span class="sub">vs ${N(b.autox_in_district)} of ours</span></td>
+        <td class="mono">${N(b.n_accounts)}</td>
+        <td class="mono">${b.dpd90p_pct.toFixed(2)}%</td>
+        <td class="sub" style="font-size:12px">${(b.top_brands||[]).map(x=>x[0]+' '+x[1]).join(' · ')||'—'}</td></tr>`).join('');
+
+    host.innerHTML=`
+      <p class="lead" style="margin:0 0 10px">${m.verdict||''}</p>
+      <table class="tbl"><tr>
+        <th>Within the same province</th><th>Branches</th><th>Accounts</th>
+        <th title="average rival branches in the district, account-weighted">Rivals near</th>
+        <th title="90+ days past due, account-weighted — MEASURED">90+</th>
+        <th title="X bucket, late but under 30dpd — MEASURED">X</th>
+        <th title="average outstanding per account — MEASURED">Avg balance</th></tr>
+        ${side(w.more_contested,'More contested','above its province median rival count')}
+        ${side(w.less_contested,'Less contested','below its province median rival count')}
+        <tr><td><b>Gap</b> <span class="sub">${N(w.n_provinces)} provinces</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td>
+          <td class="mono" style="color:${sign(w.gap_dpd90p_pp)}"><b>${pp(w.gap_dpd90p_pp)}</b></td>
+          <td class="mono" style="color:${sign(w.gap_early_pp)}"><b>${pp(w.gap_early_pp)}</b></td>
+          <td class="mono" style="color:${sign(w.gap_avg_balance_thb)}"><b>${w.gap_avg_balance_thb>0?'+':''}฿${N(Math.abs(w.gap_avg_balance_thb))}</b></td></tr>
+      </table>
+      <details style="margin-top:10px"><summary class="sub">The raw national gradient — shown only so you can see why it is not the number to quote</summary>
+        <p class="lead sub" style="margin:8px 0">Watch the last column. Rival count and catchment population rise together, so most of this gradient is <b>city vs countryside</b>, not competition. That is exactly what the within-province split above removes.</p>
+        <table class="tbl" style="margin-top:4px"><tr>
+          <th>Rivals in the district</th><th>Branches</th><th>Accounts</th><th>90+</th><th>Avg balance</th>
+          <th class="sub" title="the confound, printed on the same row as the result it threatens">Median catchment pop</th></tr>${raw}</table></details>
+      <details style="margin-top:8px"><summary class="sub">The 12 most outnumbered branches, with their books</summary>
+        <table class="tbl" style="margin-top:8px"><tr>
+          <th>Branch</th><th>Rivals in district</th><th>Accounts</th><th>90+</th><th>Who is there</th></tr>${top}</table></details>
+      <p class="lead sub" style="margin:10px 0 0"><b>Reading:</b> ${m.how_to_read||''} ${m.coverage_note||''}
+        ${w.exclusions_note?`<br><b>Who is in the split:</b> ${escHtml(w.exclusions_note)}`:''}</p>`;
+    wrapTables();
+  });
+}
+
 /* ---------- rival pulse · live promotions + voice of customer (obj #2, MEASURED) ----------
    Surfaces data/rival_pulse.json (build_rival_pulse.py, from pull_rival_promos.py [Thai-IP pull of
    the rivals' own sites] + pull_app_reviews.py [Google Play, 5 apps incl. our own เงินไชโย]).
@@ -4387,7 +4595,7 @@ function drawRivalPulse(){
             <td style="white-space:nowrap"><span class="tag" style="color:${TYPEC[p.promo_type]||'var(--dim)'};border:1px solid ${TYPEC[p.promo_type]||'var(--dim)'}">${TYPEL[p.promo_type]||p.promo_type}</span></td>
             <td class="mono" style="color:var(--gold);white-space:nowrap">${p.pricing||'<span class="sub">—</span>'}</td>
             <td class="sub" style="font-size:12px">${p.feature||''}</td>
-            <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}<a href="${p.url}" target="_blank" rel="noopener" style="font-size:12px">${p.title}</a></td>
+            <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}${p.is_gone?'<span class="tag" style="color:var(--mid);border:1px solid var(--mid)" title="not seen in the latest pull">NO LONGER LISTED</span> ':''}<a href="${p.url}" target="_blank" rel="noopener" style="font-size:12px">${p.title}</a></td>
           </tr>`).join('')}</table>`).join('');
     } else {
       lbox.innerHTML='';
@@ -4399,19 +4607,26 @@ function drawRivalPulse(){
     const byBrand={};
     promos.forEach(p=>{(byBrand[p.brand]=byBrand[p.brand]||[]).push(p);});
     const order=['TIDLOR','SAWAD','MTC'].filter(b=>byBrand[b]);
+    // Cap the per-brand feed at 6 so one prolific brand can't bury the others — but sort what
+    // CHANGED to the front first, otherwise a new or delisted item silently falls off the end and
+    // the badge that flags it is never reachable. The cap is stated below the list, never implied.
+    const PER_BRAND=6, chg=p=>(p.is_new||p.is_gone)?0:1;
     plist.innerHTML=order.map(b=>{
-      const items=byBrand[b].slice(0,6);
+      const all=byBrand[b].slice().sort((x,y)=>chg(x)-chg(y)), items=all.slice(0,PER_BRAND),
+            hidden=all.length-items.length;
       const kind=items.every(i=>i.kind==='news')?' <span class="sub">(news &amp; campaigns — MTC runs no public promo page)</span>':'';
       return `<h4 class="compsub" style="margin:10px 0 4px">${b}${kind}</h4>`+
         `<table class="tbl">${items.map(p=>`<tr>
           <td class="mono sub" style="white-space:nowrap">${p.date||p.first_seen||''}</td>
-          <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}<a href="${p.url}" target="_blank" rel="noopener">${p.title}</a>${p.detail?`<div class="sub" style="font-size:11px">${p.detail}</div>`:''}</td>
-        </tr>`).join('')}</table>`;
+          <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}${p.is_gone?'<span class="tag" style="color:var(--mid);border:1px solid var(--mid)" title="not seen in the latest pull">NO LONGER LISTED</span> ':''}<a href="${p.url}" target="_blank" rel="noopener">${p.title}</a>${p.detail?`<div class="sub" style="font-size:11px">${p.detail}</div>`:''}</td>
+        </tr>`).join('')}</table>`
+        +(hidden?`<p class="sub" style="margin:2px 0 0">+${hidden} more ${b} item(s) not shown — newest 6 per brand, anything new or delisted sorted to the top.</p>`:'');
     }).join('');
     if(pro){
-      const nNew=promos.filter(p=>p.is_new).length;
+      const nNew=promos.filter(p=>p.is_new).length, nGone=promos.filter(p=>p.is_gone).length;
       pro.innerHTML=`<b>${promos.length} promotions / campaigns</b> tracked from the rivals' own websites`+
         (nNew?` — <b style="color:var(--gold)">${nNew} new</b> since the previous pull`:'')+
+        (nGone?` · <b style="color:var(--mid)">${nGone} no longer listed</b> (not seen in the latest pull — for news items that is usually pagination roll-off, not a withdrawn offer)`:'')+
         `. Refreshed ${m.promos_pulled_at||'—'} (Thai-IP pull). ${TAG_M}`+
         methodBox(null,
           [`<b>Measured</b> — items published on tidlor.com (/th/promotion-activity), sawad.co.th (promotion posts) and muangthaicap.com (/news/ — MTC publishes campaigns as news). Every item carries first-seen tracking, so NEW = appeared since the previous pull.`,

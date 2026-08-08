@@ -213,12 +213,12 @@ def build():
                          "ratio, flag}. by_brand omits zero-count brands; brand order fixed "
                          "(alphabetical).",
         "gaps": [
-            "The rival census is a LOWER BOUND, not a registry (Google caps ~60 hits/query/"
-            "province; Overture is a sample — public reports put true totals far higher, e.g. "
-            "MTC FY2025 = 8,673). Rival counts here UNDER-count, so 'outnumbered' is conservative "
-            "and some un-flagged districts are outnumbered in reality; the bias only ever makes "
-            "AutoX look LESS outnumbered than it is. A true 100% census needs each operator's "
-            "official store-locator (pull_competitor_branches.py, from a Thai IP).",
+            "All four brands are now the operators' OWN official store-locators (Heng included, via "
+            "pull_heng_locator.py) — the earlier Google/Overture sample was replaced, not unioned, so "
+            "this is no longer a lower bound. Locators list every service point/sub-branch, so a "
+            "brand's count can sit slightly ABOVE its headline branch number (Muangthai 8,931 here vs "
+            "an 8,673 FY2025 headline). Read 'outnumbered' as service points vs AutoX branches, "
+            "like for like on the locator basis, not as a conservative under-count.",
             "Only the 4 big compliant brands (%s) are censused; sub-scale local operators are not, "
             "so this is big-4 density, not total competitive density." % ", ".join(brands),
         ],
