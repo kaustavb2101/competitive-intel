@@ -131,6 +131,12 @@
 <div id="updated" style="display:none"></div>
 
 <main id="main-content" tabindex="-1">
+  <!-- Page-level heading. The SPA renders each route's visible title as an <h2> (styled by the
+       console theme); without a real <h1> the document outline started at h2 and the front door was
+       the only nav page with no on-screen heading-one (data/status/live/rayong-catchment all have
+       one). A single visually-hidden app-name <h1> gives a correct hierarchy (h1 = app, h2 = the
+       current view) with zero visual change. document.title still carries the per-route name. -->
+  <h1 class="sr-only">AutoX · <span lang="th">เงินไชโย</span> — Credit Intelligence</h1>
   <!-- Fail honestly when JS is off: this is a Leaflet+deck.gl SPA, so <main> would otherwise render
        blank with no explanation. Themed to the default console. (The map libraries themselves are
        vendored now — only the webfont and the basemap tiles are still third-party.) -->
