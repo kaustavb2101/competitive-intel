@@ -168,17 +168,30 @@ def build():
     for j in joined:
         provs.setdefault(j["prov"], []).append(j)
     n_prov_used = 0
+    n_at_median = 0                       # branches sitting exactly ON their province's median
+    n_prov_skipped_small = 0              # provinces with too few branches to split
+    n_prov_skipped_flat = 0               # provinces where every branch has the same rival count
+    n_br_skipped_prov = 0                 # branches lost with those skipped provinces
     for prov in sorted(provs):
         sel = provs[prov]
         if len(sel) < 4:
+            n_prov_skipped_small += 1
+            n_br_skipped_prov += len(sel)
             continue                      # too few branches to split meaningfully
         rs = sorted(j["rivals"] for j in sel)
         med = rs[len(rs) // 2]
         above = [j for j in sel if j["rivals"] > med]
         below = [j for j in sel if j["rivals"] < med]
         if not above or not below:
+            n_prov_skipped_flat += 1
+            n_br_skipped_prov += len(sel)
             continue                      # province is uniform — no contrast to draw
         n_prov_used += 1
+        # A strict >/< split leaves the at-median branches in NEITHER side. That is deliberate —
+        # putting them in one arm would blur exactly the contrast being measured — but it means the
+        # two sides do not sum to n_branches_joined, so the shortfall is counted and published
+        # rather than left for a reader to notice from the arithmetic.
+        n_at_median += len(sel) - len(above) - len(below)
         hi_side.extend(above)
         lo_side.extend(below)
 
@@ -192,6 +205,22 @@ def build():
             "gap_early_pp": round(a_hi["early_pct"] - a_lo["early_pct"], 2),
             "gap_avg_balance_thb": a_hi["avg_balance_thb"] - a_lo["avg_balance_thb"],
             "n_provinces": n_prov_used,
+            "n_branches_at_median": n_at_median,
+            "n_branches_in_skipped_provinces": n_br_skipped_prov,
+            "n_provinces_skipped_few_branches": n_prov_skipped_small,
+            "n_provinces_skipped_uniform": n_prov_skipped_flat,
+            "exclusions_note": (
+                "The two sides hold %d + %d = %d of the %d joined branches, and every one of the "
+                "remaining %d is accounted for: %d sit exactly ON their own province's median rival "
+                "count, so a strict >/< split puts them in neither arm rather than letting the "
+                "branches that define the boundary blur the contrast; the other %d are in the %d "
+                "province(s) that could not be split at all (%d too few branches, %d with a uniform "
+                "rival count, so there is no more-vs-less to draw)."
+                % (len(hi_side), len(lo_side), len(hi_side) + len(lo_side), len(joined),
+                   len(joined) - len(hi_side) - len(lo_side), n_at_median, n_br_skipped_prov,
+                   n_prov_skipped_small + n_prov_skipped_flat,
+                   n_prov_skipped_small, n_prov_skipped_flat)
+            ),
         }
 
     # ---- The most contested branches, as a list someone can act on ---------------------------

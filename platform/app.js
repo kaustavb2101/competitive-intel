@@ -4340,7 +4340,8 @@ function renderRivalBookImpact(){
       <details style="margin-top:8px"><summary class="sub">The 12 most outnumbered branches, with their books</summary>
         <table class="tbl" style="margin-top:8px"><tr>
           <th>Branch</th><th>Rivals in district</th><th>Accounts</th><th>90+</th><th>Who is there</th></tr>${top}</table></details>
-      <p class="lead sub" style="margin:10px 0 0"><b>Reading:</b> ${m.how_to_read||''} ${m.coverage_note||''}</p>`;
+      <p class="lead sub" style="margin:10px 0 0"><b>Reading:</b> ${m.how_to_read||''} ${m.coverage_note||''}
+        ${w.exclusions_note?`<br><b>Who is in the split:</b> ${escHtml(w.exclusions_note)}`:''}</p>`;
     wrapTables();
   });
 }

@@ -719,6 +719,7 @@
   }
  ],
  "within_province": {
+  "exclusions_note": "The two sides hold 764 + 824 = 1588 of the 1935 joined branches, and every one of the remaining 347 is accounted for: 230 sit exactly ON their own province's median rival count, so a strict >/< split puts them in neither arm rather than letting the branches that define the boundary blur the contrast; the other 117 are in the 10 province(s) that could not be split at all (0 too few branches, 10 with a uniform rival count, so there is no more-vs-less to draw).",
   "gap_avg_balance_thb": 6254,
   "gap_dpd90p_pp": 1.03,
   "gap_early_pp": -0.91,
@@ -740,6 +741,10 @@
    "os_thb": 19867722484.0,
    "rivals_avg": 61.84
   },
-  "n_provinces": 67
+  "n_branches_at_median": 230,
+  "n_branches_in_skipped_provinces": 117,
+  "n_provinces": 67,
+  "n_provinces_skipped_few_branches": 0,
+  "n_provinces_skipped_uniform": 10
  }
 }
