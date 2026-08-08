@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-08T10:17:12+00:00",
-    "commit": "538030f"
+    "generated_at": "2026-08-08T16:23:28+00:00",
+    "commit": "096fbff"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,42 @@
   ],
   "activity": [
     {
+      "date": "2026-08-08T16:23:28+00:00",
+      "sha": "096fbff",
+      "summary": "health(deploy): freshness guard now covers the weekday SET peer scoreboard",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-08T15:54:11+00:00",
+      "sha": "4609b5f",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-08, run 31265396333)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-08T14:29:00+00:00",
+      "sha": "133aa23",
+      "summary": "docs: log ux-loop ship — deck.gl heading-one merged (#325) + deploy-verified",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-08T21:24:16+07:00",
+      "sha": "498fa4b",
+      "summary": "ux: give province.html + branch-explorer.html a visually-hidden <h1> (#325)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-08T19:42:49+07:00",
+      "sha": "de79018",
+      "summary": "feat(pulse): parallel market-pulse swarm + six-peer SET scoreboard + repo skills (#322)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-08T10:17:46+00:00",
+      "sha": "eed5555",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the #319 Competition deploy-probe ship",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-08-08T10:17:12+00:00",
       "sha": "538030f",
       "summary": "health(deploy): site-health probes for the two #319 Competition reads (rival_book_impact, rival_watch)",
@@ -673,42 +709,6 @@
       "date": "2026-08-07T22:47:40+07:00",
       "sha": "4da97fd",
       "summary": "Merge PR #311 (feat/macro-current-account-chip) — derived layers replayed, not merged",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-07T22:47:35+07:00",
-      "sha": "c39ed3b",
-      "summary": "Merge PR #308 (data/nabc-31136310673) — derived layers replayed, not merged",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-07T22:47:20+07:00",
-      "sha": "ba9f182",
-      "summary": "Merge PR #309 (data/thaiwater-31136725501) — derived layers replayed, not merged",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-07T22:47:05+07:00",
-      "sha": "6b60ea0",
-      "summary": "Merge PR #298 (data/thaiwater-31053032481) — derived layers replayed, not merged",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-07T22:41:02+07:00",
-      "sha": "17b1ac6",
-      "summary": "Merge branch 'mergebatch' into pr302",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-07T22:31:05+07:00",
-      "sha": "9de4670",
-      "summary": "Merge PR #300 (feat/debt-purpose-consumption-read) — derived layers replayed, not merged",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-07T22:31:04+07:00",
-      "sha": "1e53ce5",
-      "summary": "chore(derive): re-derive after merging #297",
       "pillar": "feature"
     }
   ]

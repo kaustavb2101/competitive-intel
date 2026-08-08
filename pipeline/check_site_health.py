@@ -2012,6 +2012,15 @@ FRESHNESS_LAYERS = [
      "meta.pulled every run and the USD/THB leg moves daily, so the folded file "
      "genuinely changes (→ commits) every weekly run — a >21-day lag (3 missed "
      "Mondays) is an unambiguous 'the macro pull stuck' signal, not a flat week"),
+    ("data/peer_scoreboard.json", "price_asof", 12,
+     "Listed-peer SET market scoreboard (market cap / valuation / ROE for the big-4 "
+     "listed title-lenders — obj#2 peer benchmark) — live-fetch()'d (app.js), refreshed "
+     "by the WEEKDAY data-set-peers.yml cron (Mon-Fri) via an autonomous SET in-browser "
+     "pull that CANNOT self-heal: a broken Playwright/SET-API pull leaves a structurally "
+     "valid (shape-probe-green) but frozen scoreboard shipping forever. meta.price_asof "
+     "is the SET trading date, so it advances every business day the pull succeeds; a "
+     ">12-day lag is ~7 missed trading-day pulls (well past any weekend + Thai market "
+     "holiday cluster) — an unambiguous 'the SET pull stuck' signal, not a market lull"),
 ]
 
 

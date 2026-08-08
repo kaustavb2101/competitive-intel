@@ -3,6 +3,75 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-08 — Intelligence loop (service/deploy-health): freshness guard now covers the weekday SET peer scoreboard — shipped to master
+
+Autonomous market & service intelligence run. Backlog is 98% done (1 owner-side item left), so the
+SERVICE pillar's job is to catch decay. Broken-reference sweep of every `data/*.json` fetched by the
+app: **0 genuine broken references** (the 4 apparent misses — `apple_reviews`/`fuel_stations`/
+`perimeter_counts`/`rayong_trees` — are all `source-data/` paths inside guarded comment/error
+strings, not live fetches). Site-health workflow already targets the correct master production alias.
+
+**The gap fixed.** The live-only freshness guard (`check_site_health.py::FRESHNESS_LAYERS`) covered
+every daily/weekly price·weather·macro upstream but **missed the one remaining *frequent* live pull**:
+`data/peer_scoreboard.json` — the listed-peer SET market scoreboard (obj #2 peer benchmark). It is
+live-`fetch()`'d (app.js:3816), refreshed by the **weekday** `data-set-peers.yml` cron via an
+autonomous SET Playwright pull, and **cannot self-heal**: a broken pull leaves a structurally-valid
+(shape-probe-green) but **frozen** scoreboard shipping forever with no alert — the exact class the
+freshness guard exists to close. Added `("data/peer_scoreboard.json", "price_asof", 12, …)`;
+`meta.price_asof` is the SET trading date, which advances every business day the pull succeeds. TTL
+**12 days** ≈ 7 missed trading-day pulls (past any weekend + Thai market-holiday cluster) — an
+unambiguous "SET pull stuck", not a market lull.
+
+**Safeguards (all pass).** (a) `bash tests/run.sh check` → **129 passed, 0 failed**. (b) No secrets
+in the diff. (c) Diff = only `pipeline/check_site_health.py` (+9 lines) + this log + `SERVICE_AUDIT.md`
+— no stray files, no `platform/data` change (→ no provenance regen needed). (d) No fabrication — the
+note describes a real cron, a real stamp key, and a real self-heal gap. Verified `_freshness_result`
+PASSes the committed `price_asof` (2026-08-07, 2d old) at TTL 12 and the entry is present in
+`FRESHNESS_LAYERS`; offline `--local` probe stays **158/158 HEALTHY** (freshness is live-only, skipped
+in the `--local` gate path, so the determinism gate is byte-unaffected). Probe-script-only, no
+visual/app change → committed straight to master (no PR / headless render required). **Next
+recommended:** freshness coverage now spans every independent frequent-cron live upstream; the natural
+next service pick is a shape/deploy probe for the remaining *live-fetched but unprobed* obj-#1/#2 reads
+(e.g. `regional_outlook.json`, `province_stress_index.json`) so a truncated CDN deploy of one fires an
+alert instead of silently blanking its card.
+
+## 2026-08-08 — UX loop (a11y): the two deck.gl pages finally have a heading-one — shipped + deploy-verified
+
+Autonomous UX-improvement run (`claude/ux-loop-20260808-1200-h1` → PR #325, **squash-merged**). Every
+numbered `docs/UXUI_AUDIT.md` finding and the surgical "Open backlog" items are already fixed; the
+remaining open items are all explicitly flagged NOT for unattended auto-merge (deck.gl gesture pages
+needing device testing) or out of `platform/` (test-infra). This run took the freshest surgical open
+item — `ux-deckgl-missing-h1`, the direct sibling of yesterday's `ux-spa-missing-h1`.
+
+**The gap fixed.** `province.html` and `branch-explorer.html` rendered **no `<h1>` at all** (0 static,
+0 dynamic), so their document outline had no heading-one (WCAG 1.3.1 / axe `page-has-heading-one`).
+Followed the `ux-spa-missing-h1` visually-hidden-h1 approach (over promoting a panel title, which
+would risk each page's inline-CSS panel layout): added `<h1 class="sr-only" id="pageH1">` as the first
+`<body>` child of both, added the canonical `.sr-only` clip (byte-matching `styles.css:130`) to each
+page's inline `<style>`, and — since these pages' identity is dynamic — kept the h1 `textContent` in
+step with `document.title` (province: focal province · region on data resolve; explorer: URL `?n=` name
+initially, then matched branch name · province in `loadPanel()`). Thai brand run wrapped `lang="th"`
+per the `ux-doc-lang-parts` convention. Zero visual change — SR-only. `rayong-catchment.html` already
+has `<h1>Call sheet · …</h1>`, so **all 7 nav pages now have a heading-one.**
+
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **129 passed, 0 failed**. (b) headless
+  render + PNG self-review of BOTH changed pages (province `?p=rayong`, branch-explorer
+  `?lat=&lng=&n=`): scenes/panels/controls render intact, sr-only h1 correctly invisible,
+  `data-errors=[]`, exactly one real `<h1>` element each, dynamically named (`Rayong · East …`,
+  `เงินไชโยสาขาระยอง2 · ระยอง …`). (c) no secrets in diff. (d) diff = 3 files (2 platform pages +
+  1-line audit entry), no stray files.
+- **Deploy-verified:** master auto-deployed; after propagation the production alias
+  `competitive-intel-git-master-…vercel.app` returns root **200**, and both `/province?p=rayong` and
+  `/branch-explorer?lat=…` return **200** (the `.html` forms 308-redirect to clean URLs per
+  `vercel.json cleanUrls` — expected, not a regression) and now serve exactly one `id="pageH1"` each.
+  No rollback needed.
+- **Next recommended:** the remaining open UX backlog is deliberately device-gated or test-infra —
+  `ux-viewport-user-scalable-3dpages` + `ux-navmore-3dpages-absolute-overflow` (deck.gl pinch/gesture,
+  need a real device, NOT unattended auto-merge) and `qa-visual-overflow-not-in-ci` /
+  `qa-visual-baseline-stale` (wire the Playwright overflow gate + refresh the stale visual baseline so
+  the CI visual gate carries signal again). Best next surgical target: `ux-live-chart-mobile-viewbox-responsive`
+  (a true responsive-viewBox fix for `live.html`'s SVG charts, bigger than one-line but self-contained).
+
 ## 2026-08-08 — Intelligence loop (deploy health): site-health probes for the two newest Competition (#acq) reads — shipped + gate-green
 
 - **Shipped** (direct to `master`): closed the deploy-health blind spot on the two layers the #319 rival-field wave landed today and left unguarded. Both are live-`fetch()`'d into the Competition (`#acq`) surface (`tmliFetch('rival_book_impact')` app.js:4287, `tmliFetch('rival_watch')` app.js:4168) and neither was in `check_site_health.py::DATA_FILES`, so a truncated/404 CDN deploy that gutted either would silently drop its board to a calm "not built for this vintage" note with **no phone alert** — the exact "broken demo" class the site-health probe exists to catch, and one that neither layer self-heals from (both are pipeline rebuilds off the owner-side loan tape / Thai-IP promo pull, no CI cron to restore a bad deploy).
