@@ -1,0 +1,130 @@
+name: Check — feed liveness (stale stamps + frozen values)
+
+# Every other guard in this repo tests PRESENCE. build_provenance.py --check asserts each data file
+# still reproduces byte-for-byte; validate_data.py asserts the numbers inside are consistent. Both
+# pass happily while a feed is dead, because a dead feed is not an absent file — it is a present file
+# that has stopped changing.
+#
+# Three real failures were invisible to every gate we had:
+#   * youtube_comments.json sat at 2,416 for 9 days behind an expired API key. The puller ran daily,
+#     exited 0, and rewrote an identical payload every time.
+#   * set_filings had no cron entry in any workflow, so nothing pulled it and nothing noticed.
+#   * investor_docs sys.exit'd in 0.1s on every run for want of pdfplumber — a 100% failure rate that
+#     never turned a check red.
+#
+# pipeline/check_feed_liveness.py asks the two questions those needed: is the feed's own vintage past
+# what its cadence allows (STALE), and has the value actually MOVED inside its window (FROZEN). The
+# second is the one nothing had, and it is the one the expired key needed.
+#
+# ALERT FLOW — deliberately the same single-rolling-issue pattern as site-health.yml, so a dead feed
+# and a dead site arrive the same way and neither can spam:
+#   FAIL -> comment on the open "Feed liveness check failed" issue, or open it.
+#   PASS -> close any open one with a recovery comment.
+
+on:
+  schedule:
+    # 14:00 UTC = 21:00 Bangkok — after the day's pulls have all landed and merged. Running this
+    # before the daily crons finish would report yesterday's data as a day stale, every day.
+    - cron: "0 14 * * *"
+  workflow_dispatch:
+    inputs:
+      asof:
+        description: "Pin the clock (YYYY-MM-DD) — for reproducing a past report. Blank = today."
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  liveness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # Same pin as qa.yml — matches the environment the pipeline targets.
+          python-version: "3.11"
+
+      # The checker is a pure read of two committed JSON files: no deps, no network.
+
+      - name: Run feed-liveness check
+        id: live
+        run: |
+          set +e
+          python pipeline/check_feed_liveness.py ${{ inputs.asof && format('--asof {0}', inputs.asof) || '' }} \
+            2>&1 | tee /tmp/liveness.txt
+          CODE=${PIPESTATUS[0]}
+          set -e
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          # Don't fail the step yet — the alerting steps below need to run first.
+
+      - name: Alert on failure (create or update the liveness issue)
+        if: steps.live.outputs.exit_code != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            echo "A registered feed has stopped being live."
+            echo
+            echo "**STALE** = the feed's own vintage is older than its cadence allows — usually the"
+            echo "puller is unscheduled or crashing."
+            echo "**FROZEN** = the stamp keeps moving but the value does not — usually an expired key"
+            echo "or a withdrawn upstream field. This is the shape that hid the YouTube key for 9 days."
+            echo
+            echo "Run: $RUN_URL"
+            echo
+            echo '```'
+            cat /tmp/liveness.txt
+            echo '```'
+            echo
+            echo "Re-check after a fix: Actions → \"Check — feed liveness\" → Run workflow."
+            echo "This issue closes itself automatically on the next passing check."
+          } > /tmp/issue_body.md
+          EXISTING="$(gh issue list --state open --search 'Feed liveness check failed in:title' \
+                        --json number --jq '.[0].number // empty')"
+          if [ -n "$EXISTING" ]; then
+            echo "Updating existing liveness issue #$EXISTING"
+            gh issue comment "$EXISTING" --body-file /tmp/issue_body.md
+          else
+            gh issue create \
+              --title "🔌 Feed liveness check failed $(date -u +%Y-%m-%d)" \
+              --body-file /tmp/issue_body.md
+          fi
+
+      - name: Close liveness issue on success
+        if: steps.live.outputs.exit_code == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          EXISTING="$(gh issue list --state open --search 'Feed liveness check failed in:title' \
+                        --json number --jq '.[0].number // empty')"
+          if [ -n "$EXISTING" ]; then
+            gh issue close "$EXISTING" --comment "Recovered — every feed is inside its cadence and every accumulated series has moved ($RUN_URL)."
+          else
+            echo "All feeds live and no open issue — nothing to do."
+          fi
+
+      - name: Upload liveness report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: feed-liveness-report
+          path: /tmp/liveness.txt
+          if-no-files-found: ignore
+          retention-days: 14
+
+      # Fail the run itself, so the Actions tab shows a red X alongside the issue.
+      - name: Fail the run when a feed is dead
+        if: steps.live.outputs.exit_code != '0'
+        run: |
+          echo "check_feed_liveness.py exited ${{ steps.live.outputs.exit_code }}"
+          exit 1

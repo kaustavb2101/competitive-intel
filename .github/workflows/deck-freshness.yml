@@ -1,0 +1,162 @@
+name: Deck — MCOM freshness (rebuild when the data moves past it)
+
+# build_mcom_macro_pptx.py reads every figure out of platform/data at build time, which is the right
+# design: the deck cannot drift by being edited, because it is never edited. But it CAN drift by
+# standing still — the data refreshes on a dozen crons, and until now NOTHING in .github/workflows
+# referenced docs/decks at all. "Somebody remembers to rebuild it" was the whole mechanism.
+#
+# The gap was real, not hypothetical. The deck committed on 2026-08-05 was, by 2026-08-09, showing
+# USD/THB 33.34 against a live 33.05, rivers running high 132/795 against a live 161/796, cassava
+# +59.3% against +61.3%, palm +27.3% against +25.5%. Every one of those is a number somebody could
+# read aloud in a meeting from a deck that looked authoritative and was four days out of date.
+#
+# THE RULE: a PR is opened only when a FIGURE ACTUALLY MOVED. docs/decks/check_deck_freshness.py
+# compares the rendered TEXT of every slide, not the bytes — a .pptx is a zip, so two byte-different
+# files routinely say precisely the same thing, and a byte comparison would open a PR on every run
+# and quickly be ignored.
+#
+# ONE ROLLING BRANCH, ONE PR. The branch name is fixed rather than run-id'd, so a second refresh
+# updates the existing PR instead of stacking a new one beside it. (16 other workflows in this repo
+# call `gh pr create` with no such guard; this one does not join them.)
+
+on:
+  push:
+    branches: [master]
+    paths:
+      # Only the layers the deck actually reads. A push that touches app.js cannot move a figure.
+      - "platform/data/**"
+      - "docs/decks/build_mcom_macro_pptx.py"
+      - "docs/decks/deckkit.py"
+      - "docs/decks/mcom_th.json"
+  schedule:
+    # Saturday 03:00 UTC — a backstop, in case a data layer ever lands without touching those paths.
+    - cron: "0 3 * * 6"
+  workflow_dispatch:
+
+# Serialise: two data merges landing minutes apart must not race to push the same branch.
+concurrency:
+  group: deck-freshness
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        # python-pptx is the only dependency — the Kanit faces the deck sets are committed under
+        # docs/decks/.fonts, so there is nothing to fetch for typography.
+        run: pip install --quiet python-pptx
+
+      - name: Check whether the data has moved past the deck
+        id: check
+        run: |
+          set +e
+          python docs/decks/check_deck_freshness.py 2>&1 | tee /tmp/deck_en.txt
+          EN=${PIPESTATUS[0]}
+          python docs/decks/check_deck_freshness.py --lang th 2>&1 | tee /tmp/deck_th.txt
+          TH=${PIPESTATUS[0]}
+          set -e
+          echo "en=$EN" >> "$GITHUB_OUTPUT"
+          echo "th=$TH" >> "$GITHUB_OUTPUT"
+          # 3 means "cannot judge" (build broke / dep missing) — that is a failure, not a no-op.
+          if [ "$EN" = "3" ] || [ "$TH" = "3" ]; then
+            echo "The freshness check could not run — see the log above." >&2
+            exit 1
+          fi
+          if [ "$EN" = "2" ] || [ "$TH" = "2" ]; then
+            echo "stale=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "stale=no" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Up to date
+        if: steps.check.outputs.stale == 'no'
+        run: echo "The committed deck still says what the data says — no PR needed."
+
+      - name: Rebuild both decks
+        if: steps.check.outputs.stale == 'yes'
+        run: |
+          python docs/decks/check_deck_freshness.py --write >/dev/null 2>&1 || true
+          python docs/decks/check_deck_freshness.py --lang th --write >/dev/null 2>&1 || true
+          git diff --stat -- docs/decks
+
+      - name: Open or update the refresh PR
+        if: steps.check.outputs.stale == 'yes'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          BR=deck/mcom-refresh
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet -- docs/decks; then
+            echo "Checker reported drift but the rebuild changed no committed bytes — nothing to push."
+            exit 0
+          fi
+
+          # One rolling branch, rebuilt from master each time, so the PR is always exactly
+          # "master + a fresh deck" and never carries a stale rebuild underneath it.
+          git checkout -B "$BR"
+          git add -- docs/decks
+          git commit -m "deck(mcom): rebuild — the data moved past the committed figures (run ${{ github.run_id }})"
+          git push --force-with-lease origin "$BR"
+
+          {
+            echo "The MCOM macro deck was rebuilt because **figures it shows have moved in the data**."
+            echo "Every number in this deck is read out of \`platform/data/\` at build time, so this is"
+            echo "purely a re-render — no wording or layout was touched by hand."
+            echo
+            echo "Opened automatically by \`deck-freshness.yml\`; the checker is"
+            echo "\`docs/decks/check_deck_freshness.py\`, which compares the rendered **text** of every"
+            echo "slide (not the bytes — a .pptx is a zip and byte-differs on every build)."
+            echo
+            echo "### What moved — English deck"
+            echo '```'
+            sed -n '1,80p' /tmp/deck_en.txt
+            echo '```'
+            echo
+            echo "### What moved — Thai deck"
+            echo '```'
+            sed -n '1,80p' /tmp/deck_th.txt
+            echo '```'
+            echo
+            echo "Run: $RUN_URL"
+          } > /tmp/pr_body.md
+
+          EXISTING="$(gh pr list --head "$BR" --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$EXISTING" ]; then
+            echo "Updating existing deck PR #$EXISTING"
+            gh pr edit "$EXISTING" --body-file /tmp/pr_body.md
+            gh pr comment "$EXISTING" --body "Rebuilt again — the data moved further. See $RUN_URL."
+          else
+            gh pr create --base master --head "$BR" \
+              --title "deck(mcom): rebuild — data has moved past the committed figures" \
+              --body-file /tmp/pr_body.md
+          fi
+
+      - name: Upload the drift reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deck-freshness-report
+          path: |
+            /tmp/deck_en.txt
+            /tmp/deck_th.txt
+          if-no-files-found: ignore
+          retention-days: 14
