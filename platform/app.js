@@ -2136,6 +2136,10 @@ function renderOverview(){
   // the crop mix → farm income correction (obj #1). Leads this section: it is the number the crop
   // tables underneath it explain. Null-safe: absent layer → nothing renders.
   renderFarmBook();
+  // The MEASURED per-province crop-YIELD read (build_oae_agstats.py → data/oae_agstats.json) sits
+  // directly under the farm book: the book ranks agri exposure by baht and moves it by price; this
+  // adds the yield lever (revenue per rai) the price/area tables can't carry. Null-safe.
+  renderCropYield();
   // RETIRED 2026-08-02 from this tab — renderCropStress (the agri_stress 0-100 composite, owner:
   // "an estimated measure that has been made up. Difficult to relate.") and renderCropMargin (the
   // 5-crop farmer-margin table). Both are now INSIDE renderFarmBook: the stress table's measured
@@ -3790,7 +3794,7 @@ function drawCreditAnchor(){
   box.innerHTML=head+
     `<div class="sub" style="margin-top:6px">The estimated 0–100 branch-risk score is a <b>triage rank, not a predicted NPL</b> — these BoT figures are the real-world scale it is read against, shown alongside the score, never inside it.</div>`+
     methodBox(m.label||null,
-      [ ...metrics.map(x=>`<b>${x.label}: ${x.display}</b> — ${x.scope}. ${TAG_M} ${x.source} (${x.vintage})${x.source_url?` · <a href="${x.source_url}" target="_blank" rel="noopener" style="color:var(--accent)">source</a>`:''}`),
+      [ ...metrics.map(x=>`<b>${x.label}: ${x.display}</b> — ${x.scope}. ${TAG_M} ${x.source} (${x.vintage})${x.source_url?` · <a href="${x.source_url}" target="_blank" rel="noopener" style="color:var(--accent)">source<span class="sr-only"> (opens in a new tab)</span></a>`:''}`),
         ahp.reason_absent?`<b>Auto hire-purchase NPL:</b> ${ahp.reason_absent}`:null,
         m.source?`Source: ${m.source}. Vintage/pulled ${m.pulled||'—'}.`:null ]);
   if(stats){
@@ -4597,7 +4601,7 @@ function drawRivalPulse(){
             <td style="white-space:nowrap"><span class="tag" style="color:${TYPEC[p.promo_type]||'var(--dim)'};border:1px solid ${TYPEC[p.promo_type]||'var(--dim)'}">${TYPEL[p.promo_type]||p.promo_type}</span></td>
             <td class="mono" style="color:var(--gold);white-space:nowrap">${p.pricing||'<span class="sub">—</span>'}</td>
             <td class="sub" style="font-size:12px">${p.feature||''}</td>
-            <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}${p.is_gone?'<span class="tag" style="color:var(--mid);border:1px solid var(--mid)" title="not seen in the latest pull">NO LONGER LISTED</span> ':''}<a href="${p.url}" target="_blank" rel="noopener" style="font-size:12px">${p.title}</a></td>
+            <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}${p.is_gone?'<span class="tag" style="color:var(--mid);border:1px solid var(--mid)" title="not seen in the latest pull">NO LONGER LISTED</span> ':''}<a href="${p.url}" target="_blank" rel="noopener" style="font-size:12px">${p.title}<span class="sr-only"> (opens in a new tab)</span></a></td>
           </tr>`).join('')}</table>`).join('');
     } else {
       lbox.innerHTML='';
@@ -4620,7 +4624,7 @@ function drawRivalPulse(){
       return `<h4 class="compsub" style="margin:10px 0 4px">${b}${kind}</h4>`+
         `<table class="tbl">${items.map(p=>`<tr>
           <td class="mono sub" style="white-space:nowrap">${p.date||p.first_seen||''}</td>
-          <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}${p.is_gone?'<span class="tag" style="color:var(--mid);border:1px solid var(--mid)" title="not seen in the latest pull">NO LONGER LISTED</span> ':''}<a href="${p.url}" target="_blank" rel="noopener">${p.title}</a>${p.detail?`<div class="sub" style="font-size:11px">${p.detail}</div>`:''}</td>
+          <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}${p.is_gone?'<span class="tag" style="color:var(--mid);border:1px solid var(--mid)" title="not seen in the latest pull">NO LONGER LISTED</span> ':''}<a href="${p.url}" target="_blank" rel="noopener">${p.title}<span class="sr-only"> (opens in a new tab)</span></a>${p.detail?`<div class="sub" style="font-size:11px">${p.detail}</div>`:''}</td>
         </tr>`).join('')}</table>`
         +(hidden?`<p class="sub" style="margin:2px 0 0">+${hidden} more ${b} item(s) not shown — newest 6 per brand, anything new or delisted sorted to the top.</p>`:'');
     }).join('');
@@ -10002,6 +10006,76 @@ function renderFarmBook(){
       }
     });
     renderFarmCrops(document.getElementById('fb-crops'),j,FI);
+  }).catch(()=>{ host.style.display='none'; });
+}
+
+/* ================= CROP YIELD — the income lever behind the farm book =================
+   Wires the built-but-never-surfaced MEASURED layer data/oae_agstats.json (build_oae_agstats.py,
+   gate-protected) into the app for the first time. The farm book above ranks agri exposure by
+   OUTSTANDING BAHT and the crop-mix column moves it by PRICE; neither carries YIELD — revenue per
+   rai — which is the per-province farm-household income lever the price/area tables cannot see
+   (objective #1, crop-household repayment capacity). A province whose main field crop yields below
+   the national benchmark AND is on a multi-year decline earns less per rai than the country average
+   and is sliding, so its households service a title loan on structurally thinner cash whatever the
+   price does.
+
+   HONESTY GUARDS baked into the read (a naive below-benchmark leaderboard is a UNIT ARTEFACT — it
+   surfaces climatically-marginal crops, the same trap the owner caught on the farm book):
+     · each province is compared ONLY to the national benchmark of the SAME crop (yield/area basis
+       differs by crop — the layer documents it), never across crops;
+     · we flag a province on its MAIN field crop = its largest-AREA crop among the five that carry a
+       national yield benchmark (maize/cassava/sugarcane/oil palm/rubber), floored at 20,000 rai so a
+       few hundred rai of out-of-zone oil palm in a rice province can't raise a false alarm;
+     · rice is excluded — the yearbook publishes no national rice-yield benchmark in this layer.
+   Null-safe: absent layer → the whole block hides itself, nothing else on the tab changes. */
+function renderCropYield(){
+  const host=document.getElementById('cropyield-wrap'); if(!host) return;
+  tmliFetch('oae_agstats').then(d=>{
+    if(!d||!d.by_province||!d.national){ host.style.display='none'; return; }
+    const nat=d.national, bp=d.by_province, meta=d.meta||{};
+    const BENCH=['maize','cassava','sugarcane','oilpalm','rubber'];
+    const EN={maize:'Maize',cassava:'Cassava',sugarcane:'Sugarcane',oilpalm:'Oil palm',rubber:'Rubber'};
+    const FLOOR=20000; // rai — materiality floor on the province's main benchmarked crop
+    const rows=[];
+    Object.keys(bp).forEach(prov=>{
+      const cr=bp[prov]||{};
+      let tot=0; ['rice','rice_second'].concat(BENCH).forEach(c=>{ const r=cr[c]; if(r&&r.area_rai) tot+=r.area_rai; });
+      let best=null;
+      BENCH.forEach(c=>{ const r=cr[c]; if(r&&r.area_rai&&r.yield_kg_rai!=null&&(!best||r.area_rai>best.rec.area_rai)) best={crop:c,rec:r}; });
+      if(!best) return;
+      const c=best.crop, r=best.rec, nb=nat[c]&&nat[c].yield_kg_rai;
+      if(!nb) return;
+      rows.push({prov,crop:c,area:r.area_rai,share:tot?r.area_rai/tot*100:null,
+                 y:r.yield_kg_rai,nb,gap:(r.yield_kg_rai-nb)/nb*100,tr:r.yield_trend_pct,year:r.year});
+    });
+    const flag=rows.filter(r=>r.gap<0&&r.tr!=null&&r.tr<0&&r.area>=FLOOR).sort((a,b)=>a.gap-b.gap);
+    if(!flag.length){ host.style.display='none'; return; }
+    host.style.display='';
+    const vin=meta.vintage_be&&meta.vintage_ce?`${meta.vintage_be}/${meta.vintage_ce}`:'';
+    const num=n=>Number(n).toLocaleString('en-US');
+    const body=flag.map((r,i)=>`<tr>
+        <td class="n">${i+1}</td>
+        <td><b>${r.prov}</b></td>
+        <td>${EN[r.crop]||r.crop}</td>
+        <td class="n">${num(r.y)}</td>
+        <td class="n" title="MEASURED national benchmark yield for the same crop">${num(r.nb)}</td>
+        <td class="n"><span style="color:var(--agri)">−${Math.abs(r.gap).toFixed(1)}%</span></td>
+        <td class="n"><span style="color:var(--agri)">${r.tr>0?'+':'−'}${Math.abs(r.tr).toFixed(1)}%</span></td>
+        <td class="n">${r.share==null?'—':r.share.toFixed(0)+'%'}</td>
+      </tr>`).join('');
+    host.innerHTML=`<h3 class="ovsub risk">Crop yield — the income lever behind the farm book
+        <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · OAE yearbook${vin?' '+vin:''}</span></h3>
+      <div class="verdict v-risk"><b>${flag.length} provinces farm their main field crop at a yield below the national benchmark — and it is still falling.</b>
+        Yield is revenue per rai. For these provinces the crop that anchors farm income produces less per rai than the country average and has been sliding across the yearbook's measured years, so the households behind that book service a title loan on structurally thinner cash — a repayment-capacity strain the price and area tables cannot see.
+        <span class="sub">Each province is compared only to the national benchmark of the SAME crop (yield basis differs by crop). The "main field crop" is the province's largest-area crop among the five that carry a national yield benchmark — maize, cassava, sugarcane, oil palm, rubber — floored at ${num(FLOOR)} rai so a marginal out-of-zone patch cannot raise a false alarm. Rice is excluded: the yearbook publishes no national rice-yield benchmark here.</span></div>
+      <table class="tbl"><tr>
+        <th scope="col">#</th><th scope="col">Province</th><th scope="col">Main field crop</th>
+        <th scope="col">Yield kg/rai</th><th scope="col" class="sub">National</th>
+        <th scope="col" title="Province yield vs the national benchmark for the same crop">vs benchmark</th>
+        <th scope="col" title="MEASURED multi-year yield direction — latest vs earliest measured year for that crop in this province">Multi-yr trend</th>
+        <th scope="col" class="sub" title="This crop's share of the province's total measured crop area — how much of the farm land the flag actually covers">Crop share</th>
+      </tr>${body}</table>
+      <p class="lead">MEASURED — Office of Agricultural Economics (สศก.) Agricultural Statistics of Thailand yearbook, read verbatim per province; latest measured year varies by crop. Yield vs benchmark and the multi-year trend are transparent ratios of measured values.</p>`;
   }).catch(()=>{ host.style.display='none'; });
 }
 
