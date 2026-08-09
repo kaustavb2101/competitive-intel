@@ -666,7 +666,12 @@
 
     <div id="competition-impact"></div><!-- impact-card drill, competition ranking (most-outgunned first) -->
 
-    <nav class="jumpnav no-print" id="compjump" aria-label="Jump to section within Competition">
+    <!-- data-exclusive turns this jump-nav into the same segmented control Macro's #ovjump uses (one
+         panel open at a time) — see showOvPanel() in app.js. data-switch points it at #compswitch,
+         the wrapper below, since showOvPanel now serves both tabs and needs to know which one.
+         "Does it cost us?" (sec-cost) is a plain heading, not a member of the panel set, so it is
+         untouched: the click handler only routes <details> targets through the switcher. -->
+    <nav class="jumpnav no-print" id="compjump" data-exclusive="1" data-switch="compswitch" aria-label="Jump to section within Competition">
       <a class="chip" href="#acq" data-jump="sec-cost">Does it cost us?</a>
       <a class="chip" href="#acq" data-jump="sec-search">Brand &amp; search</a>
       <a class="chip" href="#acq" data-jump="sec-presence">Market presence</a>
@@ -685,9 +690,17 @@
          opportunity score = UNDER-competed (few rivals) = the OPPOSITE of competitive risk, so it could not
          be honestly relabelled as a risk signal. Restore-and-reframe if you'd rather keep it. -->
 
+    <!-- SIX PANELS, ONE OPEN AT A TIME (2026-08-09) — this tab used to render 14 of its 33 blocks
+         before a reader clicked anything (3 of 6 sections shipped `open`). #ovswitch already solved
+         this exact problem on Macro; #compswitch is the same wrapper, opted into the same
+         showOvPanel()/ovSubInit() machinery via data-exclusive above. Only sec-search carries `open`
+         in the markup — the same "first section open, rest closed" default Macro uses — and
+         showOvPanel() on tab entry (see showTab in app.js) confirms exactly one panel is open even on
+         a hard reload to #acq. -->
+    <div class="compswitch" id="compswitch">
     <!-- 2 · BRAND SHARE-OF-SEARCH — how AutoX's brand demand compares to rivals, province by province. -->
     <details class="compsec" id="sec-search" open>
-    <summary><h2 class="opp">Brand share-of-search vs rivals · title-loan search interest by province <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
+    <summary><h2 class="opp">Brand share-of-search vs rivals · title-loan search interest by province <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2><span class="ovsec-what">Google Trends search interest by province, AutoX share-of-search vs 4 rival brands</span></summary>
     <p class="lead">Google Trends relative search-interest (0–100) for title-loan intent terms
       (<span class="mono" lang="th">จำนำทะเบียนรถ</span> · <span class="mono" lang="th">สินเชื่อรถแลกเงิน</span>), plus <b>share-of-search</b> —
       how AutoX's brand searches compare to the big rivals in each province (five brands on one shared Trends axis).
@@ -698,7 +711,7 @@
 
     <!-- 1.5 · MARKET & DIGITAL PRESENCE — listed-peer SET scoreboard + share-of-mind framing. -->
     <details class="compsec" id="sec-presence">
-    <summary><h2 class="opp">Market &amp; digital presence · listed-peer scoreboard &amp; share of mind <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2></summary>
+    <summary><h2 class="opp">Market &amp; digital presence · listed-peer scoreboard &amp; share of mind <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2><span class="ovsec-what">SET scoreboard for the 4 listed peers (cap, ROE), plus the search/map/market presence gap</span></summary>
     <p class="lead">How our rivals show up where AutoX largely does <b>not</b> — in the <b>capital market</b>, on the <b>map</b>, and in <b>search</b>. AutoX is <b>unlisted</b> (an SCBX subsidiary) and near-invisible on Google Maps, so this is a competitive-presence read, not an AutoX scoreboard.</p>
 
     <h3 class="compsub">Listed-peer market scoreboard <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · SET</span></h3>
@@ -714,15 +727,15 @@
          one measured, independent read of the borrower population this product has: by region, by
          socio-economic class, seven waves. Own section, open, because it corrects a strategy
          assumption rather than decorating one. -->
-    <details class="compsec" id="sec-informal" open>
-    <summary><h2 class="opp">The pool outside the banking system · in-system vs informal household debt <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · NSO</span></h2></summary>
+    <details class="compsec" id="sec-informal">
+    <summary><h2 class="opp">The pool outside the banking system · in-system vs informal household debt <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · NSO</span></h2><span class="ovsec-what">NSO in-system vs informal household debt, by region and class, seven survey waves 2011–2023</span></summary>
     <p class="lead">A non-bank title lender competes for households borrowing <b>outside the formal system</b>. The National Statistical Office measures that directly — <b lang="th">หนี้ในระบบ</b> vs <b lang="th">หนี้นอกระบบ</b>, by region and by socio-economic class, across seven survey waves 2011–2023. It sat in the local gov-data harvest unread, and what it says is not what a "big informal pool" story would predict.</p>
     <div class="tbl-wrap"><div id="acq-debtsource"></div></div>
     </details>
 
     <!-- 1.6 · RIVAL PULSE — what rivals are running right now + measured customer sentiment (incl. our own app). -->
-    <details class="compsec" id="sec-pulse" open>
-    <summary><h2 class="opp">Rival pulse · live promotions &amp; voice of customer <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2></summary>
+    <details class="compsec" id="sec-pulse">
+    <summary><h2 class="opp">Rival pulse · live promotions &amp; voice of customer <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2><span class="ovsec-what">Live promos, paid ads, YouTube and Pantip pulse, Play/Apple sentiment ladders, the full field census</span></summary>
     <p class="lead">The always-on watch: <b>what the rivals are promoting right now</b> (pulled from their own websites, new items flagged on every refresh) and <b>what customers say</b> — Google Play star ratings and dated reviews for the rivals' apps <b>and our own เงินไชโย app</b>, side by side. Stars, histograms and promo dates are <b>measured</b>; the detractor theme buckets are an <b>estimated</b> keyword read over 1–2★ reviews.</p>
 
     <!-- WHAT CHANGED, before what's live. Everything else in this section is a snapshot of the
@@ -792,7 +805,7 @@
 
     <!-- 1 · COMPETITOR THESIS — coverage + rival density + rival fragility, collapsed by default. -->
     <details class="compsec" id="sec-comp">
-    <summary><h2 class="opp">Competitor thesis · coverage, rival density &amp; rival fragility <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MOSTLY MEASURED</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">1 ESTIMATED PROXY</span></h2></summary>
+    <summary><h2 class="opp">Competitor thesis · coverage, rival density &amp; rival fragility <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MOSTLY MEASURED</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">1 ESTIMATED PROXY</span></h2><span class="ovsec-what">Rival census coverage, districts where AutoX is outnumbered, peer NPL and service ratings, PICO rivals, fragility estimate</span></summary>
 
     <h3 class="compsub">Competitor coverage · how complete is our rival census?</h3>
     <p class="lead">Our competitor map is now a <b>MEASURED, near-complete</b> census: Muangthai, Srisawad and Tidlor are pulled
@@ -886,7 +899,7 @@
 
     <!-- 3 · SEGMENT coverage & competitor exposure — every segment + district table, collapsed by default. -->
     <details class="compsec" id="sec-segments">
-    <summary><h2 class="opp">Segment coverage &amp; competitor exposure · estates · merchant · collateral · districts <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED counts</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED scores</span></h2></summary>
+    <summary><h2 class="opp">Segment coverage &amp; competitor exposure · estates · merchant · collateral · districts <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED counts</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED scores</span></h2><span class="ovsec-what">Estate, merchant and collateral coverage gaps, the 928-district whitespace leaderboard, most-stressed districts</span></summary>
     <p class="lead">Descriptive coverage-and-rival tables for the existing network — how thin AutoX's presence is against demand,
       and where rivals sit — as a <b>competitive-exposure read</b>. These are <b>not</b> open-a-branch recommendations.</p>
 
@@ -939,6 +952,7 @@
     <div class="chips" id="amprchips"></div>
     <table class="tbl" id="amprtbl"></table>
     </details>
+    </div><!-- /.compswitch -->
     <div class="story-next no-print">
       <span class="story-next-lab">Last stop — explore</span>
       <a data-v="map" href="#map">See it on the map — all 2,015 branches →</a>
