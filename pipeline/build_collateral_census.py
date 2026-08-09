@@ -187,6 +187,8 @@ def _iter_harvest():
             except ValueError:
                 continue
             venue = r.get("venue")
+            if _is_parts(r):
+                continue
             if venue == "auct":
                 yield dict(venue=venue, brand=r.get("Brand_Name"), model=r.get("Model_Name"),
                            year=_year(r.get("Manufacturing_Year")),
@@ -198,6 +200,21 @@ def _iter_harvest():
                            year=_year(r.get("year")), price=_num(r.get("price")), sold=None,
                            km=_num(r.get("km") or r.get("mileage")), date="",
                            body=_venue_body(venue, r))
+
+
+# Categories that are NOT vehicles. Measured on the kaidee harvest: of 12,105 rows, 687 are
+# อะไหล่ อุปกรณ์ตกแต่ง (spare parts and trim) and 134 are อุปกรณ์ขับขี่ (riding gear) — they sit in
+# the same motorcycle vertical as the bikes. A ฿500 helmet inside the motorcycle median corrupts
+# precisely the cell the book cares most about, motorcycles being its largest collateral type.
+#
+# Excluded by CATEGORY rather than by a minimum price, deliberately: a price floor high enough to
+# exclude a helmet would also exclude the genuinely cheap 20-year-old Wave that the census exists to
+# price, which would bias the median upward exactly where accuracy matters most.
+_PARTS = ("อะไหล่", "อุปกรณ์")
+
+
+def _is_parts(r):
+    return any(t in str(r.get("categoryName") or "") for t in _PARTS)
 
 
 def _venue_body(venue, r):

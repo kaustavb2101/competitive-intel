@@ -343,32 +343,72 @@ KAIDEE_FORBIDDEN = ("mid=", "dealership=", "_escaped_fragment_", "/member/", "/b
 # `memberId`, and an `autoInfo.dealership.name` that is frequently a private individual's given
 # name. Those are natural persons' contact details under PDPA and must never reach disk — not in a
 # harvest file, not in a log line. A denylist would leak the first field kaidee adds; this cannot.
-KAIDEE_KEEP_AD = {"price", "title", "location", "categoryName", "conditionName", "purposeName",
+# `id` is kept and it is NOT an exception to the rule above: it identifies the LISTING, not the
+# person who placed it. It is load-bearing rather than incidental — without a stable per-item id the
+# only way to tell two records apart is their text, and the same vehicle appears on many overlapping
+# category pages. See DEDUP_KEY.
+KAIDEE_KEEP_AD = {"id", "price", "title", "location", "categoryName", "conditionName", "purposeName",
                   "firstApprovedTime"}
 KAIDEE_KEEP_AUTO = {"brand", "model", "submodel", "year", "mileage", "fuelType", "transmission",
                     "carType"}
 
 
+# The category roots, MEASURED rather than taken from the categories_provinces sitemap. That sitemap
+# is a trap and the reason the first harvest was 81% duplicate rows: its 382 /c1p<N>-auto/<province>
+# URLs all 302 onto the SAME nationwide car listing (the served h1 is "ขายรถยนต์มือสอง ทั่วประเทศ"
+# — nationwide — and the canonical is rod.kaidee.com/c11-auto-car), so every province root returned
+# the identical 30 ads. `?page=N` was ignored there too: pageProps.page came back 1 on every request.
+#
+# The auto vertical actually lives on rod.kaidee.com, where ?page=N IS honoured (measured:
+# pageProps.page tracks the request and page 1 vs page 50 share only the 4 pinned ads). Motorcycles
+# are not on that host at all — they are c149 on www. Both are paginated off the page's OWN
+# total/pagesCount, so the walk stops when the category does instead of guessing a depth.
+KAIDEE_ROOTS = (
+    ("https://rod.kaidee.com/c11-auto-car", "car"),        # measured 10,361 listings / 400 pages
+    ("https://www.kaidee.com/c149-motorcycle", "moto"),    # measured 2,742 listings
+)
+KAIDEE_PER_PAGE = 26          # 30 slots/page of which ~4 are pinned repeats, dropped by dedup
+KAIDEE_MAX_PAGE = 400
+
+
+def _next_props(url):
+    """pageProps out of a Next.js page, or None. Used to read a category's own size before walking."""
+    html = fetch(url)
+    if not html:
+        return None
+    m = NEXT_DATA.search(html)
+    if not m:
+        return None
+    try:
+        return json.loads(m.group(1))["props"]["pageProps"]
+    except Exception:
+        return None
+
+
 def kaidee_urls(limit):
-    """Per-province auto category roots, paginated. Each page yields ~11 structured ads."""
-    raw = _sitemap(KAIDEE_SITEMAP)
-    if not raw:
-        return []
-    roots = [u for u in re.findall(r"<loc>([^<]+)</loc>", raw) if re.search(r"/c\d+p\d+-auto", u)]
-    print("  sitemap categories_provinces   %6d urls, %d auto roots" % (
-        len(re.findall(r"<loc>([^<]+)</loc>", raw)), len(roots)))
-    urls, page = [], 1
-    while len(urls) < limit and page <= KAIDEE_MAX_PAGE:          # breadth first, then depth
-        for u in roots:
-            if len(urls) >= limit:
-                break
-            urls.append(u if page == 1 else "%s?page=%d" % (u, page))
-        page += 1
+    """Category roots paginated to their OWN declared depth, not a fixed guess."""
+    urls = []
+    for root, kind in KAIDEE_ROOTS:
+        pp = _next_props(root)
+        if not pp:
+            print("  ! kaidee %s unreadable — skipped" % root, file=sys.stderr)
+            continue
+        total = pp.get("total") or 0
+        pages = pp.get("pagesCount") or (total + KAIDEE_PER_PAGE - 1) // KAIDEE_PER_PAGE
+        pages = min(pages, KAIDEE_MAX_PAGE)
+        print("  kaidee %-5s %-44s %6d listings, %d pages" % (kind, root.split("//")[1], total, pages))
+        urls.append(root)
+        urls += ["%s?page=%d" % (root, p) for p in range(2, pages + 1)]
     return [u for u in urls if not any(bad in u for bad in KAIDEE_FORBIDDEN)][:limit]
 
 
-KAIDEE_MAX_PAGE = 20
 NEXT_DATA = re.compile(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.S)
+# Motorcycle ads carry an EMPTY autoInfo — the structured brand/model/year/mileage block exists only
+# on the car vertical. Their titles are consistently "<BRAND> <MODEL> ปี <YYYY> ...", so brand and
+# year are recovered from the title rather than dropped. Model is deliberately NOT guessed: the
+# token after the brand is reliable for "HONDA CB650F" and wrong for "Yamaha YZF-R7 รถสวยกริ๊บ",
+# and a wrong model silently corrupts a census cell. Better absent than fabricated.
+_KD_YEAR = re.compile(r"ปี\s*((?:19|20)\d\d)")
 
 
 def kaidee_parse(html, url):
@@ -387,6 +427,10 @@ def kaidee_parse(html, url):
         rec = {k: ad[k] for k in KAIDEE_KEEP_AD if ad.get(k) not in (None, "")}
         auto = ad.get("autoInfo") or {}
         rec.update({k: auto[k] for k in KAIDEE_KEEP_AUTO if auto.get(k) not in (None, "")})
+        if not rec.get("year"):
+            y = _KD_YEAR.search(ad.get("title") or "")
+            if y:
+                rec["year"] = y.group(1)
         rec.update(venue="kaidee", kind="retail_ask", url=url, currency="THB")
         out.append(_scrubbed(rec, ("title", "location")))
     return out or None
@@ -409,39 +453,94 @@ T2H_MAX_PAGE = 40
 # STRICT ALLOWLIST, same reasoning as kaidee. Each truck2hand item embeds a `user` block carrying
 # displayName, profileImageFullUrl, mobilePhone and a shopOtherTelephoneNumbers list of {tel, name}
 # — live mobile numbers belonging to named private individuals. None of it is kept.
-T2H_KEEP = {"title", "displayPrice", "shortDetails", "subCategory1Slug", "itemSoldWorkflow"}
+# `hashId` identifies the LISTING, not the person — same reasoning as kaidee's `id`, and equally
+# load-bearing: it is what lets the same lorry appearing under several categories collapse to one row.
+T2H_KEEP = {"hashId", "title", "displayPrice", "shortDetails", "subCategory1Slug", "itemSoldWorkflow"}
+
+
+T2H_CAT = "https://www.truck2hand.com/category/cat_%s/"
+T2H_PAGE_CAP = 100            # the venue stops paginating here: 100 pages x ~100 items = 10,000
+
+
+def _t2h_size(url):
+    """(itemCount, totalPages) for a category page, from the page's own pageProps."""
+    pp = _next_props(url)
+    if not pp:
+        return None, None
+    return pp.get("itemCount"), pp.get("totalPages")
 
 
 def t2h_urls(limit):
-    """Category pages from the sitemap index, paginated. ?status=sold variants are kept: a sold
-    listing is a realised price, which is worth more than an ask."""
+    """Top-level categories walked to their own declared depth, sharded when the venue truncates.
+
+    The sitemap is NOT used to pick roots any more, and that is the fix for an 82% duplicate rate.
+    It lists 380 category URLs that are a HIERARCHY crossed with attribute facets — cat_truck
+    contains cat_truck_6wheel-truck contains cat_truck_6wheel-truck_truck-body-dump, and each of
+    those is sliced again by +attr_medium. The same lorry therefore appears on a dozen of those
+    pages, and harvesting all 380 counted it a dozen times: a vehicle listed in many categories got
+    a dozen votes in a median that is supposed to be one-vehicle-one-vote.
+
+    Every listing sits under exactly ONE top-level category, so the top-level set is complete and
+    disjoint. The exception is handled rather than ignored: the venue caps a category at 10,000
+    items / 100 pages, so a root at the cap is NOT complete, and those get sharded into their
+    children (whose individual counts are under the cap) instead of being silently truncated.
+
+    ?status=sold is kept as a separate walk. A sold listing is a REALISED retail price, which is
+    worth more to a recovery census than any number of asks.
+    """
+    urls, capped = [], []
+    for cat in T2H_CATEGORIES:
+        for sold in (False, True):
+            root = T2H_CAT % cat + ("?status=sold" if sold else "")
+            n, pages = _t2h_size(root)
+            if not pages:
+                print("  ! t2h %s unreadable — skipped" % root, file=sys.stderr)
+                continue
+            tag = "SOLD" if sold else "ask"
+            if pages >= T2H_PAGE_CAP:
+                capped.append((cat, sold, n))
+            print("  t2h %-24s %-4s %7s items, %3d pages%s"
+                  % (cat, tag, n, pages, "  <-- AT CAP, sharding" if pages >= T2H_PAGE_CAP else ""))
+            urls.append(root)
+            urls += ["%s%spage=%d" % (root, "&" if "?" in root else "?", p)
+                     for p in range(2, pages + 1)]
+    if capped:
+        urls += _t2h_shards(capped)
+    return urls[:limit]
+
+
+def _t2h_shards(capped):
+    """Child categories of the roots the venue truncated at 10,000, so their tail is not lost."""
     idx = _sitemap(T2H_SITEMAP)
     if not idx:
+        print("  ! t2h sitemap unreadable — capped categories stay TRUNCATED", file=sys.stderr)
         return []
     members = [u for u in re.findall(r"<loc>([^<]+)</loc>", idx)
                if any("categories-%s-" % c in u for c in T2H_CATEGORIES)]
-    cats = []
+    allcats = []
     for m in members:
         raw = _sitemap(m)
-        if not raw:
-            continue
-        got = re.findall(r"<loc>([^<]+)</loc>", raw)
-        print("  sitemap %-42s %6d urls" % (m.rsplit("/", 1)[-1], len(got)))
-        cats.extend(got)
-    seen, roots = set(), []
-    for u in cats:                       # collapse ?status=sold etc. onto one root, keep order
-        if u not in seen:
-            seen.add(u)
-            roots.append(u)
-    urls, page = [], 1
-    while len(urls) < limit and page <= T2H_MAX_PAGE:
-        for u in roots:
-            if len(urls) >= limit:
-                break
-            urls.append(u if page == 1 else
-                        "%s%spage=%d" % (u, "&" if "?" in u else "?", page))
-        page += 1
-    return urls[:limit]
+        if raw:
+            allcats.extend(re.findall(r"<loc>([^<]+)</loc>", raw))
+    out = []
+    for cat, sold, _n in capped:
+        # Direct children only (cat_truck_6wheel-truck), never grandchildren and never the
+        # +attr_ facets — those re-slice the same items and would reintroduce the duplication.
+        pref = "/category/cat_%s_" % cat
+        kids = sorted({u.split("?")[0] for u in allcats
+                       if pref in u and "attr_" not in u
+                       and u.split(pref)[1].strip("/").count("_") == 0})
+        for k in kids:
+            root = k + ("?status=sold" if sold else "")
+            n, pages = _t2h_size(root)
+            if not pages:
+                continue
+            out.append(root)
+            out += ["%s%spage=%d" % (root, "&" if "?" in root else "?", p)
+                    for p in range(2, min(pages, T2H_PAGE_CAP) + 1)]
+        print("  t2h shard %-24s %-4s -> %d child categories"
+              % (cat, "SOLD" if sold else "ask", len(kids)))
+    return out
 
 
 def t2h_parse(html, url):
@@ -455,8 +554,14 @@ def t2h_parse(html, url):
     out = []
     sections = (pp.get("listingSections") or []) + (pp.get("listingSoldSections") or [])
     sold_ids = {id(s) for s in (pp.get("listingSoldSections") or [])}
+    # A ?status=sold page returns its items in the ORDINARY listingSections, not in
+    # listingSoldSections — that second block only appears as a "recently sold" strip appended to an
+    # ordinary listing page. Trusting the section alone therefore labelled all 89,794 rows of a sold
+    # sweep as asks and silently threw away the realised retail price, which is the whole reason the
+    # sold pages are walked. The requested URL is the authority on what was asked for.
+    url_sold = "status=sold" in url
     for sec in sections:
-        is_sold = id(sec) in sold_ids
+        is_sold = url_sold or id(sec) in sold_ids
         for row in sec.get("rows") or []:
             for it in row.get("items") or []:
                 price = _thb(it.get("displayPrice"))
@@ -553,10 +658,14 @@ TALADROD_KEEP = {"yr4": "year", "amake": "brand", "amodel": "model", "atrim": "t
 
 
 def taladrod_urls(limit):
-    """A seed page plus one query per make id. Makes that come back at the 600 cap are reported."""
-    urls = [TALADROD_SEARCH % "fno:all+sort:y"]
-    urls += [TALADROD_SEARCH % ("mk:%d" % i) for i in range(1, TALADROD_MAX_MK + 1)]
-    return urls[:limit]
+    """One query per make id. Makes that come back at the 600 cap are reported.
+
+    The fno:all seed page that used to lead this list is gone on purpose: it returns the newest
+    cars across EVERY make, so all 600 of its rows are also returned by one of the mk: shards. It
+    contributed nothing but a duplicate of work already done, and duplicates are not free — each one
+    is an extra vote for its own price in the median.
+    """
+    return [TALADROD_SEARCH % ("mk:%d" % i) for i in range(1, TALADROD_MAX_MK + 1)][:limit]
 
 
 CAR_OBJ = re.compile(r'\{"type":"car",.*?"ncar":"\d+"\}')
@@ -621,6 +730,22 @@ VENUES = {
 }
 
 
+# The IDENTITY of a vehicle row, per venue — what makes two rows the same listing.
+#
+# This exists because the first full harvest was 66-82% duplicates on every listing-page venue, and
+# duplicates are not merely wasted bytes: the census takes MEDIANS, so a vehicle that appears on ten
+# category pages casts ten votes and drags the cell toward its own price. Deduping at write time
+# makes that structurally impossible rather than something a later stage has to remember to undo.
+#
+# one2car is absent deliberately — one URL is one listing there, so the url-level resume below is
+# already an exact dedup and a second mechanism would be redundant.
+DEDUP_KEY = {
+    "kaidee":     lambda r: "kaidee:%s" % r.get("id"),
+    "truck2hand": lambda r: "t2h:%s:%s" % (r.get("hashId"), r.get("kind")),
+    "taladrod":   lambda r: "tld:%s" % r.get("listing_id"),
+}
+
+
 def harvest(venue, limit, workers, outpath):
     spec = VENUES[venue]
     print("venue: %s — %s" % (venue, spec["note"]))
@@ -629,19 +754,27 @@ def harvest(venue, limit, workers, outpath):
     urls = [enc(u) for u in spec["urls"](limit)]
     print("  %d urls to harvest, %d workers" % (len(urls), workers))
 
-    done = set()
+    keyfn = DEDUP_KEY.get(venue)
+    done, seen = set(), set()
     if os.path.exists(outpath):                    # resumable: never refetch what we already have
         with open(outpath, encoding="utf-8") as fh:
             for line in fh:
                 try:
-                    done.add(json.loads(line).get("url"))
+                    r = json.loads(line)
                 except Exception:
-                    pass
-        print("  resuming — %d already harvested" % len(done))
-    todo = [u for u in urls if u not in done]
+                    continue
+                done.add(r.get("url"))
+                if keyfn:
+                    seen.add(keyfn(r))
+        print("  resuming — %d urls already harvested, %d distinct listings on disk"
+              % (len(done), len(seen)))
+    # A listing-page venue must NOT skip a page just because that page was fetched before: the page
+    # is the unit of fetching, but the listing is the unit of data, and re-walking a page is how new
+    # listings get picked up. Only one2car, where url == listing, resumes by url.
+    todo = urls if keyfn else [u for u in urls if u not in done]
 
     lock = threading.Lock()
-    stats = dict(ok=0, nodata=0, fail=0, n=0, rows=0)
+    stats = dict(ok=0, nodata=0, fail=0, n=0, rows=0, dup=0)
     t0 = time.time()
     fh = open(outpath, "a", encoding="utf-8")
 
@@ -655,11 +788,20 @@ def harvest(venue, limit, workers, outpath):
         recs = rec if isinstance(rec, list) else ([rec] if rec else [])
         with lock:
             stats["n"] += 1
-            if recs:
-                for r in recs:
+            fresh = []
+            for r in recs:
+                if keyfn:
+                    k = keyfn(r)
+                    if k in seen:
+                        stats["dup"] += 1
+                        continue
+                    seen.add(k)
+                fresh.append(r)
+            if fresh:
+                for r in fresh:
                     fh.write(json.dumps(r, ensure_ascii=False) + "\n")
                 stats["ok"] += 1
-                stats["rows"] += len(recs)
+                stats["rows"] += len(fresh)
                 if stats["ok"] % 25 == 0:
                     fh.flush()
             elif html:
@@ -668,9 +810,9 @@ def harvest(venue, limit, workers, outpath):
                 stats["fail"] += 1
             if stats["n"] % 50 == 0:
                 el = time.time() - t0
-                print("  %5d/%d  ok=%d rows=%d nodata=%d fail=%d  %.2f req/s  eta %.0f min"
-                      % (stats["n"], len(todo), stats["ok"], stats["rows"], stats["nodata"],
-                         stats["fail"], stats["n"] / max(el, 1),
+                print("  %5d/%d  ok=%d rows=%d dup=%d nodata=%d fail=%d  %.2f req/s  eta %.0f min"
+                      % (stats["n"], len(todo), stats["ok"], stats["rows"], stats["dup"],
+                         stats["nodata"], stats["fail"], stats["n"] / max(el, 1),
                          (len(todo) - stats["n"]) / max(stats["n"] / max(el, 1), .01) / 60),
                       flush=True)
 
@@ -678,8 +820,9 @@ def harvest(venue, limit, workers, outpath):
         list(ex.map(work, todo))
     fh.close()
     el = time.time() - t0
-    print("\ndone: %d pages ok (%d vehicle rows), %d no-data, %d failed in %.1f min (%.2f req/s) -> %s"
-          % (stats["ok"], stats["rows"], stats["nodata"], stats["fail"], el / 60,
+    print("\ndone: %d pages ok (%d NEW vehicle rows, %d duplicates dropped), %d no-data, %d failed "
+          "in %.1f min (%.2f req/s) -> %s"
+          % (stats["ok"], stats["rows"], stats["dup"], stats["nodata"], stats["fail"], el / 60,
              stats["n"] / max(el, 1), outpath))
     return 0 if stats["ok"] else 1
 
