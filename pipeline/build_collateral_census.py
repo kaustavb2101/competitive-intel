@@ -40,9 +40,18 @@ ESTIMATED The retail-to-auction RECOVERY CORRIDOR. Retail ask and auction openin
           same instrument — one is what a seller hopes for, the other is where bidding starts. The
           ratio is a corridor, not a realised recovery rate, and it is named that way.
 
-A NOTE ON THE ANCHOR YEAR. Vehicle age is computed against the newest auction date present IN THE
-DATA, never against wall clock. A builder that reads today's date produces a different file tomorrow
-from the same input, which would fail --check for a reason that has nothing to do with the data.
+TWO DATES, AND THEY ARE NOT INTERCHANGEABLE
+-------------------------------------------
+anchor_date  The newest auction date of any kind, used as the basis for vehicle age. It runs INTO
+             THE FUTURE, because auction floors are scheduled weeks ahead and the forward book
+             legitimately carries dates that have not happened yet.
+observed_to  The newest auction that demonstrably HAPPENED — the newest date among lots carrying a
+             realised sale price. This is the freshness stamp, and it is a different field on
+             purpose: a layer stamped with a future date reports age zero forever, so a puller that
+             died in March would still look fresh in August.
+
+Neither is wall clock. A builder that reads today's date produces a different file tomorrow from the
+same input, which would fail --check for a reason that has nothing to do with the data.
 """
 from __future__ import annotations
 
@@ -213,12 +222,27 @@ def aggregate():
         return 3
     cells = collections.defaultdict(lambda: collections.defaultdict(list))
     venues = collections.Counter()
-    anchor, rows, priced = "", 0, 0
+    anchor, observed, rows, priced = "", "", 0, 0
     for r in _iter_harvest():
         rows += 1
         venues[r["venue"]] += 1
         if r["date"] > anchor:
             anchor = r["date"]                    # newest date IN the data, never wall clock
+        # TWO dates, because they answer different questions and conflating them hides a dead feed.
+        #
+        # anchor_date is the newest auction date of any kind, and it runs INTO THE FUTURE — auction
+        # floors are scheduled weeks ahead, so the forward book legitimately carries dates that have
+        # not happened yet. That is the right basis for vehicle-age arithmetic (a 2015 model is the
+        # same age either way) and completely wrong as a freshness stamp: a layer stamped with a
+        # future date reports age_days=0 forever, so a puller that died in March would still look
+        # fresh in August. This layer would have shipped with exactly that hole.
+        #
+        # observed_to is the newest auction that DEMONSTRABLY happened — the newest date among lots
+        # carrying a realised Sold_Price. A lot cannot have sold at an auction that has not occurred,
+        # so this is necessarily in the past, and it stops moving the moment the feed stops, which
+        # is what makes it able to go stale and therefore able to raise an alarm.
+        if r["sold"] and r["date"] > observed:
+            observed = r["date"]
         cls = _tape_class(r["brand"], r["model"], r["body"])
         if not (cls and r["year"] and r["price"]):
             continue
@@ -242,7 +266,8 @@ def aggregate():
             generated_by="pipeline/build_collateral_census.py --aggregate",
             note=("Stage-1 aggregate of the gitignored venue harvests. Committed so that stage 2 is "
                   "reproducible from the repo alone; the ~500 MB of raw rows never enters git."),
-            anchor_date=anchor, rows_read=rows, rows_priced=priced, min_cell=MIN_CELL,
+            anchor_date=anchor, observed_to=observed, rows_read=rows, rows_priced=priced,
+            min_cell=MIN_CELL,
             venues=dict(sorted(venues.items()))),
         cells=out)
     os.makedirs(os.path.dirname(STAGING), exist_ok=True)
@@ -332,13 +357,12 @@ def build():
             why=("BoT UVPI publishes car, truck and overall only — there is no motorcycle series, and "
                  "motorcycles are the largest collateral type in the book at 127,628 accounts. This is "
                  "the first measured price anchor that layer has ever had."),
-            # as_of is the layer's data-observation vintage, and it is emitted under exactly that
-            # key on purpose: build_provenance.py's _vintage_of() reads a fixed list of freshness
-            # keys, and a layer that stamps its date under a name not on that list registers with a
-            # BLANK vintage — which is the same failure check_feed_liveness.py exists to catch, a
-            # layer that cannot be aged and therefore cannot be seen to have died. anchor_date is
-            # kept alongside it because the age arithmetic below is documented against that name.
-            as_of=agg["meta"].get("anchor_date"),
+            # observed_to is emitted under exactly that key on purpose: build_provenance.py's
+            # _vintage_of() reads a fixed list of freshness keys, and a layer stamping its date
+            # under a name not on that list registers with a BLANK vintage — unageable, and so
+            # unable to be seen to have died. See aggregate() for why the freshness stamp is the
+            # newest REALISED auction rather than anchor_date, which runs into the future.
+            observed_to=agg["meta"].get("observed_to"),
             anchor_date=agg["meta"].get("anchor_date"),
             anchor_note="Vehicle age is measured against the newest auction date IN THE DATA, not wall clock.",
             venues=agg["meta"].get("venues"), rows_read=agg["meta"].get("rows_read"),

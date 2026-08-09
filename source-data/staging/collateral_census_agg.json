@@ -6560,6 +6560,7 @@
   "generated_by": "pipeline/build_collateral_census.py --aggregate",
   "min_cell": 8,
   "note": "Stage-1 aggregate of the gitignored venue harvests. Committed so that stage 2 is reproducible from the repo alone; the ~500 MB of raw rows never enters git.",
+  "observed_to": "2026-08-06",
   "rows_priced": 342785,
   "rows_read": 522782,
   "venues": {
