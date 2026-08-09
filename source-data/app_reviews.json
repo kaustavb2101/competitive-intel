@@ -1649,16 +1649,16 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.583026,
-    "ratings": 16042,
+    "score": 4.583282,
+    "ratings": 16043,
     "reviews_total": 5082,
     "installs": "1,000,000+",
     "histogram": [
      837,
      305,
      561,
-     1292,
-     13041
+     1291,
+     13044
     ],
     "app_updated": "2026-07-09",
     "version": "3.1.0"
@@ -6165,21 +6165,29 @@
    "name": "ศรีสวัสดิ์",
    "own": false,
    "stats": {
-    "score": 4.553719,
-    "ratings": 2337,
+    "score": 4.5555553,
+    "ratings": 2338,
     "reviews_total": 836,
     "installs": "500,000+",
     "histogram": [
-     125,
-     77,
+     124,
+     76,
      67,
-     173,
-     1892
+     172,
+     1894
     ],
     "app_updated": "2026-07-01",
     "version": "1.0.60"
    },
    "reviews_store": [
+    {
+     "id": "b80f0688-185f-4079-bab7-7d91013f9e1f",
+     "at": "2026-08-08",
+     "score": 5,
+     "content": "ใช้ดีมากครับ",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "02cacc62-195e-4898-9cea-9940139efadc",
      "at": "2026-08-08",
@@ -9625,16 +9633,16 @@
    "name": "สมหวัง เงินสั่งได้ (TISCO)",
    "own": false,
    "stats": {
-    "score": 4.05,
-    "ratings": 327,
+    "score": 4.03,
+    "ratings": 328,
     "reviews_total": 128,
     "installs": "100,000+",
     "histogram": [
      52,
      16,
-     13,
+     16,
      26,
-     219
+     216
     ],
     "app_updated": "2026-04-24",
     "version": "1.11.0"
@@ -13505,16 +13513,16 @@
    "name": "GO by Krungsri Auto",
    "own": false,
    "stats": {
-    "score": 4.352174,
-    "ratings": 9247,
+    "score": 4.3544164,
+    "ratings": 9248,
     "reviews_total": 3799,
     "installs": "1,000,000+",
     "histogram": [
-     813,
-     251,
-     532,
-     914,
-     6733
+     806,
+     252,
+     534,
+     917,
+     6736
     ],
     "app_updated": "2026-07-16",
     "version": "8.5.0"
