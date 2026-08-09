@@ -137,6 +137,11 @@
        one). A single visually-hidden app-name <h1> gives a correct hierarchy (h1 = app, h2 = the
        current view) with zero visual change. document.title still carries the per-route name. -->
   <h1 class="sr-only">AutoX · <span lang="th">เงินไชโย</span> — Credit Intelligence</h1>
+  <!-- WCAG 4.1.3 Status Messages (AA): the #branches/#provinces/#market search boxes replace their
+       result table as you type, but the change was silent to screen readers (no live region existed
+       anywhere in the app). This shared polite live region lets the three draw fns announce the
+       match count on each keystroke without moving focus. sr-only = zero visual change. -->
+  <div id="searchstatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
   <!-- Fail honestly when JS is off: this is a Leaflet+deck.gl SPA, so <main> would otherwise render
        blank with no explanation. Themed to the default console. (The map libraries themselves are
        vendored now — only the webfont and the basemap tiles are still third-party.) -->
