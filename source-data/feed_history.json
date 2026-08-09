@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 192,
+  "n_points": 195,
   "n_series": 26,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -213,11 +213,12 @@
     "2026-08-06",
     "2026-08-07",
     "2026-08-08",
-    "2026-08-09"
+    "2026-08-09",
+    "2026-08-10"
    ],
    "first_seen": "2026-07-11",
    "label": "River stations above their high mark",
-   "n": 17,
+   "n": 18,
    "path": "platform/data/thaiwater_flood.json",
    "source": "ThaiWater live river/reservoir telemetry",
    "unit": "stations",
@@ -238,7 +239,8 @@
     138.0,
     149.0,
     164.0,
-    170.0
+    170.0,
+    156.0
    ]
   },
   "fuel_diesel": {
@@ -468,11 +470,12 @@
     "2026-08-06",
     "2026-08-07",
     "2026-08-08",
-    "2026-08-09"
+    "2026-08-09",
+    "2026-08-10"
    ],
    "first_seen": "2026-07-10",
    "label": "Provinces with heavy rain somewhere",
-   "n": 17,
+   "n": 18,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "provinces",
@@ -493,6 +496,7 @@
     36.0,
     31.0,
     31.0,
+    16.0,
     16.0
    ]
   },
@@ -515,11 +519,12 @@
     "2026-08-06",
     "2026-08-07",
     "2026-08-08",
-    "2026-08-09"
+    "2026-08-09",
+    "2026-08-10"
    ],
    "first_seen": "2026-07-10",
    "label": "Heaviest 24h rainfall, any gauge",
-   "n": 17,
+   "n": 18,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "mm",
@@ -540,7 +545,8 @@
     140.5,
     179.5,
     206.4,
-    292.1
+    292.1,
+    279.3
    ]
   },
   "rival_ads_live": {
