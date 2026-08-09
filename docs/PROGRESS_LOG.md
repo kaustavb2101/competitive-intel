@@ -3,7 +3,42 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
-## 2026-08-09 — Intelligence loop (service/deploy-health): the DLT fuel-type collateral chain (ev_penetration + vehicle_collateral, obj #1) now has a scheduled CI refresh — shipped to master
+## 2026-08-09 — Intelligence loop (service/deploy-health): the MEASURED loan-tape occupation cut (`tape_geo_occ.json`, obj #1) now has a deploy probe — shipped to master
+
+Autonomous integration/improvement run. Verified the top of the stated integration backlog is already
+shipped (FPO PICO competitor census → `pico_census`/`pico_*`; per-branch cropland → `branch_cropland.json`,
+in the gate + surfaced on branch/province/catchment views; the datagoth distillations → `dbd_formation`,
+`sfi_credit`, `vehicle_fleet`/`vehicle_registry`). GISTDA item #4 is not attemptable here — `GISTDA_SPHERE_KEY`
+is unset in this session — and the baac/smebank penetration distillation remains data.go.th-403 (owner/Thai-IP
+only). Baseline gate green up front (**129 passed / 0 failed**, `validate_data.py` 455/0). So a negative-space
+sweep for a genuinely NEW, CI-doable, offline+deterministic gap picked the highest-value one for **objective #1**.
+
+**The gap fixed (`tape-geo-occ-unprobed-deploy-blind-spot`).** `data/tape_geo_occ.json` — the MEASURED real
+loan-tape **occupation cut** (382,735 accounts, no-PII aggregates) — is fetched by `app.js` (renderAssistOccMacro
+9492 / renderAssistOcc 9521, the #exposure occupation panel + region→province→branch→occupation drill) but had
+**no `_shape_` probe** in `check_site_health.py`. Both renders GATE on `geo.regions` and degrade **SILENTLY** to a
+"not yet computed" note when the file is missing/truncated — no console error, **no phone alert**. Unlike almost
+every other probed layer, this one **cannot self-heal**: it is owner-side tape, no CI job re-pulls it, so a
+truncated/404 CDN deploy would blank a primary portfolio screen unnoticed. Its headline sibling `tape_real.json`
+was already probed (`_shape_tape_real`); this was the unprobed twin on the same un-refreshable source. Added
+`_shape_tape_occ` (asserts **shape not values**, robust to a future tape vintage: the `regions` dict `aodAgg`
+aggregates for `occupation`+`n`, and the `branches` list the drill navigates for `branch`/`prov`/`region`) and
+registered it next to `tape_real` in the `CHECKS` list. **+38 lines, one file** (`pipeline/check_site_health.py`).
+
+**Safeguards — all passed.** (a) `bash tests/run.sh check` → **129 passed / 0 failed** (the gate runs the
+`--local` probe path, which now reports **164/164 HEALTHY**, +3 fetch/parse/shape on the committed 3.2MB payload).
+(b) Negative-tested the validator directly: `None` on valid data; a distinct specific error for each break mode
+(empty regions / region-not-a-list / cell missing `n` / no branches / branch missing `prov` / non-dict) — proving
+it is not a no-op. (c) No secrets in the diff. (d) Diff = only `pipeline/check_site_health.py` (+ this log); **no
+`platform/data` file altered** → no provenance regen needed, no headless render (probe-script only, zero app/visual
+change). Probe runs in both live and `--local` paths with no wall-clock dependency, so it is byte-deterministic.
+Committed straight to master (no PR). **Next recommended integration:** batch the remaining unprobed-but-fetched
+obj-#1 reads the sweep surfaced (`product_segments`, `debt_source`, `income_impact`, `oae_agstats`,
+`farm_household`, `commodities`/`commodity_history`, `used_vehicle_value`), and add `pull_diw_scurve.py` /
+`pull_ilostat_labour.py` / the OAE-farm trio to `pull_swarm.py` (gated builders whose any-IP pullers are
+scheduled nowhere — the "unscheduled puller aging in silence" class).
+
+
 
 Autonomous market & service intelligence run. Deploy re-verified green up front (master production
 alias **HTTP 200** on `/`, `/data/meta.json`, `/data/peer_province.json`; `build_provenance.py --check`

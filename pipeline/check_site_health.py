@@ -264,6 +264,38 @@ def _shape_tape_real(d):
     return None
 
 
+def _shape_tape_occ(d):
+    # The MEASURED real loan-tape occupation cut (obj #1) — the #exposure
+    # occupation panel + drill (renderAssistOccMacro / renderAssistOcc). Both
+    # GATE their render on `geo.regions` and degrade SILENTLY to a "not yet
+    # computed" note when it is missing, with NO phone alert; and unlike its
+    # probed sibling tape_real, this layer CANNOT self-heal (owner-side tape,
+    # no CI job re-pulls it), so a truncated/404 CDN deploy blanks a primary
+    # portfolio screen unnoticed — the exact "broken demo" this probe catches.
+    # Assert SHAPE not values (robust to a future tape vintage): the regions
+    # dict the macro panel aggregates (aodAgg reads each region's cell list for
+    # `occupation` + `n`) and the branches list the drill navigates (`branch`
+    # /`prov`/`region`).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    regs = d.get("regions")
+    if not isinstance(regs, dict) or not regs:
+        return "missing/empty 'regions' dict (occupation panel render gate)"
+    cells = next(iter(regs.values()))
+    if not isinstance(cells, list) or not cells:
+        return "a 'regions' entry is not a non-empty cell list"
+    c0 = cells[0]
+    if not isinstance(c0, dict) or "occupation" not in c0 or "n" not in c0:
+        return "region cell missing 'occupation'/'n' (aodAgg reads)"
+    brs = d.get("branches")
+    if not isinstance(brs, list) or not brs:
+        return "missing/empty 'branches' list (occupation drill)"
+    b0 = brs[0]
+    if not isinstance(b0, dict) or not all(k in b0 for k in ("branch", "prov", "region")):
+        return "branch row missing 'branch'/'prov'/'region' (drill navigation)"
+    return None
+
+
 def _shape_collateral_flow(d):
     # The MEASURED used-collateral pulse (obj #1) — the Overview tab's lead
     # "moto / car / pickup" registration-flow card (renderCollateralFlow reads
@@ -1716,6 +1748,12 @@ DATA_FILES = [
     ("data/province_risk.json", _shape_province_risk, ".provinces rollup (~77, obj #1 risk verdict)"),
     ("data/branch_risk.json", _shape_branch_risk, ".branches list of 2015 (index-aligned composite risk)"),
     ("data/tape_real.json", _shape_tape_real, "headline + bucket_ladder (MEASURED portfolio truth)"),
+    # Sibling of tape_real on the SAME MEASURED, un-refreshable owner-side loan
+    # tape: the #exposure occupation panel + drill (renderAssistOccMacro /
+    # renderAssistOcc) gate on geo.regions and blank SILENTLY when it is missing.
+    # tape_real was probed; this cut was the unprobed twin — a truncated deploy
+    # would gut the occupation screen with no alert. Closes that blind spot.
+    ("data/tape_geo_occ.json", _shape_tape_occ, ".regions occupation cells + .branches drill (MEASURED tape occupation cut, obj #1)"),
     # The Exposure tab's LEAD read (obj #1): segment_exposure.json drives BOTH the
     # colored most-concentrated-region verdict card and the "Portfolio concentration
     # by region" board (renderConcentration/renderExpoVerdict). It gates the whole
