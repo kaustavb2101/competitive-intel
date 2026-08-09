@@ -18,7 +18,33 @@ on:
 
 jobs:
   qa:
-    runs-on: ubuntu-latest
+    # WHY THIS LEFT ubuntu-latest. Measured over 29 hours / 200 runs: QA was 3,050 of the repo's
+    # 3,849 Actions job-minutes — 79% of a metered private-repo bill, against 5% for all ten data
+    # feeds combined. Nearly all of those 22 minutes per run were toolchain, not testing: every run
+    # downloaded a fresh Chromium. On a self-hosted box that download happens once and is cached
+    # between runs (see the skip guard below).
+    #
+    # There is a second reason, and it matters more than the money. The determinism gate reproduces
+    # byte-exact only under cpython-3.11 on Linux with LF line endings — which is why reproducing a
+    # CI failure locally needs a WSL mirror. The box IS that environment natively, so the canonical
+    # gate and its local reproduction stop being two machines that can disagree.
+    #
+    # The `ci` label, NOT `thai`. The Thai-IP feeds run on a runner labelled `thai` and must never
+    # queue behind a QA backlog — a nightly data pull that misses its window because 12 PRs were
+    # testing is a silent data gap. QA needs no particular IP, so it gets its own label and its own
+    # runner instance on the same box.
+    #
+    # ONE ci runner, not several, and that is a hardware fact rather than a preference: the box is
+    # 2 cores / 4 GB. The render phases drive software-WebGL Chromium over deck.gl scenes, which can
+    # spike past 1.5 GB on its own; two of those concurrently would OOM rather than parallelise.
+    # QA here is deliberately serial. `pr-autoresolve` was considered for this box and deliberately
+    # left on ubuntu-latest for the same reason — it runs a full gate per PR under a 180-minute
+    # ceiling, and on a single runner one long autoresolve would block every PR's QA behind it.
+    runs-on: [self-hosted, ci]
+    # A hosted runner that hangs costs one job. A self-hosted runner that hangs blocks every job
+    # behind it until someone notices, so this ceiling is load-bearing here in a way it was not on
+    # ubuntu-latest, where the job had no timeout at all.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -58,15 +84,37 @@ jobs:
           # transiently and leaves nothing in node_modules, which is fine for render.sh (it drives the
           # chrome binary directly) but makes `require('playwright')` fail — so tests/run.sh overflow
           # skipped itself with "playwright npm package is not installed here" the first time it ran.
+          #
+          # node_modules lives INSIDE the workspace, which actions/checkout wipes every run, so this
+          # install always happens. npm's cache does not live in the workspace, so on the self-hosted
+          # box it is a cache hit measured in seconds rather than a download.
           npm install --no-save --no-audit --no-fund playwright@1.49.1
+
+          # The BROWSER, by contrast, lives outside the workspace and therefore survives between
+          # runs on a self-hosted box. Re-downloading ~150MB of Chromium on every one of 136 runs
+          # was most of what made this a 22-minute job; provisioning it once and detecting it here
+          # is the single change that pays for the migration.
+          if ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome >/dev/null 2>&1; then
+            echo "chromium already provisioned on this runner — skipping download:"
+            ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome
+            exit 0
+          fi
+
+          # First run on a fresh machine, or any hosted runner this job is ever moved back to.
+          # `--with-deps` apt-installs system libraries and so needs root; on the self-hosted box
+          # that is done once by the provisioning script rather than here, which is why reaching
+          # this branch there means provisioning did not complete.
           npx playwright install --with-deps chromium
-          # expose the installed chrome where render.sh looks (/opt/pw-browsers/chromium-*/...)
           PW_DIR="${PLAYWRIGHT_BROWSERS_PATH:-$HOME/.cache/ms-playwright}"
-          sudo mkdir -p /opt/pw-browsers
           CH="$(ls -d "$PW_DIR"/chromium-*/chrome-linux/chrome 2>/dev/null | head -1)"
           if [ -z "$CH" ]; then echo "chromium not found under $PW_DIR" >&2; exit 1; fi
           VER="$(basename "$(dirname "$(dirname "$CH")")")"
-          sudo cp -r "$PW_DIR/$VER" "/opt/pw-browsers/$VER"
+          # sudo -n rather than sudo: a runner account without passwordless sudo would otherwise sit
+          # waiting on a password prompt that nothing can ever answer, and burn the job timeout
+          # instead of failing in one legible line.
+          sudo -n mkdir -p /opt/pw-browsers \
+            && sudo -n cp -r "$PW_DIR/$VER" "/opt/pw-browsers/$VER" \
+            || { echo "could not write /opt/pw-browsers (no passwordless sudo?) — run the box provisioning script as root" >&2; exit 1; }
           ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome
 
       # --- Phase 2+3+4+5: render, health smoke, visual regression, layout audit (offline: vendored map libs) ---
