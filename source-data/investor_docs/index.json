@@ -34,13 +34,8 @@
    "label": "2025_en",
    "url": "https://heng.listedcompany.com/misc/form561/20260317-heng-one-report-2025-en.pdf",
    "pdf_path": "source-data/investor_docs/pdf/HENG_annual_2025_en.pdf",
-   "sha256": "c2b8281314efb712bf8ed51fd2292ad14b71c955a9a39c84f8b4e97a6817b3ad",
-   "bytes": 8658450,
-   "cached": false,
-   "status": "ok",
-   "n_pages": 357,
-   "n_chars": 613074,
-   "text_path": "source-data/investor_docs/text/HENG_annual_2025_en.txt"
+   "status": "download_failed",
+   "error": "not a PDF (first bytes b'') — the URL may have moved; rediscover it from the IR site named in the registry"
   },
   {
    "symbol": "HENG",
@@ -438,13 +433,8 @@
    "label": "2025_en",
    "url": "https://sak.listedcompany.com/misc/one-report/20260323-sak-one-report-2025-en.pdf",
    "pdf_path": "source-data/investor_docs/pdf/SAK_annual_2025_en.pdf",
-   "sha256": "426dda56c997222163b382ebab20b45369a6f37ae7eb84aa28aaf8b432a19a79",
-   "bytes": 9635432,
-   "cached": false,
-   "status": "ok",
-   "n_pages": 287,
-   "n_chars": 549882,
-   "text_path": "source-data/investor_docs/text/SAK_annual_2025_en.txt"
+   "status": "download_failed",
+   "error": "not a PDF (first bytes b'') — the URL may have moved; rediscover it from the IR site named in the registry"
   },
   {
    "symbol": "SAK",
@@ -648,13 +638,8 @@
    "label": "2025_en",
    "url": "https://sawad.listedcompany.com/misc/ar/20260327-sawad-ar-2025-en.pdf",
    "pdf_path": "source-data/investor_docs/pdf/SAWAD_annual_2025_en.pdf",
-   "sha256": "896065b2c94e797adfdae2451a4f76ac386102e1ed8a36c69223f156c0e50d42",
-   "bytes": 20240874,
-   "cached": false,
-   "status": "ok",
-   "n_pages": 349,
-   "n_chars": 555778,
-   "text_path": "source-data/investor_docs/text/SAWAD_annual_2025_en.txt"
+   "status": "download_failed",
+   "error": "not a PDF (first bytes b'') — the URL may have moved; rediscover it from the IR site named in the registry"
   },
   {
    "symbol": "SAWAD",
@@ -859,13 +844,8 @@
    "label": "2025_en",
    "url": "https://ntl.listedcompany.com/misc/one-report/tidlor-one-report-2025-en-ntl.pdf",
    "pdf_path": "source-data/investor_docs/pdf/TIDLOR_annual_2025_en.pdf",
-   "sha256": "bf6354016dff4ae1b64460d90b3b785244605aef65dd70bde0a6c01c406914aa",
-   "bytes": 20933201,
-   "cached": false,
-   "status": "ok",
-   "n_pages": 214,
-   "n_chars": 364151,
-   "text_path": "source-data/investor_docs/text/TIDLOR_annual_2025_en.txt"
+   "status": "download_failed",
+   "error": "not a PDF (first bytes b'') — the URL may have moved; rediscover it from the IR site named in the registry"
   },
   {
    "symbol": "TIDLOR",
@@ -994,13 +974,8 @@
    "label": "2025_en",
    "url": "https://turbo.listedcompany.com/misc/one-reports/20260331-turbo-or2025-en.pdf",
    "pdf_path": "source-data/investor_docs/pdf/TURBO_annual_2025_en.pdf",
-   "sha256": "d2da32c439f7859b8b5e256edede785ff09c525d5cbcb095d9a1a484bbf6a995",
-   "bytes": 9373489,
-   "cached": false,
-   "status": "ok",
-   "n_pages": 270,
-   "n_chars": 564382,
-   "text_path": "source-data/investor_docs/text/TURBO_annual_2025_en.txt"
+   "status": "download_failed",
+   "error": "not a PDF (first bytes b'') — the URL may have moved; rediscover it from the IR site named in the registry"
   },
   {
    "symbol": "TURBO",
