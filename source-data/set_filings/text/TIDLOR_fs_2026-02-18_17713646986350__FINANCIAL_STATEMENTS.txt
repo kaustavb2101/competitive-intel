@@ -1,0 +1,379 @@
+
+[SHEET: Assets]
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY										
+STATEMENTS  OF  FINANCIAL  POSITION										
+AS  AT  DECEMBER  31,  2025										
+UNIT : THOUSAND BAHT										
+			CONSOLIDATED							
+			FINANCIAL STATEMENTS							
+			2025		2024					
+					“RESTATED”		SEPARATE			
+			After		Before		FINANCIAL STATEMENTS			
+	Notes		restructuring		restructuring		2025		2024	
+ASSETS										
+CURRENT  ASSETS										
+Cash and cash equivalents	6.1		3060341		1771237		109444		1129	
+Current portion of loans and hire-purchase receivables	7		35057856		32798050		0		0	
+Other current receivables										
+Receivable from payment agents			265270		287939		0		0	
+Current contract assets			750559		612708		1		0	
+Prepaid expenses			324965		270564		96		0	
+Other receivables			46646		92796		0		2076	
+Other current financial assets	9 and 38		0		16293		0		0	
+Other current assets			24755		17154		0		0	
+Properties foreclosed	8		174224		193860		0		0	
+Total Current Assets			39704616		36060601		109541		3205	
+NON-CURRENT  ASSETS										
+Investment in a subsidiary	10		0		0		31895973		0	
+Investment in joint venture	11		90183		213157		0		0	
+Loans and hire-purchase receivables										
+- net of current portion	7		69027912		66577317		8009697		0	
+Leasehold improvement and equipment	12		1769603		1711322		198		0	
+Goodwill	13		294001		294001		0		0	
+Other intangible assets other than goodwill	14		306399		303793		0		0	
+Deferred tax assets	15		1470465		1251982		0		0	
+Other non-current assets	16		133594		118924		0		0	
+Total Non-current Assets			73092157		70470496		39905868		0	
+TOTAL  ASSETS			112796773		106531097		40015409		3205	
+Notes to the financial statements form an integral part of these statements										
+
+[SHEET: liabilities]
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY															
+STATEMENTS  OF  FINANCIAL  POSITION  (CONTINUED)															
+AS  AT  DECEMBER  31,  2025															
+UNIT : THOUSAND BAHT															
+			CONSOLIDATED												
+			FINANCIAL STATEMENTS												
+			2025		2024										
+					“RESTATED”		SEPARATE								
+			After		Before		FINANCIAL STATEMENTS								
+	Notes		restructuring		restructuring		2025		2024						
+LIABILITIES  AND  SHAREHOLDERS’  EQUITY															
+CURRENT  LIABILITIES															
+Short-term borrowing	17		850000		0		0		0						
+Other current payables															
+Amounts due to related parties	35.1		6077		606518		10584		63						
+The Revenue Department payable			170382		136783		25882		2						
+Accrued expenses			1826870		1820827		14531		81						
+Other current payables			486245		1079601		28208		0						
+Short-term borrowings from related party	18 and 35.1		1000000		0		0		4500						
+Current portion of long-term borrowings	19		14858860		8829375		0		0						
+Current portion of long-term debentures	20		11898083		19187961		0		0						
+Other current financial liabilities	9, 19 and 38		18586		0		0		0						
+Current portion of lease liabilities	21		489142		416242		284		0						
+Current income tax payable			763009		528359		0		0						
+Current provision for employee benefits	22.2		1297		1087		0		0						
+Other current liabilities			62783		63927		0		0						
+Total Current Liabilities			32431334		32670680		79489		4646						
+NON-CURRENT  LIABILITIES															
+Long-term borrowings - net of current portion	19		24415145		21919948		4998507		0						
+Long-term debentures - net of current portion	20		20387965		20569616		2987645		0						
+Lease liabilities - net of current portion	21		448322		393910		0		0						
+Non-current provision for employee benefits	22.1		305633		250340		2113		2359						
+Other non-current financial liabilities	9, 19 and 38		202739		54528		0		0						
+Other non-current liabilities			142836		148813		0		0						
+Total Non-current Liabilities			45902640		43337155		7988265		2359						
+TOTAL  LIABILITIES			78333974		76007835		8067754		7005						
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY															
+STATEMENTS  OF  FINANCIAL  POSITION  (CONTINUED)															
+AS  AT  DECEMBER  31,  2025															
+UNIT : THOUSAND BAHT															
+			CONSOLIDATED												
+			FINANCIAL STATEMENTS												
+			2025		2024										
+					“RESTATED”		SEPARATE								
+			After		Before		FINANCIAL STATEMENTS								
+	Notes		restructuring		restructuring		2025		2024						
+LIABILITIES  AND  SHAREHOLDERS’  EQUITY															
+(CONTINUED)															
+SHAREHOLDERS’  EQUITY															
+SHARE  CAPITAL	23														
+Authorized share capital															
+2,913,502,290 ordinary shares of Baht 3.7 each			10779958				10779958								
+2,913,512,290 ordinary shares of Baht 3.7 each					10779995				10779995						
+Issued and paid-up share capital															
+2,895,929,570 ordinary shares of															
+Baht 3.7 each, fully paid			10714939		0		10714939		0						
+10,000 ordinary shares of															
+Baht 3.7 each, fully paid			0		37		0		37						
+Ordinary shares premium accounts			7390915		0		21181034		0						
+Issued share capital and ordinary shares premium accounts															
+for the Company’s restructuring plan	2.2		0		18105854		0		0						
+Surplus on share-based payment	36		58126		27574		0		0						
+Retained earnings (deficit)															
+Appropriated															
+Legal reserve	24		1154417		1071506		52309		0						
+Unappropriated			15170415		11305104		-914		-3641						
+Treasury shares	36		-83074		-64528		0		0						
+Other components of shareholders’ equity			-150629		-106406		287		-196						
+Total owners of the Company			34255109		30339141		31947655		-3800						
+Non-controlling interest			207690		184121		0		0						
+TOTAL  SHAREHOLDERS’  EQUITY			34462799		30523262		31947655		-3800						
+TOTAL  LIABILITIES  AND  SHAREHOLDERS’  EQUITY			112796773		106531097		40015409		3205						
+Notes to the financial statements form an integral part of these statements															
+
+[SHEET: PL]
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY														
+STATEMENTS  OF  COMPREHENSIVE  INCOME														
+FOR  THE  YEAR  ENDED  DECEMBER   31,  2025														
+UNIT : THOUSAND BAHT														
+							SEPARATE							
+			CONSOLIDATED				FINANCIAL STATEMENTS							
+			FINANCIAL STATEMENTS						For the period from					
+			For the year ended December 31,						March 26, 2024					
+			2025		2024				(Company					
+					“RESTATED”		For the year ended		registration date)					
+			After		Before		December 31,		to December 31,					
+	Notes		restructuring		restructuring		2025		2024					
+REVENUES														
+Interest income on hire-purchase receivables			1148701		1415895		0		0					
+Interest income on loans			18195493		16953044		19316		0					
+Fee and service income	27		4024351		3733990		0		0					
+Dividend income	35.2		0		0		1079603		0					
+Other income			164597		57863		622		11					
+Total Revenues			23533142		22160792		1099541		11					
+EXPENSES														
+Service and administrative expenses	28		11635290		11036505		37992		3552					
+Total Expenses			11635290		11036505		37992		3552					
+PROFIT  (LOSS)  FROM  OPERATING  ACTIVITIES			11897852		11124287		1061549		-3541					
+Loss arising from de-recognition of financial assets														
+measured at amortised cost			-2255941		-3005986		0		0					
+Finance costs			-2535240		-2423875		-17407		-100					
+Impairment loss determined in accordance with TFRS 9			-775149		-414768		-4490		0					
+Share of profit (loss) of  joint venture accounted for														
+using the equity method - net														
+Share of profit of  joint venture accounted for														
+using the equity method	11		17026		0		0		0					
+Impairment loss determined of investment in joint venture	11		-140000		0		0		0					
+PROFIT  (LOSS)  BEFORE  INCOME  TAX  EXPENSES			6208548		5279658		1039652		-3641					
+INCOME  TAX  EXPENSES	30		-1245535		-1052819		0		0					
+PROFIT  (LOSS)  FOR  THE  PERIOD/YEAR			4963013		4226839		1039652		-3641					
+OTHER  COMPREHENSIVE  INCOME  (LOSS)														
+Components of other comprehensive income (loss)														
+that will be reclassified to profit or loss														
+Gains (losses) on cash flow hedges	9		-40933		-65450		0		0					
+Income tax relating to components of other comprehensive														
+income (loss) that will be reclassified to profit or loss	15		10067		15401		0		0					
+Total components of other comprehensive income (loss)														
+that will be reclassified to profit or loss			-30866		-50049		0		0					
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY														
+STATEMENTS  OF  COMPREHENSIVE  INCOME														
+FOR  THE  YEAR  ENDED  DECEMBER   31,  2025														
+UNIT : THOUSAND BAHT														
+							SEPARATE							
+			CONSOLIDATED				FINANCIAL STATEMENTS							
+			FINANCIAL STATEMENTS						For the period from					
+			For the year ended December 31,						March 26, 2024					
+			2025		2024				(Company					
+					“RESTATED”		For the year ended		registration date)					
+			After		Before		December 31,		to December 31,					
+	Notes		restructuring		restructuring		2025		2024					
+Components of other comprehensive income (loss)														
+that will not be reclassified to profit or loss														
+Gain (loss) on re-measurements of defined benefit plans	22.1		-17157		-31098		483		-196					
+Income tax relating to components of other comprehensive														
+income (loss) that will not be reclassified to profit or loss	15		3528		6180		0		0					
+Total components of other comprehensive income (loss)														
+that will not be reclassified to profit or loss			-13629		-24918		483		-196					
+Total other comprehensive income (loss)														
+for the period/year, net of tax			-44495		-74967		483		-196					
+TOTAL  COMPREHENSIVE  INCOME  (LOSS)  FOR  THE PERIOD/YEAR			4918518		4151872		1040135		-3837					
+NET  PROFIT  (LOSS)  ATTRIBUTABLE														
+Owners of the Company			4932838		4201323		1039652		-3641					
+Non-controlling interest			30175		25516		0		0					
+			4963013		4226839		1039652		-3641					
+TOTAL COMPREHENSIVE  INCOME  (LOSS)  ATTRIBUTABLE														
+Owners of the Company			4888615		4126807		1040135		-3837					
+Non-controlling interest			29903		25065		0		0					
+			4918518		4151872		1040135		-3837					
+EARNINGS  (LOSS)  PER  SHARE  OF  THE  PARENT  COMPANY														
+BASIC  EARNINGS  (LOSS)  PER  SHARE  (BAHT)	31		1.7		1.5		0.55		-455.13					
+Notes to the financial statements form an integral part of these statements														
+
+[SHEET: shareholder EQ_conso after]
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY																												
+STATEMENTS  OF  CHANGES  IN  SHAREHOLDERS’ EQUITY																												
+FOR  THE  YEAR  ENDED  DECEMBER   31,  2025																												
+UNIT : THOUSAND BAHT																												
+				AFTER  RESTRUCTURING - CONSOLIDATED  FINANCIAL  STATEMENTS																								
+																		Other Components of Shareholders’ Equity										
+								Issued Share Capital										Other Comprehensive Income (loss)										
+								and Ordinary Shares		Surplus on		Retained Earnings								Gains (Losses) on		Total		Total				Total
+				Issued and Paid-up		Ordinary Shares		Premium Accounts		Share-based		Appropriated						Gains (Losses) on		Re-measurements of		Other Components of		owners of		Non-controlling		Shareholders’
+		Notes		Share Capital		Premium Accounts		for restructuring plan		Payment		Legal Reserve		Unappropriated		Treasury Shares		Cash Flow Hedges		Defined Benefit Plans		Shareholders’ Equity		the Company		interest		Equity
+Balances as at January 1, 2025				37		0		18105854		27574		1071506		11305104		-64528		-52956		-53450		-106406		30339141		184121		30523262
+Decrease in ordinary shares		23		-37		0		0		0		0		0		0		0		0		0		-37		0		-37
+Legal reserve		24		0		0		0		0		82911		-82911		0		0		0		0		0		0		0
+Share-based Payment		36		0		0		0		30552		0		0		0		0		0		0		30552		-166		30386
+Increase in treasury shares		36		0		0		0		0		0		0		-18546		0		0		0		-18546		392		-18154
+Total comprehensive income				0		0		0		0		0		4932838		0		-30679		-13544		-44223		4888615		29903		4918518
+Dividend paid		26		0		0		0		0		0		-984616		0		0		0		0		-984616		0		-984616
+Dividend paid from a subsidiary		26		0		0		0		0		0		0		0		0		0		0		0		-6560		-6560
+Effect from restructuring plan		2.2 and 10		10714939		7390915		-18105854		0		0		0		0		0		0		0		0		0		0
+Balances as at December 31, 2025				10714939		7390915		0		58126		1154417		15170415		-83074		-83635		-66994		-150629		34255109		207690		34462799
+Notes to the financial statements form an integral part of these statements																												
+
+[SHEET: shareholder EQ_conso before]
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY																												
+STATEMENTS  OF  CHANGES  IN  SHAREHOLDERS’ EQUITY																												
+FOR  THE  YEAR  ENDED  DECEMBER   31,  2025																												
+UNIT : THOUSAND BAHT																												
+				BEFORE  RESTRUCTURING - CONSOLIDATED  FINANCIAL  STATEMENTS “RESTATED”																								
+																		Other Components of Shareholders’ Equity										
+								Issued Share Capital										Other Comprehensive Income (loss)										
+								and Ordinary Shares		Surplus on		Retained Earnings								Gains (Losses) on		Total		Total				Total
+				Issued and Paid-up		Ordinary Shares		Premium Accounts		Share-based		Appropriated						Gains (Losses) on		Re-measurements of		Other Components of		owners of		Non-controlling		Shareholders’
+		Notes		Share Capital		Premium Accounts		for restructuring plan		Payment		Legal Reserve		Unappropriated		Treasury Shares		Cash Flow Hedges		Defined Benefit Plans		Shareholders’ Equity		the Company		interest		Equity
+Balances as at January 1, 2024				0		0		0		0		0		0		0		0		0		0		0		0		0
+Effect from restructuring plan		2.2		0		0		17723294		20871		982764		9597047		-40005		-3209		-28681		-31890		28252081		171436		28423517
+Balances as at January 1, 2024 - after adjusted				0		0		17723294		20871		982764		9597047		-40005		-3209		-28681		-31890		28252081		171436		28423517
+Increase in ordinary shares		23		37		0		0		0		0		0		0		0		0		0		37		0		37
+Increase in share capital of a subsidiary				0		0		382560		0		0		0		0		0		0		0		382560		2321		384881
+Legal reserve		24		0		0		0		0		88742		-88742		0		0		0		0		0		0		0
+Share-based Payment		36		0		0		0		6703		0		0		0		0		0		0		6703		39		6742
+Increase in treasury shares		36		0		0		0		0		0		0		-24523		0		0		0		-24523		-149		-24672
+Dividend paid		26		0		0		0		0		0		-2404524		0		0		0		0		-2404524		-14591		-2419115
+Total comprehensive income				0		0		0		0		0		4201323		0		-49747		-24769		-74516		4126807		25065		4151872
+Balances as at December 31, 2024				37		0		18105854		27574		1071506		11305104		-64528		-52956		-53450		-106406		30339141		184121		30523262
+Notes to the financial statements form an integral part of these statements																												
+
+[SHEET: shareholder EQ_separate]
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY														
+STATEMENTS  OF  CHANGES  IN  SHAREHOLDERS’  EQUITY														
+FOR  THE  YEAR  ENDED  DECEMBER   31,  2025														
+UNIT : THOUSAND BAHT														
+				SEPARATE  FINANCIAL  STATEMENTS										
+												Other Components of		
+												shareholders’ Equity		
+				Issued and				Retained Earning				Other Comprehensive Loss		Total
+				Paid-up		Ordinary Shares		Appropiated				Losses on re-measurements		Shareholders’
+		Notes		Share Capital		Premium Accounts		Legal reserve		Unappropiated		of defined benefit plans		Equity
+Balance as at March 26, 2024				0		0		0		0		0		0
+(Company registration date)														
+Increase in ordinary shares		23		37		0		0		0		0		37
+Total comprehensive loss				0		0		0		-3641		-196		-3837
+Balances as at December 31, 2024				37		0		0		-3641		-196		-3800
+Balance as at January 1, 2025				37		0		0		-3641		-196		-3800
+Increase in ordinary shares		23		10714939		0		0		0		0		10714939
+Decrease in ordinary shares		23		-37		0		0		0		0		-37
+Legal reserve		24		0		0		52309		-52309		0		0
+Dividend		26		0		0		0		-984616		0		-984616
+Total comprehensive income				0		0		0		1039652		483		1040135
+Effect from restructuring plan		2.2 and 10		0		21181034		0		0		0		21181034
+Balances as at December 31, 2025				10714939		21181034		52309		-914		287		31947655
+Notes to the financial statements form an integral part of these statements														
+
+[SHEET: cash flows]
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY										
+STATEMENTS  OF  CASH  FLOWS										
+FOR  THE  YEAR  ENDED  DECEMBER  31,  2025										
+UNIT : THOUSAND  BAHT										
+			CONSOLIDATED				SEPARATE FINANCIAL STATEMENTS			
+			FINANCIAL STATEMENTS						For the period from	
+			For the year ended December 31,						March 26, 2024	
+			2025		2024				(Company	
+					“RESTATED”		For the year ended		registration date)	
+			After		Before		December 31,		to December 31,	
+	Notes		restructuring		restructuring		2025		2024	
+CASH  FLOWS  FROM  OPERATING  ACTIVITIES										
+Profit (loss) for the period/year			4963012.627125101		4226839		1039652		-3641	
+Adjustments to reconcile income to cash received (paid)										
+Incomes tax expenses			1245535		1052819		0		0	
+Finance costs			2535240		2423875		17407		100	
+Depreciation and amortisation			1055539		997344		115		0	
+Loss arising from de-recognition of financial assets measured										
+at amortised cost			2255941		3005986		0		0	
+Impairment loss determined in accordance with TFRS 9			775149		414768		4490		0	
+Loss on disposals and impairment of properties foreclosed			768512		1185435		0		0	
+Loss (gain)  on disposals and write-off leasehold improvement,										
+equipment and intangible assets			2908		-5643		0		0	
+Loss (gain)  on impairment and write-off other assets										
+and change in fair value attributable to change in credit risk			8913		-4553		57		0	
+Share of profit from join venture			-17026		0		0		0	
+Impairment loss of investment in joint venture			140000		0		0		0	
+Short-term employee benefit expenses (reversal)			210		-2623		0		0	
+Long-term employee benefit expenses			40676		26119		237		89	
+Employee Joint Investment Program expenses			42720		19218		0		0	
+Profit (loss) from operations before changes in										
+Operating assets and liabilities			13817329.627125101		13339584		1061958		-3452	
+Operating assets (increase) decrease										
+Loans and hire-purchase receivables			-10103191		-11884229		-8000000		0	
+Receivable from payment agents			22669		53565		0		0	
+Current contract assets			-135283		-91448		-1		0	
+Prepaid expenses			-54401		-95922		-96		0	
+Other receivables			42510		-7478		2		-2076	
+Other current assets			-7601		2778		0		0	
+Other non-current assets			-14296		-3804		0		0	
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY										
+STATEMENTS  OF  CASH  FLOWS  (CONTINUED)										
+FOR  THE  YEAR  ENDED  DECEMBER  31,  2025										
+UNIT : THOUSAND  BAHT										
+			CONSOLIDATED				SEPARATE FINANCIAL STATEMENTS			
+			FINANCIAL STATEMENTS						For the period from	
+			For the year ended December 31,						March 26, 2024	
+			2025		2024				(Company	
+					“RESTATED”		For the year ended		registration date)	
+			After		Before		December 31,		to December 31,	
+	Notes		restructuring		restructuring		2025		2024	
+CASH  FLOWS  FROM  OPERATING  ACTIVITIES  (CONTINUED)										
+Operating liabilities increase (decrease)										
+Amounts due to related parties			-602069		5489		4167		0	
+The Revenue Department payable			33599		5363		25880		0	
+Accrued expenses			104940		383968		219		0	
+Other current payables			-578466		19160		28208		83	
+Provision for employee benefits			0		0		0		2074	
+Other current liabilities			-1144		12748		0		0	
+Other non-current liabilities			-6500		69869		0		0	
+Cash received (paid) for operating activities			2518096.627125101		1809643		-6879663		-3371	
+Proceeds from sales of properties foreclosed			1775321		1751003		0		0	
+Cash paid for long-term employee benefits			-2825		-1558		0		0	
+Interest income on hire-purchase receivables and loans			-19344194		-18368939		-19316		0	
+Cash received from interest income on hire-purchase										
+receivables and loans			19172479		18076292		5129		0	
+Dividend income	35.2		0		0		-1079603		0	
+Dividend received			0		0		1079603		0	
+Cash paid for interest expenses			-2083897		-1828872		-609		-37	
+Cash paid for income tax expense			-1215830		-1353908		-57		0	
+Cash received from transferring the long-term employee benefit										
+from a subsidiary			0		0		2074		0	
+Net cash provided by (used in) operating activities			819150.6271251012		83661		-6892442		-3408	
+CASH  FLOWS  FROM  INVESTING  ACTIVITIES										
+Cash paid for purchases of leasehold improvement										
+and equipment	6.2		-383926		-361406		0		0	
+Proceeds from sales of equipment			4407		7153		0		0	
+Cash paid for purchases of intangible assets	6.2		-85926		-146189		0		0	
+Net cash used in investing activities			-465445		-500442		0		0	
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY										
+STATEMENTS  OF  CASH  FLOWS  (CONTINUED)										
+FOR  THE  YEAR  ENDED  DECEMBER  31,  2025										
+UNIT : THOUSAND  BAHT										
+			CONSOLIDATED				SEPARATE FINANCIAL STATEMENTS			
+			FINANCIAL STATEMENTS						For the period from	
+			For the year ended December 31,						March 26, 2024	
+			2025		2024				(Company	
+					“RESTATED”		For the year ended		registration date)	
+			After		Before		December 31,		to December 31,	
+	Notes		restructuring		restructuring		2025		2024	
+CASH  FLOWS  FROM  FINANCING  ACTIVITIES										
+Cash received from short-term borrowings	6.3		850000		23126688		0		0	
+Cash repayments for short-term borrowings	6.3		0		-27230000		0		0	
+Cash received from short-term borrowings from a related party	6.3		36900000		27750000		26500		5500	
+Cash repayments for short-term borrowings from a related party	6.3		-35900000		-30350000		-31000		-1000	
+Cash received from long-term borrowings	6.3		17500000		30005550		5000000		0	
+Cash repayments for long-term borrowings	6.3		-8831749		-25633330		0		0	
+Cash received from issuance for long-term debentures	6.3		11469007		12605957		3000000		0	
+Cash repayments for long-term debentures	6.3		-19400000		-8350000		0		0	
+Cash repayments for transaction costs from										
+borrowing and issuance of debentures	6.3		-53674		-58806		-10056		0	
+Cash received from increase in share capital			0		37		0		37	
+Cash paid to shareholders from decrease in share capital			-37		0		-37		0	
+Cash repayments for lease liabilities	6.3		-571467		-535195		-34		0	
+Cash paid for treasury shares for										
+Employee Joint Investment Program			-35506		-40716		0		0	
+Cash paid for dividend			-984616		-758120		-984616		0	
+Cash paid for dividend from Subsidiary			-6560		0		0		0	
+Net cash provided by financing activities			935398		532065		7000757		4537	
+Net increase in cash and cash equivalents			1289103.6271251012		115284		108315		1129	
+Cash and cash equivalents as at January 1,			1771237		1655953		1129		0	
+Cash and cash equivalents as at December 31,	6.1		3060340.627125101		1771237		109444		1129	
+Notes to the financial statements form an integral part of these statements										

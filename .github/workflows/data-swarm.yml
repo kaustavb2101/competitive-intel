@@ -12,16 +12,20 @@ name: Data — market-pulse swarm (any-IP feeds, 4x/day)
 # fixed-point loop over the determinism gate's own --check set rather than a hand-kept list. One
 # workflow, one branch, one provenance regen, no collisions. That is the whole point.
 #
-# WHAT RUNS HERE: the ANY-IP half of the registry MINUS set_peers (fuel, ThaiWater flood+rain, NABC,
-# OAE, macro, Google Trends, Play/Apple reviews, rival YouTube, Google Ads Transparency) — see
-# `python pipeline/pull_swarm.py --list` for the full registry with each feed's verified ip scope.
+# WHAT RUNS HERE: the ANY-IP half of the registry MINUS the browser-driven feeds (fuel, ThaiWater
+# flood+rain, NABC, OAE, macro, Google Trends, Play/Apple reviews, rival YouTube, Google Ads
+# Transparency) — see `python pipeline/pull_swarm.py --list` for the full registry with each feed's
+# verified ip scope.
 #
-# WHY set_peers IS EXCLUDED (not because it is Thai-IP — it is not): it is the one feed that needs a
-# headless browser, because set.or.th's JSON API 403s any request that is not same-origin. Installing
-# playwright + chromium + OS deps costs a minute or two of every run, and this job runs 4x/day for a
-# feed whose underlying data only moves once per trading day anyway. It has its own dedicated job,
-# .github/workflows/data-set-peers.yml, on a weekday cron timed after the Bangkok close. Keeping the
-# browser install in exactly one workflow instead of two is the only reason for the --exclude below.
+# WHY THE BROWSER FEEDS ARE EXCLUDED (not because they are Thai-IP — they are not): set_peers and
+# set_filings both drive a headless Chromium, because set.or.th's JSON API 403s any request that is
+# not same-origin. Installing playwright + chromium + OS deps costs a minute or two of every run, and
+# this job runs 4x/day for feeds whose underlying data moves once per trading day (peers) or once per
+# quarter (filings). set_peers has its own dedicated job, .github/workflows/data-set-peers.yml, on a
+# weekday cron timed after the Bangkok close. Keeping the browser install in exactly one workflow
+# instead of several is the whole reason for the skip below — and the skip is `--skip-browser`, which
+# reads the registry's own `needs_browser` flag, NOT a hand-kept `--exclude set_peers` list that
+# silently stops covering the next browser feed somebody adds.
 # The Thai-IP-only feeds (rival_promos, pantip, datagoth, nso_wages, competitor_branches) are
 # deliberately NOT here: their own docstrings say the corporate/gov sites they hit are
 # Cloudflare-geoblocked from any datacenter IP, so a CI runner would just log a wall of skips/failures
@@ -68,7 +72,7 @@ jobs:
       - name: Install feed dependencies
         run: |
           # google-play-scraper (app_reviews), pytrends (google_trends), openpyxl (oae_prices' XLSX
-          # fallback). Deliberately NO playwright/chromium here — see the set_peers note below.
+          # fallback). Deliberately NO playwright/chromium here — see the --skip-browser note above.
           pip install --quiet google-play-scraper==1.2.7 pytrends==4.9.2 openpyxl
 
       - name: Run the market-pulse swarm (pull, append history, re-derive — one pass)
@@ -80,7 +84,7 @@ jobs:
           # here we only make sure a TOTAL swarm failure (every feed failed) does not abort the
           # workflow either — it still falls through to "nothing to commit" cleanly below.
           set +e
-          python pipeline/pull_swarm.py --exclude set_peers
+          python pipeline/pull_swarm.py --skip-browser
           rc=$?
           set -e
           echo "rc=$rc" >> "$GITHUB_OUTPUT"

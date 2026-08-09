@@ -1,0 +1,342 @@
+
+[SHEET: 6-8]
+Srisawad Corporation Public Company Limited									
+Statement of Financial Position									
+As at 31 December 2025									
+			Consolidated				Separate		
+			financial statements				financial statements		
+			2025		2024		2025		2024
+	Notes		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Assets									
+Current assets									
+Cash and cash equivalents	9		6045546		5813692		2411014		863886
+Financial assets measured at fair value through									
+profit or loss	15.2		1056731		0		0		0
+Other financial assets measured at amortised cost	15.1		536		532		0		0
+Current portion of loans to customers and									
+accrued interest receivables, net	10		60288869		57288719		0		0
+Other current receivables	12		1447256		2327604		32519		11615
+Short-term loans to related parties and									
+accrued interest receivables	37 f)		0		0		49219039		50112820
+Properties foreclosed, net	13		1782264		1748417		0		0
+Other current assets	14		478377		209008		8253		1701
+Total current assets			71099579		67387972		51670825		50990022
+Non-current assets									
+Financial assets measured at fair value through									
+profit or loss	15.2		20473		26101		6164		6068
+Financial assets measured at fair value through									
+other comprehensive income	15.3		41854		55505		0		0
+Investments in subsidiaries, net	16		0		0		14582081		14483017
+Loans to customers and									
+accrued interest receivables, net	10		32561418		36579411		0		0
+Property, plant and equipment, net	17		687089		756864		17280		18949
+Right-of-use assets, net	18		1477107		1344568		18233		19915
+Intangible assets, net	19		1234729		1206476		710		1084
+Deferred tax assets	20		311581		291267		0		0
+Other non-current assets	21		240350		260972		3286		3287
+Total non-current assets			36574601		40521164		14627754		14532320
+Total assets			107674180		107909136		66298579		65522342
+Director_________________________________________    Director __________________________________________									
+The accompanying notes are an integral part of these consolidated and separate financial statements.									
+Srisawad Corporation Public Company Limited									
+Statement of Financial Position (Cont’d)									
+As at 31 December 2025									
+			Consolidated				Separate		
+			financial statements				financial statements		
+			2025		2024		2025		2024
+	Notes		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Liabilities and equity									
+Current liabilities									
+Short-term borrowings from financial institutions	22.1		6926301		6264184		6176433		5544263
+Other current payables	23		1503103		1466721		288718		288705
+Short-term borrowings from related party	37 g)		45000		40000		0		0
+Current portion of long-term borrowings									
+from financial institutions	22.2		4932466		7799993		4557466		2916750
+Current portion of long-term borrowings									
+from third parties	27		500000		0		0		0
+Current portion of senior debentures	24		16342371		17818873		13108869		15896047
+Current portion of derivative liabilities	25		112490		0		112490		0
+Current portion of lease liabilities	26		646343		667594		1534		1458
+Income tax payables			738735		608955		0		2488
+Other current liabilities			63664		153681		22900		18274
+Total current liabilities			31810473		34820001		24268410		24667985
+Non-current liabilities									
+Long-term borrowings from financial institutions	22.2		2533506		2327707		2533506		2077707
+Long-term borrowings from third parties	27		0		500000		0		0
+Senior debentures	24		31123500		32768843		27001476		27018459
+Derivative liabilities	25		193978		22046		193978		22046
+Lease liabilities	26		829578		703431		20082		21616
+Deferred tax liabilities	20		275033		328047		102636		106223
+Employee benefit obligations	28		113261		94564		19101		18093
+Provision for decommissioning costs			35890		42020		494		471
+Total non-current liabilities			35104746		36786658		29871273		29264615
+Total liabilities			66915219		71606659		54139683		53932600
+Director_________________________________________    Director __________________________________________									
+The accompanying notes are an integral part of these consolidated and separate financial statements.									
+Srisawad Corporation Public Company Limited									
+Statement of Financial Position (Cont’d)									
+As at 31 December 2025									
+			Consolidated				Separate		
+			financial statements				financial statements		
+			2025		2024		2025		2024
+	Notes		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Liabilities and equity (Cont'd)									
+Equity									
+Share capital									
+Authorised share capital									
+1,730,769,248 ordinary shares									
+at par value of Baht 1 each									
+(2024: 1,573,409,936 ordinary shares)	29		1730769		1573410		1730769		1573410
+Issued and paid-up share capital									
+1,661,506,929 ordinary shares									
+at par value of Baht 1 each									
+(2024: 1,510,464,313 ordinary shares)	29		1661507		1510464		1661507		1510464
+Share premium	29		6207185		6207179		6207185		6207179
+Share premium from share-based payment	29		36190		36190		36190		36190
+Retained earnings									
+Appropriated - Legal reserve	31		173077		157341		173077		157341
+Unappropriated			30928974		26713212		4125779		3711247
+Discount from changes in the ownership									
+interests in a subsidiary			-1348716		-1348755		0		0
+Other components of equity			-204060		-138814		-44842		-32679
+Equity attributable to owners of the Company			37454157		33136817		12158896		11589742
+Non-controlling interests			3304804		3165660		0		0
+Total equity			40758961		36302477		12158896		11589742
+Total liabilities and equity			107674180		107909136		66298579		65522342
+Director_________________________________________    Director __________________________________________									
+The accompanying notes are an integral part of these consolidated and separate financial statements.									
+
+[SHEET: 9-10]
+Srisawad Corporation Public Company Limited									
+Statement of Comprehensive Income									
+For the year ended 31 December 2025									
+			Consolidated				Separate		
+			financial statements				financial statements		
+			2025		2024		2025		2024
+	Notes		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Revenue									
+Interest income			16459411		18027107		2505355		2634776
+Dividend income			647		715		1160984		278781
+Other income	32		2835413		3018651		933		16472
+Total revenue			19295471		21046473		3667272		2930029
+Expenses									
+Servicing expenses	34		1265458		1613412		614		628
+Administrative expenses	34		6569111		7708339		116546		90994
+Expected credit losses			1977594		1912856		0		0
+Total expenses			9812163		11234607		117160		91622
+Profit before finance costs and income tax			9483308		9811866		3550112		2838407
+Finance costs	33		-2865984		-3181051		-2312051		-2411192
+Profit before income tax			6617324		6630815		1238061		427215
+Income tax expense	35		-1346604		-1385160		-15870		-29866
+Net profit for the year			5270720		5245655		1222191		397349
+Other comprehensive income									
+Items that will not be reclassified									
+subsequently to profit or loss									
+Remeasurements of post-employment									
+benefit obligations	28		4036		27184		1334		2419
+Income tax on items that will not be									
+reclassified subsequently to profit or loss			-50		-5684		-267		-484
+Total items that will not be reclassified									
+subsequently to profit or loss			3986		21500		1067		1935
+Items that will be reclassified									
+subsequently to profit or loss									
+Cash flow hedges	25		-15204		-40849		-15204		-40849
+Currency translation differences			-81840		-85643		0		0
+Changes in fair value of debt instruments									
+measured at fair value			-1139		0		0		0
+Translation differences from net investment									
+in a foreign operation			-12540		0		0		0
+Income tax on items that will be reclassified									
+subsequently to profit or loss			19342		8170		3041		8170
+Total items that will be reclassified									
+subsequently to profit or loss			-91381		-118322		-12163		-32679
+Total comprehensive income for the year			5183325		5148833		1211095		366605
+Director_________________________________________    Director __________________________________________									
+The accompanying notes are an integral part of these consolidated and separate financial statements.									
+Srisawad Corporation Public Company Limited									
+Statement of Comprehensive Income (Cont'd)									
+For the year ended 31 December 2025									
+			Consolidated				Separate		
+			financial statements				financial statements		
+			2025		2024		2025		2024
+	Note		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Profit attributable to:									
+Owners of the parent			5021126		5051974		1222191		397349
+Non-controlling interests			249594		193681		0		0
+			5270720		5245655		1222191		397349
+Total comprehensive income attributable to:									
+Owners of the parent			4959242		4975611		1211095		366605
+Non-controlling interests			224083		173222		0		0
+			5183325		5148833		1211095		366605
+Earnings per share									
+Basic earnings per share (Baht per share)	36		3.02		3.04		0.74		0.24
+Director_________________________________________    Director __________________________________________									
+The accompanying notes are an integral part of these consolidated and separate financial statements.									
+
+[SHEET: 11]
+Srisawad Corporation Public Company Limited																													
+Statement of Changes in Equity																													
+For the year ended 31 December 2025																													
+			Consolidated financial statements																										
+			Attributable to owners of the parent																										
+															Other components of equity														
+			Capital contributed												Other comprehensive income														
+							Share		Retained				Discount																
+							premium		earnings				from changes in		Measurement of debt														
+			Issued and				from		Appropriated		Retained		the ownership		instruments at		Translation differences		Currency				Total other		Total				
+			paid-up		Share		share-based		- Legal		earnings		interests		fair value through other		from net investment		translation		Cash flow		components		owners of		Non-controlling		Total
+			share capital		Premium		payment		reserve		- Unappropriated		in a subsidiary		comprehensive income		in a foreign operation		differences		hedges		of equity		the parent		interests		equity
+	Notes		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Opening balance as at 1 January 2024			1373152		6207179		36190		143038		21808733		-1348755		-940		0		-41598		0		-42538		28176999		3019633		31196632
+Transactions with owners during the year																													
+Increase in ordinary shares in subsidiaries			0		0		0		0		0		0		0		0		0		0		0		0		8988		8988
+Increase in ordinary shares	29, 30		137312		0		0		0		-137312		0		0		0		0		0		0		0		0		0
+Dividends paid	30		0		0		0		0		-15793		0		0		0		0		0		0		-15793		-36183		-51976
+Total comprehensive income for the year			0		0		0		0		5071887		0		0		0		-63597		-32679		-96276		4975611		173222		5148833
+Appropriation to legal reserve	31		0		0		0		14303		-14303		0		0		0		0		0		0		0		0		0
+Closing balance as at 31 December 2024			1510464		6207179		36190		157341		26713212		-1348755		-940		0		-105195		-32679		-138814		33136817		3165660		36302477
+Opening balance as at 1 January 2025			1510464		6207179		36190		157341		26713212		-1348755		-940		0		-105195		-32679		-138814		33136817		3165660		36302477
+Transactions with owners during the year																													
+Reclassification			0		0		0		0		0		0		0		-51570		51570		0		0		0		0		0
+Increase in ordinary shares in subsidiaries			0		0		0		0		0		0		0		0		0		0		0		0		8441		8441
+Increase in ordinary shares	29, 30		151043		6		0		0		-151043		0		0		0		0		0		0		6		0		6
+Dividends paid	30		0		0		0		0		-641947		0		0		0		0		0		0		-641947		-4277		-646224
+Change in proportion of investment in subsidiaries			0		0		0		0		0		39		0		0		0		0		0		39		-89103		-89064
+Total comprehensive income for the year			0		0		0		0		5024488		0		-657		1909		-54335		-12163		-65246		4959242		224083		5183325
+Appropriation to legal reserve	31		0		0		0		15736		-15736		0		0		0		0		0		0		0		0		0
+Closing balance as at 31 December 2025			1661507		6207185		36190		173077		30928974		-1348716		-1597		-49661		-107960		-44842		-204060		37454157		3304804		40758961
+Director_________________________________________________      Director __________________________________________________																													
+The accompanying notes are an integral part of these consolidated and separate financial statements.																													
+
+[SHEET: 12]
+Srisawad Corporation Public Company Limited																	
+Statement of Changes in Equity (Cont’d)																	
+For the year ended 31 December 2025																	
+			Separate financial statements														
+													Other components of equity				
+													Other				
+													comprehensive				
+			Capital contributed										income				
+			Issued and				Share Premium		Retained earnings						Total other		
+			paid-up		Share		from share-based		Appropriated		Retained earnings		Cash flow		components		
+			share capital		Premium		payment		- Legal reserve		- Unappropriated		hedges		of equity		Total equity
+	Notes		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Opening balance as at 1 January 2024			1373152		6207179		36190		143038		3479371		0		0		11238930
+Transactions with owners during the year																	
+Increase in ordinary shares	29, 30		137312		-		-		-		-137312		-		0		0
+Dividends paid	30		-		-		-		-		-15793		-		0		-15793
+Total comprehensive income for the year			-		-		-		-		399284		-32679		-32679		366605
+Appropriation to legal reserve	31		-		-		-		14303		-14303		-		0		0
+Closing balance as at 31 December 2024			1510464		6207179		36190		157341		3711247		-32679		-32679		11589742
+Opening balance as at 1 January 2025			1510464		6207179		36190		157341		3711247		-32679		-32679		11589742
+Transactions with owners during the year																	
+Increase in ordinary shares	29, 30		151043		6		0		0		-151043		0		0		6
+Dividends paid	30		0		0		0		0		-641947		0		0		-641947
+Total comprehensive income for the year			0		0		0		0		1223258		-12163		-12163		1211095
+Appropriation to legal reserve	31		0		0		0		15736		-15736		0		0		0
+Closing balance as at 31 December 2025			1661507		6207185		36190		173077		4125779		-44842		-44842		12158896
+Director_________________________________________________      Director __________________________________________________																	
+The accompanying notes are an integral part of these consolidated and separate financial statements.																	
+
+[SHEET: 13-15]
+Srisawad Corporation Public Company Limited										
+Statement of Cash Flows										
+For the year ended 31 December 2025										
+				Consolidated				Separate		
+				financial statements				financial statements		
+				2025		2024		2025		2024
+		Notes		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Cash flows from operating activities										
+Profit before income tax				6617324		6630815		1238061		427215
+Adjustments for:										
+	(Gain) loss from changes in fair value of financial assets	15.2		-53112		6177		-96		-124
+	Depreciation and amortisation	17, 18, 19		1007055		1009208		3725		3593
+	Amortisation of borrowing and debt issuance costs	22.2, 24		205608		110113		179009		77979
+	Loss on write-off of equipment			4501		2473		0		0
+	Gain on disposal of equipment			-2292		-1157		0		0
+	Gain on termination of lease			-825		-7322		0		0
+	Reversal from impairment of properties foreclosed			-223909		-746		0		0
+	Loss on disposal of properties foreclosed			739022		1746577		0		0
+	Expected credit losses			1977594		1912856		0		0
+	Employee benefit expenses	28		29179		23718		2339		183
+	Decommissioning costs			1690		1703		23		24
+	Dividend income			-647		-715		-1160984		-278781
+	Interest income			-16487622		-18049442		-2505355		-2646116
+	Interest expense			2658686		3069235		2133019		2333189
+Changes in working capital:										
+	Loans to customers and accrued interest receivables, net			-3031647		-1524690		0		0
+	Other current receivables			879627		766409		-21202		-5614
+	Properties foreclosed, net			1489243		2457070		0		0
+	Other current assets			-266649		19011		1700		0
+	Other non-current assets			20622		8402		1		0
+	Other current payables			49081		-489490		907		-21543
+	Other current liabilities			-90017		-303287		4626		-1631
+	Employee benefit obligations			-6497		0		0		0
+Cash flows used in operating activities				-4483985		-2613082		-124227		-111626
+	Interest received			16478802		17970441		2496437		2397088
+	Interest paid			-2517553		-2802677		-2043936		-2116705
+	Income tax paid			-1273580		-1778554		-27423		-27456
+Net cash generated from operating activities				8203684		10776128		300851		141301
+Director_________________________________________    Director __________________________________________										
+The accompanying notes are an integral part of these consolidated and separate financial statements.										
+Srisawad Corporation Public Company Limited										
+Statement of Cash Flows (Cont’d)										
+For the year ended 31 December 2025										
+				Consolidated				Separate		
+				financial statements				financial statements		
+				2025		2024		2025		2024
+		Notes		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Cash flows from investing activities										
+Cash received from disposal of financial assets measured at										
+	fair value through profit or loss			302009		0		0		0
+Cash paid for acquisition of financial assets measured at										
+	fair value through profit or loss			-1300000		0		0		0
+Cash received from loans to related parties		37 f)		0		0		12735500		14562200
+Cash paid for loans to related parties		37 f)		0		0		-11832500		-14306400
+Cash received from disposal of equipment				48519		12188		0		0
+Cash paid for purchase of property, plant and equipment				-145692		-147360		0		-7868
+Cash paid for purchase of intangible assets		19		-45737		-14818		0		0
+Cash received from disposal of investments in subsidiaries		16		0		0		0		1000
+Cash paid for acquisition of investments in subsidiaries		16		0		0		-99064		-1000
+Cash received from dividend income				647		715		1160984		278781
+Increase in other financial assets measured at amortised cost				-4		-3		0		0
+Net cash (used in) generated from investing activities				-1140258		-149278		1964920		526713
+Cash flows from financing activities										
+Cash received from short-term borrowings from related parties		37 g)		85000		5080000		0		0
+Cash paid from short-term borrowings from related parties		37 g)		-80000		-6040000		0		0
+Cash received from short-term borrowings from financial institutions		22.1		24692345		39911612		23864147		38452151
+Cash paid for short-term borrowings from financial institutions		22.1		-24126000		-45910000		-23326000		-44470000
+Cash received from long-term borrowings from financial institutions		22.2		5466783		4105904		5466783		3605904
+Cash paid for long-term borrowings from financial institutions		22.2		-7903202		-11776921		-3134506		-1768105
+Cash received from issuance of senior debentures		24		14630622		16701595		13040252		12677636
+Cash paid for redemption of senior debentures		24		-17908800		-9843900		-15984600		-9843900
+Cash received from exercise of warrants for ordinary shares				6		0		6		0
+Dividends paid to non-controlling interest				-89064		-36183		0		0
+Cash paid to non-controlling interest				-4277		0		0		0
+Cash received from additional investment in subsidiary										
+	for non-controlling interests			8441		8988		0		0
+Dividends paid to group shareholders				-642133		-15796		-642133		-15796
+Cash paid for principal of lease liabilities				-895776		-880532		-2592		-2592
+Net cash used in financing activities				-6766055		-8695233		-718643		-1364702
+Director_________________________________________    Director __________________________________________										
+The accompanying notes are an integral part of these consolidated and separate financial statements.										
+Srisawad Corporation Public Company Limited										
+Statement of Cash Flows (Cont’d)										
+For the year ended 31 December 2025										
+				Consolidated				Separate		
+				financial statements				financial statements		
+				2025		2024		2025		2024
+		Notes		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Net increase (decrease) in cash and cash equivalents				297371		1931617		1547128		-696688
+Cash and cash equivalents at beginning of the year				5813692		3962372		863886		1560574
+Translation differences from net investment in a foreign operation				-12540		0		0		0
+Loss on exchange on cash and cash equivalents				-52977		-80297		0		0
+Cash and cash equivalents at the end of the year		9		6045546		5813692		2411014		863886
+Non-cash items										
+Acquisition of right-of-use assets		18		942419		778685		0		0
+Employee transfer				0		9305		0		-5388
+Change in classification of asset				55579		67588		0		0
+Accounts payable from purchase of equipment				808		691		0		0
+Share dividends paid		30		151043		137312		151043		137312
+Director_________________________________________    Director __________________________________________										
+The accompanying notes are an integral part of these consolidated and separate financial statements.										
