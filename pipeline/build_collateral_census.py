@@ -332,6 +332,13 @@ def build():
             why=("BoT UVPI publishes car, truck and overall only — there is no motorcycle series, and "
                  "motorcycles are the largest collateral type in the book at 127,628 accounts. This is "
                  "the first measured price anchor that layer has ever had."),
+            # as_of is the layer's data-observation vintage, and it is emitted under exactly that
+            # key on purpose: build_provenance.py's _vintage_of() reads a fixed list of freshness
+            # keys, and a layer that stamps its date under a name not on that list registers with a
+            # BLANK vintage — which is the same failure check_feed_liveness.py exists to catch, a
+            # layer that cannot be aged and therefore cannot be seen to have died. anchor_date is
+            # kept alongside it because the age arithmetic below is documented against that name.
+            as_of=agg["meta"].get("anchor_date"),
             anchor_date=agg["meta"].get("anchor_date"),
             anchor_note="Vehicle age is measured against the newest auction date IN THE DATA, not wall clock.",
             venues=agg["meta"].get("venues"), rows_read=agg["meta"].get("rows_read"),
