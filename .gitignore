@@ -48,6 +48,12 @@ tests/node_modules/
 source-data/loan_tape_synthetic.json
 source-data/branch_aum_monthly_synthetic.json
 
+# SET filing attachments (pipeline/pull_set_filings.py) — re-pullable raw INPUT: MD&A PDFs
+# (~700KB each) and the Financial-Statement ZIPs (NOTES.DOCX + FINANCIAL_STATEMENTS.XLSX inside).
+# The extracted text (source-data/set_filings/text/) + index.json ARE committed (public disclosures).
+source-data/set_filings/pdf/
+source-data/set_filings/zip/
+
 # national building vector-tile artifacts (pipeline/build_building_tiles.py) — large, CDN-hosted,
 # NEVER committed. Re-pullable real Overture data; coverage plan + .pmtiles/tiles live here.
 pipeline/tiles_out/

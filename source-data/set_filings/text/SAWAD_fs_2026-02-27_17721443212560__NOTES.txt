@@ -1,0 +1,2083 @@
+1General information
+Srisawad Corporation Public Company Limited (“the Company”) is a public limited company listed on the Stock Exchange of Thailand and is incorporated and domiciled in Thailand. The address of the Company’s registered office is as follows:
+99/392 Srisawad Building, 4, 6 floor, Chaeng Watthana 10 Alley, 3 Sub Alley, Chaeng Watthana Road, Thungsonghong, Laksi, Bangkok, 10210.
+The Company is held 46.61% of shares by Kaewboottfa family who is the majority shareholder. The rest 53.39% of shares is held by individuals.
+The principal business operations of the Company and its subsidiaries (together “the Group”) are financial services, including hire-purchase, loan granting, non-performing assets management, investments in other companies, management and consulting services for retail credit systems in local and foreign countries and credit sales in foreign countries.
+The consolidated and separate financial statements were authorised by the Board of Directors on 27 February 2026.
+2Basis of preparation
+The consolidated and separate financial statements have been prepared in accordance with Thai Financial Reporting Standards (“TFRS”) and the financial reporting requirements issued under the Securities and Exchange Act.
+The consolidated and separate financial statements have been prepared under the historical cost convention except certain financial assets and liabilitiefs (including derivative instruments), and employee benefit obligations.
+The preparation of financial statements in conformity with TFRS requires management to use certain critical accounting estimates and to exercise its judgement in applying the Group’s accounting policies. The areas involving a higher degree of judgement or complexity, or areas that are more likely to be materially adjusted due to changes in estimates and assumptions are disclosed in Note 7.
+An English version of the consolidated and separate financial statements has been prepared from the statutory financial statements that are in the Thai language. In the event of a conflict or a difference in interpretation between the two languages, the Thai language statutory financial statements shall prevail.
+3New and amended financial reporting standards
+3.1New and amended financial reporting standards that are effective for the accounting period beginning on or after 1 January 2025 which are relevant and have significant impacts on the Group.
+Amendments to TAS 1 Presentation of Financial Statements clarified that liabilities are classified as either current or non-current, depending on the rights that exist at the end of the reporting period. Classification is unaffected by the entity’s expectations or events after the reporting period (for example, the receipt of a waiver or a breach of covenant).
+Covenants of loan arrangements will not affect classification of a liability as current or non-current at the end of reporting period if the entity must only comply with the covenants after the reporting period. However, if the entity must comply with a covenant either before or at the end of reporting period, this will affect the classification as current or non-current even if the covenant is only tested for compliance after the reporting period.
+The amendments require disclosures if an entity classifies a liability as non-current and that liability is subject to covenants with which the entity must comply within 12 months after the reporting period. The disclosures include:
+the carrying amount of the liability;
+information about the covenants; and
+facts and circumstances, if any, that indicate that the entity might have difficulty complying with the covenants
+The amendments also clarify what TAS 1 means when it refers to the ‘settlement’ of a liability. Terms of a liability that could, at the option of the counterparty, result in its settlement by the transfer of the entity’s own equity instrument can only be ignored for the purpose of classifying the liability as current or non-current if the entity classifies the option as an equity instrument.
+The amendments must be applied retrospectively in accordance with the normal requirements in TAS 8 Accounting Policies, Changes in Accounting Estimates and Errors.
+3.2New and amended financial reporting standards that are effective for the accounting period beginning on or after 1 January 2026 which are relevant to the Group.
+The following amended TFRS was not mandatory for the current reporting period and the Group has not early adopted them.
+Amendments to TAS 21 The Effects of Changes in Foreign Exchange Rates added requirements to help entities to determine whether a currency is exchangeable into another currency, and the spot exchange rate to use when it is not. Prior to these amendments, IAS 21 set out the exchange rate to use when exchangeability is temporarily lacking, but not what to do when lack of exchangeability is not temporary.
+4Material accounting policies
+4.1Investments in subsidiaries
+In the separate financial statements, investments in subsidiaries are accounted for using cost method.
+4.2Foreign currency translation
+Functional and presentation currency
+The financial statements are presented in Thai Baht, which is the Group’s and the Company’s functional and presentation currency.
+Transactions and balances
+Foreign currency transactions are translated into the functional currency using the exchange rates prevailing at the dates of the transactions.
+Foreign exchange gain and loss resulting from the settlement of such transactions and from the translation at year-end exchange rates of monetary assets and liabilities denominated in foreign currencies are recognised in the profit or loss.
+When gains or losses on a non‑monetary item are recognised in other comprehensive income, the entire exchange‑difference component of those gains or losses is also recognised in other comprehensive income. Conversely, when gains or losses on a non‑monetary item are recognised in profit or loss, the entire exchange‑difference component of those gains or losses is recognised in profit or loss as well.
+4.3Financial assets
+a)Recognition and derecognition
+Regular way purchases, acquires and sales of financial assets are recognised on trade-date. Financial assets are derecognised when the rights to receive cash flows from the financial assets have expired or have been transferred and the Group has transferred substantially all the risks and rewards of ownership.
+At initial recognition, the Group measures a financial asset at its fair value plus, in the case of a financial asset not at FVPL, transaction costs that are directly attributable to the acquisition of the financial asset. Transaction costs of financial assets carried at FVPL are expensed in profit or loss.
+b)Classification and measurement
+Debt instruments
+The Group classifies its debt instrument financial assets depending on i) business model for managing the asset and ii) the cash flow characteristics of the asset whether they represent solely payments of principal and interest (SPPI).
+Financial assets with embedded derivatives are considered in their entirety when determining whether the cash flows are solely payment of principal and interest (SPPI).
+There are three measurement categories into which the Group classifies its debt instruments:
+Amortised cost: Financial assets that are held for collection of contractual cash flows where those cash flows represent solely payments of principal and interest are measured at amortised cost. Interest income from these financial assets is presented in interest income and other income using the effective interest rate method. Any gain or loss arising on derecognition is recognised directly in profit or loss and presented in other income or adminstrative expenses together with foreign exchange gains and losses. Impairment losses are presented as a separate line item in the statement of comprehensive income.
+Fair value through other comprehensive income (FVOCI): Financial assets that are held for i) collection of contractual cash flows, where the assets’ cash flows represent solely payments of principal and interest; and ii) for selling the financial assets, are measured at FVOCI. Movements in the carrying amount are taken through other comprehensive income (OCI), except for 1) the recognition of impairment losses/reversal of impairment, 2) interest income using the effective interest method, and 3) foreign exchange gains and losses which are recognised in profit or loss. When the financial assets is derecognised, the cumulative gain or loss previously recognised in OCI is reclassified from equity to profit or loss and recognised in other income or administrative expenses. Interest income is included in interest income. Foreign exchange gains and losses are presented in other income or administrative expenses. Impairment expenses are presented separately in the statement of comprehensive income.
+Fair value through profit or loss (FVPL): Financial assets that do not meet the criteria for amortised cost or FVOCI are measured at FVPL. Any gain or loss arising from the fair value measurement are recognised in profit or loss and presented net within other income or administrative expenses in the period in which it arises.
+The Group reclassifies debt investments when and only when its business model for managing those assets changes.
+Equity instruments
+Except for equity instruments held for trading, which are measured at FVPL, the Group makes an irrevocable election at the time of initial recognition, classifying its equity instruments into two measurement categories.
+FVPL: the equity instruments are measured at fair value and changes in the fair value are recognised in other income or administrative expenses in the statement of comprehensive income.
+FVOCI: the equity instruments are measured at fair value and changes in the fair value are recognised in OCI. There is no subsequent reclassification of fair value gains and losses to profit or loss following the derecognition of the investment. Impairment losses/reversal of impairment losses are not reported separately from other changes in fair value.
+Dividends from such investments (FVPL/FVOCI) continue to be recognised in profit or loss as dividend income when the right to receive payments is established.
+4.4Loans to customers
+Hire-purchase receivables, loan receivables and personal loans receivables
+Hire-purchase receivables, loan receivables and personal loan receivables would initially be recognised at an amount equal to the net investment in the contracts. Subsequently, they are stated from the contract value net of unearned interest income and allowance for expected credit losses.
+Loan receivables from purchase of loans
+Loan receivables from purchase of loans that are purchased from financial institutions are valued at acquisition cost and subsequently amortised based on effective interest rate net allowance for expected credit losses of purchased or originated financial assets (if any).
+4.5Allowance for expected credit losses
+General approach
+The Group applies general approach to measure expected credit losses (ECL) on debt instruments measured at at fair value through other comprehensive income and debt instruments measured at amortised cost. Under the general approach, the 12-month or the lifetime expected credit loss is applied depending on whether there has been a significant increase in credit risk since the initial recognition. In which, the three-stage expected credit loss impairment will be as the following stages:
+Stage 1From initial recognition of a financial assets to the date on which the credit risk of the asset has not increased significantly relative to its initial recognition, a loss allowance is recognised equal to the credit losses expected to result from defaults occurring over the next 12 months.
+Stage 2Following a significant increase in credit risk relative to the initial recognition of the financial assets, a loss allowance is recognised equal to the credit losses expected over the full lifetime
+of the asset.
+Stage 3When a financial asset is considered to be credit-impaired, a loss allowance equal to full lifetime expected credit losses is to be recognised.
+Under the three-stage expected credit loss impairment model except for significant exposures in loans to customers, the impairment will be assessed by using collective approach model with forward-looking information adjustment. The impairment of some significant exposures in loans to customers will be assessed by using individual assessment approach.
+The significant increase in credit risk (from initial recognition) assessment is performed every end of reporting period by comparing expected risk of default as of the reporting date and estimated risk of default on the date of initial recognition.
+The Group assesses expected credit loss by taking into consideration forward-looking information and past experiences. The expected credit loss is a probability-weighted estimate of credit losses (probability-weighted present value of estimated cash shortfall). The cash shortfall is the difference between all contractual cash flows that are due to the Group and all cash flows expected to receive, discounted at the original effective interest rate.
+Purchased or originated credit-impaired financial asset
+The Group measures expected credit losses from the difference between all contractual cash flows that are due to the Group in accordance with the contract and all the cash flows that the entity expects to receive discounted at credit adjusted effective interest rate. The Group shall recognise in profit or loss the amount of the change in lifetime expected credit losses as an impairment gain or loss. The Group shall recognise favourable changes in lifetime expected credit losses as an impairment gain, even if the lifetime expected credit losses are less than the amount of expected credit losses that were included in the estimated cash flows on initial recognition.
+4.6Properties foreclosed
+Properties foreclosed consisting of immovable and movable assets are stated at the lower of cost or net realisable value less estimated selling expenses of the acquisition assets. Where the carrying value of properties foreclosed incurred impairment, the Group will recognise the provision for impairment of properties foreclosed.
+The Group will recognise gain (loss) on sales of properties foreclosed and impairment loss (if any) as income or expenses in the statement of comprehensive income.
+4.7Property, plant and equipment
+Plant and equipment are stated at historical cost less accumulated depreciation and impairment losses.
+Land is not dpreciated. Depreciation on other assets is calculated using the straight-line to allocate their cost to their residual values over their estimated useful lives, as follows:
+Land improvements20 years
+Buildings20 years
+Building improvements 3, 18 years
+Furnitures and fixtures5 years
+Office equipment 5 years
+Vehicles5, 10 years
+4.8Intangible assets
+The assets with indefinite useful life are subsequently measured at cost less accumulated impairment losses.
+The assets with finite useful life are measured at cost less accumulated amortisation and impairment losses. The amortisation is calculated using the straight-line method over their estimated useful lives, as follows:
+Computer software  10 years
+Research and development/Internally generated intangible asset
+Research expenditure is recognised as an expense as incurred.
+Development expenditure is recognised as an asset when the criteria specified in TAS 38 are met.
+Development costs previously recognised as an expense are not recognised as an asset in a subsequent period.
+Capitalised development costs are amortised when the asset is ready to use or sell by applying a straight-line method over the period of its expected benefit, not exceeding 5 years.
+Intangible assets which include finance license from the business combination
+Intangible assets which include finance license from the business combination is recognised at fair value at the acquisition date. The license has an indefinite useful life which finance license acquired from business combination with a company in Socialist Republic of Vietnam (Vietnam) must be renewed every 40 years and is not revalued in the accounts as it is not tradable in an active market. Finance license is not subject to amortisation but is considered for impairment annually.
+4.9Goodwill
+Goodwill is tested for impairment annually, or more frequently if events or changes in circumstances indicate that it might be impaired. It is carried at cost less accumulated impairment losses.
+4.10Leases
+Leases - where the Group is the lessee
+The right-of-use asset is depreciated over the shorter of the asset's useful life and the lease term on a straight-line basis. If the Group is reasonably certain to exercise a purchase option, the right-of-use asset is depreciated over the underlying asset’s useful life.
+The Group allocates the consideration in the contract to the lease and non-lease components based on their relative stand-alone prices. For contracts may contain both lease and non-lease components. where the Group is a lessee of real estate, they won’t separate lease and non-lease components but accounts for these as a single lease component.
+The group is exposed to potential future increases in variable lease payments based on an index or rate, which are not included in the lease liability until they take effect. When adjustments to lease payments based on an index or rate take effect, the lease liability is reassessed and adjusted against the right-of-use asset.
+The lease payments are discounted using the interest rate implicit in the lease. If that rate can’t be determined, the lessee’s incremental borrowing rate is used. This is the rate the lessee would have to pay to borrow the funds necessary to obtain an asset of similar value in a similar economic environment with similar terms and conditions.
+Payments associated with short-term leases and leases of low-value assets are recognised on a straight-line basis as an expense in profit or loss. Short-term leases are leases with a lease term of 12 months or less. Low-value assets include small office equipment and containers.
+Leases - where the Group is the lessor
+When assets are leased out under a finance lease, the present value of the lease payments is recognised as a receivable.
+Rental income under operating leases (net of any incentives given to lessees) is recognised on a straight-line basis over the lease term.
+4.11Financial liabilities
+Classification
+Financial instruments issued by the Group are classified as either financial liabilities or equity securities by considering contractual obligations.
+Borrowings are classified as current liabilities unless the Group has a right to defer settlement of the liability for at least 12 months after the reporting date.
+Covenants that the group is required to comply with, on or before the end of the reporting period, are considered in classifying loan arrangements with covenants as current or non-current. Covenants that the Group is required to comply with after the reporting period do not affect the classification at the reporting date.
+Measurement
+Financial liabilities are initially recognised at fair value and are subsequently measured at the amortised cost.
+Derecognition and modification
+Financial liabilities are derecognised when the obligation specified in the contract is discharged, cancelled or expired.
+Where the terms of a financial liability are renegotiated or modified, the Group assesses whether the renegotiation or modification results in the derecognition of that financial liability. Where the modification results in an extinguishment, the new financial liability is recognised based on the fair value of its obligation. The remaining carrying amount of financial liability is derecognised. The difference, as well as proceeds paid, is recognised as other income or administrative expenses in statement of comprehensive income.
+Where the Group concludes that such renegotiated terms do not meet the criteria for derecognition, the Group adjusts the carrying amount of the financial liability by recalculating the present value of the renegotiated or modified contractual cash flows discounted at its original effective interest rate. The difference is recognised in other income or administrative expenses in statement of comprehensive income.
+4.12Derivatives and hedging activities
+Fair value of derivatives is classified as a current or non-current based on their remaining maturity.
+Hedge accounting
+Derivatives are initially recognised at fair value on the date a derivative contract is entered into and are subsequently remeasured to their fair value at the end of each reporting period. The Group designates certain derivatives as either:
+hedges of the fair value of i) recognised assets or liabilities or ii) unrecognised firm commitments (fair value hedges)
+hedges of a particular risk associated with the cash flows of i) recognised assets and liabilities and ii) highly probable forecast transactions (cash flow hedges); or
+hedges of a net investment in a foreign operation (net investment hedges)
+At inception of the hedge relationship, the Group documents i) the economic relationship between hedging instruments and hedged items including whether changes in the cash flows of the hedging instruments are expected to offset changes in the cash flows of hedged items and ii) its risk management objective and strategy for undertaking its hedge transactions.
+The full fair value of a hedging derivative is classified as a current or non-current asset or liability following the maturity of related hedged item.
+The fair values of derivative financial instruments designated in hedge relationships and movements in the hedging reserve in shareholders’ equity are shown in Note 25.
+Hedge effectiveness
+Hedge effectiveness is determined at the inception of the hedge relationship, and through yearic prospective effectiveness assessments, to ensure that an economic relationship exists between the hedged item and hedging instrument.
+The Company enters into cross-currency interest rate swaps that have similar critical terms as the hedged item, such as reference rate, reset dates, payment dates, maturity dates and notional amount. The Company hedges 100% of its foreign currency borrowing, therefore the hedged item is identified as a proportion of the outstanding borrowing up to the notional amount of the swaps. As all critical terms matched during the year, there is an economic relationship.
+Hedge ineffectiveness for cross-currency interest rate swaps is assessed using the same principles as for hedge ineffectiveness of foreign currency purchases. It may occur due to:
+the credit value or debit value adjustment on the cross-currency interest rate swaps which is not matched by the borrowing, and
+differences in critical terms between the cross-currency interest rate swaps and borrowing
+Cash flow hedges that qualify for hedge accounting
+The effective portion of changes in the fair value of derivatives that are designated and qualified as cash flow hedges is recognised in cash flow hedges within equity.  The gain or loss relating to the ineffective portion is recognised immediately in profit or loss within other income or administrative expenses.
+The Group transfers the accumulated amounts recognised in equity relating to hedging activities to profit or loss in the same period in which the hedged item is recognised in profit or loss. The gain or loss relating to the effective portion of the cross-currency interest rate swaps used to hedge borrowing is recognised in profit or loss within interest income or interest expense at the same period in which the Group recognises the corresponding interest income or interest expense on the hedged item.
+4.13Current and deferred income taxes
+Income tax comprises current and deferred tax.
+Current tax is the expected tax payable on the taxable income for the year, using tax rates enacted or substantively enacted at the end of the reporting period.
+Deferred tax assets and liabilities are offset when there is a legally enforceable right to offset current tax assets and liabilities and where the deferred tax balances relate to the same taxation authority. Current tax assets and tax liabilities are offset where the entity has a legally enforceable right to offset and intends either to settle on a net basis, or to realise the asset and settle the liability simultaneously.
+Deferred tax is recognised based on temporary differences between the carrying amounts of assets and liabilities for financial reporting purposes and their value for tax purposes. Deferred income tax is determined using tax rates (and laws) that have been enacted or substantively enacted by the end of the reporting period and are expected to apply when the related deferred income tax asset is realised or the deferred income tax liability is settled.
+Deferred tax assets are recognised only to the extent that it is probable that future taxable profit will be available against which the temporary differences can be utilised.
+4.14Employee benefits
+Short-term employee benefits
+Liabilities for short-term employee benefits that are expected to be wholly settled within 12 months after the end of the period are recognised by the employees’ service up to the end of the reporting period. Short-term employee benefits include wages, salaries, paid annual leave and paid sick leave, bonuses, and medical care, and are measured at the amount expected to be paid.
+Defined contribution plan
+The Group pays contributions to a provident fund on a mandatory basis. The Group has no further payment obligations once the contributions have been paid. The contributions are recognised as employee benefit expenses when they are due.
+Defined benefit plans
+The defined benefit obligation is calculated annually by an independent actuary using the projected unit credit method. The present value of the defined benefit obligation is determined by discounting the estimated future cash outflows using market yield of government bond that matches the currency and terms of the expected cash outflows of defined benefit plans.
+Remeasurement gains and losses are recognised directly in equity though other comprehensive income in the period in which they arise. They are included in retained earnings in the statements of changes in equity.
+Past-service costs are recognised immediately in profit or loss.
+4.15Provisions
+Provisions are measured at the present value of the expenditures expected to be required to settle the obligation. The increase in the provisions due to passage of time is recognised as interest expense.
+4.16Revenues and expenses recognition
+Revenue includes all revenues from ordinary business activities. All ancillary income in connection with providing brokerage services and rendering of services in the course of the Group’s ordinary activities.
+Revenue is recorded net of value added tax. It is recognised in accordance with the provision of services, provided that the collectibility of the consideration is probable.
+Multiple element arrangements involving provision of multiple services are separated into individual distinct performance obligations. A total transaction price of the bundled contract is allocated to each performance obligation based on their relative standalone selling prices or estimated standalone selling prices. Each performance obligation is recognised as revenue on fulfillment of the obligation to the customer.
+Interest income from loans to customers
+The Group recognises interest income from loans to customers by using the effective interest rate method.
+Other income
+The Group recognises fees and services income when a diverse range of services has been rendered to its customers.
+Fee and services income is generally recognised on the completion of a transaction. These fees include insurance brokerage income, collateral assessment fees, collection fees.
+For a service that’s provided over a period of time, services income is recognised over the period the related service is provided. Such fees include the income from management fees and rental incomes.
+Gains (losses) on sales of properties foreclosed
+Gains (losses) on the sale of foreclosed properties (net from output tax) are recognised as income or expenses in statements of comprehensive income. This is when control of the foreclosed properties has been transferred to the buyer, when ownership is transferred, and there is no unfulfilled obligation that could affect the buyer acceptance of the properties foreclosed.
+Financing components
+The Group doesn’t expect to have any contracts where the period between the transfer of the promised goods or services to the customer and customer payment exceeds one year. So, the Group doesn’t adjust any of the transaction prices for the time value of money.
+Other income and expenses
+Other income and expenses are recognised on an accrual basis.
+4.17Dividend distribution
+Dividend distributed to the Company’s shareholders is recognised as a liability when interim dividends are approved by the Board of Directors, and when the annual dividends are approved by the meeting of shareholders.
+5Financial risk management
+The Group Treasury Committee carries out the financial risk management. The Group’s policy includes areas such as foreign exchange risk, interest rate risk, credit risk and liquidity risk. The framework parameters are approved by the Board of Directors and used as the key communication and control tools for the Treasury committees of the Group.
+The Group’s risk management is controlled by a central treasury department under policies approved by the Board of Directors. The Group’s treasury identifies, evaluates and manages financial risks in close co-operation with the Group’s operating units. The board provides written principles for overall risk management, and policies covering specific areas, such as foreign exchange risk management, interest rate risk management, credit risk management, use of derivatives and other financial instruments, as well as investment of excess liquidity.
+Where all relevant criteria are met, hedge accounting is applied to remove the accounting mismatch between the hedging instrument and the hedged item. This will effectively result in recognising interest expenses at a fixed interest rate for the hedged floating rate loans.
+5.1Financial risk
+5.1.1 Market risk
+a)Foreign exchange risk
+The Group operates internationally and is exposed to foreign exchange risk, primarily from the US dollar and Vietnamese Dong. Foreign exchange risk arises from future transactions relating to borrowings that are denominated in foreign currencies, subsequent measurement of translation differences arising from net investments in foreign operations, and the recognition of foreign currency‑denominated assets and liabilities that are not denominated in Thai Baht.
+The Group does not use derivative instruments to hedge foreign exchange risk arising from assets and liabilities that are denominated in foreign currencies and net investments in foreign operations, as such exposures are not considered to be significant to the Group.
+The Group uses a cross-currency interest rate swaps to hedge its cashflow exposure to foreign currency risk and interest rate risk. Under the Group’s policy, the critical terms of the forwards and options must align with the hedged items.
+Hedge of borrowing from financial instituation in foreign currency
+During the year 2025, the Company has entered into a bank loan agreement amounting to Baht 3,355 million which is denominated in U.S. dollar (2024: Baht 2,736 million which is denominated in U.S. dollar) and which was taken out for operation. The forward rate of the loan has been designated as a hedge of borrowing from financial institution.
+Exposure
+The Group’s exposure to foreign currency risk at the end of the reporting period, expressed in Thai Baht are as follows:
+
+[TABLE 1]
+ | Consolidated financial statements
+ | 31 December 2025 | 31 December 2024
+ | US Dollar | Vietnamese Dong | US Dollar | Vietnamese Dong
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Cash and cash equivalents | 264,970 | 161,726 | 263,849 | 33,197
+Loans to customers and accrued interest | 480,836 | 384,385 | 787,310 | 608,523
+Other current receivables | 7,312 | 75,759 | 1,943 | 87,511
+Other financial assets | 282 | 10,981 | 174 | 12,265
+Other current payables | 617 | 18,993 | 2,059 | 22,990
+Long-term loans from financial institutions | 4,444,104 | - | 2,731,688 | -
+Other financial liabilities | 1,234 | - | 1,197 | -
+[/TABLE 1]
+
+
+[TABLE 2]
+ | Separate financial statements
+ | 31 December 2025 | 31 December 2024
+ | US Dollar | US Dollar
+ | Thousand Baht | Thousand Baht
+Long-term loans from financial institutions | 4,444,104 | 2,731,688
+[/TABLE 2]
+
+Sensitivity
+As shown in the table above, the Group is primarily exposed to changes in Baht/US Dollar and Baht/Vietnamese Dong exchange rates. The sensitivity of profit or loss to changes in the exchange rates arises mainly from financial assets and financial liabilities denominated in foreign currencies and the impact on other components of equity arises from cross-currency interest rate swaps designated as cash flow hedges.
+
+[TABLE 3]
+ | Consolidated financial statements
+ | Impact to net profit | Impact to othercomponents of equity
+ | 2025 Thousand Baht | 2024 Thousand Baht | 2025 Thousand Baht | 2024 Thousand Baht
+US Dollar to Baht exchange rate - increase 10% (2024: 10%)* | 70,766 | 105,002 | (837,701) | (236,370)
+US Dollar to Baht exchange rate - decrease 10% (2024: 10%)* | (70,896) | (105,002) | 967,982 | 327,110
+Vietnamese Dong to Baht exchange rate - increase 10% (2024: 10%)* | 61,386 | 71,851 | - | -
+Vietnamese Dong to Baht exchange rate - decrease 10% (2024: 10%)* | (61,386) | (71,851) | - | -
+[/TABLE 3]
+
+*  Holding all other variables constant
+
+[TABLE 4]
+ | Separate financial statements
+ | Impact to net profit | Impact to othercomponents of equity
+ | 2025 Thousand Baht | 2024 Thousand Baht | 2025 Thousand Baht | 2024 Thousand Baht
+US Dollar to Baht exchange rate - increase 10% (2024: 10%)* | (4,389) | - | (837,701) | (236,370)
+US Dollar to Baht exchange rate - decrease 10% (2024: 10%)* | 4,259 | - | 967,982 | 327,110
+[/TABLE 4]
+
+*  Holding all other variables constant
+b)Cash flow risk and fair value risk from change in interest rate
+The Group’s main interest rate risk arises from long-term borrowings with variable rates, which expose the Group to cash flow interest rate risk. To manage this exposure, the Group enters into cross‑currency and interest rate swap agreements (from US Dollar to Thai Baht and from variable to fixed interest rates), as necessary, to maintain an appropriate proportion of fixed‑rate borrowings. Typically, entering into long‑term borrowings at variable rates and subsequently swapping them to fixed rates results in lower effective interest costs than borrowing directly at fixed rates. During the year 2024 and 2025, most of the Group’s variable‑rate borrowings are denominated in Thai Baht and US Dollars.
+The Group’s borrowings are carried at amortised cost and consisted of borrowings from financial institution, borrowings from related parties, borrowings from third parties, senior debentures, and lease liabilities. The borrowings are periodically contractually repriced and to that extent are also exposed to the risk of future changes in market interest rates as follows:
+
+[TABLE 5]
+ | Consolidated financial statements
+ | 2025 | 2024
+ | Thousand Baht | Thousand Baht
+Financial liabilities with variable interest rate | 4,707,716 | 7,912,993
+Financial liabilities with fixed interest rate | 59,171,349 | 60,977,632
+ | 63,879,065 | 68,890,625
+[/TABLE 5]
+
+
+[TABLE 6]
+ | Separate financial statements
+ | 2025 | 2024
+ | Thousand Baht | Thousand Baht
+Financial liabilities with variable interest rate | 4,582,716 | 3,704,695
+Financial liabilities with fixed interest rate | 48,816,649 | 49,771,605
+ | 53,399,365 | 53,476,300
+[/TABLE 6]
+
+An analysis by maturities is provided in Note 5.1.3
+Instruments used by the Group for risk management
+The Group entered into a cross-currency and interest rate swap agreement, covering 100% of the principal of a loan with an interest rate of SOFR plus a fixed annual rate, converting it to a fixed annual interest rate.
+The swap contracts require settlement of net interest receivable or payable every 90 days. The settlement dates coincide with the dates on which interest is payable on the underlying debt.
+Effects of hedge accounting on the financial position and performance
+The effects of the cross-currency interest rate swaps on the financial position and performance of the Group are as follows:
+
+[TABLE 7]
+ | Consolidated and separate financial statements
+ | Thousand Baht
+Cross-currency interest rate swaps | 
+As at 31 December 2025 | 
+Carrying amount (long-term borrowings from financial institutions) | 4,444,104
+Notional amount (Thousand US Dollar) | 140,000
+Maturity | August 2026 - April 2027
+Hedge ratio | 1:1
+Change in fair value of outstanding hedge instruments since transaction date | (308,083)
+Change in value of hedged item used to determine hedge effectiveness | (306,742)
+As at 31 December 2024 | 
+Carrying amount (long-term borrowings from financial institutions) | 2,731,688
+Notional amount (Thousand US Dollar) | 80,000
+Maturity | August 2026
+Hedge ratio | 1:1
+Change in fair value of outstanding hedge instruments since transaction date | (22,046)
+Change in value of hedged item used to determine hedge effectiveness | (22,046)
+[/TABLE 7]
+
+Sensitivity
+Profit or loss is sensitive to higher or lower interest expenses from borrowings with variable interest rate a result of changes in interest rates. Other components of equity change as a result of an increase or decrease in the fair value of the cash flow hedges of borrowings.
+
+[TABLE 8]
+ | Consolidated financial statements
+ | Impact to net profit | Impact to other components of equity
+ | 2025 Thousand Baht | 2024 Thousand Baht | 2025 Thousand Baht | 2024 Thousand Baht
+Interest rate - increaseby 50 basis points (2024: 50 bps)* | 53,959 | 41,476 | 25,253 | 28,687
+Interest rate - decrease by 50 basis points (2024: 50 bps)* | (18,096) | (41,476) | 10,610 | 5,095
+[/TABLE 8]
+
+*  Holding all other variables constant
+
+[TABLE 9]
+ | Separate financial statements
+ | Impact to net profit | Impact to other components of equity
+ | 2025 Thousand Baht | 2024 Thousand Baht | 2025 Thousand Baht | 2024 Thousand Baht
+Interest rate - increaseby 50 basis points (2024: 50 bps)* | 261,130 | 298,785 | 25,253 | 28,687
+Interest rate - decrease by 50 basis points (2024: 50 bps)* | (261,063) | (298,785) | 10,610 | 5,095
+[/TABLE 9]
+
+*  Holding all other variables constant
+5.1.2Credit risk
+Credit risk arises from cash and cash equivalents, contractual cash flows of debt instruments carried at a) amortised cost, b) at fair value through other comprehensive income (FVOCI) and c) at fair value through profit or loss (FVPL), derivative liabilities and deposits with banks and financial institutions, as well as credit exposures from loans to customers, including other receivables.
+a)Risk management
+Credit risk is managed on a group basis. For banks and financial institutions deposit, only independently rated parties with a minimum rating of investment grade are accepted.
+For transaction with customers, if customers are independently rated, these ratings are used. Otherwise, if there is no independent rating, risk control assesses the credit quality of the customers, considering its financial position, past experience and other factors. Individual risk limits are set based on tips assessments in line with limits set by the board. The compliance with customer credit limits is regularly monitored by line management.
+The Group’s investments in debt instruments are considered to be low risk investments as the Group regularly monitors the credit ratings of the investments for credit deterioration.
+b)Credit risk rating
+The risk rating for the Group’s financial assets is classified as the following table:
+Loans to customers
+
+[TABLE 10]
+Rating classification | Internal rating
+Good | Less than 30 days past due
+Fair | Between 31 and 90 days past due and qualitative consideration
+Impaired | Over 90 days past due and qualitative consideration
+[/TABLE 10]
+
+Other financial assets
+
+[TABLE 11]
+Rating classification | External rating
+Investment grade | AAA to BBB-
+Non-investment grade | BB+ or Below
+No rating | No rating
+[/TABLE 11]
+
+c)Maximum exposure to credit risk
+The Group’s maximum credit risk exposure if other parties fail to perform their obligation is detailed below. No account is taken of any collateral held. The maximum exposure to loss is considered to be the i) carrying amount in the statement of financial position or, ii) for non-derivative off-statements of financial position transactions and financial guarantees, their contractual nominal amounts. The the Group’s exposure to credit risk equals their carrying amount in the statement of financial position at the reporting date, except for the following:
+
+[TABLE 12]
+ | Consolidated financial statements | Separate financial statements
+ | Maximum exposure to credit risk | Maximum exposure to credit risk
+ | Thousand Baht | Thousand Baht
+As at 31 December 2025 |  | 
+Credit risk exposures of on-statement |  | 
+financial position assets: |  | 
+Financial assets measured at fair value |  | 
+through other comprehensive income | 60,400 | -
+ | 60,400 | -
+Credit risk exposures of off-statement |  | 
+financial position assets: |  | 
+Financial guarantees | - | 825,000
+ | - | 825,000
+As at 31 December 2024 |  | 
+Credit risk exposures of on-statement |  | 
+financial position assets: |  | 
+Financial assets measured at fair value |  | 
+through other comprehensive income | 60,400 | -
+ | 60,400 | -
+Credit risk exposures of off-statement |  | 
+financial position assets: |  | 
+Financial guarantees | - | 4,656,195
+ | - | 4,656,195
+[/TABLE 12]
+
+d)Credit quality
+The table below presents the financial assets measured at fair value through other comprehensive income and loans to customers and accrued interest receivables classified by rating.
+
+[TABLE 13]
+ | Consolidated financial statements
+ | 12-month ECL | Lifetime ECL not credit-impaired | Lifetime ECL credit-impaired | Purchased or originated credit-impaired financial assets | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+As at 31 December 2025 |  |  |  |  | 
+Financial assets measured at |  |  |  |  | 
+fair value through other |  |  |  |  | 
+comprehensive income |  |  |  |  | 
+Investment grade | - | - | - | - | -
+Non-investment grade | - | 60,400 | - | - | 60,400
+Less  Allowance for expected credit losses | - | (18,546) | - | - | (18,546)
+Net carrying amount | - | 41,854 | - | - | 41,854
+Loans to customers and |  |  |  |  | 
+accrued interest receivables |  |  |  |  | 
+Good | 79,609,421 | - | - | - | 79,609,421
+Fair | - | 9,035,798 | - | - | 9,035,798
+Impaired | - | - | 3,602,174 | 2,716,917 | 6,319,091
+Less  Allowance for expected credit losses | (325,890) | (482,282) | (1,084,085) | (221,766) | (2,114,023)
+Net carrying amount | 79,283,531 | 8,553,516 | 2,518,089 | 2,495,151 | 92,850,287
+As at 31 December 2024 |  |  |  |  | 
+Financial assets measured at |  |  |  |  | 
+fair value through other |  |  |  |  | 
+comprehensive income |  |  |  |  | 
+Investment grade | - | - | - | - | -
+Non-investment grade | - | - | 60,400 | - | 60,400
+Less  Allowance for expected credit losses | - | - | (4,895) | - | (4,895)
+Net carrying amount | - | - | 55,505 | - | 55,505
+Loans to customers and |  |  |  |  | 
+accrued interest receivables |  |  |  |  | 
+Good | 79,967,765 | - | - | - | 79,967,765
+Fair | - | 9,892,772 | - | - | 9,892,772
+Impaired | - | - | 3,337,191 | 2,905,101 | 6,242,292
+Less  Allowance for expected credit losses | (360,112) | (622,177) | (1,004,423) | (247,987) | (2,234,699)
+Net carrying amount | 79,607,653 | 9,270,595 | 2,332,768 | 2,657,114 | 93,868,130
+[/TABLE 13]
+
+e)Collaterals
+The Group implements a range of policies and practices to mitigate credit risk. The most crucial of these is accepting collaterals for loans granted. The Group has internal policies on the acceptability of specific classes of collateral to reduce credit risk.
+The Group prepares a valuation of the collateral obtained as part of the loan origination process. The main collateral types that the Group accepts and are given value are:
+real estates and
+vehicles
+The Group has revaluated the loan to value ratio to cover the credit risk over the entire contract. The Group’s policies for obtaining collateral haven’t significantly changed during the reporting period. And there has been no significant change in the overall quality of the collateral held by the Group since the prior period.
+The Group closely examines collateral used for credit-impaired financial assets. If the Group is certain that the financial assets are credit-impaired, the Group will consider the foreclosure of collateral to mitigate probable credit risk.
+f)Impairment of financial assets
+The Group and the Company have four types of financial assets that are subject to the expected credit loss model.
+Loans to customers and accrued interest receivables
+Loans to related parties
+Investment in debt instruments measured at the amortised cost
+Investment in debt instruments measured at FVOCI
+While cash and cash equivalents are also subject to the impairment requirements of TFRS 9, the identified impairment loss was immaterial.
+5.1.3Liquidity risk
+Liquidity risk is the risk that the Group will be unable to pay its debts and obligations when due because of an inability to convert assets into cash, or because of its failure to procure enough funds.
+The Group manages sufficient cash and marketable securities, the availability of funding through an adequate amount of committed credit facilities, and the ability to close out market positions.
+Management is responsible for liquidity of the Group, including procurement of both short-term and long-term sources of funding.
+a)Maturity of financial liabilities
+The tables below analyse the maturity of financial liabilities by grouping based on their contractual maturities. The amounts disclosed are the contractual undiscounted cash flows. Balances due within 12 months are equal to their carrying balances as the impact of discounting isn’t significant. For interest rate swaps, the cash flows have been estimated using forward interest rates applicable at the end of the reporting period.
+
+[TABLE 14]
+ | Consolidated financial statements
+Contractual maturities of financial liabilities As at 31 December 2025 | On demand | Within 1 year | 1-5 years | More than 5 years | Total | Carrying amount
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Non-derivatives |  |  |  |  |  | 
+Short-term borrowings from related party | 45,020 | - | - | - | 45,020 | 45,000
+Short-term borrowings from financial institutions | - | 6,956,221 | - | - | 6,956,221 | 6,926,301
+Other current payables | 43 | 1,108,224 | - | - | 1,108,267 | 1,108,267
+Long-term borrowings from financial institutions | - | 5,362,452 | 2,661,884 | - | 8,024,336 | 7,465,972
+Long-term borrowings from third parties | - | 506,553 | - | - | 506,553 | 500,000
+Senior debentures | - | 18,113,830 | 31,442,650 | - | 49,556,480 | 47,465,871
+Lease liabilities | - | 698,808 | 727,507 | 187,894 | 1,614,209 | 1,475,921
+Total non-derivatives | 45,063 | 32,746,088 | 34,832,041 | 187,894 | 67,811,086 | 64,987,332
+Derivatives |  |  |  |  |  | 
+Cross-currency interest rate swaps |  |  |  |  |  | 
+- (inflow) | - | (3,488,713) | (1,045,815) | - | (4,534,528) | (4,593,429)
+- outflow | - | 3,711,061 | 1,132,417 | - | 4,843,478 | 4,899,897
+Total derivatives | - | 222,348 | 86,602 | - | 308,950 | 306,468
+[/TABLE 14]
+
+
+[TABLE 15]
+ | Consolidated financial statements
+Contractual maturities of financial liabilities As at 31 December 2024 | On demand | Within 1 year | 1-5 years | More than 5 years | Total | Carrying amount
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Non-derivatives |  |  |  |  |  | 
+Short-term borrowings from related party | 40,000 | - | - | - | 40,000 | 40,000
+Short-term borrowings from financial institutions | - | 6,299,458 | - | - | 6,299,458 | 6,264,184
+Other current payables | 538 | 1,008,050 | - | - | 1,008,588 | 1,008,588
+Long-term borrowings from financial institutions | - | 8,047,317 | 2,391,071 | - | 10,438,388 | 10,127,700
+Long-term borrowings from third parties | - | - | 523,303 | - | 523,303 | 500,000
+Senior debentures | - | 19,745,851 | 35,087,181 | - | 54,833,032 | 50,587,716
+Lease liabilities | - | 717,049 | 580,421 | 217,906 | 1,515,376 | 1,371,025
+Total non-derivatives | 40,538 | 35,817,725 | 38,581,976 | 217,906 | 74,658,145 | 69,899,213
+Derivatives |  |  |  |  |  | 
+Cross-currency interest rate swaps |  |  |  |  |  | 
+- (inflow) | - | (167,536) | (2,758,994) | - | (2,926,530) | (2,769,829)
+- outflow | - | 108,232 | 2,820,926 | - | 2,929,158 | 2,791,875
+Total derivatives | - | (59,304) | 61,932 | - | 2,628 | 22,046
+[/TABLE 15]
+
+
+[TABLE 16]
+ | Separate financial statements
+Contractual maturities of financial liabilities As at 31 December 2025 | On demand | Within 1 year | 1-5 years | More than 5 years | Total | Carrying amount
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Non-derivatives |  |  |  |  |  | 
+Short-term borrowings from financial institutions | - | 6,206,221 | - | - | 6,206,221 | 6,176,433
+Other current payables | 6,997 | 253,542 | - | - | 260,539 | 260,539
+Long-term borrowings from financial institutions | - | 4,977,173 | 2,661,884 | - | 7,639,057 | 7,090,972
+Senior debentures | - | 14,577,217 | 27,099,617 | 2,100,869 | 43,777,703 | 40,110,345
+Lease liabilities | - | 2,592 | 10,368 | 15,120 | 28,080 | 21,616
+Total non-derivatives | 6,997 | 26,016,745 | 29,771,869 | 2,115,989 | 57,911,600 | 53,659,905
+Derivatives |  |  |  |  |  | 
+Cross-currency interest rate swaps |  |  |  |  |  | 
+- (inflow) | - | (3,488,713) | (1,045,815) | - | (4,534,528) | (4,593,429)
+- outflow | - | 3,711,061 | 1,132,417 | - | 4,843,478 | 4,899,897
+Total derivatives | - | 222,348 | 86,602 | - | 308,950 | 306,468
+[/TABLE 16]
+
+
+[TABLE 17]
+ | Separate financial statements
+Contractual maturities of financial liabilities As at 31 December 2024 | On demand | Within 1 year | 1-5 years | More than 5 years | Total | Carrying amount
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Non-derivatives |  |  |  |  |  | 
+Short-term borrowings from financial institutions | - | 5,573,054 | - | - | 5,573,054 | 5,544,263
+Other current payables | 6,998 | 258,647 | - | - | 265,645 | 265,645
+Long-term borrowings from financial institutions | - | 3,089,415 | 2,135,915 | - | 5,225,330 | 4,994,457
+Senior debentures | - | 17,516,970 | 28,982,284 | - | 46,499,254 | 42,914,506
+Lease liabilities | - | 2,592 | 10,368 | 17,712 | 30,672 | 23,074
+Total non-derivatives | 6,998 | 26,440,678 | 31,128,567 | 17,712 | 57,593,955 | 53,741,945
+Derivatives |  |  |  |  |  | 
+Cross-currency interest rate swaps |  |  |  |  |  | 
+- (inflow) | - | (167,536) | (2,758,994) | - | (2,926,530) | (2,769,829)
+- outflow | - | 108,232 | 2,820,926 | - | 2,929,158 | 2,791,875
+Total derivatives | - | (59,304) | 61,932 | - | 2,628 | 22,046
+[/TABLE 17]
+
+5.1.4Fair value estimation
+The estimated fair values of financial assets and liabilities for disclosure purposes are approximately valuated by discounting the future cash flows of similar financial instruments regarding current market interest rate which are disclosed in Note 6.
+5.2Capital management
+5.2.1Risk management
+The objectives when managing capital are to
+safeguard their ability to continue as a going concern, to provide returns for shareholders and benefits for other stakeholders, and
+maintain an optimal capital structure to reduce the cost of capital
+To maintain or adjust the capital structure, the Group may adjust the value of dividends paid to shareholders, return capital to shareholders, issue new shares or sell assets to reduce debt.
+Consistent with others in the industry, the Group monitors capital based on a gearing ratio which is determined by dividing net debt with equity.
+The Group has maintained full compliance with all covenants under its borrowing agreements with financial institutions and senior debentures, including financial ratio covenants, throughout the reporting period. Based on management’s continuous monitoring and assessment of covenant compliance, no breach, event of default, or indication of potential non‑compliance was identified during the period.
+6Fair value
+The following table shows fair values and carrying amounts of financial assets and liabilities by category, excluding those with the carrying amount equivalents to fair value.
+
+[TABLE 18]
+ | Consolidated financial statements
+ | Fair value through profit or loss | Fair value through other comprehensive income | Amortised cost | Total carrying amount | Fair value
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+As at 31 December 2025 |  |  |  |  | 
+Financial liabilities not measured at fair value |  |  |  |  | 
+Long-term borrowings from financial institutions | - | - | 7,465,972 | 7,465,972 | 7,877,069
+Long-term borrowings from third parties | - | - | 500,000 | 500,000 | 501,524
+Senior debentures | - | - | 47,465,871 | 47,465,871 | 49,164,575
+ | - | - | 55,431,843 | 55,431,843 | 57,543,168
+As at 31 December 2024 |  |  |  |  | 
+Financial liabilities not measured at fair value |  |  |  |  | 
+Long-term borrowings from financial institutions | - | - | 10,127,700 | 10,127,700 | 10,175,129
+Long-term borrowings from third parties | - | - | 500,000 | 500,000 | 494,514
+Senior debentures | - | - | 50,587,716 | 50,587,716 | 51,169,928
+ | - | - | 61,215,416 | 61,215,416 | 61,839,571
+[/TABLE 18]
+
+
+[TABLE 19]
+ | Separate financial statements
+ | Fair value through profit or loss | Fair value through other comprehensive income | Amortised cost | Total carrying amount | Fair value
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+As at 31 December 2025 |  |  |  |  | 
+Financial liabilities not measured at fair value |  |  |  |  | 
+Long-term borrowings from financial institutions | - | - | 7,090,972 | 7,090,972 | 7,499,699
+Senior debentures | - | - | 40,110,345 | 40,110,345 | 41,535,966
+ | - | - | 47,201,317 | 47,201,317 | 49,035,665
+As at 31 December 2024 |  |  |  |  | 
+Financial liabilities not measured at fair value |  |  |  |  | 
+Long-term borrowings from financial institutions | - | - | 4,994,457 | 4,994,457 | 5,039,831
+Senior debentures | - | - | 42,914,506 | 42,914,506 | 43,374,206
+ | - | - | 47,908,963 | 47,908,963 | 48,414,037
+[/TABLE 19]
+
+As at 31 December 2025, fair value of long-term borrowings from financial institutions, borrowings from third parties, and senior debentures are measured using Level 2 by based on discounted cash flows at the current market interest rate of 2.41% - 3.39% (2024: 4.02% - 4.71%).
+Fair value of financial assets and financial liabilities recognised or disclosed by their fair value hierarchy as at 31 December 2025 and 2024.
+
+[TABLE 20]
+ | Consolidated financial statements
+ | Level 1 | Level 2 | Level 3 | Total fair value | Carrying amount
+ | 2025 | 2024 | 2025 | 2024 | 2025 | 2024 | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Assets |  |  |  |  |  |  |  |  |  | 
+Financial assets at fair value through profit or loss |  |  |  |  |  |  |  |  |  | 
+Investment in unit trusts | - | - | 1,010,844 | 7,526 | - | - | 1,010,844 | 7,526 | 1,010,844 | 7,526
+Investment in listed equity securities | 53,520 | - | - | - | - | - | 53,520 | - | 53,520 | -
+Investment in non-marketable equity securities | - | - | - | - | 12,840 | 18,575 | 12,840 | 18,575 | 12,840 | 18,575
+Financial assets at fair value through other comprehensive income |  |  |  |  |  |  |  |  |  | 
+Investment in private sector debt securities | - | - | 41,854 | 55,505 | - | - | 41,854 | 55,505 | 41,854 | 55,505
+Total assets | 53,520 | - | 1,052,698 | 63,031 | 12,840 | 18,575 | 1,119,058 | 81,606 | 1,119,058 | 81,606
+Liabilities |  |  |  |  |  |  |  |  |  | 
+Hedging derivatives |  |  |  |  |  |  |  |  |  | 
+Cross-currency interest rate swaps | - | - | 306,468 | 22,046 | - | - | 306,468 | 22,046 | 306,468 | 22,046
+Total liabilities | - | - | 306,468 | 22,046 | - | - | 306,468 | 22,046 | 306,468 | 22,046
+[/TABLE 20]
+
+
+[TABLE 21]
+ | Separate financial statements
+ | Level 1 | Level 2 | Level 3 | Total fair value | Carrying amount
+ | 2025 | 2024 | 2025 | 2024 | 2025 | 2024 | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Assets |  |  |  |  |  |  |  |  |  | 
+Financial assets at fair value through profit or loss |  |  |  |  |  |  |  |  |  | 
+Investment in unit trust | - | - | 6,164 | 6,068 | - | - | 6,164 | 6,068 | 6,164 | 6,068
+Total assets | - | - | 6,164 | 6,068 | - | - | 6,164 | 6,068 | 6,164 | 6,068
+Liabilities |  |  |  |  |  |  |  |  |  | 
+Hedging derivatives |  |  |  |  |  |  |  |  |  | 
+Cross-currency interest rate swaps | - | - | 306,468 | 22,046 | - | - | 306,468 | 22,046 | 306,468 | 22,046
+Total liabilities | - | - | 306,468 | 22,046 | - | - | 306,468 | 22,046 | 306,468 | 22,046
+[/TABLE 21]
+
+Financial assets and financial liabilities are approximately to the carrying amounts as follows:
+Cash and cash equivalents
+Other current receivables
+Short-term loan to related parties and accrued interest receivables
+Short-term borrowings from financial institutions
+Other current payables
+Short-term loan from related parties
+Fair values are categorised by hierarchy based on the inputs used.
+Level 1:The fair value of financial instruments is based on the current bid price/closing price of the Stock Exchange of Thailand and Thai Bond Market Association.
+Level 2:The fair value of financial instruments is determined using significant observable inputs and, as little as possible, entity-specific estimates.
+Level 3:The fair value of financial instruments isn’t based on observable market data.
+Transfer between fair value hierarchy
+During the year, the Group transferred investment in equity securities from level 3 into level 1 as Thai Airways International Public Company Limited (“THAI”) officially resumed trading on the Stock Exchange of Thailand (SET) on 4 August 2025, following the Central Bankruptcy Court’s order terminating the company’s rehabilitation after the completion of a four-year business rehabilitation plan. This resumption of trading evidence the increased market activity and availability of quoted prices in an active market, thereby providing more reliable and observable inputs for fair value measurement.
+Upon the resumption of trading of the ordinary shares of Thai Airways International Public Company Limited (“THAI”) on the Stock Exchange of Thailand, the ordinary shares received by the Group from the debt‑to‑equity conversion are subject to a Creditors’ Lock‑up condition, which prohibits creditors who were allocated shares from the debt‑to‑equity conversion from disposing of such shares for a period of one year from the date on which THAI’s shares resumed trading on the Stock Exchange of Thailand.
+Under this lock‑up condition, 25% of the restricted shares may be disposed of upon the lapse of six months from the trading resumption date, which will fall on 3 February 2026, and the remaining 75% may be disposed of upon the lapse of one year from the trading resumption date.
+As at 31 December 2025, such shares remained subject to the aforementioned restrictions.
+Valuation techniques used to measure fair value level 2
+Investment in unit trusts
+Level 2 investment in unit trusts were fair valued using the latest net asset value prices that were published on the unit trust website.
+Investment in private sector debt securities
+Level 2 investment in debt instruments were fair valued using a discounted cash flow approach, which discounts the contractual cash flows using discount rates derived from observable market prices of other quoted debt instruments of the counterparties.
+Cross-currency interest rate swaps
+Level 2 hedging derivative was fair valued using forward interest rates extracted from observable yield curves and spot foreign exchange rates. The effects of discounting are generally insignificant for Level 2 derivatives.
+Valuation techniques used to measure fair value level 3
+Changes in level 3 financial instruments are as follows:
+
+[TABLE 22]
+ | Investment in non-marketableequity securities
+ | Consolidated financial statements
+ | Thousand Baht
+Opening balance as at 1 January 2024 | 24,893
+Loss recognised in profit or loss | (6,318)
+Closing balance as at 31 December 2024 | 18,575
+Reclassify to investment in marketable equity securities | (15,060)
+Gain recognised in profit or loss | 9,325
+Closing balance as at 31 December 2025 | 12,840
+Includes unrealised gains (loss) recognised in profit or loss attributable to balances held at the end of the reporting period | 
+31 December 2025 | 9,325
+31 December 2024 | (6,318)
+[/TABLE 22]
+
+The following table summarises the quantitative information about the significant unobservable inputs used in level 3 fair value measurements.
+
+[TABLE 23]
+ | Fair value |  | Range of inputs
+ | 2025 | 2024 | Unobservable inputs | 2025 | 2024
+ | Thousand Baht | Thousand Baht |  |  | 
+Investment in non- marketable equity |  |  | Book value reduction rate | 50.00% - 80.42% | 50.00% - 71.28%
+securities | 12,840 | 18,575 | Price per book value ratio | 0.20 - 0.90 times | 0.20 - 1.60 times
+[/TABLE 23]
+
+The relationship of unobservable inputs to fair value is shown below.
+
+[TABLE 24]
+ |  |  | Change in fair value
+ |  |  | Increase in | Decrease in
+ | Unobservable |  | assumptions | assumptions
+ | Inputs | Movement | 2025 | 2025
+Investment in non-marketable | Book value reduction rate | 5.00% | Decreased by 13.22% | Increased by 13.22%
+equity securities | Price per book value ratio | 0.05 times | Increased by 9.51% | Decreased by 9.51%
+[/TABLE 24]
+
+The Group’s valuation processes
+The Chief Financial Officer and valuation team discuss valuation processes and results at least every quarter.
+Level 3 investment in non-marketable equity securities are fair valued using a price-to-book value comparison technique of public companies that, are in opinion of the Group, in a comparable financial position with the issuer of that instrument, considering the liquidity and the Group’s growth.
+7Critical accounting estimates and judgements
+Estimates and judgements are continually evaluated and are based on historical experience and other factors, including expectations of future events that are believed to be reasonable under the circumstances.
+a)Impairment of financial assets
+The Group assesses expected credit loss on a forward-looking basis for its financial assets classified as debt instrument carried at FVOCI and financial assets at amortised cost.
+Expected credit losses are a probability-weighted estimate of credit losses over the expected life of the financial instrument (such as a present value of total cash flow expected not to receive). A cash shortfall is the difference between all contractual cash flows that are due to the Group in accordance with the contract and all the cash flows that the Group expects to receive discounted at the original effective interest rate for the financial assets that are not purchased or originated credit-impaired financial assets or credit adjusted effective interest rate for purchased or originated credit-impaired financial assets. The Group estimates cash flows by considering all contractual terms of the financial instrument through the expected life of that financial instrument.
+The cash flows that are considered shall include cash flows from the sale of collateral held or other credit enhancements that are integral to the contractual terms. There is a presumption that the expected life of a financial instrument can be estimated reliably. However, in those rare cases when it isn’t possible to reliably estimate the expected life of a financial instrument, the Group uses the remaining contractual term of the financial instrument.
+For a financial asset that is credit-impaired at the reporting date, but that isn’t a purchased or originated credit impaired financial asset, the Group measures the expected credit losses as the difference between the asset’s gross carrying amount and the present value of estimated future cash flows discounted at the financial asset’s original effective interest rate. Any adjustment is recognised in profit or loss as an impairment gain or loss.
+The Group measures expected credit losses of a financial instrument in a way that reflects:
+an unbiased and probability-weighted amount that is determined by evaluating a range of possible outcomes;
+the time value of money; and
+reasonable and supportable information that is available without undue cost or effort at the reporting date about past events, current conditions and forecasts of future economic conditions.
+The Group measures expected credit losses of a financial instrument by using general approach to measure expected credit losses on financial assets including loans to customers and accrued interest receivables, financial assets measured at fair value through other comprehensive income, and short-term loans to related parties. The Group always accounts for expected credit losses which involves a three-stage expected credit loss impairment model.
+b)Valuation of properties foreclosed
+The Group assesses allowance for impairment of properties foreclosed by taking into consideration the type and nature of assets based on historical losses on sale of properties foreclosed.
+Fair value of properties for sale-immovable assets is calculated from the appraisal value, appraised by an internal or external independent appraiser, less estimated selling expenses.
+c)Fair value of certain financial assets and derivatives
+The fair value of financial instruments that are not traded in an active market is determined using valuation techniques. The Group uses judgement to select a variety of methods and make assumptions that are mainly based on market conditions existing at the end of each reporting period. Details of key assumptions used are included in note 6.
+d)Defined retirement benefit obligations
+The present value of the retirement benefit obligations depends on a number of factors that are determined on an actuarial basis using a number of assumptions. The assumptions and impact on any changes are disclosed in Note 28 to the financial statements.
+e)Deferred tax asset
+The Group and the Company recognise deferred tax assets only to the extent that it is probable that future taxable profit will be available against which the temporary differences can be utilised. Management estimates the amount of deferred tax assets to be recognised by considering the expected taxable profit of each upcoming period.
+f)Determination of lease terms
+In determining the lease term, the Group and the Company consider all facts and circumstances that create an economic incentive to exercise an extension option, or not exercise a termination option. The Group and the Company will include such option in determining the lease term only when the lease is reasonably certain to be extended or terminated.
+For leases of properties, the most relevant factors are historical lease durations, the costs and conditions of leased assets.
+The lease term is reassessed if an option is actually exercised (or not exercised) or the Group and the Company becomes obliged to exercise (or not exercise) it. The assessment of reasonable certainty is only revised if a significant event or a significant change in circumstance affecting this assessment occur, and that it is within the control of the Group.
+g)Determination of discount rate applied to leases
+The Group and the Company determine the incremental borrowing rate as follows:
+Where possible, use recent third-party financing received by the individual lessee as a starting point, adjusting to reflect changes in its financing conditions.
+Make adjustments specific to the lease, e.g. term, economic condition, and security.
+h)Impairment of intangible assets with indefinite useful lives
+Finance license from the business combination
+The Group tests for impairment of finance license from the business combination on an annual basis in accordance with the accounting policy stated in Note 4.8. The recoverable amount of the cash-generating units is determined as the higher of value in use and carrying amount.These calculations require the use of estimates based on management assumption.
+Goodwill
+The recoverable amounts of cash-generating units have been determined based on value-in-use calculations. The calculations use cash flow projections based on financial budget approved by management covering a five-year period.
+Cash flows beyond the five-year period are extrapolated using the estimated growth rates stated in note 19. These growth rates are consistent with forecasts included in industry reports specific to the industry in which each CGU operates.
+8Segment information
+The Group presents segment information primarily based on business segments, which are determined by the type of business of the Group.
+The consolidated financial statements by segments for the years ended 31 December 2025 and 2024 are as follows:
+
+[TABLE 25]
+ | 2025
+ | Hire-purchase segment | Loan segment | Asset management segment | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Interest income | 5,220,100 | 11,000,875 | 238,436 | 16,459,411
+Dividend income |  |  |  | 647
+Other income |  |  |  | 2,835,413
+Total revenue |  |  |  | 19,295,471
+Servicing expenses |  |  |  | 1,265,458
+Administrative expenses |  |  |  | 6,569,111
+Expected credit losses | 1,230,903 | 602,109 | 144,582 | 1,977,594
+Profit before finance costs and income tax |  |  |  | 9,483,308
+Finance costs |  |  |  | (2,865,984)
+Profit before income tax |  |  |  | 6,617,324
+Income tax expenses |  |  |  | (1,346,604)
+Net profit for the year |  |  |  | 5,270,720
+Timing of other income recognition under TFRS 15 |  |  |  | 
+At a point in time |  |  |  | 1,770,348
+As at 31 December 2025 |  |  |  | 
+Loans to customers and accrued interest receivables, net | 22,760,938 | 67,594,198 | 2,495,151 | 92,850,287
+Unallocated assets |  |  |  | 14,823,893
+Total consolidated assets |  |  |  | 107,674,180
+Borrwings from related parties |  |  |  | 45,000
+Borrowings from financial institutions |  |  |  | 14,392,273
+Borrowings from third parties |  |  |  | 500,000
+Senior debentures |  |  |  | 47,465,871
+Unallocated liabilities |  |  |  | 4,512,075
+Total consolidated liabilities |  |  |  | 66,915,219
+[/TABLE 25]
+
+
+[TABLE 26]
+ | 2024
+ | Hire-purchase segment | Loan segment | Asset management segment | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Interest income | 6,315,649 | 11,436,979 | 274,479 | 18,027,107
+Dividend income |  |  |  | 715
+Other income |  |  |  | 3,018,651
+Total revenue |  |  |  | 21,046,473
+Servicing expenses |  |  |  | 1,613,412
+Administrative expenses |  |  |  | 7,708,339
+Expected credit losses | 160,945 | 1,699,705 | 52,206 | 1,912,856
+Profit before finance costs and income tax |  |  |  | 9,811,866
+Finance costs |  |  |  | (3,181,051)
+Profit before income tax |  |  |  | 6,630,815
+Income tax expenses |  |  |  | (1,385,160)
+Profit for the year |  |  |  | 5,245,655
+Timing of other income recognition under TFRS 15 |  |  |  | 
+At a point in time |  |  |  | 2,688,019
+As at 31 December 2024 |  |  |  | 
+Loans to customers and accrued interest receivables, net | 27,625,764 | 63,585,252 | 2,657,114 | 93,868,130
+Unallocated assets |  |  |  | 14,041,006
+Total consolidated assets |  |  |  | 107,909,136
+Borrwings from related parties |  |  |  | 40,000
+Borrowings from financial institutions |  |  |  | 16,391,884
+Borrowings from third parties |  |  |  | 500,000
+Senior debentures |  |  |  | 50,587,716
+Unallocated liabilities |  |  |  | 4,087,059
+Total consolidated liabilities |  |  |  | 71,606,659
+[/TABLE 26]
+
+9Cash and cash equivalents
+
+[TABLE 27]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Cash and cashier cheque | 102,501 | 10,530 | 3 | 3
+Saving deposits | 3,785,288 | 2,143,721 | 2,286,173 | 238,876
+Deposits held at call with banks | 1,855,796 | 3,158,267 | 124,838 | 125,007
+Short-term fixed deposits | 301,961 | 501,174 | - | 500,000
+Total cash and cash equivalents | 6,045,546 | 5,813,692 | 2,411,014 | 863,886
+[/TABLE 27]
+
+As at 31 December 2025, saving deposits carry the interest rate of 0.10% - 0.40% per annum (2024: 0.15% - 0.55% per annum), and short-term fixed deposits carry the interest rate of 0.40 - 1.10% per annum (2024: 0.75% - 2.00% per annum).
+10Loans to customers and accrued interest receivables, net
+10.1Classified by product
+The Group’s loans to customers, classified by product are as follows:
+
+[TABLE 28]
+ | Consolidated financial statements
+ | 2025
+ | Current portion | Non-current portion | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht
+Loan receivables | 54,088,682 | 26,932,565 | 81,021,247
+Hire-purchase receivables | 17,502,844 | 9,747,669 | 27,250,513
+Purchased or originated credit-impaired financial assets | - | 1,864,308 | 1,864,308
+Less  Unearned interest income | (10,048,392) | (6,054,736) | (16,103,128)
+Total loans to customers net unearned interest income | 61,543,134 | 32,489,806 | 94,032,940
+Add  Accrued interest receivables | 78,760 | 852,610 | 931,370
+Total loans to customers and accrued interest | 61,621,894 | 33,342,416 | 94,964,310
+Less  Allowance for expected credit losses | (1,333,025) | (780,998) | (2,114,023)
+Total loans to customers and accrued interest, net | 60,288,869 | 32,561,418 | 92,850,287
+[/TABLE 28]
+
+
+[TABLE 29]
+ | Consolidated financial statements
+ | 2024
+ | Current portion | Non-current portion | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht
+Loan receivables | 50,115,660 | 25,611,611 | 75,727,271
+Hire-purchase receivables | 18,340,858 | 15,013,282 | 33,354,140
+Purchased or originated credit-impaired financial asset | - | 2,105,311 | 2,105,311
+Less  Unearned interest income | (9,944,509) | (6,060,022) | (16,004,531)
+Total loans to customers net unearned interest income | 58,512,009 | 36,670,182 | 95,182,191
+Add  Accrued interest receivables | 104,505 | 816,133 | 920,638
+Total loans to customers and accrued interest | 58,616,514 | 37,486,315 | 96,102,829
+Less  Allowance for expected credit losses | (1,327,795) | (906,904) | (2,234,699)
+Total loans to customers and accrued interest, net | 57,288,719 | 36,579,411 | 93,868,130
+[/TABLE 29]
+
+10.2Classified by staging
+The Group’s loans to customers and accrued interest receivables classified by staging are as follows:
+
+[TABLE 30]
+ | Consolidated financial statements
+ | 2025
+ | Loans to customers and accrued interest receivables | Allowance for expected credit losses | Net book value
+ | Thousand Baht | Thousand Baht | Thousand Baht
+Performing financial assets | 79,609,421 | (325,890) | 79,283,531
+Under-performing financial assets | 9,035,798 | (482,282) | 8,553,516
+Non-performing financial assets | 3,602,174 | (1,084,085) | 2,518,089
+Purchased or originated credit-impaired |  |  | 
+financial assets | 2,716,917 | (221,766) | 2,495,151
+Total | 94,964,310 | (2,114,023) | 92,850,287
+[/TABLE 30]
+
+
+[TABLE 31]
+ | Consolidated financial statements
+ | 2024
+ | Loans to customers and accrued interest receivables | Allowance for expected credit losses | Net book value
+ | Thousand Baht | Thousand Baht | Thousand Baht
+Performing financial assets | 79,967,765 | (360,112) | 79,607,653
+Under-performing financial assets | 9,892,772 | (622,177) | 9,270,595
+Non-performing financial assets | 3,337,191 | (1,004,423) | 2,332,768
+Purchased or originated credit-impaired |  |  | 
+financial assets | 2,905,101 | (247,987) | 2,657,114
+Total | 96,102,829 | (2,234,699) | 93,868,130
+[/TABLE 31]
+
+11Allowance for expected credit losses
+
+[TABLE 32]
+ | Consolidated financial statements
+ | 2025
+ | Allowance for expected credit losses
+ | Performing financial assets | Under-performing financial assets | Non-performing financial assets | Purchased or originated credit-impaired financial assets | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Financial assets measured at fair value through other comprehensive income |  |  |  |  | 
+As at 1 January 2025 | - | - | 4,895 | - | 4,895
+Reclassification | - | 4,895 | (4,895) | - | -
+Change in value of allowance for expected credit losses from remeasurement | - | 12,512 | - | - | 12,512
+As at 31 December 2025 | - | 17,407 | - | - | 17,407
+Loans to customers and accrued interest receivables, net |  |  |  |  | 
+As at 1 January 2025 | 360,112 | 622,177 | 1,004,423 | 247,987 | 2,234,699
+Reclassification | 7,534 | (62,029) | 54,495 | - | -
+Change in value of allowance for expected credit losses from remeasurement | (92,362) | 31,367 | 592,965 | 103,226 | 635,196
+Purchase or origination of financial assets | 204,083 | 136,170 | 48,087 | - | 388,340
+Derecognition of financial assets |  |  |  |  | 
+(Closed accounts, and closed |  |  |  |  | 
+accounts at maturity) | (153,477) | (245,403) | (615,885) | (129,447) | (1,144,212)
+As at 31 December 2025 | 325,890 | 482,282 | 1,084,085 | 221,766 | 2,114,023
+[/TABLE 32]
+
+
+[TABLE 33]
+ | Consolidated financial statements
+ | 2024
+ | Allowance for expected credit losses
+ | Performing financial assets | Under-performing financial assets | Non-performing financial assets | Purchased or originated credit-impaired financial assets | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Financial assets measured at fair value through other comprehensive income |  |  |  |  | 
+As at 1 January 2024 | - | - | 44,132 | - | 44,132
+Change in value of allowance for expected credit losses from remeasurement | - | - | (19,637) | - | (19,637)
+Change in classification of    investment | - | - | (19,600) | - | (19,600)
+As at 31 December 2024 | - | - | 4,895 | - | 4,895
+Loans to customers and accrued interest receivables, net |  |  |  |  | 
+As at 1 January 2024 | 323,520 | 565,949 | 715,684 | 224,891 | 1,830,044
+Reclassification | (6,004) | 4,002 | 2,002 | - | -
+Change in value of allowance for expected credit losses from remeasurement | (53,162) | 128,058 | 746,421 | 67,780 | 889,097
+Purchase or origination of financial assets | 201,967 | 156,517 | 114,622 | - | 473,106
+Derecognition of financial assets |  |  |  |  | 
+(Closed accounts, and closed |  |  |  |  | 
+accounts at maturity) | (106,209) | (232,349) | (574,306) | (44,684) | (957,548)
+As at 31 December 2024 | 360,112 | 622,177 | 1,004,423 | 247,987 | 2,234,699
+[/TABLE 33]
+
+12Other current receivables
+
+[TABLE 34]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Amounts due from related parties (Note 37 d)) | 328 | - | 1,213 | 1,209
+Interest receivables | 3,622 | 5,534 | - | 301
+Prepaid expenses | 73,824 | 57,634 | 8,880 | 7,331
+Deposits | 170,158 | 52,521 | 1,001 | 1,349
+Receivables from Legal Execution Department | 183,635 | 231,633 | - | -
+Receivables from the Revenue Department | 267,218 | 1,078,222 | 1,425 | 1,425
+Advances | 136,797 | 93,525 | 20,000 | -
+Accrued services income | 310,909 | 481,544 | - | -
+Others | 300,765 | 326,991 | - | -
+Total | 1,447,256 | 2,327,604 | 32,519 | 11,615
+[/TABLE 34]
+
+13Properties foreclosed, net
+
+[TABLE 35]
+ | Consolidated financial statements
+ | 2025 | 2024
+ | Thousand Baht | Thousand Baht
+Cost | 1,944,880 | 2,135,188
+Less  Allowance for impairment | (162,616) | (386,771)
+Properties foreclosed, net | 1,782,264 | 1,748,417
+[/TABLE 35]
+
+14Other current assets
+
+[TABLE 36]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+VAT pending submission | 456,961 | 190,688 | - | 1,701
+Withholding tax | 20,522 | 17,802 | 8,253 | -
+Others | 894 | 518 | - | -
+Total | 478,377 | 209,008 | 8,253 | 1,701
+[/TABLE 36]
+
+15Financial assets and liabilities
+Financial assets and liabilities are classified by the characteristics of measurement as follows:
+
+[TABLE 37]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Financial assets |  |  |  | 
+Financial assets at amortised costs |  |  |  | 
+- Cash and cash equivalents | 6,045,546 | 5,813,692 | 2,411,014 | 863,886
+- Other financial assets at amortised cost | 536 | 532 | - | -
+- Loans to customers and accrued interest receivables, net | 92,850,287 | 93,868,130 | - | -
+- Other current receivables | 615,624 | 814,069 | 1,213 | 1,510
+- Short-term loans to related parties and accured interest receivables | - | - | 49,219,039 | 50,112,820
+- Other non-current assets | 240,350 | 260,972 | 3,286 | 3,287
+Financial assets measured at fair value through other comprehensive income (FVOCI) | 41,854 | 55,505 | - | -
+Financial assets measured at fair value through profit or loss (FVPL) | 1,077,204 | 26,101 | 6,164 | 6,068
+ | 100,871,401 | 100,839,001 | 51,640,716 | 50,987,571
+Financial liabilities |  |  |  | 
+Financial liabilities at amortised cost |  |  |  | 
+- Short-term borrowings from financial institutions | 6,926,301 | 6,264,184 | 6,176,433 | 5,544,263
+- Other current payables | 1,108,267 | 1,008,588 | 260,539 | 265,645
+- Short-term borrowings from related party | 45,000 | 40,000 | - | -
+- Long-term borrowings from financial institutions | 7,465,972 | 10,127,700 | 7,090,972 | 4,994,457
+- Long-term borrowings from third parties | 500,000 | 500,000 | - | -
+- Senior debentures | 47,465,871 | 50,587,716 | 40,110,345 | 42,914,506
+- Lease liabilities | 1,475,921 | 1,371,025 | 21,616 | 23,074
+Derivative financial instruments |  |  |  | 
+- Under hedge accounting | 306,468 | 22,046 | 306,468 | 22,046
+ | 65,293,800 | 69,921,259 | 53,966,373 | 53,763,991
+[/TABLE 37]
+
+15.1Other financial assets at amortised cost
+a)Classification of financial assets at amortised cost
+The Group classifies its financial assets as at amortised cost only if both of the following criterias are met.
+The asset is held within a business model whose objective is to collect the contractual cash flows, and
+The contractual terms give rise to cash flows that are solely payments of principal and interest.
+The carrying value of other financial assets at amortised cost are as follows:
+
+[TABLE 38]
+ | Consolidated financial statements
+ | 31 December 2025 | 31 December 2024
+ | Current | Non-current | Total | Current | Non-current | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Fixed deposits | 536 | - | 536 | 532 | - | 532
+Total | 536 | - | 536 | 532 | - | 532
+[/TABLE 38]
+
+15.2Financial assets at fair value through profit or loss
+a)Classification of financial assets at fair value through profit or loss
+The Group classifies the following financial assets at fair value through profit or loss.
+Debt investments that don’t qualify for measurement at either an amortised cost or FVOCI
+Equity investments that are held for trading
+Equity investments that the Group irrevocably hasn’t elected at initial recognition to recognise fair value gains and losses through OCI
+Financial assets measured at FVPL include the following:
+
+[TABLE 39]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 Thousand Baht | 2024 Thousand Baht | 2025 Thousand Baht | 2024 Thousand Baht
+Current assets |  |  |  | 
+Investment in unit trusts | 1,003,211 | - | - | -
+Investment in marketable equity securities | 53,520 | - | - | -
+ | 1,056,731 | - | - | -
+Non-current assets |  |  |  | 
+Investment in unit trusts | 7,633 | 7,526 | 6,164 | 6,068
+Investment in non-marketable equity securities | 12,840 | 18,575 | - | -
+ | 20,473 | 26,101 | 6,164 | 6,068
+[/TABLE 39]
+
+b)Amounts recognised in profit or loss
+Net gain on financial instruments measured at fair value through profit or loss for the years are as follows:
+
+[TABLE 40]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 Thousand Baht | 2024 Thousand Baht | 2025 Thousand Baht | 2024 Thousand Baht
+Fair value gains (losses) on equity investments at FVPL recognised in other income or administrative expenses | 47,774 | (6,318) | - | -
+Fair value gains on debt instruments at FVPL recognised in other income or administrative expenses | 5,338 | 141 | 96 | 124
+[/TABLE 40]
+
+15.3Financial assets at fair value through other comprehensive income
+a)Classification of financial assets at fair value through other comprehensive income
+Financial assets at fair value through other comprehensive income comprise:
+Debt securities where the contractual cash flows are solely principal and interest and the objective of the Group’s business model is achieved both by collecting contractual cash flows and selling financial assets.
+Financial assets measured at FVOCI include the following:
+
+[TABLE 41]
+ | Consolidated financial information
+ | 2025 | 2024
+ | Thousand Baht | Thousand Baht
+Investment in private sector debt securities | 41,854 | 55,505
+Total | 41,854 | 55,505
+Allowance for expected credit losses | (17,407) | (4,895)
+[/TABLE 41]
+
+b)Amounts recognised in profit or loss and other comprehensive income
+The following gains (losses) were recognised in profit or loss and other comprehensive income during the years as follows:
+
+[TABLE 42]
+ | Consolidated financial statements
+ | 2025 Thousand Baht | 2024 Thousand Baht
+(Loss) gain recognised in other comprehensive income |  | 
+Expected credit losses for debt investments at FVOCI recognised in profit or loss | (12,512) | 19,637
+[/TABLE 42]
+
+c)Allowance for expected credit losses
+The Group’s exposure to credit risk and allowance for expected credit losses are disclosed in Notes 5 and 11, respectively.
+15.4Offsetting financial assets
+There is no offsetting financial assets as at 31 December 2025 and 2024 for consolidated and separate financial statements.
+16Investments in subsidiaries, net
+As at 31 December 2025, The subsidiaries included in consolidated financial statements are listed below. The subsidiaries have only ordinary shares in which the Group directly and indirectly holds those shares. The proportion of ownership interests held by the Group is equal to voting rights in subsidiaries that the Group holds.
+Investments in associate and subsidiaries as at the date of the statement of financial position are as follows:
+
+[TABLE 43]
+ |  |  |  |  |  | Consolidated financial information | Separate financial information
+ |  |  | Proportion of ordinary shares directly held by parent | Proportion of ordinary shares directly held by the Group | Proportion of ordinary shares held by non-controlling interests | Investment at equity method | Investment at cost method
+ | Nature of | Country of | 2025 | 2024 | 2025 | 2024 | 2025 | 2024 | 2025 | 2024 | 2025 | 2024
+Company name | business | incorporation | % | % | % | % | % | % | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Subsidiaries |  |  |  |  |  |  |  |  |  |  |  | 
+Srisawad International Holding Co., Ltd. | Investment in other companies | Thailand | 99.67 | 99.67 | 99.67 | 99.67 | 0.33 | 0.33 | - | - | 268,121 | 268,121
+Srisawad Power 2014 Co., Ltd. | Hire-purchase, loan and debt collection service | Thailand | 99.99 | 99.99 | 99.99 | 99.99 | 0.01 | 0.01 | - | - | 1,999,970 | 1,999,970
+Srisawad Capital 1969 PCL. | Loan service | Thailand | 72.05 | 72.05 | 72.05 | 72.05 | 27.95 | 27.95 | - | - | 8,252,896 | 8,252,896
+Fast Money Co., Ltd. | Hire-purchase and loan service | Thailand | 99.99 | 99.99 | 99.99 | 99.99 | 0.01 | 0.01 | - | - | 3,073,280 | 3,073,280
+P Lending Co., Ltd. | Launch a loan providing platform | Thailand | 75.00 | 75.00 | 75.00 | 75.00 | 25.00 | 25.00 | - | - | 3,750 | 3,750
+Srisawad Digital Co. Ltd. | Loan service | Thailand | 99.99 | 99.99 | 99.99 | 99.99 | 0.01 | 0.01 | - | - | 50,000 | 50,000
+Srisawad Asset Solutions Co., Ltd. | Investment in other companies | Thailand | 99.99 | 89.33 | 99.99 | 89.33 | 0.01 | 10.67 | - | - | 924,064 | 835,000
+Srisawad PICO Buriram Co, Ltd. | PICO finance service | Thailand | 99.99 | - | 99.99 | - | 0.01 | - | - | - | 10,000 | -
+Total |  |  |  |  |  |  |  |  | - | - | 14,582,081 | 14,483,017
+Subsidiaries indirectly held under Srisawad International Holding Co., Ltd. |  |  |  |  |  |  |  |  |  |  |  | 
+SWP Services Co., Ltd. | Management and consulting services | Thailand | 99.99 | 99.99 | 99.66 | 99.66 | 0.34 | 0.34 | - | - | - | -
+Srisawad Leasing Lao Co., Ltd. | Hire-purchase and loan service | Lao PDR | 90.00 | 90.00 | 89.70 | 89.70 | 10.30 | 10.30 | - | - | - | -
+Fast Money Sawad Joint Stock Company | Loan service | Vietnam | 70.00 | 70.00 | 69.77 | 69.77 | 30.23 | 30.23 | - | - | - | -
+Total |  |  |  |  |  |  |  |  | - | - | - | -
+[/TABLE 43]
+
+
+[TABLE 44]
+ |  |  |  |  |  | Consolidated financial information | Separate financial information
+ |  |  | Proportion of ordinary shares directly held by parent | Proportion of ordinary shares directly held by the Group | Proportion of ordinary shares held by non-controlling interests | Investment at equity method | Investment at cost method
+ | Nature of | Country of | 2025 | 2024 | 2025 | 2024 | 2025 | 2024 | 2025 | 2024 | 2025 | 2024
+Company name | business | incorporation | % | % | % | % | % | % | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Subsidiary indirectly held under Srisawad Power 2014 Co., Ltd. |  |  |  |  |  |  |  |  |  |  |  | 
+Srisawad Power 2022 Co., Ltd. | Loan service | Thailand | 99.99 | 99.99 | 99.99 | 99.99 | 0.01 | 0.01 | - | - | - | -
+Total |  |  |  |  |  |  |  |  | - | - | - | -
+Subsidiaries indirectly held under Srisawad Capital 1969 PCL. |  |  |  |  |  |  |  |  |  |  |  | 
+S Leasing Co., Ltd. | Hire-purchase and loan service | Thailand | 90.00 | 90.00 | 64.84 | 64.84 | 35.16 | 35.16 | - | - | - | -
+Cathay Leasing Co., Ltd. | Hire-purchase | Thailand | 100.00 | 100.00 | 72.05 | 72.05 | 27.95 | 27.95 | - | - | - | -
+Sawad Rung Reung Finance (Cambodia) PLC. | Loan service | Cambodia | 75.00 | 75.00 | 54.04 | 54.04 | 45.96 | 45.96 | - | - | - | -
+Total |  |  |  |  |  |  |  |  | - | - | - | -
+Subsidiaries indirectly held under Srisawad Asset Solutions Co., Ltd. |  |  |  |  |  |  |  |  |  |  |  | 
+SWP Asset Management Co., Ltd. | Asset management | Thailand | 99.99 | 99.99 | 99.99 | 89.33 | 0.01 | 10.67 | - | - | - | -
+Srisawad Property Solutions Co., Ltd. | Buying and selling real estate business and activities related to real estate | Thailand | 99.99 | 99.99 | 99.99 | 89.33 | 0.01 | 10.67 | - | - | - | -
+Srisawad Property Solutions Casa Co., Ltd. | Buying and selling real estate business and activities related to real estate | Thailand | 99.99 | - | 99.99 | - | 0.01 | - | - | - | - | -
+Total |  |  |  |  |  |  |  |  | - | - | - | -
+[/TABLE 44]
+
+Movements of the investments in subsidiaries for the years are as follows:
+
+[TABLE 45]
+ | Separate financial statements
+ | 2025 | 2024
+ | Thousand Baht | Thousand Baht
+Opening balance | 14,483,017 | 14,483,017
+Additions of investment in subsidiaries | 99,064 | 1,000
+Disposals of investment in subsidiaries | - | (1,000)
+Closing balance | 14,582,081 | 14,483,017
+[/TABLE 45]
+
+16.1Transactions incurred during the year 2025
+On 7 April 2025, the Annual General Meeting of Shareholders No.1/2568 of Srisawad Property Solutions Company Limited a subsidiary of Srisawad Asset Solutions Company Limited passed a resolution to approve the capital increase from 10,000 registered shares to 1,000,000 registered shares at par value of Baht 100 per share, totaling Baht 100 million in registered capital, to support business expansion. The subsidiary completed the registration of the capital increase on 11 April 2025.
+On 14 May 2025, the Board of Directors Meeting No.4/2568 of Srisawad Corporation Public Company Limited approved the acquisition of 800,000 ordinary shares of Srisawad Asset Solutions Company Limited from shareholders and directors at Baht 89 million. As a result, the investment proportion increased from 89.33% to 99.99% of the total outstanding shares.
+On 18 December 2025, the Group established Srisawad Property Solutions Casa Company Limited to conduct activities related to real estate business with the registered ordinary shares of 1,000,000 shares at Baht 100 per share of which the Srisawad Asset Solutions Company Limited invested in 999,998 ordinary shares which represented 99.99% of total share capital.
+On 29 December 2025, the Company established Srisawad PICO Buriram Company Limited to conduct PICO finance business with the registered ordinary shares of 100,000 shares with par value of Baht 100 of which the Company invested in 99,998 ordinary shares which represented 99.99% of total share capital.
+16.2Transactions incurred during the year 2024
+Investments in subsidiaries
+Srisawad Asset Solutions Co., Ltd.
+On 1 July 2024, the Company established Srisawad Asset Solutions Company Limited with the registered ordinary shares of 7,500,000 shares with par value of Baht 100 through a share swap at a ratio of 1 share of SWP Asset Management Company Limited per 1 share of Srisawad Asset Solutions Company Limited. This will result in the Company holding 89.33% of Srisawad Asset Solutions Co., Ltd. and Srisawad Asset Solutions Company Limited holding 99.99% of shares in SWP Asset Management Company Limited.
+Srisawad Property Solutions Company Limited
+On 15 May 2024, The Board of Director of Srisawad Corporation Public Company Limited No.4/2024 has approved the establishment of Srisawad Property Solutions Company Limited. The Company holds 9,998 ordinary shares of Srisawad Property Solutions Company Limited of Baht 100 per share totaling Baht 999,800. In the result, the Company holds an investment proportion at 99.98%.
+On 30 October 2024, the Company had sold 9,998 shares of Srisawad Property Solutions Company Limited at a price of 100 Baht per share to Srisawad Asset Solutions Company Limited resulting Srisawad Asset Solutions Company Limited holding 99.98% of ordinary shares of Srisawad Property Solutions Company Limited.
+16.3Non-controlling interests
+The total non-controlling interests as of 31 December 2025 is Baht 3,304.80 million (2024: Baht 3,165.66 million), of which Baht 2,430.56 million is for Srisawad Capital 1969 PCL. (2024: Baht 2,038.97 million). The remaining non controlling interests are considered immaterial to the Group’s equity.
+Summarised financial statements on subsidiaries with material non-controlling interests
+Set out below is the summarised financial statements for subsidiaries that have non-controlling interests that are material to the Group. The amounts disclosed for each subsidiary are before inter-company eliminations.
+Summarised statement of financial position
+
+[TABLE 46]
+ | Srisawad Capital 1969 PCL.
+ | 2025 | 2024
+ | Thousand Baht | Thousand Baht
+Assets | 25,962,247 | 32,575,967
+Liabilities | (17,072,974) | (23,995,722)
+Net assets | 8,889,273 | 8,580,245
+Non-controlling interests | 2,430,558 | 2,342,991
+[/TABLE 46]
+
+Summarised statement of comprehensive income
+
+[TABLE 47]
+ | Srisawad Capital 1969 PCL.
+ | 2025 | 2024
+ | Thousand Baht | Thousand Baht
+Revenue | 1,628,728 | 1,892,522
+Profit of the year | 324,892 | 320,416
+Other comprehensive income | (599) | 2,142
+Total comprehensive income | 324,293 | 322,558
+Profit (loss) allocated to non-controlling interests | 91,999 | 85,824
+Dividends paid to non-controlling interests | 4,264 | 4,183
+[/TABLE 47]
+
+Summarised statement of cash flows
+
+[TABLE 48]
+ | Srisawad Capital 1969 PCL.
+ | 2025 | 2024
+ | Thousand Baht | Thousand Baht
+Net cash generated from operating activities | 473,207 | 307,803
+Net cash generated from investing activities | 5,347,430 | 2,022,624
+Net cash used in financing activities | (5,862,148) | (1,730,342)
+Net (decrease) increase in cash and cash equivalents, net | (41,511) | 600,085
+Cash and cash equivalents at the beginning of the year | 830,652 | 230,567
+Cash and cash equivalents at the end of the year | 789,141 | 830,652
+[/TABLE 48]
+
+17Property, plant and equipment, net
+
+[TABLE 49]
+ | Consolidated financial statements
+ |  |  | Buildings | Furniture |  |  |  | 
+ |  | Land | and building | and | Office |  | Work in | 
+ | Land | improvements | improvements | fixtures | equipment | Vehicles | process | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+At 1 January 2024 |  |  |  |  |  |  |  | 
+Cost | 30,567 | 9,418 | 1,012,592 | 394,549 | 393,312 | 315,508 | 584 | 2,156,530
+Less  Accumulated depreciation | - | (1,073) | (693,759) | (319,032) | (280,132) | (98,277) | - | (1,392,273)
+Net book value | 30,567 | 8,345 | 318,833 | 75,517 | 113,180 | 217,231 | 584 | 764,257
+For the year ended |  |  |  |  |  |  |  | 
+31 December 2024 |  |  |  |  |  |  |  | 
+Opening net book value | 30,567 | 8,345 | 318,833 | 75,517 | 113,180 | 217,231 | 584 | 764,257
+Additions/Asset transfer | - | - | 98,732 | 25,056 | 13,002 | 78,849 | - | 215,639
+Disposals/write off, net | - | - | (2,475) | (12) | (724) | (10,293) | - | (13,504)
+Transfer out | - | - | - | - | - | - | (584) | (584)
+Depreciation charge | - | (471) | (95,910) | (33,742) | (42,061) | (36,631) | - | (208,815)
+Effects of changes in foreign exchange rates | - | - | - | 1 | (130) | - | - | (129)
+Closing net book value | 30,567 | 7,874 | 319,180 | 66,820 | 83,267 | 249,156 | - | 756,864
+At 31 December 2024 |  |  |  |  |  |  |  | 
+Cost | 30,567 | 9,418 | 1,101,005 | 417,044 | 404,773 | 398,525 | - | 2,361,332
+Less  Accumulated depreciation | - | (1,544) | (781,825) | (350,224) | (321,506) | (149,369) | - | (1,604,468)
+Net book value | 30,567 | 7,874 | 319,180 | 66,820 | 83,267 | 249,156 | - | 756,864
+For the year ended |  |  |  |  |  |  |  | 
+31 December 2025 |  |  |  |  |  |  |  | 
+Opening net book value | 30,567 | 7,874 | 319,180 | 66,820 | 83,267 | 249,156 | - | 756,864
+Additions/Asset transfer | - | - | 119,567 | 13,586 | 13,279 | 55,647 | - | 202,079
+Disposals/write off, net | - | - | (4,672) | (1,452) | (992) | (43,612) | - | (50,728)
+Depreciation charge | - | (471) | (118,114) | (25,942) | (36,039) | (40,927) | - | (221,493)
+Effects of changes in foreign exchange rates | - | - | 1 | (29) | 397 | (2) | - | 367
+Closing net book value | 30,567 | 7,403 | 315,962 | 52,983 | 59,912 | 220,262 | - | 687,089
+At 31 December 2025 |  |  |  |  |  |  |  | 
+Cost | 30,567 | 9,418 | 1,201,533 | 418,681 | 417,107 | 393,260 | - | 2,470,566
+Less  Accumulated depreciation | - | (2,015) | (885,571) | (365,698) | (357,195) | (172,998) | - | (1,783,477)
+Net book value | 30,567 | 7,403 | 315,962 | 52,983 | 59,912 | 220,262 | - | 687,089
+[/TABLE 49]
+
+
+[TABLE 50]
+ | Separate financial statements
+ | Buildings |  |  | 
+ | and building |  |  | 
+ | improvements | Equipment | Vehicle | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+At 1 January 2024 |  |  |  | 
+Cost | 17,403 | 81 | - | 17,484
+Less  Accumulated depreciation | (4,834) | (37) | - | (4,871)
+Net book value | 12,569 | 44 | - | 12,613
+For the year ended 31 December 2024 |  |  |  | 
+Opening net book value | 12,569 | 44 | - | 12,613
+Addition | - | 278 | 7,590 | 7,868
+Depreciation charge | (994) | (38) | (500) | (1,532)
+Closing net book value | 11,575 | 284 | 7,090 | 18,949
+At 31 December 2024 |  |  |  | 
+Cost | 17,403 | 359 | 7,590 | 25,352
+Less  Accumulated depreciation | (5,828) | (75) | (500) | (6,403)
+Net book value | 11,575 | 284 | 7,090 | 18,949
+For the year ended 31 December 2025 |  |  |  | 
+Opening net book value | 11,575 | 284 | 7,090 | 18,949
+Depreciation charge | (991) | (71) | (607) | (1,669)
+Closing net book value | 10,584 | 213 | 6,483 | 17,280
+At 31 December 2025 |  |  |  | 
+Cost | 17,403 | 359 | 7,590 | 25,352
+Less  Accumulated depreciation | (6,819) | (146) | (1,107) | (8,072)
+Net book value | 10,584 | 213 | 6,483 | 17,280
+[/TABLE 50]
+
+18Right-of-use assets, net
+
+[TABLE 51]
+ | Consolidated financial statements
+ | Buildings | Branches | Vehicles | Computer | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Net book value as at 1 January 2024 | 265,635 | 1,127,828 | 19,111 | 3,057 | 1,415,631
+Additions | 143,973 | 625,115 | 1,687 | 7,910 | 778,685
+Lease termination | (52,208) | (9,815) | (46) | - | (62,069)
+Depreciation charge | (49,031) | (722,824) | (8,062) | (2,654) | (782,571)
+Effects of changes in foreign exchange rates | 56 | (5,203) | 39 | - | (5,108)
+Net book value as at 31 December 2024 | 308,425 | 1,015,101 | 12,729 | 8,313 | 1,344,568
+Net book value as at 1 January 2025 | 308,425 | 1,015,101 | 12,729 | 8,313 | 1,344,568
+Additions | 17,547 | 915,834 | 3,951 | 5,087 | 942,419
+Lease termination | (4,445) | (8,348) | - | - | (12,793)
+Depreciation charge | (41,163) | (718,171) | (5,456) | (4,604) | (769,394)
+Effects of changes in foreign exchange rates | (89) | (27,250) | (354) | - | (27,693)
+Net book value as at 31 December 2025 | 280,275 | 1,177,166 | 10,870 | 8,796 | 1,477,107
+[/TABLE 51]
+
+
+[TABLE 52]
+ | Separate financial statements
+ | Buildings
+ | Thousand Baht
+Net book value as at 1 January 2024 | 21,601
+Depreciation charge | (1,686)
+Net book value as at 31 December 2024 | 19,915
+Net book value as at 1 January 2025 | 19,915
+Depreciation charge | (1,682)
+Net book value as at 31 December 2025 | 18,233
+[/TABLE 52]
+
+For the year ended 31 December, amounts charged to profit or loss and cash flows relating to leases are as follows:
+
+[TABLE 53]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Interest expense (included in finance cost) | 62,538 | 60,352 | 1,134 | 1,210
+Expense relating to leases of low-value assets | 5,760 | 6,752 | - | -
+Total cash outflow for leases | 890,016 | 887,284 | 2,592 | 2,592
+[/TABLE 53]
+
+19Intangible assets, net
+The Group and the Company’s net intangible assets are as follows:
+
+[TABLE 54]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Intangible assets which include finance license from the business combination | 886,000 | 886,000 | - | -
+Goodwill | 267,771 | 267,771 | - | -
+Computer software | 80,958 | 52,705 | 710 | 1,084
+Total intangible assets, net | 1,234,729 | 1,206,476 | 710 | 1,084
+[/TABLE 54]
+
+Intangible assets which include finance license from the business combination and goodwill is allocated to a cash generating unit (CGU) identified according to business unit.
+A segment-level summary of the Intangible assets which include finance license from the business combination and goodwill allocation is presented below:
+
+[TABLE 55]
+ | Finance license from the business combination | Goodwill
+ | Thousand Baht | Thousand Baht
+At 31 December 2025 |  | 
+Foreign business unit | 555,000 | -
+Domestic business unit | 331,000 | 267,771
+Total | 886,000 | 267,771
+[/TABLE 55]
+
+Key assumptions used for value-in-use calculations are as follows
+
+[TABLE 56]
+ | Finance license from the business combination | Goodwill
+Average annual loan portfolio growth rate | 2 - 7% | 2%
+Average interest cost rate | 5 - 9% | 4 - 7%
+Fee income rate | 0 - 38% | -
+Discount rate calculated from the cost of equity | 12 - 20% | 12 - 13%
+Terminal growth rate | 1 - 2% | 1%
+[/TABLE 56]
+
+The assumptions were determined based on historical operating performance, industry trends, economic conditions, and management’s assessment of future developments. The discount rate reflects the time value of money and the specific risks associated with each cashgenerating unit, referenced to the Group’s weighted average cost of capital and adjusted to reflect the risk characteristics of the relevant business units.
+For those business units that hold intangible assets with indefinite useful lives in the form of finance licenses, the Group applied a 15‑year cash flow projection period in determining the value in use. This projection period is considered appropriate because the licenses do not have a specified contractual term and the related operations are continuous and long‑term in nature. Management considers that the projection period used appropriately reflects the expected pattern of economic benefits to be derived and the business units’ ability to generate cash flows.
+Based on the annual impairment assessment, management concluded there was no impairment of the intangible assets which include finance license from the business combination as at 31 December 2025 (2024: None).
+Computer Software
+Movements of computer software for the years are as follows:
+
+[TABLE 57]
+ | Consolidated financial statements | Separate financial statements
+ | Computer software | Work in process | Total | Computer software | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+At 1 January 2024 |  |  |  |  | 
+Cost | 119,714 | 1,294 | 121,008 | 3,277 | 3,277
+Less  Accumulated amortisation | (65,931) | - | (65,931) | (1,818) | (1,818)
+Net book value | 53,783 | 1,294 | 55,077 | 1,459 | 1,459
+For the year ended 31 December 2024 |  |  |  |  | 
+Opening net book value | 53,783 | 1,294 | 55,077 | 1,459 | 1,459
+Additions | 4,755 | 10,063 | 14,818 | - | -
+Amortisation charge | (17,822) | - | (17,822) | (375) | (375)
+Transfer in (out) | 6,651 | (6,067) | 584 | - | -
+Translation difference | 48 | - | 48 | - | -
+Closing net book value | 47,415 | 5,290 | 52,705 | 1,084 | 1,084
+At 31 December 2024 |  |  |  |  | 
+Cost | 131,082 | 5,290 | 136,372 | 3,277 | 3,277
+Less  Accumulated amortisation | (83,667) | - | (83,667) | (2,193) | (2,193)
+Net book value | 47,415 | 5,290 | 52,705 | 1,084 | 1,084
+For the year ended 31 December 2025 |  |  |  |  | 
+Opening net book value | 47,415 | 5,290 | 52,705 | 1,084 | 1,084
+Additions | 4,801 | 40,936 | 45,737 | - | -
+Disposals | (1,070) | - | (1,070) | - | -
+Amortisation charge | (16,168) | - | (16,168) | (374) | (374)
+Transfer in (out) | 450 | (450) | - | - | -
+Translation difference | (246) | - | (246) | - | -
+Closing net book value | 35,182 | 45,776 | 80,958 | 710 | 710
+At 31 December 2025 |  |  |  |  | 
+Cost | 134,783 | 45,776 | 180,559 | 3,277 | 3,277
+Less  Accumulated amortisation | (99,601) | - | (99,601) | (2,567) | (2,567)
+Net book value | 35,182 | 45,776 | 80,958 | 710 | 710
+[/TABLE 57]
+
+20Deferred tax
+Analysis of deferred tax assets and deferred tax liabilities are as follows:
+
+[TABLE 58]
+ | Consolidated | Separate
+ | financial statements | financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Deferred tax assets | 818,779 | 808,580 | 43,772 | 40,817
+Deferred tax liabilities | (782,231) | (845,360) | (146,408) | (147,040)
+Deferred tax, net | 36,548 | (36,780) | (102,636) | (106,223)
+[/TABLE 58]
+
+The movements in deferred tax assets and liabilities during the year is as folows:
+
+[TABLE 59]
+ | Consolidated financial statements
+ | Loss on financial assets measured at FVOCI | Allowance for expected credit losses | Allowance for impairment | Employee benefit obligations | Prepaid expenses | Tax losses | Lease liabilities | Cash flow hedges | Share of loss of associate accounted for using the equity method | Other | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Deferred tax assets |  |  |  |  |  |  |  |  |  |  | 
+At 1 January 2024 | 8,827 | 348,054 | 74,567 | 18,741 | 29,303 | 104,549 | 270,618 | - | (5,582) | 7,803 | 856,880
+Charged (credited) to profit or loss | 1,265 | 67,608 | (361) | 4,861 | (15,194) | (95,887) | (14,075) | - | - | 1,393 | (50,390)
+(Credited) charged to other comprehensive income | - | - | - | (5,437) | - | - | - | 8,170 | - | - | 2,733
+Translation difference | - | (269) | - | (5) | - | (313) | (56) | - | - | - | (643)
+As at 31 December 2024 | 10,092 | 415,393 | 74,206 | 18,160 | 14,109 | 8,349 | 256,487 | 8,170 | (5,582) | 9,196 | 808,580
+At 1 January 2025 | 10,092 | 415,393 | 74,206 | 18,160 | 14,109 | 8,349 | 256,487 | 8,170 | (5,582) | 9,196 | 808,580
+Charged (credited) to profit or loss | - | 18,197 | (44,782) | 4,994 | (3,732) | - | 28,718 | - | - | 1,157 | 4,552
+(Credited) charged to other comprehensive income | 228 | - | - | (50) | - | - | - | 3,041 | - | 2,507 | 5,726
+Translation difference | - | (724) | (50) | - | - | - | (130) | - | - | 825 | (79)
+As at 31 December 2025 | 10,320 | 432,866 | 29,374 | 23,104 | 10,377 | 8,349 | 285,075 | 11,211 | (5,582) | 13,685 | 818,779
+[/TABLE 59]
+
+
+[TABLE 60]
+ | Consolidated financial statements
+ | Gain |  |  |  |  | 
+ | on financial assets |  |  |  |  | 
+ | measured at |  | Interest | Prepaid | Right-of-use | 
+ | FVPL | Revaluation | receivable | expenses | assets | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Deferred tax liabilities |  |  |  |  |  | 
+As at 1 January 2024 | (8,247) | (176,219) | (143,388) | (476,329) | (258,396) | (1,062,579)
+(Charged) credited to profit or loss | (30) | - | (16,570) | 225,390 | 8,429 | 217,219
+As at 31 December 2024 | (8,277) | (176,219) | (159,958) | (250,939) | (249,967) | (845,360)
+As at 1 January 2025 | (8,277) | (176,219) | (159,958) | (250,939) | (249,967) | (845,360)
+(Charged) credited to profit or loss | (7,591) | - | (10,564) | 114,528 | (33,562) | 62,811
+Translation difference | - | - | - | 205 | 113 | 318
+As at 31 December 2025 | (15,868) | (176,219) | (170,522) | (136,206) | (283,416) | (782,231)
+[/TABLE 60]
+
+
+[TABLE 61]
+ | Separate financial statements
+ | Employee |  |  |  |  | 
+ | benefit | Allowance for | Lease | Cash flow |  | 
+ | obligations | impairment | liablities | hedges | Other | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Deferred tax assets |  |  |  |  |  | 
+As at 1 January 2024 | 4,928 | 6,176 | 21,814 | - | 447 | 33,365
+Charged (credited) to profit or loss | 37 | - | (276) | - | 5 | (234)
+Charged to othercomprehensive income | (484) | - | - | 8,170 | - | 7,686
+As at 31 December 2024 | 4,481 | 6,176 | 21,538 | 8,170 | 452 | 40,817
+As at 1 January 2025 | 4,481 | 6,176 | 21,538 | 8,170 | 452 | 40,817
+Charged (credited) to profit or loss | 468 | - | (292) | - | 5 | 181
+(Credited) Charged to other comprehensive income | (267) | - | - | 3,041 | - | 2,774
+As at 31 December 2025 | 4,682 | 6,176 | 21,246 | 11,211 | 457 | 43,772
+[/TABLE 61]
+
+
+[TABLE 62]
+ | Separate financial statements
+ | Gain on |  | 
+ | financial assets | Right-of-use | 
+ | measured at FVPL | assets | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht
+Deferred tax liabilities |  |  | 
+As at 1 January 2024 | (125,751) | (21,601) | (147,352)
+(Charged) credited to profit or loss | (25) | 337 | 312
+As at 31 December 2024 | (125,776) | (21,264) | (147,040)
+As at 1 January 2025 | (125,776) | (21,264) | (147,040)
+(Charged) credited to profit or loss | 296 | 336 | 632
+As at 31 December 2025 | (125,480) | (20,928) | (146,408)
+[/TABLE 62]
+
+Deferred income tax assets are recognised for tax loss and carried forwards only to the extent that realisation of the related tax benefit through the future taxable profits is probable. The Group does not recognise deferred tax asset of Baht 6.64 million (2024: Baht 13.88 million) from tax losses of Baht 33.18 million (2024: Baht 69.38 million), to carry forward against future taxable income; these tax losses of Baht 33.18 million (2024: Baht 69.38 million) will expire in 2029 and 2028, respectively.
+21Other non-current assets
+
+[TABLE 63]
+ | Consolidated | Separate
+ | financial statements | financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Rental deposits | 83,058 | 95,486 | 3,286 | 3,287
+Employee retention | 91,330 | 103,200 | - | -
+Restricted cash | 3,222 | 3,190 | - | -
+Other deposits | 62,740 | 59,096 | - | -
+Total other non-current assets | 240,350 | 260,972 | 3,286 | 3,287
+[/TABLE 63]
+
+22Borrowings from financial institutions
+
+[TABLE 64]
+ | Consolidated | Separate
+ | financial statements | financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Current |  |  |  | 
+Short-term borrowings from |  |  |  | 
+financial institutions | 6,926,301 | 6,264,184 | 6,176,433 | 5,544,263
+Current portion of long-term borrowings |  |  |  | 
+from financial institutions | 4,932,466 | 7,799,993 | 4,557,466 | 2,916,750
+Total current borrowings | 11,858,767 | 14,064,177 | 10,733,899 | 8,461,013
+Non-current |  |  |  | 
+Long-term borrowings from financial institutions | 2,533,506 | 2,327,707 | 2,533,506 | 2,077,707
+Total non-current borrowings | 2,533,506 | 2,327,707 | 2,533,506 | 2,077,707
+Total borrowings from financial institutions | 14,392,273 | 16,391,884 | 13,267,405 | 10,538,720
+[/TABLE 64]
+
+22.1Movements of short-term borrowings from financial institutions for the years are as follows:
+
+[TABLE 65]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Opening book balance | 6,264,184 | 12,084,572 | 5,544,263 | 11,384,572
+Additions of short-term borrowings | 24,692,345 | 39,911,612 | 23,864,147 | 38,452,151
+Repayments of short-term borrowings | (24,126,000) | (45,910,000) | (23,326,000) | (44,470,000)
+Amortisation of prepaid interest expenses | 95,772 | 178,000 | 94,023 | 177,540
+Closing book balance | 6,926,301 | 6,264,184 | 6,176,433 | 5,544,263
+[/TABLE 65]
+
+Short-term borrowings from financial institutions carry an interest rate of 2.05% - 3.00% per annum (2024: 3.40% - 4.25% per annum) and are due for interest and principal repayment at the maturity date.
+22.2Movements of long-term borrowings from financial institutions which included the current portion for the years are as follows:
+
+[TABLE 66]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Opening book balance | 10,127,700 | 17,781,976 | 4,994,457 | 3,155,867
+Additions of long-term borrowings | 5,466,783 | 4,105,904 | 5,466,783 | 3,605,904
+Repayments of long-term borrowings | (7,903,202) | (11,776,921) | (3,134,506) | (1,768,105)
+Amortisation of issuance cost | 49,275 | 21,053 | 38,822 | 5,103
+Currency translation differences | (274,584) | (4,312) | (274,584) | (4,312)
+Closing book balance | 7,465,972 | 10,127,700 | 7,090,972 | 4,994,457
+[/TABLE 66]
+
+Long-term borrowings from financial institutions carry an interest rate of 2.53% - 4.96% per annum (2024: 3.18% - 4.99% per annum). Interest is due for repayment on a monthly and quarterly basis and principal are due for repayment at the maturity date.
+The Group and the Company have the following undrawn committed borrowing facilities of Baht 6,200 million (2024: Baht 5,843 million). These borrowing agreements require the Group and the Company to maintain an agreed debt-to-equity ratio using computations from the annual consolidated financial statements. The Group and the Company have complied with such conditions.
+The Group and the Company have obtained the bank overdrafts with a limit of Baht 200 million (2024: Baht 200 million).
+23Other current payables
+
+[TABLE 67]
+ | Consolidated | Separate
+ | financial statements | financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Other payables | 849,830 | 736,196 | 5,886 | 3,612
+Amounts due to related parties (Note 37 h)) | 593 | 1,130 | 8,981 | 10,478
+Accrued expenses | 243,917 | 302,761 | 31,414 | 26,105
+Accrued interest expenses | 280,851 | 299,538 | 242,436 | 248,510
+Others | 127,912 | 127,096 | 1 | -
+Total | 1,503,103 | 1,466,721 | 288,718 | 288,705
+[/TABLE 67]
+
+24Senior debentures
+
+[TABLE 68]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Senior and unsecured debentures |  |  |  | 
+- Expiring within one year | 3,233,502 | 1,922,826 | - | -
+- Expiring more than one year | 4,122,024 | 5,750,384 | - | -
+Total unsecured | 7,355,526 | 7,673,210 | - | -
+Senior and secured debentures |  |  |  | 
+- Expiring within one year | 13,108,869 | 15,896,047 | 13,108,869 | 15,896,047
+- Expiring more than one year | 27,001,476 | 27,018,459 | 27,001,476 | 27,018,459
+Total secured | 40,110,345 | 42,914,506 | 40,110,345 | 42,914,506
+Total | 47,465,871 | 50,587,716 | 40,110,345 | 42,914,506
+[/TABLE 68]
+
+Movements of senior debentures which included the current portion for the years are as follows:
+
+[TABLE 69]
+ | Consolidated financial statements
+ | 2025 | 2024
+ | Unsecured | Secured | Unsecured | Secured
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Opening balance | 7,673,210 | 42,914,506 | 3,633,067 | 40,007,894
+Additions (Principal - net of borrowing cost) | 1,590,370 | 13,040,252 | 4,023,959 | 12,677,636
+Repayments | (1,924,200) | (15,984,600) | - | (9,843,900)
+Amortisation of debt issuance costs | 16,146 | 140,187 | 16,184 | 72,876
+Closing balance | 7,355,526 | 40,110,345 | 7,673,210 | 42,914,506
+[/TABLE 69]
+
+
+[TABLE 70]
+ | Separate financial statements
+ | 2025 | 2024
+ | Unsecured | Secured | Unsecured | Secured
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Opening balance | - | 42,914,506 | - | 40,007,894
+Additions (Principal - net of borrowing cost) | - | 13,040,252 | - | 12,677,636
+Repayments | - | (15,984,600) | - | (9,843,900)
+Amortisation of debt issuance costs | - | 140,187 | - | 72,876
+Closing balance | - | 40,110,345 | - | 42,914,506
+[/TABLE 70]
+
+Senior unsecured debentures
+As at 31December 2025, Senior unsecured debentures, are debentures in which the holder has equivalent rights as other creditors, are charged interest rate of 4.50 - 5.05 % per annum (31 December 2024: 4.00% - 5.05% per annum) in accordance with conditions of each debenture. Interest is due on a quarterly basis and principal is due at maturity date.
+Senior secured debentures
+As at 31 December 2025, Senior secured debentures, are debentures in which the holder has equivalent rights as other creditors, are charged interest rate of 3.00 - 5.25% per annum (31 December 2024: 3.65% - 5.25% per annum) in accordance with condition of each debenture. Interest is due on a quarterly basis and principal is due at maturity date. These debentures are guaranteed by a subsidiary.
+These debenture agreements require the Group and the Company to maintain debts to equity ratio by computing from annual consolidated financial statements. The Group and the Company have complied with these conditions.
+25Derivative liabilities
+Cash flow hedge
+As at 31 December 2025, the Company has long-term borrowings agreement amounting to Baht 4,444.10 million, for which derivative contracts have been entered into to hedge cash flow risks from foreign exchange rate risk and interest rate risk. The fair value of financial derivative liabilities is Baht 306.47 million, and the change in fair value used as a basis for recognising hedge ineffectiveness was Baht 1.57 million. The accumulated loss from the cash flow hedge reserve and the accumulated gain from the cost of hedging reserve within other components of equity amounted to Baht 56.07 million and Baht 0.02 million, respectively.
+As at 31 December 2024, the Company has long-term borrowings agreement amounting to Baht 2,731.69 million, for which derivative contracts have been entered into to hedge cash flow risks from foreign exchange rate risk and interest rate risk. The fair value of financial derivative liabilities is Baht 22.05 million, with no change in fair value used as a basis for recognising hedge ineffectiveness. The accumulated loss from the cash flow hedge reserve and the cost of hedging reserve within other components of equity amounted to Baht 40.83 million and Baht 0.02 million, respectively.
+The following table shows a reconciliation of the components of equity that relate to cash flow hedge relationships:
+
+[TABLE 71]
+ | Consolidated and Separate statements
+ | Cash flow hedge reserve
+ | 31 December 2025 | 31 December 2024
+ | Thousand Baht | Thousand Baht
+Beginning balance | (40,849) | -
+Effective portion of changes in fair value | (15,247) | (40,826)
+Cost of hedging reserve | 43 | (23)
+Ending balances | (56,053) | (40,849)
+[/TABLE 71]
+
+Cash flow hedges are used to protect against exposure to variability in future cash flows attributable to movements in foreign exchange rates and interest rates of financial liabilities. The Company hedges cash flows from loan, against foreign exchange rates risk and interest rates risk using cross-currency interest rate swap.
+26Lease liabilities
+
+[TABLE 72]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Minimum finance lease liabilities payments |  |  |  | 
+Not later than one year | 698,808 | 717,049 | 2,592 | 2,592
+Later than 1 year but not later than 5 years | 727,507 | 580,421 | 10,368 | 10,368
+Later than 5 years | 187,894 | 217,906 | 15,120 | 17,712
+Total undiscounted lease liabilities | 1,614,209 | 1,515,376 | 28,080 | 30,672
+Less Future finance charges on finance leases | (138,288) | (144,351) | (6,464) | (7,598)
+Present value of finance lease liabilities | 1,475,921 | 1,371,025 | 21,616 | 23,074
+Present value of finance lease liabilities |  |  |  | 
+Not later than one year | 646,343 | 667,594 | 1,534 | 1,458
+Later than 1 year but not later than 5 years | 666,983 | 519,073 | 6,978 | 6,631
+Later than 5 years | 162,595 | 184,358 | 13,104 | 14,985
+Total discounted lease liabilities | 1,475,921 | 1,371,025 | 21,616 | 23,074
+[/TABLE 72]
+
+27Long-term borrowings from third parties
+
+[TABLE 73]
+ | Consolidated financial statements
+ | 2025 | 2024
+ | Thousand Baht | Thousand Baht
+Current | 500,000 | -
+Non-current | - | 500,000
+Total long-term borrowings from third parties | 500,000 | 500,000
+[/TABLE 73]
+
+Movements of long-term borrowings from third parties for the years are as follows;
+
+[TABLE 74]
+ | Consolidated financial statements
+ | 2025 | 2024
+ | Thousand Baht | Thousand Baht
+Opening book balance | 500,000 | -
+Reclassification of borrowings due to contract modification | - | 500,000
+Closing book balance | 500,000 | 500,000
+[/TABLE 74]
+
+As at 31 December 2025, the Company has Long-term borrowings from third parties carry a mutually agreed interest rate. Interest and principal are due for repayment at the maturity date.
+28Employee benefit obligations
+
+[TABLE 75]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Post employment benefits |  |  |  | 
+Statement of financial position | 113,261 | 94,564 | 19,101 | 18,093
+Loss charge included in operating profit | 29,179 | 26,934 | 2,339 | 184
+Remeasurement | 4,036 | 27,184 | 1,334 | 2,419
+[/TABLE 75]
+
+Recognised amounts in the statement of financial position
+
+[TABLE 76]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Present value of obligations | 113,261 | 94,564 | 19,101 | 18,093
+Liabilities in the statement of financial position | 113,261 | 94,564 | 19,101 | 18,093
+[/TABLE 76]
+
+The movements in employee benefit obligations for the years are as follows:
+
+[TABLE 77]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+As at 1 January | 94,564 | 98,030 | 18,093 | 25,717
+Current service costs | 26,960 | 25,908 | 1,969 | 1,992
+Past service costs | - | (1,357) | - | (2,225)
+Interest costs | 2,219 | 2,383 | 370 | 416
+Defined benefit obligation transferred to related parties | - | - | 3 | (5,388)
+Other adjustment | 51 | - | - | -
+Remeasurements: |  |  |  | 
+(Gain) loss from change in demographic assumptions | (8,991) | (8,730) | (1,916) | (346)
+Loss (gain) from change in financial assumptions | 2,895 | 3,501 | 87 | (105)
+Experience loss (gain) | 2,060 | (21,955) | 495 | (1,968)
+Payment from plans: |  |  |  | 
+Benefit payment | (6,497) | (3,216) | - | -
+As at 31 December | 113,261 | 94,564 | 19,101 | 18,093
+[/TABLE 77]
+
+Expenses (revenue) for employee benefits recognised in the statement of comprehensive income are as follows:
+
+[TABLE 78]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Current service costs | 26,960 | 25,908 | 1,969 | 1,992
+Past service costs | - | (1,357) | - | (2,225)
+Interest costs | 2,219 | 2,383 | 370 | 416
+Remeasurement of employee benefit obligations | (4,036) | (27,184) | (1,334) | (2,419)
+ | 25,143 | (250) | 1,005 | (2,236)
+[/TABLE 78]
+
+The significant actuarial assumptions used were as follows:
+
+[TABLE 79]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+Discount rate | 1.24%-2.36% | 2.09%-2.56% | 1.24% | 2.09%
+Salary increase rate | 4.70% | 5.00% | 4.70% | 5.00%
+Mortality rate | 100.00% of Thai Mortality Ordinary Table 2017 | 100.00% of Thai Mortality Ordinary Table 2017 | 100.00% of Thai Mortality Ordinary Table 2017 | 100.00% of Thai Mortality Ordinary Table 2017
+Turnover rate | 2.00%-28.00% | 2.00%-28.00% | 2.00%-28.00% | 2.00%-28.00%
+Retirement age | 60 years old | 60 years old | 60 years old | 60 years old
+[/TABLE 79]
+
+Sensitivity analysis for each significant assumption used is as follows:
+
+[TABLE 80]
+ | Increase (decrease) in provisions for employment benefits
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | % | % | % | %
+Financial Assumptions |  |  |  | 
+Discount rate |  |  |  | 
+Increase 1% | (6.87) | (6.71) | (3.44) | (2.96)
+Decrease 1% | 8.56 | 7.71 | 3.72 | 3.19
+Salary increase rate |  |  |  | 
+Increase 1% | 7.75 | 6.94 | 3.13 | 2.62
+Decrease 1% | (6.32) | (6.17) | (2.96) | (2.47)
+Demographic Assumptions |  |  |  | 
+Turnover rate |  |  |  | 
+Increase 10% | (6.86) | (6.57) | (1.36) | (1.26)
+Decrease 10% | 9.14 | 8.21 | 1.54 | 1.45
+[/TABLE 80]
+
+The above sensitivity analyses are based on a change in an assumption while holding all other assumptions constant. In practice, this is unlikely to occur, and changes in some of the assumptions may be correlated. When calculating the sensitivity of the employee benefit obligation to significant actuarial assumptions, the same method was used when calculating the pension liability in the statement of financial position - the present value of the defined benefit obligation calculated with the projected unit credit method at the end of the reporting period.
+methods and types of assumptions used in preparing the sensitivity analysis didn’t change compared to the previous year.
+The weighted average duration of the defined benefit obligation of the Group and the Company is 4 - 17 years and 4 years, respectively.
+Expected maturity analysis of undiscounted retirement payment is as follows:
+
+[TABLE 81]
+ | Consolidated financial statements
+ | Less than a year | Between 1 - 3 years | Between 3 - 5 years | Over 5 years | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+At 31 December 2025 |  |  |  |  | 
+Pension benefits | 24,937 | 23,807 | 15,889 | 282,837 | 347,470
+Total | 24,937 | 23,807 | 15,889 | 282,837 | 347,470
+At 31 December 2024 |  |  |  |  | 
+Pension benefits | 3,776 | 46,787 | 16,695 | 239,149 | 306,407
+Total | 3,776 | 46,787 | 16,695 | 239,149 | 306,407
+[/TABLE 81]
+
+
+[TABLE 82]
+ | Separate financial statements
+ | Less than a year | Between 1 - 3 years | Between 3 - 5 years | Over 5 years | Total
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+At 31 December 2025 |  |  |  |  | 
+Pension benefits | 1,736 | 16,066 | 3,541 | 4,297 | 25,640
+Total | 1,736 | 16,066 | 3,541 | 4,297 | 25,640
+At 31 December 2024 |  |  |  |  | 
+Pension benefits | 3,776 | 13,684 | 3,373 | 3,720 | 24,553
+Total | 3,776 | 13,684 | 3,373 | 3,720 | 24,553
+[/TABLE 82]
+
+29Share capital and premium on share capital
+
+[TABLE 83]
+ | Consolidated and Separate financial statements
+ |  |  | Issued |  | Share | 
+ |  | Number of | and |  | premium | 
+ | Number of | issued and | paid-up |  | from | 
+ | ordinary | paid-up | ordinary | Share | share-based | 
+ | shares | shares | shares | premium | payments | Total
+ | Thousand | Thousand | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+At 1 January 2025 | 1,573,410 | 1,510,464 | 1,510,464 | 6,207,179 | 36,190 | 7,753,833
+Issuance of ordinary shares | 157,359 | 151,043 | 151,043 | 6 | - | 151,049
+At 31 December 2025 | 1,730,769 | 1,661,507 | 1,661,507 | 6,207,185 | 36,190 | 7,904,882
+At 1 December 2024 | 1,430,383 | 1,373,152 | 1,373,152 | 6,207,179 | 36,190 | 7,616,521
+Issuance of ordinary shares | 143,027 | 137,312 | 137,312 | - | - | 137,312
+At 31 December 2024 | 1,573,410 | 1,510,464 | 1,510,464 | 6,207,179 | 36,190 | 7,753,833
+[/TABLE 83]
+
+Transactions incurred during the year 2025
+At the meeting of the Company’s Annual General Meeting of the Shareholders for fiscal year 2025, held on 29 April 2025, the shareholders approved the issuance of new ordinary shares to accommodate the payment of share dividends and accommodate the exercise of warrants amounting to 157,359,312 ordinary shares at par value of Baht 1 per share, resulting in a new registered capital of 1,730,769,248 shares from 1,573,409,936 shares. As at 30 June 2025, number of issued and paid-up shares were 1,661,506,837 shares. The company has registered the change in share capital with the Department of Business Development.
+In August 2025, certain warrant holders exercised their rights to convert into 92 ordinary shares at an exercise price of Baht 79.262 per shares (par value of Baht 1 per share). This caused the company to record an increase in share premium of Baht 0.006 million, resulting in an increase in the total number of issued and paid-up ordinary shares from 1,661,506,837 shares to 1,661,506,929 shares. As at 30 September 2025, number of issued and paid-up shares were 1,661,506,929 shares. The Company has registered the change in share capital with the Department of Business Development.
+Transactions incurred during the year 2024
+At the meeting of the Company’s Annual General Meeting of the Shareholders for thel year 2024, held on 29 April 2024, the shareholders approved the issuance of new ordinary shares to accommodate the payment of share dividends and accommodate the exercise of warrants amounting to 143,027,280 ordinary shares at par value of Baht 1 per share, resulting in a new registered capital of 1,573,409,936 shares from 1,430,382,656 shares. As at 31 December 2024, number of issued and paid-up shares were 1,510,464,313 shares. The Company has registered the change in share capital with the Department of Business Development.
+30Dividends
+Srisawad Corporation Public Company Limited and its subsidiary
+On 23 September 2025, the Board of Directors Meeting approved the resolution regarding the interim dividend payments from performance of the half year 2025. The cash dividend was paid at the rate of Baht 0.35 per share amounting to Baht 581.53 million. The Company paid such dividends to the shareholders on 22 October 2025.
+On 29 April 2025, the Annual General Meeting approved the resolution regarding the dividend payments from retained earnings for the year 2024. The cash dividend was paid at the rate of Baht 0.04 per share amounting to Baht 60.42 million. The dividend payment of 151,046,431 shares at par value of Baht 1 per share was paid to the shareholders at the rate of 10 ordinary shares per 1 ordinary share dividend totaling Baht 151.04 million, a dividend of Baht 0.10 per share. The Company paid such dividends to the shareholders on 27 May 2025.
+The Board of Directors of Fast Money Company Limited approved the resolution regarding the interim dividend payments from performance of 2024 to shareholders amounting to Baht 280 million. The dividend payment was made in cash at the rate of Baht 28 per share on 19 June 2025 and the Company received the dividend amounting to Baht 280 million.
+The Board of Directors of Srisawad Power 2014 Company Limited approved the resolution regarding the interim dividend payments from performance of 2024 to shareholders amounting to Baht 870 million. The dividend payment was made in cash at the rate of Baht 43.50 per share on 19 June 2025 and the Company received the dividend amounting to Baht 870 million.
+On 29 April 2024, the Annual General Meeting approved the resolution regarding the dividend payments from retained earnings for the year 2023. The cash dividend was paid at the rate of Baht 0.0115 per share amounting to Baht 15.79 million. The dividend payment of 137,311,920 shares at par value of Baht 1 per share was paid to the shareholders at the rate of 10 ordinary shares per 1 ordinary share dividend totaling Baht 137.31 million, a dividend of Baht 0.10 per share. The Company paid such dividends to the shareholders on 23 May 2024.
+The Board of Directors of SWP Asset Management Company Limited approved the interim dividend payment from retained earnings for the year 2023 to shareholders amounting to Baht 300 million. The cash dividend was paid at the rate of Baht 40 per share on 29 March 2024 and the Company received the dividend amounting to Baht 268 million.
+Srisawad Capital 1969 Public Company Limited
+On 29 April 2025, the Annual General Meeting approved the resolution regarding the dividend payments from net profit for the year 2024. The cash dividend was paid at the rate of Baht 0.0023 per share amounting to Baht 15.26 million. The dividend payment of 132,727,196 shares at par value of Baht 1 per share was paid to the shareholders at the rate of 50 ordinary shares per 1 ordinary share dividend totaling Baht 132.73 million, a dividend of Baht 0.02 per share. The dividend payment was made on 27 May 2025.
+On 29 April 2024, the Annual General Meeting approved the resolution regarding the dividend payments from net profit for the year 2023. The cash dividend was paid at the rate of Baht 0.0023 per share amounting to Baht 14.96 million and the Company received the cash dividend amounting to Baht 10.78 million. The dividend payment of 130,124,724 shares at par value of Baht 1 per share was paid to the shareholders at the rate of 50 ordinary shares per 1 ordinary share dividend totaling Baht 130.12 million, a dividend of Baht 0.02 per share. The Company paid such dividends to the shareholders on 23 May 2024.
+31Legal reserve
+
+[TABLE 84]
+ | Consolidated and Separate financial statements
+ | 2025 | 2024
+ | Thousand Baht | Thousand Baht
+At 1 January | 157,341 | 143,038
+Appropriation during the year | 15,736 | 14,303
+At 31 December | 173,077 | 157,341
+[/TABLE 84]
+
+Under the Public Limited Company Act. 1992, the Company must set aside at least 5% of its net profit after accumulated deficit brought forward (if any), as a legal reserve, until the reserve is more than 10% of the registered capital. The legal reserve is non-distributable.
+32Other income
+
+[TABLE 85]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Fee income | 619,064 | 594,907 | 421 | 5,065
+Insurance commission income | 1,332,510 | 1,315,409 | - | -
+Others | 883,839 | 1,108,335 | 512 | 11,407
+Total other income | 2,835,413 | 3,018,651 | 933 | 16,472
+[/TABLE 85]
+
+33Finance costs
+
+[TABLE 86]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Interest and capital cost of lease liabilities | 64,946 | 62,819 | 1,159 | 1,234
+Interest of borrowings from financial institutions | 592,473 | 932,152 | 481,683 | 535,301
+Interest and amortisation of senior debentures | 2,208,565 | 2,186,080 | 1,829,209 | 1,874,657
+Total finance costs | 2,865,984 | 3,181,051 | 2,312,051 | 2,411,192
+[/TABLE 86]
+
+34Expenses by nature
+
+[TABLE 87]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Marketing expenses | 83,999 | 119,160 | 614 | 628
+Marketing incentives | 1,181,459 | 1,494,252 | - | -
+Advisory and professional fee | 132,177 | 125,917 | 4,680 | 5,053
+Personnel expenses | 3,183,260 | 2,882,562 | 52,862 | 36,666
+Depreciation and amortisation expenses | 1,006,784 | 1,009,208 | 3,724 | 3,593
+Rental and service expenses | 32,206 | 44,895 | 693 | 693
+Specific business tax and other taxes | 447,696 | 489,527 | 1,176 | 1,553
+Utilities expenses | 252,684 | 283,968 | 545 | 687
+Fuel expenses | 134,652 | 165,256 | - | -
+Loss on sale and impairment of properties foreclosed | 515,113 | 1,748,237 | - | -
+Outsource service fees | 226,801 | 248,210 | - | -
+Other administrative expenses | 637,738 | 710,559 | 52,866 | 42,749
+Total expense | 7,834,569 | 9,321,751 | 117,160 | 91,622
+[/TABLE 87]
+
+35Income tax expense
+Income tax expenses for the years are as follows:
+
+[TABLE 88]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Current tax |  |  |  | 
+Current tax on profits for the year | 1,413,154 | 1,520,577 | 16,717 | 29,944
+Adjustment in respect of prior year | 813 | 31,412 | (34) | -
+Total current tax | 1,413,967 | 1,551,989 | 16,683 | 29,944
+Deferred tax: (Note 20) |  |  |  | 
+(Increase) decrease in deferred tax assets | (4,552) | 50,390 | (181) | 234
+Decrease in deferred tax liabilities | (62,811) | (217,219) | (632) | (312)
+Total deferred tax | (67,363) | (166,829) | (813) | (78)
+Total income tax expense | 1,346,604 | 1,385,160 | 15,870 | 29,866
+[/TABLE 88]
+
+The Group’s profit before tax differs from the theoretical amount using the basic tax rate of the companies’ home country.
+
+[TABLE 89]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Profit before tax | 6,617,324 | 6,630,815 | 1,238,061 | 427,215
+Tax calculated at a tax rate of 20% | 1,323,465 | 1,326,163 | 247,612 | 85,443
+Tax effect of: |  |  |  | 
+Income not subject to tax | (253,031) | (86,951) | (231,901) | (55,781)
+Expenses not deductible for tax purpose | 281,717 | 92,701 | 195 | 216
+Additional deductible expenses | (2,318) | (58) | (2) | (12)
+Utilisation of previously unrecognised deferred tax assets | (2,695) | (8,295) | - | -
+Tax losses for which no deferred |  |  |  | 
+income tax asset was recognised | (1,347) | 30,188 | - | -
+Adjustment in respect of prior year | 813 | 31,412 | (34) | -
+Income tax | 1,346,604 | 1,385,160 | 15,870 | 29,866
+[/TABLE 89]
+
+The weighted average income tax rate in the consolidated and separate financial statements for the year ended 31 December 2025 was 20% and 1%, respectively (2024: 21% and 7%, respectively).
+In December 2021, the Organisation for Economic Co-operation and Development (OECD) released the Pillar Two model rules to reform international corporate taxation that aim to ensure that large multinationals pay a minimum effective corporate tax rate of 15% in each jurisdiction in which they operate. In 2024, Pillar Two legislation was enacted in Thailand, the jurisdictions in which the Company is incorporated, and came into effect on 1 January 2025.
+The Group has assessed the scope of the Pillar Two model rules and concluded that the Group does not meet the revenue threshold as defined under the Pillar Two framework. Accordingly, the Group is out of scope of the Pillar Two rules and has no exposure to top‑up tax under Pillar Two.
+As a result, there is no accounting impact or current tax liability arising from the Pillar Two rules for the year ended 31 December 2025.
+36Earnings per share
+Basic earnings per share are calculated by dividing the Company’s net profit attributable to shareholders by the weighted average number of ordinary shares in issue during the year.
+
+[TABLE 90]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+Profit attributable to ordinary shareholders of the Company (Thousand Baht) | 5,021,126 | 5,051,974 | 1,222,191 | 397,349
+Weighted average number of |  |  |  | 
+ordinary shares outstanding (Thousand Shares) | 1,661,507 | 1,661,507 | 1,661,507 | 1,661,507
+Basic earnings per share (Baht per share) | 3.02 | 3.04 | 0.74 | 0.24
+[/TABLE 90]
+
+37Related-party transactions
+Enterprises and individuals that, directly or indirectly, through one more intermediaries, control, or are controlled by, or are under common control with the Company, including holding companies, subsidiaries and fellow subsidiaries are related parties of the Company. Associates and individuals owning, directly or indirectly, an interest in the voting power of the Company and subsidiaries that gives them significant influence over the enterprise, key management personnel, including directors and officers of the Company and subsidiaries and close members of the family of these individuals and companies associated with these individuals also constitute related parties.
+In considering each possible related-party relationship, attention is directed to the substance of the relationship, and not merely the legal form.
+During the year, the Group had significant business transactions with its related parties. These transactions have been conducted based on agreed upon contracts. The relationship and significant transactions can be summarised as below:
+
+[TABLE 91]
+ | Relationship
+Fast Money Co., Ltd. | Subsidiary
+Srisawad International Holding Co., Ltd. | Subsidiary
+P Lending Co., Ltd. | Subsidiary
+Srisawad Power 2014 Co., Ltd. | Subsidiary
+Srisawad Capital 1969 PCL. | Subsidiary
+Srisawad Digital Co., Ltd. | Subsidiary
+Srisawad Asset Solutions Co., Ltd. | Subsidiary
+Srisawad PICO Buriram Co, Ltd. | Subsidiary
+SWP Asset Management Co., Ltd. | Subsidiary (held by subsidiary)
+Srisawad Property Solutions Co., Ltd. | Subsidiary (held by subsidiary)
+Srisawad Property Solutions Casa Co., Ltd. | Subsidiary (held by subsidiary)
+Srisawad Leasing Lao Co., Ltd. | Subsidiary (held by subsidiary)
+SWP Services Co., Ltd. | Subsidiary (held by subsidiary)
+S Leasing Co., Ltd. | Subsidiary (held by subsidiary)
+Srisawad Power 2022 Co., Ltd. | Subsidiary (held by subsidiary)
+Cathay Leasing Co., Ltd. | Subsidiary (held by subsidiary)
+Fast Money Sawad Joint Stock Company | Subsidiary (held by subsidiary)
+Sawad Rung Reung Finance (Cambodia) PLC. | Subsidiary (held by subsidiary)
+Srisawad Power Co., Ltd. | Related party (having common directors)
+Srisamarn Condotel Co., Ltd. | Related party (having common directors)
+Srisamarn Bangkok Co., Ltd. | Related party (having common directors)
+I.D. 2007 Co., Ltd. | Related party (having common directors)
+Freewill Solutions Co., Ltd. | Related party (having common directors)
+[/TABLE 91]
+
+Transactions with related parties are as follows:
+Revenue
+
+[TABLE 92]
+ |  | Consolidated financial statements | Separate financial statements
+ |  | 2025 | 2024 | 2025 | 2024
+ | Pricing policy | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Interest income |  |  |  |  | 
+Subsidiaries | Agreed rate |  |  |  | 
+ | per contract | - | - | 2,493,826 | 2,634,776
+Dividend Income |  |  |  |  | 
+Subsidiaries | As declared | - | - | 1,160,984 | 278,782
+Guarantee income - bank loan |  |  |  |  | 
+Subsidiaries | Agreed rate |  |  |  | 
+ | per contract | - | - | 421 | 5,065
+[/TABLE 92]
+
+Expenses
+
+[TABLE 93]
+ |  | Consolidated financial statements | Separate financial statements
+ |  | 2025 | 2024 | 2025 | 2024
+ | Pricing policy | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Interest expenses - senior debentures |  |  |  |  | 
+Directors and | Rate per |  |  |  | 
+management | announcement | 1,171 | 123 | 1,171 | 123
+Interest expenses - lease liabilities |  |  |  |  | 
+Other related parties |  |  |  |  | 
+(having common | Agreed rate |  |  |  | 
+directors) | per contract | 15,672 | 15,147 | 1,134 | 1,210
+Directors | Agreed rate |  |  |  | 
+ | per contract | 1,061 | 123 | - | -
+Rent |  |  |  |  | 
+Other related parties |  |  |  |  | 
+(having common | Agreed rate |  |  |  | 
+directors) | per contract | 8,694 | 8,787 | 693 | 693
+Management fee |  |  |  |  | 
+Other related parties |  |  |  |  | 
+(having common | Agreed rate |  |  |  | 
+directors) | per contract | 443 | 443 | - | -
+[/TABLE 93]
+
+Key management and directors’ compensation
+
+[TABLE 94]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Short-term employee benefits | 126,602 | 131,578 | 49,858 | 45,045
+Post-employment benefits | 7,086 | 8,091 | 2,296 | 2,368
+Total | 133,688 | 139,669 | 52,154 | 47,413
+[/TABLE 94]
+
+Other current receivables
+
+[TABLE 95]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Amounts due from related parties |  |  |  | 
+Subsidiaries | - | - | 1,213 | 1,209
+Other related parties (having common directors) | 328 | - | - | -
+Total (Note 12) | 328 | - | 1,213 | 1,209
+Advances |  |  |  | 
+Director | 20,000 | - | 20,000 | -
+Total | 20,000 | - | 20,000 | -
+[/TABLE 95]
+
+Other non current assets
+
+[TABLE 96]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Rent deposits |  |  |  | 
+Other related parties |  |  |  | 
+(having common directors) | 4,407 | 4,407 | 287 | 287
+[/TABLE 96]
+
+Short-term loans to related parties and accrued interest receivables
+
+[TABLE 97]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Subsidiaries |  |  |  | 
+Short-term loans | - | - | 47,939,400 | 48,842,400
+Accrued interest receivables from short-term loans | - | - | 1,279,639 | 1,270,420
+Total | - | - | 49,219,039 | 50,112,820
+[/TABLE 97]
+
+Movements of short-term loans to related parties for the years are as follows:
+
+[TABLE 98]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Subsidiaries |  |  |  | 
+As at 1 January | - | - | 50,112,820 | 43,529,464
+Loan additions during the year | - | - | 11,832,500 | 14,306,400
+Interest income during the year | - | - | 2,493,826 | 2,465,236
+Loan repayments during the year | - | - | (12,735,500) | (8,000,000)
+Interest received during the year | - | - | (2,484,607) | (2,188,280)
+As at 31 December | - | - | 49,219,039 | 50,112,820
+[/TABLE 98]
+
+As at 31 December 2025, unsecured short-term loans to related parties are due at call or at maturity. The loans bear interest of 5.03% per annum (2024: 5.26% per annum).
+Short-term borrowings from related party
+
+[TABLE 99]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Related party |  |  |  | 
+Short-term borrowing | 45,000 | 40,000 | - | -
+Total | 45,000 | 40,000 | - | -
+[/TABLE 99]
+
+The movements of short-term borrowings from related party for the years are as follows:
+
+[TABLE 100]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Related party |  |  |  | 
+As at 1 January | 40,000 | 1,000,000 | - | -
+Borrowing additions during the year | 85,000 | 5,080,000 | - | -
+Borrowing repayments during the year | (80,000) | (6,040,000) | - | -
+As at 31 December | 45,000 | 40,000 | - | -
+[/TABLE 100]
+
+As at 31 December 2025, unsecured short-term borrowings from related party bears interest rate as agreed per contract and is due at call.
+Other current payables
+
+[TABLE 101]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Amounts due to related parties |  |  |  | 
+Subsidiaries | - | - | 8,981 | 10,478
+Other related parties |  |  |  | 
+(having common directors) | 553 | 593 | - | -
+Directors | 40 | 537 | - | -
+Total (Note 23) | 593 | 1,130 | 8,981 | 10,478
+[/TABLE 101]
+
+Obligations under lease liabilities
+
+[TABLE 102]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Other related parties |  |  |  | 
+(having common directors) | 301,965 | 317,925 | 21,616 | 23,074
+Director | 10,853 | 472 | - | -
+Total | 312,818 | 318,397 | 21,616 | 23,074
+[/TABLE 102]
+
+The movements of obligations under lease liabilities for the years are as follows:
+
+[TABLE 103]
+ | Consolidated financial statements | Separate financial statements
+ | 2025 | 2024 | 2025 | 2024
+ | Thousand Baht | Thousand Baht | Thousand Baht | Thousand Baht
+Other related parties (having common directors) | 317,925 | 306,681 | 23,074 | 24,456
+As at 1 January | 18,845 | 44,557 | - | -
+Payments | (34,755) | (32,378) | (1,458) | (1,382)
+Other movements | (50) | (935) | - | -
+As at 31 December | 301,965 | 317,925 | 21,616 | 23,074
+Directors |  |  |  | 
+As at 1 January | 472 | 6,292 | - | -
+Additions | 15,247 | - | - | -
+Payments | (5,519) | (5,820) | - | -
+Other movements | 653 | - | - | -
+As at 31 December | 10,853 | 472 | - | -
+[/TABLE 103]
+
+Guarantee
+As at 31 December 2025, the Company and a subsidiary jointly guaranteed for joint credit facilities of another subsidiary of Baht 250 million (31 December 2024: Baht 500 million). The Company also has guaranteed for promissory notes and long-term borrowings from financial institution of the subsidiaries total Baht 825 million(31 December 2024: Baht 4,656 million).
+38Capital expenditure commitments
+As at 31 December 2025, the Group had capital expenditure commitments in respect of the acquisition and development of intangible assets which had not yet been recognised as liabilities in the financial statements, amounting to Baht 46.99 million (31 December 2024: none).
+39Event after the statement of financial position date
+Srisawad Corporation Public Company Limited
+On 12 and 19 January 2026, the Company established Srisawad PICO Ubon Rachathani Company Limited and Srisawad PICO Nakhon Ratchasima Company Limited respectively to conduct PICO finance business with the registered ordinary shares of 100,000 shares with par value of Baht 100 of which the Company invested in 99,998 ordinary shares in each company which represented 99.99% of total share capital.
+On 27 February 2026, the Board of Directors Meeting No. 2/2026 approved the payment of dividends in cash fromthe operating results for the year 2025 totaling Baht 1,163.05 million, or Baht 0.70 per share, representing a dividend payout ratio of 95.16% of net profit. The Company paid an interim dividend to shareholders on 22 October 2025 at Baht 0.35 per share and will pay an additional dividend of Baht 0.35 per share. The resolutions will be proposed to the Annual General Meeting of Shareholders for the year 2026 for consideration and approval.
+Srisawad Capital 1969 Public Company Limited
+On 27 February 2026, the Board of Directors Meeting No.1/2026 passed a resolution to approve dividend payment from the operating results for the year 2025 and retained earnings. The dividend will be paid by cash at the rate of Baht 0.07 per share amounting to Baht 473.84 million. The resolution will be proposed to the Annual General Meeting of Shareholders in the year 2026 for consideration and approval.

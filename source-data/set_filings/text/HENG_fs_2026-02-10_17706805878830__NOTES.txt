@@ -1,0 +1,997 @@
+Heng Leasing and Capital Public Company Limited
+Notes to financial statements
+For the year ended 31 December 2025
+General information
+Heng Leasing and Capital Public Company Limited (“the Company”) is a public company incorporated and domiciled in Thailand. The Company is principally engaged in the providing financial services specifically hire purchase, loans secured against vehicle registrations, land and building loans, personal loan and nano finance without collateral. The Company’s registered address is 69 Moo 7, Tambon Sansai Noi, Amphur Sansai, Chiang Mai.                     The Company has 743 branches (2024: 1,018 branches).
+Basis for the preparation of financial statements
+The financial statements have been prepared in accordance with Thai Financial Reporting Standards enunciated under the Accounting Professions Act B.E. 2547 and their presentation has been made in compliance with the stipulations of the Notification of the Department of Business Development, issued under the Accounting Act B.E. 2543.
+The financial statements in Thai language are the official statutory financial statements of the Company. The financial statements in English language have been translated from the Thai language financial statements.
+The financial statements have been prepared on a historical cost basis except where otherwise disclosed in the accounting policies.
+New financial reporting standards
+3.1 Financial reporting standards that became effective in the current year
+During the year, the Company has adopted the revised financial reporting standards which are effective for fiscal years beginning on or after 1 January 2025. These financial reporting standards were aimed at alignment with the corresponding International Financial Reporting Standards with most of the changes directed towards clarifying accounting treatment and providing accounting guidance for users of the standards.
+The adoption of these financial reporting standards does not have any significant impact on the Company’s financial statements.
+3.2Financial reporting standard that will become effective for fiscal years beginning on or after 1 January 2026
+The Federation of Accounting Professions issued a revised financial reporting standard, which is effective for fiscal years beginning on or after 1 January 2026. This financial reporting standard was aimed at alignment with the corresponding International Financial Reporting Standards with most of the changes directed towards clarifying accounting treatment and providing accounting guidance for users of the standards.
+The management of the Company believes that adoption of these amendments will not have any significant impact on the Company’s financial statements.
+Accounting policies
+4.1Revenue recognition
+a)Interest income from loan to customer
+The Company has recognised interest income from hire purchase and loan receivables on an accrual basis throughout the term of the contract, using the effective interest rate method and the calculation based on the gross carrying amounts of the hire purchase and loan receivables.
+When the hire purchase and loan receivables subsequently become credit-impaired, interest income is calculated by using the effective interest rate method on the net carrying amount (gross book value net of an allowance for expected credit losses) of the receivables.
+Initial direct income and costs at the inception of hire purchase and loan arrangement are to be deferred and amortised using the effective interest rate method, with amortisation deducted from interest income from hire purchase and loan receivables throughout the contract period to reflect the effective rate of return on the contracts.
+b)Fee and service income
+Fee and service income are recognised on accrual basis, except fees that are integral part of effective interest rate and fee income from late payment are recognised when received.
+4.2Expense recognition - Interest expenses
+Interest expenses are charged to expenses on an accrual basis.
+4.3Financial Instruments
+Classification and measurement of financial assets and financial liabilities
+Financial asset
+The Company classifies its financial assets - debt instruments, such as hire purchase and loan receivables as subsequently measured at amortised cost or fair value in accordance with the Company’ business model for managing the financial assets and the contractual cash flows characteristics of the financial assets. All financial assets of the Company are classified and measured at amortised cost because of following conditions are met: the financial asset is held within a business model whose objective is to hold financial assets in order to collect contractual cash flows and the contractual terms of the financial assets give rise on specified dates to cash flows that are solely payments of principal and interest on the principal amount outstanding. These financial assets are initially measured at its fair value plus transaction costs and subsequently measured at amortised cost net of allowance for expected credit loss (if any).
+Financial liabilities
+The Company classify financial liabilities as measured at amortised cost. Financial liabilities are initially recognised at fair value net of transaction costs and subsequently measured at amortised cost calculated using effective interest rate method.
+Offsetting
+Financial assets and financial liabilities are offset, and the net amount is presented in the statement of financial position when the Company has a legal right to offset the amounts and intends to settle on a net basis or to realise the asset and settle the liability simultaneously.
+Derecognition of financial instruments
+The Company derecognises a financial asset when the contractual cash flows from the asset expire or it transfers its rights to receive contractual cash flows on the financial asset in a transaction in which all or substantially all the risks and rewards of ownership are transferred. Any interest from transferred financial assets, which is created or retained by the Company, are still recognised as financial assets.
+A financial liability is derecognised when the obligation under the liability is discharged or cancelled or expires.
+4.4Cash and cash equivalents
+Cash and cash equivalents consist of cash in hand and cash at banks, and all highly liquid investments with an original maturity of three months or less and not subject to withdrawal restrictions.
+4.5Hire purchase receivables/Loan receivables
+Hire purchase receivables are stated at the contract value net of unearned hire purchase, which is presented after net of initial direct income and costs at the inception of the contracts.
+Loan receivables are stated at the principal amount and accrued interest receivables, which is presented after net of initial direct income and costs at the inception of the contracts.
+4.6Allowance for expected credit losses
+The Company applies the General Approach to calculate the expected credit losses on its financial assets, such as deposits at financial institutions and hire purchase and loan receivables.
+The Company classifies its financial assets into three stages (three-stage approach) to measure the value of the expected credit losses, with the classification of the financial assets determined on the basis of the change in credit risk since initial recognition as follows:
+Stage 1: Financial assets where there has not been a significant increase in credit risk (Performing)
+For the financial assets where there has not been a significant increase in credit risk since initial recognition, the Company recognises allowance for expected credit losses at the amount equal to the 12month expected credit losses.
+Stage 2: Financial assets where there has been a significant increase in credit risk (Under-Performing)
+For financial assets where there has been a significant increase in credit risk since initial recognition but not credit-impaired, the Company recognises allowance for expected credit losses at on amount equal to the lifetime expected credit losses of the financial assets.
+Stage 3: Financial assets that are credit-impaired (Non-performing)
+For financial assets are assessed as credit-impaired, the Company recognises expected credit losses in an amount equal to the lifetime expected credit losses of the financial assets.
+At the end of each reporting period, the Company assesses whether there has been a significant increase in credit risk of financial assets since initial recognition by comparing the risk of default at the reporting date with the risk of default at the date of initial recognition.In determining whether credit risk has increased significantly since initial recognition, the Company may uses internal quantitative and qualitative indicators and forecasts information to assess the deterioration in the credit quality of financial assets such as arrears of over      30 days past due. The Company assesses whether the credit risk has increased significantly from the date of initial recognition on an individual or a collective basis.
+Hire purchase/loan receivables are assessed to be credit-impaired when one or more events that have a detrimental impact on the estimated future cash flows of receivables have occurred. Evidence of credit-impaired receivables includes arrears of over 90 days past due or having indications that the borrower is experiencing significant financial difficulty, the legal status, renegotiation of terms or distressed restructuring.
+In subsequent periods, if the credit quality of financial assets improves and the assessment is that the significant increase in credit risk from the initial recognition date that was assessed in the previous period no longer applies, the Company will change from recognising expected credit losses over the expected lifetime to recognising the 12month expected credit losses.
+Hire purchase and loan receivables that have been renegotiated or changed in terms of the contractual cash flows due to a deterioration in the debtor’s condition is usually considered to be significant increase in credit risk or credit-impaired unless there is evidence that the risk of not receiving contractual cash flows has reduced significantly and there are no other indicators of impairment.
+Expected credit losses are the probability-weighted estimate of expected credit losses over the lifetime of the financial assets, taking into account the present value of all cash that are expected not to be recoverable based on historical loss information for a group of assets that the Company considers having shared credit risk characteristics, taking into account type of collateral, months on books, and other relevant factors, adjusted for current observable data, as well as forward-looking information that is supportable and reasonable, provided it can be shown to be statistically related. It also involves the appropriate exercise of judgement to estimate the amount of expected credit losses, using macroeconomic data. The Company determines both current and future economic scenario, and probability-weighted each scenario (base-case scenario, best-case scenario and worst-case scenario) for the purpose of calculating expected credit losses. Use of forward-looking data increases the degree of judgement required in evaluating how relevant current macroeconomic changes affect expected credit losses. However, the Company has established a process to review and monitor methodologies, assumptions and forward-looking economic scenario on a regular basis. In addition, a management overlay is applied to account for factors that are not captured by the model.
+Increase (decrease) in an allowance for expected credit loss is recognised as expenses in profit or loss in the statements of comprehensive income. The Company has a policy to  write-off receivables when it has made appropriate efforts at recovery, for which there is clear evidence, and debts remain unsettled.
+4.7Financial assets with modifications of terms/Debt restructuring
+When a financial asset’s terms of repayment are renegotiated or modified, or debt is restructured, or an existing financial asset is replaced with a new financial asset because a debtor is having financial difficulties, the Company assesses whether to derecognise the financial asset and measures the expected credit losses, as follows:
+-If the modification of terms does not result in derecognition of the financial asset, the Company calculates the gross book value of the new financial asset based on the present value of the new or modified cash flows, discounted using the original effective interest rate of the financial asset, and recognises a gain or loss on modification of terms in profit or loss.
+-If the modification of terms results in derecognition of the financial asset, the fair value of the new financial asset is the latest cash flows of the original financial asset as at the date of derecognition. The difference between the book value and the fair value of the financial asset is recognised in profit or loss.
+In cases where debt restructuring does not result in derecognition, a debtor is classified as a financial asset with a significant increase in credit risk (Stage 2) until the debtor is able to make payment in accordance with the debt restructuring agreement for the longer of                  3 consecutive months or 3 installments, or the debtor is reclassified as credit-impaired             (Stage 3). A debtor is classified at the same stage until payment is made in compliance with the debt restructuring agreement for not less than 12 months from the restructuring date, when the debtor is classified as a financial asset without a significant increase in credit risk (Stage 1). If the debt restructuring results in derecognition, the new financial asset is treated as a financial asset where there has not been a significant increase in credit risk (Performing or Stage 1).
+4.8Assets foreclosed
+Assets foreclosed are assets seized from hire purchase and loan receivables and stated at the lower of cost or net realisable value net of allowance for loss on impairment (if any).
+Gain (loss) on disposal of assets foreclosed are recognised in profit or loss in the statements of comprehensive income upon disposal.
+Loss on impairment (if any) is recognised as an expense in the statements of comprehensive income.
+4.9Land, buildings and equipment and depreciation
+Land is stated at cost. Buildings and equipment are stated at cost less accumulated depreciation and allowance for impairment (if any).
+Depreciation of buildings and equipment is calculated by reference to their costs on a   straight-line basis over the following estimated useful lives:
+
+[TABLE 1]
+Building |  | 10 years
+Building improvement |  | Not more than 10 years
+Furniture and office equipment |  | 5 years
+Computers and equipment |  | 5 years
+Motor vehicles |  | 7 years
+[/TABLE 1]
+
+Depreciation is included in determining income.
+No depreciation is provided on land and assets under construction.
+An item of land, buildings and equipment is derecognised upon disposal or when no future economic benefits are expected from its use or disposal. Any gain or loss arising on disposal of an asset is recognised in profit or loss in the statement of comprehensive income when the assets are derecognised.
+4.10Lease liabilities
+At inception of contact, the Company assesses whether a contract is, or contains, a lease.   A contract is, or contains, a lease if the contract conveys the right to control the use of an identified asset for a period of time in exchange for consideration.
+The Company applies a single recognition and measurement approach of all leases, except for short-term leases and leases of low-value assets. The Company recognise right-of-use assets, which represent the right to use underlying assets and lease liabilities based on lease payment.
+Right-of-use assets
+At the commencement date of the lease, the Company is measured right-of-use assets at cost, less accumulated depreciation and any accumulated impairment loss, and adjusted for any remeasurement of lease liabilities. The cost of right-of-use assets includes the amount of lease liabilities initially recognised, initial direct costs incurred, and lease payments made at or before the commencement date of the lease and less any lease incentives received.
+Depreciation of right-of-use assets are calculated by reference to their costs, on the          straight-line basis over the shorter of their useful lives and the lease term as follows:
+
+[TABLE 2]
+Buildings | Not more than 10 years
+Office equipment | 4 years
+Vehicles | 3 - 5 years
+[/TABLE 2]
+
+If ownership of the leased asset is transfers to the Company at the end of the lease term or the cost of such asset reflects the exercise of a purchase option, depreciation is calculated using the estimated useful life of the asset.
+The Company is to assess the impairment of the right-of-use assets as discussed in the note to the financial statements on impairment of non-financial assets.
+Lease liabilities
+Lease liabilities are measured at the present value of the lease payments to be made over the lease term. The lease payments include fixed payments less any lease incentives receivable.
+The Company discounted the present value of the lease payments by the Company’s incremental borrowing rate. After the commencement date, the amount of lease liabilities is increased to reflect the accretion of interest and reduced for the lease payments made. In addition, the carrying amount of lease liabilities is remeasured if there is a change in the lease term, a change in the lease payments or a change in the assessment of an option to purchase the underlying asset.
+Short-term leases and leases of low-value assets
+A lease that has a lease term less than or equal to 12 months from commencement date or a lease of low-value assets is recognised as expenses on a straight-line basis over the lease term.
+4.11Intangible assets
+Intangible assets are initially recognised at cost. Following the initial recognition, the intangible assets are carried at cost less any accumulated amortisation and any accumulated impairment loss (if any).
+Intangible assets with finite lives are amortised on a systematic basis over the economic useful life and tested for impairment whenever there is an indication that the intangible asset may be impaired. The amortisation period and the amortisation method of such intangible assets are reviewed at least at each financial year end. The amortisation expense is charged to profit or loss.
+The Company’s intangible assets are computer software, that have useful lives of approximately 1 - 3 years.
+4.12Impairment of non-financial assets
+At the end of each reporting period, the Company performs impairment reviews in respect of the property, plant and equipment, right-of-use assets or intangible assets whenever events or changes in circumstances indicate that an asset may be impaired. An impairment loss is recognised when the recoverable amount of an asset, which is the higher of the asset’s fair value less costs to sell and its value in use, is less than the carrying amount.
+An impairment loss is recognised in profit or loss in statements of comprehensive income             (if any).
+4.13Employee benefits
+a)Short-term employee benefits
+Salaries, wages, bonuses and contributions to the social security fund are recognised as expenses when incurred.
+b)Post-employment benefits (Defined contribution plans)
+The Company and its employees have jointly established a provident fund. The fund is monthly contributed by employees and by the Company. The fund’s assets are held in a separate trust fund and the Company’s contributions are recognised as expenses when incurred.
+c)Post-employment benefits (Defined benefit plans)
+The Company has obligations in respect of the severance payments it must make to employees upon retirement under labor law. The Company treats these severance payment obligations as a defined benefit plan.
+The obligation under the defined benefit plan is determined by a professionally qualified independent actuary based on actuarial techniques, using the projected unit credit method.
+Actuarial gain and loss arising from post-employment benefits are recognised immediately in other comprehensive income.
+4.14Income tax
+Income tax expense represents the sum of corporate income tax currently payable and deferred tax.
+Current tax
+Current income tax is provided in the accounts at the amount expected to be paid to the taxation authorities, based on taxable profits determined in accordance with tax legislation.
+Deferred tax
+Deferred income tax is provided on temporary differences between the tax bases of assets and liabilities and their carrying amounts at the end of each reporting period, using the tax rates enacted at the end of the reporting period.
+The Company recognise deferred tax liabilities for all taxable temporary differences while they recognise deferred tax assets for all deductible temporary differences to the extent that it is probable that future taxable profit will be available against which such deductible temporary differences can be utilised.
+At each reporting date, the Company review and reduces the carrying amount of deferred tax assets to the extent that it is no longer probable that sufficient taxable profit will be available to allow all or part of the deferred tax asset to be utilised.
+The Company record deferred tax directly to shareholders' equity if the tax relates to items that are recorded directly to shareholders' equity.
+4.15Related party transactions
+Related parties comprise individuals or enterprises that control, or are controlled by, the Company, whether directly or indirectly, or which are under common control with the Company.
+They also include individuals or enterprises which directly or indirectly own a voting interest in the Company that gives them significant influence over the Company, key management personnel, directors, and officers with authority in the planning and direction of the Company’s operations.
+4.16Provisions
+Provisions are recognised when the Company have a present obligation as a result of a past event, it is probable that an outflow of resources embodying economic benefits will be required to settle the obligation, and a reliable estimate can be made of the amount of the obligation.
+4.17Fair value measurement
+Fair value is the price that would be received from sell an asset or paid to transfer a liability in an orderly transaction between buyer and seller (market participants) at the measurement date. The Company apply a quoted market price in an active market to measure their assets and liabilities that are required to be measured at fair value by relevant financial reporting standards, except in case of no active market of an identical asset or liability or when a quoted market price is not available, the Company measure fair value using valuation technique that are appropriate in the circumstances and maximises the use of relevant observable inputs related to assets and liabilities that are required to be measured at fair value.
+All assets and liabilities for which fair value is measured or disclosed in the financial statements are categorised within the fair value hierarchy into three levels based on categorise of input to be used in fair value measurement as follows:
+Level 1Use of quoted market prices in an observable active market for such assets or liabilities
+Level 2Use of other observable inputs for such assets or liabilities, whether directly or indirectly
+Level 3Use of unobservable inputs such as estimates of future cash flows
+At the end of each reporting period, the Company determines whether transfers have occurred between levels within the fair value hierarchy for assets and liabilities held at the end of the reporting period that are measured at fair value on a recurring basis.
+Significant accounting judgements and estimates
+The preparation of financial statements in conformity with financial reporting standards at times requires management to make subjective judgements and estimates regarding matters that are inherently uncertain. These judgements and estimates affect reported amounts and disclosures; and actual results could differ from these estimates. Significant judgements and estimates are as follows:
+5.1Allowance for expected credit losses of hire purchase/loan receivables
+The management is required to use judgement in estimation in determining the allowance for expected credit losses of hire purchase and loan receivables. The Company’s calculation of allowance for expected credit losses based on complex models, a series of assumptions and assessments related to the increase in credit risk, as well as designation of forward-looking information. The estimates involve numerous variables; therefore, actual results may differ from the estimates.
+5.2Allowance for impairment of assets foreclosed
+In determining allowance for impairment of assets foreclosed, management apply judgment in estimating the anticipated loss on such assets, based on analysis of various factors, including net realisable value, historical sales data and the prevailing economic condition.
+5.3Land, buildings and equipment and depreciation
+In determining depreciation of buildings and equipment, the management is required to make estimates of the useful lives and residual values of the buildings and equipment and to review estimate useful lives and residual values when there are any changes.
+In addition, the management is required to review land, buildings and equipment for impairment on a periodical basis and record impairment loss when it is determined that their recoverable amount is lower than the carrying amount. This requires judgements regarding forecast of future revenues and expenses relating to the assets subject to the review.
+5.4Leases - lessee
+Determining the lease term of contracts with renewal and termination options
+In determining the lease term, the management is required to use judgement in evaluating whether it is reasonably certain whether or not to exercise the option to renew or terminate the lease considering all relevant facts and circumstances that create an economic incentive for it to exercise either the renewal or termination.
+Incremental borrowing rate
+The Company is unable to determine the interest rate implicit the lease agreement. Therefore, the Company's incremental loan interest rate is used to discount the lease liability. The marginal borrowing rate is the rate of interest that the Company would have pay to borrow over a similar term, and with a similar security, the funds necessary to obtain an asset of a similar value to the right-of-use asset in a similar economic environment.
+5.5Deferred tax assets
+Deferred tax assets are recognised for deductible temporary differences to the extent that it is probable that taxable profit will be available against which the temporary differences. Significant management judgement is required to determine the amount of deferred tax assets that can be recognised, based upon the likely timing and level of estimate future taxable profits.
+5.6Post-employment benefits under defined benefit plans
+The obligation under the defined benefit plan is determined based on actuarial techniques. Such determination is made based on various assumptions, including discount rate, future salary increase rate, mortality rate and staff turnover rate.
+5.7Fair value of financial instruments
+In determining the fair value of financial instruments that are not actively traded and for which quoted market prices are not readily available, the management exercise judgement, using a variety of valuation techniques and models. The input to these models is taken from observable markets, and includes consideration of credit risk, liquidity, correlation and         longer-term volatility of financial instruments. Change in assumptions about these factors could affect the fair value and disclosures of fair value hierarchy.
+Cash and cash equivalents
+
+[TABLE 3]
+(Unit: Thousand Baht)
+ | 2025 | 2024
+Cash | 644 | 713
+Bank deposits - savings accounts | 39,845 | 55,612
+Bank deposits - current accounts | 69,089 | 39,617
+Total | 109,578 | 95,942
+Less: Deposits at banks for premium that the Company received from policy holders | (5,054) | (12,025)
+Total | 104,524 | 83,917
+[/TABLE 3]
+
+As at 31 December 2025, bank deposits in savings accounts carried interest at rates between 0.10 - 0.65 percent per annum (2024: 0.10 - 0.95 percent per annum) as announced by the banks.
+As at 31 December 2025, the outstanding balance amounting to Baht 5 million                    (2024: Baht 12 million) represented bank deposits for premiums that the Company received from policy holders. The Company must submit these premiums to insurers, and not use or exploit or deduct any expense from premiums as stated in the brokerage contracts.
+Hire purchase receivables
+7.1 As at 31 December 2025 and 2024, the contracted terms of the Company’s hire purchase receivables are 12 - 84 installments with payments to be made in equal installments and interest charged at fixed rates throughout the contracts. Hire purchase receivables classified by due date per agreement are as follows:
+
+[TABLE 4]
+ | (Unit: Thousand Baht)
+ | 2025
+ | Portion due within one year (2) | Portion due over one year but within   two years | Portion due over two years but within three years | Portion due over three years but within            four years | Portion due over four years but within five years | Portion due over five years | Total
+Hire purchase receivables | 1,154,499 | 760,739 | 478,864 | 220,744 | 84,655 | 23,405 | 2,722,906
+Less:Unearned hire purchase income (1) | (256,852) | (137,521) | (65,229) | (24,513) | (7,248) | (1,343) | (492,706)
+Undue output Vat | (71,560) | (49,768) | (31,328) | (14,441) | (5,538) | (1,531) | (174,166)
+Present value of the minimum lease payment receivables | 826,087 | 573,450 | 382,307 | 181,790 | 71,869 | 20,531 | 2,056,034
+Less: Allowance for expected credit losses | (119,000) | (29,647) | (25,282) | (16,012) | (7,849) | (2,799) | (200,589)
+Net hire purchase receivables | 707,087 | 543,803 | 357,025 | 165,778 | 64,020 | 17,732 | 1,855,445
+[/TABLE 4]
+
+(1) Presented net of deferred initial direct income and costs of hire purchase.
+(2) The balance of hire purchase receivables due within 1 year included receivables that are credit impaired.
+
+[TABLE 5]
+ | (Unit: Thousand Baht)
+ | 2024
+ | Portion due within one year (2) | Portion due over one year but within   two years | Portion due over two years but within three years | Portion due over three years but within          four years | Portion due over four years but within five years | Portion due over five years | Total
+Hire purchase receivables | 1,712,238 | 1,177,124 | 782,004 | 426,380 | 165,127 | 53,350 | 4,316,223
+Less:Unearned hire purchase income (1) | (418,667) | (243,196) | (125,965) | (52,508) | (16,178) | (3,703) | (860,217)
+Undue output Vat | (105,517) | (77,008) | (51,159) | (27,894) | (10,803) | (3,490) | (275,871)
+Present value of the minimum lease payment receivables | 1,188,054 | 856,920 | 604,880 | 345,978 | 138,146 | 46,157 | 3,180,135
+Less: Allowance for expected credit losses | (149,626) | (37,657) | (33,303) | (23,379) | (12,540) | (6,006) | (262,511)
+Net hire purchase receivables | 1,038,428 | 819,263 | 571,577 | 322,599 | 125,606 | 40,151 | 2,917,624
+[/TABLE 5]
+
+(1) Presented net of deferred initial direct income and costs of hire purchase.
+(2) The balance of hire purchase receivables due within 1 year included receivables that are credit impaired.
+7.2 As at 31 December 2025 and 2024, the balances of hire purchase receivables are classified by credit risk and allowance for expected credit losses as follows:
+
+[TABLE 6]
+ |  | (Unit: Thousand Baht)
+ | Hire purchase receivables - net of unearned hire purchase income (1) | Allowance for expected                  credit losses
+ | 2025 | 2024 | 2025 | 2024
+Hire purchase receivables without a significant increase in credit risk (Performing) | 1,320,344 | 2,047,974 | 13,459 | 17,791
+Hire purchase receivables with a significant increase in credit risk                               (Under-performing) | 545,809 | 864,241 | 86,105 | 120,155
+Hire purchase receivables with credit impaired (Non-performing) | 189,881 | 267,920 | 101,025 | 124,565
+Total | 2,056,034 | 3,180,135 | 200,589 | 262,511
+[/TABLE 6]
+
+Presented net of deferred initial direct income and costs of hire purchase.
+7.3As at 31 December 2025, hire purchase receivables amounting to Baht 1,027 million (net of unearned hire purchase income) were pledged to secure credit facilities from commercial banks (2024: Baht 1,464 million), as discussed in Notes 16 and 21 to the financial statements.
+Loan receivables
+8.1As at 31 December 2025 and 2024, the contracted terms of the Company’s loan receivables are 1 - 84 installments with payments to be made in equal installments and interest charged at fixed rates throughout in the contracts. Loan receivables classified by due date per agreement are as follows:
+
+[TABLE 7]
+ | (Unit: Thousand Baht)
+ | 2025
+ | Amounts due within 1 year (2) | Amounts due over 1 year | Total
+Loan receivables | 2,394,579 | 4,553,510 | 6,948,089
+Add: Deferred financial expenses (1) | 11,948 | 20,023 | 31,971
+Accrued interest receivables | 376,647 | - | 376,647
+Total | 2,783,174 | 4,573,533 | 7,356,707
+Less: Allowance for expected credit losses | (355,403) | (246,834) | (602,237)
+Loan receivables - net | 2,427,771 | 4,326,699 | 6,754,470
+[/TABLE 7]
+
+Presented net of deferred initial direct income and costs of loan.
+The balance of loan receivables due within 1 year includes receivables that are credit impaired.
+
+[TABLE 8]
+ | (Unit: Thousand Baht)
+ | 2024
+ | Amounts due within 1 year (2) | Amounts due over 1 year | Total
+Loan receivables | 2,908,424 | 6,670,690 | 9,579,114
+Add: Deferred financial expenses (1) | 15,869 | 38,389 | 54,258
+Accrued interest receivables | 392,709 | - | 392,709
+Total | 3,317,002 | 6,709,079 | 10,026,081
+Less: Allowance for expected credit losses | (343,064) | (286,177) | (629,241)
+Loan receivables - net | 2,973,938 | 6,422,902 | 9,396,840
+[/TABLE 8]
+
+(1)Presented net of deferred initial direct income and costs of loan.
+(2)The balance of loan receivables due within 1 year includes receivables that are credit impaired.
+8.2As at 31 December 2025 and 2024, the balances of loan receivables are classified by credit risk and allowance for expected credit losses as follows:
+
+[TABLE 9]
+ |  | (Unit: Thousand Baht)
+ | Loan receivables and accrued             interest income (1) | Allowance for expected                credit losses
+ | 2025 | 2024 | 2025 | 2024
+Loan receivables without a significant increase in credit risk (Performing) | 5,337,269 | 7,663,576 | 54,937 | 82,114
+Loan receivables with a significant increase in credit risk (Under-performing) | 1,506,419 | 1,804,247 | 267,534 | 292,506
+Loan receivables with credit impaired (Non-performing) | 513,019 | 558,258 | 279,766 | 254,621
+Total | 7,356,707 | 10,026,081 | 602,237 | 629,241
+[/TABLE 9]
+
+Presented net of deferred initial direct income and costs of loan.
+8.3As at 31 December 2025, loan receivables amounting to Baht 4,076 million (net of unearned financial income and deferred financial expenses) were pledged to secure credit facilities from commercial banks (2024: Baht 5,249 million), as discussed in Notes 16 and 21 to the financial statements.
+Allowance for expected credit losses
+Movements of allowance for expected credit losses (ECL) of hire purchase and loan receivables are as follows:
+
+[TABLE 10]
+(Unit: Thousand Baht)
+ | For the year ended 31 December 2025
+ | 12-month ECL (Stage 1) | Lifetime                     ECL - not credit impaired (Stage 2) | Lifetime        ECL - credit impaired (Stage 3) | Total
+Beginning balance | 99,905 | 412,661 | 379,186 | 891,752
+Stage changes | 70,780 | (126,923) | 56,143 | -
+Changes due to revaluation of allowance for credit loss | (80,780) | 13,602 | 747,866 | 680,688
+New financial assets acquired | 22,930 | 257,612 | 57,550 | 338,092
+Derecognition of financial assets | (44,439) | (203,313) | (55,630) | (303,382)
+Bad debt written-off | - | - | (804,324) | (804,324)
+Ending balance | 68,396 | 353,639 | 380,791 | 802,826
+[/TABLE 10]
+
+
+[TABLE 11]
+(Unit: Thousand Baht)
+ | For the year ended 31 December 2024
+ | 12-month ECL (Stage 1) | Lifetime                     ECL - not credit impaired (Stage 2) | Lifetime        ECL - credit impaired (Stage 3) | Total
+Beginning balance | 188,339 | 194,369 | 241,845 | 624,553
+Stage changes | (24,370) | (20,328) | 44,698 | -
+Changes due to revaluation of allowance for credit loss | (34,529) | 77,427 | 631,161 | 674,059
+New financial assets acquired | 45,550 | 261,451 | 80,295 | 387,296
+Derecognition of financial assets | (75,085) | (100,258) | (30,072) | (205,415)
+Bad debt written-off | - | - | (588,741) | (588,741)
+Ending balance | 99,905 | 412,661 | 379,186 | 891,752
+[/TABLE 11]
+
+Other current receivables
+
+[TABLE 12]
+ | (Unit: Thousand Baht)
+ | 2025 | 2024
+Corporate income tax receivable | 34,355 | -
+Prepaid expenses | 8,032 | 9,517
+Accrued commission income | 814 | 3,407
+Deferred expense | 2,842 | 4,251
+Others | 8,526 | 5,430
+Total | 54,569 | 22,605
+[/TABLE 12]
+
+Assets foreclosed
+
+[TABLE 13]
+ | (Unit: Thousand Baht)
+ | 2025 | 2024
+Assets foreclosed - cost | 33,012 | 42,086
+Less: Allowance for impairment | (10,300) | (15,811)
+Assets foreclosed - net | 22,712 | 26,275
+[/TABLE 13]
+
+Land, building and equipment
+
+[TABLE 14]
+(Unit: Thousand Baht)
+ | Land | Buildings and Building improvements | Furniture and office equipment | Computers and equipment | Motor vehicles | Construction in progress | Total
+Cost |  |  |  |  |  |  | 
+1 January 2024 | 6,965 | 147,062 | 97,981 | 58,891 | 62,398 | 663 | 373,960
+Additions | - | 14,483 | 16,603 | - | 7,380 | 6,293 | 44,759
+Disposals/written-off | - | (578) | (444) | (2,443) | (549) | - | (4,014)
+Transfer in (Transfer out) | - | 370 | 6,536 | 1 | - | (6,907) | -
+31 December 2024 | 6,965 | 161,337 | 120,676 | 56,449 | 69,229 | 49 | 414,705
+Additions | - | 1,892 | 45 | 202 | - | 31 | 2,170
+Disposals/written-off | - | (40,795) | (26,583) | (2,348) | (3,874) | - | (73,600)
+Transfer in (Transfer out) | - | 56 | 17 | - | - | (73) | -
+31 December 2025 | 6,965 | 122,490 | 94,155 | 54,303 | 65,355 | 7 | 343,275
+Accumulated depreciation |  |  |  |  |  | 
+1 January 2024 | - | 65,592 | 60,227 | 50,303 | 39,314 | - | 215,436
+Depreciation for the year | - | 17,025 | 14,546 | 3,918 | 7,100 | - | 42,589
+Depreciation for disposals/written-off | - | (178) | (405) | (2,442) | (409) | - | (3,434)
+31 December 2024 | - | 82,439 | 74,368 | 51,779 | 46,005 | - | 254,591
+Depreciation for the year | - | 16,215 | 14,204 | 2,784 | 6,953 | - | 40,156
+Depreciation for disposals/written-off | - | (22,491) | (17,986) | (2,328) | (3,849) | - | (46,654)
+31 December 2025 | - | 76,163 | 70,586 | 52,235 | 49,109 | - | 248,093
+Allowance for impairment |  |  |  |  |  | 
+31 December 2024 | - | - | - | - | - | - | -
+Additions during the year | - | 18,169 | 9,870 | - | - | - | 28,039
+31 December 2025 | - | 18,169 | 9,870 | - | - | - | 28,039
+Net book value |  |  |  |  |  |  | 
+31 December 2024 | 6,965 | 78,898 | 46,308 | 4,670 | 23,224 | 49 | 160,114
+31 December 2025 | 6,965 | 28,158 | 13,699 | 2,068 | 16,246 | 7 | 67,143
+Depreciation recognised in the statement of comprehensive income for the years
+2024 |  |  |  |  |  |  | 42,589
+2025 |  |  |  |  |  |  | 40,156
+[/TABLE 14]
+
+As at 31 December 2025, certain items of furniture and office equipment, computers and equipment and vehicles were fully depreciated but are still in use. The gross carrying amount before deducting accumulated depreciation of those assets amounted to approximately Baht 158 million (2024: Baht 132 million).
+Right-of-use assets
+The movement of rights-of-use assets for the years ended 31 December 2025 and 2024 are as follows:
+
+[TABLE 15]
+(Unit: Thousand Baht)
+ | Buildings | Office equipment | Motor vehicles | Total
+1 January 2024 | 189,091 | 1,106 | 15,468 | 205,665
+Additions | 118,803 | - | 2,689 | 121,492
+Lease modification and cancellation | (1,019) | (163) | (1,922) | (3,104)
+Depreciation | (108,516) | (668) | (7,564) | (116,748)
+31 December 2024 | 198,359 | 275 | 8,671 | 207,305
+Additions | 68,032 | 152 | - | 68,184
+Lease modification and cancellation | (74,236) | - | (7,669) | (81,905)
+Depreciation | (100,354) | (362) | (1,002) | (101,718)
+31 December 2025 | 91,801 | 65 | - | 91,866
+[/TABLE 15]
+
+Intangible assets
+
+[TABLE 16]
+ |  | (Unit: Thousand Baht)
+ | Computer software | Computer software in process | Total
+Cost |  |  | 
+1 January 2024 | 30,814 | - | 30,814
+Additions | 2,573 | 22,557 | 25,130
+Disposals/written-off | (783) | - | (783)
+Transfer in (Transfer out) | 8,757 | (8,757) | -
+31 December 2024 | 41,361 | 13,800 | 55,161
+Cancel purchase | - | (13,800) | (13,800)
+Disposals/written-off | (5,285) | - | (5,285)
+31 December 2025 | 36,076 | - | 36,076
+Accumulated amortisation |  |  | 
+1 January 2024 | 22,156 | - | 22,156
+Amortisation for the year | 4,751 | - | 4,751
+Amortisation for disposals/written-off | (294) | - | (294)
+31 December 2024 | 26,613 | - | 26,613
+Amortisation for the year | 4,757 | - | 4,757
+Amortisation for disposals/written-off | (4,720) | - | (4,720)
+31 December 2025 | 26,650 | - | 26,650
+Net book value |  |  | 
+31 December 2024 |  |  | 28,548
+31 December 2025 |  |  | 9,426
+Amortisation recognised in the statement of comprehensive income for the years |  |  | 
+2024 |  |  | 4,751
+2025 |  |  | 4,757
+[/TABLE 16]
+
+As at 31 December 2025, computer software has remaining amortisation period between     1 - 3 years (2024: 1 - 5 years).
+As at 31 December 2025, certain items of computer software were fully amortised but are still in use. The gross carrying amount before deducting accumulated amortisation of those assets amounted to approximately Baht 17 million (2024: Baht 17 million).
+Deferred tax assets/income tax expenses
+15.1Deferred tax assets
+As at 31 December 2025 and 2024, the components of deferred tax assets and deferred tax liabilities are as follows:
+
+[TABLE 17]
+(Unit: Thousand Baht)
+ | 2025 | 2024
+Deferred tax assets |  | 
+Difference in cost of assets foreclosed for accounting and tax purposes | 3,917 | 3,988
+Allowance for expected credit losses | 168,616 | 186,524
+Allowance for impairment of building and equipment | 5,608 | -
+Allowance for impairment of assets foreclosed | 2,060 | 3,162
+Difference in interest income recognised for accounting and tax purposes | 3,521 | 3,218
+Provision for employee benefits | 6,558 | 6,784
+Accumulated depreciation - buildings and building improvements | 7,746 | 8,257
+Right-of-use assets | 825 | 1,209
+Total | 198,851 | 213,142
+Deferred tax liabilities |  | 
+Deferred initial direct costs from hire purchase/ loan receivables | 11,452 | 20,531
+Deferred loans issuing costs | 1,703 | 4,678
+Total | 13,155 | 25,209
+Deferred tax assets - net | 185,696 | 187,933
+[/TABLE 17]
+
+15.2 Income tax expenses
+Income tax expenses for the years ended 31 December 2025 and 2024 are as follows:
+
+[TABLE 18]
+(Unit: Thousand Baht)
+ | For the years ended 31 December
+ | 2025 | 2024
+Current income tax: |  | 
+Corporate income tax charge for the year | 6,552 | 81,359
+Adjustment of corporate income tax expense for prior year | 8 | -
+Deferred tax: |  | 
+Relating to origination and reversal of temporary differences | 1,707 | (63,860)
+Income tax expenses reported in the statements of comprehensive income | 8,267 | 17,499
+[/TABLE 18]
+
+The amounts of income tax relating to each component of other comprehensive income for the years ended 31 December 2025 and 2024 are as follows:
+
+[TABLE 19]
+(Unit: Thousand Baht)
+ | 2025 | 2024
+Deferred tax relating to actuarial gain | (530) | (1,184)
+[/TABLE 19]
+
+Reconciliation between income tax expenses and the product of accounting profits multiplied by the applicable tax rate for the years ended 31 December 2025 and 2024 are as follows:
+
+[TABLE 20]
+(Unit: Thousand Baht)
+ | For the years ended 31 December
+ | 2025 | 2024
+Accounting profit before tax | 42,247 | 90,483
+Applicable tax rate | 20% | 20%
+Accounting profit before tax multiplied by applicable tax rate | 8,449 | 18,096
+Adjustment of corporate income tax expense for prior year | 8 | -
+Effects of additional expense and non-deductible expense | (190) | (597)
+Income tax expenses reported in the statements of comprehensive income | 8,267 | 17,499
+[/TABLE 20]
+
+Bank overdrafts and short-term loans from financial institutions
+As at 31 December 2025 and 2024, the following are short-term loans in the form of bank overdrafts and promissory notes from financial institutions in Thailand:
+
+[TABLE 21]
+(Unit: Thousand Baht)
+ | Loan facility/Repayment schedule | 2025 | 2024
+a) | Bank overdrafts | 4,919 | -
+b) | Promissory notes under credit facilities amounting to Baht 350 million, with principal repayable within the specific date of each promissory, and interest charged at MOR less a fixed rate, payable monthly | 87,662 | 243,633
+c) | Promissory notes under credit facilities amounting to Baht 410 million, with principal repayable within the specific date of each promissory, and interest charged at MLR less a fixed rate, payable monthly | 79,779 | 141,909
+d) | Promissory notes under credit facilities amounting to Baht 200 million, with principal repayable within the specific date of each promissory, and interest charged at MLR less a fixed rate, payable monthly | 47,788 | -
+Total bank overdrafts and short-term loans from financial institutions | 220,148 | 385,542
+[/TABLE 21]
+
+Bank overdrafts and short-term loans are secured by the transfer of ownership rights and the assignment of collection rights over hire purchase receivables, loan receivables and loans secured against motorcycle registrations, car registrations, commercial car registrations and truck registrations. Moreover, the Company is required to comply with certain terms and conditions as specified in each loan agreement, such as to maintain ratios of non-performing hire purchase receivables and loan receivables (overdue more than 3 months) to total receivables, collection ratio, debt to equity ratio, earnings before interest and taxes to interest expenses, depending on the conditions in each agreement.
+As at 31 December 2025, the Company has Baht 65 million in bank overdrafts and             short-term credit facilities from financial institutions that are available to be drawn down           (2024: Baht 627 million).
+Other current payables
+
+[TABLE 22]
+(Unit: Thousand Baht)
+ | 2025 | 2024
+Other current payables | 45,705 | 59,487
+Accrued employee expenses | - | 1,650
+Revenue department payable | 6,874 | 9,386
+Accrued expenses | 15,565 | 16,438
+Total | 68,144 | 86,961
+[/TABLE 22]
+
+Lease liabilities
+
+[TABLE 23]
+ | (Unit: Thousand Baht)
+ | 2025 | 2024
+Lease liabilities | 103,939 | 229,740
+Less: Deferred interest expenses | (7,982) | (16,553)
+Total | 95,957 | 213,187
+Less: Current portion | (44,359) | (94,999)
+Lease liabilities - net of current portion | 51,598 | 118,188
+[/TABLE 23]
+
+Movements of lease liabilities for the years ended 31 December 2025 and 2024 are summarised below.
+
+[TABLE 24]
+ | (Unit: Thousand Baht)
+ | 2025 | 2024
+Balance at the beginning of year | 213,187 | 204,000
+Additions | 68,184 | 121,492
+Interest recognised | 9,080 | 10,194
+Lease payment | (109,261) | (121,439)
+Decrease | (85,233) | (1,060)
+Balance at the end of year | 95,957 | 213,187
+[/TABLE 24]
+
+The maturity analysis of undiscounted lease payments is disclosed in Note 35.3 the financial statements on Liquidity risk.
+Expenses relating to leases that are recognised in profit or loss.
+
+[TABLE 25]
+ | (Unit: Thousand Baht)
+ | 2025 | 2024
+Depreciation of right-of-use assets | 101,718 | 116,748
+Interest expenses on lease liabilities | 9,080 | 10,194
+Expense relating to short-term leases | 29,760 | 25,974
+Total | 140,558 | 152,916
+[/TABLE 25]
+
+The Company had total cash outflows for leases for the year ended 31 December 2025 of Baht 139 million (2024: Baht 147 million).
+Loans from an unrelated party
+As at 31 December 2025, the Company had short-term loans and long-term loans from an unrelated party amounting to Baht 7 million and Baht 10 million, respectively. The loans bear interest at a fixed rate, with interest payable every three months and the principal repayable at the end of the contractual term.
+Loans from related parties
+As at 31 December 2025, all loans from related parties were from directors and individuals related to directors. The loans bear interest at a fixed rate, with interest payable every three months and the principal repayable at the end of the contractual term.
+During the year ended 31 December 2025, movements of the Company’s loans from related parties were as follow:
+
+[TABLE 26]
+ | (Unit: Thousand Baht)
+ | 1 January 2025 | Increase | Decrease | 31 December 2025
+Related parties |  |  |  | 
+Short-term loans | - | 62,500 | (31,500) | 31,000
+Long-term loans | - | 10,000 | - | 10,000
+[/TABLE 26]
+
+Long-term loans
+As at 31 December 2025 and 2024, the following are loans from financial institutions in Thailand.
+
+[TABLE 27]
+ |  | (Unit: Thousand Baht)
+ | Loan facility/Repayment schedule | 2025 | 2024
+a) | Credit facility amounting to Baht 100 million, repayable principal equally every month, and interest charged at MLR less a fixed rate, payable monthly | 91,420 | 77,500
+b) | Syndicate loan facility amounting to Baht 2,000 million, repayable principal equally every month, and interest charged at MLR less a fixed rate, payable monthly | 151,140 | 482,880
+c) | Credit facility amounting to Baht 500 million, repayable principal equally every month, and interest charged at MLR less a fixed rate, payable monthly | 59,069 | 184,097
+d) | Credit facility amounting to Baht 800 million, repayable principal equally every month, after the end of 1-year grace period from the date of loan withdrawal and interest charged at MLR less a fixed rate, payable monthly | - | 199,920
+e) | Credit facility amounting to Baht 100 million, repayable principal equally every month, and interest charged at MLR less a fixed rate, payable monthly | - | 22,438
+f) | Syndicate loan facility amounting to Baht 3,000 million, repayable principal equally every month, and interest charged at MLR less a fixed rate, payable monthly | 582,390 | 1,344,240
+g) | Credit facility amounting to Baht 1,000 million, repayable principal and interest equally every month, and interest charged at MLR less a                           fixed rate | 420,483 | 673,794
+h) | Syndicate loan facility amounting to Baht 4,500 million, repayable principal equally every month, and interest charged at MLR less a fixed rate, payable monthly | 2,090,740 | 3,217,180
+i) | Credit facility amounting to Baht 200 million, repayable principal and interest equally every month, and interest charged at MLR less a                      fixed rate | 81,375 | 147,814
+Total | 3,476,617 | 6,349,863
+Less: Deferred issuing costs | (7,509) | (18,708)
+Long-term loans | 3,469,108 | 6,331,155
+Less: Current portion due within one year | (2,274,265) | (3,407,845)
+Long-term loans - net of current portion | 1,194,843 | 2,923,310
+[/TABLE 27]
+
+The above long-term loans are secured by the assignment of collection rights over loans secured against motorcycle registrations, car registrations, commercial car registrations and truck registrations with specific conditions to the bank. Moreover, the Company is required to comply with certain terms and conditions as specified in each loan agreement, such as to maintain ratios of non-performing hire purchase receivables and loan receivables (overdue more than 3 months) to total receivables, collection ratio, debt to equity ratio, earnings before interest and taxes to interest expenses, depending on the conditions in each agreement.
+As at 31 December 2025, the Company had certain long‑term loan agreements with financial institutions for which it was unable to maintain the required financial ratio in accordance with the loan covenants. However, on 31 December 2025, the Company obtained consent and covenant‑waiver letters from the respective financial institutions, granting a waiver of the aforementioned ratio for the financial statements for the year 2025.
+As at 31 December 2025, the Company has Baht 9 million the long-term credit facilities which have not yet been drawn down (2024: Baht 23 million).
+Movements in the long-term loans account during the year ended 31 December 2025 are summarised below.
+
+[TABLE 28]
+(Unit: Thousand Baht)
+Balance as at 1 January 2025 | 6,349,863
+Add: Drawdown | 117,500
+Less: Repayment | (2,990,746)
+Balance as at 31 December 2025 | 3,476,617
+[/TABLE 28]
+
+Debentures
+As at 31 December 2025, the Company has debentures issued with details below.
+(Unite: Thousand Baht)
+
+[TABLE 29]
+No. | Date of issuance | Repayment schedule | 2025 | 2024
+1 | 28 May 2024 | Debenture with name registered, unsubordinated, unsecured and having a debenture representative, 1 year and 6 months term with a coupon rate of 5.25% per annum, interest payable every three months | - | 613,900
+2 | 28 May 2024 | Debenture with name registered, unsubordinated, unsecured and having a debenture representative, 3 years term with a coupon rate of 5.50% per annum, interest payable every three months | 147,700 | 147,700
+Total |  | 147,700 | 761,600
+Less: Deferred issuing costs | (1,004) | (4,682)
+Debentures |  | 146,696 | 756,918
+Less: Current portion due within 1 year | - | (610,881)
+Debentures - net of current portion | 146,696 | 146,037
+[/TABLE 29]
+
+The Company has to comply with financial covenants by maintaining a debt to equity ratio at the end of each accounting period throughout the life of debentures.
+Other current liabilities
+
+[TABLE 30]
+ | (Unit: Thousand Baht)
+ | 2025 | 2024
+Accrued interest expenses | 4,378 | 9,913
+Accrued special business tax expenses | 3,739 | 4,950
+Accrued withholding tax expenses | 1,076 | 1,423
+Accrued output tax expenses | 129 | 67
+Others | 4 | 34
+Total | 9,326 | 16,387
+[/TABLE 30]
+
+Provision for employee benefits
+Provision for employee benefits, which represents compensation payable to employees after they retire, was as follows:
+
+[TABLE 31]
+ | (Unit: Thousand Baht)
+ | For the years ended 31 December
+ | 2025 | 2024
+Provision for employee benefits at beginning of year | 33,922 | 41,034
+Included in profit or loss: |  | 
+Current service cost | 5,514 | 7,592
+Interest cost | 414 | 577
+Loss from benefit paid | 11,728 | 10,650
+Included in other comprehensive income: |  | 
+Remeasurement gain arising from |  | 
+Demographic assumptions changes | (1,462) | (7,235)
+Financial assumptions changes | (835) | (1,319)
+Experience adjustments | (354) | 2,635
+Benefits paid during the year | (16,138) | (20,012)
+Provision for employee benefits at the end of year | 32,789 | 33,922
+[/TABLE 31]
+
+As at 31 December 2025 and 2024, the Company expects not to pay of long-term employee benefits during the next year.
+As at 31 December 2025, weighted average duration of the liabilities for long-term employee benefits of the Company is 6.79 years (2024: 7.54 years).
+Significant actuarial assumptions are summarised below:
+(Unit: percent per annum)
+
+[TABLE 32]
+ | 2025 | 2024
+Discount rate | 1.54 | 2.24
+Future salary increase rate | 0.5 | 1.5
+Turnover rate (depending on age of employee) | 14 - 34 | 13 - 31
+[/TABLE 32]
+
+The result of sensitivity analysis for significant assumptions that affect the present value of the long-term employee benefit obligation as at 31 December 2025 and 2024 are summarised below:
+
+[TABLE 33]
+ | (Unit: Thousand Baht)
+ | 2025
+ | Increase rate | Decrease rate
+ | Percent | Liabilities increased (decreased) | Percent | Liabilities increased (decreased)
+Discount rate | 1.0 | (1,957) | 1.0 | 2,186
+Salary increase rate | 1.0 | 2,351 | 1.0 | (1,095)
+Turnover rate | 1.0 | (2,182) | 1.0 | 1,320
+[/TABLE 33]
+
+
+[TABLE 34]
+ | (Unit: Thousand Baht)
+ | 2024
+ | Increase rate | Decrease rate
+ | Percent | Liabilities increased (decreased) | Percent | Liabilities increased (decreased)
+Discount rate | 1.0 | (2,247) | 1.0 | 2,522
+Salary increase rate | 1.0 | 2,682 | 1.0 | (2,427)
+Turnover rate | 1.0 | (2,513) | 1.0 | 1,568
+[/TABLE 34]
+
+Provident fund
+The Company and its employees have jointly established a provident fund in accordance with the Provident Fund Act B.E. 2530. Both the Company and employees contribute to the fund monthly at the rate of 3 percent of basic salary. The fund, which is managed by Kasikorn Asset Management Company Limited, will be paid to employees upon termination in accordance with the fund rules. The contributions for the year 2025 amounting to approximately Baht 6.15 million (2024: Baht 13.99 million) were recognised as expense.
+Statutory reserve
+Pursuant to Section 116 of the Public Limited Companies Act B.E. 2535, the Company is required to set aside a statutory reserve at least 5 percent of its net profit after deducting accumulated deficit brought forward (if any), until the reserve reaches 10 percent of the registered capital. The statutory reserve is not available for dividend distribution.
+As at 31 December 2025, the Company has the statutory reserve Baht 100.12 million (2024: Baht 98.42 million).
+Dividend
+On 19 April 2024, the Annual General Meeting of Shareholders for 2024 of the Company approved dividend payment of Baht 0.0665 per share from the 2023 operating result to the shareholders of the Company, or a total dividend payment of Baht 253.37 million. The Company dividend was paid on 10 May 2024.
+On 18 April 2025, the Annual General Meeting of Shareholders for 2025 of the Company approved dividend payment of Baht 0.0525 per share from unappropriated retained earnings and from the 2024 operating result to the shareholders of the Company, or a total dividend payment of Baht 200.03 million. The Company dividend was paid on 9 May 2025.
+Finance cost
+
+[TABLE 35]
+ | (Unit: Thousand Baht)
+ | For the years ended 31 December
+ | 2025 | 2024
+Interest expenses on borrowings | 326,113 | 522,528
+Interest expenses on lease liabilities | 9,080 | 10,194
+Total | 335,193 | 532,722
+[/TABLE 35]
+
+Expenses by nature
+Significant expenses by nature are as follows:
+
+[TABLE 36]
+ | (Unit: Thousand Baht)
+ | For the years ended 31 December
+ | 2025 | 2024
+Salary, wages and other employee benefits | 464,765 | 630,699
+Sale promotional expenses | 17,755 | 50,971
+Depreciation and amortisation expenses | 146,631 | 164,088
+Rental and service expenses | 142,380 | 151,007
+Consultation and professional service fees | 9,182 | 24,235
+Special business tax and other tax expenses | 70,750 | 88,349
+Allowance for expected credit losses | 705,697 | 857,069
+Loss on impairment and disposals of assets | 192,659 | 235,199
+[/TABLE 36]
+
+Loss on impairment and disposals of assets
+
+[TABLE 37]
+ | (Unit: Thousand Baht)
+ | For the years ended 31 December
+ | 2025 | 2024
+Reversal on impairment of assets foreclosed | (5,510) | (43,933)
+Loss on disposals of assets foreclosed | 145,916 | 279,196
+Impairment of fixed assets | 28,039 | -
+Loss (gain) on disposals and write-offs of assets | 24,214 | (64)
+Total | 192,659 | 235,199
+[/TABLE 37]
+
+Earnings per share
+Basic earnings per share is calculated by dividing profit for the year attributable to equity holders of the Company (excluding other comprehensive income) by the weighted average number of ordinary shares in issue during the year.
+Segment information
+The Company’s principal operations involve a single operating segment of hire purchase and loan receivables. Their operations are carried on in the single geographical area of Thailand. Segment performance is measured based on operating profit or loss, on a basis consistent with that the Company’s chief operating decision maker (Managing Director) used to measure operating profit or loss in the financial statements. As a result, all of the revenues, operating profits and assets as reflected in these financial statements pertain to the aforementioned reportable operating segment and geographical area. In addition, the Company has no major customer with reserve of 10 percent or more of an entity’s revenues during the years 2025 and 2024.
+Related party transactions
+During the years, the Company had significant business transactions with related parties. Such transactions are in the ordinary course of business and were concluded on commercial terms and bases agreed upon between the Company and those related parties. A summary of related parties and transactions with those parties is below.
+(Unit: Thousand Baht)
+
+[TABLE 38]
+ | 2025 | 2024 | Pricing Policy
+Transactions with related parties |  |  | 
+Rental expenses | 4,503 | 4,949 | As stipulated in agreements
+Interest expenses | 1,679 | - | As stipulated in agreements
+[/TABLE 38]
+
+As at 31 December 2025 and 2024, the balances of the accounts between the Company and those related parties are as follows:
+(Unit: Thousand Baht)
+
+[TABLE 39]
+ | 2025 | 2024
+Related parties |  | 
+Other current receivables | - | 58
+Accrued interest expenses | 250 | -
+Short-term loans | 31,000 | -
+Long-term loans | 10,000 | -
+Lease liabilities | 2,852 | 9,883
+[/TABLE 39]
+
+Directors and management’s benefits
+During the years, the Company had employee benefit expenses payable to their directors and management as below.
+
+[TABLE 40]
+(Unit: Thousand Baht)
+ | For the years ended 31 December
+ | 2025 | 2024
+Short-term employee benefits | 37,098 | 42,774
+Post-employment benefits | 872 | 694
+Total | 37,970 | 43,468
+[/TABLE 40]
+
+Commitments with unrelated party
+34.1 Service agreements
+The Company has entered into other services agreement. The terms of the agreements are generally between 1 - 3 years. As at 31 December 2025, future minimum lease payments required under these non-cancellable service contracts were as follows:
+
+[TABLE 41]
+(Unit: Thousand Baht)
+ | 31 December 2025 | 31 December 2024
+Within 1 year | 13,565 | 21,969
+Over 1 and up to 3 years | 1,241 | 14,533
+Total | 14,806 | 36,502
+[/TABLE 41]
+
+Risk management
+The Company’s financial instruments, principally comprise cash and cash equivalents, deposits at banks with restrictions, hire purchase and loan receivables, bank overdrafts, loans from financial institutions, lease liabilities, debentures, loan form an unrelated party and loans form related parties. The financial risks associated with these financial instruments and how they are managed is described below.
+35.1Credit risk
+The Company is exposed to credit risk primarily with respect to hire purchase and loan receivables. The Company manages the risk by adopting appropriate credit control policies and procedures. In addition, the Company does not have high concentrations of credit risk since it has a variety of customer bases and a number of customers. The maximum exposure to credit risk is limited to the carrying amounts of hire purchase and loan receivables less allowance for expected credit loss as stated in the statements of financial position.
+Maximum exposure to credit risk of financial instruments
+Maximum exposure to credit risk is the amount of financial instruments without taking account of any collateral held or other credit enhancements to increase creditability. For financial assets recognised in statements of financial position, maximum exposure to credit risk is the carrying amounts before allowance for expected credit loss.
+Credit quality analysis
+Credit risk refers to the risk that a customer or a counterparty will default on its contractual obligations resulting in a financial loss to the Company. The Company has adopted policies to mitigate this risk by analysis of credit from customer information and monitoring status of customer.
+The table below shows the credit quality of financial assets exposed to credit risk. The amounts presented for financial assets are gross carrying amount (before deducting allowance for expected credit losses). Explanation of 12-months expected credit losses, lifetime expected credit losses - not credit impaired, and lifetime expected credit losses-credit impaired are included in Note 4.6 to the financial statements.
+
+[TABLE 42]
+ | (Unit: Million Baht)
+ | 2025
+ | Financial assets where there has not been a significant increase in credit risk (12-month ECL) | Financial assets where there has been a significant increase in credit risk (Lifetime ECL - not credit impaired) | Financial assets that are credit-impaired (Lifetime ECL - credit impaired) | Total
+Cash and cash equivalents |  |  | 
+Investment grade | 105 | - | - | 105
+Total | 105 | - | - | 105
+Less: Allowance for expected credit losses | - | - | - | -
+Net book value | 105 | - | - | 105
+Deposits at banks with restrictions |  |  | 
+Deposits at banks with restrictions | 5 | - | - | 5
+Total | 5 | - | - | 5
+Less: Allowance for expected credit losses | - | - | - | -
+Net book value | 5 | - | - | 5
+Hire purchase and loan receivables |  |  |  | 
+Not yet due | 5,407 | - | - | 5,407
+Overdue 1 - 30 days | 1,251 | - | - | 1,251
+Overdue 31 - 60 days | - | 1,272 | - | 1,272
+Overdue 61 - 90 days | - | 780 | - | 780
+More than 90 days | - | - | 664 | 664
+Litigation receivables | - | - | 39 | 39
+Total | 6,658 | 2,052 | 703 | 9,413
+Less: Allowance for expected credit losses | (68) | (354) | (381) | (803)
+Net book value | 6,590 | 1,698 | 322 | 8,610
+[/TABLE 42]
+
+
+[TABLE 43]
+ | (Unit: Million Baht)
+ | 2024
+ | Financial assets where there has not been a significant increase in credit risk (12-month ECL) | Financial assets where there has been a significant increase in credit risk (Lifetime ECL - not credit impaired) | Financial assets that are credit-impaired (Lifetime ECL - credit impaired) | Total
+Cash and cash equivalents |  |  |  | 
+Investment grade | 84 | - | - | 84
+Total | 84 | - | - | 84
+Less: Allowance for expected credit losses | - | - | - | -
+Net book value | 84 | - | - | 84
+Deposits at banks with restrictions |  |  | 
+Deposits at banks with restrictions | 12 | - | - | 12
+Total | 12 | - | - | 12
+Less: Allowance for expected credit losses | - | - | - | -
+Net book value | 12 | - | - | 12
+Hire purchase and loan receivables |  |  |  | 
+Not yet due | 7,699 | - | - | 7,699
+Overdue 1 - 30 days | 2,013 | - | - | 2,013
+Overdue 31 - 60 days | - | 1,648 | - | 1,648
+Overdue 61 - 90 days | - | 1,020 | - | 1,020
+More than 90 days | - | - | 796 | 796
+Litigation receivables | - | - | 30 | 30
+Total | 9,712 | 2,668 | 826 | 13,206
+Less: Allowance for expected credit losses | (100) | (413) | (379) | (892)
+Net book value | 9,612 | 2,255 | 447 | 12,314
+[/TABLE 43]
+
+Collateral and any operations to increase creditability
+The Company has held collateral and any operations to increase creditability of exposure to credit risk. The details of the collateral held by the Company for each type of financial assets are as follows:
+
+[TABLE 44]
+ |  |  | (Unit: Million Baht)
+ | Exposure to risk with collateral | 
+ | 2025 | 2024 | Type of collateral
+Hire purchase and loan receivables | 9,071 | 12,793 | Car, motorcycle and land
+[/TABLE 44]
+
+35.2Market risk
+Market risk is the risk that changes in interest rates, foreign exchange rates and securities prices may have an effect on the financial position of the Company. As the Company has no foreign currency assets and liabilities and no investments in securities, market risk therefore consists of only interest rate risk. The Company manages the changes in interest rate risk by means of an appropriate structuring of holdings in assets and liabilities with different repricing dates, in order to generate a suitable yield while maintaining risk at acceptable levels.
+Interest rate risk
+As at 31 December 2025 and 2024, significant financial assets and liabilities classified by type of interest rate are summarised in the table below, with those financial assets and liabilities that carry fixed interest rates further classified based on the maturity date, or the repricing date if this occurs before the maturity date.
+
+[TABLE 45]
+ | (Unit: Thousand Baht)
+ | 2025
+ | Fixed interest rate |  |  | 
+ | Repricing or maturity date |  |  | 
+Transactions | Within             1 year | Over             1 year | Floating interest rate | Non-interest  bearing | Total
+Financial assets |  |  |  |  | 
+Cash and cash equivalents | - | - | 34,791 | 69,733 | 104,524
+Deposits at banks with restrictions | - | - | 5,054 | - | 5,054
+Hire purchase and loan receivables (1) | 3,134,858 | 5,475,057 | - | - | 8,609,915
+Financial liabilities |  |  |  |  | 
+Bank overdrafts and short-term loans from financial institutions | - | - | 220,148 | - | 220,148
+Long-term loans (2) | - | - | 3,476,617 | - | 3,476,617
+Lease liabilities | 44,359 | 51,598 | - | - | 95,957
+Debentures (3) | - | 147,700 | - | - | 147,700
+Loans from an unrelated party | 7,000 | 10,000 | - | - | 17,000
+Loans from related parties | 31,000 | 10,000 | - | - | 41,000
+[/TABLE 45]
+
+(1) The outstanding balance of hire purchase and loan receivables which have fixed interest rate and maturity within 1 year included credit-impaired receivables.
+(2) The outstanding balance of long-term loans are presented before net of deferred issuing costs.
+(3) The outstanding balance of debentures are presented before net of deferred issuing costs.
+
+[TABLE 46]
+ | (Unit: Thousand Baht)
+ | 2024
+ | Fixed interest rate |  |  | 
+ | Repricing or maturity date |  |  | 
+Transactions | Within             1 year | Over             1 year | Floating interest rate | Non-interest  bearing | Total
+Financial assets |  |  |  |  | 
+Cash and cash equivalents | - | - | 43,587 | 40,330 | 83,917
+Deposits at banks with restrictions | - | - | 12,025 | - | 12,025
+Hire purchase and loan receivables (1) | 4,012,366 | 8,302,098 | - | - | 12,314,464
+Financial liabilities |  |  |  |  | 
+Short-term loans from financial institutions | - | - | 385,542 | - | 385,542
+Long-term loans (2) | - | - | 6,349,863 | - | 6,349,863
+Lease liabilities | 94,999 | 118,188 | - | - | 213,187
+Debentures (3) | 613,900 | 147,700 | - | - | 761,600
+[/TABLE 46]
+
+(1) The outstanding balance of hire purchase and loan receivables which have fixed interest rate and maturity within 1 year included credit-impaired receivables.
+(2) The outstanding balance of long-term loans are presented before net of deferred issuing costs.
+(3) The outstanding balance of debentures are presented before net of deferred issuing costs.
+Interest rate sensitivity
+The sensitivity of the Company’s profit before tax to a reasonably possible change in interest rates on that portion of floating rate of cash and cash equivalents, deposits at banks with restrictions, bank overdrafts, short-term loans and long-term loans from financial institutions affected as at 31 December 2025 and 2024 are as follow:
+
+[TABLE 47]
+(Unit: Thousand Baht)
+ |  | Effect on profit before tax
+ | Increase / Decrease | 2025 (1) | 2024 (1)
+ | (Percent) |  | 
+Cash and cash equivalents | +0.5% | 174 | 218
+ | -0.5% | (174) | (218)
+Deposits at banks with restrictions | +0.5% | 25 | 60
+ | -0.5% | (25) | (60)
+Bank overdrafts and short-term loans from | +0.5% | (1,101) | (1,928)
+financial institutions | -0.5% | 1,101 | 1,928
+Long-term loans | +0.5% | (17,383) | (31,749)
+ | -0.5% | 17,383 | 31,749
+[/TABLE 47]
+
+(1)This information is not a forecast or prediction of future market conditions, then actual result could differ from this analysis.
+The above analysis has been prepared assuming that the amounts of cash and cash equivalents, deposits at banks with restrictions, bank overdrafts, short-term and long-term loans from financial institutions and all other variables remain constant over one year. Moreover, the floating legs of these cash and cash equivalents, deposits at banks with restrictions, short-term and long-term loans from financial institutions are assumed to not yet have set interest rates. As a result, a change in interest rates affects interest for the full               12-month period of the sensitivity calculation.
+35.3Liquidity risk
+Liquidity risk is the risk that the Company will be unable to liquidate their financial assets and/or procure sufficient funds to discharge their obligations in a timely manner, resulting in the incurrence of a financial loss. The Company has a policy to manage liquidity risk with appropriate long-term loan and short-term loan structure. However, the Company has a policy in maintaining the liquidity to ensure that there is sufficient liquidity of requirement for the current and the future.
+The table below summarises the maturity profile of the Company’s financial instruments as at 31 December 2025 and 2024.
+
+[TABLE 48]
+ | (Unit: Thousand Baht)
+ | 2025
+Transactions | At call | Within 1 year | Over 1 year | No specific maturity | Total
+Financial assets |  |  |  |  | 
+Cash and cash equivalents | 104,524 | - | - | - | 104,524
+Deposits at banks with restrictions | - | 5,054 | - | - | 5,054
+Hire purchase and loan receivables (1) | - | 3,134,858 | 5,475,057 | - | 8,609,915
+Financial liabilities |  |  |  |  | 
+Bank overdrafts and short-term loans from financial institutions | - | 220,148 | - | - | 220,148
+Long-term loans | - | 2,274,265 | 1,194,843 | - | 3,469,108
+Lease Liabilities | - | 44,359 | 51,598 | - | 95,957
+Debentures | - | - | 146,696 | - | 146,696
+Loans from an unrelated party | - | 7,000 | 10,000 | - | 17,000
+Loans from related parties | - | 31,000 | 10,000 | - | 41,000
+[/TABLE 48]
+
+(1)   The outstanding balance of hire purchase and loan receivables due within 1 year included credit-impaired receivables.
+
+[TABLE 49]
+ | (Unit: Thousand Baht)
+ | 2024
+Transactions | At call | Within 1 year | Over 1 year | No specific maturity | Total
+Financial assets |  |  |  |  | 
+Cash and cash equivalents | 83,917 | - | - | - | 83,917
+Deposits at banks with restrictions | - | 12,025 | - | - | 12,025
+Hire purchase and loan receivables (1) | - | 4,012,366 | 8,302,098 | - | 12,314,464
+Financial liabilities |  |  |  |  | 
+Short-term loans from financial institutions | - | 385,542 | - | - | 385,542
+Long-term loans | - | 3,407,845 | 2,923,310 | - | 6,331,155
+Lease Liabilities | - | 94,999 | 118,188 | - | 213,187
+Debentures | - | 610,881 | 146,037 | - | 756,918
+[/TABLE 49]
+
+(1)   The outstanding balance of hire purchase and loan receivables due within 1 year included credit-impaired receivables.
+35.4Fair value
+As at 31 December 2025 and 2024, the Company had no financial assets or financial liabilities that were measured at fair value. However, the Company had financial assets and liabilities that were measured at cost which fair value was disclosed using different levels of inputs as follows:
+
+[TABLE 50]
+ | (Unit: Thousand Baht)
+ | 2025
+ | Book value | Fair value
+ |  | Total | Level 1 | Level 2 | Level 3
+Financial assets disclosed at fair value |  |  |  |  | 
+Cash and cash equivalents | 104,524 | 104,524 | 104,524 | - | -
+Deposits at banks with restrictions | 5,054 | 5,054 | 5,054 | - | -
+Hire purchase and loan receivables | 8,609,915 | 8,429,772 | - | - | 8,429,772
+Financial liabilities disclosed at fair value |  |  |  | 
+Bank overdrafts and short-term loans   from financial institutions | 220,148 | 220,148 | - | 220,148 | -
+Long-term loans | 3,469,108 | 3,469,108 | - | 3,469,108 | -
+Lease liabilities | 95,957 | 95,957 | - | 95,957 | -
+Debentures | 146,696 | 147,412 | - | 147,412 | -
+Loans from an unrelated party | 17,000 | 17,000 | - | 17,000 | -
+Loans from related parties | 41,000 | 41,000 | - | 41,000 | -
+[/TABLE 50]
+
+
+[TABLE 51]
+ | (Unit: Thousand Baht)
+ | 2024
+ | Book value | Fair value
+ |  | Total | Level 1 | Level 2 | Level 3
+Financial assets disclosed at fair value |  |  |  |  | 
+Cash and cash equivalents | 83,917 | 83,917 | 83,917 | - | -
+Deposits at banks with restrictions | 12,025 | 12,025 | 12,025 | - | -
+Hire purchase and loan receivables | 12,314,464 | 12,184,907 | - | - | 12,184,907
+Financial liabilities disclosed at fair value |  |  |  | 
+Short-term loans from financial institutions | 385,542 | 385,542 | - | 385,542 | -
+Long-term loans | 6,331,155 | 6,331,155 | - | 6,331,155 | -
+Lease liabilities | 213,187 | 213,187 | - | 213,187 | -
+Debentures | 756,918 | 760,269 | - | 760,269 | -
+[/TABLE 51]
+
+Fair value hierarchy for financial assets and liabilities as at 31 December 2025 and 2024 is stipulated in Note 4.17 to the financial statements.
+As at 31 December 2025 and 2024, the Company has estimated the fair value of financial instruments as follows:
+For financial assets and liabilities which have short-term maturity, including cash and cash equivalents, deposits at banks with restrictions, bank overdrafts and short-term loans from financial institutions, their carrying amounts in the statement of financial position approximate their fair value.
+Hire purchase and loan receivables, fair value is estimated by discounting expected future cash flow by the current market interest rate of the loans with similar terms and conditions.
+For long-term loans from financial institutions carrying interest at floating rate with interest approximate to the market rate, their carrying amounts in the statement of financial position approximate their fair value.
+For loans from an unrelated party and loans from related parties carrying interest with interest approximate to the market rate, their carrying amounts in the statement of financial position approximate their fair value.
+For lease liabilities, their carrying amounts approximate their fair value since their carrying interest approximate to the market rate.
+Fair values of debentures are referenced by the price of debentures at the Thai Bond Market Association (“ThaiBMA”).
+During the current year, there were no transfers within the fair value hierarchy.
+Capital Management
+The primary objective of the Company’s capital management is to ensure that it has appropriate capital structure and preserves the ability to continue its business as a going concern. As at 31 December 2025, the Company’s debt to equity ratio is 0.81:1 (2024: 1.50:1).
+Events after the reporting period
+On 10 February 2026, the Board of Director Meeting of the Company No.1/2026 passed the resolutions to propose to the Annual General Meeting of shareholders to approve a dividend payment from unappropriated retained earnings and 2025 operating results at a rate of Baht 0.0262 per share, or a total of Baht 99.82 million.
+Approval of financial statements
+These financial statements were authorised for issue by the Company’s Board of Directors on 10 February 2026.
