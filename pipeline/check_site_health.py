@@ -1318,6 +1318,84 @@ def _shape_farm_book(d):
     return None
 
 
+def _shape_collateral_outlook(d):
+    # The Overview (#overview) collateral board's national recovery-value read
+    # AND the command-center collateral clause (obj #1). renderCollatOutlook +
+    # the command-center read both key off `COLLO.national`: the MEASURED used-
+    # car/pickup resale card gates on `national.used_veh_yoy_blended != null`
+    # (reading used_veh_yoy_car/pickup/price_period), and the "recovery outlook —
+    # firming vs softening" card + the command-center row both gate on
+    # `national.exposure_weighted_outlook != null` (reading n_firming/n_provinces/
+    # most_at_risk_province). It is a composite of MEASURED gold + MEASURED BoT
+    # UVPI used-vehicle prices + a structural moto proxy, and it live-degrades
+    # SILENTLY — absent/truncated COLLO just falls back to an editorial card with
+    # no phone alert, the same "broken demo" blind spot the collateral_book /
+    # macro_book / farm_book obj-#1 probes closed for their Overview siblings, and
+    # it was the sibling the last audit's own "next probe targets" note flagged
+    # alongside macro_sensitivity. Asserts the two national gate keys + render
+    # reads and the 77-province backbone, not values — robust to a future BoT
+    # UVPI / Pink Sheet vintage moving the numbers.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'national' object (renderCollatOutlook gate)"
+    for k in ("used_veh_yoy_blended", "exposure_weighted_outlook", "n_firming", "n_provinces"):
+        if not isinstance(nat.get(k), (int, float)):
+            return "national.%s missing/non-numeric (collateral-outlook card gate/render read)" % k
+    if not (isinstance(nat.get("most_at_risk_province"), str) and nat["most_at_risk_province"].strip()):
+        return "national.most_at_risk_province missing/blank (recovery-outlook card render read)"
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        return "missing/empty 'provinces' list (per-province outlook backbone)"
+    return None
+
+
+def _shape_macro_sensitivity(d):
+    # The per-branch "What moves this branch" popup read (obj #1) — msensRec picks
+    # MSENS[idxOf(branch)] from `j.branches`, so the list MUST stay index-aligned
+    # to branches.json (2015), and msensPhrase renders each driver against
+    # `meta.drivers[key]` (reading .label + .yoy_pct). It is an ESTIMATED PROXY
+    # over MEASURED inputs (Pink Sheet price YoY x OAE crop shares / rainfall) and
+    # is fully null-guarded — absent/truncated file just omits the branch-drill
+    # driver line with no phone alert, the same "broken demo" blind spot the
+    # obj-#1 book probes closed for their siblings, and the read the last audit's
+    # own "next probe targets" note flagged alongside collateral_outlook. Asserts
+    # the index-aligned branches list + a well-formed driver tuple + the
+    # meta.drivers phrase-render table + the province watchlist, not values —
+    # robust to a future price vintage reshuffling which lever leads.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    branches = d.get("branches")
+    if not isinstance(branches, list):
+        return "missing 'branches' list (MSENS index-aligned branch drill read)"
+    if len(branches) < 2000:
+        return "branches has %d entries, expected ~2015 (index-aligned to branches.json)" % len(branches)
+    # entries may be empty (branch with no dominant driver); a non-empty one must
+    # be a [key, score, dir, ctx] tuple of >=4 (msensPhrase reads t[0]/t[2]/t[3]).
+    for rec in branches:
+        if not isinstance(rec, list):
+            return "a branch entry is not a list (msensRec expects an array of driver tuples)"
+        if rec:
+            t0 = rec[0]
+            if not isinstance(t0, list) or len(t0) < 4:
+                return "a driver tuple is not a >=4-element [key,score,dir,ctx] (msensPhrase render read)"
+            break
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object (msensPhrase driver-label lookup)"
+    drivers = meta.get("drivers")
+    if not isinstance(drivers, dict) or not drivers:
+        return "missing/empty 'meta.drivers' (msensPhrase label/yoy_pct render read)"
+    dv0 = next(iter(drivers.values()))
+    if not isinstance(dv0, dict) or not (isinstance(dv0.get("label"), str) and dv0["label"].strip()):
+        return "a meta.drivers entry missing 'label' (msensPhrase render read)"
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        return "missing/empty 'provinces' list (Overview province macro watchlist)"
+    return None
+
+
 def _shape_flood_hazard(d):
     # The Exposure (#exposure) tab's "Portfolio flood-hazard exposure" read (obj #1)
     # — the MEASURED GISTDA Repeated-Flooding 2005-2016 census projected to a per-
@@ -1960,6 +2038,22 @@ DATA_FILES = [
     # verdict/commentary render shape (national KPIs + province dict + crops rows),
     # not values.
     ("data/farm_book.json", _shape_farm_book, ".national KPI block + province drill + .crops commentary (Overview farm-book section)"),
+    # The Overview collateral board's national recovery-value read + the command-
+    # center collateral clause (obj #1), and one of the two reads the last audit's
+    # "next probe targets" note flagged. renderCollatOutlook + the command-center
+    # read both gate off `COLLO.national` (used_veh_yoy_blended for the MEASURED
+    # BoT-UVPI resale card; exposure_weighted_outlook/n_firming/most_at_risk for
+    # the firming-vs-softening card), and it live-degrades SILENTLY to an editorial
+    # fallback — a truncated CDN deploy would drop the measured recovery read with
+    # no phone alert. Asserts the two national gate keys + the 77-province backbone.
+    ("data/collateral_outlook.json", _shape_collateral_outlook, ".national recovery-value KPIs (used_veh_yoy_blended + exposure_weighted_outlook) + 77-province backbone (Overview collateral board)"),
+    # The per-branch "What moves this branch" drill (obj #1), and the second read
+    # the last audit flagged. msensRec picks MSENS[idxOf(branch)] off `.branches`
+    # so it MUST stay index-aligned to branches.json, and msensPhrase renders each
+    # driver against `meta.drivers[key]`. Fully null-guarded -> a truncated deploy
+    # silently omits the branch driver line with no phone alert. Asserts the index-
+    # aligned branch list + a well-formed driver tuple + the meta.drivers table.
+    ("data/macro_sensitivity.json", _shape_macro_sensitivity, ".branches index-aligned (2015) driver tuples + meta.drivers label table (branch 'what moves this' drill)"),
     # The Overview (#overview) LEAD narrative (regional_outlook.json) — the very
     # first thing the tab renders (renderNationalOutlook draws the "Bottom line"
     # insight off .national.headline) and the source of the per-province .metrics
