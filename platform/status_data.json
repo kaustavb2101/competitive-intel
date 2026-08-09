@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-09T04:31:07+00:00",
-    "commit": "e130658"
+    "generated_at": "2026-08-09T10:29:39+00:00",
+    "commit": "1333162"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,48 @@
   ],
   "activity": [
     {
+      "date": "2026-08-09T10:29:39+00:00",
+      "sha": "1333162",
+      "summary": "health(deploy): probe the Overview LEAD narrative so a broken deploy of #overview alerts",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-09T10:02:13+00:00",
+      "sha": "0b324d9",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-09, run 31307168382)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-09T08:25:27+00:00",
+      "sha": "2a37f41",
+      "summary": "docs(progress): log ux-sim-result-status-message merge+deploy+verify (PR #344)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-09T15:22:38+07:00",
+      "sha": "f016530",
+      "summary": "ux: announce #sim scenario-simulator result to screen readers (WCAG 4.1.3) (#344)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-09T06:34:49+00:00",
+      "sha": "3bef369",
+      "summary": "health(deploy): probe the MEASURED loan-tape occupation cut so a broken deploy of #exposure alerts",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-09T04:44:23+00:00",
+      "sha": "c695bc2",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-09, run 31295044692)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-09T04:33:07+00:00",
+      "sha": "a8d8ff0",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the DLT fuel-chain schedule ship",
+      "pillar": "data-integration"
+    },
+    {
       "date": "2026-08-09T04:31:07+00:00",
       "sha": "e130658",
       "summary": "health(deploy): schedule the DLT fuel-type refresh so ev_penetration + vehicle_collateral can self-heal",
@@ -668,48 +710,6 @@
       "sha": "fa0b662",
       "summary": "data: ThaiWater flood + rain pulse (2026-08-08, run 31280275461)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-08T20:28:41+00:00",
-      "sha": "1440ab0",
-      "summary": "docs(progress): log ux-newtab-link-cue ship — merged (#330) + deploy-verified",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-09T03:24:52+07:00",
-      "sha": "dde748b",
-      "summary": "ux: warn SR/keyboard users that external promo & source links open a new tab (#330)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-08T16:26:15+00:00",
-      "sha": "73211bd",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer-scoreboard freshness-guard ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-08T16:23:28+00:00",
-      "sha": "096fbff",
-      "summary": "health(deploy): freshness guard now covers the weekday SET peer scoreboard",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-08T15:54:11+00:00",
-      "sha": "4609b5f",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-08, run 31265396333)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-08T14:29:00+00:00",
-      "sha": "133aa23",
-      "summary": "docs: log ux-loop ship — deck.gl heading-one merged (#325) + deploy-verified",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-08T21:24:16+07:00",
-      "sha": "498fa4b",
-      "summary": "ux: give province.html + branch-explorer.html a visually-hidden <h1> (#325)",
-      "pillar": "uxui"
     }
   ]
 }
