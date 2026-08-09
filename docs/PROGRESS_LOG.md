@@ -783,6 +783,36 @@ values** (robust to a future DLT-vintage refresh moving the counts):
   or the province deep-dive fetches; the next DATA target stays owner-side/Thai-IP (GISTDA 40m crop once
   the secret is in-session; the excise/baac/smebank legs) — nothing new is CI-unblocked this run.
 
+## 2026-08-09 — UX loop: announce all four `#sim` levers to screen readers, WCAG 4.1.3 (PR #348, merged + deployed + verified)
+
+Autonomous UX-improvement run. The named backlog is exhausted (remaining open items are all "bigger than
+surgical" content/mandate passes or device-tested-only 3D-page gaps excluded from unattended auto-merge), so
+this run took the explicit follow-up flagged under `ux-sim-result-status-message` (2026-08-09): the scenario
+simulator's `#simstatus` polite live region announced **only** the agri (crop-price/rainfall) outcome, while
+the **used-vehicle collateral** (`renderSimCollat`) and **factory/manufacturing slowdown** (`renderSimFactory`)
+sub-cards recompute via `innerHTML` on every slider move and were **silent to screen readers** — dragging the
+vehicle or factory slider produced no announcement because `computeSim` set the status to `''` whenever
+price/rain were 0.
+- **Fix:** `platform/app.js` — extended `computeSim()`'s announcement to a **multi-clause** status built from all
+  active levers (agri clause when price/rain set; used-vehicle clause when `simState.veh!==0`; factory clause when
+  `simState.factory>0`, reusing the already-computed `simFactoryModel()`, guarded on `fm.mfgBr`), joined with `; `
+  under one "Under this shock: …" lead; all-zero stays silent (matching the search/reset precedent). SR-only live
+  region, **zero visual change** (+8/−4).
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` **129 passed · 0 failed**; `node --check` clean;
+  headless `#sim` mobile render self-reviewed (verdict + sliders intact); Playwright slider drive of the live
+  region → baseline `""` → veh −10 announces vehicle clause → +factory adds factory clause → +price adds agri
+  clause → reset `""`, `pageerror=[]`; no secrets; scope = `platform/app.js` + one `docs/UXUI_AUDIT.md` line.
+- **Merge + deploy + verify:** squash-merged as `06d872c`, branch auto-deleted. Production alias
+  `competitive-intel-git-master-…vercel.app` verified after deploy: `/` **200**, `/app.js` **200**
+  (`/index.html` 308 = expected `cleanUrls` redirect, not a regression); grep confirms the new
+  "manufacturing slowdown: avg occupation-stress" string is **live** in the production `app.js`. No rollback needed.
+- **Recommend next:** the remaining backlog is genuinely out of scope for unattended surgical runs — the two
+  test-infra items (`qa-visual-overflow-not-in-ci`, `qa-live-not-in-overflow-audit-routes`) would wire the standing
+  overflow audit into the gate so future bleed/PAGEX defects are caught automatically; and `ux-acquire-taxonomy-mandate`
+  is the last expansion-framing residue in `build_regional_outlook.py` and deserves its own careful pass. The
+  device-tested 3D-page gaps (`ux-viewport-user-scalable-3dpages`, `ux-navmore-3dpages-absolute-overflow`) still
+  need a human-in-the-loop run.
+
 ## 2026-08-06 — UX loop: `.fb-h4` tag pill wraps so it stops bleeding out on mobile #overview (PR #307, merged + deployed + verified)
 
 Autonomous UX-improvement run. The named backlog is exhausted (remaining open items are all "bigger than
