@@ -21,11 +21,18 @@ name: Data — market-pulse swarm (any-IP feeds, 4x/day)
 # set_filings both drive a headless Chromium, because set.or.th's JSON API 403s any request that is
 # not same-origin. Installing playwright + chromium + OS deps costs a minute or two of every run, and
 # this job runs 4x/day for feeds whose underlying data moves once per trading day (peers) or once per
-# quarter (filings). set_peers has its own dedicated job, .github/workflows/data-set-peers.yml, on a
-# weekday cron timed after the Bangkok close. Keeping the browser install in exactly one workflow
-# instead of several is the whole reason for the skip below — and the skip is `--skip-browser`, which
-# reads the registry's own `needs_browser` flag, NOT a hand-kept `--exclude set_peers` list that
-# silently stops covering the next browser feed somebody adds.
+# quarter (filings). Each has its OWN dedicated job, so skipping them here does not drop them:
+#   set_peers   -> .github/workflows/data-set-peers.yml    (weekday cron, after the Bangkok close)
+#   set_filings -> .github/workflows/data-set-filings.yml  (weekly Saturday cron)
+# That second line was missing until 2026-08-09, and so was the workflow: this header asserted the
+# browser feeds were handled elsewhere while set_filings was in fact owned by NO schedule anywhere.
+# `--skip-browser` did its job correctly and the feed simply never ran — the six peers' MD&A and
+# audited notes only moved when someone pulled them by hand. Skipping a feed here is only safe if
+# something else actually owns it; if you add a `needs_browser` feed, give it a job before relying
+# on this skip.
+# Keeping the browser install out of THIS workflow is the whole reason for the skip below — and the
+# skip is `--skip-browser`, which reads the registry's own `needs_browser` flag, NOT a hand-kept
+# `--exclude set_peers` list that silently stops covering the next browser feed somebody adds.
 # The Thai-IP-only feeds (rival_promos, pantip, datagoth, nso_wages, competitor_branches) are
 # deliberately NOT here: their own docstrings say the corporate/gov sites they hit are
 # Cloudflare-geoblocked from any datacenter IP, so a CI runner would just log a wall of skips/failures
@@ -72,8 +79,17 @@ jobs:
       - name: Install feed dependencies
         run: |
           # google-play-scraper (app_reviews), pytrends (google_trends), openpyxl (oae_prices' XLSX
-          # fallback). Deliberately NO playwright/chromium here — see the --skip-browser note above.
-          pip install --quiet google-play-scraper==1.2.7 pytrends==4.9.2 openpyxl
+          # fallback), pdfplumber (investor_docs).
+          # Deliberately NO playwright/chromium here — see the --skip-browser note above.
+          #
+          # pdfplumber was missing until 2026-08-09, and investor_docs is registered with
+          # `--kind both` (i.e. text extraction ON), so pull_investor_docs.py hit its own import
+          # guard and sys.exit'd in 0.1s on EVERY swarm run since the feed was registered — a
+          # registered feed that could never once succeed here. It cost nothing to notice and
+          # nothing to fix; what made it invisible is that a per-feed failure is isolated by
+          # design, so the job stayed green while one source never ran. Same shape as the
+          # YOUTUBE_API_KEY outage: the failure was reported honestly and nobody was reading.
+          pip install --quiet google-play-scraper==1.2.7 pytrends==4.9.2 openpyxl pdfplumber
 
       - name: Run the market-pulse swarm (pull, append history, re-derive — one pass)
         id: swarm

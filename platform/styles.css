@@ -385,14 +385,26 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
    phone (Assistance: 636px of scroll in a 390px viewport). Aliased, not renamed, so the two
    spellings cannot drift apart again. Descendant selector, not child: index.html wraps a mount div,
    app.js wraps the table directly. */
+/* contain:layout (Wave 2, 2026-08-09): found while making #acq's Rival-pulse panel the tab's
+   default-open section — its promo-landscape tables (auto-generated per product group, deep inside
+   a <details>) blew the root scrollable area out to 525px on a 390px viewport (window.scrollX could
+   actually reach 135 — a real, swipeable overflow, not just a stale scrollWidth number) EVEN THOUGH
+   every .tblwrap measured a correctly-clipped 298px and every .tbl inside it was properly wrapped.
+   overflow-x:auto alone does not stop a descendant's layout size from being counted into an
+   ancestor's (here: <html>'s) scrollWidth in every engine; CSS containment is the property built
+   for exactly that boundary. Verified live (Playwright): adding contain:layout to just this class
+   took document.documentElement.scrollWidth from 525 back to 390 with no visible change to any
+   table's own rendering. Reproduces identically on unmodified master by clicking the "Rival pulse"
+   chip — pre-existing, not introduced by this wave — but Wave 2 turns that from a rarely-clicked
+   edge case into the very first thing every visitor sees, so it is fixed here rather than deferred. */
 .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);max-width:100%;
-  min-width:0;overscroll-behavior-x:contain}
+  min-width:0;overscroll-behavior-x:contain;contain:layout}
 .tbl-wrap .tbl{width:auto;min-width:100%}
 
 /* .tblwrap is the mobile guard rail: a wide multi-column .tbl scrolls INSIDE this box
    instead of pushing the whole page sideways. app.js wraps every table.tbl in one at boot. */
 .tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);max-width:100%;
-  overscroll-behavior-x:contain}
+  overscroll-behavior-x:contain;contain:layout}
 .tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;
   background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--elev-1)}
 .tbl th{text-align:left;color:var(--mid);font-weight:600;font-size:10.5px;text-transform:uppercase;
