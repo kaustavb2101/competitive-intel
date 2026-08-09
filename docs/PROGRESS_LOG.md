@@ -3,7 +3,45 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
-## 2026-08-08 — Intelligence loop (service/deploy-health): deploy-shape probe now guards the front-door structural-stress index — shipped to master
+## 2026-08-09 — UX loop: SPA search results now announce their match count to screen readers (WCAG 4.1.3) — shipped to master (PR #334, squash-merged)
+
+Autonomous UX-improvement run. Every open `docs/UXUI_AUDIT.md` backlog item safe for unattended
+auto-merge was already fixed; the six remaining are explicitly deferred (device-tested gesture work
+on the 3 deck.gl pages, the bigger-than-surgical `acquire`-taxonomy mandate pass and the live-chart
+responsive-viewBox rework, and two test-infra items outside `platform/`). Per the mandate's "review a
+route yourself" fallback, reviewed the SPA search surface and found a genuinely new, unaddressed gap.
+
+**The gap fixed (`ux-search-results-status-message`).** The three SPA search boxes — `#search`→
+`#branches`, `#provsearch`→`#provtbl`, `#mktsearch`→`#mkttbl` — replace their result table's
+`innerHTML` on every keystroke, but the change was **entirely silent to assistive tech**: `grep`
+confirmed there was NO `aria-live`/`role="status"` region *anywhere* in the app. An AT user typing a
+filter got no cue how many rows matched, or that a mistyped query dropped to zero — the WCAG **4.1.3
+Status Messages (AA)** gap, distinct from the sighted-only `.cc-empty` empty-state rows shipped
+earlier. Added ONE shared visually-hidden polite live region (`#searchstatus`, after the sr-only
+`<h1>` in index.html) + a guarded `setSearchStatus(msg)` helper (skips identical text so re-sort/
+tab-open never re-announce) called from all three draw fns with a query-aware, region-qualified,
+singular/plural-correct count; empty query sets '' so tab-open and clearing stay silent. **12
+insertions, 2 files** (`platform/index.html` +5, `platform/app.js` +7). sr-only = **zero visual change**.
+
+**Safeguard protocol — all passed.** (a) `bash tests/run.sh check` → **129 passed / 0 failed** (both
+a fresh clean-master baseline AND the edited tree). (b) Headless render of `#branches` PNG-reviewed:
+header/lead/search/sort-chips/table/provenance all intact, live region invisible. (c) No secrets in
+diff. (d) Diff matches intent, no stray files. Extra verification via Playwright: region is
+`role=status`/`aria-live=polite`/1px×1px `clip rect(0,0,0,0)`; typing "rayong"→"59 branches match",
+"zzzzzz"→"0 branches match", clear→"", "chon"→"1 province match", "nakhon"→"7 provinces match";
+`pageerror=[]`. Marked the audit item fixed + logged one NEW backlog item
+(`qa-live-not-in-overflow-audit-routes`, test-infra) noticed while here.
+
+**Merge + deploy-verify.** PR #334 opened, safeguard-gated, squash-merged to master (commit
+`5f4fbbe`), branch auto-deleted. Production alias `…git-master…` stayed HTTP 200 on `/`, `/index.html`
+(→308 cleanUrls), `/app.js` throughout — **no regression, so no rollback**. The PR's immutable
+preview deployment (`dpl_FV7ev…`, identical bytes) is READY/200 with `setSearchStatus` present,
+proving the built artifact is correct. As of run end, Vercel had **not yet promoted `5f4fbbe` to
+production** (queue delay — the production alias still served the prior commit `8592580`, healthy);
+the promotion is Vercel-side and self-resolving. A `send_later` re-check was armed to confirm the
+change reaches production and to roll back only if the promotion errors.
+
+
 
 Autonomous market & service intelligence run. Backlog is 98% done (1 owner-side item left), so the
 SERVICE/DEPLOY-HEALTH pillar's job is to close deploy blind spots. Freshness coverage over the
