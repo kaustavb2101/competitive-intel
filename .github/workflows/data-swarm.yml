@@ -79,6 +79,7 @@ jobs:
         id: swarm
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          GOOGLE_PLACES_KEY: ${{ secrets.GOOGLE_PLACES_KEY }}   # place_ratings; secret set 2026-07-11
         run: |
           # Isolation is pull_swarm.py's own job (one feed failing/timing out never aborts the rest);
           # here we only make sure a TOTAL swarm failure (every feed failed) does not abort the
@@ -118,6 +119,15 @@ jobs:
           # reached without a second hand-kept file list to go stale, and never adds an untracked
           # generated layer (same discipline as data-thaiwater.yml / data-social-listening.yml).
           git add -u source-data platform/data
+          # ...but swarm_runs.json is the ONE file that has to be named. It is this job's own audit
+          # trail — per-feed rc, status, duration, byte delta — and every swarm PR body tells the
+          # reader to go look at it. Being untracked, `-u` skipped it on the very first run and has
+          # skipped it on every run since, so it has never been committed once and the PR bodies
+          # point at a file that does not exist. Without it the only way to find out WHY a feed
+          # stopped refreshing is to read raw Action logs, which is exactly how the 10-day YouTube
+          # outage stayed invisible. Named explicitly rather than dropping -u, so the discipline
+          # above still holds for everything else.
+          git add source-data/swarm_runs.json
           if git diff --cached --quiet; then
             echo "No net change vs committed layers. No PR opened."
             exit 0

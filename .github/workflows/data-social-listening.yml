@@ -71,14 +71,30 @@ jobs:
       - name: Pull Apple App Store reviews (any IP, no key)
         run: python pipeline/pull_apple_reviews.py
 
-      - name: Pull YouTube comments (needs the API key)
+      - name: Pull YouTube comments (needs the API key — non-fatal, reported)
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: |
+          # A SET key that Google REJECTS is not the same as an unset key, and this step used to
+          # treat only the second case as survivable. When the key went invalid on 2026-07-31
+          # ("API key not valid"), the script exited non-zero, the step failed, and the job stopped
+          # HERE — so Pantip and all three rebuild steps below never ran. The result: app_reviews,
+          # apple_reviews, rival_pulse, social_themes and pantip_panel were never once refreshed by
+          # the workflow that owns them. One broken feed took down five working ones.
+          #
+          # Same set +e / rc / warning shape as the Pantip step directly below, which already had
+          # it. That is pull_swarm.py's stated principle — one feed failing never aborts the rest —
+          # finally applied to this older workflow too.
           if [ -z "$YOUTUBE_API_KEY" ]; then
             echo "::warning title=YouTube skipped::YOUTUBE_API_KEY secret is not set — comment threads not refreshed this run."
           else
+            set +e
             python pipeline/pull_youtube_comments.py
+            rc=$?
+            set -e
+            if [ "$rc" -ne 0 ]; then
+              echo "::warning title=YouTube pull failed::pull_youtube_comments.py exited $rc — comment threads not refreshed. A 400 'API key not valid' means the YOUTUBE_API_KEY secret needs replacing (check the key is unrestricted for server-side use and that YouTube Data API v3 is enabled on its project). Continuing so the rest of this job still runs."
+            fi
           fi
 
       - name: Pull Pantip (UNVERIFIED from a datacenter IP — non-fatal, reported)
