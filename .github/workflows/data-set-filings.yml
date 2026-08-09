@@ -1,0 +1,158 @@
+name: Data — SET peer filings, MD&A + audited notes (weekly)
+
+# Refreshes the MEASURED company disclosures for the six SET-listed Thai title-loan lenders
+# (MTC, TIDLOR, SAWAD, TURBO, HENG, SAK) via pipeline/pull_set_filings.py:
+#   source-data/set_filings/index.json  — what was found and pulled
+#   source-data/set_filings/text/       — flattened text of each filing
+#
+# Two KINDS, because they answer different questions (see the script's own docstring):
+#   mda  management's NARRATIVE — branch counts, growth, credit-cost commentary (a PDF)
+#   fs   the AUDITED statements + NOTES — IFRS-9 Stage 1/2/3 ECL, allowance movement,
+#        receivables by collateral type, maturity analysis (a ZIP)
+# The MD&A is what management CHOSE to say; the notes are what the auditor made them disclose.
+#
+# WHY THIS WORKFLOW EXISTS — the feed had NO SCHEDULE AT ALL.
+# `set_filings` sits in pull_swarm.py's REGISTRY flagged `needs_browser=True`, and
+# data-swarm.yml runs the swarm with `--skip-browser`, so the swarm has never pulled it once.
+# data-swarm.yml's own header states the browser feeds are handled elsewhere — "set_peers has its
+# own dedicated job, .github/workflows/data-set-peers.yml" — which is true for set_peers and was
+# silently false for set_filings: no workflow ran it, anywhere. It moved only when somebody ran it
+# by hand. That is the same defect as place_ratings (fixed 2026-08-08) and the YOUTUBE_API_KEY
+# outage: a live source that no schedule owns, aging in silence while the board looks fine.
+#
+# It is not a dormant layer. The 2026-08-08 Competition-tab audit rewrote build_exit_whitespace.py's
+# survivor framing on the strength of THESE texts — HENG's filed branch collapse (1,018 -> 743 ->
+# 450), loan book ฿13,206.2m -> ฿8,002.8m, Stage 3 NPL 6.78%, and a covenant waiver dated
+# 31 Dec 2025. That is a rival in visible distress, evidenced from its own audited notes. Letting
+# the corpus freeze means the next quarter's evidence never arrives.
+#
+# WHY WEEKLY FOR QUARTERLY DOCUMENTS: the registry marks the CADENCE OF THE DATA as quarterly, and
+# that is right — a company files once a quarter. But six companies file on six different dates,
+# scattered across roughly a six-week window after each quarter end. A quarterly cron would land on
+# one arbitrary day in that window and systematically miss most of them by weeks. Weekly costs one
+# browser install and six symbol searches, and bounds the lag at seven days. The pull is
+# incremental — already-downloaded filings are skipped — so a run with no new filing is cheap and
+# opens no PR.
+#
+# WHY A BROWSER: set.or.th's JSON API 403s every external request (Akamai bot protection). The
+# reliable path is a real headless browser loading a SET page and calling the news-search API
+# SAME-ORIGIN via fetch() from inside it — exactly the pattern pull_set_peers.py uses and
+# data-set-peers.yml already runs successfully on ubuntu-latest. Nothing here is Thai-IP locked;
+# it is Akamai's bot check, not geography, that the browser gets past.
+#
+# PR-ONLY, NEVER auto-merge. These are third-party company disclosures that feed editorial and
+# competitive judgements, so a human reads what arrived before it lands. Committed to a fresh
+# data/set-filings-<run_id> branch and opened as a DRAFT PR against the branch this ran on.
+# No-ops cleanly when no new filing has been published.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Saturday 12:50 UTC = 19:50 Bangkok. Off-minute and off-day from every other data-*.yml job
+    # (nabc :15, thaiwater :20, swarm :35 x4, set-peers 11:15 weekdays, social 20:40 Tue), so this
+    # job's checkout never races one of theirs.
+    - cron: "50 12 * * 6"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40        # 6 symbols x up to 4 filings each, PDF/ZIP download + text extraction
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Install Playwright (Python client) + Chromium + the extractors
+        run: |
+          # pull_set_filings.py imports playwright.sync_api (the PYTHON client, not the Node one
+          # qa.yml uses for rendering), pdfplumber for the MD&A PDFs, and openpyxl for the .xlsx
+          # members inside the financial-statement ZIPs. It checks all three up front and exits
+          # with a named message rather than failing deep in a download, so a missing one here is
+          # loud — but only if it is actually installed to begin with. Pinned playwright for a
+          # reproducible browser build, same as data-set-peers.yml.
+          pip install playwright==1.49.1 pdfplumber openpyxl
+          python -m playwright install --with-deps chromium
+
+      - name: Pull MD&A + financial-statement filings for all 6 peers
+        id: pull
+        run: |
+          # Non-fatal by design. A single symbol's filing can 404, or SET can serve an attachment
+          # the extractor cannot read, and that must not throw away the other five peers' filings
+          # — same principle pull_swarm.py applies per feed. The exit code is reported in the PR
+          # body so a partial pull is visible rather than laundered into "nothing new was filed".
+          set +e
+          python pipeline/pull_set_filings.py --kind both
+          rc=$?
+          set -e
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning title=set_filings pull returned $rc::pull_set_filings.py exited $rc — whatever it did manage to write is still committed below, and the exit code is reported in the PR body. Check this step's log for which symbol failed."
+          fi
+
+      - name: Commit to a data branch + open a draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/set-filings-${{ github.run_id }}
+          PULL_RC: ${{ steps.pull.outputs.rc }}
+        run: |
+          # Unlike every other data-*.yml job, this one CANNOT use `git add -u` alone. Its whole
+          # output is NEW files — a newly published filing is by definition untracked, and `-u`
+          # stages only already-tracked paths, so `-u` would commit the index.json edit while
+          # silently dropping the text/ files it points at. That is exactly the bug that kept
+          # swarm_runs.json uncommitted for every run of data-swarm.yml. `add -A` over this one
+          # directory is scoped tightly enough to stay honest: nothing outside source-data/set_filings
+          # is touched by this job.
+          git add -A source-data/set_filings
+          if git diff --cached --quiet; then
+            echo "No new filings published since the last run. No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+
+          NEW_FILES="$(git diff --cached --name-only --diff-filter=A -- source-data/set_filings/text | wc -l | tr -d ' ')"
+          NEW_LIST="$(git diff --cached --name-only --diff-filter=A -- source-data/set_filings/text | sed 's|.*/||' | head -20)"
+          NFILINGS="$(python -c "import json;d=json.load(open('source-data/set_filings/index.json',encoding='utf-8'));f=d.get('filings') or d.get('items') or [];print(len(f) if isinstance(f,list) else 'n/a')")"
+
+          git commit -m "data: SET peer filings refresh (run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-set-filings.yml via pipeline/pull_set_filings.py (set.or.th, MEASURED company disclosures, same-origin in-browser search). ${NEW_FILES} new extracted text file(s) across the six listed peers."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated weekly SET peer-filings refresh (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "**${NEW_FILES} new extracted text file(s)**; \`index.json\` now tracks **${NFILINGS}** filings."
+            echo
+            if [ "$NEW_FILES" -gt 0 ]; then
+              echo "New this run:"
+              echo '```'
+              echo "$NEW_LIST"
+              echo '```'
+              echo
+            fi
+            if [ "$PULL_RC" != "0" ]; then
+              echo "**PARTIAL PULL** — \`pull_set_filings.py\` exited \`$PULL_RC\`. What it did write is committed here;"
+              echo "read the pull step's log for which symbol failed before treating this as a complete quarter."
+              echo
+            fi
+            echo "Provenance: **MEASURED** — the companies' own filings to the Stock Exchange of Thailand."
+            echo "\`mda\` is management's narrative; \`fs\` is the audited/reviewed statements **and the notes**"
+            echo "(IFRS-9 Stage 1/2/3 ECL, allowance movement, receivables by collateral type). Where the two"
+            echo "disagree, **the notes win** — the MD&A is what management chose to say, the notes are what"
+            echo "the auditor made them disclose."
+            echo
+            echo "These are third-party disclosures, not our own data: nothing here is derived, nothing enters"
+            echo "\`platform/data/\`, and the determinism gate does not cover it (the corpus grows as SET"
+            echo "publishes). Read what arrived before drawing a competitive conclusion from it."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: SET peer filings refresh (run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md
