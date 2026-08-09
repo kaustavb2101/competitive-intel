@@ -2,26 +2,33 @@
 """
 build_exit_whitespace.py — "competitor-exit white-space" cue per amphoe (district)
 =================================================================================
-Objective #2 (WHERE TO EXPAND). A REGULATORY-TAILWIND lens.
+Objective #2 (COMPETITIVE RISK on the network we already run — NOT branch expansion).
+A REGULATORY-TAILWIND lens on where the rival field is thinnest.
 
 THE THESIS (regulatory tailwind, cited)
 ---------------------------------------
 Thailand's BoT responsible-lending framework (notification 25680030) puts auto
 title-loan operators under a personal-loan licence: >=THB 50m registered capital,
 interest capped at 28%. The registration window closes **Q1 2026**; non-compliant,
-sub-scale / informal lenders risk **forced exit**. Tighter supervision favours
-scaled, compliant incumbents (MTC, SAWAD, Tidlor, Heng, and AutoX) and squeezes
-small operators out — so **white-space may open as sub-scale rivals retreat**.
+sub-scale / informal lenders risk **forced exit**. The bar selects on SCALE AND
+CAPITAL, not on financial health — tighter supervision squeezes small operators out,
+so **the rival field may thin as sub-scale operators retreat**. That does not make
+every big-4 incumbent healthy: HENG, one of the four brands censused below, is
+itself contracting sharply per its own SET filings (branches 1,018→743→450 and
+gross loan book ฿13,206.2m→฿8,002.8m, Dec 2024→Jun 2026; see honesty_caveat for the
+full, cited figures). "Compliant" is not "thriving".
 (docs/RESEARCH_DIGEST.md, section A; https://www.bot.or.th/.../25680030.pdf)
 
 ⛔ HONESTY — WHY THIS IS AN ESTIMATED PROXY, NOT A MEASUREMENT
 -------------------------------------------------------------
 The firms that will EXIT are exactly the sub-scale / informal operators we do
-**not** census. platform/data/competitors_national.json is a best-effort Google
-Places census of the FOUR BIG, COMPLIANT brands only (Heng, Muangthai, Tidlor,
-Srisawad) — i.e. the incumbents who will *survive*, not the marginal players who
-will leave. We therefore CANNOT directly measure where sub-scale rivals will exit;
-inventing such a count would be fabrication.
+**not** census. platform/data/competitors_census.json is a MEASURED census of the
+FOUR BIG, BoT-compliant brands only (Heng, Muangthai, Tidlor, Srisawad) — i.e. the
+incumbents large enough to clear the capital/licensing bar, not necessarily
+incumbents that are healthy (see the HENG distress note above and in
+honesty_caveat) — and not the marginal players who will leave. We therefore
+CANNOT directly measure where sub-scale rivals will exit; inventing such a count
+would be fabrication.
 
 What we CAN do honestly is INFER the opportunity surface: districts where AutoX
 demand/white-space exists but the big-4 are ABSENT or SPARSE. In such districts the
@@ -44,9 +51,11 @@ operators are compliant it is presence, NOT a count of who will exit under Q1-20
 METHOD (deterministic, network-free)
 ------------------------------------
 Per amphoe (keyed by the SAME th_amphoe.geojson shapeID build_amphoe.py uses):
-  - big4_competitors   MEASURED  point-in-polygon count of competitors_national.json
-                                 (+ _overture if present) into the polygon. The
-                                 big-4 footprint = the *surviving* incumbents.
+  - big4_competitors   MEASURED  point-in-polygon count of competitors_census.json
+                                 into the polygon. The big-4 footprint = the four
+                                 BoT-compliant incumbents (compliant with the Q1-2026
+                                 capital bar; not necessarily financially healthy —
+                                 see honesty_caveat).
   - demand             MEASURED  amphoe.json demand (OSM footfall + workers), 0-100.
   - whitespace         MEASURED  amphoe.json whitespace (demand minus AutoX
                                  saturation), 0-100.
@@ -233,14 +242,22 @@ def build():
                  "CAPTURE SHARE if marginal sub-scale operators exit under the Q1-2026 "
                  "registration deadline. NOT a measurement of sub-scale operators (we do "
                  "not census them); inferred from big-4 scarcity x our demand/white-space.",
-        "objective": "Acquisition / where to expand (objective #2) — a regulatory-tailwind lens.",
+        "objective": "Competitive risk on the existing network (objective #2) — a "
+                     "regulatory-tailwind lens on rival-field thinness, not a where-to-expand cue.",
         "regulatory_citation": {
             "summary": "BoT responsible-lending framework (notification 25680030): auto "
                        "title-loan operators need a personal-loan licence (>=THB 50m capital, "
                        "28% interest cap). Registration window closes Q1 2026; non-compliant, "
-                       "sub-scale / informal lenders risk forced exit. Tighter supervision "
-                       "favours scaled compliant incumbents and squeezes small operators out, "
-                       "so white-space may open as sub-scale rivals retreat.",
+                       "sub-scale / informal lenders risk forced exit. The bar selects on scale "
+                       "and capital, not financial health: one of the four brands it 'favours', "
+                       "HENG, is itself contracting sharply per its own SET filings — branches "
+                       "1,018→743→450 and gross loan book ฿13,206.2m→฿8,002.8m "
+                       "(Dec 2024→Jun 2026), a covenant-waiver letter dated 31 Dec 2025, Stage 3 "
+                       "(NPL) at 6.78% (฿542.8m/฿8,002.8m, Jun 2026), headcount cut "
+                       "2,041→1,527 amid a stated 'regrouping of branches' (HENG FY2025 annual "
+                       "report). So the rival field may still thin as sub-scale operators retreat, "
+                       "but 'compliant incumbent' should not be read as 'thriving incumbent' — see "
+                       "honesty_caveat.",
             "deadline": "Q1 2026",
             "confidence": "High",
             "sources": [
@@ -250,17 +267,34 @@ def build():
             "from": "docs/RESEARCH_DIGEST.md, section A (Conf: High)",
         },
         "honesty_caveat": "The operators that will EXIT are the sub-scale / informal lenders. "
-                          "competitors_national.json is a best-effort census of the FOUR BIG, COMPLIANT "
-                          "brands (Heng, Muangthai, Tidlor, Srisawad) — the incumbents who will SURVIVE "
-                          "— so the exit-capture SCORE is still inferred from big-4 absence x demand and "
-                          "stays ESTIMATED. What we CAN now measure is sub-scale rival PRESENCE: the "
-                          "pico_operators component is a straight tally of LICENSED PICO-finance operators "
-                          "in the district (pico_district.json, FPO registry), surfaced beside the "
-                          "inferred sub_scale_proxy as a reality-check — high where a real sub-scale field "
-                          "backs the inference, 0 where the residual rests on big-4 absence alone. It does "
-                          "NOT feed the score, and because licensed PICO operators are compliant it "
-                          "measures presence, not which operators will exit. Treat exit_capture_score as "
-                          "ESTIMATED; treat pico_operators as MEASURED.",
+                          "competitors_census.json is a MEASURED census of the FOUR BIG, BoT-compliant "
+                          "brands (Heng, Muangthai, Tidlor, Srisawad) — the incumbents large enough to "
+                          "clear the capital/licensing bar, NOT necessarily incumbents that are healthy. "
+                          "One of the four, HENG, is itself in visible distress per its own SET filings: "
+                          "branches collapsed 1,018→743→450 (Dec 2024→Dec 2025→Jun 2026; HENG MD&A "
+                          "2026-02-10 and 2026-08-07), gross loan book ฿13,206.2m→฿9,412.7m→฿8,002.8m over "
+                          "the same span, a covenant-waiver letter dated 31 Dec 2025 for a breached "
+                          "financial-ratio covenant (HENG FS notes, 2026-02-10 filing), Stage 3 "
+                          "(credit-impaired) receivables at 6.78% of the gross book as of 30 Jun 2026 "
+                          "(฿542.8m/฿8,002.8m; HENG FS notes, 2026-08-07 filing), and headcount cut "
+                          "2,041→1,527 in 2025 amid a stated 'organizational restructuring and the "
+                          "regrouping of branches' (HENG FY2025 annual report). So 'compliant' in this "
+                          "census should not be read as 'thriving' — HENG's own 450 post-collapse "
+                          "branches (2.7% of the 16,491 census points that join to a district) are what "
+                          "get counted here, and excluding them entirely leaves the SAME 20 districts in "
+                          "the top-20 the UI renders (two adjacent ranks swap order within it) and moves "
+                          "the largest district score anywhere by at most 1.6 points on this 0-100 scale — "
+                          "so the scoring formula and competitor-census inputs are unchanged; only this "
+                          "caveat's framing of the big-4 as uniformly healthy 'survivors' was wrong and is "
+                          "corrected here. The exit-capture SCORE is still inferred from big-4 "
+                          "scarcity x demand and stays ESTIMATED. What we CAN now measure is sub-scale "
+                          "rival PRESENCE: the pico_operators component is a straight tally of LICENSED "
+                          "PICO-finance operators in the district (pico_district.json, FPO registry), "
+                          "surfaced beside the inferred sub_scale_proxy as a reality-check — high where a "
+                          "real sub-scale field backs the inference, 0 where the residual rests on big-4 "
+                          "absence alone. It does NOT feed the score, and because licensed PICO operators "
+                          "are compliant it measures presence, not which operators will exit. Treat "
+                          "exit_capture_score as ESTIMATED; treat pico_operators as MEASURED.",
         "n_districts": len(districts),
         "pico_crosscheck": {
             "component": "components.pico_operators",
@@ -292,7 +326,7 @@ def build():
         },
         "provenance": {
             "measured": [
-                "big4_competitors (PIP of competitors_national.json into th_amphoe.geojson, MEASURED best-effort)",
+                "big4_competitors (PIP of competitors_census.json into th_amphoe.geojson, MEASURED)",
                 "demand, whitespace (platform/data/amphoe.json, MEASURED — OSM footfall + AutoX saturation)",
                 "pico_operators (per-district tally of licensed PICO-finance operators, pico_district.json / "
                 "FPO registry — MEASURED sub-scale rival presence; a cross-check, does NOT feed the score)",
