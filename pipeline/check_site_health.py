@@ -470,6 +470,41 @@ def _shape_rival_threat(d):
     return None
 
 
+def _shape_regional_outlook(d):
+    # The Overview (#overview) LEAD narrative (regional_outlook.json) — a pure
+    # deterministic rollup of the SAME per-branch recs the map shows, and the very
+    # first thing the Overview tab renders: renderNationalOutlook draws the "Bottom
+    # line" insight straight off OUTLOOK.national.headline, and the region rows carry
+    # the per-province .metrics that provDetailHTML reveals in the risk-drill
+    # (region -> province -> branch). The whole #outlook block is null-guarded to
+    # render NOTHING when the file is absent (loadOutlook swallows a non-200), so a
+    # truncated CDN deploy that drops or empties it silently blanks the Overview's
+    # lead answer with NO phone alert — the same "broken demo" blind spot the
+    # collateral_book / macro_book / farm_book / rival_threat_region probes closed
+    # for the sibling front-door reads. Asserts the render shape (the national.headline
+    # the lead insight reads, the 5 macro-region rows carrying per-province drills, and
+    # a ~77-province total across regions), not values — robust to a future vintage
+    # reshuffling the narrative or the recommendations.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'national' block (Overview lead render read)"
+    if not (isinstance(nat.get("headline"), str) and nat["headline"].strip()):
+        return "national.headline missing/blank (the 'Bottom line' insight render)"
+    regs = d.get("regions")
+    if not isinstance(regs, list) or len(regs) != 5:
+        return "expected 5 macro-region rows, got %s" % (
+            len(regs) if isinstance(regs, list) else type(regs).__name__)
+    r0 = regs[0]
+    if not isinstance(r0, dict) or not isinstance(r0.get("provinces"), list):
+        return "first region missing 'provinces' drill list"
+    tot = sum(len(r.get("provinces", [])) for r in regs if isinstance(r, dict))
+    if tot < 70:
+        return "only %d provinces across regions (expected ~77 — truncated build)" % tot
+    return None
+
+
 def _shape_rival_threat_region(d):
     # The per-region density x service JOIN (rival_threat_region.json, obj #2) —
     # the ONE competitive read that renders on the exec FRONT DOOR (renderHomeDefend
@@ -1925,6 +1960,15 @@ DATA_FILES = [
     # verdict/commentary render shape (national KPIs + province dict + crops rows),
     # not values.
     ("data/farm_book.json", _shape_farm_book, ".national KPI block + province drill + .crops commentary (Overview farm-book section)"),
+    # The Overview (#overview) LEAD narrative (regional_outlook.json) — the very
+    # first thing the tab renders (renderNationalOutlook draws the "Bottom line"
+    # insight off .national.headline) and the source of the per-province .metrics
+    # the risk-drill reveals. The #outlook block is fully null-guarded (absent file
+    # -> renders nothing), so a truncated CDN deploy that drops it silently blanks
+    # the Overview's lead answer with no phone alert — the same blind spot the
+    # collateral_book / macro_book / farm_book probes closed for the sibling Overview
+    # reads. Asserts the national.headline gate + the 5 macro-region drill rows.
+    ("data/regional_outlook.json", _shape_regional_outlook, ".national.headline lead insight + 5 macro-region drill rows (~77 provinces) (Overview lead narrative)"),
     # The Exposure (#exposure) tab's flagship obj-#1 flood read, and the audit's own
     # flagged "next probe target" after farm_book. renderFloodExposure gates the whole
     # "Portfolio flood-hazard exposure" panel on `FLOODHZ && FLOODHZ.length` (the
