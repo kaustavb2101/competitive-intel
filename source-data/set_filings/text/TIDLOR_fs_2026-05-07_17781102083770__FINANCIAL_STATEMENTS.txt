@@ -1,0 +1,322 @@
+
+[SHEET: Assets]
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY										
+STATEMENTS  OF  FINANCIAL  POSITION										
+AS  AT  MARCH  31,  2026										
+UNIT : THOUSAND BAHT										
+			CONSOLIDATED				SEPARATE			
+			FINANCIAL STATEMENTS				FINANCIAL STATEMENTS			
+			“UNAUDITED”				“UNAUDITED”			
+			As at		As at		As at		As at	
+			March  31,		December 31,		March  31,		December 31,	
+	Notes		2026		2025		2026		2025	
+ASSETS										
+CURRENT  ASSETS										
+Cash and cash equivalents	5.1		3389034		3060341		26848		109444	
+Current portion of loans and										
+hire-purchase receivables	6 and 18		34800726		35057848		5010331		14179	
+Other current receivables										
+Receivable from payment agents			143383		265270		0		0	
+Current contract assets			697604		750559		105		1	
+Prepaid expenses			284944		324965		5100		96	
+Other receivables			90469		46646		0		0	
+Other current assets			32724		24755		538		0	
+Properties foreclosed			133655		174224		0		0	
+Total Current Assets			39572539		39704608		5042922		123720	
+NON-CURRENT  ASSETS										
+Investment in subsidiary			0		0		31895973		31895973	
+Investment in joint venture			92597		90183		0		0	
+Loans and hire-purchase receivables										
+- net of current portion	6 and 18		69639106		69027920		10993806		7995518	
+Leasehold improvement and equipment	7		1762467		1769603		149		198	
+Goodwill			294001		294001		0		0	
+Other intangible assets other than goodwill			292510		306399		0		0	
+Deferred tax assets			1497181		1470465		0		0	
+Other non-current assets			154408		133594		0		0	
+Total Non-current Assets			73732270		73092165		42889928		39891689	
+TOTAL  ASSETS			113304809		112796773		47932850		40015409	
+The condensed notes to the financial statements form an integral part of these interim financial statements										
+
+[SHEET: liabilities]
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY														
+STATEMENTS  OF  FINANCIAL  POSITION  (CONTINUED)														
+AS  AT  MARCH  31,  2026														
+UNIT : THOUSAND BAHT														
+			CONSOLIDATED				SEPARATE							
+			FINANCIAL STATEMENTS				FINANCIAL STATEMENTS							
+			“UNAUDITED”				“UNAUDITED”							
+			As at		As at		As at		As at					
+			March  31,		December 31,		March  31,		December 31,					
+	Notes		2026		2025		2026		2025					
+LIABILITIES  AND  SHAREHOLDERS’  EQUITY														
+CURRENT  LIABILITIES														
+Short-term borrowings	8 and 18		850000		850000		0		0					
+Other current payables														
+Amounts due to related parties	17.1		13351		6077		6506		10584					
+The Revenue Department payable			274792		170382		167		25882					
+Accrued expenses			1083571		1826870		41478		14531					
+Other current payables			460007		486245		338		28208					
+Short-term borrowings from related party	9		0		1000000		0		0					
+Current portion of long-term borrowings	10, 17 and 18		16360381		14858860		0		0					
+Current portion of long-term debentures	11 and 18		11944365		11898083		0		0					
+Other current financial liabilities	17.1 and 18		22446		18586		0		0					
+Current portion of lease liabilities			493486		489142		150		284					
+Current income tax payable			1166910		763009		0		0					
+Current provision for employee benefits			6756		1297		0		0					
+Other current liabilities			58366		62783		0		0					
+Total Current Liabilities			32734431		32431334		48639		79489					
+NON-CURRENT  LIABILITIES														
+Long-term borrowings - net of current portion	10, 17 and 18		25057300		24415145		7998622		4998507					
+Long-term debentures - net of current portion	11 and 18		18439907		20387965		2988698		2987645					
+Lease liabilities - net of current portion			427466		448322		0		0					
+Non-current provision for employee benefits			317342		305633		2173		2113					
+Other non-current financial liabilities	18		116599		202739		0		0					
+Other non-current liabilities			136585		142836		0		0					
+Total Non-current Liabilities			44495199		45902640		10989493		7988265					
+TOTAL  LIABILITIES			77229630		78333974		11038132		8067754					
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY														
+STATEMENTS  OF  FINANCIAL  POSITION  (CONTINUED)														
+AS  AT  MARCH  31,  2026														
+UNIT : THOUSAND BAHT														
+			CONSOLIDATED				SEPARATE							
+			FINANCIAL STATEMENTS				FINANCIAL STATEMENTS							
+			“UNAUDITED”				“UNAUDITED”							
+			As at		As at		As at		As at					
+			March  31,		December 31,		March  31,		December 31,					
+			2026		2025		2026		2025					
+LIABILITIES  AND  SHAREHOLDERS’  EQUITY  (CONTINUED)														
+SHAREHOLDERS’  EQUITY														
+SHARE  CAPITAL														
+Authorized share capital														
+2,913,502,290 ordinary shares of Baht 3.7 each			10779958		10779958		10779958		10779958					
+Issued and paid-up share capital														
+2,895,929,570 ordinary shares of														
+Baht 3.7 each, fully paid			10714939		10714939		10714939		10714939					
+Ordinary shares premium accounts			7390915		7390915		21181034		21181034					
+Surplus on share-based payment			67852		58126		0		0					
+RETAINED  EARNINGS														
+Appropriated														
+Legal reserve			1154417		1154417		52309		52309					
+Unappropriated			16784159		15170415		4946149		-914					
+Treasury shares			-89861		-83074		0		0					
+Other components of shareholders’ equity			-134806		-150629		287		287					
+Total owners of the Company			35887615		34255109		36894718		31947655					
+Non-controlling interest			187564		207690		0		0					
+TOTAL  SHAREHOLDERS’  EQUITY			36075179		34462799		36894718		31947655					
+TOTAL  LIABILITIES  AND  SHAREHOLDERS’  EQUITY			113304809		112796773		47932850		40015409					
+The condensed notes to the financial statements form an integral part of these interim financial statements														
+
+[SHEET: 3M]
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY														
+STATEMENTS  OF  COMPREHENSIVE  INCOME														
+FOR  THE  THREE-MONTH  PERIOD  ENDED  MARCH   31,  2026														
+“UNAUDITED”														
+UNIT : THOUSAND BAHT														
+			CONSOLIDATED											
+			FINANCIAL STATEMENTS											
+			2026		2025									
+					“RESTATED”		SEPARATE							
+			After		Before		FINANCIAL STATEMENTS							
+	Notes		restructuring		restructuring		2026		2025					
+REVENUES														
+Interest income on hire-purchase receivables			266947		304718		0		0					
+Interest income on loans			4702120		4353405		72741		0					
+Fee and service income	12		1051036		971677		0		0					
+Dividend income	17.2		0		0		4955912		0					
+Other income			49369		10609		104		5					
+Total Revenues			6069472		5640409		5028757		5					
+EXPENSES														
+Service and administrative expenses			2980905		2730029		9136		12805					
+Total Expenses			2980905		2730029		9136		12805					
+PROFIT  (LOSS)  FROM  OPERATING  ACTIVITIES			3088567		2910380		5019621		-12800					
+Loss arising from de-recognition of financial assets														
+measured at amortised cost			-503002		-600331		0		0					
+Finance costs			-593062		-630814		-68058		-81					
+Reversal of impairment (loss) determined in accordance with TFRS 9			35081		-171187		-4500		0					
+Share of profit from joint venture			2414		0		0		0					
+PROFIT  (LOSS)  BEFORE  INCOME  TAX  EXPENSES			2029998		1508048		4947063		-12881					
+INCOME  TAX  EXPENSES			-406408		-302886		0		0					
+PROFIT  (LOSS)  FOR  THE  PERIOD			1623590		1205162		4947063		-12881					
+OTHER  COMPREHENSIVE  INCOME  (LOSS)														
+Components of other comprehensive income (loss)														
+that will be reclassified to profit or loss														
+Gains (losses) on cash flow hedges			19875		-47266		0		0					
+Income tax relating to components of other comprehensive														
+income (loss) that will be reclassified to profit or loss			-3956		8284		0		0					
+Total components of other comprehensive income (loss)														
+that will be reclassified to profit or loss			15919		-38982		0		0					
+Components of other comprehensive income (loss)														
+that will not be reclassified to profit or loss														
+Gain on re-measurements of defined benefit plans			0		196		0		0					
+Income tax relating to components of other comprehensive														
+income (loss) that will not be reclassified to profit or loss			0		-39		0		0					
+Total components of other comprehensive income (loss)														
+that will not be reclassified to profit or loss			0		157		0		0					
+Total other comprehensive income (loss) for the period, net of tax			15919		-38825		0		0					
+TOTAL  COMPREHENSIVE  INCOME  (LOSS)  FOR  THE  PERIOD			1639509		1166337		4947063		-12881					
+NET  PROFIT  (LOSS)  ATTRIBUTABLE														
+Owners of the Company			1613744		1197815		4947063		-12881					
+Non-controlling interest			9846		7347		0		0					
+			1623590		1205162		4947063		-12881					
+TOTAL COMPREHENSIVE  INCOME  (LOSS)  ATTRIBUTABLE														
+Owners of the Company			1629567		1159225		4947063		-12881					
+Non-controlling interest			9942		7112		0		0					
+			1639509		1166337		4947063		-12881					
+EARNINGS  (LOSS)  PER  SHARE  OF  THE  PARENT  COMPANY														
+BASIC  EARNINGS  (LOSS)  PER  SHARE  (BAHT)	13		0.56		0.41		1.71		-1288.15					
+The condensed notes to the financial statements form an integral part of these interim financial statements														
+
+[SHEET: shareholder conso]
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY																												
+STATEMENTS  OF  CHANGES  IN  SHAREHOLDERS’ EQUITY																												
+FOR  THE  THREE-MONTH  PERIOD  ENDED  MARCH  31,  2026																												
+“UNAUDITED”																												
+UNIT : THOUSAND BAHT																												
+				BEFORE  RESTRUCTURING - CONSOLIDATED  FINANCIAL  STATEMENTS “RESTATED”																								
+																		Other Components of Shareholders’ Equity										
+								Issued Share Capital										Other Comprehensive Income (loss)										
+								and Ordinary Shares		Surplus on		Retained Earnings								Gains (Losses)				Total				Total
+				Issued and Paid-up		Ordinary Shares		Premium Accounts		Share-based		Appropriated						Gains (Losses) on		on Re-measurements		Total Other Components		owners of		Non-controlling		Shareholders’
+				Share Capital		Premium Accounts		for restructuring plan		Payment		Legal Reserve		Unappropriated		Treasury Shares		Cash Flow Hedges		of Defined Benefit Plans		of Shareholders’ Equity		the Company		interest		Equity
+Balances as at January 1, 2025				37		0		18105854		27574		1071506		11305104		-64528		-52956		-53450		-106406		30339141		184121		30523262
+Share-based Payment				0		0		0		4079		0		0		0		0		0		0		4079		26		4105
+Increase in treasury shares				0		0		0		0		0		0		-9659		0		0		0		-9659		-58		-9717
+Total comprehensive income				0		0		0		0		0		1197815		0		-38746.88099103571		157.0530582215537		-38589.82793281416		1159225.1720671859		7112		1166337.1720671859
+Balances as at March 31,  2025				37		0		18105854		31653		1071506		12502919		-74187		-91702.88099103571		-53292.94694177845		-144995.82793281417		31492786.172067188		191201		31683987.172067188
+				AFTER  RESTRUCTURING - CONSOLIDATED  FINANCIAL  STATEMENTS																								
+Balances as at January 1, 2026				10714939		7390915		0		58126		1154417		15170415		-83074		-83635		-66994		-150629		34255109		207690		34462799
+Share-based Payment				0		0		0		9726		0		0		0		0		0		0		9726		0		9726
+Increase in treasury shares				0		0		0		0		0		0		-6787		0		0		0		-6787		0		-6787
+Total comprehensive income				0		0		0		0		0		1613744		0		15823		0		15823		1629567		9942		1639509
+Dividend paid from a subsidiary				0		0		0		0		0		0		0		0		0		0		0		-30068		-30068
+Balances as at March 31,  2026				10714939		7390915		0		67852		1154417		16784159		-89861		-67812		-66994		-134806		35887615		187564		36075179
+The condensed notes to the financial statements form an integral part of these interim financial statements																												
+
+[SHEET: shareholder separate]
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY													
+STATEMENTS  OF  CHANGES  IN  SHAREHOLDERS’  EQUITY													
+FOR  THE  THREE-MONTH  PERIOD  ENDED  MARCH   31,  2026													
+“UNAUDITED”													
+UNIT : THOUSAND BAHT													
+			SEPARATE  FINANCIAL  STATEMENTS										
+											Other Components of		
+											shareholders’ Equity		
+			Issued and				Retained Earning (deficit)				Other Comprehensive Loss		Total
+			Paid-up		Ordinary Shares		Appropriated				Losses on re-measurements		Shareholders’
+			Share Capital		Premium Accounts		Legal reserve		Unappropriated		of defined benefit plans		Equity
+Balance as at January 1, 2025			37		0		0		-3641		-196		-3800
+Total comprehensive loss			0		0		0		-12881		0		-12881
+Balance as at March 31, 2025			37		0		0		-16522		-196		-16681
+Balance as at January 1, 2026			10714939		21181034		52309		-914		287		31947655
+Total comprehensive income			0		0		0		4947063		0		4947063
+Balance as at March 31, 2026			10714939		21181034		52309		4946149		287		36894718
+The condensed notes to the financial statements form an integral part of these interim financial statements													
+
+[SHEET: cash flows]
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY										
+STATEMENTS  OF  CASH  FLOWS										
+FOR  THE  THREE-MONTH  PERIOD  ENDED  MARCH  31,  2026										
+“UNAUDITED”										
+UNIT : THOUSAND  BAHT										
+			CONSOLIDATED							
+			FINANCIAL STATEMENTS							
+			2026		2025					
+					“RESTATED”		SEPARATE			
+			After		Before		FINANCIAL STATEMENTS			
+			restructuring		restructuring		2026		2025	
+CASH  FLOWS  FROM  OPERATING  ACTIVITIES										
+Profit (loss) for the periods			1623590		1205162		4947063		-12881	
+Adjustments to reconcile income to cash received (paid)										
+Incomes tax expenses			406408		302886		0		0	
+Finance costs			593062		630814		68058		81	
+Depreciation and amortisation			255286		254397		49		0	
+Loss arising from de-recognition of financial assets measured										
+at amortised cost			503002		600331		0		0	
+(Reversal) of impairment loss determined in accordance with TFRS 9			-35081		171187		4500		0	
+Loss on disposals and impairment of properties foreclosed			110839		208854		0		0	
+(Gain) loss on disposals and write-off leasehold improvement,										
+equipment and intangible assets			-2496		-582		0		0	
+(Gain) loss on impairment and write-off other assets										
+and change in fair value attributable to change in credit risk			-841		2		0		0	
+Share of profit of joint venture			-2414		0		0		0	
+Short-term employee benefit expenses			5459		4308		0		0	
+Long-term employee benefit expenses			11709		10102		60		59	
+Employee Joint Investment Program expenses			9726		4105		0		0	
+Profit (loss) from operations before changes in										
+Operating assets and liabilities			3478249		3391566		5019730		-12741	
+Operating assets (increase) decrease										
+Loans and hire-purchase receivables			-1265182		-1977921		-7980000		0	
+Receivable from payment agents			121887		140394		0		0	
+Current contract assets			53657		134038		-104		0	
+Prepaid expenses			40021		3497		-5004		0	
+Other receivables			-43684		36923		0		0	
+Other current assets			-7431		-20784		0		2	
+Other non-current assets			-20814		-1483		0		0	
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY										
+STATEMENTS  OF  CASH  FLOWS  (CONTINUED)										
+FOR  THE  THREE-MONTH  PERIOD  ENDED  MARCH  31,  2026										
+“UNAUDITED”										
+UNIT : THOUSAND  BAHT										
+			CONSOLIDATED							
+			FINANCIAL STATEMENTS							
+			2026		2025					
+					“RESTATED”		SEPARATE			
+			After		Before		FINANCIAL STATEMENTS			
+	Notes		restructuring		restructuring		2026		2025	
+CASH  FLOWS  FROM  OPERATING  ACTIVITIES  (CONTINUED)										
+Operating liabilities increase (decrease)										
+Amounts due to related parties			8914		1230		-2438		0	
+The Revenue Department payable			104410		114388		-25715		0	
+Accrued expenses			-666800		-743907		17		0	
+Other current payables			-13138		74892		-27870		364	
+Other current liabilities			-4417		-5554		0		0	
+Other non-current liabilities			-6387		-6798		0		0	
+Cash received (paid) for operating activities			1779285		1140481		-3021384		-12375	
+Proceeds from sales of properties foreclosed			399742		456022		0		0	
+Interest income on hire-purchase receivables and loans			-4969067		-4658123		-72741		-6	
+Cash received from interest income on hire-purchase										
+receivables and loans			4940438		4667902		53801		0	
+Dividend income	17.2		0		0		-4955912		0	
+Dividend received			0		0		4955912		0	
+Cash paid for interest expenses			-559120		-633118		-41598		0	
+Cash paid for income tax expense			-33717		-31408		-538		0	
+Cash received from transferring the long-term employee benefit										
+from a subsidiary			0		0		0		2074	
+Net cash provided by (used in) operating activities			1557561		941756		-3082460		-10307	
+CASH  FLOWS  FROM  INVESTING  ACTIVITIES										
+Cash paid for purchases of leasehold improvement										
+and equipment	5.2		-77486		-108083		0		0	
+Proceeds from sales of equipment			2595		671		0		0	
+Cash paid for purchases of intangible assets	5.2		-47557		-14493		0		0	
+Net cash used in investing activities			-122448		-121905		0		0	
+TIDLOR  HOLDINGS PUBLIC  COMPANY  LIMITED  AND  ITS  SUBSIDIARY										
+STATEMENTS  OF  CASH  FLOWS  (CONTINUED)										
+FOR  THE  THREE-MONTH  PERIOD  ENDED  MARCH  31,  2026										
+“UNAUDITED”										
+UNIT : THOUSAND  BAHT										
+			CONSOLIDATED							
+			FINANCIAL STATEMENTS							
+			2026		2025					
+					“RESTATED”		SEPARATE			
+			After		Before		FINANCIAL STATEMENTS			
+	Notes		restructuring		restructuring		2026		2025	
+CASH  FLOWS  FROM  FINANCING  ACTIVITIES										
+Cash received from short-term borrowings	5.3		850000		4200000		0		0	
+Cash repayments for short-term borrowings	5.3		-850000		-3200000		0		0	
+Cash received from short-term borrowings from a related party	5.3		3000000		0		0		0	
+Cash repayments for short-term borrowings from a related party	5.3		-4000000		0		0		16500	
+Cash received from long-term borrowings	5.3		6000000		3000000		3000000		0	
+Cash repayments for long-term borrowings	5.3		-3924919		-2924592		0		0	
+Cash repayments for long-term debentures	5.3		-2000000		-1000000		0		0	
+Cash repayments for transaction costs from										
+borrowing and issuance of debentures	5.3		-141		-1668		0		0	
+Cash repayments for lease liabilities	5.3		-144505		-135988		-136		0	
+Cash paid for treasury shares for										
+Employee Joint Investment Program			-6787		-9717		0		0	
+Cash paid for dividend			0		-1276114		0		0	
+Cash paid for dividend from subsidiary			-30068		0		0		0	
+Net cash provided by (used in) financing activities			-1106420		-1348079		2999864		16500	
+Net increase (decrease) in cash and cash equivalents			328693		-528228		-82596		6193	
+Cash and cash equivalents as at January 1,			3060341		1771237		109444		1129	
+Cash and cash equivalents as at March 31,	5.1		3389034		1243009		26848		7322	
+The condensed notes to the financial statements form an integral part of these interim financial statements										

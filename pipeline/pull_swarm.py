@@ -109,6 +109,14 @@ FEEDS = [
          label="NABC daily agri prices (crop/livestock/fishery)", cadence="4x/day", ip="any",
          group="macro", out="source-data/nabc_prices.json"),
 
+    # Unscheduled until 2026-08-08 and quietly ageing: no workflow ran it, so source-data/
+    # nabc_agri.json sat 34 days old while build_branch_agri.py and build_crop_farmer_income.py
+    # (both objective-#1 layers) kept reproducing from it. A puller nobody runs is a feed that
+    # goes stale in silence — the registry is what stops that happening again.
+    dict(key="nabc_agri", script="pull_nabc_agri.py", args=["--stamp", STAMP],
+         label="NABC per-province agri production (feeds branch_agri + crop_farmer_income)",
+         cadence="weekly", ip="any", group="macro", out="source-data/nabc_agri.json"),
+
     dict(key="oae_prices", script="pull_oae_prices.py", args=["--stamp", STAMP],
          label="OAE weekly farm-gate prices (measured, replaces the World Bank proxy)",
          cadence="weekly", ip="any", group="macro", out="source-data/oae_farmgate_prices.json",
@@ -138,9 +146,37 @@ FEEDS = [
          label="Rival Google Ads Transparency Center creatives + copy", cadence="weekly", ip="any",
          group="competitive", out="source-data/google_ads_raw.json", timeout=2400),  # ~17 advertisers, paced
 
-    dict(key="set_peers", script="pull_set_peers.py", args=[],
+    # needs_browser: these two drive a real headless Chromium (set.or.th 403s external requests;
+    # only a same-origin fetch from inside a loaded SET page gets through). CI runners that have not
+    # run `playwright install chromium` must skip them — use --skip-browser, NOT a hand-kept
+    # --exclude list, so a third browser feed added later is skipped there automatically instead of
+    # failing the first time nobody remembers to edit the workflow.
+    dict(key="set_peers", script="pull_set_peers.py", args=[], needs_browser=True,
          label="SET-listed peer market + financial data (MTC/TIDLOR/SAWAD/TURBO)", cadence="daily",
          ip="any", group="competitive", out="source-data/set_peers.json"),
+
+    # The NOTES to the financial statements are where the rivals' real credit picture lives: the
+    # IFRS-9 Stage 1/2/3 ECL tables, the allowance roll-forward and the receivables-by-collateral
+    # split. The MD&A (same script, kind=mda) is only management's narrative — SAWAD, for one,
+    # publishes no NPL ratio there at all while disclosing both of its components in the notes.
+    # Quarterly because that is how often SET filings appear; the run is cheap and idempotent
+    # (attachments are immutable once filed, so a re-run re-downloads nothing).
+    dict(key="set_filings", script="pull_set_filings.py", args=["--kind", "both"], needs_browser=True,
+         label="SET filings: MD&A narrative + Financial Statements/NOTES (ECL staging, collateral mix)",
+         cadence="quarterly", ip="any", group="competitive",
+         out="source-data/set_filings/index.json", timeout=1800),
+
+    # The 56-1 One Report is where a peer's book actually gets split by collateral and product —
+    # the audited notes (set_filings above) stop at "loan receivables" + "hire-purchase receivables"
+    # for all six peers, so the 56-1 is the ONLY public source for the product mix. It is NOT filed
+    # to SET and NOT held by SEC Thailand; each company publishes it on its own IR site, so the URLs
+    # are a hand-verified registry inside the script rather than anything derivable. Annual (filed
+    # ~March), but the same script also pulls the quarterly Opportunity Day decks, hence quarterly.
+    # No browser: the IR CDNs (Optiwise / listedcompany.com) serve over plain urllib.
+    dict(key="investor_docs", script="pull_investor_docs.py", args=["--kind", "both"],
+         label="56-1 One Report (collateral/product split) + SET Opportunity Day decks, 6 peers",
+         cadence="quarterly", ip="any", group="competitive",
+         out="source-data/investor_docs/index.json", timeout=2400),
 
     # ------------------------------------------------------------------- THAI-IP-ONLY (opt-in only)
     dict(key="rival_promos", script="pull_rival_promos.py", args=[],
@@ -194,6 +230,12 @@ def select_feeds(args):
     --only / --exclude narrow it. Unknown --only keys are a hard error (a typo should not silently
     run "everything"); a --only key that exists but is thai-and-not-included is reported, not run."""
     pool = [f for f in FEEDS if f["ip"] == "any" or args.include_thai]
+    if args.skip_browser:
+        dropped = [f["key"] for f in pool if f.get("needs_browser")]
+        if dropped:
+            print("--skip-browser: dropping %s (needs headless Chromium)" % ", ".join(sorted(dropped)),
+                  file=sys.stderr)
+        pool = [f for f in pool if not f.get("needs_browser")]
     if args.only:
         wanted = {k.strip() for k in args.only.split(",") if k.strip()}
         unknown = wanted - set(FEEDS_BY_KEY)
@@ -362,6 +404,9 @@ def main():
     ap.add_argument("--exclude", metavar="k1,k2", help="comma-separated feed keys to skip")
     ap.add_argument("--include-thai", action="store_true",
                      help="also run the Thai-IP-only feeds (only useful from a Thai residential IP)")
+    ap.add_argument("--skip-browser", action="store_true",
+                     help="skip every feed that needs a headless Chromium (for runners without "
+                          "`playwright install chromium`)")
     ap.add_argument("--jobs", type=int, default=DEFAULT_JOBS, help="parallel workers (default %d)" % DEFAULT_JOBS)
     ap.add_argument("--dry-run", action="store_true", help="print the plan, touch nothing")
     ap.add_argument("--no-derive", action="store_true",

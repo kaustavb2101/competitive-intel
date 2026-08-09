@@ -1,0 +1,498 @@
+Management Discussion and Analysis for the Year 2025
+Business Overview and Economic and Industry Factors Impacting Operations
+Tidlor Holdings Public Company Limited (the “Company” or the “Group”) was established on 26 March 2024 as the
+holding company of the Group pursuant to the shareholding and management restructuring plan, and operates as an
+investment holding company without engaging in operating businesses of its own. The Company’s principal subsidiary
+is Ngern Tid Lor Public Company Limited (“NTL” or the “Subsidiary”), which operates vehicle title loan and insurance
+brokerage businesses. For the purpose of presenting the operating results in this document, the Company’s
+performance for 2023 is compared with that of NTL, as the Company did not have direct operating results or revenue
+during that period. There were no significant differences in the operating results and financial position of the Company
+and its Subsidiary before and after the shareholding restructuring.
+Financial Statements
+Statements of Financial Position
+2025-2024
+31 December 31 December 31 December Change
+(Unit: Million Baht)
+2023 2024 2025
+Change % Change
+Assets
+Cash and cash equivalents 1,656.0 1,771.2 3,060.3 1,289.1 72.8%
+Loans and hire purchase receivables 97,456.5 103,929.1 109,585.6 5,656.5 5.4%
+Allowance for expected credit loss (3,981.4) (4,553.7) (5,499.8) (946.1) 20.8%
+Other current assets 1,431.2 1,491.3 1,586.4 95.1 6.4%
+Other non-current assets 3,585.6 3,893.2 4,064.3 171.1 4.4%
+Total assets 100,147.9 106,531.1 112,796.8 6,265.7 5.9%
+Liabilities and Shareholders’ Equity
+Borrowings 33,086.7 30,749.3 41,124.0 10,374.7 33.7%
+Debentures 35,127.3 39,757.6 32,286.1 (7,471.5) (18.8%)
+Other liabilities 3,510.4 5,500.9 4,923.9 (577.0) (10.5%)
+Total liabilities 71,724.4 76,007.8 78,334.0 2,326.2 3.1%
+Total shareholders’ equity 28,423.5 30,523.3 34,462.8 3,939.5 12.9%
+Total liabilities and shareholders’ equity 100,147.9 106,531.1 112,796.8 6,265.7 5.9%
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 1 | 14
+Statements of Profit or Loss and Other Comprehensive Income
+2025-2024
+(Unit: Million Baht) 2023 2024 2025 Change
+Change % Change
+Interest income on hire-purchase receivables 1,537.1 1,415.9 1,148.7 (267.2) (18.9%)
+Interest income on loans 14.007.7 16,953.0 18,195.5 1,242.5 7.3%
+Fee and service income 3,380.2 3,734.0 4,024.3 290.3 7.8%
+Other income 47.1 57.9 164.6 106.7 184.3%
+Total revenues 18,972.1 22,160.8 23,533.1 1,372.3 6.2%
+Service and administrative expenses (9,400.8) (11,036.5) (11,635.3) (598.8) 5.4%
+Finance costs (1,841.9) (2,423.9) (2,535.2) (111.3) 4.6%
+Profit before credit loss 7,729.4 8,700.4 9,362.6 662.2 7.6%
+Credit loss (2,985.7) (3,420.8) (3,031.1) 389.7 (11.4%)
+Loss arising from derecognition of financial
+(2,180.8) (3,006.0) (2,255.9) 750.1 (25.0%)
+assets measured at amortized cost
+Impairment loss determined in accordance
+(804.9) (414.8) (775.2) (360.4) 86.9%
+with TFRS 9
+Share of profit (loss) of joint venture
+- - (123.0) (123.0) -
+accounted for using the equity method - net
+Share of profit of joint venture accounted
+- - 17.0 17.0 -
+for using the equity method
+Impairment loss determined of investment
+- - (140.0) (140.0) -
+in joint venture
+Profit before income tax expense 4,743.7 5,279.6 6,208.5 928.9 17.6%
+Income tax expenses (953.3) (1,052.8) (1,245.5) (192.7) 18.3%
+Net profit 3,790.4 4,226.8 4,963.0 736.2 17.4%
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 2 | 14
+Key Financial Ratios
+2023 2024 2025
+Profitability Ratios
+Interest Margin (%) 17.4 18.2 18.1
+Funding Cost (%) 2.1 2.4 2.4
+Net Interest Margin (%) 15.3 15.8 15.7
+Net Profit Margin (%) 20.0 19.1 21.1
+Return on Equity (ROE) (%) 14.1 14.3 15.3
+Return on Asset (ROA) (%) 4.1 4.1 4.5
+Operating Efficiency Ratios
+Current Ratio (times) 0.9 1.1 1.2
+Net Debt to EBITDA ratio (times)
+(Net Debt to EBITDA ratio = interest bearing liabilities - cash 8.8 8.9 8.0
+and cash equivalents - short-term investments /EBITDA)
+Interest Coverage ratio (times)
+(Interest Coverage Ratio: ICR = earnings before tax and finance 3.6 3.2 3.4
+costs / finance costs)
+Debt Service Coverage Ratio (times)
+(Debt Service Coverage Ratio: DSCR = EBITDA/ interest bearing 0.2 0.3 0.3
+short-term debt + current portions of interest bearing debts)
+Debt-to-Equity Ratio (times)
+(Debt to Equity Ratio: D/E = total liabilities / total 2.5 2.5 2.3
+shareholders’ equity))
+Financial Ratios
+Current Portion of Interest-Bearing Debts due within 1 year to
+0.5 0.4 0.4
+Total Interest-Bearing Debt (times)
+Borrowings from Financial Institutions to Total Liabilities
+0.5 0.4 0.6
+(times)
+Asset quality ratio
+Non-Performing Loans to Total Loans and Hire-Purchase
+1.4 1.8 1.5
+Receivables (%)
+Expected Credit Losses to Non-Performing Loans (%) 282.1 242.7 325.0
+Credit Cost (%) 3.3 3.4 2.8
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 3 | 14
+Executive Summary
+In 2025, Tidlor Holdings Public Company Limited (the “Group”) continued to deliver quality earnings growth
+despite a challenging economic environment. Net profit for the year reached Baht 4,963.0 million, representing an
+increase of 17.4% (YoY), driven by revenue growth from both the lending and insurance brokerage businesses,
+alongside prudent asset quality management and disciplined cost control.
+Total revenue of the Group for the year amounted to Baht 23,533.1 million, increasing by 6.2% (YoY). Growth was
+primarily supported by higher interest income in line with loan portfolio expansion, as well as fee and service income from the
+insurance brokerage business, which remains a key revenue contributor. The customer base across both businesses continued
+to expand steadily. Total expenses were Baht 17,201.6 million, rising modestly by 1.9% (YoY). The increase was mainly
+attributable to higher service and administrative expenses, in line with business and customer base expansion. Cost of funds
+remained broadly stable compared to the prior year, while credit loss improved. As a result, the Cost-to-Income ratio declined
+slightly from the previous year to 55.4%, reflecting effective cost management amid business expansion.
+As of the end of 2025, the Group’s outstanding loan portfolio totaled Baht 109,585.6 million, growing by 5.4% (YoY)
+and 2.1% (QoQ). Growth continued to be primarily driven by vehicle title loans, while hire purchase loans declined in line with the
+Group’s prudent risk management approach. The number of lending customers increased by 9.0% (YoY), outpacing overall loan
+portfolio growth and reflecting quality customer base expansion. This was supported by the Group’s nationwide branch network
+of 1,873 branches, together with enhanced digital capabilities through the NTL application, Tidlor Card, and E-Withdrawal
+services, which continued to gain traction and enhance customer accessibility and experience.
+Asset quality remained well under control. The non-performing loan (NPL) ratio declined to 1.5% as of year-
+end 2025, compared with 1.8% in the prior year. Full-year credit cost stood at 2.8%, decreasing from the previous year,
+mainly attributable to lower net write-offs. This improvement was supported by prudent underwriting, effective debt
+collection, and the continued enhancement of overall portfolio quality throughout the year.
+Meanwhile, the insurance brokerage business continued its steady growth trajectory, with total non-life insurance
+premiums reaching Baht 11,247.2 million, increasing by 10.5% (YoY). Growth was driven by the performance of all three core
+brands — Shield Insurance, Areegator, and heygoody.com — together with comprehensive distribution channels, ongoing
+product development, and the adoption of digital technology to enhance accessibility and service quality.
+For the fourth quarter of 2025 (“4Q25”), the Group reported net profit of Baht 1,038.5 million, decreasing
+slightly by 0.4% (YoY). The decrease was primarily due to additional provisions recorded through management overlay
+to address uncertainties arising from flooding in the southern region and other external factors that may affect
+economic conditions and customers’ repayment capacity in the future. In addition, the Group recognized a one-time
+impairment of investment in a joint venture. These items were non-recurring in nature and did not reflect any
+structural change in the Group’s core operating trends, which remained solid and aligned with its strategic direction.
+The Group continues to maintain strong business fundamentals, sound financial position, strong capital
+structure, and ample liquidity to support long-term growth. The Group remains committed to quality growth under a
+disciplined risk management framework, while promoting financial inclusion through its lending and insurance
+brokerage businesses in a sustainable manner.
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 4 | 14
+Financial Highlights
+% YoY % YoY
+(Unit: Million Baht) 2024 2025 Increase/ 4Q24 4Q25 Increase/
+(Decrease) (Decrease)
+Interest income on hire-purchase
+1,415.9 1,148.7 (18.9%) 324.6 278.0 (14.4%)
+receivables
+Interest income on loans 16,953.0 18,195.5 7.3% 4,377.4 4,734.3 8.2%
+Fee and service income 3,734.0 4,024.3 7.8% 1,054.8 1,145.7 8.6%
+Other income 57.9 164.6 184.3% 20.2 51.5 155.0%
+Total revenues 22,160.8 23,533.1 6.2% 5,777.0 6,209.5 7.5%
+Service and administrative expenses (11,036.5) (11,635.3) 5.4% (3,119.4) (3,191.0) 2.3%
+Finance costs (2,423.9) (2,535.2) 4.6% (654.0) (615.7) (5.9%)
+Profit before credit loss 8,700.4 9,362.6 7.6% 2,003.6 2,402.8 19.9%
+Credit loss (3,420.8) (3,031.1) (11.4%) (701.6) (980.7) 39.8%
+Loss arising from derecognition of financial
+(3,006.0) (2,255.9) (25.0%) (652.3) (571.3) (12.4%)
+assets measured at amortized cost
+Impairment loss determined in accordance
+(414.8) (775.2) 86.9% (49.3) (409.4) 730.4%
+with TFRS 9
+Share of profit (loss) of joint venture
+- (123.0) - - (123.0) -
+accounted for using the equity method - net
+Share of profit of joint venture
+accounted - 17.0 - - 17.0 -
+for using the equity method
+Impairment loss determined of investment
+- (140.0) - - (140.0) -
+in joint venture
+Profit before income tax expense 5,279.6 6,208.5 17.6% 1,302.0 1,299.1 (0.2%)
+Income tax expenses (1,052.8) (1,245.5) 18.3% (259.7) (260.6) 0.3%
+Net profit 4,226.8 4,963.0 17.4% 1,042.3 1,038.5 (0.4%)
+Key Financial Ratios
+2023 2024 2025 4Q24 3Q25 4Q25
+NPL Ratio (%)
+1.45 1.81 1.54 1.81 1.66 1.54
+NPL Coverage Ratio (%) 282.1 242.7 325.0 242.7 283.9 325.0
+Credit Cost (%) 3.3 3.4 2.8 2.7 2.2 3.6
+Debt to Equity (D/E) Ratio (times) 2.5 2.5 2.3 2.5 2.2 2.3
+Cost to Income (C/I) Ratio (%) 54.9 55.9 55.4 60.9 55.4 57.0
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 5 | 14
+Economic and Financial Market Overview
+Thailand’s economic growth moderated in 2025 compared to the previous year, reflecting pressures from both
+structural factors and external headwinds. Key challenges included an uneven recovery in domestic demand, elevated
+household om6debt levels, and ongoing global economic uncertainties. Private consumption and investment remained
+broadly stable, while exports began to face pressure from the slowdown in major trading partner economies and U.S.
+tariff measures in certain industries. The tourism sector, one of Thailand’s key economic drivers, showed signs of
+deceleration in 2025, with the number of international arrivals declining from the prior year and tourist purchasing
+power yet to fully recover. Meanwhile, the industrial sector, particularly the automotive segment, continued to
+experience pressure from weakened domestic demand and intense price competition.
+On the fiscal policy front, the government maintained a supportive stance to facilitate economic recovery through
+stimulus measures and assistance programs for retail borrowers and SMEs, including the “You Fight, We Help” program,
+the “Khon La Khrueng” co-payment scheme, and the “Close Debt Fast, Move Forward” initiative, with the objective of
+strengthening long-term financial system stability.
+In terms of monetary policy, the Monetary Policy Committee (MPC) continued to adopt an accommodative stance
+throughout 2025, reducing the policy rate to 1.25% in December 2025, amid low inflation and a gradual recovery in
+overall economic demand.
+Summary of Key Events and Developments
+• On 15 May 2025, the Company was listed on the Stock Exchange of Thailand under the ticker symbol “TIDLOR”
+following the shareholding and management restructuring. The Company conducted a tender offer for all shares
+of Ngern Tid Lor Public Company Limited (“NTL”), with the share exchange successfully completed, representing
+99.4% of NTL’s total issued and paid-up shares. The Group is currently reviewing certain aspects of the
+restructuring plan relating to the transfer of NTL’s InsurTech business, taking into consideration the evolving
+business and economic environment, to ensure optimal resource allocation and long-term sustainable growth.
+• In August 2025, the Company was notified of a change in its major shareholding structure. Siam Asia Credit Access
+Pte. Ltd. (“SACA”) disposed of its entire shareholding in the Company to Bank of Ayudhya Public Company Limited
+(“Krungsri”), resulting in Krungsri increasing its shareholding to 46.51%.
+• The Company was assigned a corporate credit rating of “A+” with a “Stable” outlook by TRIS Rating Co., Ltd. (“TRIS
+Rating”). In addition, the Company received a foreign and local currency long-term issuer rating of “A-” with a
+“Stable” outlook from Japan Credit Rating Agency, Ltd. (“JCR”). These ratings reflect the Group’s strong business
+fundamentals, solid financial position, prudent risk management, and its capability to access capital markets at
+an international level.
+• On 25 November 2025, the Board of Directors’ Meeting No. 9/2025 resolved to approve an interim cash dividend
+for the operating results for the period from 1 January 2025 to 30 September 2025 at Baht 0.34 per share,
+totaling Baht 984,616,053.80.
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 6 | 14
+Operating Results for Q4 2025 and year 2025
+Summary of Operating Results
+Revenue:
+% YoY % YoY % QoQ
+(Unit: Million Baht) 2024 2025 Increase/ 4Q25 Increase/ Increase/
+(Decrease) (Decrease) (Decrease)
+Interest income on hire-purchase receivables 1,415.9 1,148.7 (18.9%) 278.0 (14.4%) (1.8%)
+Interest income on loans 16,953.0 18,195.5 7.3% 4,734.3 8.2% 2.3%
+Fee and service income 3,734.0 4,024.3 7.8% 1,145.7 8.6% 21.4%
+Other income 57.9 164.6 184.3% 51.5 155.0% (28.1%)
+Total revenues 22,160.8 23,533.1 6.2% 6,209.5 7.5% 4.8%
+% Total % Total
+(Unit: Million Baht) 2024 2025
+Revenue Revenue
+Interest income on hire-purchase receivables 1,415.9 6.4% 1,148.7 4.9%
+Interest income on loans 16,953.0 76.5% 18,195.5 77.3%
+Fee and service income 3,734.0 16.8% 4,024.3 17.1%
+Other income 57.9 0.3% 164.6 0.7%
+Total revenues 22,160.8 100.0% 23,533.1 100.0%
+▪ Interest income: In 2025, interest income totaled Baht 19,344.2 million, increasing by 5.3% (YoY), and accounted for
+82.2% of total revenue. Growth was mainly driven by interest income on loans of Baht 18,195.5 million, rising by 7.3%
+(YoY), supported by the expansion of the vehicle title loan portfolio and a shift in asset mix. Meanwhile, interest
+income on hire purchase receivables amounted to Baht 1,148.7 million, decreasing by 18.9% (YoY), in line with the
+reduction of the hire purchase portfolio under a prudent risk management approach.
+In terms of interest yield and funding cost efficiency, yield on loans stood at 18.1%, slightly decreasing from 18.2%
+in the previous year. This reflected relief measures provided to vulnerable customers under the “You Fight, We Help”
+program, as part of the Group’s responsible business practices in response to prevailing economic conditions. Cost
+of funds remained stable at 2.4%, supported by effective funding management aligned with market interest rate
+conditions. As a result, net interest margin (NIM) remained at a sound level of 15.7%.
+In 4Q25, interest income totaled Baht 5,012.3 million. The increase was mainly attributable to interest income on
+loans, which grew by 8.2% (YoY) and 2.3% (QoQ), driven by growth in vehicle title loan portfolio. However, interest
+income was partially impacted by a special interest rate campaign for car title loans implemented during the quarter.
+(Unit: %) 2023 2024 2025 4Q24 3Q25 4Q25
+Interest Margin 17.4 18.2 18.1 18.2 18.4 18.5
+Funding Cost 2.1 2.4 2.4 2.5 2.4 2.3
+Net interest margin 15.3 15.8 15.7 15.7 16.0 16.2
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 7 | 14
+▪ Fee and service income: In 2025, fee and service income amounted to Baht 4,024.3 million, increasing by 7.8% (YoY),
+and accounted for 17.1% of total revenue. The increase was primarily driven by the insurance brokerage business,
+which remains a key contributor to revenue diversification and helps mitigate overall earnings volatility. This was
+supported by the performance of the three core brands, together with ongoing development and application of
+InsurTech to enhance customer access, broaden product offerings, and improve service efficiency across all channels.
+Consequently, the Group’s insurance brokerage business continued to expand its customer base and sustain growth
+across distribution channels, as follows:
+1. Shield Insurance – a face-to-face insurance broker supported by licensed non-life and life insurance branch
+staff, together with Call Center 1501.
+2. Areegator – an online insurance brokerage platform serving member insurance agents and brokers.
+3. heygoody.com – a fully digital insurance brokerage platform enabling customers to independently browse
+and purchase insurance products through online channels 24 hours a day.
+In 4Q25, fee and service income totaled Baht 1,145.7 million, increasing by 8.6% (YoY) and 21.4% (QoQ), mainly
+supported by the insurance brokerage business, which typically benefited from seasonal factors in the year-end
+period, resulting in continued growth in fee income.
+▪ Other income: In 2025, other income amounted to Baht 164.6 million, increasing by 184.3% (YoY), and accounted for
+0.7% of total revenue. The increase was mainly attributable to contributions received from the Financial Institutions
+Development Fund (FIDF) under the “You Fight, We Help” program, as well as other fee and service income associated
+with the expansion of the customer base.
+In 4Q25, other income totaled Baht 51.5 million, increasing by 155.0% (YoY), primarily driven by contributions from
+the FIDF under relevant government measures.
+Expenses:
+% YoY % YoY % QoQ
+(Unit: Million Baht) 2024 2025 Increase/ 4Q25 Increase/ Increase/
+(Decrease) (Decrease) (Decrease)
+Service and administrative expenses 11,036.5 11,635.3 5.4% 3,191.0 2.3% 9.1%
+Finance costs 2,423.9 2,535.2 4.6% 615.7 (5.9%) (4.5%)
+Credit loss 3,420.8 3,031.1 (11.4%) 980.7 39.8% 67.1%
+Loss arising from derecognition of
+3,006.0 2,255.9 (25.0%) 571.3 (12.4%) 7.9%
+financial assets measured at amortized cost
+Impairment loss determined in
+414.8 775.2 86.9% 409.4 730.4% 612.0%
+accordance with TFRS 9
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 8 | 14
+% Total % Total
+(Unit: Million Baht) 2024 2025
+Revenue Revenue
+Service and administrative expenses 11,036.5 49.8% 11,635.3 49.4%
+Finance costs 2,423.9 10.9% 2,535.2 10.8%
+Credit loss 3,420.8 15.4% 3,031.1 12.9%
+Loss arising from de-recognition of financial assets
+3,006.0 13.6% 2,255.9 9.6%
+measured at amortized cost
+Impairment loss determined in accordance with TFRS 9 414.8 1.9% 775.2 3.3%
+▪ Service and administrative expenses: In 2025, service and administrative expenses amounted to Baht 11,635.3
+million, increasing by 5.4% (YoY), consistent with the expansion of the customer base and overall business
+activities, including higher personnel expenses and marketing and promotional cost. Nevertheless, the Group
+maintained disciplined cost management, resulting in a manageable Cost-to-Income ratio of 55.4%.
+In 4Q25, service and administrative expenses totaled Baht 3,191.0 million, increasing by 2.3% (YoY) and 9.1% (QoQ),
+reflecting typical year-end seasonality, during which business activities generally intensify
+▪ Cost of funds: In 2025, cost of funds amounted to Baht 2,535.2 million, increasing by 4.6% (YoY), in line with
+prevailing market interest rates and higher borrowing to support business expansion. The Group continues to
+manage its funding costs efficiently through diversified funding sources and appropriate borrowing strategies.
+In 4Q25, cost of funds totaled Baht 615.7 million, decreasing by 5.9% (YoY) and 4.5% (QoQ), in line with the
+downward trend in the policy rate and bond yields during the quarter, resulting in a gradual decline in the Group’s
+funding costs.
+▪ Credit loss: In 2025, credit loss amounted to Baht 3,031.1 million, decreasing by 11.4% (YoY), primarily due to a
+reduction in net write-offs. This was consistent with improved portfolio quality, disciplined loan underwriting, and
+effective debt collection. The Group continued to maintain adequate provisions in accordance with risk
+management framework.
+In 4Q25, credit loss totaled Baht 980.7 million, increasing by 39.8% (YoY) and 67.1% (QoQ), mainly attributable to
+additional provisions through a management overlay to address uncertainties arising from flooding in the
+southern region and other external factors. These provisions were undertaken as a proactive risk management
+measure to strengthen reserve buffers and do not indicate a structural deterioration in the Group’s asset quality.
+Share of profit (loss) from investment in joint venture:
+% YoY % YoY % QoQ
+(Unit: Million Baht) 2024 2025 Increase/ 4Q25 Increase/ Increase/
+(Decrease) (Decrease) (Decrease)
+Share of profit (loss) of joint venture
+- (123.0) - (123.0) - -
+accounted for using the equity method - net
+Share of profit of joint venture accounted
+- 17.0 - 17.0 - -
+for using the equity method
+Impairment loss determined of investment
+- (140.0) - (140.0) - -
+in joint venture
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 9 | 14
+For 2025, the Group recorded a net share of loss from its joint venture amounting to Baht 123.0 million. In 4Q25, the
+Group recognized a one-time impairment of its investment in the joint venture, following a valuation assessment
+conducted in accordance with applicable accounting standards. This item is non-recurring in nature and does not
+represent a change in the long-term operating performance of the Group’s core businesses.
+Net Profit:
+% YoY % YoY % QoQ
+(Unit: Million Baht) 2024 2025 Increase/ 4Q24 Increase/ Increase/
+(Decrease) (Decrease) (Decrease)
+Net Profit 4,226.8 4,963.0 17.4% 1,038.5 (0.4%) (26.6%)
+Pre-Provision Operating Profit 5,694.4 7,106.7 24.8% 1,831.5 35.5% 0.2%
+In 2025, the Group reported a net profit of Baht 4,963.0 million, increasing by 17.4% (YoY), supported by revenue growth
+from both the lending and insurance brokerage businesses, together with effective credit quality management and cost
+control.
+In 4Q25, the Group’s net profit amounted to Baht 1,038.5 million, decreasing by 0.4% (YoY) and 26.6% (QoQ), primarily
+due to the recognition of an additional management overlay and a one-time impairment of its investment in a joint
+venture. However, pre-provision operating profit (PPOP) totaled Baht 1,831.5 million, increasing by 35.5% (YoY) and 0.2%
+(QoQ), underscoring the resilience of the Group’s core operating performance and earnings generation.
+Summary of Financial Position
+Assets:
+2025-2024
+31 December 2024 31 December 2025
+(Unit: Million Baht) Change
+Amount % Amount % %
+Cash and cash equivalents 1,771.2 1.7% 3,060.3 2.7% 72.8%
+Loans and hire purchase receivables 103,929.1 97.6% 109,585.6 97.2% 5.4%
+Allowance for expected credit loss (4,553.7) (4.3%) (5,499.8) (4.9%) 20.8%
+Other current assets 1,491.3 1.4% 1,586.4 1.4% 6.4%
+Other non-current assets 3,893.2 3.6% 4,064.3 3.6% 4.4%
+Total assets 106,531.1 100.0% 112,796.8 100.0% 5.9%
+As of 31 December 2025, the Group’s total assets amounted to Baht 112,796.8 million, increasing by 5.9% (YoY) from
+year-end 2024. The growth was primarily driven by the expansion of the loan portfolio, which remains the Group’s core
+asset. Loans and hire purchase receivables accounted for 97.2% of total assets.
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 10 | 14
+A Detailed Breakdown of the Lending Portfolio
+% YoY % QoQ
+(Unit: Million Baht) 2024 2025 Increase/ 3Q25 4Q25 Increase/
+(Decrease) (Decrease)
+Loans and Accrued Interest Receivables 94,989.0 101,589.4 6.9% 99,170.9 101,589.4 2.4%
+Hire-Purchase Receivables* 8,940.1 7,996.2 (10.6%) 8,153.3 7,996.2 (1.9%)
+Total Loans and Accrued Interest
+103,929.1 109,585.6 5.4% 107,324.2 109,585.6 2.1%
+Receivables and Hire Purchase Receivables
+*Net of unearned interest income
+At the end of 2025, the outstanding loan portfolio totaled Baht 109,585.6 million, growing by 5.4% (YoY) and 2.1%
+(QoQ), aligned with the Group’s strategy to prioritize quality growth, focusing on sustainable returns under a robust
+and disciplined risk management. By loan category:
+• Loans and accrued interest receivables amounted to Baht 101,589.4 million, increasing by 6.9% (YoY) and 2.4%
+(QoQ), driven by the expansion of the vehicle title loan portfolio. This segment represented the majority of the
+total loan portfolio at 92.7%.
+• Hire purchase receivables totaled Baht 7,996.2 million, decreasing by 10.6% (YoY) and 1.9% (QoQ), in line with the
+Group’s prudent underwriting approach and adjustments in response to prevailing economic conditions and
+customers’ repayment capacity.
+Loan portfolio growth was supported by the continued expansion of a quality customer base through a nationwide
+branch network of 1,873 branches, complemented by non-branch channels, including tele-sales and digital platforms.
+These channels have enhanced financial access, improved service convenience, and catered to diverse customer needs,
+thereby supporting long-term asset growth.
+In addition, Tidlor Card and E-Withdrawal service via the NTL application continued to play a key enabler of loan growth,
+with user adoption increasing steadily. As of December 2025, over 771,000 Tidlor Cards was issued, and approximately
+79% of total loan drawdowns were processed through E-Withdrawal, reflecting the growing role of digital capabilities
+in enhancing service efficiency and supporting portfolio expansion.
+Quality of Loans and Hire-Purchase Receivables
+(Unit: Million Baht) 2024 2025 3Q25
+Amount % Amount % Amount %
+Performing 83,394.0 80.24% 89,288.8 81.48% 86,856.3 80.93%
+Under-performing 18,658.6 17.95% 18,604.7 16.98% 18,686.9 17.41%
+Non-performing 1,876.5 1.81% 1,692.1 1.54% 1,781.0 1.66%
+Total loans and hire-purchase receivables 103,929.1 100.00% 109,585.6 100.00% 107,324.2 100.00%
+Less Allowance for expected credit losses (4,553.8) (4.38%) (5,499.8) (5.02%) (5,057.0) (4.71%)
+Loans and hire-purchase receivables - Net 99,375.3 95.62% 104,085.8 94.98% 102,267.2 95.29%
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 11 | 14
+The Group’s asset quality remained well controlled under the prevailing economic uncertainties. As of 31 December
+2025, the non-performing loan (NPL) ratio stood at 1.54%, improving from year-end 2024 and declining from 1.66% at
+the end of 3Q25. The ratio remained within the Group’s target range for asset quality.
+The improvement in portfolio quality was driven by the consistent implementation of disciplined underwriting policies,
+sustained quality of newly originated loans, and effective debt monitoring and collection management. Furthermore,
+government support measures, including the “You Fight, We Help” program, helped mitigate credit risk for certain
+customer segments.
+As of year-end 2025, the Group’s expected credit loss (ECL) allowance totaled Baht 5,499.8 million, representing an
+NPL coverage ratio of 325.0%. The coverage level remained strong and appropriate, in line with the Group’s risk
+management approach, and provides sufficient buffer to accommodate potential uncertainties while supporting
+sustainable loan portfolio growth.
+Liabilities:
+2025-2024
+31 December 2024 31 December 2025
+(Unit: Million Baht) Change
+Amount % Amount % %
+Borrowings 30,749.3 40.5% 41,124.0 52.5% 33.7%
+Debentures 39,757.6 52.3% 32,286.1 41.2% (18.8%)
+Other liabilities 5,500.9 7.2% 4,923.9 6.3% (10.5%)
+Total liabilities 76,007.8 100.0% 78,334.0 100.0% 3.1%
+As of 31 December 2025, the Group’s total liabilities amounted to Baht 78,334.0 million, increasing by 3.1% (YoY). The
+increase was mainly driven by higher borrowings from financial institutions to support loan portfolio growth and to
+serve as working capital for the Group’s operations.
+At the end of 2025, total borrowings from financial institutions and debentures amounted to Baht 73,410.1 million,
+increasing by 4.1% (YoY), and accounted for 93.7% of total liabilities. The funding structure remained well diversified
+between bank borrowings and debentures at a ratio of 56:44, respectively, reinforcing financial flexibility and reducing
+concentration risk. The debt-to-equity (D/E) ratio stood at 2.3x at year-end 2025, decreasing from the previous year,
+reflecting a disciplined capital structure management.
+The Group continues to maintain a sound financial position, supported by a corporate credit rating of “A+” with a
+“Stable” outlook from TRIS Rating. In addition, in late 2025, the Group was assigned a long-term issuer rating in both
+foreign and local currency of “A-” with a “Stable” outlook from JCR. These strong credit ratings enhance the Group’s
+ability to access diversified funding sources at appropriate costs from both financial institutions and the capital
+markets. As of year-end 2025, the Group had available credit facilities of over Baht 22,000 million, underscoring its
+ample liquidity and readiness to support future business growth.
+Shareholders’ Equity: As of 31 December 2025, the Group’s total shareholders’ equity amounted to Baht 34,462.8 million,
+rising 12.9% (YoY). This growth can be attributed to the increase in net profit for the year 2025.
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 12 | 14
+Cash Flows
+The Group’s cash flow for the year ended December 31, 2025. The details are as follows:
+2025-2024 Change
+(Unit: Million Baht) 2023 2024 2025
+%
+Net cash from (used in) operating activities (10,710.7) 83.6 819.1 879.8%
+Net cash from (used in) investing activities (750.0) (500.4) (465.4) (7.0%)
+Net cash from (used in) financing activities 10,925.5 532.1 935.4 75.8%
+Net increase (decrease) in cash and cash equivalents (535.2) 115.3 1,289.1 1,018.0%
+Net cash from operating activities: The Group generated net cash from operating activities at the end of 2025 totaling
+Baht 819.1 million, rising 879.8% (YoY). This reflected the Group’s ability to generate cash flows from its core
+operations, supported by strong operating profit, a moderation in loan portfolio growth compared to the prior year,
+and working capital management.
+Net cash from investing activities: The Company recorded net cash used in investing activities at the end of 2025,
+amounted to Baht 465.4 million, decreasing by 7.0% (YoY). The outflows were primarily related to investments in
+leasehold improvements, equipment, and information technology to support business operations and infrastructure.
+Net cash from financing activities: The Company reported net cash from financing activities at the end of 2025 totaling
+Baht 935.4 million, increasing by 75.8% (YoY). This was mainly driven by new borrowings through both short-term and
+long-term loans from financial institutions, together with bond issuances, consistent with scheduled repayments and
+the growth of the loan portfolio.
+Factors That May Impact Future Operations or Growth
+In 2026, Thailand’s economy is expected to expand gradually. The Office of the National Economic and Social
+Development Council (NESDC) forecasts GDP growth in the range of 1.2–2.2%, with key drivers remaining private
+consumption, government spending, and the tourism sector. However, the outlook continues to be constrained by high
+household debt levels, debt repayment capacity among certain borrower segments, and financial conditions that
+remain in an adjustment phase.
+The financial and lending landscape are likely to remain under pressure amid cautious credit expansion. Most financial
+institutions continue to place greater emphasis on asset quality and risk management, against the backdrop of a
+gradual and uneven recovery in household income. Competitive intensity in the lending market is therefore anticipated
+to remain elevated. Meanwhile, growth in durable goods lending, particularly automotive, may not yet return to pre-
+slowdown levels.
+On funding costs, policy interest rates and bond yields have exhibited lower volatility compared to previous periods,
+which may help ease funding cost pressures to some extent. Nevertheless, uncertainties stemming from global
+economic conditions, geopolitical tensions, and trade policy directions of major economies remain key risk factors that
+may influence overall confidence and economic activity.
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 13 | 14
+Against this backdrop, the Group continues to closely monitor these developments and operates under a quality
+growth strategy. The priority will be given to risk management, well-balanced asset quality, disciplined cost control,
+and continuous operational efficiency improvement. The Group also conducts the business in compliance with
+regulatory frameworks and supervisory guidelines to strengthen business resilience and support sustainable long-
+term growth.
+Sustainability Developments
+The Company sets its sustainable development goals in line with the UN’s Sustainable Development Goals (SDGs) by
+adhering to the principles of good corporate governance, integrity, and fairness while placing importance on all
+stakeholders. Moreover, the Company takes into account the changing contexts covering economic, social, and
+environmental issues and its goals, all of which are considered for the base of determining the Company’s business
+strategies and improving operational efficiency.
+The Company’s sustainability strategy focuses on the continuous development of technology and innovative services,
+including the NTL application, Tidlor Card, Areegator platform, and heygoody.com, to enhance service efficiency and
+better respond to customer needs. In addition, the Company has implemented environmental, social, and governance
+(ESG) risk management practices, including raising awareness of and minimizing environmental impacts arising from
+its business operations and services, promoting efficient resource utilization, and upholding responsibility toward
+communities and society.
+The Company remains committed to improving the quality of life for Thai people by providing accessible, fair, and
+transparent financial services. In 2025, the Company helped 359,300 customers establish financial credit records,
+enabled 1,098,100 individuals to gain access to insurance coverage, and delivered financial literacy programs to 528
+participants across local communities, external organizations, and students.
+Further details are on the Company’s website at https://www.tidlorinvestor.com/en/tidlor-
+sustainability/sustainability
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited for the year 2025 Page 14 | 14

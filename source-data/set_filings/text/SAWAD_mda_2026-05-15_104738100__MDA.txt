@@ -1,0 +1,186 @@
+Ref. SAWAD-007/2026
+15 May 2026
+Subject: Management Discussion and Analysis for the Quarter Ended 31 March 2026
+To: Managing Director
+Stock Exchange of Thailand
+Srisawad Corporation Public Company Limited (“Company”) would like to present its Management Discussion and Analysis
+(MD&A) for the quarter ended 31 March 2026 with details as follows:
+1. Key Highlights and Operating Performance Overview
+Thailand’s economy in Q1/2026 showed signs of gradual recovery from the prior quarter, supported by exports of technology-
+related products, industrial production, and government spending that began to flow into the system. Nevertheless, the economy
+remained vulnerable to geopolitical risks in the Middle East, which weighed on energy costs and consumer purchasing power.
+The Monetary Policy Committee (MPC) maintained the policy rate at 1.00% per annum to support the ongoing economic recovery
+amid cost-of-living pressures and persistently elevated household debt levels.
+Against this backdrop, the retail lending industry continued to face pressure on borrower quality and stricter lending standards
+under the Bank of Thailand’s Responsible Lending guidelines, prompting industry participants to place greater emphasis on asset
+quality management and cautious growth.
+Under these conditions, the Company continued to operate within a prudent risk management framework, alongside efficient
+management of financial costs and operating expenses. As a result, operating performance in Q1/2026 improved both year-on-
+year and quarter-on-quarter, with net profit of THB 1,457 million, up 28.03% YoY and up 3.26% QoQ. The Net Profit Margin rose
+to 29.73%, compared to 23.83% in the same quarter of the prior year and 29.20% in the prior quarter, reflecting the quality of
+operating performance and the Company’s underlying profitability.
+Key factors supporting operating performance in this quarter include:
+• Recovery in Interest Income: Interest income in Q1/2026 was THB 4,205 million, up 3.72% YoY and up 1.55% QoQ. This
+marked the return to year-on-year expansion, reflecting the recovery of the title loan portfolio - the Company’s core business
+- under a quality-focused growth framework.
+• Enhanced Foreclosed Asset Management: Loss on sale of foreclosed assets in Q1/2026 declined significantly to THB 109
+million, down 62.02% YoY and down 3.54% QoQ. This reflects the effectiveness of the risk management system and asset
+management processes that have been carried forward from the previous year, resulting in greater stability in borrower
+screening and foreclosed asset disposal.
+• Disciplined Financial Cost Management: Finance costs in Q1/2026 were THB 657 million, down 9.75% YoY and down
+6.81% QoQ, driven by appropriate debt structure management combined with the continued decline in the policy rate. The
+Company was able to issue debentures and refinance borrowings at lower costs consistent with market direction.
+• Operating Expense Management: services and administrative expenses were THB 1,739 million, down 7.89% YoY,
+reflecting continued improvement in operational efficiency and cost management, including the effects of the branch
+restructuring carried out from the prior year.
+Regarding the overall loan portfolio, the Company continued to focus on expanding its portfolio in high-yield and high-demand
+product segments, particularly title loans and others, which are secured by collateral. Outstanding title loans reached THB 69,405
+million, up 8.19% compared to the same period of the prior year.
+As of the end of Q1/2026, the Company’s total outstanding receivables stood at THB 95,030 million, up 1.75% YoY. The proportion
+of title loans to the total portfolio rose to 73.03% from 68.69% in the same quarter of the prior year, consistent with the Company’s
+portfolio restructuring strategy.
+On asset quality, although total NPLs edged up slightly to THB 3,665 million in line with broader household debt conditions, the
+Company continues to monitor borrower quality closely and manage the NPL ratio at a manageable level. The Company has also
+set aside provisions on a conservative basis sufficient to cover potential risks.
+The growth in profitability and the maintenance of loan portfolio quality this quarter occurred amid a Thai economy still expanding
+below potential and a retail lending industry facing structural challenges. This reflects the Company’s ability to manage its loan
+portfolio and risk in line with continued economic uncertainty, while sustaining its capacity to generate returns.
+(THB million) Y on Y Q on Q
+Q1/26 Proportion Q1/25 Proportion Q4/25 Proportion
+Outstanding Receivables 95,030 100.00% 93,397 100.00% 94,964 100.00%
+- Title Loans and Others 69,405 73.03% 64,152 68.69% 69,214 72.88%
+- Hire Purchase and Personal Loans 25,625 26.97% 29,245 31.31% 25,750 27.12%
+NPL 3,665 3,404 3,602
+- Title Loans and Others 2,272 2,165 2,260
+- Hire Purchase and Personal Loans 1,393 1,239 1,342
+2. Operating Results
+(THB million) 3 Months Y on Y Q on Q
+Q1/26 Q1/25 % YoY Q4/25 % QoQ
+Interest Income 4,205 4,054 3.72% 4,141 1.55%
+Other Income 340 411 -17.27% 350 -2.86%
+Insurance Brokerage Income 356 310 14.84% 341 4.40%
+Services and Administrative Expenses 1,848 2,175 -15.03% 1,850 -0.11%
+- Loss on Sale of Foreclosed Assets 109 287 -62.02% 113 -3.54%
+Expected Credit Losses 513 421 21.85% 551 -6.90%
+Finance Costs 657 728 -9.75% 705 -6.81%
+Net Profit 1,457 1,138 28.03% 1,411 3.26%
+Net Profit Margin 29.73% 23.83% 29.20%
+Financial Ratios
+Q1/26 Q1/25 Q4/25
+Debt-to-Equity Ratio (times) 1.53 1.85 1.64
+Interest Coverage Ratio (times) 4.26 3.34 3.66
+Cost-to-Income Ratio (%) 35.48% 39.54% 35.95%
+Key Factors
+ Interest Income
+In Q1/2026, total interest income was THB 4,205 million, up 3.72% YoY and up 1.55% QoQ. This represented a return
+to year-on-year expansion following the slowdown in 2025 under a more stringent lending policy. The recovery is
+consistent with the resumption of growth in the title loan portfolio under a quality-focused growth framework and reflects
+the effectiveness of the portfolio restructuring carried out continuously since 2025.
+ Other Income and Insurance Brokerage Income
+In Q1/2026, Other Income was THB 340 million, down 17.27% YoY and down 2.86% QoQ. Insurance brokerage income
+was THB 356 million, up 14.84% YoY and up 4.40% QoQ, reflecting the Company’s ability to expand its insurance
+brokerage revenue base through its existing branch network and loan customer base.
+ Services and Administrative Expenses
+In Q1/2026, Services and Administrative Expenses were THB 1,848 million, down 15.03% YoY, reflecting continued cost
+management efficiency, driven by the adoption of digital technology in service delivery and appropriate workforce
+management.
+ Loss on Sale of Foreclosed Assets
+In Q1/2026, Loss on Sale of Foreclosed Assets was THB 109 million, a significant decline of 62.02% YoY from THB 287
+million in the same period of the prior year, and down 3.54% QoQ. This extends the positive trend that began in 2025,
+reflecting improved loan portfolio quality, more efficient foreclosed asset management processes, as well as greater
+stability in the used car market compared to early 2025.
+ Expected Credit Losses
+In Q1/2026, Expected Credit Losses was THB 513 million, up 21.85% YoY but down 6.90% QoQ. The year-on-year
+increase reflects provisioning on a conservative basis to cover credit risk among vulnerable customer segments amid
+an economy still expanding below potential and elevated household debt. The decline from Q4/2025, when the
+Company set aside additional provisions of THB 551 million, indicates that the provisioning level is now in line with the
+risk profile of the current portfolio.
+ Finance Costs
+In Q1/2026, Finance Costs were THB 657 million, down 9.75% YoY and down 6.81% QoQ, driven by appropriate debt
+structure and funding source management, together with the MPC’s policy rate cut to 1.00%. This led to a continued
+decline in funding costs from both financial institutions and the debt capital market, supporting the Company’s efficiency
+in managing funding sources and its ability to access low-cost funding.
+ Net Profit Margin
+In Q1/2026, the Net Profit Margin was 29.73%, up 5.90 percentage points from 23.83% in the same quarter of the prior
+year, and up 0.53 percentage points from 29.20% in Q4/2025. The continued improvement reflects efficient business
+cost management, particularly the decline in loss on the sale of foreclosed assets, lower finance costs, and disciplined
+operating expense management, combined with the resumption of growth in interest income, driving net profit growth
+of 28.03% YoY.
+3. Financial Position
+(THB million) Y on Y Q on Q
+Q1/26 Q1/25 %YoY Q4/25 %QoQ
+Current Assets 69,402 66,035 5.10% 71,099 -2.39%
+Non-Current Assets 37,433 40,813 -8.28% 36,575 2.35%
+Total Assets 106,835 106,848 -0.01% 107,674 -0.78%
+Current Liabilities 32,200 30,302 6.26% 31,810 1.23%
+Non-Current Liabilities 32,346 39,057 -17.18% 35,105 -7.86%
+Total Liabilities 64,546 69,359 -6.94% 66,915 -3.54%
+Shareholders' Equity 42,289 37,489 12.80% 40,759 3.75%
+Total Liabilities and Shareholders' Equity 106,835 106,848 -0.01% 107,674 -0.78%
+Total Assets
+Total assets as of 31 March 2026 stood at THB 106,835 million, virtually flat year-on-year and down 0.78% from the end of 2025.
+Current assets increased 5.10% YoY to THB 69,402 million, while non-current assets declined 8.28% YoY to THB 37,433 million,
+driven by the continued reduction in foreclosed assets, consistent with the improved efficiency in foreclosed asset disposal.
+Total Liabilities and Shareholders’ Equity
+Total liabilities as of 31 March 2026 stood at THB 64,546 million, down 6.94% YoY and down 3.54% from the end of 2025, due to
+the repayment of borrowings and debentures upon maturity, alongside debt structure management aligned with the size of the
+loan portfolio.
+Shareholders’ equity increased 12.80% YoY and up 3.75% from the end of 2025 to THB 42,289 million, supported by continued
+operating profits. The Debt-to-Equity (D/E) ratio improved to 1.53 times, from 1.85 times in the same quarter of the prior year,
+reflecting capital and financial structure levels supportive of business growth and future opportunities.
+Liquidity
+As of 31 March 2026, the Company’s ending cash balance was THB 5,369.74 million, which remains sufficient to support ongoing
+operations. The Company generated net cash flow from operating activities of THB 2,355.59 million. In Q1/2026, the Company
+repaid borrowings and debentures totaling THB 5,266.96 million upon maturity, reducing the financial cost burden and aligning
+the capital structure more appropriately.
+4. Outlook and Strategy 2026
+In the MD&A for the year ended 2025, the Company set out a strategic framework for 2026 comprising five key priorities: Loan
+Portfolio Quality Enhancement, Selective Growth, Insurance Brokerage Business Expansion, Branch Network Restructuring and
+Digital Transformation, Regulatory Compliance and Borrower Protection
+Operating performance in Q1/2026 confirms that this strategic framework is on the right track and capable of delivering high-
+quality returns. However, in the past quarter, the economy continued to face uncertainty from geopolitical factors, energy price
+volatility, and cost-of-living pressures. Significant developments in the operating environment during the quarter have prompted
+the Company to recalibrate the weighting of its strategic execution for Q2 through Q4 of 2026, to align with the evolving economic
+conditions and risks, as follows:
+ Loan Portfolio Quality Enhancement
+The Company continues to prioritize loan portfolio quality management. Elevated energy costs are expected to weigh
+on the repayment capacity of certain customer segments, particularly those in the transportation sector, agricultural
+workers, and labor-based occupations in provincial areas. The Company therefore plans to proactively enhance
+portfolio quality measures, including stricter new customer screening, early-bucket collection, and debt restructuring
+for affected customers, in order to limit the migration of loans into NPL status going forward.
+ Selective Growth
+The Company continues to expand the title loan portfolio, which grew 8.19% YoY in Q1/2026 with its share of the total
+loan portfolio rising to 73.03%. For the remainder of the year, the Company will place greater emphasis on the selection
+of collateral types, customer occupational segments, and service areas more aligned with appropriate risk levels. In
+addition, the Company will continue to build on insurance brokerage income, which grew 14.84% YoY in this quarter,
+to create a more balanced revenue mix and mitigate credit risk exposure.
+ Insurance Brokerage Business Expansion
+Insurance brokerage income grew 14.84% YoY in Q1/2026, continuing the steady expansion of this fee-based revenue
+stream. The Company will accelerate this momentum through the remainder of the year, leveraging cross-sell
+opportunities to the existing loan customer base across its nationwide branch network, broadening the product mix to
+capture emerging segments such as EV motor insurance and health-related coverage, and strengthening digital and
+Telesales channels. As a non-credit-risk income source that is highly complementary to the core lending business,
+insurance brokerage will play an increasingly important role in diversifying the Company's revenue base and supporting
+margin stability going forward.
+ Branch Network Restructuring and Digital Transformation
+The Company continues to execute its existing plans for branch network restructuring, including expansion in high-
+potential areas and downsizing of underperforming branches, alongside the continued advancement of the e-KYC,
+Mobile Lending Platform, and new Loan Management System (LMS), which are expected to be progressively rolled out
+within 2026. These investments aim to enhance operational efficiency, reduce unit costs, and support long-term credit
+risk management.
+ Regulatory Compliance and Borrower Protection
+The Company closely monitors and prepares to comply with new regulatory requirements, including the Bank of
+Thailand’s Responsible Lending guidelines and new hire purchase lending regulations effective in 2026. The Company
+will provide appropriate assistance measures for borrowers affected by external factors, alongside prudent risk
+management, to support long-term business growth and appropriate customer care.
+5. Factors That May Affect Operations or Growth
+The Thai economic outlook for 2026 points to slower growth than previously expected. In addition, geopolitical tensions in the
+Middle East that escalated toward the end of the quarter have driven volatility in global energy prices, affecting cost-of-living
+burdens and business operating costs for the Thai public. This may in turn affect the repayment capacity of the general population.
+6. Sustainability Development
+The Company is committed to operating in accordance with the principles of sustainable development, ensuring its operations
+align with international sustainability standards across the three dimensions of Environment, Social, and Governance (ESG),
+guided by the Sustainable Development Goals (SDGs) and supporting the Responsible Lending framework in creating business
+opportunities and shared value for all stakeholder groups. For 2026, the Company will continue to operate under its existing
+management approach, committed to driving business growth to create value for shareholders, customers, and all stakeholder
+groups, while conducting business responsibly and growing together with Thai society in a sustainable manner.

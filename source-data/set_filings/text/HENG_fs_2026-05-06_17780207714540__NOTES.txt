@@ -1,0 +1,348 @@
+Heng Leasing and Capital Public Company Limited
+Condensed notes to interim financial statements
+For the three-month period ended 31 March 2026
+1.General information
+1.1Corporate information
+Heng Leasing and Capital Public Company Limited (“the Company”) is a public company incorporated and domiciled in Thailand. The Company is principally engaged in the providing financial services specifically hire purchase, loans secured against vehicle registrations, land and building loans, personal loan and nano finance without collateral. The Company’s registered address is 69 Moo 7, Sansai Noi Subdistrict, Sansai District, Chiang Mai.                 The Company has 450 branches (31 December 2025: 743 branches).
+1.2Basis for the preparation of the interim financial statements
+These interim financial statements have been prepared in accordance with Thai Accounting Standard No.34 Interim Financial Reporting, with the Company presenting condensed interim financial statements.The Company has presented the statements of financial position, comprehensive income, changes in shareholders' equity, and cash flows in the same format as that used for the annual financial statements and has presented notes to the interim financial statements on a condensed basis.
+The interim financial statements are intended to provide information additional to that included in the latest annual financial statements. Accordingly, they focus on new activities, events and circumstances so as not to duplicate information previously reported. These interim financial statements should therefore be read in conjunction with the latest annual financial statements.
+The interim financial statements in Thai language are the official statutory financial statements of the Company. The interim financial statements in English language have been translated from the Thai language financial statements.
+1.3  Accounting policies
+The interim financial statements are prepared by using the same accounting policies and methods of computation as were used for the financial statements for the year ended                    31 December 2025.
+The revised financial reporting standards which are effective for fiscal years beginning on or after 1 January 2026, do not have any significant impact on the Company’s financial statements.
+2.Cash and cash equivalents
+
+[TABLE 1]
+(Unit: Thousand Baht)
+ | 31 March 2026 | 31 December 2025
+Cash | 688 | 644
+Bank deposits - savings accounts | 24,916 | 39,845
+Bank deposits - current accounts | 30,712 | 69,089
+Total | 56,316 | 109,578
+Less: Deposits at banks for premium that the Company received from policy holders | (7,700) | (5,054)
+Total | 48,616 | 104,524
+[/TABLE 1]
+
+3.Hire purchase receivables
+3.1 As at 31 March 2026 and 31 December 2025, the contracted terms of the Company’s hire purchase receivables are 12 - 84 installments with payments to be made in equal installments and interest charged at fixed rates throughout the contracts. Hire purchase receivables classified by due date per agreement are as follows:
+
+[TABLE 2]
+ | (Unit: Thousand Baht)
+ | 31 March 2026
+ | Portion due within one year (2) | Portion due over one year but within two years | Portion due over two years but within three years | Portion due over three years but within four years | Portion due over four years but within five years | Portion due over five years | Total
+Hire purchase receivables | 1,043,988 | 678,511 | 419,064 | 194,375 | 73,083 | 19,999 | 2,429,020
+Less:Unearned hire purchase income (1) | (222,623) | (119,778) | (55,572) | (20,770) | (6,004) | (1,092) | (425,839)
+Undue output Vat | (62,724) | (44,389) | (27,415) | (12,716) | (4,781) | (1,309) | (153,334)
+Present value of the minimum lease   payment receivables | 758,641 | 514,344 | 336,077 | 160,889 | 62,298 | 17,598 | 1,849,847
+Less:Allowance for expected credit losses | (121,651) | (25,614) | (21,790) | (13,435) | (6,401) | (2,343) | (191,234)
+Net hire purchase receivables | 636,990 | 488,730 | 314,287 | 147,454 | 55,897 | 15,255 | 1,658,613
+[/TABLE 2]
+
+(1) Presented net of deferred initial direct income and costs of hire purchase.
+(2) The balance of hire purchase receivables due within 1 year included receivables that are credit impaired.
+
+[TABLE 3]
+ | (Unit: Thousand Baht)
+ | 31 December 2025
+ | Portion due within one year (2) | Portion due over one year but within  two years | Portion due over two years but within three years | Portion due over three years but within  four years | Portion due over four years but within five years | Portion due over five years | Total
+Hire purchase receivables | 1,154,499 | 760,739 | 478,864 | 220,744 | 84,655 | 23,405 | 2,722,906
+Less:Unearned hire purchase income (1) | (256,852) | (137,521) | (65,229) | (24,513) | (7,248) | (1,343) | (492,706)
+Undue output Vat | (71,560) | (49,768) | (31,328) | (14,441) | (5,538) | (1,531) | (174,166)
+Present value of the minimum lease payment receivables | 826,087 | 573,450 | 382,307 | 181,790 | 71,869 | 20,531 | 2,056,034
+Less:Allowance for expected credit losses | (119,000) | (29,647) | (25,282) | (16,012) | (7,849) | (2,799) | (200,589)
+Net hire purchase receivables | 707,087 | 543,803 | 357,025 | 165,778 | 64,020 | 17,732 | 1,855,445
+[/TABLE 3]
+
+(1) Presented net of deferred initial direct income and costs of hire purchase.
+(2) The balance of hire purchase receivables due within 1 year included receivables that are credit impaired.
+3.2 As at 31 March 2026 and 31 December 2025, the balances of hire purchase receivables are classified by credit risk and allowance for expected credit losses as follows:
+
+[TABLE 4]
+ |  | (Unit: Thousand Baht)
+ | Hire purchase receivables - net of unearned hire purchase income (1) | Allowance for expected credit losses
+ | 31 March                2026 | 31 December 2025 | 31 March                2026 | 31 December 2025
+Hire purchase receivables without a significant increase in credit risk (Performing) | 1,200,810 | 1,320,344 | 12,305 | 13,459
+Hire purchase receivables with a significant increase in credit risk (Under-performing) | 469,192 | 545,809 | 72,396 | 86,105
+Hire purchase receivables with credit impaired (Non-performing) | 179,845 | 189,881 | 106,533 | 101,025
+Total | 1,849,847 | 2,056,034 | 191,234 | 200,589
+[/TABLE 4]
+
+Presented net of deferred initial direct income and costs of hire purchase.
+3.3As at 31 March 2026, hire purchase receivables amounting to Baht 1,248 million (net of unearned hire purchase income) were pledged to secure credit facilities from commercial banks (31 December 2025: Baht 1,027 million), as described in Notes 9 and 12 to the interim financial statements.
+4.Loan receivables
+4.1As at 31 March 2026 and 31 December 2025, the contracted terms of the Company’s loan receivables are 1 - 84 installments with payments to be made in equal installments and interest charged at fixed rates throughout in the contracts. Loan receivables classified by due date per agreement are as follows:
+
+[TABLE 5]
+ | (Unit: Thousand Baht)
+ | 31 March 2026
+ | Amounts due within 1 year (2) | Amounts due over 1 year | Total
+Loan receivables | 2,292,309 | 4,127,807 | 6,420,116
+Add:Deferred financial expenses (1) | 10,663 | 16,798 | 27,461
+Accrued interest receivables | 354,639 | - | 354,639
+Total | 2,657,611 | 4,144,605 | 6,802,216
+Less: Allowance for expected credit losses | (315,634) | (196,320) | (511,954)
+Loan receivables - net | 2,341,977 | 3,948,285 | 6,290,262
+[/TABLE 5]
+
+Presented net of deferred initial direct income and costs of loan.
+The balance of loan receivables due within 1 year includes receivables that are credit impaired.
+
+[TABLE 6]
+ | (Unit: Thousand Baht)
+ | 31 December 2025
+ | Amounts due within 1 year (2) | Amounts due over 1 year | Total
+Loan receivables | 2,394,579 | 4,553,510 | 6,948,089
+Add:Deferred financial expenses (1) | 11,948 | 20,023 | 31,971
+Accrued interest receivables | 376,647 | - | 376,647
+Total | 2,783,174 | 4,573,533 | 7,356,707
+Less: Allowance for expected credit losses | (355,403) | (246,834) | (602,237)
+Loan receivables - net | 2,427,771 | 4,326,699 | 6,754,470
+[/TABLE 6]
+
+(1)Presented net of deferred initial direct income and costs of loan.
+(2)The balance of loan receivables due within 1 year includes receivables that are credit impaired.
+4.2As at 31 March 2026 and 31 December 2025, the balances of loan receivables are classified by credit risk and allowance for expected credit losses as follows:
+
+[TABLE 7]
+ |  | (Unit: Thousand Baht)
+ | Loan receivables                     and accrued interest income (1) | Allowance for expected credit losses
+ | 31 March                2026 | 31 December  2025 | 31 March                2026 | 31 December  2025
+Loan receivables without a significant increase in credit risk (Performing) | 5,146,038 | 5,337,269 | 54,073 | 54,937
+Loan receivables with a significant increase in credit risk (Under-performing) | 1,204,427 | 1,506,419 | 210,998 | 267,534
+Loan receivables with credit impaired                    (Non-performing) | 451,751 | 513,019 | 246,883 | 279,766
+Total | 6,802,216 | 7,356,707 | 511,954 | 602,237
+[/TABLE 7]
+
+Presented net of deferred initial direct income and costs of loan.
+4.3As at 31 March 2026, loan receivables amounting to Baht 3,764 million (net of unearned financial income and deferred financial expenses) were pledged to secure credit facilities from commercial banks (31 December 2025: Baht 4,076 million), as described in Notes 9 and 12 to the interim financial statements.
+5.Allowance for expected credit losses
+Movements of allowance for expected credit losses (ECL) of hire purchase and loan receivables are as follows:
+
+[TABLE 8]
+(Unit: Thousand Baht)
+ | For the three-month period ended 31 March 2026
+ | 12-month ECL (Stage 1) | Lifetime                     ECL - not credit impaired (Stage 2) | Lifetime        ECL - credit impaired (Stage 3) | Total
+Beginning balance | 68,396 | 353,639 | 380,791 | 802,826
+Change in expected credit losses during the period | (2,018) | (70,245) | 166,139 | 93,876
+Bad debt written-off during the period | - | - | (193,514) | (193,514)
+Ending balance | 66,378 | 283,394 | 353,416 | 703,188
+[/TABLE 8]
+
+
+[TABLE 9]
+(Unit: Thousand Baht)
+ | For the year ended 31 December 2025
+ | 12-month ECL (Stage 1) | Lifetime                     ECL - not credit impaired (Stage 2) | Lifetime        ECL - credit impaired (Stage 3) | Total
+Beginning balance | 99,905 | 412,661 | 379,186 | 891,752
+Stage changes | 70,780 | (126,923) | 56,143 | -
+Changes due to revaluation of allowance for credit loss | (80,780) | 13,602 | 747,866 | 680,688
+New financial assets acquired | 22,930 | 257,612 | 57,550 | 338,092
+Derecognition of financial assets | (44,439) | (203,313) | (55,630) | (303,382)
+Bad debt written-off | - | - | (804,324) | (804,324)
+Ending balance | 68,396 | 353,639 | 380,791 | 802,826
+[/TABLE 9]
+
+6.Assets foreclosed
+
+[TABLE 10]
+ | (Unit: Thousand Baht)
+ | 31 March 2026 | 31 December 2025
+Assets foreclosed - cost | 28,980 | 33,012
+Less: Allowance for impairment | (8,919) | (10,300)
+Assets foreclosed - net | 20,061 | 22,712
+[/TABLE 10]
+
+7.Land, building and equipment
+
+[TABLE 11]
+ | (Unit: Thousand Baht)
+Cost | 
+Balance as at 1 January 2026 | 343,275
+Additions during the period | 121
+Disposals/written-off | (42,508)
+Balance as at 31 March 2026 | 300,888
+Accumulated depreciation | 
+Balance as at 1 January 2026 | 248,093
+Depreciation during the period | 6,990
+Depreciation for disposals/written-off | (22,833)
+Balance as at 31 March 2026 | 232,250
+Allowance for impairment | 
+Balance as at 1 January 2026 | 28,039
+Allowance for impairment for disposals/written-off | (24,310)
+Balance as at 31 March 2026 | 3,729
+Net book value | 
+Balance as at 31 March 2026 | 64,909
+[/TABLE 11]
+
+8.Right-of-use assets
+The movement of rights-of-use assets for the three-month period ended 31 March 2026 are summarised below:
+
+[TABLE 12]
+(Unit: Thousand Baht)
+Balance as at 1 January 2026 |  |  |  | 91,866
+Additions during the period |  |  |  | 16,489
+Written-off during the period |  |  |  | (5,445)
+Depreciation during the period |  |  |  | (16,554)
+Depreciation for written-off |  |  |  | 5,466
+Balance as at 31 March 2026 |  |  |  | 91,822
+[/TABLE 12]
+
+9.Bank overdrafts and short-term loans from financial institutions
+As at 31 March 2026 and 31 December 2025, the following are short-term loans in the form of bank overdrafts and promissory notes from financial institutions in Thailand:
+
+[TABLE 13]
+(Unit: Thousand Baht)
+ | Loan facility/Repayment schedule | 31 March                 2026 | 31 December 2025
+a) | Bank overdrafts | - | 4,919
+b) | Promissory notes under credit facilities amounting to Baht 350 million, with principal repayable within the specific date of each promissory, and interest charged at MOR less a fixed rate, payable monthly | 54,418 | 87,662
+c) | Promissory notes under credit facilities amounting to Baht 410 million, with principal repayable within the specific date of each promissory, and interest charged at MLR less a fixed rate, payable monthly | 61,003 | 79,779
+d) | Promissory notes under credit facilities amounting to Baht 200 million, with principal repayable within the specific date of each promissory, and interest charged at MLR less a fixed rate, payable monthly | - | 47,788
+Total bank overdrafts and short-term loans from financial institutions | 115,421 | 220,148
+[/TABLE 13]
+
+Bank overdrafts and short-term loans are secured by the transfer of ownership rights and the assignment of collection rights over hire purchase receivables, loan receivables and loans secured against motorcycle registrations, car registrations, commercial car registrations and truck registrations. Moreover, the Company is required to comply with certain terms and conditions as specified in each loan agreement, such as to maintain ratios of non-performing hire purchase receivables and loan receivables (overdue more than 3 months) to total receivables, collection ratio, debt to equity ratio, earnings before interest and taxes to total interest expenses, depending on the conditions in each agreement.
+As at 31 March 2026, the Company has Baht 70 million in bank overdrafts and             short-term credit facilities from financial institutions that are available to be drawn down           (31 December 2025: Baht 65 million).
+10.Other current payables
+
+[TABLE 14]
+(Unit: Thousand Baht)
+ | 31 March 2026 | 31 December 2025
+Other current payables | 45,394 | 45,705
+Accrued employee expenses | 862 | -
+Revenue department payable | 5,860 | 6,874
+Accrued expenses | 16,695 | 15,565
+Total | 68,811 | 68,144
+[/TABLE 14]
+
+11. Loans from an unrelated party
+As at 31 March 2026, the Company had long-term loans from an unrelated party amounting to Baht 10 million (31 December 2025: The Company had short-term and long-term loans from an unrelated party amounting to Baht 7 million and Baht 10 million, respectively).               The loans bear interest at a fixed rate, with interest payable every three months and the principal repayable at the end of the contractual term.
+12.Long-term loans
+As at 31 March 2026 and 31 December 2025, the following are loans from local financial institutions in Thailand.
+
+[TABLE 15]
+ |  | (Unit: Thousand Baht)
+ | Loan facility/Repayment schedule | 31 March 2026 | 31 December 2025
+a) | Credit facility amounting to Baht 100 million, repayable principal equally  every month, and interest charged at MLR less a fixed rate, payable monthly | 80,950 | 91,420
+b) | Syndicate loan facility amounting to Baht 2,000 million, repayable principal equally every month, and interest charged at MLR less a fixed rate,  payable monthly | 92,620 | 151,140
+c) | Credit facility amounting to Baht 500 million, repayable principal equally  every month, and interest charged at MLR less a fixed rate, payable monthly | 27,812 | 59,069
+d) | Syndicate loan facility amounting to Baht 3,000 million, repayable principal equally every month, and interest charged at MLR less a fixed rate,  payable monthly | 414,080 | 582,390
+e) | Credit facility amounting to Baht 1,000 million, repayable principal and  interest equally every month, and interest charged at MLR less a fixed rate | 332,586 | 420,483
+f) | Syndicate loan facility amounting to Baht 4,500 million, repayable principal equally every month, and interest charged at MLR less a fixed rate,                  payable monthly | 1,809,130 | 2,090,740
+g) | Credit facility amounting to Baht 200 million, repayable principal and                     interest equally every month, and interest charged at MLR less a fixed rate | 58,368 | 81,375
+Total | 2,815,546 | 3,476,617
+Less: Deferred issuing costs | (5,552) | (7,509)
+Long-term loans | 2,809,994 | 3,469,108
+Less: Current portion due within one year | (2,087,068) | (2,274,265)
+Long-term loans - net of current portion | 722,926 | 1,194,843
+[/TABLE 15]
+
+The above long-term loans are secured by the assignment of collection rights over loans secured against motorcycle registrations, car registrations, commercial car registrations and truck registrations with specific conditions to the bank. Moreover, the Company is required to comply with certain terms and conditions as specified in each loan agreement, such as to maintain ratios of non-performing hire purchase receivables and loan receivables (overdue more than 3 months) to total receivables, debt to equity ratio, earnings before interest and taxes to interest expenses, depending on the conditions in each agreement.
+As at 31 March 2026, the Company has Baht 19 million the long-term credit facilities which have not yet been drawn down (31 December 2025: Baht 9 million).
+Movements in the long-term loans account during the three-month period ended 31 March 2026 are summarised below.
+
+[TABLE 16]
+(Unit: Thousand Baht)
+Balance as at 1 January 2026 | 3,476,617
+Less: Repayment | (661,071)
+Balance as at 31 March 2026 | 2,815,546
+[/TABLE 16]
+
+13.Debentures
+As at 31 March 2026 and 31 December 2025, the Company has debentures issued with details below.
+(Unite: Thousand Baht)
+
+[TABLE 17]
+No. | Date of issuance | Repayment schedule | 31 March            2026 | 31 December 2025
+1 | 28 May 2024 | Debenture with name registered, unsubordinated, unsecured and having  a debenture representative, 3 years term with a coupon rate of 5.50% per annum, interest payable every three months | 147,700 | 147,700
+Total |  | 147,700 | 147,700
+Less: Deferred issuing costs | (833) | (1,004)
+Debentures |  | 146,867 | 146,696
+Less: Current portion due within 1 year | - | -
+Debentures - net of current portion | 146,867 | 146,696
+[/TABLE 17]
+
+The Company has to comply with financial covenants by maintaining a debt to equity ratio at the end of each accounting period throughout the life of debentures.
+14.Income tax expenses
+Income tax expenses for the three-month periods ended 31 March 2026 and 2025 are as follows:
+
+[TABLE 18]
+(Unit: Thousand Baht)
+ | For the three-month periods ended 31 March
+ | 2026 | 2025
+Current income tax: |  | 
+Corporate income tax charge for the periods | (8,243) | 24,640
+Deferred tax: |  | 
+Relating to origination and reversal of temporary differences | 24,025 | (11,149)
+Income tax expenses reported in the statements of comprehensive income | 15,782 | 13,491
+[/TABLE 18]
+
+Reconciliation between income tax expenses and the product of accounting profits multiplied by the applicable tax rate for the three-month periods ended 31 March 2026 and 2025 are as follows:
+
+[TABLE 19]
+(Unit: Thousand Baht)
+ | For the three-month periods ended 31 March
+ | 2026 | 2025
+Accounting profit before tax | 78,904 | 65,929
+Applicable tax rate | 20% | 20%
+Accounting profit before tax multiplied by applicable tax rate | 15,781 | 13,186
+Effects of additional expense and non-deductible expense | 1 | 305
+Income tax expenses reported in the statements of comprehensive income | 15,782 | 13,491
+[/TABLE 19]
+
+15.Earnings per share
+Basic earnings per share is calculated by dividing profit for the period attributable to equity holders of the Company (excluding other comprehensive income) by the weighted average number of ordinary shares in issue during the period.
+16.Segment information
+The Company’s principal operations involve a single operating segment of hire purchase and loan receivables. Their operations are carried on in the single geographical area of Thailand. Segment performance is measured based on operating profit or loss, on a basis consistent with that the Company’s chief operating decision maker (Managing Director) used to measure operating profit or loss in the financial statements. As a result, all of the revenues, operating profits and assets as reflected in these financial statements pertain to the aforementioned reportable operating segment and geographical area. In addition, the Company has no major customer with reserve of 10 percent or more of an entity’s revenues during the three-month period ended 31 March 2026.
+17.Related party transactions
+During the periods, the Company had significant business transactions with related parties. Such transactions are in the ordinary course of business and were concluded on commercial terms and bases agreed upon between the Company and those related parties. A summary of related parties and transactions with those parties is below.
+
+[TABLE 20]
+(Unit: Thousand Baht)
+ | For the three-month periods ended 31 March | 
+ | 2026 | 2025 | Pricing Policy
+Transactions with related parties |  |  | 
+Rental expenses | 735 | 1,110 | As stipulated in agreements
+Interest expenses | 328 | - | As stipulated in agreements
+[/TABLE 20]
+
+As at 31 March 2026 and 31 December 2025, the balances of the accounts between the Company and those related parties are as follows:
+(Unit: Thousand Baht)
+
+[TABLE 21]
+ | 31 March 2026 | 31 December 2025
+Related parties |  | 
+Accrued interest expenses | 42 | 250
+Short-term loans | - | 31,000
+Long-term loans | 10,000 | 10,000
+Lease liabilities | 2,209 | 2,852
+[/TABLE 21]
+
+During the three-month period ended 31 March 2026, movements of the Company’s loans from related parties were as follow:
+
+[TABLE 22]
+ | (Unit: Thousand Baht)
+ | 1 January 2026 | Increase | Decrease | 31 March 2026
+Related parties |  |  |  | 
+Short-term loans | 31,000 | - | (31,000) | -
+Long-term loans | 10,000 | - | - | 10,000
+[/TABLE 22]
+
+Directors and management’s benefits
+During the three-month periods ended 31 March 2026 and 2025, the Company had employee benefit expenses payable to their directors and management as below.
+
+[TABLE 23]
+(Unit: Thousand Baht)
+ | For the three-month periods ended 31 March
+ | 2026 | 2025
+Short-term employee benefits | 7,872 | 10,207
+Post-employment benefits | 154 | 132
+Total | 8,026 | 10,339
+[/TABLE 23]
+
+18.Fair value of financial instrument
+Since the majority of the Company’s financial instruments consist of those that are short-term in nature and those that carry interest at rates close to the market interest rates, their fair value is not expected to be materially different from the amounts presented in the statement of financial position.
+19.Events after the reporting period
+On 17 April 2026, the Annual General Meeting of Shareholders for 2026 approved a dividend payment of Baht 0.0262 per share from unappropriated retained earnings and 2025 operating results to the shareholders of the Company, or a total dividend payment of Baht 99.82 million, with the schedule to pay dividends on 8 May 2026.
+20.Approval of interim financial statements
+These interim financial statements were authorised for issue by the Company’s Board of Directors on 6 May 2026.

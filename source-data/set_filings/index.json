@@ -1,0 +1,1073 @@
+{
+ "meta": {
+  "title": "SET filings — MD&A narrative + Financial Statements/NOTES for the six SET-listed Thai title-loan peers (measured, autonomous pull)",
+  "generated_by": "pipeline/pull_set_filings.py",
+  "generated_date": "2026-08-08",
+  "label": "MEASURED — Stock Exchange of Thailand (set.or.th) company disclosures. kind=mda: the Management Discussion & Analysis PDF (management's narrative). kind=fs: the Financial Statement ZIP, whose NOTES.DOCX carries the IFRS-9 Stage 1/2/3 ECL tables, allowance movement and receivables-by-collateral breakdowns, and whose FINANCIAL_STATEMENTS.XLSX carries the primary statements. Text extracted with pdfplumber / openpyxl / a zip+XML docx reader. Newest 4 of each kind per symbol.",
+  "source": "Stock Exchange of Thailand · set.or.th news search + weblink.set.or.th attachments",
+  "symbols": [
+   "HENG",
+   "MTC",
+   "SAK",
+   "SAWAD",
+   "TIDLOR",
+   "TURBO"
+  ],
+  "kinds": [
+   "fs"
+  ],
+  "last_run_symbols": [
+   "TURBO"
+  ],
+  "search_window": {
+   "from": "01/01/2026",
+   "to": "08/08/2026"
+  },
+  "per_symbol": 4
+ },
+ "filings": [
+  {
+   "symbol": "HENG",
+   "kind": "fs",
+   "id": "17706805878830",
+   "date": "2026-02-10",
+   "headline": "Financial Statement Yearly 2025 (Audited)",
+   "url": "https://weblink.set.or.th/dat/news/202602/1667FIN100220261819580833E.zip",
+   "raw_path": "source-data/set_filings/zip/HENG_fs_2026-02-10_17706805878830.zip",
+   "sha256": "95bb42e577066da83c51ad5fdc0041287cdc24bc80bc4d526043149de7302027",
+   "cached": false,
+   "members": [
+    {
+     "name": "AUDITOR_REPORT.DOCX",
+     "bytes": 42209,
+     "ext": ".docx",
+     "n_tables": 1,
+     "status": "ok",
+     "n_chars": 13598
+    },
+    {
+     "name": "FINANCIAL_STATEMENTS.XLSX",
+     "bytes": 61186,
+     "ext": ".xlsx",
+     "n_sheets": 4,
+     "status": "ok",
+     "n_chars": 12334
+    },
+    {
+     "name": "NOTES.DOCX",
+     "bytes": 200309,
+     "ext": ".docx",
+     "n_tables": 51,
+     "status": "ok",
+     "n_chars": 78517
+    }
+   ],
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "AUDITOR_REPORT.DOCX",
+     "text_path": "source-data/set_filings/text/HENG_fs_2026-02-10_17706805878830__AUDITOR_REPORT.txt",
+     "n_chars": 13598
+    },
+    {
+     "member": "FINANCIAL_STATEMENTS.XLSX",
+     "text_path": "source-data/set_filings/text/HENG_fs_2026-02-10_17706805878830__FINANCIAL_STATEMENTS.txt",
+     "n_chars": 12334
+    },
+    {
+     "member": "NOTES.DOCX",
+     "text_path": "source-data/set_filings/text/HENG_fs_2026-02-10_17706805878830__NOTES.txt",
+     "n_chars": 78517
+    }
+   ],
+   "n_chars": 104449
+  },
+  {
+   "symbol": "HENG",
+   "kind": "fs",
+   "id": "17780207714540",
+   "date": "2026-05-06",
+   "headline": "Financial Statement Quarter 1/2026 (Reviewed)",
+   "url": "https://weblink.set.or.th/dat/news/202605/1667FIN060520261617100125E.zip",
+   "raw_path": "source-data/set_filings/zip/HENG_fs_2026-05-06_17780207714540.zip",
+   "sha256": "6690fbed89ac69128fced3406fa160b22042194109acfe53263a1c4aa92191f3",
+   "cached": false,
+   "members": [
+    {
+     "name": "AUDITOR_REPORT.DOCX",
+     "bytes": 34656,
+     "ext": ".docx",
+     "n_tables": 1,
+     "status": "ok",
+     "n_chars": 2175
+    },
+    {
+     "name": "FINANCIAL_STATEMENTS.XLSX",
+     "bytes": 60034,
+     "ext": ".xlsx",
+     "n_sheets": 4,
+     "status": "ok",
+     "n_chars": 10455
+    },
+    {
+     "name": "NOTES.DOCX",
+     "bytes": 114619,
+     "ext": ".docx",
+     "n_tables": 23,
+     "status": "ok",
+     "n_chars": 23512
+    }
+   ],
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "AUDITOR_REPORT.DOCX",
+     "text_path": "source-data/set_filings/text/HENG_fs_2026-05-06_17780207714540__AUDITOR_REPORT.txt",
+     "n_chars": 2175
+    },
+    {
+     "member": "FINANCIAL_STATEMENTS.XLSX",
+     "text_path": "source-data/set_filings/text/HENG_fs_2026-05-06_17780207714540__FINANCIAL_STATEMENTS.txt",
+     "n_chars": 10455
+    },
+    {
+     "member": "NOTES.DOCX",
+     "text_path": "source-data/set_filings/text/HENG_fs_2026-05-06_17780207714540__NOTES.txt",
+     "n_chars": 23512
+    }
+   ],
+   "n_chars": 36142
+  },
+  {
+   "symbol": "HENG",
+   "kind": "fs",
+   "id": "17860548306280",
+   "date": "2026-08-07",
+   "headline": "Financial Statement Quarter 2/2026 (Reviewed)",
+   "url": "https://weblink.set.or.th/dat/news/202608/1667FIN070820261819170408E.zip",
+   "raw_path": "source-data/set_filings/zip/HENG_fs_2026-08-07_17860548306280.zip",
+   "sha256": "c566ce61a4103c1376020c6f2ec83393d89c0e6ca02b2739e0c7886eaa966e69",
+   "cached": false,
+   "members": [
+    {
+     "name": "AUDITOR_REPORT.DOCX",
+     "bytes": 35033,
+     "ext": ".docx",
+     "n_tables": 1,
+     "status": "ok",
+     "n_chars": 2280
+    },
+    {
+     "name": "FINANCIAL_STATEMENTS.XLSX",
+     "bytes": 58916,
+     "ext": ".xlsx",
+     "n_sheets": 4,
+     "status": "ok",
+     "n_chars": 10469
+    },
+    {
+     "name": "NOTES.DOCX",
+     "bytes": 120604,
+     "ext": ".docx",
+     "n_tables": 23,
+     "status": "ok",
+     "n_chars": 25490
+    }
+   ],
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "AUDITOR_REPORT.DOCX",
+     "text_path": "source-data/set_filings/text/HENG_fs_2026-08-07_17860548306280__AUDITOR_REPORT.txt",
+     "n_chars": 2280
+    },
+    {
+     "member": "FINANCIAL_STATEMENTS.XLSX",
+     "text_path": "source-data/set_filings/text/HENG_fs_2026-08-07_17860548306280__FINANCIAL_STATEMENTS.txt",
+     "n_chars": 10469
+    },
+    {
+     "member": "NOTES.DOCX",
+     "text_path": "source-data/set_filings/text/HENG_fs_2026-08-07_17860548306280__NOTES.txt",
+     "n_chars": 25490
+    }
+   ],
+   "n_chars": 38239
+  },
+  {
+   "symbol": "HENG",
+   "kind": "mda",
+   "id": "101078500",
+   "date": "2026-02-10",
+   "headline": "Management Discussion and Analysis Yearly Ending 31 Dec 2025",
+   "url": "https://weblink.set.or.th/dat/news/202602/1667NWS100220261920530890E.pdf",
+   "raw_path": "source-data/set_filings/pdf/HENG_mda_2026-02-10_101078500.pdf",
+   "sha256": "36e18abe496d1075efd0802fe806b3cae72dc38799b67e0d05735373b6107604",
+   "cached": false,
+   "n_pages": 5,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "HENG_mda_2026-02-10_101078500.pdf",
+     "text_path": "source-data/set_filings/text/HENG_mda_2026-02-10_101078500__MDA.txt",
+     "n_chars": 7126
+    }
+   ],
+   "n_chars": 7126
+  },
+  {
+   "symbol": "HENG",
+   "kind": "mda",
+   "id": "103854100",
+   "date": "2026-05-06",
+   "headline": "Management Discussion and Analysis Quarter 1 Ending 31 Mar 2026",
+   "url": "https://weblink.set.or.th/dat/news/202605/1667NWS060520261735117030E.pdf",
+   "raw_path": "source-data/set_filings/pdf/HENG_mda_2026-05-06_103854100.pdf",
+   "sha256": "245ce938806aa638d25e08b10143ae77da2e3552a33f67fc1635e85680de9dfd",
+   "cached": false,
+   "n_pages": 5,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "HENG_mda_2026-05-06_103854100.pdf",
+     "text_path": "source-data/set_filings/text/HENG_mda_2026-05-06_103854100__MDA.txt",
+     "n_chars": 7354
+    }
+   ],
+   "n_chars": 7354
+  },
+  {
+   "symbol": "HENG",
+   "kind": "mda",
+   "id": "105738000",
+   "date": "2026-08-07",
+   "headline": "Management Discussion and Analysis Quarter 2 Ending 30 Jun 2026",
+   "url": "https://weblink.set.or.th/dat/news/202608/1667NWS070820261932091200E.pdf",
+   "raw_path": "source-data/set_filings/pdf/HENG_mda_2026-08-07_105738000.pdf",
+   "sha256": "c14215c5660c8d8dd4f2ab1be6bef83c9a68f171ea0f0840e0a51ba444fb3a5d",
+   "cached": false,
+   "n_pages": 7,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "HENG_mda_2026-08-07_105738000.pdf",
+     "text_path": "source-data/set_filings/text/HENG_mda_2026-08-07_105738000__MDA.txt",
+     "n_chars": 10262
+    }
+   ],
+   "n_chars": 10262
+  },
+  {
+   "symbol": "MTC",
+   "kind": "fs",
+   "id": "17712782999880",
+   "date": "2026-02-17",
+   "headline": "Financial Statement Yearly 2025 (Audited)",
+   "url": "https://weblink.set.or.th/dat/news/202602/1225FIN170220262154400521E.zip",
+   "raw_path": "source-data/set_filings/zip/MTC_fs_2026-02-17_17712782999880.zip",
+   "sha256": "451ea4e706e2e60e51e8d8e4f2b22d18fd436bc298a1dedeaef81d3924e6a846",
+   "cached": false,
+   "members": [
+    {
+     "name": "AUDITOR_REPORT.DOCX",
+     "bytes": 135979,
+     "ext": ".docx",
+     "n_tables": 1,
+     "status": "ok",
+     "n_chars": 11836
+    },
+    {
+     "name": "FINANCIAL_STATEMENTS.XLSX",
+     "bytes": 221256,
+     "ext": ".xlsx",
+     "n_sheets": 5,
+     "status": "ok",
+     "n_chars": 17390
+    },
+    {
+     "name": "NOTES.DOCX",
+     "bytes": 414543,
+     "ext": ".docx",
+     "n_tables": 63,
+     "status": "ok",
+     "n_chars": 132435
+    }
+   ],
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "AUDITOR_REPORT.DOCX",
+     "text_path": "source-data/set_filings/text/MTC_fs_2026-02-17_17712782999880__AUDITOR_REPORT.txt",
+     "n_chars": 11836
+    },
+    {
+     "member": "FINANCIAL_STATEMENTS.XLSX",
+     "text_path": "source-data/set_filings/text/MTC_fs_2026-02-17_17712782999880__FINANCIAL_STATEMENTS.txt",
+     "n_chars": 17390
+    },
+    {
+     "member": "NOTES.DOCX",
+     "text_path": "source-data/set_filings/text/MTC_fs_2026-02-17_17712782999880__NOTES.txt",
+     "n_chars": 132435
+    }
+   ],
+   "n_chars": 161661
+  },
+  {
+   "symbol": "MTC",
+   "kind": "fs",
+   "id": "17785422108830",
+   "date": "2026-05-12",
+   "headline": "Financial Statement Quarter 1/2026 (Reviewed)",
+   "url": "https://weblink.set.or.th/dat/news/202605/1225FIN120520261807040560E.zip",
+   "raw_path": "source-data/set_filings/zip/MTC_fs_2026-05-12_17785422108830.zip",
+   "sha256": "d085fc69fb1d28a4a09764bad4dd50a87e7ca08ff8185d33531fb3a464e26c76",
+   "cached": false,
+   "members": [
+    {
+     "name": "AUDITOR_REPORT.DOCX",
+     "bytes": 127794,
+     "ext": ".docx",
+     "n_tables": 0,
+     "status": "ok",
+     "n_chars": 2135
+    },
+    {
+     "name": "FINANCIAL_STATEMENTS.XLSX",
+     "bytes": 54851,
+     "ext": ".xlsx",
+     "n_sheets": 5,
+     "status": "ok",
+     "n_chars": 15556
+    },
+    {
+     "name": "NOTES.DOCX",
+     "bytes": 203470,
+     "ext": ".docx",
+     "n_tables": 24,
+     "status": "ok",
+     "n_chars": 29537
+    }
+   ],
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "AUDITOR_REPORT.DOCX",
+     "text_path": "source-data/set_filings/text/MTC_fs_2026-05-12_17785422108830__AUDITOR_REPORT.txt",
+     "n_chars": 2135
+    },
+    {
+     "member": "FINANCIAL_STATEMENTS.XLSX",
+     "text_path": "source-data/set_filings/text/MTC_fs_2026-05-12_17785422108830__FINANCIAL_STATEMENTS.txt",
+     "n_chars": 15556
+    },
+    {
+     "member": "NOTES.DOCX",
+     "text_path": "source-data/set_filings/text/MTC_fs_2026-05-12_17785422108830__NOTES.txt",
+     "n_chars": 29537
+    }
+   ],
+   "n_chars": 47228
+  },
+  {
+   "symbol": "MTC",
+   "kind": "mda",
+   "id": "101222100",
+   "date": "2026-02-17",
+   "headline": "Management Discussion and Analysis Yearly Ending 31 Dec 2025",
+   "url": "https://weblink.set.or.th/dat/news/202602/1225NWS170220262209133160E.pdf",
+   "raw_path": "source-data/set_filings/pdf/MTC_mda_2026-02-17_101222100.pdf",
+   "sha256": "62b782018493c31514f1d2abad9bee24f2461410d36a8228424237abb9483e59",
+   "cached": false,
+   "n_pages": 4,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "MTC_mda_2026-02-17_101222100.pdf",
+     "text_path": "source-data/set_filings/text/MTC_mda_2026-02-17_101222100__MDA.txt",
+     "n_chars": 6906
+    }
+   ],
+   "n_chars": 6906
+  },
+  {
+   "symbol": "MTC",
+   "kind": "mda",
+   "id": "104236100",
+   "date": "2026-05-12",
+   "headline": "Management Discussion and Analysis Quarter 1 Ending 31 Mar 2026",
+   "url": "https://weblink.set.or.th/dat/news/202605/1225NWS120520261852457350E.pdf",
+   "raw_path": "source-data/set_filings/pdf/MTC_mda_2026-05-12_104236100.pdf",
+   "sha256": "685a024bff4fd82ef56ecdd08614dadf7ca29888327d0474f22676dc8981ca78",
+   "cached": false,
+   "n_pages": 4,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "MTC_mda_2026-05-12_104236100.pdf",
+     "text_path": "source-data/set_filings/text/MTC_mda_2026-05-12_104236100__MDA.txt",
+     "n_chars": 7908
+    }
+   ],
+   "n_chars": 7908
+  },
+  {
+   "symbol": "MTC",
+   "kind": "mda",
+   "id": "104269300",
+   "date": "2026-05-13",
+   "headline": "Management Discussion and Analysis Quarter 1 Ending 31 Mar 2026  (Revised)",
+   "url": "https://weblink.set.or.th/dat/news/202605/1225NWS130520261251456910E.pdf",
+   "raw_path": "source-data/set_filings/pdf/MTC_mda_2026-05-13_104269300.pdf",
+   "sha256": "a9c7ffee90e69c8b9714987624ad655516a076227036df85a17d55d870e62ca5",
+   "cached": false,
+   "n_pages": 4,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "MTC_mda_2026-05-13_104269300.pdf",
+     "text_path": "source-data/set_filings/text/MTC_mda_2026-05-13_104269300__MDA.txt",
+     "n_chars": 7854
+    }
+   ],
+   "n_chars": 7854
+  },
+  {
+   "symbol": "SAK",
+   "kind": "fs",
+   "id": "17713646982200",
+   "date": "2026-02-18",
+   "headline": "Financial Statement Yearly 2025 (Audited)",
+   "url": "https://weblink.set.or.th/dat/news/202602/1606FIN180220261846230031E.zip",
+   "raw_path": "source-data/set_filings/zip/SAK_fs_2026-02-18_17713646982200.zip",
+   "sha256": "397134908ae930aaa5cdb952c56da69c2f573ecb8733e72ede0589ef62b8868c",
+   "cached": false,
+   "members": [
+    {
+     "name": "AUDITOR_REPORT.DOCX",
+     "bytes": 43063,
+     "ext": ".docx",
+     "n_tables": 1,
+     "status": "ok",
+     "n_chars": 12078
+    },
+    {
+     "name": "FINANCIAL_STATEMENTS.XLSX",
+     "bytes": 93265,
+     "ext": ".xlsx",
+     "n_sheets": 5,
+     "status": "ok",
+     "n_chars": 18634
+    },
+    {
+     "name": "NOTES.DOCX",
+     "bytes": 337364,
+     "ext": ".docx",
+     "n_tables": 44,
+     "status": "ok",
+     "n_chars": 83481
+    }
+   ],
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "AUDITOR_REPORT.DOCX",
+     "text_path": "source-data/set_filings/text/SAK_fs_2026-02-18_17713646982200__AUDITOR_REPORT.txt",
+     "n_chars": 12078
+    },
+    {
+     "member": "FINANCIAL_STATEMENTS.XLSX",
+     "text_path": "source-data/set_filings/text/SAK_fs_2026-02-18_17713646982200__FINANCIAL_STATEMENTS.txt",
+     "n_chars": 18634
+    },
+    {
+     "member": "NOTES.DOCX",
+     "text_path": "source-data/set_filings/text/SAK_fs_2026-02-18_17713646982200__NOTES.txt",
+     "n_chars": 83481
+    }
+   ],
+   "n_chars": 114193
+  },
+  {
+   "symbol": "SAK",
+   "kind": "fs",
+   "id": "17785422107660",
+   "date": "2026-05-12",
+   "headline": "Financial Statement Quarter 1/2026 (Reviewed)",
+   "url": "https://weblink.set.or.th/dat/news/202605/1606FIN120520261542440283E.zip",
+   "raw_path": "source-data/set_filings/zip/SAK_fs_2026-05-12_17785422107660.zip",
+   "sha256": "4c915fe0bbbfa03632954555b9584983b48cac2d3d1c31943afadc7f3233f785",
+   "cached": false,
+   "members": [
+    {
+     "name": "AUDITOR_REPORT.DOCX",
+     "bytes": 33687,
+     "ext": ".docx",
+     "n_tables": 0,
+     "status": "ok",
+     "n_chars": 2127
+    },
+    {
+     "name": "FINANCIAL_STATEMENTS.XLSX",
+     "bytes": 92413,
+     "ext": ".xlsx",
+     "n_sheets": 5,
+     "status": "ok",
+     "n_chars": 18219
+    },
+    {
+     "name": "NOTES.DOCX",
+     "bytes": 149302,
+     "ext": ".docx",
+     "n_tables": 22,
+     "status": "ok",
+     "n_chars": 25078
+    }
+   ],
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "AUDITOR_REPORT.DOCX",
+     "text_path": "source-data/set_filings/text/SAK_fs_2026-05-12_17785422107660__AUDITOR_REPORT.txt",
+     "n_chars": 2127
+    },
+    {
+     "member": "FINANCIAL_STATEMENTS.XLSX",
+     "text_path": "source-data/set_filings/text/SAK_fs_2026-05-12_17785422107660__FINANCIAL_STATEMENTS.txt",
+     "n_chars": 18219
+    },
+    {
+     "member": "NOTES.DOCX",
+     "text_path": "source-data/set_filings/text/SAK_fs_2026-05-12_17785422107660__NOTES.txt",
+     "n_chars": 25078
+    }
+   ],
+   "n_chars": 45424
+  },
+  {
+   "symbol": "SAK",
+   "kind": "mda",
+   "id": "101249700",
+   "date": "2026-02-18",
+   "headline": "Management Discussion and Analysis Yearly Ending 31 Dec 2025",
+   "url": "https://weblink.set.or.th/dat/news/202602/1606NWS180220261948150860E.pdf",
+   "raw_path": "source-data/set_filings/pdf/SAK_mda_2026-02-18_101249700.pdf",
+   "sha256": "b79734a3de69b1e2272786f434fcdb1c5e2bcdaa52fb3bf6fa403df0b62e1b21",
+   "cached": false,
+   "n_pages": 3,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "SAK_mda_2026-02-18_101249700.pdf",
+     "text_path": "source-data/set_filings/text/SAK_mda_2026-02-18_101249700__MDA.txt",
+     "n_chars": 4402
+    }
+   ],
+   "n_chars": 4402
+  },
+  {
+   "symbol": "SAK",
+   "kind": "mda",
+   "id": "104196900",
+   "date": "2026-05-12",
+   "headline": "Management Discussion and Analysis Quarter 1 Ending 31 Mar 2026",
+   "url": "https://weblink.set.or.th/dat/news/202605/1606NWS120520261845357130E.pdf",
+   "raw_path": "source-data/set_filings/pdf/SAK_mda_2026-05-12_104196900.pdf",
+   "sha256": "9e03f5e07d07fcd49ccbcc08945e571b9ec80aabf40994875cdf5397bd119193",
+   "cached": false,
+   "n_pages": 3,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "SAK_mda_2026-05-12_104196900.pdf",
+     "text_path": "source-data/set_filings/text/SAK_mda_2026-05-12_104196900__MDA.txt",
+     "n_chars": 4011
+    }
+   ],
+   "n_chars": 4011
+  },
+  {
+   "symbol": "SAWAD",
+   "kind": "fs",
+   "id": "17721443212560",
+   "date": "2026-02-27",
+   "headline": "Financial Statement Yearly 2025 (Audited)",
+   "url": "https://weblink.set.or.th/dat/news/202602/1184FIN270220262136410157E.zip",
+   "raw_path": "source-data/set_filings/zip/SAWAD_fs_2026-02-27_17721443212560.zip",
+   "sha256": "378d466c86bc90e9222e80b44aa673c2592ab5b65356807c0ed992737218f65a",
+   "cached": false,
+   "members": [
+    {
+     "name": "AUDITOR_REPORT.DOCX",
+     "bytes": 50357,
+     "ext": ".docx",
+     "n_tables": 2,
+     "status": "ok",
+     "n_chars": 16935
+    },
+    {
+     "name": "FINANCIAL_STATEMENTS.XLSX",
+     "bytes": 65004,
+     "ext": ".xlsx",
+     "n_sheets": 5,
+     "status": "ok",
+     "n_chars": 21481
+    },
+    {
+     "name": "NOTES.DOCX",
+     "bytes": 473981,
+     "ext": ".docx",
+     "n_tables": 103,
+     "status": "ok",
+     "n_chars": 153117
+    }
+   ],
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "AUDITOR_REPORT.DOCX",
+     "text_path": "source-data/set_filings/text/SAWAD_fs_2026-02-27_17721443212560__AUDITOR_REPORT.txt",
+     "n_chars": 16935
+    },
+    {
+     "member": "FINANCIAL_STATEMENTS.XLSX",
+     "text_path": "source-data/set_filings/text/SAWAD_fs_2026-02-27_17721443212560__FINANCIAL_STATEMENTS.txt",
+     "n_chars": 21481
+    },
+    {
+     "member": "NOTES.DOCX",
+     "text_path": "source-data/set_filings/text/SAWAD_fs_2026-02-27_17721443212560__NOTES.txt",
+     "n_chars": 153117
+    }
+   ],
+   "n_chars": 191533
+  },
+  {
+   "symbol": "SAWAD",
+   "kind": "fs",
+   "id": "17787949529300",
+   "date": "2026-05-15",
+   "headline": "Financial Statement Quarter 1/2026 (Reviewed)",
+   "url": "https://weblink.set.or.th/dat/news/202605/1184FIN150520261904310393E.zip",
+   "raw_path": "source-data/set_filings/zip/SAWAD_fs_2026-05-15_17787949529300.zip",
+   "sha256": "b9a3b9ebac669040fcec86917fb710f87c5460709d93cd1a8ec1ab93964cf519",
+   "cached": false,
+   "members": [
+    {
+     "name": "AUDITOR_REPORT.DOCX",
+     "bytes": 44146,
+     "ext": ".docx",
+     "n_tables": 0,
+     "status": "ok",
+     "n_chars": 2264
+    },
+    {
+     "name": "FINANCIAL_STATEMENTS.XLSX",
+     "bytes": 326116,
+     "ext": ".xlsx",
+     "n_sheets": 5,
+     "status": "ok",
+     "n_chars": 19179
+    },
+    {
+     "name": "NOTES.DOCX",
+     "bytes": 275567,
+     "ext": ".docx",
+     "n_tables": 45,
+     "status": "ok",
+     "n_chars": 49856
+    }
+   ],
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "AUDITOR_REPORT.DOCX",
+     "text_path": "source-data/set_filings/text/SAWAD_fs_2026-05-15_17787949529300__AUDITOR_REPORT.txt",
+     "n_chars": 2264
+    },
+    {
+     "member": "FINANCIAL_STATEMENTS.XLSX",
+     "text_path": "source-data/set_filings/text/SAWAD_fs_2026-05-15_17787949529300__FINANCIAL_STATEMENTS.txt",
+     "n_chars": 19179
+    },
+    {
+     "member": "NOTES.DOCX",
+     "text_path": "source-data/set_filings/text/SAWAD_fs_2026-05-15_17787949529300__NOTES.txt",
+     "n_chars": 49856
+    }
+   ],
+   "n_chars": 71299
+  },
+  {
+   "symbol": "SAWAD",
+   "kind": "mda",
+   "id": "101998700",
+   "date": "2026-02-27",
+   "headline": "Management Discussion and Analysis Yearly Ending 31 Dec 2025",
+   "url": "https://weblink.set.or.th/dat/news/202602/1184NWS270220262150048790E.pdf",
+   "raw_path": "source-data/set_filings/pdf/SAWAD_mda_2026-02-27_101998700.pdf",
+   "sha256": "be59d8a3f1c1708a79c30cd4e297e18c5d1b5f9782142c7bf24b4293a4d33340",
+   "cached": false,
+   "n_pages": 5,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "SAWAD_mda_2026-02-27_101998700.pdf",
+     "text_path": "source-data/set_filings/text/SAWAD_mda_2026-02-27_101998700__MDA.txt",
+     "n_chars": 11059
+    }
+   ],
+   "n_chars": 11059
+  },
+  {
+   "symbol": "SAWAD",
+   "kind": "mda",
+   "id": "104738100",
+   "date": "2026-05-15",
+   "headline": "Management Discussion and Analysis Quarter 1 Ending 31 Mar 2026",
+   "url": "https://weblink.set.or.th/dat/news/202605/1184NWS150520262134429470E.pdf",
+   "raw_path": "source-data/set_filings/pdf/SAWAD_mda_2026-05-15_104738100.pdf",
+   "sha256": "d4950e459bfa9981651399d4199c73b1a59a3736f7d013bb4ba7712cc7060f70",
+   "cached": false,
+   "n_pages": 6,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "SAWAD_mda_2026-05-15_104738100.pdf",
+     "text_path": "source-data/set_filings/text/SAWAD_mda_2026-05-15_104738100__MDA.txt",
+     "n_chars": 15645
+    }
+   ],
+   "n_chars": 15645
+  },
+  {
+   "symbol": "TIDLOR",
+   "kind": "fs",
+   "id": "17713646986350",
+   "date": "2026-02-18",
+   "headline": "Financial Statement Yearly 2025 (Audited)",
+   "url": "https://weblink.set.or.th/dat/news/202602/2027FIN180220261813420172E.zip",
+   "raw_path": "source-data/set_filings/zip/TIDLOR_fs_2026-02-18_17713646986350.zip",
+   "sha256": "9c45c055506bfa7bd8ae0944cc0136106ca2734cfe63062de21b62cd5575e362",
+   "cached": false,
+   "members": [
+    {
+     "name": "AUDITOR_REPORT.DOCX",
+     "bytes": 43397,
+     "ext": ".docx",
+     "n_tables": 2,
+     "status": "ok",
+     "n_chars": 14452
+    },
+    {
+     "name": "FINANCIAL_STATEMENTS.XLSX",
+     "bytes": 120577,
+     "ext": ".xlsx",
+     "n_sheets": 7,
+     "status": "ok",
+     "n_chars": 23041
+    },
+    {
+     "name": "NOTES.DOCX",
+     "bytes": 446709,
+     "ext": ".docx",
+     "n_tables": 76,
+     "status": "ok",
+     "n_chars": 171064
+    }
+   ],
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "AUDITOR_REPORT.DOCX",
+     "text_path": "source-data/set_filings/text/TIDLOR_fs_2026-02-18_17713646986350__AUDITOR_REPORT.txt",
+     "n_chars": 14452
+    },
+    {
+     "member": "FINANCIAL_STATEMENTS.XLSX",
+     "text_path": "source-data/set_filings/text/TIDLOR_fs_2026-02-18_17713646986350__FINANCIAL_STATEMENTS.txt",
+     "n_chars": 23041
+    },
+    {
+     "member": "NOTES.DOCX",
+     "text_path": "source-data/set_filings/text/TIDLOR_fs_2026-02-18_17713646986350__NOTES.txt",
+     "n_chars": 171064
+    }
+   ],
+   "n_chars": 208557
+  },
+  {
+   "symbol": "TIDLOR",
+   "kind": "fs",
+   "id": "17781102083770",
+   "date": "2026-05-07",
+   "headline": "Financial Statement Quarter 1/2026 (Reviewed)",
+   "url": "https://weblink.set.or.th/dat/news/202605/2027FIN070520261813520261E.zip",
+   "raw_path": "source-data/set_filings/zip/TIDLOR_fs_2026-05-07_17781102083770.zip",
+   "sha256": "3ef1783110908aa86be8596162ad9e7f2af3b72937ae0949739a3633c62b57aa",
+   "cached": false,
+   "members": [
+    {
+     "name": "AUDITOR_REPORT.DOCX",
+     "bytes": 32613,
+     "ext": ".docx",
+     "n_tables": 0,
+     "status": "ok",
+     "n_chars": 2717
+    },
+    {
+     "name": "FINANCIAL_STATEMENTS.XLSX",
+     "bytes": 110912,
+     "ext": ".xlsx",
+     "n_sheets": 6,
+     "status": "ok",
+     "n_chars": 18930
+    },
+    {
+     "name": "NOTES.DOCX",
+     "bytes": 236513,
+     "ext": ".docx",
+     "n_tables": 31,
+     "status": "ok",
+     "n_chars": 44574
+    }
+   ],
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "AUDITOR_REPORT.DOCX",
+     "text_path": "source-data/set_filings/text/TIDLOR_fs_2026-05-07_17781102083770__AUDITOR_REPORT.txt",
+     "n_chars": 2717
+    },
+    {
+     "member": "FINANCIAL_STATEMENTS.XLSX",
+     "text_path": "source-data/set_filings/text/TIDLOR_fs_2026-05-07_17781102083770__FINANCIAL_STATEMENTS.txt",
+     "n_chars": 18930
+    },
+    {
+     "member": "NOTES.DOCX",
+     "text_path": "source-data/set_filings/text/TIDLOR_fs_2026-05-07_17781102083770__NOTES.txt",
+     "n_chars": 44574
+    }
+   ],
+   "n_chars": 66221
+  },
+  {
+   "symbol": "TIDLOR",
+   "kind": "mda",
+   "id": "101235400",
+   "date": "2026-02-18",
+   "headline": "Management Discussion and Analysis Yearly Ending 31 Dec 2025",
+   "url": "https://weblink.set.or.th/dat/news/202602/2027NWS180220262046193140E.pdf",
+   "raw_path": "source-data/set_filings/pdf/TIDLOR_mda_2026-02-18_101235400.pdf",
+   "sha256": "0a8fe996b9d673beed0b695effc0a154ef509bda4de4238d05bc7d6431647459",
+   "cached": false,
+   "n_pages": 14,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "TIDLOR_mda_2026-02-18_101235400.pdf",
+     "text_path": "source-data/set_filings/text/TIDLOR_mda_2026-02-18_101235400__MDA.txt",
+     "n_chars": 35897
+    }
+   ],
+   "n_chars": 35897
+  },
+  {
+   "symbol": "TIDLOR",
+   "kind": "mda",
+   "id": "103932600",
+   "date": "2026-05-07",
+   "headline": "Management Discussion and Analysis Quarter 1 Ending 31 Mar 2026",
+   "url": "https://weblink.set.or.th/dat/news/202605/2027NWS070520261826502150E.pdf",
+   "raw_path": "source-data/set_filings/pdf/TIDLOR_mda_2026-05-07_103932600.pdf",
+   "sha256": "52a83b6a94b2ca465d62b462fde3a4c581692ad47913d0d6d341461c453e0ce0",
+   "cached": false,
+   "n_pages": 5,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "TIDLOR_mda_2026-05-07_103932600.pdf",
+     "text_path": "source-data/set_filings/text/TIDLOR_mda_2026-05-07_103932600__MDA.txt",
+     "n_chars": 14382
+    }
+   ],
+   "n_chars": 14382
+  },
+  {
+   "symbol": "TURBO",
+   "kind": "fs",
+   "id": "17718892072580",
+   "date": "2026-02-24",
+   "headline": "Financial Statement Yearly 2025 (Audited)",
+   "url": "https://weblink.set.or.th/dat/news/202602/1890FIN240220260856070805E.zip",
+   "raw_path": "source-data/set_filings/zip/TURBO_fs_2026-02-24_17718892072580.zip",
+   "sha256": "94da9bedc066dded483dde82b4c255c73ef5f00e9c423117409e8dbf9bd2c5bd",
+   "cached": true,
+   "members": [
+    {
+     "name": "AUDITOR_REPORT.DOCX",
+     "bytes": 44670,
+     "ext": ".docx",
+     "n_tables": 1,
+     "status": "ok",
+     "n_chars": 12548
+    },
+    {
+     "name": "FINANCIAL_STATEMENTS.XLSX",
+     "bytes": 69932,
+     "ext": ".xlsx",
+     "n_sheets": 4,
+     "status": "ok",
+     "n_chars": 15239
+    },
+    {
+     "name": "NOTES.DOCX",
+     "bytes": 346294,
+     "ext": ".docx",
+     "n_tables": 109,
+     "status": "ok",
+     "n_chars": 102400
+    }
+   ],
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "AUDITOR_REPORT.DOCX",
+     "text_path": "source-data/set_filings/text/TURBO_fs_2026-02-24_17718892072580__AUDITOR_REPORT.txt",
+     "n_chars": 12548
+    },
+    {
+     "member": "FINANCIAL_STATEMENTS.XLSX",
+     "text_path": "source-data/set_filings/text/TURBO_fs_2026-02-24_17718892072580__FINANCIAL_STATEMENTS.txt",
+     "n_chars": 15239
+    },
+    {
+     "member": "NOTES.DOCX",
+     "text_path": "source-data/set_filings/text/TURBO_fs_2026-02-24_17718892072580__NOTES.txt",
+     "n_chars": 102400
+    }
+   ],
+   "n_chars": 130187
+  },
+  {
+   "symbol": "TURBO",
+   "kind": "fs",
+   "id": "17781966068220",
+   "date": "2026-05-08",
+   "headline": "Financial Statement Quarter 1/2026 (Reviewed)",
+   "url": "https://weblink.set.or.th/dat/news/202605/1890FIN080520261047190447E.zip",
+   "raw_path": "source-data/set_filings/zip/TURBO_fs_2026-05-08_17781966068220.zip",
+   "sha256": "017f02d4a6957cf64fcee7b6766a49b53af5249ab5a8613ec060feebddd6a0f6",
+   "cached": true,
+   "members": [
+    {
+     "name": "AUDITOR_REPORT.DOCX",
+     "bytes": 43527,
+     "ext": ".docx",
+     "n_tables": 0,
+     "status": "ok",
+     "n_chars": 2200
+    },
+    {
+     "name": "FINANCIAL_STATEMENTS.XLSX",
+     "bytes": 1902207,
+     "ext": ".xlsx",
+     "n_sheets": 4,
+     "status": "ok",
+     "n_chars": 13570
+    },
+    {
+     "name": "NOTES.DOCX",
+     "bytes": 171793,
+     "ext": ".docx",
+     "n_tables": 68,
+     "status": "ok",
+     "n_chars": 35761
+    }
+   ],
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "AUDITOR_REPORT.DOCX",
+     "text_path": "source-data/set_filings/text/TURBO_fs_2026-05-08_17781966068220__AUDITOR_REPORT.txt",
+     "n_chars": 2200
+    },
+    {
+     "member": "FINANCIAL_STATEMENTS.XLSX",
+     "text_path": "source-data/set_filings/text/TURBO_fs_2026-05-08_17781966068220__FINANCIAL_STATEMENTS.txt",
+     "n_chars": 13570
+    },
+    {
+     "member": "NOTES.DOCX",
+     "text_path": "source-data/set_filings/text/TURBO_fs_2026-05-08_17781966068220__NOTES.txt",
+     "n_chars": 35761
+    }
+   ],
+   "n_chars": 51531
+  },
+  {
+   "symbol": "TURBO",
+   "kind": "fs",
+   "id": "105511700",
+   "date": "2026-07-23",
+   "headline": "Turbo Notification of Performance and financial statement for Q2/2026 on August 13, 2026 and host an Earnings call on August 14, 2026",
+   "url": "https://weblink.set.or.th/dat/news/202607/1890NWS230720261842568060E.pdf",
+   "raw_path": "source-data/set_filings/pdf/TURBO_fs_2026-07-23_105511700.pdf",
+   "sha256": "00756d966b17bbe0fa9674b3d82fc9992149c871699a6aa5dd2d50dd1c773228",
+   "cached": true,
+   "n_pages": 1,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "TURBO_fs_2026-07-23_105511700.pdf",
+     "text_path": "source-data/set_filings/text/TURBO_fs_2026-07-23_105511700__FS.txt",
+     "n_chars": 1259
+    }
+   ],
+   "n_chars": 1259
+  },
+  {
+   "symbol": "TURBO",
+   "kind": "mda",
+   "id": "101506700",
+   "date": "2026-02-24",
+   "headline": "Management Discussion and Analysis Yearly Ending 31 Dec 2025",
+   "url": "https://weblink.set.or.th/dat/news/202602/1890NWS240220261807411540E.pdf",
+   "raw_path": "source-data/set_filings/pdf/TURBO_mda_2026-02-24_101506700.pdf",
+   "sha256": "0c395920ec3eb72bd2230a3d33968b6493206441ee023c280faf7305c5cb286d",
+   "cached": false,
+   "n_pages": 4,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "TURBO_mda_2026-02-24_101506700.pdf",
+     "text_path": "source-data/set_filings/text/TURBO_mda_2026-02-24_101506700__MDA.txt",
+     "n_chars": 10106
+    }
+   ],
+   "n_chars": 10106
+  },
+  {
+   "symbol": "TURBO",
+   "kind": "mda",
+   "id": "103995500",
+   "date": "2026-05-08",
+   "headline": "Management Discussion and Analysis Quarter 1 Ending 31 Mar 2026",
+   "url": "https://weblink.set.or.th/dat/news/202605/1890NWS080520261707293750E.pdf",
+   "raw_path": "source-data/set_filings/pdf/TURBO_mda_2026-05-08_103995500.pdf",
+   "sha256": "bad6c8f6d5410cda3484187d54695bc2d5615aab30b9512eaa5a7242984c70a3",
+   "cached": false,
+   "n_pages": 6,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "TURBO_mda_2026-05-08_103995500.pdf",
+     "text_path": "source-data/set_filings/text/TURBO_mda_2026-05-08_103995500__MDA.txt",
+     "n_chars": 14153
+    }
+   ],
+   "n_chars": 14153
+  }
+ ]
+}

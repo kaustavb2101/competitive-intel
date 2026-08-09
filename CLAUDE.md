@@ -242,6 +242,12 @@ digest back); (3) external feedback ~days (phone use / preview comments / nightl
 
 ## Where to go next
 See `docs/NEXT_STEPS.md` (prioritized) and `docs/PROGRESS_LOG.md` (what's done + decisions).
-The top three: (1) deploy and verify on Vercel, (2) run the blocked gov data from the Thai IP and
-fold DLT vehicles + DIW factories into the loop, (3) replace the catchment's walk-radius estimate
-with a true 15-min street-network isochrone (routing API).
+The top three: (1) deploy and verify on Vercel, (2) replace the catchment's walk-radius estimate
+with a true 15-min street-network isochrone (routing API) — `data-isochrones.yml` exists but is
+gated on an owner-side key, (3) widen `pipeline/pull_swarm.py`'s registry as new feeds land, so no
+puller is left unscheduled to age in silence.
+
+RETIRED 2026-08-08: "run the blocked gov data from the Thai IP and fold DLT vehicles + DIW factories
+into the loop". This contradicted the ✅ BREAKTHROUGH note above — the departments' own CKAN catalogs
+are not geoblocked, and `.github/workflows/data-gov-census.yml` has been doing exactly this weekly
+from CI since well before now (last success 2026-08-03). No Thai IP is needed for it.

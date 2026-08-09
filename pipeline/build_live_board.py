@@ -128,9 +128,26 @@ def stamp_of(doc, override=None):
 
     `override` names a layer-specific field for feeds that carry their vintage under a name of
     their own — the loan tape stamps itself `meta.mob_anchor` (the newest disbursement month IN
-    the data, never wall clock), which is a truer vintage than anything in the standard chain."""
+    the data, never wall clock), which is a truer vintage than anything in the standard chain.
+
+    A stamp key we do not recognise is WORSE than no feed at all: the layer keeps its own honest
+    date, we return None, and the board silently shows no age — so a badly stale feed reads exactly
+    like a fresh one and the aging/fresh thresholds never fire. That is a green light over a red
+    state. `search_demand.json` sat 35 days old (14 days past its own aging window) and showed
+    nothing, purely because it stamps `pulled_at_utc` and this list only knew `pulled`.
+
+    So the chain below covers the SYNONYMS builders in this repo actually write, not just the
+    canonical four. If you add a layer that stamps itself under a new name, add it here too —
+    grep `meta` keys across platform/data before assuming the standard chain covers you."""
     m = (doc or {}).get("meta") or {}
-    keys = ([override] if override else []) + ["pulled", "as_of", "vintage", "updated"]
+    keys = ([override] if override else []) + [
+        # when it was pulled ...
+        "pulled", "pulled_at", "pulled_at_utc", "retrieved",
+        # ... what it is as-of ...
+        "as_of", "price_asof", "observed_to",
+        # ... what vintage it is, then when the app last touched it.
+        "vintage", "updated",
+    ]
     for k in keys:
         v = m.get(k)
         if isinstance(v, str) and v.strip() and v.strip().lower() != "none":

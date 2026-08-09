@@ -941,6 +941,46 @@ def _shape_household_risk(d):
     return None
 
 
+def _shape_province_stress_index(d):
+    # The combined province STRUCTURAL-STRESS index (province_stress_index.json,
+    # obj #1, MEASURED legs) — the pure borrower-leverage read (household DTI +
+    # unemployment, both NSO measured; the two percentiles + composite_stress an
+    # ESTIMATED equal-weighted blend). It renders on the exec FRONT DOOR (the #home
+    # "Structurally riskiest · household DTI + unemployment" card reads PSTRESS_LIST[0]
+    # — .province/.region/.debt_to_income/.unemployment_rate/.composite_stress) AND
+    # drives a #map lens, and it is the parent whose composite the already-probed
+    # province_pressure join consumes. loadProvinceStress builds PSTRESS_LIST by
+    # filtering .provinces on `composite_stress != null` and GATES every render on that
+    # list being non-empty — so a truncated/404 CDN deploy that guts the file silently
+    # drops the front-door structural-leverage card and hides the map lens with NO phone
+    # alert, the same "broken demo" blind spot the household_risk / province_pressure /
+    # obj-#1 flow-card probes closed for the sibling reads. It CANNOT self-heal (the DTI
+    # + unemployment legs come from NSO SES/LFS folded by a pipeline build, not a CI
+    # pull). The builder can also write an HONEST meta.absent state that the app treats
+    # as a valid empty shape (PSTRESS stays empty, lens hides, no error); mirror that
+    # here (absent -> OK, not an alert) so the probe fires only on a real truncation.
+    # Asserts render shape (the composite-bearing rows the PSTRESS_LIST gate is built
+    # from + the province name each row renders), not values — robust to a future
+    # SES/LFS vintage shifting the ratios.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    meta = d.get("meta")
+    if isinstance(meta, dict) and meta.get("absent"):
+        return None  # builder's honest source-absent guard — a valid empty shape, not a truncation
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or len(provs) < 70:
+        return "missing/short 'provinces' list (expected ~77)"
+    stress_rows = [p for p in provs if isinstance(p, dict) and p.get("composite_stress") is not None]
+    if not stress_rows:
+        return "no province carries a numeric 'composite_stress' (the PSTRESS_LIST render gate)"
+    p0 = stress_rows[0]
+    if not (isinstance(p0.get("province"), str) and p0["province"].strip()):
+        return "first stress-bearing province missing 'province' name (PSTRESS map key + card label)"
+    if not isinstance(p0.get("composite_stress"), (int, float)):
+        return "first stress-bearing province missing numeric 'composite_stress' (#home card + lens read)"
+    return None
+
+
 def _shape_segment_exposure(d):
     # The Exposure tab's LEAD read (obj #1 portfolio concentration): renderConcentration
     # + renderExpoVerdict build the whole board ONLY from segment_exposure.json. The tab
@@ -1791,6 +1831,14 @@ DATA_FILES = [
     ("data/rival_density.json", _shape_rival_density, ".records (928 districts) with autox/rivals/by_brand (#acq district-outnumbered board)"),
     ("data/search_demand.json", _shape_search_demand, ".provinces (~77) with demand/autox_share/best_rival (#acq share-of-search)"),
     ("data/household_risk_by_province.json", _shape_household_risk, ".provinces (~77) with debt_to_income (obj #1 DTI map lens)"),
+    # The combined structural-stress index (household DTI + unemployment, MEASURED
+    # NSO legs) — parent of the already-probed province_pressure join, and itself the
+    # #home "Structurally riskiest" front-door card + a #map lens. Carries the same
+    # honest meta.absent guard as household_risk/search_demand (probe treats it as a
+    # valid empty shape). It was the last surfaced obj-#1 province read with no deploy
+    # probe: a truncated CDN deploy silently drops the front-door leverage card + hides
+    # the lens with no phone alert. Closes that blind spot alongside its DTI sibling.
+    ("data/province_stress_index.json", _shape_province_stress_index, ".provinces (~77) with composite_stress + province (obj #1 #home structural-leverage card + map lens)"),
     # The Command-center DATA ROOM honesty census — the exec front door's core
     # measured / estimated / UNLABELLED provenance table (renderHomeDataRoom eager-
     # loads data/provenance.json on #home). It is the surface the project's whole
