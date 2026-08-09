@@ -19,7 +19,7 @@ const escHtml=s=>String(s==null?'':s).replace(/[&<>"']/g,
 // hero:true  → one of the 4 ALWAYS-VISIBLE hero pills docked over the map (the rest live in "More ▾").
 // tag:'m'|'e' → the in-band [M] measured / [E] estimated badge shown on the pill (parity with the prov chips).
 const LENS = {
-  dws:  {pill:'Coverage gap', label:'District coverage gap ◇', desc:"COVERAGE · MEASURED — each branch's whole district demand (footfall + workers) minus how saturated AutoX already is there. Brighter = thinner AutoX coverage of local demand.", color:'#E6B450', unit:'coverage gap (0–100)', amp:true, hero:true, tag:'m', val:d=>d._amp?d._amp.whitespace:0},
+  dws:  {pill:'Coverage gap', label:'District coverage gap ◇ est', desc:"COVERAGE · ESTIMATED proxy (0–100) — each branch's whole district demand (a log-normalized, weighted blend of measured POI footfall + DIW workers) minus a penalty for how saturated AutoX already is there. Brighter = thinner AutoX coverage of local demand. The inputs are measured; the blend/weighting is a modelled proxy, not a measured coverage metric.", color:'#E6B450', unit:'coverage gap (0–100, est)', est:true, amp:true, hero:true, tag:'e', val:d=>d._amp?d._amp.whitespace:0},
   brisk:    {pill:'Composite risk', label:'Composite branch risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — one fused 'which branches are getting riskier' read, blending measured household debt + crop/drought stress + occupation concentration + the branch's own segment mix. A triage rank, not a measured default rate.", color:'#E0574F', unit:'composite (est)', est:true, brisk:true, hero:true, tag:'e', val:d=>briskVal(d)},
   comp:     {pill:'Competitors', label:'Competitor density ◆', desc:'COMPETITIVE PRESSURE · MEASURED (Google Places, a lower bound, not a registry) — rival title-loan branches (Srisawad, Muangthai, Tidlor, Heng) within ~5 km of each AutoX branch. Brighter = denser rival presence around us. Blank until the rival census loads.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, hero:true, tag:'m', val:d=>compCount(d)},
   hhdti:    {pill:'Household DTI', label:'Household debt-to-income ●', desc:"BORROWER STRESS · MEASURED (NSO household survey 2566) — the branch's province household debt as a multiple of annual income. Brighter = more household balance-sheet stress. Hidden until the survey layer loads.", color:'#C8433B', unit:'×100 DTI', hh:true, prov:true, hero:true, tag:'m', val:d=>hhriskVal(d)},
@@ -3230,8 +3230,10 @@ function renderDebtSource(){
 
 function renderCompetition(){
   $('#estates').innerHTML = `<tr><th scope="col">AutoX ≤10km</th><th scope="col">Industrial estate</th></tr>`+
-    META.estates.map(s=>{const c=s.own<=3?'#E0474B':s.own<=6?'var(--gold)':'#2BB673';const t=s.own<=3?'white space':s.own<=6?'thin':'covered';
-      return `<tr><td><span class="tag" style="color:${c};border:1px solid ${c}">${s.own} · ${t}</span></td><td>${s.name}</td></tr>`;}).join('');
+    META.estates.map(s=>{const c=s.own<=3?'#E0474B':s.own<=6?'var(--gold)':'#2BB673';const t=s.own<=3?'thin coverage':s.own<=6?'thin':'covered';
+      // MEASURED branch count spelled out with its unit — a bare "1 · thin coverage" tag could be
+      // misread as a rank or a severity score rather than what it is (1 AutoX branch ≤10km).
+      return `<tr><td><span class="tag" style="color:${c};border:1px solid ${c}">${s.own} branch${s.own===1?'':'es'} ≤10km · ${t}</span></td><td>${s.name}</td></tr>`;}).join('');
   $('#mws').innerHTML = `<tr><th scope="col">Demand</th><th scope="col">AutoX</th><th scope="col">Fresh mkts</th><th scope="col">Province</th><th scope="col">Branch</th></tr>`+
     META.mws.map(m=>`<tr><td class="mono" style="color:var(--merch)">${m.md}</td><td class="mono">${m.own}</td><td class="mono">${m.fmkt}</td><td>${m.v}</td><td class="sub">${m.n}</td></tr>`).join('');
   $('#cws').innerHTML = `<tr><th scope="col">Collat</th><th scope="col">Vehicle</th><th scope="col">Gold</th><th scope="col">AutoX</th><th scope="col">Province</th><th scope="col">Branch</th></tr>`+
@@ -5210,7 +5212,7 @@ function renderGapBoard(){
   // "underserved AND undercompeted". Null-safe: if the file is absent the column shows "n/a".
   if(!compAttached) loadCompetitors().then(()=>{ drawGapBoard(); });  // always redraw when census lands (was guarded on v-acq being visible, so the Rivals column stuck on 'n/a' until a chip click)
 }
-// Per-region ranking: which region has the most white space on average + the single best opening.
+// Per-region ranking: which region shows the widest average coverage gap + its single most under-covered catchment.
 function drawGapRegions(){
   if(!$('#gapregions')) return;
   const byReg={};
@@ -5219,7 +5221,7 @@ function drawGapRegions(){
     o.n++; o.sum+=s; if(s>o.topS){o.topS=s; o.top=d;}});
   const regs=Object.values(byReg).map(o=>({...o,avg:o.sum/o.n})).sort((a,b)=>b.avg-a.avg);
   const mxAvg=Math.max(1,...regs.map(o=>o.avg));
-  $('#gapregions').innerHTML=`<tr><th>#</th><th>Region</th><th>Catchments</th><th class="h-opp" title="mean coverage-gap score across the region (est)">Avg coverage-gap ★ est</th><th>Widest single gap (est)</th></tr>`+
+  $('#gapregions').innerHTML=`<tr><th>#</th><th>Region</th><th>Catchments</th><th class="h-opp" title="mean coverage-gap score across the region (est)">Avg coverage-gap ★ est</th><th title="the single catchment with the highest ESTIMATED coverage-gap score in the region">Widest coverage-gap (est)</th></tr>`+
     regs.map((o,i)=>{const sc=o.avg>=45?'var(--gold)':o.avg>=30?'var(--merch)':'var(--mid)';
       return `<tr onclick="location.href='${branchHref(o.top)}'" tabindex="0" role="link" style="cursor:pointer">
       <td class="mono sub">${i+1}</td><td><b>${o.r}</b></td>
@@ -5285,7 +5287,7 @@ function drawGapBoard(){
 }
 function gapCSV(){
   const haveComp=compHasData();
-  const hdr=['rank','whitespace_score_est','demand_proxy_0_1_est','own_headroom_0_1_est','competitor_headroom_proxy_0_1_est','branch','province','region','own_autox_10km','rival_branches_5km_measured_lower_bound','undercompeted_flag','factory_workers_diw','province_pickups_dlt','fin_density_banks_atms_10km_est','opportunity_o_est'];
+  const hdr=['rank','coverage_gap_score_est','demand_proxy_0_1_est','own_headroom_0_1_est','competitor_headroom_proxy_0_1_est','branch','province','region','own_autox_10km','rival_branches_5km_measured_lower_bound','undercompeted_flag','factory_workers_diw','province_pickups_dlt','fin_density_banks_atms_10km_est','opportunity_o_est'];
   const lines=[hdr.join(',')].concat(gapRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const L=gapLegs(d);
     const cn=compCount(d); const under=haveComp&&row.s>=40&&cn===0;
     return [i+1,row.s,L.demand.toFixed(3),L.ownHead.toFixed(3),L.compHead.toFixed(3),d.n,d.v,d.r,d.w,haveComp?cn:'',under?'yes':(haveComp?'no':''),d.dwork==null?'':d.dwork,pl.pickup==null?'':pl.pickup,L.fin,d.o==null?'':d.o]
@@ -5657,7 +5659,7 @@ function drawAmpRisk(){
 function ampCSV(){
   const rows=AMP.filter(a=>ampRegion==='all'||a.region===ampRegion)
     .sort((x,y)=>(y.whitespace||0)-(x.whitespace||0));
-  const hdr=['rank','whitespace_score_est','district_th','district_en','province','region','autox_branches_measured',
+  const hdr=['rank','coverage_gap_score_est','district_th','district_en','province','region','autox_branches_measured',
     'dominant_occupation_measured_overture','dominant_occupation_share','rival_branches_5km_centroid_measured_lower_bound',
     'diw_workers','diw_workers_measured','merchant_poi_cvs_rest_measured','collateral_poi_gold_veh_measured',
     'demand_proxy_est','risk_proxy_est','agri_stress_province_inherited','unemployment_rate_pct_measured_nso_province_inherited'];
@@ -8262,7 +8264,8 @@ function drawMarket(){
 
 /* ---------- command center (Step 1, daily-use front door) ----------
    Aggregates the existing computed signals into one screen answering the two standing
-   objectives: WHERE TO EXPAND (top white-space districts + provinces) and WHAT IS GETTING
+   objectives: COMPETITIVE RISK on the network we already run (thinnest-coverage districts +
+   provinces — a risk lens, not a where-to-expand cue) and WHAT IS GETTING
    RISKIER (crop stress, motorcycle-heavy collateral, gold-up vs pickup-pressure). Plus a
    macro/regulatory read, risk movers (when ≥2 vintages exist), a localStorage watchlist, and
    CSV + print export. Every figure is tagged measured (m) or estimated/proxy (e). No new data
