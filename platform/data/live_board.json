@@ -162,7 +162,7 @@
    "key": "rival_ads",
    "label": "Rivals running paid ads",
    "measured": true,
-   "no_history": "creative-level first_seen/last_seen is kept; the live-creative count is now being accumulated too, and becomes a line once several weekly pulls have landed",
+   "no_history": "accumulating — 2 observations since 2026-07-30; the line is drawn once 4 have landed",
    "source": "Google Ads Transparency Center",
    "stamp": "2026-08-09",
    "stamp_iso": "2026-08-09",
@@ -263,7 +263,7 @@
    "stamp_iso": "2026-08-09",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4456,
+   "value": 4455,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -286,8 +286,8 @@
    "stamp": "2026-08-09",
    "stamp_iso": "2026-08-09",
    "stamp_kind": "pulled",
-   "unit": "of 796",
-   "value": 167,
+   "unit": "of 795",
+   "value": 169,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
