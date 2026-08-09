@@ -6447,10 +6447,14 @@ function computeSim(){
   const shocked=(price!==0||rain!==0);
   renderSimVerdict(baseHiP,baseHiBr,N,shocked,scenHiP,scenHiBr);
   // announce the recomputed outcome to AT (see setSimStatus). Silent at baseline/reset.
-  { const s=v=>(v>0?'+':'')+v;
-    setSimStatus(shocked
-      ? `Under this shock: high agri-stress provinces ${baseHiP} to ${scenHiP} (${s(dP)}); exposed branches ${baseHiBr.toLocaleString()} to ${scenHiBr.toLocaleString()} (${s(dBr)}).`
-      : ''); }
+  // Covers all four levers, not just agri: the used-vehicle (renderSimCollat) and factory
+  // (renderSimFactory) sub-cards recompute via innerHTML and are otherwise silent to screen readers.
+  { const s=v=>(v>0?'+':'')+v; const parts=[];
+    if(shocked) parts.push(`high agri-stress provinces ${baseHiP} to ${scenHiP} (${s(dP)}); exposed branches ${baseHiBr.toLocaleString()} to ${scenHiBr.toLocaleString()} (${s(dBr)})`);
+    if(simState.veh!==0) parts.push(`used-vehicle collateral ${s(simState.veh)}% — recovery ${simState.veh>0?'firming, loss-given-default lower':'softening, loss-given-default higher'}`);
+    const fm=(simState.factory>0)?simFactoryModel():null;
+    if(fm&&fm.mfgBr) parts.push(`manufacturing slowdown: avg occupation-stress ${fm.baseAvg.toFixed(0)} to ${fm.scenAvg.toFixed(0)} (+${fm.delta.toFixed(0)}) across ${fm.mfgBr.toLocaleString()} factory-base branches`);
+    setSimStatus(parts.length?('Under this shock: '+parts.join('; ')+'.'):''); }
   // ----- summary cards -----
   const dCol=v=>v>0?'var(--agri)':v<0?'var(--up)':'var(--mid)';
   const sign=v=>(v>0?'+':'')+v;
@@ -11689,12 +11693,19 @@ function renderHomeWhitespace(){
   }
   // COMPETITOR COVERAGE — national census completeness (competitor_coverage.json totals). A confidence
   // flag on the coverage signals below, not market share. Omitted gracefully if absent.
+  // When the total sits ABOVE 100% the census is the near-complete rival network, NOT a lower bound:
+  // the big brands' official store-locators list every service point beyond the IR "branches" headline
+  // (SAWAD group ≈4.6× its listed entity), so found > IR is expected. Mirror the blessed #acq method
+  // language here rather than contradict it with a "lower-bound · 141%" front-door row.
   const cct=(COMPCOV&&COMPCOV.meta&&COMPCOV.meta.totals)||null;
   if(cct&&cct.coverage_pct!=null){
+    const complete=cct.coverage_pct>=100;
     html+=`<div class="cc-sub2"${html?'':' style="margin-top:0"'}>Competitor coverage · census completeness ${TAG_M}</div>`;
     html+=ccRow(`Located ${(cct.found||0).toLocaleString()} of ~${(cct.expected||0).toLocaleString()} rival branches`,
-      'lower-bound census · a confidence flag on the coverage signal below, not market share',
-      `${cct.coverage_pct.toFixed(0)}%`,'coverage','var(--merch)');
+      complete
+        ? 'near-complete rival network · official locators list every service point beyond the IR headline (SAWAD group ≈4.6× its listed entity) — a completeness flag, not market share'
+        : 'lower-bound census · a confidence flag on the coverage signal below, not market share',
+      `${cct.coverage_pct.toFixed(0)}%`,complete?'located vs IR':'coverage','var(--merch)');
   }
   // thinnest-coverage districts from amphoe.json — where AutoX presence is thin vs demand, shown with
   // measured rival counts (a competitive-exposure read; NOT an open-a-branch recommendation).

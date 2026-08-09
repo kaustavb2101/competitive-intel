@@ -3,6 +3,13 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-09 — Intelligence loop (peer/service, honesty): the command-center competitor-coverage row no longer contradicts itself ("lower-bound census · 141%") — shipped to master (PR #349)
+- **The gap fixed (`home-coverage-row-lower-bound-vs-141pct-contradiction`).** The exec front door (`#home` command center) renders a national competitor-coverage confidence row off `competitor_coverage.json`'s `meta.totals` (`found` 16,503 / `expected` 11,684 / `coverage_pct` **141.2**). It showed `Located 16,503 of ~11,684 rival branches · 141%` under the fixed sublabel **"lower-bound census · a confidence flag…"** — a self-contradiction, since a 141% total is by definition **not** a lower bound. The cause is deliberate and already documented on `#acq`: the big brands' `found` comes from each operator's **official store-locator** (the full network), which lists every service point beyond the IR "branches" headline, and the **SAWAD group locator ≈4.6× its listed-entity IR count** (Srisawad found 5,203 vs IR ~1,138). That blessed explanation (app.js `#acq` method box, ~line 3446) never propagated to the `#home` row, so the front door asserted "lower-bound" while displaying 141%.
+- **The fix.** Made the command-center row adapt on `coverage_pct>=100`: at/above 100% it now reads **"near-complete rival network · official locators list every service point beyond the IR headline (SAWAD group ≈4.6× its listed entity) — a completeness flag, not market share"** with the right-column tag **"located vs IR"**; below 100% it keeps the accurate **"lower-bound census …"** wording and the **"coverage"** tag. Reuses the exact already-approved `#acq` reasoning — invents no number, changes no data, does **not** touch the deliberate builder decision to keep SAWAD in `LOCATOR_COMPLETE_BRANDS`. One file, `platform/app.js`, +9/−2.
+- **How it was found:** the CEO autonomy plan shows 0 autonomous-open items (98%; the 1 open is owner-side Vercel access-protection), so a fresh cross-pillar audit. Deploy verified green up front (prod alias **200** on `/`, `/data/branches.json`, `/data/provenance.json`); broken-reference sweep clean (3 apparent misses were `source-data/` mentions in comments, not `data/` fetches); freshness sweep clean (stale-over-180d list empty; oldest is DLT fuel at 162d, already wired to refresh). The one genuine honesty defect was this front-door contradiction — the `#acq` table caveats it, the `#home` row did not.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **129 passed, 0 failed** (incl. `node --check` on app.js + 455/455 data-integrity). (b) headless render (global Playwright + `/opt/pw-browsers` Chromium) of `index.html#home`: the row renders `…near-complete rival network … SAWAD group ≈4.6× its listed entity … 141% · located vs IR`; only console error is a sandbox `ERR_CONNECTION_RESET` on an external map-tile resource, unrelated to this text-only change; logic re-verified for the `<100%` branch (falls back to the "lower-bound … coverage" wording). (c) no secrets in the diff (one conditional + two template strings). (d) no `platform/data` file altered → no `build_provenance.py` regen; no fabrication (the ≈4.6× figure is the pre-existing blessed `#acq` language, not a new number).
+- **Next recommended:** carry the same completeness-vs-lower-bound framing into the **per-brand** `#acq` coverage table's `coverage_pct` column presentation (Srisawad's 457% cell currently leans on the method-box footnote alone — an inline "scope differs" tag on that one cell would make the row self-explanatory without scrolling to the method box); and, separately, keep batching the remaining fetched-but-unprobed obj-#1 reads (`product_segments`, `debt_source`, `income_impact`, `oae_agstats`) into `check_site_health.py`.
+
 ## 2026-08-09 — Intelligence loop (service/deploy-health): the two obj-#1 reads the last audit flagged (`collateral_outlook.json`, `macro_sensitivity.json`) now have deploy probes — shipped to master
 - **The gap fixed (`collateral-outlook-and-macro-sensitivity-unprobed`).** Two front-door obj-#1 layers were fetched by `app.js` but had **no `_shape_` probe** in `pipeline/check_site_health.py` — the exact pair the previous run's "next recommended integration" note called out. Both live-degrade **SILENTLY**, so a truncated/404 CDN deploy would blank them with no phone alert:
   - `data/collateral_outlook.json` — the Overview (`#overview`) collateral board's national recovery-value read **and** the command-center collateral clause. `renderCollatOutlook` + the command-center read both gate off `COLLO.national`: the MEASURED BoT-UVPI used-car/pickup resale card on `used_veh_yoy_blended`, and the "recovery outlook — firming vs softening" card + command-center row on `exposure_weighted_outlook`/`n_firming`/`most_at_risk_province`. Absent/truncated → silent fallback to an editorial card.
@@ -782,6 +789,36 @@ values** (robust to a future DLT-vintage refresh moving the counts):
   service target is the Overview switchboard's remaining multi-source reads (`debt_source`/`farm_household`)
   or the province deep-dive fetches; the next DATA target stays owner-side/Thai-IP (GISTDA 40m crop once
   the secret is in-session; the excise/baac/smebank legs) — nothing new is CI-unblocked this run.
+
+## 2026-08-09 — UX loop: announce all four `#sim` levers to screen readers, WCAG 4.1.3 (PR #348, merged + deployed + verified)
+
+Autonomous UX-improvement run. The named backlog is exhausted (remaining open items are all "bigger than
+surgical" content/mandate passes or device-tested-only 3D-page gaps excluded from unattended auto-merge), so
+this run took the explicit follow-up flagged under `ux-sim-result-status-message` (2026-08-09): the scenario
+simulator's `#simstatus` polite live region announced **only** the agri (crop-price/rainfall) outcome, while
+the **used-vehicle collateral** (`renderSimCollat`) and **factory/manufacturing slowdown** (`renderSimFactory`)
+sub-cards recompute via `innerHTML` on every slider move and were **silent to screen readers** — dragging the
+vehicle or factory slider produced no announcement because `computeSim` set the status to `''` whenever
+price/rain were 0.
+- **Fix:** `platform/app.js` — extended `computeSim()`'s announcement to a **multi-clause** status built from all
+  active levers (agri clause when price/rain set; used-vehicle clause when `simState.veh!==0`; factory clause when
+  `simState.factory>0`, reusing the already-computed `simFactoryModel()`, guarded on `fm.mfgBr`), joined with `; `
+  under one "Under this shock: …" lead; all-zero stays silent (matching the search/reset precedent). SR-only live
+  region, **zero visual change** (+8/−4).
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` **129 passed · 0 failed**; `node --check` clean;
+  headless `#sim` mobile render self-reviewed (verdict + sliders intact); Playwright slider drive of the live
+  region → baseline `""` → veh −10 announces vehicle clause → +factory adds factory clause → +price adds agri
+  clause → reset `""`, `pageerror=[]`; no secrets; scope = `platform/app.js` + one `docs/UXUI_AUDIT.md` line.
+- **Merge + deploy + verify:** squash-merged as `06d872c`, branch auto-deleted. Production alias
+  `competitive-intel-git-master-…vercel.app` verified after deploy: `/` **200**, `/app.js` **200**
+  (`/index.html` 308 = expected `cleanUrls` redirect, not a regression); grep confirms the new
+  "manufacturing slowdown: avg occupation-stress" string is **live** in the production `app.js`. No rollback needed.
+- **Recommend next:** the remaining backlog is genuinely out of scope for unattended surgical runs — the two
+  test-infra items (`qa-visual-overflow-not-in-ci`, `qa-live-not-in-overflow-audit-routes`) would wire the standing
+  overflow audit into the gate so future bleed/PAGEX defects are caught automatically; and `ux-acquire-taxonomy-mandate`
+  is the last expansion-framing residue in `build_regional_outlook.py` and deserves its own careful pass. The
+  device-tested 3D-page gaps (`ux-viewport-user-scalable-3dpages`, `ux-navmore-3dpages-absolute-overflow`) still
+  need a human-in-the-loop run.
 
 ## 2026-08-06 — UX loop: `.fb-h4` tag pill wraps so it stops bleeding out on mobile #overview (PR #307, merged + deployed + verified)
 

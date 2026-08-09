@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 191,
+  "n_points": 192,
   "n_series": 26,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -76,7 +76,7 @@
     4.9248,
     4.4155,
     4.4051,
-    4.403
+    4.245
    ]
   },
   "app_mtc_score": {
@@ -99,7 +99,7 @@
     4.6433,
     4.6603,
     4.6609,
-    4.6614
+    4.6677
    ]
   },
   "app_sawad_1star_pct": {
@@ -145,7 +145,7 @@
     4.6504,
     4.5844,
     4.5565,
-    4.5602
+    4.5537
    ]
   },
   "app_tidlor_1star_pct": {
@@ -168,7 +168,7 @@
     6.447,
     5.1466,
     5.2747,
-    5.2444
+    5.2195
    ]
   },
   "app_tidlor_score": {
@@ -191,7 +191,7 @@
     4.4853,
     4.5783,
     4.5789,
-    4.5817
+    4.583
    ]
   },
   "flood_high": {
@@ -238,7 +238,7 @@
     138.0,
     149.0,
     164.0,
-    167.0
+    170.0
    ]
   },
   "fuel_diesel": {
@@ -493,7 +493,7 @@
     36.0,
     31.0,
     31.0,
-    20.0
+    16.0
    ]
   },
   "rain_max_mm": {
@@ -540,22 +540,24 @@
     140.5,
     179.5,
     206.4,
-    277.9
+    292.1
    ]
   },
   "rival_ads_live": {
    "cadence": "weekly",
    "dates": [
-    "2026-07-30"
+    "2026-07-30",
+    "2026-08-09"
    ],
    "first_seen": "2026-07-30",
    "label": "Rival ad creatives running now",
-   "n": 1,
+   "n": 2,
    "path": "platform/data/rival_ads.json",
    "source": "Google Ads Transparency Center",
    "unit": "creatives",
    "values": [
-    368.0
+    368.0,
+    356.0
    ]
   },
   "rival_promo_live_mtc": {
@@ -625,7 +627,7 @@
    "values": [
     10.1818,
     9.1299,
-    9.2208
+    9.2338
    ]
   },
   "set_mtc_mcap": {
