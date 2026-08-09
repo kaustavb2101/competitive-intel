@@ -1649,16 +1649,16 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.579306,
-    "ratings": 16030,
+    "score": 4.580186,
+    "ratings": 16031,
     "reviews_total": 5080,
     "installs": "1,000,000+",
     "histogram": [
-     843,
+     842,
      307,
      565,
-     1310,
-     12999
+     1299,
+     13012
     ],
     "app_updated": "2026-07-09",
     "version": "3.1.0"
@@ -4423,8 +4423,8 @@
    "name": "เมืองไทย แคปปิตอล",
    "own": false,
    "stats": {
-    "score": 4.6614175,
-    "ratings": 6384,
+    "score": 4.6608834,
+    "ratings": 6383,
     "reviews_total": 2123,
     "installs": "1,000,000+",
     "histogram": [
@@ -4432,7 +4432,7 @@
      70,
      191,
      442,
-     5398
+     5395
     ],
     "app_updated": "2026-05-18",
     "version": "2.5.103"
@@ -10957,16 +10957,16 @@
    "name": "Good Money เงินดีดี (GSB)",
    "own": false,
    "stats": {
-    "score": 3.9063444,
-    "ratings": 3097,
+    "score": 3.9030304,
+    "ratings": 3096,
     "reviews_total": 1365,
     "installs": "1,000,000+",
     "histogram": [
-     570,
+     571,
      196,
      140,
-     233,
-     1954
+     234,
+     1950
     ],
     "app_updated": "2026-07-09",
     "version": "1.0.44"

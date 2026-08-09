@@ -124,10 +124,10 @@
   "note": "first_seen values span more than one pull; 'new' reflects arrivals since the previous pull."
  },
  "search_demand": {
-  "as_of": "2026-08-08T21:58Z",
+  "as_of": "2026-08-09T04:49Z",
   "label": null,
   "movement": [],
   "n_brands_moved": 0,
-  "note": "EXCLUDED: search_demand.json's per-province brand share-of-search (`sos`) is a single Google Trends snapshot (pulled_at_utc 2026-08-08T21:58Z) with no prior vintage recorded anywhere this script reads. Its own national_ts field is a national query-VOLUME series, not a per-brand share-of-search series, so it cannot substitute. Emitting a movement number here would mean inventing a 'before' that was never measured, so nothing is emitted."
+  "note": "EXCLUDED: search_demand.json's per-province brand share-of-search (`sos`) is a single Google Trends snapshot (pulled_at_utc 2026-08-09T04:49Z) with no prior vintage recorded anywhere this script reads. Its own national_ts field is a national query-VOLUME series, not a per-brand share-of-search series, so it cannot substitute. Emitting a movement number here would mean inventing a 'before' that was never measured, so nothing is emitted."
  }
 }
