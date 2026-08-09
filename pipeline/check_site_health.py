@@ -1874,6 +1874,154 @@ def _shape_rival_watch(d):
     return None
 
 
+def _num(v):
+    return isinstance(v, (int, float)) and not isinstance(v, bool)
+
+
+def _shape_debt_source(d):
+    # MEASURED NSO household debt inside-vs-outside the formal system (obj #1). The
+    # Competition/#acq tab's renderDebtSource GATES the whole informal-debt board on
+    # `Array.isArray(j.by_class)`, then reads per-class .cls_en/.total/.informal_pct/
+    # .consumption_debt rows and the .national series ([0] + last) for the lead. A
+    # truncated/404 CDN deploy that drops or guts it degrades SILENTLY to a "not built
+    # for this vintage" note with NO phone alert, and it CANNOT self-heal (NSO SES is a
+    # laptop/owner-side fold, no CI cron) — the same "broken demo" blind spot the
+    # farm_book / macro_book obj-#1 probes closed for their siblings. Asserts the
+    # by_class gate + a real (non-total) class row's render fields + the national
+    # series; shape not values, robust to a future SES wave.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    bc = d.get("by_class")
+    if not isinstance(bc, list) or not bc:
+        return "missing/empty 'by_class' list (the informal-debt board render gate)"
+    rows = [r for r in bc if isinstance(r, dict) and r.get("cls") != "รวม"]
+    if not rows:
+        return "no non-total 'by_class' row (every row is the รวม total)"
+    r0 = rows[0]
+    if not (isinstance(r0.get("cls_en"), str) and r0["cls_en"].strip()):
+        return "first class row missing 'cls_en' label (the household-type render read)"
+    if not _num(r0.get("informal_pct")):
+        return "first class row missing numeric 'informal_pct' (the share-outside render read)"
+    if not _num(r0.get("total")):
+        return "first class row missing numeric 'total' (the debt/household render read)"
+    nat = d.get("national")
+    if not isinstance(nat, list) or not nat:
+        return "missing/empty 'national' series (the lead informal-share trend read)"
+    if not _num(nat[-1].get("informal_pct")):
+        return "national[-1].informal_pct missing/non-numeric (the lead headline read)"
+    return None
+
+
+def _shape_income_impact(d):
+    # ESTIMATED first-order income-impact engine (obj #1). renderIncome GATES its whole
+    # region table on `Array.isArray(j.regions)`, then reads per-region .key +
+    # .income_pressure_pct + .book_mix (+ best_occ/worst_occ/nso_wage_ref). Fully
+    # null-guarded -> a truncated CDN deploy that drops or guts it silently blanks the
+    # income-impact panel with NO phone alert, and it CANNOT self-heal (a pipeline
+    # rebuild off NSO SES + tape, no CI cron) — the same blind spot the crop_stress /
+    # farm_book obj-#1 probes closed. Asserts the regions gate + a region row's render
+    # fields; shape not values, robust to a future vintage reshuffling the pass-through.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    regs = d.get("regions")
+    if not isinstance(regs, list) or not regs:
+        return "missing/empty 'regions' list (the income-impact table render gate)"
+    r0 = regs[0]
+    if not isinstance(r0, dict):
+        return "first region row is not an object"
+    if not (isinstance(r0.get("key"), str) and r0["key"].strip()):
+        return "first region missing 'key' name (the region-row render read)"
+    if not _num(r0.get("income_pressure_pct")):
+        return "first region missing numeric 'income_pressure_pct' (the book-pressure render read)"
+    if not isinstance(r0.get("book_mix"), dict):
+        return "first region missing 'book_mix' object (the top-occupations render read)"
+    return None
+
+
+def _shape_credit_anchor(d):
+    # MEASURED BoT credit anchor (obj #1) — the real-world scale the estimated branch-
+    # risk score is read against, on the Competition/#acq method surface. drawCreditAnchor
+    # GATES on `Array.isArray(CREDITANCHOR.metrics)` (non-empty), then reads per-metric
+    # .key/.label/.display/.scope/.source/.vintage and looks up by('system_npl') for the
+    # headline. Fully null-guarded -> a truncated CDN deploy that drops or empties it
+    # silently swaps the measured scale for a "not available" note with NO phone alert,
+    # and it CANNOT self-heal (pull_bot_credit.py off BoT FSR text, no CI cron). Asserts
+    # the metrics gate + a metric's render fields + the presence of the system_npl
+    # headline metric; shape not values, robust to a future BoT-FSR vintage.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    metrics = d.get("metrics")
+    if not isinstance(metrics, list) or not metrics:
+        return "missing/empty 'metrics' list (the credit-anchor render gate)"
+    m0 = metrics[0]
+    if not isinstance(m0, dict):
+        return "first metric is not an object"
+    for f in ("key", "label", "display"):
+        if not (isinstance(m0.get(f), str) and m0[f].strip()):
+            return "first metric missing '%s' (a metric-card render read)" % f
+    if not any(isinstance(m, dict) and m.get("key") == "system_npl" for m in metrics):
+        return "no 'system_npl' metric (the answer-first headline read)"
+    return None
+
+
+def _shape_rival_universe(d):
+    # The MEASURED/ESTIMATED operator census (obj #2) — every material title-lender,
+    # us + rivals + banks + brokers — on the Competition/#acq rival-pulse surface.
+    # drawRivalUniverse GATES on `Array.isArray(RIVUNI.operators)` (non-empty), then
+    # reads per-operator .tier/.name_th/.name_en/.owner/.model/.footprint(/.app), with
+    # the tier=='us' (AutoX) row highlighted. Fully null-guarded -> a truncated CDN
+    # deploy that drops or empties it silently swaps the census for a "not available"
+    # note with NO phone alert, and it CANNOT self-heal (build_rival_universe.py has no
+    # CI cron) — the same blind spot the rival_reputation / rival_threat obj-#2 probes
+    # closed. Asserts the operators gate + an operator's render fields + the presence of
+    # the tier=='us' AutoX self-row; shape not values, robust to a future roster edit.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    ops = d.get("operators")
+    if not isinstance(ops, list) or not ops:
+        return "missing/empty 'operators' list (the operator-census render gate)"
+    o0 = ops[0]
+    if not isinstance(o0, dict):
+        return "first operator is not an object"
+    if not (isinstance(o0.get("name_th"), str) and o0["name_th"].strip()):
+        return "first operator missing 'name_th' (the operator-row render read)"
+    if not (isinstance(o0.get("tier"), str) and o0["tier"].strip()):
+        return "first operator missing 'tier' (the US/NON-BANK/BANK badge render read)"
+    if not any(isinstance(o, dict) and o.get("tier") == "us" for o in ops):
+        return "no tier=='us' operator (the AutoX self-row the board highlights)"
+    return None
+
+
+def _shape_farm_household(d):
+    # MEASURED farm-household cash P&L (obj #1) — the ground under every crop-price
+    # claim, on the Proactive-assist/#assist surface. Its render GATES on `j.latest`,
+    # then reads .latest.income/.expense (objects) + .net_cash_monthly +
+    # .farm_share_of_income_pct + .nonfarm_share_of_income_pct (+ .household), and a
+    # non-empty .years trend. Fully null-guarded -> a truncated CDN deploy that drops or
+    # guts it silently blanks the household backdrop with NO phone alert, and it CANNOT
+    # self-heal (OAE farm-household survey fold, no CI cron) — the same blind spot the
+    # farm_book / crop_stress obj-#1 probes closed. Asserts the latest gate + its
+    # income/expense/net-cash render reads + the years trend; shape not values, robust
+    # to a future crop-year vintage.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    L = d.get("latest")
+    if not isinstance(L, dict):
+        return "missing 'latest' object (the household-P&L render gate)"
+    if not isinstance(L.get("income"), dict):
+        return "latest.income missing/not-an-object (the farm-cash render read)"
+    if not isinstance(L.get("expense"), dict):
+        return "latest.expense missing/not-an-object (the cash-expense render read)"
+    if not _num(L.get("net_cash_monthly")):
+        return "latest.net_cash_monthly missing/non-numeric (the /month lead render read)"
+    if not _num(L.get("farm_share_of_income_pct")):
+        return "latest.farm_share_of_income_pct missing/non-numeric (the split-bar render read)"
+    yrs = d.get("years")
+    if not isinstance(yrs, list) or not yrs:
+        return "missing/empty 'years' list (the trend-table render read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -2218,6 +2366,25 @@ DATA_FILES = [
     # siblings. Both assert render shape, not values.
     ("data/rival_book_impact.json", _shape_rival_book_impact, ".within_province more/less-contested split + gap deltas (#acq rival-density x loan-tape book-cost board)"),
     ("data/rival_watch.json", _shape_rival_watch, ".promos + .ads change-diff counts (#acq 'what changed since the last pull' panel)"),
+    # A coherent batch of the remaining surfaced-but-unprobed obj-#1/#2 FRONT-DOOR
+    # reads the last three intelligence runs' "next recommended" note enumerated —
+    # each live-fetched (tmliFetch / direct fetch) into a default-reachable route, each
+    # GATING its section on a specific structural key, and each degrading SILENTLY (a
+    # calm "not built for this vintage" / "not available" note) on a truncated/404 CDN
+    # deploy with NO phone alert. None self-heals from CI (all fold off owner-side /
+    # Thai-IP sources — NSO SES, OAE farm survey, BoT FSR text, the operator roster —
+    # with no cron), so the probe is the ONLY deploy safeguard, exactly like the
+    # branch_pico / assist-radar siblings. Each asserts render shape, not values:
+    #  - debt_source: the #acq informal-debt board (obj #1, MEASURED NSO SES);
+    #  - income_impact: the #assist income-impact engine (obj #1, ESTIMATED first-order);
+    #  - credit_anchor: the #acq BoT credit-scale anchor (obj #1, MEASURED BoT FSR);
+    #  - farm_household: the #assist farm-household cash-P&L backdrop (obj #1, MEASURED OAE);
+    #  - rival_universe: the #acq operator census (obj #2).
+    ("data/debt_source.json", _shape_debt_source, ".by_class informal-debt board + .national trend series (#acq informal-debt read, obj #1)"),
+    ("data/income_impact.json", _shape_income_impact, ".regions income-pressure table with key/income_pressure_pct/book_mix (#assist income-impact engine, obj #1)"),
+    ("data/credit_anchor.json", _shape_credit_anchor, ".metrics scale cards + system_npl headline (#acq BoT credit anchor, obj #1)"),
+    ("data/farm_household.json", _shape_farm_household, ".latest income/expense/net_cash_monthly + .years trend (#assist farm-household P&L, obj #1)"),
+    ("data/rival_universe.json", _shape_rival_universe, ".operators census with tier/name_th + the tier=='us' AutoX row (#acq operator census, obj #2)"),
 ]
 
 
