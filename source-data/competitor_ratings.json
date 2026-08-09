@@ -5424,7 +5424,7 @@
    "brand": "Tidlor",
    "prov": "กรุงเทพมหานคร",
    "rating": 5,
-   "n": 12
+   "n": 15
   },
   {
    "place_id": "ChIJGW7nfMSd4jARzFd27ywnF8A",
@@ -7083,7 +7083,7 @@
    "brand": "Tidlor",
    "prov": "สมุทรสาคร",
    "rating": 5,
-   "n": 97
+   "n": 98
   },
   {
    "place_id": "ChIJDa4114TH4jARteAVYkEPVSI",
@@ -7555,13 +7555,6 @@
    "n": 30
   },
   {
-   "place_id": "ChIJhyqX5MczHTERKVaKklGsp54",
-   "brand": "Tidlor",
-   "prov": "ชลบุรี",
-   "rating": 4.9,
-   "n": 20
-  },
-  {
    "place_id": "ChIJp3THelmr-DARFpRaPwIxhjA",
    "brand": "Tidlor",
    "prov": "ชุมพร",
@@ -7889,6 +7882,13 @@
    "prov": "ชลบุรี",
    "rating": 4.7,
    "n": 9
+  },
+  {
+   "place_id": "ChIJhyqX5MczHTERKVaKklGsp54",
+   "brand": "Tidlor",
+   "prov": "ชลบุรี",
+   "rating": 4.7,
+   "n": 21
   },
   {
    "place_id": "ChIJg4DdTA-r-DARCFLL20XBBJw",

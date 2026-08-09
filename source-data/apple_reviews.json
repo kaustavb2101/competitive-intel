@@ -428,10 +428,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.703,
-    "ratings": 1532,
-    "score_current_version": 3.703,
-    "ratings_current_version": 1532,
+    "score": 3.70131,
+    "ratings": 1530,
+    "score_current_version": 3.70131,
+    "ratings_current_version": 1530,
     "version": "3.1.0",
     "app_updated": "2026-07-20",
     "released": "2020-04-30",
@@ -15065,10 +15065,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.7034,
-    "ratings": 63062,
-    "score_current_version": 4.7034,
-    "ratings_current_version": 63062,
+    "score": 4.70332,
+    "ratings": 63035,
+    "score_current_version": 4.70332,
+    "ratings_current_version": 63035,
     "version": "7.5.0",
     "app_updated": "2026-07-20",
     "released": "2021-10-10",
@@ -19586,10 +19586,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84502,
-    "ratings": 42619,
-    "score_current_version": 4.84502,
-    "ratings_current_version": 42619,
+    "score": 4.84535,
+    "ratings": 42587,
+    "score_current_version": 4.84535,
+    "ratings_current_version": 42587,
     "version": "3.1.1",
     "app_updated": "2026-05-25",
     "released": "2023-03-06",
@@ -32979,6 +32979,15 @@
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14401076023",
+     "at": null,
+     "score": 1,
+     "title": "ยกเลิกข้อมูลทั้งหมด",
+     "content": "ข้าพเจ้า นส. ทา**** นามสกุล ส**** \n(บัตรปชชลงท้ายด้วย 3928)\nได้ทำการกรอกข้อมูลบัตรประชาชนและทำการสมัครเข้าApplicationมันนี่ฮับ เมื่อวันที่7/8/69และได้ยื่นสินเชื่อแต่ไม่ได้รับอนุมัติ **ดังนั้นเอกสารที่แนบไปทั้งหมดข้าพเจ้าไม่อนุญาตให้บริษัทนำไปใช้ในด้านอื่นๆทุกกรณีทั้งสิ้น**และถ้าเกิดเหตุการณ์ใดๆขึ้น ข้าพเจ้าจะไม่รับผิดชอบทุกๆกรณี และถ้าบริษัทมันนี่ฮับนำข้อมูลที่ได้รับไปใช้ในทางที่ไม่ถูกต้อง ก่อให้เ",
+     "version": "5.65",
+     "votes": 0
+    },
     {
      "id": "14397483619",
      "at": null,
