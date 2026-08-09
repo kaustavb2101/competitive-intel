@@ -146,9 +146,25 @@ FEEDS = [
          label="Rival Google Ads Transparency Center creatives + copy", cadence="weekly", ip="any",
          group="competitive", out="source-data/google_ads_raw.json", timeout=2400),  # ~17 advertisers, paced
 
-    dict(key="set_peers", script="pull_set_peers.py", args=[],
+    # needs_browser: these two drive a real headless Chromium (set.or.th 403s external requests;
+    # only a same-origin fetch from inside a loaded SET page gets through). CI runners that have not
+    # run `playwright install chromium` must skip them — use --skip-browser, NOT a hand-kept
+    # --exclude list, so a third browser feed added later is skipped there automatically instead of
+    # failing the first time nobody remembers to edit the workflow.
+    dict(key="set_peers", script="pull_set_peers.py", args=[], needs_browser=True,
          label="SET-listed peer market + financial data (MTC/TIDLOR/SAWAD/TURBO)", cadence="daily",
          ip="any", group="competitive", out="source-data/set_peers.json"),
+
+    # The NOTES to the financial statements are where the rivals' real credit picture lives: the
+    # IFRS-9 Stage 1/2/3 ECL tables, the allowance roll-forward and the receivables-by-collateral
+    # split. The MD&A (same script, kind=mda) is only management's narrative — SAWAD, for one,
+    # publishes no NPL ratio there at all while disclosing both of its components in the notes.
+    # Quarterly because that is how often SET filings appear; the run is cheap and idempotent
+    # (attachments are immutable once filed, so a re-run re-downloads nothing).
+    dict(key="set_filings", script="pull_set_filings.py", args=["--kind", "both"], needs_browser=True,
+         label="SET filings: MD&A narrative + Financial Statements/NOTES (ECL staging, collateral mix)",
+         cadence="quarterly", ip="any", group="competitive",
+         out="source-data/set_filings/index.json", timeout=1800),
 
     # ------------------------------------------------------------------- THAI-IP-ONLY (opt-in only)
     dict(key="rival_promos", script="pull_rival_promos.py", args=[],
@@ -202,6 +218,12 @@ def select_feeds(args):
     --only / --exclude narrow it. Unknown --only keys are a hard error (a typo should not silently
     run "everything"); a --only key that exists but is thai-and-not-included is reported, not run."""
     pool = [f for f in FEEDS if f["ip"] == "any" or args.include_thai]
+    if args.skip_browser:
+        dropped = [f["key"] for f in pool if f.get("needs_browser")]
+        if dropped:
+            print("--skip-browser: dropping %s (needs headless Chromium)" % ", ".join(sorted(dropped)),
+                  file=sys.stderr)
+        pool = [f for f in pool if not f.get("needs_browser")]
     if args.only:
         wanted = {k.strip() for k in args.only.split(",") if k.strip()}
         unknown = wanted - set(FEEDS_BY_KEY)
@@ -370,6 +392,9 @@ def main():
     ap.add_argument("--exclude", metavar="k1,k2", help="comma-separated feed keys to skip")
     ap.add_argument("--include-thai", action="store_true",
                      help="also run the Thai-IP-only feeds (only useful from a Thai residential IP)")
+    ap.add_argument("--skip-browser", action="store_true",
+                     help="skip every feed that needs a headless Chromium (for runners without "
+                          "`playwright install chromium`)")
     ap.add_argument("--jobs", type=int, default=DEFAULT_JOBS, help="parallel workers (default %d)" % DEFAULT_JOBS)
     ap.add_argument("--dry-run", action="store_true", help="print the plan, touch nothing")
     ap.add_argument("--no-derive", action="store_true",

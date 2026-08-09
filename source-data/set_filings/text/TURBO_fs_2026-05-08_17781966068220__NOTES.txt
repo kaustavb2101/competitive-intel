@@ -1,0 +1,774 @@
+
+[TABLE 1]
+1General information
+[/TABLE 1]
+
+Ngernturbo Public Company Limited (“the Company”) is a public limited company which listed on the Stock Exchange of Thailand. The Company is incorporated and domiciled in Thailand. The address of the Company’s registered office is as follows:
+500 Moo 3, Tiwanon Road, Ban Mai, Pak Kret, Nonthaburi 11120.
+The principal business operations of the Company and its subsidiaries (together “the Group”) are 1) financial services specifically loans secured against vehicle registrations, land title deeds and nano-finance, 2) engaged in life and non-life insurance broker business, and 3) cash and installment sales.
+The interim consolidated and separate financial information were authorised for issue by the Board of Directors on 8 May 2026.
+
+[TABLE 2]
+2Basis of preparation
+[/TABLE 2]
+
+The interim consolidated and separated financial information has been prepared in accordance with Thai Accounting Standard (TAS) no. 34, Interim Financial Reporting and other financial reporting requirements issued under the Securities and Exchange Act.
+The interim financial information should be read in conjunction with the annual financial statements for the year ended 31 December 2025.
+An English version of this interim financial information has been prepared from the interim financial information that is in the Thai language. In the event of a conflict or a difference in interpretation between the two languages, the Thai language interim financial information shall prevail.
+
+[TABLE 3]
+3Material accounting policies
+[/TABLE 3]
+
+The accounting policies used in the preparation of the interim financial information are consistent with those used in the annual financial statements for the year ended 31 December 2025.
+New and amended Thai Financial Reporting Standards that are effective for the accounting period beginning on or after 1 January 2026 do not have material impacts on the Group.
+
+[TABLE 4]
+4Estimates
+[/TABLE 4]
+
+The preparation of interim financial information requires management to make judgements, estimates and assumptions that affect the application of accounting policies and the reported amounts of assets and liabilities, incomes and expenses. Actual results may differ from these estimates.
+In preparing this interim financial information, the significant judgements made by management in applying the Group’s accounting policies and the key sources of estimation uncertainty were the same as those that applied to the financial statements for the year ended 31 December 2025.
+
+[TABLE 5]
+5Segment and revenue information
+[/TABLE 5]
+
+The Group present segment information based on the type of business in determining business segment, which the information by segment is presented as follows:
+
+[TABLE 6]
+ | Consolidated financial information
+ | Financial services business | Insurance broker business | Total
+the three-month period ended | 2026 | 2025 | 2026 | 2025 | 2026 | 2025
+31 March | Thousand | Thousand | Thousand | Thousand | Thousand | Thousand
+ | Baht | Baht | Baht | Baht | Baht | Baht
+Revenues |  |  |  |  |  | 
+Interest income | 691,564 | 661,437 | - | - | 691,564 | 661,437
+Fees and services income | 10,913 | 18,733 | - | - | 10,913 | 18,733
+Other income | 1,905 | 3,945 | 102,159 | 60,799 | 104,064 | 64,744
+ | 704,382 | 684,115 | 102,159 | 60,799 | 806,541 | 744,914
+Expenses |  |  |  |  |  | 
+Expected credit losses | 130,717 | 123,135 | 292 | 508 | 131,009 | 123,643
+Finance costs | 87,384 | 107,764 | - | - | 87,384 | 107,764
+ | 218,101 | 230,899 | 292 | 508 | 218,393 | 231,407
+Unallocated revenues |  |  |  |  |  | 
+Sales of goods |  |  |  |  | 10,119 | 3,642
+Other income |  |  |  |  | 10 | 11
+Unallocated expenses |  |  |  |  |  | 
+Cost of goods sold |  |  |  |  | 156 | 146
+Administrative expenses |  |  |  |  | 381,791 | 337,184
+Profit before income tax |  |  |  |  | 216,330 | 179,830
+Income tax |  |  |  |  | (41,308) | (34,845)
+Profit for the period |  |  |  |  | 175,022 | 144,985
+[/TABLE 6]
+
+
+[TABLE 7]
+ | Consolidated financial information
+ | Financial services business | Insurance broker business | Total
+ | 31 March | 31 December | 31 March | 31 December | 31 March | 31 December
+ | 2026 | 2025 | 2026 | 2025 | 2026 | 2025
+ | Thousand | Thousand | Thousand | Thousand | Thousand | Thousand
+ | Baht | Baht | Baht | Baht | Baht | Baht
+Loan receivables | 11,485,392 | 11,092,074 | 9,221 | 10,443 | 11,494,613 | 11,102,517
+Hire purchase receivables | - | 4 | - | - | - | 4
+Other current receivables - others | 1,101 | 1,321 | 50,645 | 56,515 | 51,746 | 57,836
+Unallocated assets |  |  |  |  | 1,405,152 | 1,516,880
+ |  |  |  |  | 12,951,511 | 12,677,237
+[/TABLE 7]
+
+
+[TABLE 8]
+ | Consolidatedfinancial information | Separatefinancial information
+Timing of revenue recognition | 2026 | 2025 | 2026 | 2025
+ | Thousand | Thousand | Thousand | Thousand
+ | Baht | Baht | Baht | Baht
+At a point in time | 68,028 | 53,407 | 42,905 | 39,455
+Over time | 56,094 | 31,421 | 1,831 | 1,257
+[/TABLE 8]
+
+
+[TABLE 9]
+6Fair value
+[/TABLE 9]
+
+Fair values are categorised into hierarchy based on inputs used as follows:
+Level 1:The fair value of financial instruments is based on the current bid price by reference to the Stock Exchange of Thailand.
+Level 2: The fair value of financial instruments is determined using significant observable inputs and, as little as possible, entity-specific estimates.
+Level 3: The fair value of financial instruments is not based on observable market data.
+The Group has no financial instruments measured at fair value as at 31 March 2026 and 31 December 2025.
+Transfer between fair value hierarchy
+The Group recognises transfers between fair value hierarchy levels as at the date of the event or change in circumstances that caused the transfer.
+There are no transfers of fair value hierarchy or changes in valuation techniques during the period.
+
+[TABLE 10]
+7Cash and cash equivalents
+[/TABLE 10]
+
+
+[TABLE 11]
+ | Consolidatedfinancial information | Separatefinancial information
+ | 31 March | 31 December | 31 March | 31 December
+ | 2026 | 2025 | 2026 | 2025
+ | Baht | Baht | Baht | Baht
+Cash on hand | 21,969,951 | 21,022,569 | 21,969,951 | 21,022,569
+Deposits at financial institutions | 127,619,477 | 218,652,803 | 94,277,517 | 128,729,944
+Total | 149,589,428 | 239,675,372 | 116,247,468 | 149,752,513
+[/TABLE 11]
+
+
+[TABLE 12]
+8Loan receivables
+[/TABLE 12]
+
+As at 31 March 2026 and 31 December 2025, the Group’s loan receivables have the average contracts period of 1 - 10 years which can be classified by due date in the contracts as follows:
+
+[TABLE 13]
+ | Consolidated financial information
+ | 31 March 2026
+ | Portion due | Portion due | 
+ | within | later than | 
+ | 1 year | 1 year | Total
+ | Baht | Baht | Baht
+Loan receivables | 3,737,897,954 | 7,905,121,270 | 11,643,019,224
+Add  Accrued interest receivables and                  accrued fee receivables | 321,102,152 | - | 321,102,152
+Total loan receivables, accrued interest receivables and accrued fee receivables | 4,059,000,106 | 7,905,121,270 | 11,964,121,376
+Less  Allowance for expected credit losses | (281,518,330) | (187,990,252) | (469,508,582)
+Total | 3,777,481,776 | 7,717,131,018 | 11,494,612,794
+[/TABLE 13]
+
+
+[TABLE 14]
+ | Consolidated financial information
+ | 31 December 2025
+ | Portion due | Portion due | 
+ | within | later than | 
+ | 1 year | 1 year | Total
+ | Baht | Baht | Baht
+Loan receivables | 3,671,054,046 | 7,562,107,157 | 11,233,161,203
+Add  Accrued interest receivables and    accrued fee receivables | 328,338,077 | - | 328,338,077
+Total loan receivables, accrued interest receivables and accrued fee receivables | 3,999,392,123 | 7,562,107,157 | 11,561,499,280
+Less  Allowance for expected credit losses | (277,394,142) | (181,588,270) | (458,982,412)
+Total | 3,721,997,981 | 7,380,518,887 | 11,102,516,868
+[/TABLE 14]
+
+
+[TABLE 15]
+ | Separate financial information
+ | 31 March 2026
+ | Portion due | Portion due | 
+ | within | later than | 
+ | 1 year | 1 year | Total
+ | Baht | Baht | Baht
+Loan receivables | 3,728,603,505 | 7,905,121,270 | 11,633,724,775
+Add  Accrued interest receivables | 320,809,541 | - | 320,809,541
+Total loan receivables and accrued interest receivables | 4,049,413,046 | 7,905,121,270 | 11,954,534,316
+Less  Allowance for expected credit losses | (281,383,772) | (187,990,252) | (469,374,024)
+Total | 3,768,029,274 | 7,717,131,018 | 11,485,160,292
+[/TABLE 15]
+
+
+[TABLE 16]
+ | Separate financial information
+ | 31 December 2025
+ | Portion due | Portion due | 
+ | within | later than | 
+ | 1 year | 1 year | Total
+ | Baht | Baht | Baht
+Loan receivables | 3,660,447,246 | 7,562,107,157 | 11,222,554,403
+Add  Accrued interest receivables | 327,956,021 | - | 327,956,021
+Total loan receivables and accrued interest receivables | 3,988,403,267 | 7,562,107,157 | 11,550,510,424
+Less  Allowance for expected credit losses | (277,152,147) | (181,588,270) | (458,740,417)
+Total | 3,711,251,120 | 7,380,518,887 | 11,091,770,007
+[/TABLE 16]
+
+The Group’s loan receivables amounting to Baht 4,461 million (31 December 2025: Baht 4,381 million) are pledged as collateral for the borrowings from financial institutions (Note 18).
+As at 31 March 2026 and 31 December 2025, staging and allowance for expected credit losses for loan receivables are as follows:
+
+[TABLE 17]
+ | Consolidated financial information
+ | 31 March 2026
+ | Loan receivables, accrued interest receivable and accrued fee receivable | Allowance for expected credit losses
+ | Baht | Baht
+Staging |  | 
+Performing financial assets | 10,928,453,974 | 168,824,675
+Under-performing financial assets | 595,664,237 | 95,034,020
+Non-performing financial assets | 440,003,165 | 205,649,887
+Total | 11,964,121,376 | 469,508,582
+[/TABLE 17]
+
+
+[TABLE 18]
+ | Consolidated financial information
+ | 31 December 2025
+ | Loan receivables, accrued interest receivable and accrued fee receivable | Allowance for expected credit losses
+ | Baht | Baht
+Staging |  | 
+Performing financial assets | 10,446,812,663 | 157,489,644
+Under-performing financial assets | 657,232,823 | 97,350,387
+Non-performing financial assets | 457,453,794 | 204,142,381
+Total | 11,561,499,280 | 458,982,412
+[/TABLE 18]
+
+
+[TABLE 19]
+ | Separate financial information
+ | 31 March 2026
+ | Loan receivables and accrued interest receivable | Allowance for expected credit losses
+ | Baht | Baht
+Staging |  | 
+Performing financial assets | 10,919,184,016 | 168,796,338
+Under-performing financial assets | 595,478,750 | 94,983,739
+Non-performing financial assets | 439,871,550 | 205,593,947
+Total | 11,954,534,316 | 469,374,024
+[/TABLE 19]
+
+
+[TABLE 20]
+ | Separate financial information
+ | 31 December 2025
+ | Loan receivables and accrued interest receivable | Allowance for expected credit losses
+ | Baht | Baht
+Staging |  | 
+Performing financial assets | 10,436,424,689 | 157,454,718
+Under-performing financial assets | 656,811,407 | 97,216,810
+Non-performing financial assets | 457,274,328 | 204,068,889
+Total | 11,550,510,424 | 458,740,417
+[/TABLE 20]
+
+
+[TABLE 21]
+9Hire purchase receivables
+[/TABLE 21]
+
+
+[TABLE 22]
+ | Consolidated financial information
+ | 31 March 2026
+ | Portion due | Portion due | 
+ | within | later than | 
+ | 1 year | 1 year | Total
+ | Baht | Baht | Baht
+Hire purchase receivables | - | - | -
+Less  Deferred interest income | - | - | -
+Total hire purchase receivables |  |  | 
+net of deferred interest income | - | - | -
+Less Allowance for expected credit losses | - | - | -
+Total | - | - | -
+[/TABLE 22]
+
+
+[TABLE 23]
+ | Consolidated financial information
+ | 31 December 2025
+ | Portion due | Portion due | 
+ | within | later than | 
+ | 1 year | 1 year | Total
+ | Baht | Baht | Baht
+Hire purchase receivables | 19,600 | - | 19,600
+Less  Deferred interest income | - | - | -
+Total hire purchase receivables |  |  | 
+net of deferred interest income | 19,600 | - | 19,600
+Less  Allowance for expected credit losses | (15,301) | - | (15,301)
+Total | 4,299 | - | 4,299
+[/TABLE 23]
+
+As at 31 March 2026 and 31 December 2025, staging and allowance for expected credit losses for hire purchase receivables are as follows:
+
+[TABLE 24]
+ | Consolidated financial information
+ | 31 March 2026
+ | Hire purchase   receivables net of deferred interest income | Allowance for expected credit losses
+ | Baht | Baht
+Staging |  | 
+Performing financial assets | - | -
+Under-performing financial assets | - | -
+Non-performing financial assets | - | -
+Total | - | -
+[/TABLE 24]
+
+
+[TABLE 25]
+ | Consolidated financial information
+ | 31 December 2025
+ | Hire purchase   receivables net of deferred interest income | Allowance for expected credit losses
+ | Baht | Baht
+Staging |  | 
+Performing financial assets | - | -
+Under-performing financial assets | 1,980 | 1,425
+Non-performing financial assets | 17,620 | 13,876
+Total | 19,600 | 15,301
+[/TABLE 25]
+
+
+[TABLE 26]
+10Allowance for expected credit losses
+[/TABLE 26]
+
+
+[TABLE 27]
+ | Consolidated financial information
+ | Performing financial assets | Under- Performing financial assets | Non- performing financial assets | Total
+ | Baht | Baht | Baht | Baht
+As at 1 January 2026 | 157,489,644 | 97,351,812 | 204,156,257 | 458,997,713
+Newly acquired financial assets | 15,522,795 | - | - | 15,522,795
+Changes due to changes in staging | 18,567,519 | (67,459,924) | 48,892,405 | -
+Changes due to new estimation of credit losses | (20,028,939) | 71,143,436 | 32,929,856 | 84,044,353
+Transfers to foreclosed assets | (2,724,285) | (5,703,308) | (5,661,766) | (14,089,359)
+Write-off | (2,059) | (297,996) | (74,666,865) | (74,966,920)
+As at 31 March 2026 | 168,824,675 | 95,034,020 | 205,649,887 | 469,508,582
+[/TABLE 27]
+
+
+[TABLE 28]
+ | Separate financial information
+ | Performing financial assets | Under- Performing financial assets | Non- performing financial assets | Total
+ | Baht | Baht | Baht | Baht
+As at 1 January 2026 | 157,454,718 | 97,216,810 | 204,068,889 | 458,740,417
+Newly acquired financial assets | 15,522,795 | - | - | 15,522,795
+Changes due to changes in staging | 18,573,272 | (67,464,166) | 48,890,894 | -
+Changes due to new estimation of credit losses | (20,030,161) | 70,959,938 | 32,930,323 | 83,860,100
+Transfers to foreclosed assets | (2,724,286) | (5,702,083) | (5,661,767) | (14,088,136)
+Write-off | - | (26,760) | (74,634,392) | (74,661,152)
+As at 31 March 2026 | 168,796,338 | 94,983,739 | 205,593,947 | 469,374,024
+[/TABLE 28]
+
+
+[TABLE 29]
+11Other current receivables
+[/TABLE 29]
+
+
+[TABLE 30]
+ | Consolidated financial information | Separate financial information
+ | 31 March 2026 | 31 December 2025 | 31 March 2026 | 31 December 2025
+ | Baht | Baht | Baht | Baht
+Other current receivables - others | 52,859,372 | 58,922,015 | 2,213,954 | 2,406,624
+Other current receivables - related parties (Note 26 b)) | - | - | 15,487,648 | 139,839,141
+Prepaid expenses | 18,767,877 | 11,735,319 | 18,601,004 | 11,564,312
+Advance payments | 3,879,982 | 2,883,811 | 3,271,169 | 2,565,627
+Total | 75,507,231 | 73,541,145 | 39,573,775 | 156,375,704
+[/TABLE 30]
+
+
+[TABLE 31]
+12Other current assets
+[/TABLE 31]
+
+
+[TABLE 32]
+ | Consolidated financial information | Separate financial information
+ | 31 March 2026 | 31 December 2025 | 31 March 2026 | 31 December 2025
+ | Baht | Baht | Baht | Baht
+Foreclosed assets | 9,495,731 | 16,416,250 | 9,475,302 | 16,394,361
+Less Allowance for diminution in value | (1,692,628) | (1,666,130) | (1,672,200) | (1,644,241)
+Other current assets | 5,379,751 | 6,940,522 | 2,009,744 | 3,754,016
+Total | 13,182,854 | 21,690,642 | 9,812,846 | 18,504,136
+[/TABLE 32]
+
+
+[TABLE 33]
+13Investments in the subsidiaries
+[/TABLE 33]
+
+The Company has subsidiaries included in consolidated financial statement. The subsidiaries have only ordinary shares in which the Company directly holds those shares. The proportion of ownership interests held by the Company is equal to voting rights in subsidiaries held by the Company.
+
+[TABLE 34]
+ |  |  | Separate financial information
+ |  |  | Ownership interest | Cost
+ | Country of | Type of | 2026 | 2025 | 2026 | 2025
+Entity name | incorporation | business | % | % | Baht | Baht
+Subsidiaries |  |  |  |  |  | 
+Ngernturbo Pay | Thailand | Cash and | 99.99 | 99.99 | 2,000,000 | 2,000,000
+Later Co., Ltd. |  | installment sales |  |  |  | 
+Ngernturbo Insurance | Thailand | Insurance broker | 99.99 | 99.99 | 3,000,000 | 3,000,000
+Broker Co., Ltd. |  |  |  |  |  | 
+NTBX Co., Ltd. | Thailand | Financial services | 99.99 | 99.99 | 50,000,000 | 50,000,000
+Ngernturbo Development | Thailand | Training services | 99.99 | 99.99 | 1,000,000 | 1,000,000
+Center Co., Ltd. |  | for affiliates |  |  |  | 
+Lazy Lazy Co., Ltd. | Thailand | Insurance consultation | 99.99 | 99.99 | 3,000,000 | 3,000,000
+Ngernturbo (Bangkok) Co., Ltd. | Thailand | Loan Business | 99.99 | - | 10,000,000 | -
+Total |  |  |  |  | 69,000,000 | 59,000,000
+[/TABLE 34]
+
+During 2026, the Company invested in a subsidiary which is Ngernturbo (Bangkok) Co., Ltd. in the amount of 1,000,000 ordinary shares at Baht 10 per share totalling to Baht 10 million. The subsidiary received share payment and registered the capital increase with the Ministry of Commerce on 2 March 2026.
+
+[TABLE 35]
+14Land, buildings and equipment
+[/TABLE 35]
+
+Movements of land, buildings and equipment for the three-month period ended 31 March 2026 are as follows:
+
+[TABLE 36]
+ | Consolidated financial information
+ | Land | Land improvements | Building and building improvements | Computers and office equipment | Furniture and fixtures | Vehicles | Work in progress | Total
+ | Baht | Baht | Baht | Baht | Baht | Baht | Baht | Baht
+Opening net book amount | 344,035,174 | 5,101,780 | 280,394,266 | 41,398,158 | 35,712,443 | 1,753,625 | 524,040 | 708,919,486
+Additions | - | - | 1,510,264 | 933,537 | 415,781 | 18,133 | 1,405,288 | 4,283,003
+Disposals and write-off | - | - | (59,440) | (17,135) | (17,205) | - | - | (93,780)
+Transfer in (out) | - | - | 388,222 | - | - | - | (388,222) | -
+Depreciation charge | - | (69,898) | (8,443,843) | (6,451,459) | (3,589,376) | (166,781) | - | (18,721,357)
+Closing net book amount | 344,035,174 | 5,031,882 | 273,789,469 | 35,863,101 | 32,521,643 | 1,604,977 | 1,541,106 | 694,387,352
+[/TABLE 36]
+
+
+[TABLE 37]
+ | Separate financial information
+ | Land | Land improvements | Building and building improvements | Computers and office equipment | Furniture and fixtures | Vehicles | Work in progress | Total
+ | Baht | Baht | Baht | Baht | Baht | Baht | Baht | Baht
+Opening net book amount | 344,035,174 | 5,101,780 | 280,394,266 | 41,397,745 | 35,709,666 | 1,753,625 | 524,040 | 708,916,296
+Additions | - | - | 1,510,264 | 933,537 | 415,781 | 18,133 | 1,405,288 | 4,283,003
+Disposals and write-off | - | - | (59,440) | (17,135) | (17,205) | - | - | (93,780)
+Transfer in (out) | - | - | 388,222 | - | - | - | (388,222) | -
+Depreciation charge | - | (69,898) | (8,443,843) | (6,451,296) | (3,589,013) | (166,781) | - | (18,720,831)
+Closing net book amount | 344,035,174 | 5,031,882 | 273,789,469 | 35,862,851 | 32,519,229 | 1,604,977 | 1,541,106 | 694,384,688
+[/TABLE 37]
+
+
+[TABLE 38]
+15Right-of-use assets
+[/TABLE 38]
+
+Movements of right-of-use assets for the three-month period ended 31 March 2026 are as follows:
+
+[TABLE 39]
+ | Consolidated and separate financial information
+ | Buildings | Vehicles | Total
+ | Baht | Baht | Baht
+Opening net book amount | 235,863,621 | 34,199,521 | 270,063,142
+Additions | 40,057,697 | 1,250,000 | 41,307,697
+Terminations | - | (18,133) | (18,133)
+Lease modifications and reassessments | (2,411,970) | - | (2,411,970)
+Depreciation charge | (40,108,624) | (3,925,024) | (44,033,648)
+Closing net book amount | 233,400,724 | 31,506,364 | 264,907,088
+[/TABLE 39]
+
+
+[TABLE 40]
+16Intangible assets
+[/TABLE 40]
+
+Movements of intangible assets for the three-month period ended 31 March 2026 are as follows:
+
+[TABLE 41]
+ | Consolidated and separate financial information
+ |  | Computer | 
+ | Computer | software | 
+ | software | in progress | Total
+ | Baht | Baht | Baht
+Opening net book amount | 81,201,962 | 5,263,612 | 86,465,574
+Additions | - | 4,579,602 | 4,579,602
+Transfer in (out) | 2,413,616 | (2,413,616) | -
+Amortisation charge | (7,649,313) | - | (7,649,313)
+Closing net book amount | 75,966,265 | 7,429,598 | 83,395,863
+[/TABLE 41]
+
+
+[TABLE 42]
+17Other current payables
+[/TABLE 42]
+
+
+[TABLE 43]
+ | Consolidated financial information | Separate financial information
+ | 31 March 2026 | 31 December 2025 | 31 March 2026 | 31 December 2025
+ | Baht | Baht | Baht | Baht
+Other current payables - others | 54,526,239 | 46,130,724 | 51,781,857 | 43,582,849
+Other current payables - related parties (Note 26 b)) | 5,112,488 | 315,624 | 28,652,455 | 17,366,857
+Accrued expenses | 23,168,658 | 34,191,030 | 21,865,586 | 33,052,104
+Total | 82,807,385 | 80,637,378 | 102,299,898 | 94,001,810
+[/TABLE 43]
+
+As at 31 March 2026, the Group has bank deposits for insurance premiums awaiting delivery to insurance companies amounting to Baht 81.4 million (31 December 2025: Baht 72.2 million). These amounts are not recognised as assets and liabilities in the statement of financial position.
+
+[TABLE 44]
+18Borrowings
+[/TABLE 44]
+
+
+[TABLE 45]
+ | Consolidated financial information | Separate financial information
+ | 31 March | 31 December | 31 March | 31 December
+ | 2026 | 2025 | 2026 | 2025
+ | Baht | Baht | Baht | Baht
+Current |  |  |  | 
+Short-term borrowings from financial institutions | 150,000,000 | 30,000,000 | 150,000,000 | 30,000,000
+Short-term borrowings from related parties |  |  |  | 
+(Note 26 c)) | 2,114,573,500 | 2,114,573,500 | 2,279,558,706 | 2,258,158,706
+Current portion of long-term borrowings from financial institutions | 2,722,257,202 | 2,573,865,391 | 2,722,257,202 | 2,573,865,391
+Total current borrowings | 4,986,830,702 | 4,718,438,891 | 5,151,815,908 | 4,862,024,097
+Non-current |  |  |  | 
+Long-term borrowings from financial institutions | 2,609,181,421 | 2,822,813,175 | 2,609,181,421 | 2,822,813,175
+Total non-current borrowings | 2,609,181,421 | 2,822,813,175 | 2,609,181,421 | 2,822,813,175
+Total | 7,596,012,123 | 7,541,252,066 | 7,760,997,329 | 7,684,837,272
+[/TABLE 45]
+
+As at 31 March 2026, short-term borrowings from financial institutions bear a fixed rate per annum and at floating rate (31 December 2025: a fixed rate per annum) which will be due at call, and long-term borrowings from financial institutions bear interest at floating rate (31 December 2025: floating rate) which will be due during 2026 to 2030 (31 December 2025: 2026 to 2030).
+As at 31 March 2026, the borrowings from financial institutions of Baht 5,481 million (31 December 2025: Baht 5,427 million) are secured over a part of the Company’s loan receivables (Note 8), land which belongs to the Company (Note 14), land which belongs to shareholders and the Company’s related parties, common stocks which belong to shareholders and the Company’s related parties, and having shareholders and the Company's related parties as guarantors.
+Borrowings from financial institutions require the Group to maintain financial ratios. The Group has ability to maintain certain minimum financial ratios which comply with agreements.
+Movements of long-term borrowings from financial institutions for the three-month period ended 31 March 2026 areas follows:
+
+[TABLE 46]
+ | Consolidated and separate financial information
+ | 2026
+ | Baht
+Opening net book amount | 5,396,678,566
+Additions | 615,000,000
+Repayments | (680,775,049)
+Add Deferred upfront fee amortisation | 535,106
+Total long-term borrowings | 5,331,438,623
+Current portion | (2,722,257,202)
+Closing net book amount | 2,609,181,421
+[/TABLE 46]
+
+
+[TABLE 47]
+19Debentures
+[/TABLE 47]
+
+Balances of debentures classified by maturity are as follows:
+
+[TABLE 48]
+ | Consolidated and separate financial information
+ | 2026 | 2025
+ | Baht | Baht
+Current portion | 413,373,265 | 412,656,645
+Non-current portion | 505,365,061 | 504,792,123
+Total | 918,738,326 | 917,448,768
+[/TABLE 48]
+
+As at 31 March 2026, debentures were registered, unsubordinated and unsecured debentures which bear a fixed rate per annum and will be due during 2026 to 2028 (31 December 2025: 2026 to 2028).
+The Group, as debentures issuer, has a condition to maintain a debt-to-equity ratio at end of each six-month period and fiscal year, and the Group is able to maintain the financial ratio which comply with the condition.
+Movements of debentures for the three-month period ended 31 March 2026 are as follows:
+
+[TABLE 49]
+ | Consolidated and separate financial information
+ | 2026
+ | Baht
+Opening net book amount | 917,448,768
+Add Deferred debenture issuance cost | 1,289,558
+Closing net book amount | 918,738,326
+[/TABLE 49]
+
+
+[TABLE 50]
+20Share-based payment
+[/TABLE 50]
+
+The warrants are offered to directors and employees of the Group who meet the specified conditions. The information of the warrants to purchase the Company's ordinary shares are as follows:
+
+[TABLE 51]
+ |  |  | Exercise ratio
+ |  |  | (Unit/share)
+TURBO-E1 |  |  | -
+TURBO-E2 |  |  | 1.2000
+TURBO-E3 |  |  | 1.8750
+TURBO-E4 |  |  | -
+[/TABLE 51]
+
+The movement in the share-based payment reserve for the three-month period ended 31 March 2026 is as follows:
+
+[TABLE 52]
+ | Consolidated and separate financial information
+ | 2026
+ | Baht
+At 1 January | 2,141,245
+Expenses for the period | 1,885,277
+At 31 March | 4,026,522
+[/TABLE 52]
+
+
+[TABLE 53]
+21Dividends
+[/TABLE 53]
+
+On 30 December 2024, the Board of Directors Meeting of the subsidiaries approved the resolution regarding to the payment of interim dividend from retained earnings to pay dividends of Baht 430 per share and Baht 4.6 per share and Baht 501 per share, amounting to the total of Baht 202,100,000. The dividends were paid on 28 January 2025, comprises cash dividend payments to related persons and the Company amounting to Baht 11,324 and Baht 611,772, respectively, and offsetting transaction with dividend income amounting to Baht 201,476,904 (Note 26 c)).
+On 26 December 2025, the Board of Directors Meeting of the subsidiaries approved the resolution regarding to the payment of interim dividend from retained earnings to pay dividends of Baht 0.64 per share and Baht 135 per share and Baht 250 per share and Baht 30 per share, amounting to the total of Baht 97,700,000. The dividends were paid on 20 January 2026, comprises cash dividend payments to related persons and the Company amounting to Baht 3,542 and Baht 26,693,938, respectively, and offsetting transaction with dividend income amounting to Baht 71,002,520 (Note 26 c)).
+
+[TABLE 54]
+22Fee and service income
+[/TABLE 54]
+
+Fee and service income for the three-month period ended 31 March 2026 and 2025 are as follows:
+
+[TABLE 55]
+ | Consolidated financial information | Separate financial information
+the three-month period ended 31 March | 2026 | 2025 | 2026 | 2025
+ | Baht | Baht | Baht | Baht
+Guarantee fee income | 905,554 | 2,213,273 | - | -
+Other fee and service income | 10,007,428 | 16,519,691 | 10,007,428 | 16,519,651
+Total | 10,912,982 | 18,732,964 | 10,007,428 | 16,519,651
+[/TABLE 55]
+
+
+[TABLE 56]
+23Other income
+[/TABLE 56]
+
+Other income for the three-month period ended 31 March 2026 and 2025 are as follows:
+
+[TABLE 57]
+ | Consolidatedfinancial information | Separatefinancial information
+the three-month period ended 31 March | 2026 | 2025 | 2026 | 2025
+ | Baht | Baht | Baht | Baht
+Commission from brokerage of |  |  |  | 
+non-life insurance and life insurance | 46,042,378 | 29,332,573 | - | -
+Other compensation from brokerage of |  |  |  | 
+non-life insurance and life insurance | 56,093,795 | 31,421,458 | - | -
+Management fee | - | - | 32,572,922 | 19,974,176
+Rental income | 79,553 | 89,053 | 396,353 | 421,396
+Other income | 1,858,841 | 3,911,940 | 2,155,406 | 4,218,596
+Total | 104,074,567 | 64,755,024 | 35,124,681 | 24,614,168
+[/TABLE 57]
+
+
+[TABLE 58]
+24Income tax
+[/TABLE 58]
+
+Interim income tax expense is recognised based on management’s estimate of the weighted average effective annual income tax rate expected for the full financial year. The estimated average annual tax rate for the consolidated financial information used for the three-month period ended 31 March 2026 is 19.09% compared to 19.38% for the three-month period ended 31 March 2025, the tax rate was lower in the current period due to the increase in training expense on which is a double deductible expense and training income on a subsidiary which is a non-taxable income, and the estimated average annual tax rate for the separate financial information used for the three-month period ended 31 March 2026 is 19.07% compared to 19.50% for the three-month period ended 31 March 2025, the tax rate was lower due to the increase in training expense on which is a double deductible expense.
+
+[TABLE 59]
+25Earnings per share
+[/TABLE 59]
+
+Basic earnings per share is calculated by dividing the net profit for the period attributable to shareholders of the parent company by the weighted average number of ordinary shares in attributable to shareholders during the period.
+
+[TABLE 60]
+ | Consolidated financial information | Separate financial information
+the three-month period ended 31 March | 2026 | 2025 | 2026 | 2025
+Basic earnings per share |  |  |  | 
+Profit for the period (Baht) | 175,022,383 | 144,985,366 | 109,220,687 | 107,569,036
+Weighted average number of ordinary shares |  |  |  | 
+attributable to shareholders of the parent |  |  |  | 
+company during the period (Shares) | 2,670,000,000 | 2,222,220,000 | 2,670,000,000 | 2,222,220,000
+Basic earnings per share (Baht per shares) | 0.066 | 0.065 | 0.041 | 0.048
+[/TABLE 60]
+
+
+[TABLE 61]
+ | Consolidated financial information | Separate financial information
+the three-month period ended 31 March | 2026 | 2025 | 2026 | 2025
+Diluted earnings per share |  |  |  | 
+Profit for the period (Baht) | 175,022,383 | 144,985,366 | 109,220,687 | 107,569,036
+Weighted average number used as the denominator in calculating diluted earnings per share (Shares) | 2,671,228,455 | 2,222,220,000 | 2,671,228,455 | 2,222,220,000
+Diluted earnings per share (Baht per shares) | 0.066 | 0.065 | 0.041 | 0.048
+[/TABLE 61]
+
+
+[TABLE 62]
+26Related party transactions
+[/TABLE 62]
+
+Individuals and entities that directly or indirectly control or are controlled by or are under common control with the Company, including investment entities, associates, joint venture and individuals or entities having significant influence over the Company, key management personnel, including directors and officers of the Company and close members of the family of these individuals and entities associated with these individuals also constitute related parties.
+In considering each possible related-party relationship, attention is directed to the substance of the relationship, and not merely the legal form.
+The Company’s major shareholders are Tangmitrphracha family which owns 74% of the Company’s shares.
+Relationships with related parties are as follows:
+
+[TABLE 63]
+Related party | Country / Nationality | Relationship
+Amplus Holdings Ltd. | Hong Kong | Controlling shareholder
+Ngernturbo Pay Later Co., Ltd. | Thai | Subsidiary
+Ngernturbo Insurance Broker Co., Ltd. | Thai | Subsidiary
+NTBX Co., Ltd. | Thai | Subsidiary
+Ngernturbo Development Center Co., Ltd. | Thai | Subsidiary
+Lazy Lazy Co., Ltd. | Thai | Subsidiary
+Ngernturbo (Bangkok) Co., Ltd. | Thai | Subsidiary
+Dohome Holding Co., Ltd. | Thai | Common shareholder
+Dohome Public Company Limited | Thai | Common shareholder
+AN Capital Co., Ltd. | Thai | Common shareholder
+Thunthongmawin Capital Co., Ltd. | Thai | Common shareholder
+Thuntarin Co., Ltd. | Thai | Common shareholder
+Dohome Acadamy Co., Ltd. | Thai | Common shareholder
+Related persons | Thai | Director
+[/TABLE 63]
+
+Transactions with related parties
+Transactions with related parties for the three-month periods ended 31 March 2026 and 2025 are as follows:
+
+[TABLE 64]
+ | Consolidated financial information | Separate financial information | 
+ | 2026 | 2025 | 2026 | 2025 | Pricing policy
+ | Baht | Baht | Baht | Baht | 
+Other income |  |  |  |  | 
+Subsidiaries | - | - | 33,220,366 | 20,669,322 | Contractual price
+Administrative expenses |  |  |  |  | 
+Subsidiaries | - | - | 4,762,356 | 3,437,910 | Contractual price
+Related parties | 112,390 | 126,674 | 112,390 | 126,674 | Contractual price
+Related persons | 30,928 | 30,928 | 30,928 | 30,928 | Contractual price
+Purchases of equipment |  |  |  |  | 
+Related parties | 401,243 | 49,042 | 401,243 | 49,042 | Contractual price
+Finance costs |  |  |  |  | 
+Shareholder | 1,428,230 | 1,428,230 | 1,428,230 | 1,428,230 | Contractual price
+Subsidiaries | - | - | 234,029 | 313,271 | Contractual price
+Related parties | 2,915,140 | 2,940,112 | 2,915,140 | 2,940,112 | Contractual price
+Related persons | 2,755,760 | 1,398,604 | 2,755,760 | 1,398,604 | Contractual price
+[/TABLE 64]
+
+Outstanding balances
+The outstanding balances at the end of the reporting period in relation to transactions with related parties are as follows:
+
+[TABLE 65]
+ | Consolidated financial information | Separate financial information
+ | 31 March 2026 | 31 December 2025 | 31 March 2026 | 31 December 2025
+ | Baht | Baht | Baht | Baht
+Other current receivables |  |  |  | 
+Subsidiaries | - | - | 15,487,648 | 139,839,141
+Other current payables |  |  |  | 
+Shareholder | 1,428,230 | - | 1,428,230 | -
+Subsidiaries | - | - | 23,550,593 | 17,061,859
+Related parties | 3,399,330 | 30,696 | 3,388,704 | 20,070
+Related persons | 284,928 | 284,928 | 284,928 | 284,928
+Other non-current assets |  |  |  | 
+Related parties | 183,391 | 183,391 | 183,391 | 183,391
+Related persons | 50,000 | 50,000 | 50,000 | 50,000
+Right-of-use assets |  |  |  | 
+Related parties | 2,588,808 | 2,978,838 | 2,588,808 | 2,978,838
+Related persons | 145,164 | 188,141 | 145,164 | 188,141
+Lease liabilities |  |  |  | 
+Related parties |  |  |  | 
+Related persons | 2,671,484 | 3,061,394 | 2,671,484 | 3,061,394
+ | 170,090 | 215,131 | 170,090 | 215,131
+Debentures |  |  |  | 
+Related persons | 186,900,000 | 186,900,000 | 186,900,000 | 186,900,000
+[/TABLE 65]
+
+Lease liabilities
+
+[TABLE 66]
+ | Consolidated and separate financial information
+ | 31 March 2026 Baht | 31 December 2025 Baht
+Opening net book value | 3,276,524 | 1,029,752
+Acquisitions | 38,330 | 4,798,652
+Payments | (473,280) | (1,997,211)
+Lease modifications and reassessments | - | (554,669)
+Closing net book value | 2,841,574 | 3,276,524
+[/TABLE 66]
+
+Short-term borrowings from related parties
+Movements of short-term borrowings from related parties for the three-month period ended 31 March 2026 and for the year ended 31 December 2025 are as follows:
+
+[TABLE 67]
+ | Consolidated financial information | Separate financial information
+ | 31 March 2026 | 31 December 2025 | 31 March 2026 | 31 December 2025
+ | Baht | Baht | Baht | Baht
+Opening book value | 2,114,573,500 | 2,114,573,500 | 2,258,158,706 | 2,370,373,500
+Additions | - | - | 101,999,980 | 87,985,206
+Repayments | - | - | (80,599,980) | (200,200,000)
+Closing book value | 2,114,573,500 | 2,114,573,500 | 2,279,558,706 | 2,258,158,706
+[/TABLE 67]
+
+During 2026 and 2025, the repayments in the separate financial information amounting to Baht 70,600,000 and Baht 200,200,000 comprises offsetting transaction with dividend income (Note 21).
+As at 31 March 2026, short-term loans from related parties bear a fixed rate per annum (31 December 2025: a fixed rate per annum) which will be due at call.
+Key management compensation
+Key management compensation paid or accrued is as follows:
+
+[TABLE 68]
+ | Consolidated and Separate financial information
+the three-month period ended 31 March | 2026 | 2025
+ | Baht | Baht
+Short-term employee benefits | 14,408,330 | 8,022,276
+Post-employment benefits | 361,228 | 345,592
+Share-based payment | 118,130 | -
+Total | 14,887,688 | 8,367,868
+[/TABLE 68]

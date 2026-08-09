@@ -1,0 +1,219 @@
+
+[SHEET: BS]
+Heng Leasing and Capital Public Company Limited														
+Statements of financial position														
+As at 31 December 2025														
+						(Unit: Baht)								
+				31 December		31 December								
+		Note		2025		2024								
+Assets														
+Current assets														
+Cash and cash equivalents		6		104523645		83916657								
+Deposits at banks with restrictions		6		5054375		12024834								
+Current portion of hire purchase receivables		7		707087106		1038428468								
+Current portion of loan receivables		8		2427770735		2973937654								
+Other current receivables		10		54569138		22605309								
+Assets foreclosed - net		11		22711630		26274831								
+Other current assets				15471178		29222343								
+Total current assets				3337187807		4186410096								
+Non-current assets														
+Hire purchase receivables - net of current portion		7		1148357683		1879196215								
+Loan receivables - net of current portion		8		4326698833		6422902419								
+Land, building and equipment - net		12		67142974		160114003								
+Right-of-use assets - net		13		91865760		207305256								
+Intangible assets - net		14		9425463		28547757								
+Deferred tax assets		15		185695575		187932738								
+Other non-current assets				10310205		15557249								
+Total non-current assets				5839496493		8901555637								
+Total assets				9176684300		13087965733								
+The accompanying notes are an integral part of the financial statements.														
+Heng Leasing and Capital Public Company Limited														
+Statements of financial position (continued)														
+As at 31 December 2025														
+						(Unit: Baht)								
+				31 December		31 December								
+		Note		2025		2024								
+Liabilities and shareholders' equity														
+Current liabilities														
+Bank overdrafts and short-term loans from financial institutions		16		220147573		385542000								
+Other current payables		17		68144043		86961470								
+Current portion of long-term loans		21		2274265277		3407845312								
+Current portion of lease liabilities		18		44358633		94998486								
+Current portion of debenture		22		0		610881175								
+Short-term loans from an unrelated party		19		7000000		0								
+Short-term loans from related parties		20		31000000		0								
+Income tax payable				0		23451991								
+Other current liabilities		23		9326086		16387166								
+Total current liabilities				2654241612		4626067600								
+Non-current liabilities														
+Long-term loans - net of current portion		21		1194842733		2923310216								
+Lease liabilities - net of current portion		18		51598424		118188255								
+Debenture - net of current portion		22		146695981		146036843								
+Long-term loans from an unrelated party		19		10000000		0								
+Long-term loans from related parties		20		10000000		0								
+Non-current provision for employee benefits		24		32788791		33922094								
+Total non-current liabilities				1445925929		3221457408								
+Total liabilities				4100167541		7847525008								
+The accompanying notes are an integral part of the financial statements.														
+Heng Leasing and Capital Public Company Limited														
+Statements of financial position (continued)														
+As at 31 December 2025														
+						(Unit: Baht)								
+				31 December		31 December								
+		Note		2025		2024								
+Shareholders' equity														
+Share capital														
+Registered														
+3,810,000,000 ordinary shares of Baht 1 each				3810000000		3810000000								
+Issued and fully paid-up														
+3,810,000,000 ordinary shares of Baht 1 each				3810000000		3810000000								
+Share premium				715342189		715342189								
+Retained earnings														
+Appropriated - statutory reserve		26		100123072		98424053								
+Unappropriated				451051498		616674483								
+Total shareholders' equity				5076516759		5240440725								
+Total liabilities and shareholders' equity				9176684300		13087965733								
+				0		0								
+The accompanying notes are an integral part of the financial statements.														
+	Directors													
+
+[SHEET: PL]
+Heng Leasing and Capital Public Company Limited														
+Statements of comprehensive income														
+For the year ended 31 December 2025														
+						(Unit: Baht)								
+		Note		2025		2024								
+Profit or loss:														
+Revenues														
+Hire purchase interest income				354764157		556670919								
+Loan interest income				1708660536		2129504042								
+Fee and service income				41749950		110501557								
+Other income				47430179		64044597								
+Total revenues				2152604822		2860721115								
+Expenses														
+Service and administrative expenses				876808564		1145247735								
+Expected credit losses				705697332		857069161								
+Loss on impairment and disposal of assets		30		192658659		235199451								
+Total expenses				1775164555		2237516347								
+Profit before finance cost and income tax expenses				377440267		623204768								
+Finance cost		28		-335192946		-532722005								
+Profit before income tax expenses				42247321		90482763								
+Income tax expenses		15.2		-8266942		-17498705								
+Profit for the years				33980379		72984058								
+Other comprehensive income:														
+Other comprehensive income not to be reclassified														
+to profit or loss in subsequent periods														
+Remeasurement gain on defined benefit plan				2650819		5918861								
+Less: Income tax effect		15.2		-530164		-1183772								
+Other comprehensive income for the years				2120655		4735089								
+Total comprehensive income for the years				36101034		77719147								
+Earnings per share		31												
+Basic earnings per share				0.008918734645669292		0.019155920734908138								
+Weighted average number of ordinary shares (share)				3810000000		3810000000								
+The accompanying notes are an integral part of the financial statements.														
+
+[SHEET: SE]
+Heng Leasing and Capital Public Company Limited																			
+Statements of changes in shareholders' equity																			
+For the year ended 31 December 2025																			
+										(Unit: Baht)									
+						Retained earnings													
+		Issued and fully				Appropriated -													
+		paid-up share capital		Share premium		Statutory reserve		Unappropriated		Total									
+Balance as at 1 January 2024		3810000000	0	715342189	0	94774850	0	795969539		5416086578									
+Profit for the year		0		0		0		72984058		72984058									
+Other comprehensive income for the year		0		0		0		4735089		4735089									
+Total comprehensive income for the year		0		0		0		77719147		77719147									
+Dividend paid (Note 27)		0		0		0		-253365000		-253365000									
+Transferred unappropriated retained earnings																			
+to statutory reserve		0		0		3649203		-3649203		0									
+Balance as at 31 December 2024		3810000000		715342189		98424053		616674483		5240440725									
+Balance as at 1 January 2025		3810000000		715342189		98424053		616674483	0	5240440725									
+Profit for the year		0		0		0		33980379		33980379									
+Other comprehensive income for the year		0		0		0		2120655		2120655									
+Total comprehensive income for the year		0		0		0		36101034		36101034									
+Dividend paid (Note 27)		0		0		0		-200025000		-200025000									
+Transferred unappropriated retained earnings																			
+to statutory reserve		0		0		1699019		-1699019		0									
+Balance as at 31 December 2025		3810000000		715342189		100123072		451051498		5076516759									
+		0		0		0		0		0									
+The accompanying notes are an integral part of the financial statements.																			
+
+[SHEET: CF]
+Heng Leasing and Capital Public Company Limited												
+Cash flows statements												
+For the year ended 31 December 2025												
+						(Unit: Baht)						
+				2025		2024						
+Cash flows from operating activities												
+Profit before income tax				42247321		90482763						
+Adjustments to reconcile profit before income tax to net cash												
+provided by (paid from) operating activities												
+Depreciation and amortisation				146630993		164087716						
+Expected credit losses				705697332		857069161						
+Losses (gains) on sales of fixed assets				9343711		-1007167						
+Losses on write-offs of fixed assets and intangible assets				14869885		943796						
+Gains on lease modification and cancellation				-3326835		-41529						
+Losses on impairment of fixed assets				28039127		0						
+Reversal on impairment of assets foreclosed				-5510494		-43932700						
+Losses on disposals of assets foreclosed				145916430		279195522						
+Provision for long-term employee benefits				1517516		2091824						
+Interest income				-2063424693		-2686174961						
+Finance cost				326113231		522527825						
+Amortised finance cost for lease liabilities				9079715		10194180						
+Loss from operating activities before changes in operating assets and liabilities				-642806761		-804563570						
+Operating assets (increase) decrease												
+Deposits at banks with restrictions				6970459		36487481						
+Hire purchase receivables				697959055		990428985						
+Loan receivables				1777649200		-196387003						
+Other current receivables				2390948		10217911						
+Assets foreclosed				303685593		329720275						
+Other current assets				13751165		-20142376						
+Other non-current assets				5247044		-1358335						
+Operating liabilities increase (decrease)												
+Other current payables				-18692423		-81958858						
+Other current liabilities				-1526281		-946714						
+Provision for long-term employee benefits				0		-3285313						
+Cash flows provided by operating activities				2144627999	0	258212483						
+Cash received from interest				2146141177		2669670373						
+Cash paid for income tax				-64366711		-113615803						
+Net cash flows provided by operating activities				4226402465		2814267053						
+The accompanying notes are an integral part of the financial statements.												
+Heng Leasing and Capital Public Company Limited												
+Cash flows statements (continued)												
+For the year ended 31 December 2025												
+						(Unit: Baht)						
+				2025		2024						
+Cash flows from investing activities												
+Decrease in deposits at bank with collateral obligation				0		50000000						
+Proceeds from sales of land, building and equipment				3296566		1413327						
+Cash paid for acquisitions of land, building and equipment				-2294473		-46005647						
+Cash received from cancellation for acquistions of intangible assets				13800000		0						
+Cash paid for acquisitions of intangible assets				0		-25129628						
+Net cash flows provided by (used in) investing activities				14802093		-19721948						
+Cash flows from financing activities												
+Decrease in bank overdraft and short-term loans from financial institutions				-165394427		-87733000						
+Cash received from loans from an unrelated party				25000000		0						
+Repayment of loans from an unrelated party				-8000000		0						
+Cash received from loans from related parties				72500000		0						
+Repayment of loans from related parties				-31500000		0						
+Cash received from long-term loans				117500000		1267000000						
+Repayment of long-term loans				-2990745878		-4244166619						
+Cash received from debentures				0		761600000						
+Repayment of debentures				-613900000		0						
+Repayment of lease liabilities				-109260558		-121439065						
+Payment for loans issuing cost				0		-1485000						
+Payment for debentures issuing cost				0		-6887671						
+Cash paid for interest				-316771707		-504299112						
+Cash paid for dividend				-200025000		-253365000						
+Net cash flows used in financing activities				-4220597570		-3190775467						
+Net increase (decrease) in cash and cash equivalents				20606988		-396230362						
+Cash and cash equivalents at beginning of year				83916657		480147019						
+Cash and cash equivalents at end of year				104523645		83916657						
+				0		0						
+Supplement cash flow information												
+Non-cash items												
+Assets foreclosed received for debts settlement				688005907		720029457						
+Increase (decrease) in lease liabilities				-1790189		7546298						
+Decrease in account payable on purchase of assets				-125005		-3051475						
+The accompanying notes are an integral part of the financial statements.												

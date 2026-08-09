@@ -1,0 +1,706 @@
+TIDLOR  HOLDINGS  PUBLIC  COMPANY  LIMITED  AND   ITS   SUBSIDIARY
+THE  CONDENSED  NOTES  TO  THE  FINANCIAL  STATEMENTS
+FOR  THE  THREE-MONTH  PERIOD  ENDED  MARCH  31,  2026
+“UNAUDITED”
+NotesContents
+
+[TABLE 1]
+1 | General information and operations of the Company
+2 | Basis for preparation and presentation of the interim financial statements
+3 | Adoption of revised Thai Financial Reporting Standards
+4 | Material accounting policies information
+5 | Supplementary disclosure of cash flows information
+6 | Loans and hire-purchase receivables
+7 | Leasehold improvement and equipment
+8 | Short-term borrowings
+9 | Short-term borrowing from related party
+10 | Long-term borrowings
+11 | Long-term debentures
+12 | Fee and service income
+13 | Basic earnings (loss) per share
+14 | Operating segments
+15 | Operating leases and services commitments
+16 | Commitments and contingent liabilities
+17 | Related party transactions
+18 | Fair value of financial assets and financial liabilities
+19 | The Group’s restructuring plan
+20 | Event after the reporting period
+21 | Approval of the interim financial statements
+[/TABLE 1]
+
+TIDLOR  HOLDINGS  PUBLIC  COMPANY  LIMITED  AND   ITS   SUBSIDIARY
+THE  CONDENSED  NOTES  TO  THE  FINANCIAL  STATEMENTS
+FOR  THE  THREE-MONTH  PERIOD  ENDED  MARCH  31,  2026
+“UNAUDITED”
+1.GENERAL  INFORMATION  AND  OPERATIONS  OF  THE  COMPANY
+Tidlor Holdings Public Company Limited (the “Company”) was registered in Thailand on March 26, 2024. Its registered address is at 428 Ari Hills Building, 15th Floor, Phahonyothin Road, Samsen Nai Subdistrict, Phaya Thai District, Bangkok 10400. The Company’s principal business is to invest in other companies.
+As at March 31, 2026, the Major shareholders are Bank of Ayudhya Public Company Limited (“the Bank shareholder”), which is incorporated in Thailand and holds 46.51% of the Company’s issued and paid-up share capital.
+The immediate and ultimate parent companies of the Bank shareholder are MUFG Bank, Ltd. and Mitsubishi UFJ Financial Group, Inc., respectively. Both companies are registered in Japan.
+The principal businesses of the Company, its subsidiary, and its joint venture together referred to as the “Group” to operate the principal business is to provide loans and hire-purchase for all types of vehicles, as well as non-life insurance brokerage and life insurance brokerage directly.
+Details of the Group’s subsidiary as at March 31, 2026 were as follows:
+
+[TABLE 2]
+ |  |  |  | Company
+ |  |  | Country of | ownership
+No. | Name of the entity | Type of business | incorporation | interest (%)
+ | Direct subsidiary |  |  | 
+1 | Ngern Tid Lor Public Company Limited | To provide loans and hire-purchase for all types of vehicles, as well as non-life insurance brokerage and life insurance brokerage directly. | Thailand | 99.4
+[/TABLE 2]
+
+The Company has extensive transactions and relationships with related companies. Accordingly, the financial statements may not necessarily indicate of the conditions that would have existed or the results of operations that would have occurred had the Company operated without such affiliations.
+2.BASIS  FOR  PREPARATION  AND  PRESENTATION  OF  THE  INTERIM  FINANCIAL  STATEMENTS
+2.1 These interim financial statements are prepared in Thai Baht and comply with Thai Accounting Standard No. 34 “Interim Financial Reporting” and accounting practices generally accepted in Thailand. The Company presents the condensed notes to interim financial statements, and the additional information is disclosed in accordance with the regulation of the Office of the Securities and Exchange Commission (the “SEC”).
+2.2 Comparative information
+The statement of financial position as at December 31, 2025, presented herein for comparison, was derived from the Company’s previously audited financial statements for the year then ended
+In May 2025, the Group undertook a group restructuring plan. As this transaction was considered a business combination under common control, the comparative information presented in the interim consolidated statement of comprehensive income, the interim consolidated statement of changes in shareholders’ equity, and the interim consolidated statement of cash flows for the three-month period ended March 31, 2025 has been restated to include the financial statements of Ngern Tid Lor Public Company Limited, as if the restructuring had occurred from the beginning of the comparative period. Non-controlling interests were adjusted to reflect the ownership interests after the share exchange in 2025.
+2.3 The unaudited operating results presented for the three-month period ended March 31, 2026, are not necessarily indicative of or in anticipation of the operating results for the entire year.
+2.4 The interim financial statements do not include all of the financial information required for annual financial statements but focus on new activities, events and circumstances to avoid repetition of information previously reported. Accordingly, these interim financial statement should be read in conjunction with the audited financial statements for the year ended December 31, 2025.
+2.5The preparation of the interim financial statements in conformity with TFRS also requires management to exercise judgment and make estimates and assumptions that affect the reported revenues, expenses, assets and liabilities, and the disclosure of contingent assets and liabilities. The actual results may differ from such estimates.
+2.6The English version of financial statements had been prepared from the Thai version of the financial statements prepared by law. In the event of any conflict or different interpretation of the two different languages, the Thai version of financial statements by the law is superseded.
+3.ADOPTION  OF  REVISED  THAI  FINANCIAL  REPORTING  STANDARDS
+Thai Financial Reporting Standards affecting the presentation and disclosure in the current period financial statements
+During this period, the Group adopted the revised financial reporting standards issued by the Federation of Accounting Professions, effective for accounting periods beginning on or after January 1, 2026. These standards were revised or issued to align with the corresponding International Financial Reporting Standards and include changes to accounting requirements, as follows:
+-  Thai Accounting Standard No.21 “The Effects of Changes in Foreign Exchange Rates”, require entities to apply a consistent approach in assessing whether one currency is exchangeable into another currency, by specifying how to assess whether a currency is exchangeable and how to determine the exchange rate in circumstances in which exchangeability is lacking.
+The adoption of these financial reporting standards did not have a significant impact on the Group's interim financial statements.
+4.MATERIAL  ACCOUNTING  POLICIES  INFORMATION
+The interim financial statements had been prepared based on the basis, accounting policies, accounting treatment guidance, and method of computation consistent with those used in the financial statements for the year ended December 31, 2025.
+5.SUPPLEMENTARY  DISCLOSURE  OF  CASH  FLOWS  INFORMATION
+5.1Cash and cash equivalents consisted of the following:
+
+[TABLE 3]
+ |  |  |  | Unit: Thousand Baht | 
+ | CONSOLIDATED |  |  | SEPARATE | 
+ | FINANCIAL STATEMENTS |  |  | FINANCIAL STATEMENTS | 
+ | As at |  | As at |  |  | As at |  |  | As at | 
+ | March 31, |  | December 31, |  |  | March 31, |  |  | December 31, | 
+ | 2026 |  | 2025 |  |  | 2026 |  |  | 2025 | 
+Cash on hand |  | 105,871 |  |  | 3,508 |  |  | - |  |  | - | 
+Deposits at financial institutions |  | 3,283,163 |  |  | 3,056,833 |  |  | 26,848 |  |  | 109,444 | 
+Cash and cash equivalents |  | 3,389,034 |  |  | 3,060,341 |  |  | 26,848 |  |  | 109,444 | 
+[/TABLE 3]
+
+Cash and cash equivalents in consolidated financial statements as at March 31, 2026 and December 31, 2025, as presented net of deposits at banks for premiums that the subsidiary received from policy holders by Baht 884.87 million and Baht 1,076.65 million, respectively. The subsidiary is required to submit these premiums to insurers and not use or exploit premiums or deduct any expenses stated in the brokerage contracts except for interest or other benefits arising from deposits.
+5.2Significant non-cash transactions were as follows:
+
+[TABLE 4]
+ | Unit: Thousand Baht
+ | CONSOLIDATED
+ | FINANCIAL STATEMENTS
+For the three-month periods ended March 31, |  | 2026 |  |  | 2025
+ |  | (After |  |  | (Before
+ |  | restructuring) |  |  | restructuring)
+Other current payables for leasehold improvement and |  |  |  |  | 
+equipment acquisition as at January 1, |  | 54,701 |  |  | 100,680
+Add Purchases of leasehold improvement |  |  |  |  | 
+and equipment |  | 102,728 |  |  | 38,020
+Less Cash payments for purchases of |  |  |  |  | 
+leasehold improvement and equipment |  | (77,486) |  |  | (108,083)
+Other current payables for leasehold improvement and |  |  |  |  | 
+equipment acquisition as at March 31, |  | 79,943 |  |  | 30,617
+Other current payables for intangible assets |  |  |  |  | 
+acquisition as at January 1, |  | 40,926 |  |  | 9,837
+Add Purchases of intangible assets |  | 9,215 |  |  | 7,533
+Less Cash payments for purchases of intangible assets |  | (47,557) |  |  | (14,493)
+Other current payables for intangible assets |  |  |  |  | 
+acquisition as at March 31, |  | 2,584 |  |  | 2,877
+[/TABLE 4]
+
+5.3Changing in liabilities from financing activities for the three-month period ended March 31, were as follows:
+
+[TABLE 5]
+ | Unit: Thousand Baht
+ | CONSOLIDATED FINANCIAL STATEMENTS
+ |  |  | Net cash flows |  |  |  | 
+ | Balance |  | received |  |  |  | Balance
+ | as at |  | (paid) from |  |  |  | as at
+ | January 1, |  | financing |  | Non-cash |  | March 31,
+ | 2026 |  | activities |  | changes |  | 2026
+Short-term borrowings | 850,000 |  | - |  | - |  | 850,000
+Short-term borrowings from related party | 1,000,000 |  | (1,000,000) |  | - |  | -
+Long-term borrowings | 39,274,005 |  | 2,075,081** |  | 68,595 |  | 41,417,681
+Long-term debentures | 32,286,048 |  | (2,000,141)** |  | 98,365 |  | 30,384,272
+Lease liabilities | 937,464 |  | (144,505) |  | 127,993 |  | 920,952
+Total | 74,347,517 |  | (1,069,565) |  | 294,953 |  | 73,572,905
+ |  |  | Net cash flows |  |  |  | 
+ | Balance |  | received |  |  |  | Balance
+ | as at |  | (paid) from |  |  |  | as at
+ | January 1, |  | financing |  | Non-cash |  | March 31,
+ | 2025 |  | activities |  | changes |  | 2025
+Short-term borrowings | - |  | 1,000,000 |  | - |  | 1,000,000
+Long-term borrowings | 30,749,323 |  | 75,318** |  | 1,380* |  | 30,826,021
+Long-term debentures | 39,757,577 |  | (1,001,578)** |  | 109,180* |  | 38,865,179
+Lease liabilities | 810,152 |  | (135,988) |  | 156,275 |  | 830,439
+Total | 71,317,052 |  | (62,248) |  | 266,835 |  | 71,521,639
+[/TABLE 5]
+
+*Non-cash changes, including deferred costs for borrowings and deferred costs for issuance of debentures.
+**Net cash flows received (paid) from financing activities included net transaction costs from borrowings and issuance of debentures.
+
+[TABLE 6]
+ | Unit: Thousand Baht
+ | SEPARATE FINANCIAL STATEMENTS
+ |  |  | Net cash flows |  |  |  | 
+ | Balance |  | received |  |  |  | Balance
+ | as at |  | (paid) from |  |  |  | as at
+ | January 1, |  | financing |  | Non-cash |  | March 31,
+ | 2026 |  | activities |  | changes |  | 2026
+Long-term borrowings | 4,998,507 |  | 3,000,000 |  | 115 |  | 7,998,622
+Long-term debentures | 2,987,645 |  | - |  | 1,053 |  | 2,988,698
+Lease liabilities | 284 |  | (136) |  | 2 |  | 150
+Total | 7,986,436 |  | 2,999,864 |  | 1,170 |  | 10,987,470
+ |  |  | Net cash flows |  |  |  | 
+ | Balance |  | received |  |  |  | Balance
+ | as at |  | (paid) from |  |  |  | as at
+ | January 1, |  | financing |  | Non-cash |  | March 31,
+ | 2025 |  | activities |  | changes |  | 2025
+Short-term borrowings from related party | 4,500 |  | 16,500 |  | - |  | 21,000
+[/TABLE 6]
+
+6.Loans  and  hire-purchase  receivables
+Classified by loan types
+
+[TABLE 7]
+ | Unit: Thousand Baht
+ | CONSOLIDATED  FINANCIAL  STATEMENTS
+ | Amount due per agreements
+ | Within |  | Over 1 year |  | More than |  | 
+As at March 31, 2026 | 1 year |  | to 5 years |  | 5 years |  | Total
+Loans | 31,830,436 |  | 65,602,082 |  | 2,508,301 |  | 99,940,819
+Add Accrued interest receivables | 1,811,090 |  | 116,480 |  | 1,819 |  | 1,929,389
+ | 33,641,526 |  | 65,718,562 |  | 2,510,120 |  | 101,870,208
+Less  Allowance for expected credit loss | (1,676,986) |  | (3,276,715) |  | (124,918) |  | (5,078,619)
+Loans | 31,964,540 |  | 62,441,847 |  | 2,385,202 |  | 96,791,589
+Hire-purchase receivables | 3,948,576 |  | 6,143,817 |  | 47,166 |  | 10,139,559
+Less Unearned interest income | (961,210) |  | (1,119,706) |  | (2,719) |  | (2,083,635)
+ | 2,987,366 |  | 5,024,111 |  | 44,447 |  | 8,055,924
+Less Allowance for expected credit loss | (151,180) |  | (254,252) |  | (2,249) |  | (407,681)
+Hire-purchase receivables | 2,836,186 |  | 4,769,859 |  | 42,198 |  | 7,648,243
+Total loans and hire-purchase receivables | 34,800,726 |  | 67,211,706 |  | 2,427,400 |  | 104,439,832
+[/TABLE 7]
+
+
+[TABLE 8]
+ | Amount due per agreements
+ | Within |  | Over 1 year |  | More than |  | 
+As at December 31, 2025 | 1 year |  | to 5 years |  | 5 years |  | Total
+Loans | 32,035,874 |  | 65,201,644 |  | 2,451,164 |  | 99,688,682
+Add Accrued interest receivables | 1,900,760 |  | - |  | - |  | 1,900,760
+ | 33,936,634 |  | 65,201,644 |  | 2,451,164 |  | 101,589,442
+Less  Allowance for expected credit loss | (1,694,354) |  | (3,259,788) |  | (122,379) |  | (5,076,521)
+Loans | 32,242,280 |  | 61,941,856 |  | 2,328,785 |  | 96,512,921
+Hire-purchase receivables | 3,891,869 |  | 6,090,912 |  | 48,142 |  | 10,030,923
+Less Unearned interest income | (918,924) |  | (1,113,041) |  | (2,824) |  | (2,034,789)
+ | 2,972,945 |  | 4,977,871 |  | 45,318 |  | 7,996,134
+Less Allowance for expected credit loss | (157,377) |  | (263,511) |  | (2,399) |  | (423,287)
+Hire-purchase receivables | 2,815,568 |  | 4,714,360 |  | 42,919 |  | 7,572,847
+Total loans and hire-purchase receivables | 35,057,848 |  | 66,656,216 |  | 2,371,704 |  | 104,085,768
+[/TABLE 8]
+
+
+[TABLE 9]
+ | Unit: Thousand Baht | 
+ |  | SEPARATE FINANCIAL STATEMENT | 
+ |  | Amount due per agreements | 
+ |  | Within |  | Over 1 year |  |  | 
+ |  | 1 year |  | to 5 years |  | Total | 
+As at March 31, 2026 |  |  |  |  |  |  | 
+Loans |  | 4,980,000 |  | 11,000,000 |  | 15,980,000 | 
+Add Accrued interest receivable |  | 33,127 |  | - |  | 33,127 | 
+ |  | 5,013,127 |  | 11,000,000 |  | 16,013,127 | 
+Less Allowance for expected credit loss |  | (2,796) |  | (6,194) |  | (8,990) | 
+Loans |  | 5,010,331 |  | 10,993,806 |  | 16,004,137 | 
+As at December 31, 2025 |  |  |  |  |  |  | 
+Loans |  | - |  | 8,000,000 |  | 8,000,000 | 
+Add Accrued interest receivable |  | 14,187* |  | - |  | 14,187 | 
+ |  | 14,187 |  | 8,000,000 |  | 8,014,187 | 
+Less Allowance for expected credit loss |  | (8) |  | (4,482) |  | (4,490) | 
+Loans |  | 14,179 |  | 7,995,518 |  | 8,009,697 | 
+*Accrued interest due within one year represents interest arising from loans whose principal amounts have remaining maturities of more than | 
+one year. The Company classifies accrued interest based on the expected timing of receipt, separately from the loan principal. | 
+[/TABLE 9]
+
+(2)Classified by types of classification
+
+[TABLE 10]
+ |  |  | Unit: Thousand Baht
+ | CONSOLIDATED  FINANCIAL  STATEMENTS
+ | As at March 31, 2026 |  | As at December 31, 2025
+ | Loans and |  | Allowance |  | Loans and |  | Allowance
+ | accrued interest |  | for expected |  | accrued interest |  | for expected
+ | receivable |  | credit loss |  | receivable |  | credit loss
+Performing | 84,946,409 |  | 2,565,640 |  | 84,180,835 |  | 2,461,860
+Under-performing | 15,484,450 |  | 1,783,951 |  | 15,926,713 |  | 1,743,291
+Non-performing | 1,439,349 |  | 729,028 |  | 1,481,894 |  | 871,370
+Total | 101,870,208 |  | 5,078,619 |  | 101,589,442 |  | 5,076,521
+[/TABLE 10]
+
+
+[TABLE 11]
+ | Hire-purchase |  |  |  | Hire-purchase |  | 
+ | receivables after |  |  |  | receivables after |  | 
+ | deduction of |  | Allowance |  | deduction of |  | Allowance
+ | unearned interest |  | for expected |  | unearned interest |  | for expected
+ | income |  | credit loss |  | income |  | credit loss
+Performing | 5,442,678 |  | 135,052 |  | 5,107,947 |  | 117,225
+Under-performing | 2,441,314 |  | 188,372 |  | 2,678,003 |  | 192,471
+Non-performing | 171,932 |  | 84,257 |  | 210,184 |  | 113,591
+Total | 8,055,924 |  | 407,681 |  | 7,996,134 |  | 423,287
+[/TABLE 11]
+
+
+[TABLE 12]
+ | Unit: Thousand Baht
+ | SEPARATE  FINANCIAL  STATEMENTS
+ | As at March 31, 2026 |  | As at December 31, 2025
+ |  | Loans and |  | Allowance |  |  | Loans and |  | Allowance
+ |  | accrued interest |  | for expected |  |  | accrued interest |  | for expected
+ |  | receivable |  | credit loss |  |  | receivable |  | credit loss
+Performing |  | 16,013,127 |  | 8,990 |  |  | 8,014,187 |  | 4,490
+Total |  | 16,013,127 |  | 8,990 |  |  | 8,014,187 |  | 4,490
+[/TABLE 12]
+
+(3) Loans and hire-purchase receivables modified and troubled debt restructuring
+Loans and hire-purchase receivables that were modified while they had a loss allowance measured at an amount equal to lifetime ECL were as follows:
+
+[TABLE 13]
+ |  |  | Unit: Thousand Baht
+ |  | CONSOLIDATED
+ |  | FINANCIAL STATEMENTS
+For the three-month periods ended March 31, | 2026 | 2025
+ |  |  | (After | (Before
+ |  |  | restructuring) | restructuring)
+Loans and hire-purchase receivables modified during the periods |  | 
+Amortised cost before modification |  | 86,875 | 43,067
+Net modification loss |  |  | 24,807 | 14,228
+[/TABLE 13]
+
+7.Leasehold  improvement  and  equipment
+The movements of leasehold improvement and equipment for the three-month period ended March 31, 2026, were as follows:
+
+[TABLE 14]
+ | Unit: Thousand Baht
+ | CONSOLIDATED
+ | FINANCIAL STATEMENTS
+Net book value as at January 1, 2026 |  | 1,769,603 | 
+Increase in right-of-use assets |  | 120,603 | 
+Purchases of assets (including assets under installation) |  | 102,728 | 
+Transferred assets in/adjustment |  | 1,814 | 
+Cost of disposal/written off of assets |  | (42,040) | 
+Accumulated depreciation - disposal/written off |  | 41,941 | 
+Depreciation |  | (232,182) | 
+Net book value as at March 31, 2026 |  | 1,762,467 | 
+[/TABLE 14]
+
+8.SHORT-TERM  BORROWINGS
+
+[TABLE 15]
+ |  | Unit: Thousand Baht
+ | CONSOLIDATED FINANCIAL STATEMENTS
+ | As at March 31, 2026 |  | As at December 31, 2025 | 
+Short-term borrowings | 850,000 |  | 850,000 | 
+Total | 850,000 |  | 850,000 | 
+[/TABLE 15]
+
+As at March 31, 2026 and December 31, 2025, short-term borrowings were unsecured borrowings, bearing interest rates as agreed upon.
+9.SHORT-TERM  BORROWING FROM RELATED PARTY
+
+[TABLE 16]
+ | Unit: Thousand Baht
+ | CONSOLIDATED | 
+ | FINANCIAL STATEMENTS | 
+ | As at December 31, 2025 | 
+Short-term borrowing from related party | 1,000,000 | 
+Total | 1,000,000 | 
+[/TABLE 16]
+
+As at December 31, 2025, short-term borrowing from related party were unsecured borrowings, bearing interest rates as agreed upon.
+During the current period, the Company fully repaid the short-term loan from a related party. As a result, as at March 31, 2026, the Company had no outstanding balance of such short-term loan.
+10.LONG-TERM  BORROWINGS
+
+[TABLE 17]
+ | Unit: Thousand Baht
+ | CONSOLIDATED |  | SEPARATE
+ | FINANCIAL STATEMENTS |  | FINANCIAL STATEMENTS
+ |  | As at |  | As at |  | As at |  | As at
+ |  | March 31, |  | December 31, |  | March 31, |  | December 31,
+ |  | 2026 |  | 2025 |  | 2026 |  | 2025
+Long-term borrowings |  | 41,456,982 |  | 39,319,401 |  | 8,000,000 |  | 5,000,000
+Less Deferred borrowings expenses |  | (39,301) |  | (45,396) |  | (1,378) |  | (1,493)
+Total |  | 41,417,681 |  | 39,274,005 |  | 7,998,622 |  | 4,998,507
+Less Current portion of long-term borrowings |  | (16,360,381) |  | (14,858,860) |  | - |  | -
+Long-term borrowings - net of current portion |  | 25,057,300 |  | 24,415,145 |  | 7,998,622 |  | 4,998,507
+[/TABLE 17]
+
+As at March 31, 2026 and December 31, 2025, long-term borrowings represented unsecured borrowings, with interest rates as agreed upon.
+Long-term borrowings contain covenants to maintain financial ratios, including maintaining the shareholding percentage of the Bank shareholder in some agreements, subject to the terms and conditions of each borrowing agreement. As at March 31, 2026 and December 31, 2025, the subsidiary was still within those relevant covenants.
+11.Long-term  debentureS
+The movements of long-term debentures for the three-month period ended March 31, 2026, were as follows:
+
+[TABLE 18]
+ |  | Unit: Thousand Baht
+ |  | CONSOLIDATED |  | SEPARATE | 
+ |  | FINANCIAL STATEMENTS | FINANCIAL STATEMENTS
+As at January 1, 2026 |  |  | 32,286,048 |  |  | 2,987,645 | 
+Repayment of long-term debentures |  |  | (2,000,000) |  |  | - | 
+Amortised of discounted of debentures |  |  | 94,189 |  |  | - | 
+Deferred costs for issuance of debentures - net |  |  | 4,035 |  |  | 1,053 | 
+As at March 31, 2026 |  |  | 30,384,272 |  |  | 2,988,698 | 
+Current portion of long-term debentures |  |  | 11,944,365 |  |  | - | 
+Long-term debentures - net of current portion |  |  | 18,439,907 |  |  | 2,988,698 | 
+Total |  |  | 30,384,272 |  |  | 2,988,698 | 
+[/TABLE 18]
+
+The above debentures are registered, unsubordinated, and unsecured debentures that were offered to the public offering, institutional investors, and high-net-worth investors specified in the Notification of Securities and Exchange Commission.The par value of debentures of Baht 1,000 each. Interest is payable every 6 months and the final payment of principal and interest is made on the maturity date of the debentures. Furthermore, the above debentures also included zero-coupon debentures.
+Debentures contain covenants to maintain certain financial ratios as specified in the relevant terms and conditions. As at March 31, 2026 and December 31, 2025, the subsidiary was still within those relevant covenants.
+12.FEE  AND  SERVICE  INCOME
+
+[TABLE 19]
+ |  |  |  |  | Unit : Thousand Baht
+ |  | CONSOLIDATED
+ |  | FINANCIAL STATEMENTS
+For the three-month periods ended March 31, |  |  | 2026 |  | 2025
+ |  |  |  |  |  |  |  | (After |  | (Before
+ |  |  |  |  |  |  |  | restructuring) |  | restructuring)
+Commission from brokerage of  non-life insurance and life insurance |  |  | 679,177 |  | 626,207
+Other compensation from brokerage of non-life insurance and life insurance |  |  | 327,267 |  | 283,338
+Other fee incomes |  |  |  |  |  |  |  | 38,639 |  | 56,313
+Other service incomes |  |  |  |  |  |  |  | 5,953 |  | 5,819
+Total |  |  |  |  |  |  |  | 1,051,036 |  | 971,677
+[/TABLE 19]
+
+13.BASIC  EARNINGS  (LOSS)  PER  SHARE
+The calculations of basic earnings (loss) per share were based on the profit (loss) for the periods attributable to ordinary shareholders of the Company and the weighted average number of ordinary shares outstanding during the periods as follows:
+
+[TABLE 20]
+ | CONSOLIDATED |  | SEPARATE
+ | FINANCIAL STATEMENTS |  | FINANCIAL STATEMENTS
+For the three-month periods ended March 31, | 2026 |  | 2025 |  | 2026 |  | 2025
+ | (After |  | (Before |  |  |  | 
+ | restructuring) |  | restructuring) |  |  |  | 
+Profit (loss) for the periods attributable to ordinary |  |  |  |  |  |  | 
+shareholders of the Company (Thousand Baht) | 1,613,744 |  | 1,197,815 |  | 4,947,063 |  | (12,881)
+Weighted-average number of ordinary shares |  |  |  |  |  |  | 
+held by sareholders (Thousand shares) | 2,895,930 |  | 2,895,940 |  | 2,895,930 |  | 10
+Basic earnings (loss) per share (Baht per share) | 0.56 |  | 0.41 |  | 1.71 |  | (1,288.15)
+[/TABLE 20]
+
+14.OPERATING  SEGMENTS
+The business segment results are prepared based on the Group’s internal management reporting, which reflects the organizational management structure. The operating results by business segment provided to the chief operating decision maker to make decisions about allocating resources to, and assessing the performance of operating segments are measured in accordance with Thai Financial Reporting Standards. The chief operating decision maker has been identified as the Board of Directors.
+The business segment of the Group provides financial services to customers. The products and services available to customers are loans and hire-purchases for all types of vehicles and non-life insurance brokers. During the current period, the Group has not changed the structure of the operating segments.
+Operating segments by businesses of the Group were as follows:
+
+[TABLE 21]
+ |  |  |  |  |  |  |  |  | Unit: Thousand Baht
+CONSOLIDATED FINANCIAL STATEMENTS | Non-life insurance broker |  | Hire-purchase and lending service |  | Total
+For the three-month periods ended March 31, | 2026 |  | 2025 |  | 2026 |  | 2025 |  | 2026 |  | 2025
+ | (After |  | (Before |  | (After |  | (Before |  | (After |  | (Before
+ | restructuring) |  | restructuring) |  | restructuring) |  | restructuring) |  | restructuring) |  | restructuring)
+Interest income on hire-purchase receivables | - |  | - |  | 266,947 |  | 304,718 |  | 266,947 |  | 304,718
+Interest income on loans | 82,327 |  | 74,282 |  | 4,619,793 |  | 4,279,123 |  | 4,702,120 |  | 4,353,405
+Fee and service income | 728,883 |  | 619,981 |  | 322,153 |  | 351,696 |  | 1,051,036 |  | 971,677
+Other income | 6,647 |  | 1,308 |  | 42,722 |  | 9,301 |  | 49,369 |  | 10,609
+Total revenues | 817,857 |  | 695,571 |  | 5,251,615 |  | 4,944,838 |  | 6,069,472 |  | 5,640,409
+Service and administrative expenses |  |  |  |  |  |  |  |  | 2,980,905 |  | 2,730,029
+Total expenses |  |  |  |  |  |  |  |  | 2,980,905 |  | 2,730,029
+Profit from operating activities |  |  |  |  |  |  |  |  | 3,088,567 |  | 2,910,380
+Loss arising from de-recognition of financial assets measured at amortised cost |  |  |  |  |  |  |  |  | (503,002) |  | (600,331)
+Finance costs |  |  |  |  |  |  |  |  | (593,062) |  | (630,814)
+Reversal of impairment (loss) determined in accordance with TFRS 9 |  |  |  |  |  |  |  |  | 35,081 |  | (171,187)
+Share of profit of joint venture accounted for using the equity method |  |  |  |  |  |  |  |  | 2,414 |  | -
+Profit before income tax expenses |  |  |  |  |  |  |  |  | 2,029,998 |  | 1,508,048
+Income tax expenses |  |  |  |  |  |  |  |  | (406,408) |  | (302,886)
+Profit for the periods |  |  |  |  |  |  |  |  | 1,623,590 |  | 1,205,162
+[/TABLE 21]
+
+
+[TABLE 22]
+ |  |  |  |  |  |  |  |  | Unit: Thousand Baht
+ | Non-life insurance broker |  | Hire-purchase and lending service |  | Total
+CONSOLIDATED FINANCIAL STATEMENTS AS AT | March 31, |  | December 31, |  | March 31, |  | December 31, |  | March 31, |  | December 31,
+ | 2026 |  | 2025 |  | 2026 |  | 2025 |  | 2026 |  | 2025
+Cash and cash equivalents | - |  | - |  | 3,389,034 |  | 3,060,341 |  | 3,389,034 |  | 3,060,341
+Loans and hire-purchase receivables | 2,954,283 |  | 2,915,294 |  | 101,485,549 |  | 101,170,474 |  | 104,439,832 |  | 104,085,768
+Other assets | 112,757 |  | 118,698 |  | 5,363,186 |  | 5,531,966 |  | 5,475,943 |  | 5,650,664
+Total assets | 3,067,040 |  | 3,033,992 |  | 110,237,769 |  | 109,762,781 |  | 113,304,809 |  | 112,796,773
+[/TABLE 22]
+
+Geographic information
+The Group operates in Thailand only. As a result, all of the revenues and assets, as reflected in these financial statements, pertain to the aforementioned geographical reporting.
+Major customers
+For the three-month periods ended March 31, 2026 and 2025, the Group had no major customers with revenue of 10% or more of the Group’s revenues.
+15.OPERATING  LEASES  AND  SERVICES  COMMITMENTS
+The Group had commitment under lease agreements for office space and services. The future payments were as follows:
+
+[TABLE 23]
+ |  |  |  | Unit: Thousand Baht
+ |  | CONSOLIDATED |  | SEPARATE
+ |  | FINANCIAL STATEMENTS |  | FINANCIAL STATEMENTS
+ |  | As at |  | As at |  | As at |  | As at
+ |  | March 31, |  | December 31, |  | March 31, |  | December 31,
+ |  | 2026 |  | 2025 |  | 2026 |  | 2025
+Due within 1 year |  | 176,041 |  | 105,077 |  | 229 |  | 305
+Due over 1 year but not over 5 years |  | 286,521 |  | 38,012 |  | - |  | -
+ |  | 462,562 |  | 143,089 |  | 229 |  | 305
+[/TABLE 23]
+
+For the three-month periods ended March 31, 2026 and 2025, the Group had operating lease and service agreements were recorded as expenses in the consolidated statements of comprehensive income amounting to Baht 29.60 million and Baht 30.74 million, respectively.
+16.COMMITMENTS  AND  CONTINGENT  LIABILITIES
+16.1The Group had a commitment were as follows:
+
+[TABLE 24]
+ | CONSOLIDATED |  | SEPARATE
+ | FINANCIAL STATEMENTS |  | FINANCIAL STATEMENTS
+ | As at |  | As at |  | As at |  | As at
+ | March 31, |  | December 31, |  | March 31, |  | December 31,
+ | 2026 |  | 2025 |  | 2026 |  | 2025
+Unused overdraft credit facilities from banks |  |  |  |  |  |  | 
+(Million Baht) | 60 |  | 60 |  | 20 |  | 20
+Credit facilities for borrowings from financial |  |  |  |  |  |  | 
+institutions |  |  |  |  |  |  | 
+- Thai Baht (Million Baht) | 84,117 |  | 68,062 |  | 15,980 |  | 11,480
+- United States Dollar (Million US Dollar) | 50 |  | 50 |  | - | - | -
+[/TABLE 24]
+
+16.2In 2011, the subsidiary was sued in the Civil Court for a material amount in infringement cases and the Bangkok North Municipal Court for fabricated false documents. These cases are still temporarily suspended.
+17.Related  party  transactions
+Related parties are those linked to the Group by common shareholders or directors. Transactions with related parties are conducted at market prices or, where no market price exists, at contractually agreed prices.
+During 2025, the Company experienced a change in its major shareholder on August 13, 2025. Consequently, the former shareholder ceased to be classified as a related party of the Company from that date forward. Accordingly, related party transactions presented in the financial statements for the year 2025 encompass solely transactions that took place prior to the shareholding change.
+The names of the related companies that have a relationship with the major shareholders and/or the same common directors were as follows:
+General Card Services Limited
+Total Services Solutions Public Company Limited
+Krungsriayudhya Card Company Limited
+Lotus’s Money Services Limited
+Lotus’s General Insurance Broker Limited
+Lotus’s Life Assurance Broker Limited
+Krungsri General Insurance Broker Ltd.
+Krungsri Genesis Ltd.
+Ayudhya Capital Auto Lease Public Company Limited
+Ayudhya Development Leasing Company Limited
+Siam Realty and Services Security Company Limited
+Krungsri Asset Management Company Limited
+Hattha Bank Public Company Limited
+Ayudhya Capital Services Company Limited
+Krungsri Securities Public Company Limited
+Hattha Services Company Limited
+Krungsri Ayudhya AMC Limited
+Krungsri Finnovate Company Limited
+Krungsri Leasing Services Company Limited
+Krungsri Non-Deposit Taking Microfinance Institution Co., Ltd.
+Krungsri Nimble Company Limited
+Pattanasin Plus (1970) Public Company Limited
+SB Finance, Inc.
+SHBank Finance Company Limited
+HC Consumer Finance Philippines, Inc.
+HCPH Financing 1, Inc.
+HCPH Insurance Brokerage, Inc.
+PT. Home Credit Indonesia
+Somjai 2559 Company Limited
+The Thammasat Economics Association
+V-Cube (Thailand) Company Limited
+Learn Corporation Public Company Limited
+Skooldio Company Limited
+Ngern Tid Lor Public Company Limited
+Interlink Telecom Public Company Limited
+Vehicle Title Loan Trade Association
+Business Online Public Company Limited
+Siam Asia Credit Access PTE LTD was a former major shareholder of the Company until August 13, 2025, and was considered a related party of the Company only during that period.
+17.1Balances with related parties were as follows:
+
+[TABLE 25]
+ | Unit : Thousand Baht
+ | CONSOLIDATED |  | SEPARATE
+ | FINANCIAL STATEMENTS |  | FINANCIAL STATEMENTS
+ |  | As at |  |  | As at |  |  | As at |  | As at
+ |  | March 31, |  |  | December 31, |  |  | March 31, |  | December 31,
+ |  | 2026 |  |  | 2025 |  |  | 2026 |  | 2025
+Transaction types / Relationship |  |  |  |  |  |  |  |  |  | 
+with the Company |  |  |  |  |  |  |  |  |  | 
+Cash and cash equivalents |  |  |  |  |  |  |  |  |  | 
+Major shareholder |  | 1,591,616 |  |  | 2,922,734 |  |  | 26,847 |  | 109,443
+Loans-net |  |  |  |  |  |  |  |  |  | 
+Subsidiary |  | - |  |  | - |  |  | 16,004,137 |  | 8,009,697
+Related company |  | 533,999 |  |  | 563,694 |  |  | - |  | -
+Related persons |  | 28 |  |  | 49 |  |  | - |  | -
+ |  | 534,027 |  |  | 563,743 |  |  | 16,004,137 |  | 8,009,697
+Deferred commissions |  |  |  |  |  |  |  |  |  | 
+Major shareholder |  | 6,103 |  |  | 6,214 |  |  | - |  | -
+Current contract assets |  |  |  |  |  |  |  |  |  | 
+Major shareholder |  | 141,815 |  |  | 106,891 |  |  | 105 |  | 1
+Prepaid expense |  |  |  |  |  |  |  |  |  | 
+Related company |  | 33 |  |  | 16 |  |  | - |  | -
+Other receivables |  |  |  |  |  |  |  |  |  | 
+Related company |  | 804 |  |  | 50 |  |  | - |  | -
+Right-of-use of assets (presented |  | 
+in “Leasehold improvement |  | 
+and equipment”) |  | 
+Major shareholder |  | 173 |  |  | 291 |  |  | - |  | -
+Other non-current assets |  |  |  |  |  |  |  |  |  | 
+Major shareholder |  | 125 |  |  | 125 |  |  | - |  | -
+Short-term borrowing |  |  |  |  |  |  |  |  |  | 
+Subsidiary |  | - |  |  | 1,000,000 |  |  | - |  | -
+Amounts due to related parties |  |  |  |  |  |  |  |  |  | 
+Major shareholder |  | 3,759 |  |  | 4,975 |  |  | 273 |  | 1,913
+Subsidiary |  | - |  |  | - |  |  | 6,233 |  | 8,671
+Related companies |  | 9,589 |  |  | 1,051 |  |  | - |  | -
+Related persons |  | 3 |  |  | 51 |  |  | - |  | -
+ |  | 13,351 |  |  | 6,077 |  |  | 6,506 |  | 10,584
+Other current financial liabilities |  |  |  |  |  |  |  | 
+Major shareholder |  | 9,791 |  |  | - |  |  | - |  | -
+Long-term borrowing |  |  |  |  |  |  |  |  |  | 
+Major shareholder |  | 3,500,000 |  |  | 3,500,000 |  |  | 3,500,000 |  | 3,500,000
+Long-term debentures |  |  |  |  |  |  |  |  |  | 
+Related persons |  | 6,000 |  |  | 6,000 |  |  | - |  | -
+Deferred issuance expenses of debentures |  |  |  |  |  |  |  | 
+Major shareholder |  | 5,913 |  |  | 5,821 |  |  | 1,082 |  | 1,182
+Subsidiary |  | - |  |  | - |  |  | 3,897 |  | 4,261
+ |  | 5,913 |  |  | 5,821 |  |  | 4,979 |  | 5,443
+Lease liabilities |  |  |  |  |  |  |  |  |  | 
+Major shareholder |  | 251 |  |  | 374 |  |  | - |  | -
+Subsidiary |  | - |  |  | - |  |  | 150 |  | 284
+ |  | 251 |  |  | 374 |  |  | 150 |  | 284
+[/TABLE 25]
+
+
+[TABLE 26]
+ | Unit : Thousand Baht
+ | CONSOLIDATED |  | SEPARATE
+ | FINANCIAL STATEMENTS |  | FINANCIAL STATEMENTS
+ |  | As at |  |  | As at |  |  | As at |  | As at
+ |  | March 31, |  |  | December 31, |  |  | March 31, |  | December 31,
+ |  | 2026 |  |  | 2025 |  |  | 2026 |  | 2025
+Transaction types / Relationship |  |  |  |  |  |  |  |  |  | 
+with the Company |  |  |  |  |  |  |  |  |  | 
+Other non-current financial liabilities |  |  |  |  |  |  |  | 
+Major shareholder |  | - |  |  | 13,061 |  |  | - |  | -
+[/TABLE 26]
+
+17.2Significant transactions with related parties were as follows:
+
+[TABLE 27]
+ | Unit : Thousand Baht
+ | CONSOLIDATED FINANCIAL STATEMENTS |  | SEPARATE FINANCIAL STATEMENTS
+For the three-month periods |  |  | 
+ended March 31, |  | 2026 |  |  | 2025 |  |  | 2026 |  | 2025
+ |  | (After |  |  | (Before |  |  |  |  | 
+ |  | restructuring) |  |  | restructuring) |  |  |  |  | 
+Transactions / Relationship with |  |  |  |  |  |  |  |  |  | 
+the Company |  |  |  |  |  |  |  |  |  | 
+Interest income on loans |  |  |  |  |  |  |  |  |  | 
+Subsidiary |  | - |  |  | - |  |  | 72,741 |  | -
+Related companies |  | 8,100 |  |  | 10,518 |  |  | - |  | -
+Related persons |  | 1 |  |  | 1 |  |  | - |  | -
+ |  | 8,101 |  |  | 10,519 |  |  | 72,741 |  | -
+Fee and service incomes |  |  |  |  |  |  |  |  |  | 
+Related company |  | 752 |  |  | 867 |  |  | - |  | -
+Dividend income |  |  |  |  |  |  |  |  |  | 
+Subsidiary |  | - |  |  | - |  |  | 4,955,912 |  | -
+Other income |  |  |  |  |  |  |  |  |  | 
+Major shareholder |  | 918 |  |  | 743 |  |  | 104 |  | 5
+Related company |  | 22 |  |  | 11 |  |  | - |  | -
+ |  | 940 |  |  | 754 |  |  | 104 |  | 5
+Service and administrative |  |  |  |  |  |  |  |  |  | 
+expenses |  |  |  |  |  |  |  |  |  | 
+Major shareholder |  | 8,549 |  |  | 9,935 |  |  | 3 |  | -
+Subsidiary |  | - |  |  | - |  |  | 1,808 |  | -
+Related companies |  | 334 |  |  | 678 |  |  | - |  | -
+ |  | 8,883 |  |  | 10,613 |  |  | 1,811 |  | -
+Finance costs |  |  |  |  |  |  |  |  |  | 
+Major shareholder* |  | 32,318 |  |  | 21,273 |  |  | 24,697 |  | -
+Subsidiary |  | - |  |  | - |  |  | 366 |  | 81
+Related persons |  | 51 |  |  | 51 |  |  | - |  | -
+ |  | 32,369 |  |  | 21,324 |  |  | 25,063 |  | 81
+Gains (losses) on cash flow |  |  |  |  |  |  |  |  |  | 
+hedges |  |  |  |  |  |  |  |  |  | 
+Major shareholder |  | 3,262 |  |  | (7,646) |  |  | - |  | -
+Dividend paid |  |  |  |  |  |  |  |  |  | 
+Major shareholder |  | - |  |  | 382,847 |  |  | - |  | -
+Former major shareholder |  | - |  |  | 207,136 |  |  | - |  | -
+ |  | - |  |  | 589,983 |  |  | - |  | -
+*Including net interest paid - received from entering a cross currency interest rate swap agreement and interest rate swap agreement
+[/TABLE 27]
+
+Transactions with related parties were conducted on normal terms of business. All service fees were charged at the rates agreed by the Company and those related parties.
+17.3Key management personnel and director’s compensation were as follows:
+
+[TABLE 28]
+ |  |  |  |  | Unit : Thousand Baht | 
+ | CONSOLIDATED |  | SEPARATE | 
+ | FINANCIAL STATEMENTS |  | FINANCIAL STATEMENTS | 
+For the three-month periods ended March 31, | 2026 |  | 2025 |  | 2026 |  |  | 2025 | 
+Short-term employee benefits | 38,624 |  | 31,332 |  | 3,364 |  |  | 1,349 | 
+Post-employment benefits | 1,075 |  | 765 |  | 49 |  |  | 46 | 
+Shared-based payment | 1,291 |  | 453 |  | - |  |  | - | 
+Total | 40,990 |  | 32,550 |  | 3,413 |  |  | 1,395 | 
+[/TABLE 28]
+
+Benefits paid to directors and persons with management authority
+The Group had no special benefits given to the directors and executive officers beyond the general benefits made as usual, including contingency benefits from employment compensation agreements and other benefits for those persons.
+The Group did not significantly sell, give, or lease any properties to directors, executive officers, or their related parties or did not purchase or lease any assets from those persons.
+17.4Significant agreements with related companies
+The Group entered into an agreement with the Major shareholder to use information technology and management services and is committed to pay service fees as specified in the agreement.
+The Group entered into a marketing support agreement with the Major shareholder for referral service and is committed to pay service fees as specified in the agreement.
+The subsidiary entered into agreements with a related company to provide of financial support and information technology support and use referral services and employee recruitment services. The subsidiary  is committed to the term specified in the agreement.
+The Company has entered into short-term loan agreements with a subsidiary. Those are unsecured loans with a interest rate as agreed.
+The Company has entered into an agreement with the subsidiary to rent space and building services, as well as human resources, accounting and finance, marketing, legal and compliance, anti-fraud management, and internal audit services, along with the subsidiary  guarantee. The Company is committed to the term specified in the agreement.
+18.FAIR  VALUE  OF  FINANCIAL  ASSETS  AND  FINANCIAL  LIABILITIES
+Classifications of financial assets and financial liabilities measured at fair value by the level of fair value hierarchy were as follows:
+
+[TABLE 29]
+ |  |  | Unit: Thousand Baht
+ | CONSOLIDATED FINANCIAL STATEMENTS
+ | As at March 31, 2026 |  | As at December 31, 2025
+ | Fair value |  | Fair value
+ | Level 1 | Level 2 | Level 3 | Total |  | Level 1 | Level 2 | Level 3 | Total
+Financial liabilities |  |  |  |  |  |  |  |  | 
+Other current financial liabilities |  |  |  |  |  |  |  |  | 
+Derivative liabilities |  |  |  |  |  |  |  |  | 
+- Interest Rate Swap | - | 22,446 | - | 22,446 |  | - | 18,586 | - | 18,586
+Other non-current financial liabilities |  |  |  |  |  |  |  |  | 
+Derivative liabilities |  |  |  |  |  |  |  |  | 
+- Interest Rate Swap | - | 13,870 | - | 13,870 |  | - | 32,121 | - | 32,121
+- Cross Currency Interest Rate Swap | - | 102,729 | - | 102,729 |  | - | 170,618 | - | 170,618
+[/TABLE 29]
+
+No transfers of financial assets and financial liabilities measured at fair value occurred during the three-month period ended March 31, 2026.
+Classifications of financial assets and financial liabilities that were not measured at fair value by the level of fair value hierarchy were as follows:
+
+[TABLE 30]
+ | Unit: Thousand Baht
+ | CONSOLIDATED FINANCIAL STATEMENTS |  | Level of
+ | As at March 31, 2026 |  | As at December 31, 2025 |  | Fair value
+ | Book value |  | Fair value |  | Book value |  | Fair value |  | hierarchy
+Financial assets |  |  |  |  |  |  |  |  | 
+Cash and cash equivalents | 3,389,034 |  | 3,389,034 |  | 3,060,341 |  | 3,060,341 |  | Carrying amount
+Loans and hire-purchase receivables | 104,439,832 |  | 108,854,518 |  | 104,085,768 |  | 108,220,259 |  | Level 3
+Other financial assets | 931,456 |  | 931,456 |  | 1,062,475 |  | 1,062,475 |  | Carrying amount
+Financial liabilities |  |  |  |  |  |  |  |  | 
+Short-term borrowings | 850,000 |  | 850,153 |  | 850,000 |  | 850,042 |  | Level 3
+Other current payables | 1,831,721 |  | 1,831,721 |  | 2,489,574 |  | 2,489,574 |  | Carrying amount
+Short-term borrowings from related party | - |  | - |  | 1,000,000 |  | 1,000,000 |  | Level 3
+Long-term borrowings | 41,417,681 |  | 41,450,597 |  | 39,274,005 |  | 39,495,190 |  | Level 3
+Long-term debentures | 30,384,272 |  | 30,856,180 |  | 32,286,048 |  | 32,846,705 |  | Level 2
+[/TABLE 30]
+
+
+[TABLE 31]
+ | SEPARATE FINANCIAL STATEMENTS |  | Level of
+ | As at March 31, 2026 |  | As at December 31, 2025 |  | Fair value
+ | Book value |  | Fair value |  | Book value |  | Fair value |  | hierarchy
+Financial assets |  |  |  |  |  |  |  |  | 
+Cash and cash equivalents | 26,848 |  | 26,848 |  | 109,444 |  | 109,444 |  | Carrying amount
+Loans | 16,004,137 |  | 15,887,948 |  | 8,009,697 |  | 7,987,932 |  | Level 3
+Other financial assets | 105 |  | 105 |  | 1 |  | 1 |  | Carrying amount
+Financial liabilities |  |  |  |  |  |  |  |  | 
+Other current payables | 48,489 |  | 48,489 |  | 79,205 |  | 79,205 |  | Carrying amount
+Long-term borrowings | 7,998,622 |  | 7,917,162 |  | 4,998,507 |  | 5,004,667 |  | Level 3
+Long-term debentures | 2,988,698 |  | 3,027,404 |  | 2,987,645 |  | 3,014,650 |  | Level 2
+[/TABLE 31]
+
+19.THE  GROUP’S  RESTRUCTURING  PLAN
+As disclosed in the notes to the annual financial statements for the year 2025 regarding the plan to restructure the shareholding structure within the Group, as at March 31, 2026, there has been no material progress in relation to such plan, and no related transactions have occurred.
+Accordingly, such a plan has not had any material impact on the interim financial statements for the current period.
+20.EVENT  AFTER  THE  REPORTING  PERIOD
+On April 10, 2026, the Company issued Long-term Debentures No. 1/2026 in the form of secured, unsubordinated and named debentures, guaranteed by its subsidiary, in the amount of Baht 3,500 million with a tenor of 3 years and a maturity date of April 10, 2029. The debentures bear no interest throughout their term and were offered to institutional investors (PP-II). The proceeds from the debenture issuance will be used to fund lending to companies within the Group and/or the repayment of intercompany debts in April 2026 and July 2026.
+On April 17, 2026, the Annual General Meeting of Shareholders of the Group’s principal subsidiary approved a decrease in its registered capital of Baht 9,671.80 and an increase in its registered capital of Baht 3,215.50 million through the issuance of 869,055,354 ordinary shares with a par value of Baht 3.70 each for offering to its existing shareholders in proportion to their shareholdings (Rights Offering). These events had no impact on the Group’s issued and paid-up share capital as at March 31, 2026.
+21.APPROVAL  OF  THE  INTERIM  FINANCIAL  STATEMENTS
+These interim financial statements were approved by the audit committee of the Company for issuance on May 7, 2026.
