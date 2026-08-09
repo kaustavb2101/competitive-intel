@@ -1,4 +1,4 @@
-name: Data — DIW factories + DLT vehicles (gov census, weekly)
+name: Data — DIW factories + DLT vehicles + DLT fuel-type (gov census, weekly)
 
 # The breakthrough this workflow captures: data.go.th is Cloudflare-geoblocked to datacenter IPs, BUT
 # the DEPARTMENTS' OWN CKAN catalogs are NOT — verified HTTP 200 from GitHub-hosted runners:
@@ -6,6 +6,14 @@ name: Data — DIW factories + DLT vehicles (gov census, weekly)
 #   * DLT vehicles  : gdcatalog.dlt.go.th    (dataset_1_1_04 — registered vehicles by province+type)
 # So the authoritative factory + vehicle census refreshes FULLY in the cloud — no Thai laptop, no key.
 # (DLT resource URLs rotate monthly; committee/census.py resolves the newest CSV via the CKAN API.)
+#
+# ALSO lands the DLT FUEL-TYPE detail of the same dataset_1_1_04 (province × type × fuel) via
+# pipeline/pull_dlt_fuel.py — the MEASURED base for build_ev_penetration.py + build_vehicle_collateral.py
+# (obj #1 collateral/EV risk). census.py streams that dataset for type-counts only and never lands the
+# raw CSV, so before this step those two builders' input (source-data/dlt/raw/dataset_1_1_04/, gitignored)
+# was populated by NO scheduled job — the "unscheduled puller aging in silence" case CLAUDE.md warns of,
+# which froze both layers at the 2026-02-28 vintage. Now the re-derive step below (rederive_drift.py,
+# gate-driven) picks both up automatically whenever DLT publishes a newer snapshot.
 #
 # SAFETY: census.py would rewrite source-data/branches_final.json (the master) in place. This workflow
 # runs it against a THROWAWAY COPY (--in) so the master is never touched, and commits only the two
@@ -47,6 +55,17 @@ jobs:
           git diff --quiet -- source-data/branches_final.json \
             || { echo "::error::census.py modified the master — aborting"; exit 1; }
 
+      - name: Land DLT fuel-type CSV (feeds ev_penetration + vehicle_collateral)
+        run: |
+          # Light single-dataset pull of dataset_1_1_04's fuel-type detail into the gitignored raw
+          # mirror. rederive_drift.py won't run pull_*.py itself (network), so the raw CSV must be on
+          # disk before the re-derive step for build_ev_penetration / build_vehicle_collateral to pick
+          # up a newer DLT snapshot. TOLERANT: gdcatalog.dlt.go.th is intermittent — a failed pull must
+          # NOT break the DIW/DLT census job; the two builders then simply --check-SKIP (no drift) and
+          # the layers stay at their last committed vintage until the next run.
+          python3 pipeline/pull_dlt_fuel.py \
+            || echo "::warning::DLT fuel-type pull failed (intermittent host) — ev_penetration/vehicle_collateral stay at last vintage this run"
+
       - name: Re-derive every layer the census pull left stale
         run: |
           # This job had no re-derive step at all — it committed the two raw census artifacts and
@@ -82,8 +101,9 @@ jobs:
             echo
             echo "**Factories:** $FAC · **Vehicles:** $VEH"
             echo
-            echo "Provenance: MEASURED — DIW \`factype3\` + DLT \`dataset_1_1_04\` via the department CKAN"
-            echo "catalogs (diw-dataset.diw.go.th / gdcatalog.dlt.go.th), which bypass the data.go.th"
+            echo "Provenance: MEASURED — DIW \`factype3\` + DLT \`dataset_1_1_04\` (incl. its fuel-type"
+            echo "detail → ev_penetration / vehicle_collateral, obj #1 collateral risk) via the department"
+            echo "CKAN catalogs (diw-dataset.diw.go.th / gdcatalog.dlt.go.th), which bypass the data.go.th"
             echo "geo-block. Nothing fabricated."
             echo
             echo "These are staged for review. To adopt: wire them into \`build_branch_vehicles.py\` /"

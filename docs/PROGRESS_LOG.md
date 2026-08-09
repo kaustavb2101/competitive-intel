@@ -3,6 +3,47 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-09 — Intelligence loop (service/deploy-health): the DLT fuel-type collateral chain (ev_penetration + vehicle_collateral, obj #1) now has a scheduled CI refresh — shipped to master
+
+Autonomous market & service intelligence run. Deploy re-verified green up front (master production
+alias **HTTP 200** on `/`, `/data/meta.json`, `/data/peer_province.json`; `build_provenance.py --check`
+byte-exact; freshness sweep clean — every frequent CI upstream 0–2d fresh, only the known coarse
+annual/monthly vintages lag). The shape-probe and freshness-guard backlogs are exhausted, so a
+negative-space sweep for a genuinely NEW gap surfaced one that serves **objective #1**.
+
+**The gap fixed (`dlt-fuel-chain-unscheduled`).** `ev_penetration.json` + `vehicle_collateral.json`
+(per-province EV/diesel penetration and the diesel-share collateral watch — both MEASURED, both
+rendered in the Overview/Macro collateral book) were the two **stalest** layers in the tree, frozen at
+the **2026-02-28** DLT vintage. Root cause was structural, not a broken pull: both builders read
+`source-data/dlt/raw/dataset_1_1_04/*.csv` (the DLT fuel-type table), landed **only** by
+`pipeline/pull_dlt_fuel.py` — a light, any-IP CKAN puller that was **scheduled in NO workflow and NOT
+in `pull_swarm.py`**. Exactly the "unscheduled puller aging in silence" CLAUDE.md NEXT_STEPS §3 warns
+of: when DLT publishes its next cumulative snapshot, nothing would pick it up. (Verified this run that
+DLT's newest published resource is *still* `…25690228` = 2026-02-28, so the layers are already at the
+freshest available vintage — the staleness is upstream, but the refresh path was dead.)
+
+**Why this home, and how minimal.** `.github/workflows/data-gov-census.yml` already pulls the *same*
+`dataset_1_1_04` weekly from the *same* any-IP CKAN host — but via `committee/census.py`, which streams
+it for type-counts only and never lands the raw fuel-type CSV. It also already runs `rederive_drift.py`
+(gate-driven fixed-point re-derive — both builders ARE in `tests/run.sh`'s `--check` set at lines
+278/288) and commits to a **draft PR**, never auto-merging. So the entire safe refresh machinery
+existed; the only missing link was landing the raw CSV. Added **one tolerant step** before the
+re-derive: `python3 pipeline/pull_dlt_fuel.py || <::warning::>` (a failed pull on the intermittent host
+must not break the DIW/DLT census job — the builders then `--check`-SKIP with no drift). The existing
+`git add -u … platform/data` picks up any refreshed layer automatically. **+23 lines, one file**, no
+new workflow, no duplicated PR logic.
+
+**Safeguards — all passed.** (a) `bash tests/run.sh check` → **131 passed / 0 failed**; because the
+raw CSV was pulled locally this run, the gate actually *ran* (not SKIPped) `build_ev_penetration.py
+--check` and `build_vehicle_collateral.py --check` — both **byte-exact**, proving the CI chain is
+correct. (b) No secrets in the diff (workflow YAML comments + one `python3` step). (c) Diff matches
+intent — additive step only; the raw mirror is gitignored so nothing bloats the repo. (d) No
+fabrication / provenance intact — no `platform/data` file altered (byte-exact), the refresh is MEASURED
+DLT data. Workflow-config-only, no visual/app change → committed straight to master (no PR / headless
+render required). **Next recommended:** sweep `pull_swarm.py`'s registry for any other puller whose
+builder is in the gate but whose pull is scheduled nowhere (same class), then continue market/peer
+signal-sharpening now that the deploy-health coverage set is complete.
+
 ## 2026-08-09 — UX loop: SPA search results now announce their match count to screen readers (WCAG 4.1.3) — shipped to master (PR #334, squash-merged)
 
 Autonomous UX-improvement run. Every open `docs/UXUI_AUDIT.md` backlog item safe for unattended
