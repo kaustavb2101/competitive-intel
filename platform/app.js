@@ -1563,10 +1563,10 @@ function showTab(v){
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
   if(v==='assist'){ renderAssist(); renderIncome(); renderAssistOccMacro(); renderAssistOcc(); }
-  // showOvPanel() with no argument falls back to the first topic, so entering Macro always lands on
-  // exactly one open panel with its chip marked — including on a hard reload, where the static
+  // showOvPanel() with no matching id falls back to the first topic, so entering a tab always lands
+  // on exactly one open panel with its chip marked — including on a hard reload, where the static
   // `open` attribute in the markup would otherwise leave the chip row showing nothing selected.
-  if(v==='overview'){ renderOverview(); renderCommoditiesBoard(); renderImfWeo(); showOvPanel(OV_PANEL); }
+  if(v==='overview'){ renderOverview(); renderCommoditiesBoard(); renderImfWeo(); showOvPanel(PANEL_MEM.ovswitch); }
   if(v==='branches') renderBranches();
   if(v==='map') initMap();
   if(v==='provinces') renderProvinces();
@@ -1574,7 +1574,7 @@ function showTab(v){
   if(v==='exposure'){ renderExposure(); renderProducts(); }
   if(v==='sim'){ renderSim(); renderScenarios(); }
   if(v==='trend') renderTrend();
-  if(v==='acq'){ loadAmphoe(); renderAcqAnswerBand(); renderRivalBookImpact(); renderRivalWatch(); }
+  if(v==='acq'){ loadAmphoe(); renderAcqAnswerBand(); renderRivalBookImpact(); renderRivalWatch(); showOvPanel(PANEL_MEM.compswitch,{wrap:'compswitch',nav:'compjump'}); }
   renderImpactMounts(v);    // Region→Province→Branch drill on Home + the pillar front doors
   closeBranchSheet();   // the mobile branch sheet belongs to the map — never let it cover another tab
   window.scrollTo(0,0);
@@ -1609,33 +1609,48 @@ document.addEventListener('click',e=>{
   const sec=document.getElementById(a.dataset.jump); if(!sec) return;
   e.preventDefault();
   const nav=a.closest('.jumpnav');
-  if(nav&&nav.dataset.exclusive){ showOvPanel(sec.id,{scroll:'nav'}); return; }
+  // data-exclusive only governs the <details> members of that nav's switcher — #compjump also
+  // carries a plain-heading chip ("Does it cost us?" -> sec-cost) that isn't part of the panel
+  // set, so a non-<details> target keeps falling through to the plain open+scroll behaviour below.
+  // nav.dataset.switch names the wrapper (#compswitch) for a nav that isn't #ovjump/#ovswitch;
+  // absent (as on #ovjump itself) it falls back to showOvPanel's own ovswitch/ovjump default.
+  if(nav&&nav.dataset.exclusive&&sec.tagName==='DETAILS'){ showOvPanel(sec.id,{scroll:'nav',wrap:nav.dataset.switch,nav:nav.id}); return; }
   sec.open=true;
   sec.scrollIntoView({behavior:'smooth',block:'start'});
   const sm=sec.querySelector('summary'); if(sm) sm.focus({preventScroll:true});
 });
 
-/* ---------- Macro topic switcher ----------
-   The six Macro topics are still <details class="ovsec"> in the DOM. That is deliberate: the print
+/* ---------- Macro / Competition topic switcher ----------
+   The topics are still <details class="ovsec"|"compsec"> in the DOM. That is deliberate: the print
    engine already expands every <details> in a view, the native element keeps its own keyboard and
    screen-reader behaviour, and deep links keep working — so making them exclusive is a behaviour
    change, not a markup rewrite, and nothing downstream had to learn a new structure.
 
    What changes is that opening one CLOSES the rest, and the closed panels hide their <summary> so
-   the reader sees exactly one heading and one panel instead of six stacked headings. The chip row
-   above is the only control; it carries aria-selected so the active topic is announced.
+   the reader sees exactly one heading and one panel instead of several stacked headings. The chip
+   row above is the only control; it carries aria-selected so the active topic is announced.
    Printing overrides all of it (CSS restores every summary) — the export must still contain the
-   whole tab, which is the promise the per-tab print made. */
-// Remembers the chosen topic for the session, so leaving Macro for another pillar and coming back
-// does not silently reset the reader to "Conditions & commodities".
-let OV_PANEL='sec-ov-macro';
+   whole tab, which is the promise the per-tab print made.
+
+   GENERALISED 2026-08-09: this drove only Macro's #ovswitch/#ovjump. Competition's #compjump
+   carried the same 6-vs-33-block first-paint problem and the same data-jump chip markup — it had
+   just never opted in (see data-exclusive on #compjump in index.html). showOvPanel() now takes the
+   wrapper/nav ids as opt.wrap/opt.nav (defaulting to ovswitch/ovjump, so every existing Macro call
+   site is unchanged) instead of hardcoding them, and PANEL_MEM remembers each switcher's chosen
+   topic separately so picking a Competition section never disturbs Macro's remembered one. */
+// Remembers the chosen topic per switcher for the session, so leaving a tab for another pillar and
+// coming back does not silently reset the reader to the first topic. Seeded to match the section
+// that ships `open` in the markup (sec-ov-macro / sec-search), so the very first call — before any
+// click — resolves to the same target the static HTML already shows.
+const PANEL_MEM={ovswitch:'sec-ov-macro', compswitch:'sec-search'};
 function showOvPanel(id,opt){
   opt=opt||{};
-  const wrap=document.getElementById('ovswitch'), nav=document.getElementById('ovjump');
+  const wrapId=opt.wrap||'ovswitch', navId=opt.nav||'ovjump';
+  const wrap=document.getElementById(wrapId), nav=document.getElementById(navId);
   if(!wrap) return;
-  const secs=[...wrap.querySelectorAll('details.ovsec')];
+  const secs=[...wrap.querySelectorAll(':scope > details')];
   const target=secs.some(s=>s.id===id)?id:(secs[0]&&secs[0].id);
-  OV_PANEL=target;
+  PANEL_MEM[wrapId]=target;
   secs.forEach(s=>{ s.open=(s.id===target); });
   if(nav) nav.querySelectorAll('[data-jump]').forEach(c=>{
     const on=c.dataset.jump===target;
@@ -1643,7 +1658,7 @@ function showOvPanel(id,opt){
     c.setAttribute('aria-selected',String(on));
   });
   // Scroll to the CHIP ROW, not the panel: the switcher is the thing the reader is operating, and
-  // leaving it off-screen after a switch strands them with no way back to the other five topics.
+  // leaving it off-screen after a switch strands them with no way back to the other topics.
   if(opt.scroll==='nav'&&nav) nav.scrollIntoView({behavior:'smooth',block:'start'});
   const sm=wrap.querySelector('#'+CSS.escape(target)+' > summary');
   if(sm&&opt.scroll) sm.focus({preventScroll:true});
@@ -1651,15 +1666,18 @@ function showOvPanel(id,opt){
   // the already-resolved ones and rebuild as the rest land — ovSubInit() is a full rebuild, so the
   // repeats are free and the reader's chosen subsection survives them (it is keyed by label).
   ovSubInit(target);
-  [500,1500].forEach(ms=>setTimeout(()=>{ if(OV_PANEL===target) ovSubInit(target); },ms));
+  [500,1500].forEach(ms=>setTimeout(()=>{ if(PANEL_MEM[wrapId]===target) ovSubInit(target); },ms));
 }
 /* A click on a visible summary would normally just toggle that one panel; route it through the
    switcher so the "one open at a time" rule holds however the reader gets there. Closing the only
-   open panel is refused — an all-closed Macro tab looks broken. */
+   open panel is refused — an all-closed tab looks broken (secs.forEach above always sets exactly
+   one `open`, by construction, so there is no code path that closes every panel). */
 document.addEventListener('click',e=>{
-  const sm=e.target.closest&&e.target.closest('#ovswitch details.ovsec > summary'); if(!sm) return;
+  const sm=e.target.closest&&e.target.closest('#ovswitch details.ovsec > summary, #compswitch details.compsec > summary');
+  if(!sm) return;
   e.preventDefault();
-  showOvPanel(sm.parentElement.id);
+  const inComp=!!sm.closest('#compswitch');
+  showOvPanel(sm.parentElement.id, inComp?{wrap:'compswitch',nav:'compjump'}:undefined);
 });
 
 /* ---------- SECOND level: a sub-switcher INSIDE the long topics (2026-08-02) ----------
@@ -1674,6 +1692,10 @@ document.addEventListener('click',e=>{
    and is therefore idempotent — necessary because most of these blocks are filled asynchronously and
    a block can disappear entirely when its renderer finds no data.
 
+   ALSO DISCOVERS `h3.compsub` (2026-08-09): Competition's subsections use the same heading pattern
+   (see .compsub/.ovsub sharing one CSS rule) — sec-pulse has 8, sec-comp has 9, both well over the
+   threshold below, so both get a switcher automatically with no separate Competition code path.
+
    An "All" chip is always present: nothing this does may put content out of reach. Hiding is
    screen-only (see .ovsub-off in styles.css) so printing still emits the whole tab, which is the
    promise the per-tab print makes. */
@@ -1683,7 +1705,7 @@ function ovSubBlocks(sec){
   const blocks=[];
   [...sec.children].forEach(c=>{
     if(c.tagName==='SUMMARY'||c.classList.contains('ovsubnav')) return;
-    const h=(c.matches&&c.matches('h3.ovsub'))?c:(c.querySelector?c.querySelector('h3.ovsub'):null);
+    const h=(c.matches&&c.matches('h3.ovsub,h3.compsub'))?c:(c.querySelector?c.querySelector('h3.ovsub,h3.compsub'):null);
     if(h){
       // Chip label = the heading up to its first "·" separator, with the MEASURED/ESTIMATED tag
       // stripped. The full heading stays as the chip's title so nothing is lost to the shortening.
@@ -1741,7 +1763,7 @@ function ovSubInit(secId){
 document.addEventListener('click',e=>{
   const c=e.target.closest&&e.target.closest('.ovsubnav [data-ovsub]'); if(!c) return;
   e.preventDefault();
-  const sec=c.closest('details.ovsec'); if(!sec) return;
+  const sec=c.closest('details.ovsec,details.compsec'); if(!sec) return;
   OV_SUB[sec.id]=c.dataset.ovsub||'';
   ovSubApply(sec,ovSubBlocks(sec),OV_SUB[sec.id]);
   const nav=sec.querySelector(':scope > .ovsubnav');
