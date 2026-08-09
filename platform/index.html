@@ -698,13 +698,13 @@
     <!-- SIX PANELS, ONE OPEN AT A TIME (2026-08-09) — this tab used to render 14 of its 33 blocks
          before a reader clicked anything (3 of 6 sections shipped `open`). #ovswitch already solved
          this exact problem on Macro; #compswitch is the same wrapper, opted into the same
-         showOvPanel()/ovSubInit() machinery via data-exclusive above. Only sec-search carries `open`
-         in the markup — the same "first section open, rest closed" default Macro uses — and
-         showOvPanel() on tab entry (see showTab in app.js) confirms exactly one panel is open even on
-         a hard reload to #acq. -->
+         showOvPanel()/ovSubInit() machinery via data-exclusive above. sec-pulse carries `open` in the
+         markup (WAVE 2, 2026-08-09: moved off sec-search — the owner opens this tab FOR the rival
+         pulse, the one section that refreshes every day) — and showOvPanel() on tab entry (see
+         showTab in app.js) confirms exactly one panel is open even on a hard reload to #acq. -->
     <div class="compswitch" id="compswitch">
     <!-- 2 · BRAND SHARE-OF-SEARCH — how AutoX's brand demand compares to rivals, province by province. -->
-    <details class="compsec" id="sec-search" open>
+    <details class="compsec" id="sec-search">
     <summary><h2 class="opp">Brand share-of-search vs rivals · title-loan search interest by province <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2><span class="ovsec-what">Google Trends search interest by province, AutoX share-of-search vs 4 rival brands</span></summary>
     <p class="lead">Google Trends relative search-interest (0–100) for title-loan intent terms
       (<span class="mono" lang="th">จำนำทะเบียนรถ</span> · <span class="mono" lang="th">สินเชื่อรถแลกเงิน</span>), plus <b>share-of-search</b> —
@@ -739,7 +739,7 @@
     </details>
 
     <!-- 1.6 · RIVAL PULSE — what rivals are running right now + measured customer sentiment (incl. our own app). -->
-    <details class="compsec" id="sec-pulse">
+    <details class="compsec" id="sec-pulse" open>
     <summary><h2 class="opp">Rival pulse · live promotions &amp; voice of customer <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2><span class="ovsec-what">Live promos, paid ads, YouTube and Pantip pulse, Play/Apple sentiment ladders, the full field census</span></summary>
     <p class="lead">The always-on watch: <b>what the rivals are promoting right now</b> (pulled from their own websites, new items flagged on every refresh) and <b>what customers say</b> — Google Play star ratings and dated reviews for the rivals' apps <b>and our own เงินไชโย app</b>, side by side. Stars, histograms and promo dates are <b>measured</b>; the detractor theme buckets are an <b>estimated</b> keyword read over 1–2★ reviews.</p>
 
@@ -755,11 +755,17 @@
     <div class="insight" id="pulsesentreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="pulsesenttbl"></table>
 
-    <h3 class="compsub" style="margin-top:18px">The same customers on iPhone <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Apple App Store (TH)</span></h3>
-    <p class="lead sub">iOS skews to the higher-income borrower — the one whose collateral is a car rather than a motorcycle — so it is read as that slice, not as the market. Apple publishes <b>no review dates, no star histogram and no developer replies</b>, so there is deliberately no 90-day trend or reply rate here; those live in the Google Play ladder above. The <b>star rating</b> is the whole rating population; the <b>1–2★ of written sample</b> column is only the people who wrote something, who skew heavily negative — use it to rank operators against each other, never as the share of customers who are unhappy.</p>
+    <!-- FOLD (Wave 2, 2026-08-09): kept, not cut — real Apple App Store data, incl. our own app — but
+         nested under a closed <details>. It is the smaller, secondary VOC read by design (Apple gives
+         no dates/histogram/dev-replies, so it can't carry a trend the way the Play ladder above does),
+         and sec-pulse is now the tab's default-open panel, so its always-visible weight matters most. -->
+    <details style="margin-top:18px">
+    <summary style="cursor:pointer"><h3 class="compsub" style="display:inline;border-bottom:none;padding-bottom:0;margin:0">The same customers on iPhone <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Apple App Store (TH)</span></h3></summary>
+    <p class="lead sub" style="margin-top:10px">iOS skews to the higher-income borrower — the one whose collateral is a car rather than a motorcycle — so it is read as that slice, not as the market. Apple publishes <b>no review dates, no star histogram and no developer replies</b>, so there is deliberately no 90-day trend or reply rate here; those live in the Google Play ladder above. The <b>star rating</b> is the whole rating population; the <b>1–2★ of written sample</b> column is only the people who wrote something, who skew heavily negative — use it to rank operators against each other, never as the share of customers who are unhappy.</p>
     <div class="insight" id="pulseiosreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span></div></div>
     <table class="tbl" id="pulseiostbl"></table>
     <div id="pulseiosnote"></div>
+    </details>
 
     <h3 class="compsub" style="margin-top:18px">Live rival promotions &amp; campaigns <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · rivals' own sites</span></h3>
     <div class="insight" id="pulsepromoreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span></div></div>
@@ -788,9 +794,15 @@
       <b>PDPA:</b> no author name, member id, handle or profile link is read at any stage, identifiers are scrubbed from the text too, and quotes are short and unattributed.</p>
     <div class="insight" id="pantipreadout" style="border-left-color:var(--collat)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="pantiptbl"></table>
-    <h4 class="compsub" style="margin-top:14px;font-size:13px">In borrowers' own words — including about us</h4>
-    <p class="lead sub">Verbatim, unattributed, and chosen only for carrying a theme and naming the brand. Nothing is filtered for being unflattering.</p>
+    <!-- FOLD (Wave 2, 2026-08-09): the measured table above (match rate, themes, reply rate) carries
+         the analytical content; these 35 verbatim quotes across 14 brands are illustrative colour, so
+         they sit one click away rather than adding a long scroll to the tab's now-default-open panel.
+         pantipnote (the cap/name-collision/PDPA caveats) stays OUTSIDE the fold — it must not hide. -->
+    <details style="margin-top:14px">
+    <summary class="sub" style="cursor:pointer;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--mid)">In borrowers' own words — including about us</summary>
+    <p class="lead sub" style="margin-top:8px">Verbatim, unattributed, and chosen only for carrying a theme and naming the brand. Nothing is filtered for being unflattering.</p>
     <div id="pantipquotes"></div>
+    </details>
     <p class="lead sub" id="pantipnote" style="margin-top:6px"></p>
 
     <h3 class="compsub" style="margin-top:18px">Say / hear gap · what the field advertises vs what customers raise <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED counts</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED themes</span></h3>
@@ -802,10 +814,16 @@
     <table class="tbl" id="themectatbl"></table>
     <p class="lead sub" id="themesnote" style="margin-top:6px"></p>
 
-    <h3 class="compsub" style="margin-top:18px">The full จำนำทะเบียน field · every material operator <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED · public reports</span></h3>
-    <p class="lead">Beyond the big-4 branch census: the <b>whole</b> title-loan field, including the <b>bank-backed entrants</b> — TISCO's สมหวัง (800+ branches), KBank's เงินให้ใจ (rides ~800 K-branches), Krungsri's Car4Cash, KTC พี่เบิ้ม, GSB's เงินดีดี / มีที่มีเงิน, ttb and KKP — plus the listed regionals (TURBO, SAK, MICRO, AMANAH). Footprints are each company's <b>own public claim</b> (cited in the data); app scores join live from the <b>measured</b> Play ladder above.</p>
+    <!-- FOLD (Wave 2, 2026-08-09): unlike the rest of sec-pulse (promos/ads/video/pantip/reviews all
+         refresh daily), this is a static public-report census — the least "dynamic" content in the
+         section the owner opens FOR its daily refresh. Kept, not cut (real data, 18 operators), just
+         nested under a closed <details> so it reads as the reference appendix it is. -->
+    <details style="margin-top:18px">
+    <summary style="cursor:pointer"><h3 class="compsub" style="display:inline;border-bottom:none;padding-bottom:0;margin:0">The full จำนำทะเบียน field · every material operator <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED · public reports</span></h3></summary>
+    <p class="lead" style="margin-top:10px">Beyond the big-4 branch census: the <b>whole</b> title-loan field, including the <b>bank-backed entrants</b> — TISCO's สมหวัง (800+ branches), KBank's เงินให้ใจ (rides ~800 K-branches), Krungsri's Car4Cash, KTC พี่เบิ้ม, GSB's เงินดีดี / มีที่มีเงิน, ttb and KKP — plus the listed regionals (TURBO, SAK, MICRO, AMANAH). Footprints are each company's <b>own public claim</b> (cited in the data); app scores join live from the <b>measured</b> Play ladder above.</p>
     <div class="insight" id="pulseunireadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span></div></div>
     <table class="tbl" id="pulseunitbl"></table>
+    </details>
     </details>
 
     <!-- 1 · COMPETITOR THESIS — coverage + rival density + rival fragility, collapsed by default. -->
@@ -856,7 +874,15 @@
     <div class="insight" id="rivrepreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="rivreptbl"></table>
 
-    <h3 class="compsub" style="margin-top:18px">Rival threat matrix · footprint × service quality per brand <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">MIXED · footprint EST · service MEASURED</span></h3>
+    <!-- FOLD (Wave 2, 2026-08-09): these two were both literal joins of data already on the tab
+         (footprint from the coverage/density boards above + service from the reputation board below)
+         — a combined-threat SYNTHESIS, not a new primary source. Merged under one closed <details> so
+         the section reads as coverage/density/quality/PICO/fragility first, this join second. Both
+         original tables + both original caveat paragraphs are kept verbatim, just regrouped under h4. -->
+    <details style="margin-top:18px">
+    <summary style="cursor:pointer"><h3 class="compsub" style="display:inline;border-bottom:none;padding-bottom:0;margin:0">Combined rival threat read · footprint × service, by brand &amp; by region <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">MIXED · footprint EST · service MEASURED</span></h3></summary>
+
+    <h4 class="compsub2" style="margin-top:10px">By brand, nationally</h4>
     <p class="lead">The density board says <b>where</b> rivals are; the reputation board says <b>how good</b> they are. This joins the two per
       brand — national <b>footprint</b> (branches vs the ~2,015 AutoX runs; company-IR headline, with the measured census count alongside)
       next to the <b>measured Google service rating</b> — so you can read at a glance which rival is the strongest <b>combined</b> threat to the
@@ -865,7 +891,7 @@
     <div class="insight" id="rivthreatreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="rivthreattbl"></table>
 
-    <h3 class="compsub" style="margin-top:18px">Rival threat by region · where our branches actually sit <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
+    <h4 class="compsub2" style="margin-top:16px">By region · where our branches actually sit</h4>
     <p class="lead">AutoX defends a <b>footprint</b>, not a brand — so the same join, localised to the five regions our branches sit in.
       How <b>outgunned</b> we are on the ground (measured rivals:AutoX census ratio, plus the share of our districts where rivals lead)
       next to how <b>well-liked</b> the rival field is there (measured Google rating). Rivals outnumber us several-fold <b>everywhere</b>, so
@@ -874,6 +900,7 @@
       <b>not an AutoX figure</b> on the service axis.</p>
     <div class="insight" id="rivthreatregreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="rivthreatregtbl"></table>
+    </details>
 
     <h3 class="compsub" style="margin-top:18px">Sub-scale rivals vs our footprint · licensed PICO-finance operators per province <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
     <p class="lead">Beyond the big-4 title lenders, a <b>distinct small-ticket competitor class</b>: licensed
