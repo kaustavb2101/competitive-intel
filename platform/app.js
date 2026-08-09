@@ -6447,10 +6447,14 @@ function computeSim(){
   const shocked=(price!==0||rain!==0);
   renderSimVerdict(baseHiP,baseHiBr,N,shocked,scenHiP,scenHiBr);
   // announce the recomputed outcome to AT (see setSimStatus). Silent at baseline/reset.
-  { const s=v=>(v>0?'+':'')+v;
-    setSimStatus(shocked
-      ? `Under this shock: high agri-stress provinces ${baseHiP} to ${scenHiP} (${s(dP)}); exposed branches ${baseHiBr.toLocaleString()} to ${scenHiBr.toLocaleString()} (${s(dBr)}).`
-      : ''); }
+  // Covers all four levers, not just agri: the used-vehicle (renderSimCollat) and factory
+  // (renderSimFactory) sub-cards recompute via innerHTML and are otherwise silent to screen readers.
+  { const s=v=>(v>0?'+':'')+v; const parts=[];
+    if(shocked) parts.push(`high agri-stress provinces ${baseHiP} to ${scenHiP} (${s(dP)}); exposed branches ${baseHiBr.toLocaleString()} to ${scenHiBr.toLocaleString()} (${s(dBr)})`);
+    if(simState.veh!==0) parts.push(`used-vehicle collateral ${s(simState.veh)}% — recovery ${simState.veh>0?'firming, loss-given-default lower':'softening, loss-given-default higher'}`);
+    const fm=(simState.factory>0)?simFactoryModel():null;
+    if(fm&&fm.mfgBr) parts.push(`manufacturing slowdown: avg occupation-stress ${fm.baseAvg.toFixed(0)} to ${fm.scenAvg.toFixed(0)} (+${fm.delta.toFixed(0)}) across ${fm.mfgBr.toLocaleString()} factory-base branches`);
+    setSimStatus(parts.length?('Under this shock: '+parts.join('; ')+'.'):''); }
   // ----- summary cards -----
   const dCol=v=>v>0?'var(--agri)':v<0?'var(--up)':'var(--mid)';
   const sign=v=>(v>0?'+':'')+v;
