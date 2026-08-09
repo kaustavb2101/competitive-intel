@@ -1640,9 +1640,13 @@ document.addEventListener('click',e=>{
    topic separately so picking a Competition section never disturbs Macro's remembered one. */
 // Remembers the chosen topic per switcher for the session, so leaving a tab for another pillar and
 // coming back does not silently reset the reader to the first topic. Seeded to match the section
-// that ships `open` in the markup (sec-ov-macro / sec-search), so the very first call — before any
+// that ships `open` in the markup (sec-ov-macro / sec-pulse), so the very first call — before any
 // click — resolves to the same target the static HTML already shows.
-const PANEL_MEM={ovswitch:'sec-ov-macro', compswitch:'sec-search'};
+// WAVE 2 (2026-08-09): compswitch's default moved from sec-search to sec-pulse — the owner is "very
+// keen on the social pulse … it's very dynamic and gets refreshed every day," it's the reason he
+// opens this tab. sec-search stays the FIRST chip in #compjump (unchanged tab order/scan path); only
+// which panel is open by default changed.
+const PANEL_MEM={ovswitch:'sec-ov-macro', compswitch:'sec-pulse'};
 function showOvPanel(id,opt){
   opt=opt||{};
   const wrapId=opt.wrap||'ovswitch', navId=opt.nav||'ovjump';
