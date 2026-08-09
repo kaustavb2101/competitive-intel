@@ -146,6 +146,18 @@ FEEDS = [
          label="Rival Google Ads Transparency Center creatives + copy", cadence="weekly", ip="any",
          group="competitive", out="source-data/google_ads_raw.json", timeout=2400),  # ~17 advertisers, paced
 
+    # Google rating + review count for the 755 rival branches the scout already captured a
+    # place_id for. It had NO schedule at all — not here, not in any workflow — so it only ever
+    # moved when someone ran it by hand, and it had sat 21 days by the time anyone checked. That
+    # is not a dormant layer: rival_reputation.json, rival_threat.json and rival_threat_region.json
+    # are all rendered on the Competition tab today. GOOGLE_PLACES_KEY has been a repo secret since
+    # 2026-07-11; nothing was calling the script. Resumable + cached by design (a re-run only
+    # fetches place_ids missing from its cache), so a partial run costs nothing to finish next time.
+    dict(key="place_ratings", script="pull_place_ratings.py", args=[],
+         label="Google rating + review count per rival branch (needs GOOGLE_PLACES_KEY)",
+         cadence="weekly", ip="any", group="competitive",
+         out="source-data/competitor_ratings.json", timeout=2400),
+
     # needs_browser: these two drive a real headless Chromium (set.or.th 403s external requests;
     # only a same-origin fetch from inside a loaded SET page gets through). CI runners that have not
     # run `playwright install chromium` must skip them — use --skip-browser, NOT a hand-kept
