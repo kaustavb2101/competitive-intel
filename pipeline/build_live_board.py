@@ -261,6 +261,38 @@ REGISTRY = [
          label="Borrower themes tracked", group="Competition",
          what="what borrowers are actually asking for, from reviews and forums, vs what lenders answer",
          pick=lambda d: (_n(d.get("demand")), "demand themes"), measured=True),
+    # rival_pulse and pantip_panel render on the Competition tab and were missing from this
+    # REGISTRY entirely — so the freshness board could not see them, and they aged with nothing
+    # watching. That is precisely the hole this board exists to close, and it is not theoretical:
+    # a YOUTUBE_API_KEY that went invalid on 2026-07-31 froze the social layers for nine days and
+    # nothing flagged it, because the one social row that WAS here (social_themes) is rebuilt by an
+    # unrelated job's re-derive pass and therefore kept looking fresh.
+    #
+    # rival_pulse stamps itself `sentiment_anchor` (the newest review date IN the data, never wall
+    # clock) and `promos_pulled_at` — neither is in stamp_of()'s synonym chain, so a plain row here
+    # would render a BLANK age, which this function's own docstring calls worse than no feed at
+    # all. Rather than widen the shared chain for one layer, use the `stamp_path` override the
+    # registry already provides for exactly this case (tape_real uses it for `mob_anchor`).
+    # sentiment_anchor is the right choice of the two: the sentiment ladder is what the card shows,
+    # and a promo pull succeeding would otherwise mask a frozen sentiment feed.
+    dict(key="rival_pulse", file="rival_pulse.json", cadence="weekly",
+         label="Our app's rating vs rivals", group="Competition",
+         what="what borrowers score us out of 5 against every rival lender's app — the fastest-moving "
+              "read we have on how we are perceived, and the one that moves without us doing anything",
+         pick=lambda d: (next((b.get("score") for b in (d.get("sentiment") or []) if b.get("own")), None),
+                         "★ our app"), measured=True,
+         stamp_path="sentiment_anchor"),
+    # Pantip is a MEASURED but LAPTOP-ONLY feed: run 31291388481 proved pull_pantip.py exits 3 from
+    # a datacenter IP (it refuses to write anything rather than launder a block into "the market
+    # went quiet"), so the scheduled job can never refresh it and it only moves when Kaustav pulls
+    # from a Thai connection. Listing it here will therefore show it aging, often past its window.
+    # That is the point — it IS stale, and a board that hides a source it cannot refresh is telling
+    # a comfortable lie. Its `pulled` key is already in the standard chain, so no override needed.
+    dict(key="pantip_panel", file="pantip_panel.json", cadence="weekly",
+         label="Pantip lender discussion", group="Competition",
+         what="unprompted borrower talk about each lender on Thailand's biggest forum — the only "
+              "channel here nobody can buy their way into. THAI-IP ONLY: CI cannot refresh it",
+         pick=lambda d: (_n(d.get("brands")), "lenders tracked"), measured=True),
     dict(key="commodity_history", file="commodity_history.json", cadence="monthly",
          label="Rice · world price", group="Farm income",
          what="the GLOBAL benchmark in $/mt, monthly — context for the Thai farm-gate price above "
@@ -359,6 +391,10 @@ NO_HISTORY_REASON = {
                  "accumulated too, and becomes a line once several weekly pulls have landed",
     "rival_youtube": "channel stats are point-in-time; subscriber history is not stored",
     "social_themes": "theme mix is recomputed per run, not accumulated",
+    "rival_pulse": "each pull overwrites the last; appending our own star score weekly would give "
+                   "the single best line we could have — how borrower perception of us moves",
+    "pantip_panel": "each pull overwrites the last, and it can only be pulled from a Thai IP, so "
+                    "any series would have irregular gaps rather than a weekly cadence",
     "dbd_formation": "one month per pull; the DBD monthly files would stack into a series",
     "province_lfs": "one NSO quarter per pull",
     "credit_anchor": "one FSR vintage per pull",
