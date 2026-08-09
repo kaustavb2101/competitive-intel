@@ -1606,6 +1606,40 @@ def _shape_branch_cropland(d):
     return None
 
 
+def _shape_branch_pico(d):
+    # The per-branch LICENSED-PICO rival count (branch_pico.json, obj #2 — the FPO
+    # พิโกไฟแนนซ์ registry counted in each branch's OWN district, a DISTINCT small-ticket
+    # rival class the big-4 census (rival_pressure.json) is blind to; pipeline/
+    # build_branch_pico.py). It is index-aligned to branches.json and renders the
+    # MEASURED "PICO rivals in อำเภอ" block in every branch popup (picoBrHTML reads
+    # picoBrRec(d)=PICOBR[i] and GATES the line on `typeof e.pico!=='number'`, then
+    # renders e.pico + the e.head/e.branch/e.recent split). The client loader sets
+    # PICOBR=null on any fetch/parse failure, so a truncated/404 CDN deploy silently
+    # drops the PICO competitive-pressure block from every popup with NO phone alert —
+    # the same "broken demo" blind spot the branch_cropland / tape_geo_occ / flood_hazard
+    # probes closed for their siblings. Its DISTRICT-grain twins (pico_district,
+    # pico_competitors) are already probed; this per-branch layer (backlog item #1's
+    # shipped per-branch integration, obj #2's #1 competitive gap) was the unprobed one.
+    # Asserts the render contract (the 2015-branch index-aligned array + the numeric
+    # .pico gate and the .head/.branch/.recent split the popup reads) as SHAPE not
+    # values, robust to a future FPO registry vintage moving the counts.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    recs = d.get("branches")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'branches' array (client PICOBR gate + popup PICOBR[i] read)"
+    if len(recs) != 2015:
+        return "expected 2015 branch records (index-aligned to branches.json), got %d" % len(recs)
+    r0 = recs[0]
+    if not isinstance(r0, dict):
+        return "first 'branches' record is not an object"
+    for k in ("pico", "head", "branch", "recent"):
+        v = r0.get(k)
+        if not isinstance(v, (int, float)) or isinstance(v, bool):
+            return "first branch record missing numeric '%s' (popup .%s render read)" % (k, k)
+    return None
+
+
 def _shape_vehicle_mix(d):
     # The collateral board's fleet-mix panel (`cb-mix`, obj #1 — vehicle titles are
     # ~75% of the book, so the stock-vs-new-registration gap by DLT class is a direct
@@ -2146,6 +2180,7 @@ DATA_FILES = [
     # drops the block from every popup with no phone alert — the same blind spot
     # the flood_hazard / branch_labor obj-#1 probes closed for their siblings.
     ("data/branch_cropland.json", _shape_branch_cropland, ".meta.crops + 2015-branch index-aligned .branches with ha[]/crop_ha (per-branch crop-area popup block)"),
+    ("data/branch_pico.json", _shape_branch_pico, "2015-branch index-aligned .branches with numeric pico/head/branch/recent (per-branch PICO-rival popup block, obj #2)"),
     # The two collateral-board fleet reads from the same DLT wave, both surfaced via
     # tmliFetch and both self-hiding (display='none') on a truncated/404 deploy with no
     # phone alert — annual off-cadence pulls, so neither self-heals from CI (probe = the
