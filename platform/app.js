@@ -6414,10 +6414,16 @@ function renderSimVerdict(baseHiP,baseHiBr,N,shocked,scenHiP,scenHiBr){
       `<div class="sub" style="margin-top:4px">ILLUSTRATIVE what-if · branch counts measured, stress flag estimated ${TAG_E}</div>`;
   }
 }
+// WCAG 4.1.3 Status Messages: the sliders recompute the result via innerHTML, which is silent to
+// screen readers (the sliders' own aria-valuetext announces the INPUT, not the OUTCOME). Announce the
+// recomputed agri-stress result via the #simstatus polite live region. Baseline/no-shock -> '' (silent
+// on tab-open and reset), mirroring setSearchStatus. Guarded so an identical string doesn't re-announce.
+function setSimStatus(msg){const el=$('#simstatus'); if(el && el.textContent!==msg) el.textContent=msg;}
 function computeSim(){
   if(!$('#sim-cards')) return;
   if(!CSTRESS_LIST||!CSTRESS_LIST.length){
     $('#sim-cards').innerHTML='';
+    setSimStatus('');
     renderSimVerdict(null);
     $('#sim-readout').innerHTML='Crop-stress data not available (data/crop_stress.json missing) — the agri what-if needs it.';
     $('#sim-prov').innerHTML=''; renderSimCollat(); renderSimFactory(); return;
@@ -6440,6 +6446,11 @@ function computeSim(){
   const dP=scenHiP-baseHiP, dBr=scenHiBr-baseHiBr;
   const shocked=(price!==0||rain!==0);
   renderSimVerdict(baseHiP,baseHiBr,N,shocked,scenHiP,scenHiBr);
+  // announce the recomputed outcome to AT (see setSimStatus). Silent at baseline/reset.
+  { const s=v=>(v>0?'+':'')+v;
+    setSimStatus(shocked
+      ? `Under this shock: high agri-stress provinces ${baseHiP} to ${scenHiP} (${s(dP)}); exposed branches ${baseHiBr.toLocaleString()} to ${scenHiBr.toLocaleString()} (${s(dBr)}).`
+      : ''); }
   // ----- summary cards -----
   const dCol=v=>v>0?'var(--agri)':v<0?'var(--up)':'var(--mid)';
   const sign=v=>(v>0?'+':'')+v;
