@@ -166,6 +166,18 @@ FEEDS = [
          cadence="quarterly", ip="any", group="competitive",
          out="source-data/set_filings/index.json", timeout=1800),
 
+    # The 56-1 One Report is where a peer's book actually gets split by collateral and product —
+    # the audited notes (set_filings above) stop at "loan receivables" + "hire-purchase receivables"
+    # for all six peers, so the 56-1 is the ONLY public source for the product mix. It is NOT filed
+    # to SET and NOT held by SEC Thailand; each company publishes it on its own IR site, so the URLs
+    # are a hand-verified registry inside the script rather than anything derivable. Annual (filed
+    # ~March), but the same script also pulls the quarterly Opportunity Day decks, hence quarterly.
+    # No browser: the IR CDNs (Optiwise / listedcompany.com) serve over plain urllib.
+    dict(key="investor_docs", script="pull_investor_docs.py", args=["--kind", "both"],
+         label="56-1 One Report (collateral/product split) + SET Opportunity Day decks, 6 peers",
+         cadence="quarterly", ip="any", group="competitive",
+         out="source-data/investor_docs/index.json", timeout=2400),
+
     # ------------------------------------------------------------------- THAI-IP-ONLY (opt-in only)
     dict(key="rival_promos", script="pull_rival_promos.py", args=[],
          label="Rival promo/campaign listings from their own sites (Tidlor/MTC/Sawad)",

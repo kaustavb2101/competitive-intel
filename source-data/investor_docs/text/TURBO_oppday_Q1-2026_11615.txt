@@ -1,0 +1,256 @@
+28 55 108
+71 86 138
+106 121 155
+174 181 197
+197 197 197
+225 225 221
+255 227 236
+228 71 130
+228 71 130
+1
+28 55 108 IMPORTANT NOTICE AND DISCLAIMER
+71 86 138 This presentation and the accompanying oral commentary have been prepared by Ngernturbo Public Company Limited (the “Company”) solely for
+informational purposes. It does not constitute investment advice, or an offer, invitation, solicitation, or recommendation tobuy or sell any
+securities of the Company in Thailand or any other jurisdiction.
+106 121 155
+No Warranty and Liability:The information provided herein is based on matters as they exist as of the date of this presentation and has not been
+independently verified. No representation or warranty, express or implied, is made as to the accuracy, completeness, or reliability of the information. To
+174 181 197
+the maximum extent permitted by law, neither the Company nor any of its affiliates, directors, officers, employees, or representatives shall have any
+liability whatsoever (in negligence or otherwise) for any direct or consequential loss arising from any use of this presentationor its contents.
+197 197 197
+Forward-Looking Statements:This presentation contains forward-looking statements. These statements can generally be identified by words such as
+“expects,” “anticipates,” “intends,” “plans,” “believes,” “targets,” “estimates,” or similar expressions. These forward-looking statements are based on
+225 225 221 the Company’s current expectations and assumptions regarding its business, the economy, and other future conditions.
+Because forward-looking statements relate to the future, they are subject to inherent uncertainties, risks, and changes in circumstances that are difficult
+255 227 236
+to predict. Actual results or performance may differ materially from those contemplated by the forward-looking statements due tovarious factors,
+including macro-economic conditions in Thailand and globally, regulatory changes, and competitive pressures. You are cautioned not to place undue
+reliance on these statements. The Company undertakes no obligation to publicly update or revise any forward-looking statement.
+228 71 130
+Financial Information and Metrics:The financial information and operational data contained in this presentation may be preliminary, unaudited, and
+subject to revision. This presentation may also include certain non-standard financial measures that are not recognized under Thai Financial Reporting
+228 71 130
+Standards (TFRS) or other standard accounting frameworks. These measures should be considered supplemental to, and not as a substitute for, the
+Company's official audited financial statements.
+Ngernturbo PLC (TURBO): Opportunity Day for Q1’2026 2
+28 55 108 Profit
+hits new highs with ROA hovering above 5.0%
+71 86 138
+Net Profit Return on Assets (ROA)(1)
+106 121 155
+Unit : Million THB Unit : %
+174 181 197
+503.1 5.5%
+197 197 197
+4.4%
+141.5
+3.9%
+225 225 221
+125.7
+QoQ +23.7%
+255 227 236 YoY +20.7%
+90.9
+Q4 1 1 3 0 1 5. . 5 7 141.6
+228 71 130
+Q3 54.7 53.7
+Q2 50.8 26.7 145.0 175.0 1.3% 1.1%
+Q1 37.9 54.6
+228 71 130
+2023 2024 2025 2026 2023 2024 2025 Q4’2025 Q1’2026
+Note : (1) ROA is calculated using Net Profit / Average Assets
+Data for Q4’25 and Q1’26 have been annualized for comparison purpose
+Ngernturbo PLC (TURBO): Opportunity Day for Q1’2026 3
+28 55 108 Revenue
+continues to expand, driven by portfolio growth and steady yield.
+71 86 138
+Total Revenue & Yield on Loan (1) Loan Receivables (2)
+106 121 155
+Unit : Million THB / % Unit : Million THB
+174 181 197
+11,685.4 11,964.1
+24.3% 24.5% 24.8% 24.8% 2.6 11,561.5 11,561.5 9.3 0 H % ire I n p s u u rc ra h n a c s e e
+22.9% 10,631.5 18.8 10.6 10.6
+197 197 197 Yield on Loan 4.3 2,241.3 2,301.2 2,301.2 2,397.5 Nano Finance
+1,487.3
+3,094.7
+3,033.2
+121.3 101.8 1,430.6 1,025.4 1,025.4 1,054.1 Land title deed loan
+1,511.5
+225 225 221 2,430.8 316.7 321.9
+Other income 125.0
+Brokerage insurance 280.6
+income
+255 227 236
+8,503.2 Vehicle title loan
+7,992.1 8,224.3 8,224.3
+7,628.4
+Interest Income 2,671.0
+814.3 816.7
+228 71 130 2,025.2 2,595.2 26.7 23.0
+105.3 102.1 QoQ Growth
+3.5%
+682.3 691.6
+228 71 130
+2023 2024 2025 Q4’2025 Q1’2026 2023 2024 2025 Q4’2025 Q1’2026
+Note : (1) Yield on Loan is calculated using Interest income / Avg. quarterly Net Loan receivables, normalized with actual days in calculated period.
+(2) Loan receivables by loan type are presented before deducting Expected Credit Loss Allowances.
+Data for Q4’25 and Q1’26 have been annualized for comparison purpose
+Ngernturbo PLC (TURBO): Opportunity Day for Q1’2026 4
+28 55 108 Loan per branch
+continues to grow steadily with an optimized branch network.
+71 86 138
+# of Branches Loan per Branch
+106 121 155
+Unit : Branches Unit : Million THB
+174 181 197
+197 197 197 12.0
+1,030 1,036 989 989 998 11.7 11.7
+11.3
+225 225 221
+10.3
+255 227 236
+228 71 130
+228 71 130
+2023 2024 2025 Q4’2025 Q1’2026 2023 2024 2025 Q4’2025 Q1’2026
+Ngernturbo PLC (TURBO): Opportunity Day for Q1’2026 5
+28 55 108 Operational efficiency
+is driven by scaled operations and AI integration.
+71 86 138
+Operating Cost to Income (CI)(1) Revenue per Staff (2)
+106 121 155
+Unit : % Unit : Million THB
+174 181 197
+1.37
+68.8% 1.33
+64.2% 1.23
+197 197 197 1.17
+54.8% 55.9% 1.08
+52.4%
+225 225 221
+255 227 236
+228 71 130
+228 71 130
+2023 2024 2025 Q4’2025 Q1’2026 2023 2024 2025 Q4’2025 Q1’2026
+Note : (1) Operating Cost / Income Ratio is calculated using (Cost of sales + Administrative expenses) / (Total revenue –Finance costs)
+(2) Revenue per Staff is calculated using Revenue / Average Staffs
+Data for Q4’25 and Q1’26 have been annualized for comparison purpose
+Ngernturbo PLC (TURBO): Opportunity Day for Q1’2026 6
+28 55 108 Credit quality
+continues its positive trajectory with a prudent buffer.
+71 86 138
+Credit Cost (1) NPL Coverage Ratio
+106 121 155
+Unit : % Unit : %
+174 181 197
+6.8%
+121.4%
+197 197 197
+113.8%
+5.5% 106.7%
+5.2% 5.1% 100.3% 100.3%
+4.5%
+225 225 221
+4.3%
+255 227 236
+3.7%
+228 71 130
+228 71 130
+2023 2024 2025 Q4’2025 Q1’2026 2023 2024 2025 Q4’2025 Q1’2026
+Note : (1) Credit Cost is calculated using Expected Credit Losses / Average Gross Loan receivables
+Data for Q4’25 and Q1’26 have been annualized for comparison purpose
+Ngernturbo PLC (TURBO): Opportunity Day for Q1’2026 7
+28 55 108 Credit quality
+shows visible improvement at every stage.
+71 86 138
+Stage 1 Stage 3
+106 121 155
+Unit : % Unit : %
+174 181 197
+90.36% 90.36% 91.34%
+86.66% 84.52%
+197 197 197
+225 225 221
+4.17% 3.96% 3.96%
+3.68%
+3.15%
+255 227 236
+228 71 130
+228 71 130
+2023 2024 2025 Q4’2025 Q1’2026 2023 2024 2025 Q4’2025 Q1’2026
+Ngernturbo PLC (TURBO): Opportunity Day for Q1’2026 8
+28 55 108 Funding cost
+has been stabilized with a resilient capital structure.
+71 86 138
+Finance Cost (1) Capital Structure (2)
+106 121 155
+Unit : % Unit : X
+174 181 197
+197 197 197 1.71
+1.64
+4.6%
+4.3%
+3.3%
+225 225 221 4.0% 4.0%
+1.15 1.15 1.13
+255 227 236
+228 71 130
+228 71 130
+2023 2024 2025 Q4’2025 Q1’2026 2023 2024 2025 Q4’2025 Q1’2026
+Note : (1) Finance Cost is calculated using Finance cost / Average Interest bearing debts.
+(2) Capital Structure is calculated using (Total Debt -Shareholder’s Loan) / (Equity + Shareholder’s Loan)
+Data for Q4’25 and Q1’26 have been annualized for comparison purpose
+Ngernturbo PLC (TURBO): Opportunity Day for Q1’2026 9
+28 55 108 Management Outlook
+71 86 138
+Situation Assessment Operational Priorities
+106 121 155
+Management remains vigilant regarding macroeconomic shifts, Key Focus:Resilience & Scaling
+including:
+174 181 197 Navigating 2026 by leveraging technological integration and prudent
+○ Geopolitical Tensions: Indirect impact on Thai economy via credit management to sustain the Q1 momentum.
+197 197 197 energy prices & supply chains. 1. Quality Portfolio Growth:An optimal balance between growth
+and asset quality.
+○ Household Debt:High debt levels challenging domestic
+2. Operational Efficiency:Integration of technology to drive
+225 225 221
+purchasing power and repayment capacity. continuous improvement in Cost-to-Income ratio.
+3. Revenue Diversification: Scaling insurance brokerage and
+○ Collateral Volatility:Fluctuations affecting write-off values
+255 227 236
+developing high-value tailored customer products
+and seizure losses.
+4. Development Banks Standard Readiness: Structural alignment of
+228 71 130 capital and risk systems to meet Development Bank standards.
+228 71 130
+*IMPORTANT DISCLAIMER: The above financial targets may change depending on economic conditions and do not include the impact of any future business opportunities.
+Ngernturbo PLC (TURBO): Opportunity Day for Q1’2026 10
+28 55 108 Financial Outlook
+71 86 138
+○ Quality Portfolio Growth:Due to the ongoing conflict in Middle East, we are targeting 12.5–20.5% loan growth in 2026 via
+106 121 155
+optimized LTVs and quality customer acquisition. Yields projected to hold steady.
+174 181 197 ○ Improving Asset Quality:Credit costs expected to decline over the next 18–24 months, driven by rigorous initial
+underwriting and enhanced collection efficiency. Targeting 4.25%-5.25%
+197 197 197
+○ Accelerating Insurance Expansion: Non-life brokerage scaling to consistently outpace loan growth over the next 36
+months, diversifying revenue.
+225 225 221
+○ Enhancing Operational Efficiency:Significant decline expected in the cost-to-income ratio. While absolute OPEX will be
+255 227 236
+slightly elevated, its growth will be well below revenue increases, driven by scale and AI integration.
+228 71 130 ○ Expanding Profitability:Targeted Return on Assets (ROA) improvement of 100–150 bps, fueled by the combined impact of
+operational efficiencies, lower credit costs, and optimized funding.
+228 71 130
+*IMPORTANT DISCLAIMER: The above financial targets may change depending on economic conditions and do not include the impact of any future business opportunities.
+Ngernturbo PLC (TURBO): Opportunity Day for Q1’2026 11
+28 55 108
+71 86 138
+106 121 155
+174 181 197
+197 197 197
+225 225 221
+255 227 236
+228 71 130
+228 71 130
+12
