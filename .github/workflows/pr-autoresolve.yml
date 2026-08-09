@@ -31,6 +31,7 @@ on:
 permissions:
   contents: write
   pull-requests: read
+  actions: write   # required to dispatch qa.yml (workflow_dispatch) against the branch this job pushes
 
 concurrency:
   # One at a time: two of these racing would push conflicting merges onto the same PR branches.
@@ -119,6 +120,18 @@ jobs:
               if git push origin "HEAD:$BRANCH"; then
                 echo "- #$NUM \`$BRANCH\` — merged master + re-derived, gate green, mergeable again" >> "$GITHUB_STEP_SUMMARY"
                 RESOLVED=$((RESOLVED+1))
+                # A push made with GITHUB_TOKEN is exempt from GitHub's loop-prevention, so qa.yml's
+                # own `push` trigger never fires on this new head — the PR page would keep showing
+                # the OLD head's green checks while this commit sits ungated and mergeable.
+                # workflow_dispatch is the documented exception, so explicitly ask qa.yml to run
+                # against the branch we just pushed. Best-effort: a dispatch failure must not fail
+                # this job (that would block every other PR still waiting in the loop), but it must
+                # be LOUD — a silent failure here would recreate the exact bug this step exists to close.
+                if gh workflow run qa.yml --ref "$BRANCH"; then
+                  echo "  dispatched qa.yml on $BRANCH @ $(git rev-parse HEAD)"
+                else
+                  echo "::error::qa.yml dispatch FAILED for #$NUM ($BRANCH) — new head $(git rev-parse HEAD) has NO visible gate run. Check/dispatch manually."
+                fi
               else
                 echo "- #$NUM \`$BRANCH\` — resolved but the push was rejected (branch moved mid-run); next master push retries" >> "$GITHUB_STEP_SUMMARY"
                 BLOCKED=$((BLOCKED+1))
