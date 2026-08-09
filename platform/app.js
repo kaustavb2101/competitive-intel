@@ -4354,11 +4354,11 @@ function renderRivalBookImpact(){
     host.innerHTML=`
       <p class="lead" style="margin:0 0 10px">${m.verdict||''}</p>
       <table class="tbl"><tr>
-        <th>Within the same province</th><th>Branches</th><th>Accounts</th>
-        <th title="average rival branches in the district, account-weighted">Rivals near</th>
-        <th title="90+ days past due, account-weighted — MEASURED">90+</th>
-        <th title="X bucket, late but under 30dpd — MEASURED">X</th>
-        <th title="average outstanding per account — MEASURED">Avg balance</th></tr>
+        <th scope="col">Within the same province</th><th scope="col">Branches</th><th scope="col">Accounts</th>
+        <th scope="col" title="average rival branches in the district, account-weighted">Rivals near</th>
+        <th scope="col" title="90+ days past due, account-weighted — MEASURED">90+</th>
+        <th scope="col" title="X bucket, late but under 30dpd — MEASURED">X</th>
+        <th scope="col" title="average outstanding per account — MEASURED">Avg balance</th></tr>
         ${side(w.more_contested,'More contested','above its province median rival count')}
         ${side(w.less_contested,'Less contested','below its province median rival count')}
         <tr><td><b>Gap</b> <span class="sub">${N(w.n_provinces)} provinces</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td>
@@ -4369,11 +4369,11 @@ function renderRivalBookImpact(){
       <details style="margin-top:10px"><summary class="sub">The raw national gradient — shown only so you can see why it is not the number to quote</summary>
         <p class="lead sub" style="margin:8px 0">Watch the last column. Rival count and catchment population rise together, so most of this gradient is <b>city vs countryside</b>, not competition. That is exactly what the within-province split above removes.</p>
         <table class="tbl" style="margin-top:4px"><tr>
-          <th>Rivals in the district</th><th>Branches</th><th>Accounts</th><th>90+</th><th>Avg balance</th>
-          <th class="sub" title="the confound, printed on the same row as the result it threatens">Median catchment pop</th></tr>${raw}</table></details>
+          <th scope="col">Rivals in the district</th><th scope="col">Branches</th><th scope="col">Accounts</th><th scope="col">90+</th><th scope="col">Avg balance</th>
+          <th scope="col" class="sub" title="the confound, printed on the same row as the result it threatens">Median catchment pop</th></tr>${raw}</table></details>
       <details style="margin-top:8px"><summary class="sub">The 12 most outnumbered branches, with their books</summary>
         <table class="tbl" style="margin-top:8px"><tr>
-          <th>Branch</th><th>Rivals in district</th><th>Accounts</th><th>90+</th><th>Who is there</th></tr>${top}</table></details>
+          <th scope="col">Branch</th><th scope="col">Rivals in district</th><th scope="col">Accounts</th><th scope="col">90+</th><th scope="col">Who is there</th></tr>${top}</table></details>
       <p class="lead sub" style="margin:10px 0 0"><b>Reading:</b> ${m.how_to_read||''} ${m.coverage_note||''}
         ${w.exclusions_note?`<br><b>Who is in the split:</b> ${escHtml(w.exclusions_note)}`:''}</p>`;
     wrapTables();
