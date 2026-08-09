@@ -39,6 +39,21 @@ OUT = os.path.join(DATA, "competitors_census.json")
 AMPHOE = os.path.join(SRC, "th_amphoe.geojson")         # 928 ADM2 district polygons (shapeName/shapeID)
 BRANCHES = os.path.join(SRC, "branches_final.json")     # AutoX master (each branch has a real prov)
 
+# FRESHNESS STAMP (build_provenance.py contract: a "vintage" key on meta). None of the inputs
+# (competitors_official.json, competitors_national.json, competitors_overture.json) carry their own
+# pull-date field, and this builder is deterministic + network-free + --check-gated so it must NOT
+# call datetime.now() (that would make --check non-reproducible and the freshness readout depend on
+# when the build happens to run, not on the data). So this is a literal constant, not a live clock
+# read: the real, already-known date the CURRENTLY COMMITTED source-data/competitors_official.json
+# reached its present content — verified from git history (`git log --follow`), not invented:
+#   2026-07-03  commit 183790c8  "Rivals now reflect FULL official-locator networks" (Srisawad/
+#               Tidlor/Muangthai pulled from each operator's live branch endpoint)
+#   2026-07-04  commit f7b44a4d  "Ingest Heng official-locator: 450 branches" (Heng's province-walk
+#               merged into the same file — the file's last content-changing commit)
+# No commit has touched competitors_official.json since. Update this string (and re-run without
+# --check) only when the census is actually re-pulled.
+CENSUS_VINTAGE = "2026-07-04"
+
 DEDUPE_M = 140.0
 CELL_DEG = 0.0025
 R_EARTH = 6371000.0
@@ -238,6 +253,14 @@ def build():
         heng_gap = ("Heng Leasing is a SAMPLE (Google∪Overture), not its full network — its official locator "
                     "sits behind a Cloudflare challenge unsolvable from a headless cloud IP (archived "
                     "countBranch.php reported ~852 branches). Needs a residential/Thai browser session.")
+    # Freshness stamp (build_provenance.py contract — a "vintage" key on meta). Only honest to attach
+    # when EVERY point in the census actually comes from the dated official-locator pull (by_src has
+    # no other source): a census that also carries undated Google/Overture sample rows would misstate
+    # its own freshness if the whole file inherited the official pull's date. Right now the sample
+    # fallback isn't in use (all four brands are official-locator, see CENSUS_VINTAGE above) so this
+    # fires; if a brand ever reverts to the sample path, the file honestly goes back to no vintage
+    # rather than a fabricated one.
+    all_official_src = set(by_src) <= {"official-locator"}
     meta = {
         "generated_by": "pipeline/build_competitor_census.py",
         "label": label,
@@ -269,6 +292,15 @@ def build():
             "bbox approximations.",
         ],
     }
+    if all_official_src:
+        meta["vintage"] = CENSUS_VINTAGE
+        meta["vintage_note"] = (
+            "The real date source-data/competitors_official.json (every point in this census, right "
+            "now) last changed — the Heng province-walk ingest that completed the four-brand official-"
+            "locator merge (git commit f7b44a4d, following the Srisawad/Tidlor/Muangthai pull in "
+            "183790c8 the day before). A literal constant, not a live clock read: this builder is "
+            "deterministic/--check-gated and must reproduce byte-exact regardless of when it runs. "
+            "Stale once any brand's locator is re-pulled without updating CENSUS_VINTAGE.")
     return {"meta": meta, "items": out}
 
 
