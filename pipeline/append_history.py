@@ -146,6 +146,28 @@ def _promo_live_count(doc, brand):
                and it.get("brand") == brand and it.get("last_seen") == pulled)
 
 
+def _youtube_views_total(doc):
+    """Total lifetime view count across every tracked rival brand channel (13 in the current pull).
+    This is the frozen-value canary for the YouTube feed. Views accrue continuously on any live
+    channel, so this large integer ticks UP on every genuine pull (verified: 915.9M → 920.0M across
+    the 2026-07-30 → 2026-08-09 pulls). It goes flat ONLY if the YouTube Data API stops returning
+    fresh channel statistics — the exact expired-key failure mode this whole history mechanism was
+    built to catch (youtube_comments.json sat frozen for 9 days behind a dead key while the puller
+    exited 0 daily). TEST-A stale-stamp coverage already exists via live_board; this closes the
+    TEST-B (frozen value) blind spot the sibling ad/promo/app feeds all have and this one lacked."""
+    chans = (doc or {}).get("channels")
+    if not isinstance(chans, list) or not chans:
+        return None
+    tot = 0
+    seen = False
+    for c in chans:
+        v = (c or {}).get("views_total") if isinstance(c, dict) else None
+        if isinstance(v, (int, float)):
+            tot += v
+            seen = True
+    return tot if seen else None
+
+
 # ---------------------------------------------------------------- registry
 # `path` is the file to read, relative to the repo root — this is also the path walked by --from-git,
 # so a feed can only be backfilled if its history was actually committed under that name.
@@ -281,6 +303,15 @@ REGISTRY = [
          label="TIDLOR · live promo/news items", unit="items", cadence="weekly",
          source="tidlor.com (own-site pull)",
          pick=lambda d: _promo_live_count(d, "TIDLOR")),
+
+    # YouTube — the frozen-value canary for the rival brand-channel feed. Summed lifetime views
+    # across all tracked channels; live pulls tick it up, an expired API key freezes it. `pulled`
+    # is the only stamp this feed carries. Weekly cadence matches its ~10-day refresh so a run of
+    # identical values across 4+ pulls (never legitimate for accruing view counts) trips TEST B.
+    dict(key="rival_youtube_views", path="platform/data/rival_youtube.json", stamp=("pulled",),
+         label="Rival YouTube brand channels · total views", unit="views", cadence="weekly",
+         source="YouTube Data API v3 (official) — public brand-channel statistics",
+         pick=_youtube_views_total),
 ]
 
 
