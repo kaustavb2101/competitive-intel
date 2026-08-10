@@ -2022,6 +2022,41 @@ def _shape_farm_household(d):
     return None
 
 
+def _shape_branch_peers(d):
+    # The peer-twin outlier benchmark (branch_peers.json, obj #1 PEER pillar,
+    # ESTIMATED) — the Risk-trend (#trend) audit-first "risky vs its market twins"
+    # list AND the #map peer-deviation lens. TWO render paths, both silently
+    # degrading with NO phone alert: peerHasData() gates the lens on a non-empty
+    # `.branches` array indexed by branch position (peerRec reads .branches[i].dev),
+    # so a truncated file that drops rows misaligns every branch's lens value; and
+    # drawPeerOutliers gates the audit table on a non-empty `.outliers` array, each
+    # row reading .name/.prov/.risk/.peer_median/.dev/.top_driver + a .twins[] list
+    # (.name/.risk per twin). The client sets PEERS=null on any fetch failure, so a
+    # truncated/404 CDN deploy blanks the audit list (to "not yet computed") and
+    # zeroes the lens with no alert — the same "broken demo" blind spot the
+    # branch_risk / peer_province probes closed for their siblings. Asserts the
+    # index-aligned branches shape + the outlier row render reads; shape not values.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    brs = d.get("branches")
+    if not isinstance(brs, list):
+        return "missing 'branches' list (the #map peer-deviation lens read)"
+    if len(brs) != 2015:
+        return "expected 2015 branch records (index-aligned), got %d" % len(brs)
+    if not (isinstance(brs[0], dict) and "dev" in brs[0]):
+        return "first branch record missing 'dev' (peerDevVal lens read)"
+    outs = d.get("outliers")
+    if not isinstance(outs, list) or not outs:
+        return "missing/empty 'outliers' list (the #trend audit-table render gate)"
+    o0 = outs[0]
+    need = ("name", "prov", "risk", "peer_median", "dev", "top_driver", "twins")
+    if not isinstance(o0, dict) or not all(k in o0 for k in need):
+        return "outlier row missing render keys (name/prov/risk/peer_median/dev/top_driver/twins)"
+    if not isinstance(o0.get("twins"), list):
+        return "outlier 'twins' is not a list (the closest-twins column render read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -2385,6 +2420,15 @@ DATA_FILES = [
     ("data/credit_anchor.json", _shape_credit_anchor, ".metrics scale cards + system_npl headline (#acq BoT credit anchor, obj #1)"),
     ("data/farm_household.json", _shape_farm_household, ".latest income/expense/net_cash_monthly + .years trend (#assist farm-household P&L, obj #1)"),
     ("data/rival_universe.json", _shape_rival_universe, ".operators census with tier/name_th + the tier=='us' AutoX row (#acq operator census, obj #2)"),
+    # The peer-twin outlier benchmark (branch_peers.json, obj #1 PEER pillar) — the
+    # last surfaced peer-comparison read with no deploy probe. It is load-bearing on
+    # TWO #trend/#map surfaces (the audit-first "risky vs its market twins" table and
+    # the per-branch peer-deviation map lens), both null-guarded so a truncated/404
+    # CDN deploy silently blanks the table and zeroes the lens with NO phone alert —
+    # the same "broken demo" blind spot the branch_risk / peer_province probes closed
+    # for their siblings. Asserts the 2015-index-aligned .branches shape + the outlier
+    # row render reads, not values — robust to a future risk-vintage refresh.
+    ("data/branch_peers.json", _shape_branch_peers, ".branches index-aligned (2015) with dev + .outliers audit rows (name/prov/risk/peer_median/dev/top_driver/twins) (#trend peer-twin benchmark + #map lens, obj #1)"),
 ]
 
 
