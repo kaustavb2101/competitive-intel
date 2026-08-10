@@ -5008,11 +5008,11 @@ function drawPicoCompetitors(){
   const winMo=(lm&&lm.window_months)||24;
   const top=rows.slice().sort((a,b)=>(b.outnumber||0)-(a.outnumber||0)).slice(0,PICOCOMP_TOPN);
   const maxPico=Math.max(1,...top.map(r=>r.pico_total||0));
-  tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
-    `<th title="MEASURED — licensed PICO-finance (พิโกไฟแนนซ์) operator service points in the province (FPO licence registry)">PICO operators ◆</th>`+
-    `<th title="MEASURED — AutoX (เงินไชโย) branches in the province">AutoX branches ◆</th>`+
-    `<th title="MEASURED — PICO operators minus AutoX branches. Positive (red) = sub-scale rivals outnumber our footprint here.">Outnumber ◆</th>`+
-    `<th title="MEASURED — PICO operators per AutoX branch (n/a where AutoX has no branch)">Rivals / branch</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th>`+
+    `<th scope="col" title="MEASURED — licensed PICO-finance (พิโกไฟแนนซ์) operator service points in the province (FPO licence registry)">PICO operators ◆</th>`+
+    `<th scope="col" title="MEASURED — AutoX (เงินไชโย) branches in the province">AutoX branches ◆</th>`+
+    `<th scope="col" title="MEASURED — PICO operators minus AutoX branches. Positive (red) = sub-scale rivals outnumber our footprint here.">Outnumber ◆</th>`+
+    `<th scope="col" title="MEASURED — PICO operators per AutoX branch (n/a where AutoX has no branch)">Rivals / branch</th></tr>`+
     top.map((r,i)=>{
       const on=r.outnumber||0;
       const onc=on>0?PRESS:AX;
@@ -5116,14 +5116,14 @@ function drawExitWhitespace(){
   }
   const top=rows.slice().sort((a,b)=>(b.exit_capture_score||0)-(a.exit_capture_score||0)).slice(0,EXIT_TOPN);
   const cell=(v,color)=>{const n=Math.round(v||0); return `<td>${barHTML(n,color)} <span class="mono" style="color:${color}">${n}</span></td>`;};
-  tbl.innerHTML=`<tr><th>#</th>`+
-    `<th class="h-opp" title="ESTIMATED fragility cue (0–100): thin surviving big-4 field + residual sub-scale demand. Higher = the rival field here is most exposed if a marginal local operator exits under Q1-2026. NOT a measurement.">Rival-fragility ★ est</th>`+
-    `<th>District (amphoe)</th><th>Province</th><th>Region</th>`+
-    `<th title="AutoX branches inside the district (measured)">AutoX</th>`+
-    `<th class="h-opp" title="ESTIMATED — demand the big-4 do NOT cover (demand × thin-big-4). Higher = residual market likely served by sub-scale, exit-prone operators.">Sub-scale residual est</th>`+
-    `<th title="MEASURED — licensed PICO-finance (พิโกไฟแนนซ์) operators inside the district (FPO registry, pico_district.json) — a real sub-scale non-bank lender class. A reality-check on the ESTIMATED residual to its left: >0 = a real sub-scale field backs the inference; 0 = the residual rests on big-4 absence alone. Licensed operators are compliant, so this is rival PRESENCE, not who will exit.">PICO ops ≤district meas</th>`+
-    `<th class="h-opp" title="MEASURED — district demand proxy minus AutoX saturation (0–100). Higher = thinner AutoX coverage.">Coverage-gap ★</th>`+
-    `<th title="MEASURED — big-4 rival branches inside the district (Google Places, lower bound). Lower = thinner surviving-incumbent footprint.">Big-4 ≤district</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">#</th>`+
+    `<th scope="col" class="h-opp" title="ESTIMATED fragility cue (0–100): thin surviving big-4 field + residual sub-scale demand. Higher = the rival field here is most exposed if a marginal local operator exits under Q1-2026. NOT a measurement.">Rival-fragility ★ est</th>`+
+    `<th scope="col">District (amphoe)</th><th scope="col">Province</th><th scope="col">Region</th>`+
+    `<th scope="col" title="AutoX branches inside the district (measured)">AutoX</th>`+
+    `<th scope="col" class="h-opp" title="ESTIMATED — demand the big-4 do NOT cover (demand × thin-big-4). Higher = residual market likely served by sub-scale, exit-prone operators.">Sub-scale residual est</th>`+
+    `<th scope="col" title="MEASURED — licensed PICO-finance (พิโกไฟแนนซ์) operators inside the district (FPO registry, pico_district.json) — a real sub-scale non-bank lender class. A reality-check on the ESTIMATED residual to its left: >0 = a real sub-scale field backs the inference; 0 = the residual rests on big-4 absence alone. Licensed operators are compliant, so this is rival PRESENCE, not who will exit.">PICO ops ≤district meas</th>`+
+    `<th scope="col" class="h-opp" title="MEASURED — district demand proxy minus AutoX saturation (0–100). Higher = thinner AutoX coverage.">Coverage-gap ★</th>`+
+    `<th scope="col" title="MEASURED — big-4 rival branches inside the district (Google Places, lower bound). Lower = thinner surviving-incumbent footprint.">Big-4 ≤district</th></tr>`+
     top.map((d,i)=>{
       const c=d.components||{};
       const sc=Math.round(d.exit_capture_score||0);
@@ -5225,7 +5225,7 @@ function drawGapRegions(){
     o.n++; o.sum+=s; if(s>o.topS){o.topS=s; o.top=d;}});
   const regs=Object.values(byReg).map(o=>({...o,avg:o.sum/o.n})).sort((a,b)=>b.avg-a.avg);
   const mxAvg=Math.max(1,...regs.map(o=>o.avg));
-  $('#gapregions').innerHTML=`<tr><th>#</th><th>Region</th><th>Catchments</th><th class="h-opp" title="mean coverage-gap score across the region (est)">Avg coverage-gap ★ est</th><th title="the single catchment with the highest ESTIMATED coverage-gap score in the region">Widest coverage-gap (est)</th></tr>`+
+  $('#gapregions').innerHTML=`<tr><th scope="col">#</th><th scope="col">Region</th><th scope="col">Catchments</th><th scope="col" class="h-opp" title="mean coverage-gap score across the region (est)">Avg coverage-gap ★ est</th><th scope="col" title="the single catchment with the highest ESTIMATED coverage-gap score in the region">Widest coverage-gap (est)</th></tr>`+
     regs.map((o,i)=>{const sc=o.avg>=45?'var(--gold)':o.avg>=30?'var(--merch)':'var(--mid)';
       return `<tr onclick="location.href='${branchHref(o.top)}'" tabindex="0" role="link" style="cursor:pointer">
       <td class="mono sub">${i+1}</td><td><b>${o.r}</b></td>
@@ -5253,9 +5253,9 @@ function drawGapBoard(){
     .map(d=>({d, s:gapScore(d)})).sort((a,b)=>b.s-a.s).slice(0,60);
   drawGapRegions();
   const haveComp=compHasData();
-  $('#gaptbl').innerHTML=`<tr><th>#</th><th class="h-opp" title="ESTIMATED coverage-gap screen: demand proxy × own-AutoX headroom × competitor-proxy headroom (0–100)">Coverage-gap ★ est</th><th>Branch / area</th><th>Prov</th><th>Region</th><th title="own AutoX ≤10km — lower = thinner coverage">AutoX ≤10km</th>`+
-    `<th class="h-collat" title="MEASURED rival title-loan / vehicle-finance branches within ~5km (Google Places, a lower bound — not a registry). Low rivals + high coverage-gap = thinly-covered AND undercompeted.">Rivals ≤5km ◆ meas</th>`+
-    `<th class="h-opp" title="DIW factory workers (measured)">Workers (DIW)</th><th title="province pickup stock (DLT)">Pickups (prov)</th><th title="banks+ATMs ≤10km (OSM) — financial-density proxy for rival presence, NOT a competitor census">Fin. density ◇ est</th></tr>`+
+  $('#gaptbl').innerHTML=`<tr><th scope="col">#</th><th scope="col" class="h-opp" title="ESTIMATED coverage-gap screen: demand proxy × own-AutoX headroom × competitor-proxy headroom (0–100)">Coverage-gap ★ est</th><th scope="col">Branch / area</th><th scope="col">Prov</th><th scope="col">Region</th><th scope="col" title="own AutoX ≤10km — lower = thinner coverage">AutoX ≤10km</th>`+
+    `<th scope="col" class="h-collat" title="MEASURED rival title-loan / vehicle-finance branches within ~5km (Google Places, a lower bound — not a registry). Low rivals + high coverage-gap = thinly-covered AND undercompeted.">Rivals ≤5km ◆ meas</th>`+
+    `<th scope="col" class="h-opp" title="DIW factory workers (measured)">Workers (DIW)</th><th scope="col" title="province pickup stock (DLT)">Pickups (prov)</th><th scope="col" title="banks+ATMs ≤10km (OSM) — financial-density proxy for rival presence, NOT a competitor census">Fin. density ◇ est</th></tr>`+
     gapRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const sc=row.s>=60?'var(--gold)':row.s>=40?'var(--merch)':'var(--mid)';
       const hd=d.w<=2?' · gap':d.w<=5?' · thin':' · covered';
       const k=d.k10||{}; const fin=(k.bank||0)+(k.atm||0);
