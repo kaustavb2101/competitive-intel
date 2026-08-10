@@ -456,8 +456,8 @@
       "province": "ประจวบคีรีขันธ์",
       "region": "Central&BKK",
       "n_branches": 33,
-      "mean_risk": 25.1,
-      "p90_risk": 28.4,
+      "mean_risk": 25.0,
+      "p90_risk": 28.3,
       "top_driver_mix": {
         "household": 33
       }
@@ -467,7 +467,7 @@
       "region": "Central&BKK",
       "n_branches": 27,
       "mean_risk": 24.9,
-      "p90_risk": 26.5,
+      "p90_risk": 26.4,
       "top_driver_mix": {
         "household": 27
       }
