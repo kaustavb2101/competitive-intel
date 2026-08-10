@@ -94,7 +94,7 @@ Rayong was the pilot template; the goal was the same deep-dive for every provinc
 | POI-within-province (10 layers) | `source-data/osm_layers.json` (national) | ✅ |
 | nationwide amphoe (district) polygons | `source-data/th_amphoe.geojson` (928 amphoe) | ✅ acquired |
 | per-district rollups (all 77 prov) | `build_province.py` / `build_amphoe.py` (spatial join) | ✅ done |
-| competitors | hand-curated Google Places, **Rayong only** (30) | ⚠️ automate per province |
+| competitors | MEASURED national census (`competitors_census.json`, 16,503 rivals) | ✅ all 77 provinces |
 | "what impacts them" narrative | editorial, **Rayong only** | ⚠️ template by region |
 | catchment 3D buildings | OSM footprints, urban cores only | ⚠️ opportunistic |
 
@@ -102,9 +102,20 @@ Rayong was the pilot template; the goal was the same deep-dive for every provinc
   acquired; `build_province.py` reproduces Rayong's shape for all 77 provinces; `build_amphoe.py`
   scores all 928 districts (incl. 0-branch white-space). Rendered via `province.html?p=<slug>` and
   the National-map amphoe lenses + Acquisition district leaderboard.
-- **Remaining (data-gated, see TONIGHT_CHECKLIST §competitors):** automate competitor pulls per
-  province (Places, brand × province) so the deep-dive isn't competitor-blind outside Rayong; then
-  template the "what impacts them" narrative by region (EEC-East, agri-Isan, tourism-South…).
+- ✅ **Competitors are no longer Rayong-only (corrected 2026-08-10 — the prior "automate per province /
+  competitor-blind outside Rayong" claim was STALE).** The MEASURED national census
+  (`competitors_census.json`, 16,503 deduped rival title-loan / vehicle-finance branches — Google
+  Places ∪ official store-locators ∪ Overture) is now the competitor source for every province:
+  `build_province.py` (`_load_competitors` → point-in-polygon into each amphoe) writes a per-district
+  `competitors` count onto all 77 `platform/data/provinces/<slug>.json` (e.g. Khon Kaen = 397 rivals
+  across 23 districts), and `province.html` plots the per-province competitor points live from the
+  census (`_CENSUS.filter(c=>c.prov===provTh)`). The hand-curated 30-point `rayong_competitors.json`
+  survives only as a Rayong fallback, unioned-not-replaced. (NB: the province files' branch-level
+  `ncomp`/`ncompn` and top-level `competitors[]` remain stubs — `None`/`[]` — but have NO app consumer;
+  the live census filter supplies the points, so this is a harmless stub, not a gap.)
+- **Remaining (editorial, NOT deterministic):** template the "what impacts them" narrative by region
+  (EEC-East, agri-Isan, tourism-South…). Left open deliberately — templating editorial text is
+  fabrication risk, not a clean build, so it is not an autonomous-loop task.
 
 ## 0b. ✅ CLOSED 2026-07-21 — the REAL loan tape landed
 Was "the highest-leverage data unlock for objective #1". It is done: **382,735 real accounts**
