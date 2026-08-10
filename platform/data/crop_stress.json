@@ -61,7 +61,7 @@
       "branches_final.json": "rain_3mo_anom per branch — MEASURED rainfall anomaly proxy.",
       "doae_planted_area.json": "MEASURED DOAE farmer-registry planted area (BE 2568, hectares -> rai) — folded in for Cassava, Maize, Coconut, Pineapple, the dominant upland borrower crops absent from the OAE crop_prov_area.json (rice/rubber/oil palm only). Priced by the live NABC daily feed.",
       "ocsb_cane.json": "MEASURED OCSB cane area (production year 2565/66, rai) — folded in for Sugarcane. Cane is in neither the OAE planted-area census nor the DOAE farmer registry, because growers register with OCSB; this is the register of record. Priced by the ANNOUNCED national cane price (administered per season, ~10 CCS), not a market quote.",
-      "farmgate_prices.json": "MEASURED Thai farm-gate price layer (di-farmgate), built by pipeline/build_farmgate_prices.py from the NABC daily national-average feed (agriapi.nabc.go.th, reachable from a Thai IP / cloud). Replaces the World Bank GLOBAL proxy for: Coconut, Oil palm, Pineapple, Rice, Rubber, Sugarcane. vintage 2026-08-07.",
+      "farmgate_prices.json": "MEASURED Thai farm-gate price layer (di-farmgate), built by pipeline/build_farmgate_prices.py from the NABC daily national-average feed (agriapi.nabc.go.th, reachable from a Thai IP / cloud). Replaces the World Bank GLOBAL proxy for: Coconut, Oil palm, Pineapple, Rice, Rubber, Sugarcane. vintage 2026-08-10.",
       "nabc_prices.json": "NABC live daily market prices (agriapi.nabc.go.th), pulled by pipeline/pull_nabc_prices.py — MEASURED, cloud-refreshable. Crops: Cassava, Maize, Oil palm, Rice, Rubber."
     },
     "caveats": [
@@ -73,13 +73,13 @@
     ],
     "price_sources": {
       "Cassava": "MEASURED-NABC — Thai live daily market YoY % (agriapi.nabc.go.th)",
-      "Coconut": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-08-07)",
+      "Coconut": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-08-10)",
       "Maize": "MEASURED-NABC — Thai live daily market YoY % (agriapi.nabc.go.th)",
-      "Oil palm": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-08-07)",
-      "Pineapple": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-08-07)",
-      "Rice": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-08-07)",
-      "Rubber": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-08-07)",
-      "Sugarcane": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-08-07)"
+      "Oil palm": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-08-10)",
+      "Pineapple": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-08-10)",
+      "Rice": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-08-10)",
+      "Rubber": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-08-10)",
+      "Sugarcane": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-08-10)"
     }
   },
   "provinces": [
@@ -129,7 +129,7 @@
           "area": 16
         }
       ],
-      "price_stress": 20.54,
+      "price_stress": 20.88,
       "drought": 0.52,
       "crop_dependence": 0.9909,
       "agri_stress": 0.2061,
@@ -191,7 +191,7 @@
           "area": 24
         }
       ],
-      "price_stress": 12.88,
+      "price_stress": 13.07,
       "drought": 0.7375,
       "crop_dependence": 0.6425,
       "agri_stress": 0.1895,
@@ -258,7 +258,7 @@
           "area": 1
         }
       ],
-      "price_stress": 15.1,
+      "price_stress": 15.33,
       "drought": 0.5875,
       "crop_dependence": 0.6799,
       "agri_stress": 0.1598,
@@ -320,7 +320,7 @@
           "area": 303
         }
       ],
-      "price_stress": 17.68,
+      "price_stress": 17.94,
       "drought": 0.5475,
       "crop_dependence": 0.6738,
       "agri_stress": 0.1476,
@@ -387,7 +387,7 @@
           "area": 198
         }
       ],
-      "price_stress": 4.66,
+      "price_stress": 4.84,
       "drought": 0.9525,
       "crop_dependence": 0.372,
       "agri_stress": 0.1417,
@@ -454,7 +454,7 @@
           "area": 25
         }
       ],
-      "price_stress": 10.5,
+      "price_stress": 10.8,
       "drought": 0.465,
       "crop_dependence": 0.7549,
       "agri_stress": 0.1404,
@@ -516,7 +516,7 @@
           "area": 539
         }
       ],
-      "price_stress": 16.31,
+      "price_stress": 16.58,
       "drought": 0.3942,
       "crop_dependence": 0.6955,
       "agri_stress": 0.1097,
@@ -578,7 +578,7 @@
           "area": 4
         }
       ],
-      "price_stress": 13.17,
+      "price_stress": 13.4,
       "drought": 0.605,
       "crop_dependence": 0.445,
       "agri_stress": 0.1077,
@@ -645,7 +645,7 @@
           "area": 1340
         }
       ],
-      "price_stress": 7.13,
+      "price_stress": 7.48,
       "drought": 0.87,
       "crop_dependence": 0.2911,
       "agri_stress": 0.1013,
@@ -697,7 +697,7 @@
           "area": 82
         }
       ],
-      "price_stress": 28.93,
+      "price_stress": 29.42,
       "drought": 0.69,
       "crop_dependence": 0.3315,
       "agri_stress": 0.0915,
@@ -764,7 +764,7 @@
           "area": 8
         }
       ],
-      "price_stress": 9.49,
+      "price_stress": 9.7,
       "drought": 0.7,
       "crop_dependence": 0.3142,
       "agri_stress": 0.088,
@@ -826,7 +826,7 @@
           "area": 9
         }
       ],
-      "price_stress": 12.79,
+      "price_stress": 13.06,
       "drought": 0.485,
       "crop_dependence": 0.4376,
       "agri_stress": 0.0849,
@@ -888,7 +888,7 @@
           "area": 271
         }
       ],
-      "price_stress": 5.15,
+      "price_stress": 5.44,
       "drought": 0.5825,
       "crop_dependence": 0.3616,
       "agri_stress": 0.0843,
@@ -955,7 +955,7 @@
           "area": 203
         }
       ],
-      "price_stress": 18.1,
+      "price_stress": 18.41,
       "drought": 0.4175,
       "crop_dependence": 0.4214,
       "agri_stress": 0.0704,
@@ -1022,7 +1022,7 @@
           "area": 2
         }
       ],
-      "price_stress": 10.39,
+      "price_stress": 10.62,
       "drought": 0.83,
       "crop_dependence": 0.1998,
       "agri_stress": 0.0663,
@@ -1084,7 +1084,7 @@
           "area": 84
         }
       ],
-      "price_stress": 15.51,
+      "price_stress": 15.77,
       "drought": 0.495,
       "crop_dependence": 0.3154,
       "agri_stress": 0.0624,
@@ -1146,7 +1146,7 @@
           "area": 420
         }
       ],
-      "price_stress": 19.83,
+      "price_stress": 20.1,
       "drought": 0.4025,
       "crop_dependence": 0.3517,
       "agri_stress": 0.0566,
@@ -1213,7 +1213,7 @@
           "area": 1
         }
       ],
-      "price_stress": 17.91,
+      "price_stress": 18.17,
       "drought": 0.2575,
       "crop_dependence": 0.5288,
       "agri_stress": 0.0545,
@@ -1280,17 +1280,17 @@
           "area": 454
         }
       ],
-      "price_stress": -3.26,
+      "price_stress": -3.03,
       "drought": 1.0,
       "crop_dependence": 0.1059,
-      "agri_stress": 0.0506,
+      "agri_stress": 0.0501,
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
         "total_crop_rai": 556402,
-        "price_term": 0.1304,
+        "price_term": 0.1212,
         "drought_term": 1.0,
-        "hazard": 0.4782,
+        "hazard": 0.4727,
         "rain_pct_of_normal": 56.3,
         "price_coverage": 1.0,
         "n_branches": 27,
@@ -1347,7 +1347,7 @@
           "area": 709
         }
       ],
-      "price_stress": 18.24,
+      "price_stress": 18.73,
       "drought": 0.205,
       "crop_dependence": 0.5965,
       "agri_stress": 0.0489,
@@ -1414,7 +1414,7 @@
           "area": 144
         }
       ],
-      "price_stress": 11.89,
+      "price_stress": 12.18,
       "drought": 0.67,
       "crop_dependence": 0.1742,
       "agri_stress": 0.0467,
@@ -1481,7 +1481,7 @@
           "area": 649
         }
       ],
-      "price_stress": 10.05,
+      "price_stress": 10.37,
       "drought": 0.245,
       "crop_dependence": 0.4677,
       "agri_stress": 0.0458,
@@ -1548,7 +1548,7 @@
           "area": 216
         }
       ],
-      "price_stress": 10.88,
+      "price_stress": 11.24,
       "drought": 0.4825,
       "crop_dependence": 0.2366,
       "agri_stress": 0.0457,
@@ -1615,7 +1615,7 @@
           "area": 5
         }
       ],
-      "price_stress": 16.08,
+      "price_stress": 16.49,
       "drought": 0.109,
       "crop_dependence": 1.0,
       "agri_stress": 0.0436,
@@ -1677,7 +1677,7 @@
           "area": 238
         }
       ],
-      "price_stress": 12.52,
+      "price_stress": 12.73,
       "drought": 0.2875,
       "crop_dependence": 0.3711,
       "agri_stress": 0.0427,
@@ -1744,7 +1744,7 @@
           "area": 1305
         }
       ],
-      "price_stress": 19.8,
+      "price_stress": 20.07,
       "drought": 0.5425,
       "crop_dependence": 0.1841,
       "agri_stress": 0.0399,
@@ -1762,73 +1762,6 @@
         "rice_rubber_share": 0.897,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
-        "ds_drought_elevated": false
-      }
-    },
-    {
-      "th": "ประจวบคีรีขันธ์",
-      "en": null,
-      "region": "Central&BKK",
-      "crop_mix": [
-        {
-          "crop": "Rubber",
-          "share": 0.3473,
-          "area": 272009
-        },
-        {
-          "crop": "Coconut",
-          "share": 0.2864,
-          "area": 224274
-        },
-        {
-          "crop": "Oil palm",
-          "share": 0.1948,
-          "area": 152584
-        },
-        {
-          "crop": "Pineapple",
-          "share": 0.0804,
-          "area": 62961
-        },
-        {
-          "crop": "Sugarcane",
-          "share": 0.0621,
-          "area": 48648
-        },
-        {
-          "crop": "Rice",
-          "share": 0.0278,
-          "area": 21793
-        },
-        {
-          "crop": "Maize",
-          "share": 0.0007,
-          "area": 565
-        },
-        {
-          "crop": "Cassava",
-          "share": 0.0004,
-          "area": 321
-        }
-      ],
-      "price_stress": -2.35,
-      "drought": 0.49,
-      "crop_dependence": 0.1491,
-      "agri_stress": 0.0376,
-      "double_stress": false,
-      "double_stress_score": 0.0,
-      "components": {
-        "total_crop_rai": 783155,
-        "price_term": 0.094,
-        "drought_term": 0.49,
-        "hazard": 0.2524,
-        "rain_pct_of_normal": 80.4,
-        "price_coverage": 1.0,
-        "n_branches": 33,
-        "n_rain_branches": 33,
-        "rice_rubber_share": 0.3751,
-        "ds_price_softening": true,
-        "ds_share_qualifies": false,
         "ds_drought_elevated": false
       }
     },
@@ -1878,7 +1811,7 @@
           "area": 7
         }
       ],
-      "price_stress": 20.55,
+      "price_stress": 20.91,
       "drought": 0.8225,
       "crop_dependence": 0.1136,
       "agri_stress": 0.0374,
@@ -1940,7 +1873,7 @@
           "area": 45
         }
       ],
-      "price_stress": 17.67,
+      "price_stress": 18.01,
       "drought": 0.3425,
       "crop_dependence": 0.2698,
       "agri_stress": 0.037,
@@ -1958,6 +1891,73 @@
         "rice_rubber_share": 0.826,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ประจวบคีรีขันธ์",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.3473,
+          "area": 272009
+        },
+        {
+          "crop": "Coconut",
+          "share": 0.2864,
+          "area": 224274
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.1948,
+          "area": 152584
+        },
+        {
+          "crop": "Pineapple",
+          "share": 0.0804,
+          "area": 62961
+        },
+        {
+          "crop": "Sugarcane",
+          "share": 0.0621,
+          "area": 48648
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0278,
+          "area": 21793
+        },
+        {
+          "crop": "Maize",
+          "share": 0.0007,
+          "area": 565
+        },
+        {
+          "crop": "Cassava",
+          "share": 0.0004,
+          "area": 321
+        }
+      ],
+      "price_stress": -1.98,
+      "drought": 0.49,
+      "crop_dependence": 0.1491,
+      "agri_stress": 0.0363,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 783155,
+        "price_term": 0.0792,
+        "drought_term": 0.49,
+        "hazard": 0.2435,
+        "rain_pct_of_normal": 80.4,
+        "price_coverage": 1.0,
+        "n_branches": 33,
+        "n_rain_branches": 33,
+        "rice_rubber_share": 0.3751,
+        "ds_price_softening": true,
+        "ds_share_qualifies": false,
         "ds_drought_elevated": false
       }
     },
@@ -1992,7 +1992,7 @@
           "area": 1
         }
       ],
-      "price_stress": 13.43,
+      "price_stress": 13.63,
       "drought": 0.5675,
       "crop_dependence": 0.1552,
       "agri_stress": 0.0352,
@@ -2054,7 +2054,7 @@
           "area": 623
         }
       ],
-      "price_stress": 39.82,
+      "price_stress": 40.16,
       "drought": 0.705,
       "crop_dependence": 0.1191,
       "agri_stress": 0.0336,
@@ -2121,7 +2121,7 @@
           "area": 16
         }
       ],
-      "price_stress": 13.23,
+      "price_stress": 13.68,
       "drought": 0.1625,
       "crop_dependence": 0.5083,
       "agri_stress": 0.033,
@@ -2183,7 +2183,7 @@
           "area": 340
         }
       ],
-      "price_stress": 13.81,
+      "price_stress": 14.06,
       "drought": 0.1025,
       "crop_dependence": 0.6736,
       "agri_stress": 0.0276,
@@ -2250,7 +2250,7 @@
           "area": 796
         }
       ],
-      "price_stress": 23.85,
+      "price_stress": 24.18,
       "drought": 0.175,
       "crop_dependence": 0.382,
       "agri_stress": 0.0267,
@@ -2317,7 +2317,7 @@
           "area": 1006
         }
       ],
-      "price_stress": 8.98,
+      "price_stress": 9.19,
       "drought": 0.9225,
       "crop_dependence": 0.0706,
       "agri_stress": 0.0261,
@@ -2379,7 +2379,7 @@
           "area": 3
         }
       ],
-      "price_stress": 16.53,
+      "price_stress": 16.79,
       "drought": 0.3275,
       "crop_dependence": 0.1891,
       "agri_stress": 0.0248,
@@ -2446,7 +2446,7 @@
           "area": 44
         }
       ],
-      "price_stress": 10.23,
+      "price_stress": 10.56,
       "drought": 0.1975,
       "crop_dependence": 0.2925,
       "agri_stress": 0.0231,
@@ -2503,7 +2503,7 @@
           "area": 5
         }
       ],
-      "price_stress": 2.24,
+      "price_stress": 2.4,
       "drought": 0.8075,
       "crop_dependence": 0.0688,
       "agri_stress": 0.0222,
@@ -2570,7 +2570,7 @@
           "area": 19
         }
       ],
-      "price_stress": 19.14,
+      "price_stress": 19.37,
       "drought": 0.1525,
       "crop_dependence": 0.3608,
       "agri_stress": 0.022,
@@ -2612,7 +2612,7 @@
           "area": 322
         }
       ],
-      "price_stress": 11.48,
+      "price_stress": 11.67,
       "drought": 0.7175,
       "crop_dependence": 0.0699,
       "agri_stress": 0.0201,
@@ -2664,7 +2664,7 @@
           "area": 39
         }
       ],
-      "price_stress": 35.89,
+      "price_stress": 36.28,
       "drought": 0.5,
       "crop_dependence": 0.0966,
       "agri_stress": 0.0193,
@@ -2726,7 +2726,7 @@
           "area": 23
         }
       ],
-      "price_stress": 23.89,
+      "price_stress": 24.34,
       "drought": 0.2227,
       "crop_dependence": 0.1951,
       "agri_stress": 0.0174,
@@ -2778,7 +2778,7 @@
           "area": 1
         }
       ],
-      "price_stress": 13.4,
+      "price_stress": 13.62,
       "drought": 0.7325,
       "crop_dependence": 0.0584,
       "agri_stress": 0.0171,
@@ -2835,7 +2835,7 @@
           "area": 12
         }
       ],
-      "price_stress": 11.3,
+      "price_stress": 11.48,
       "drought": 0.6512,
       "crop_dependence": 0.0629,
       "agri_stress": 0.0164,
@@ -2902,7 +2902,7 @@
           "area": 18
         }
       ],
-      "price_stress": 16.58,
+      "price_stress": 17.01,
       "drought": 0.355,
       "crop_dependence": 0.1016,
       "agri_stress": 0.0144,
@@ -2959,7 +2959,7 @@
           "area": 5
         }
       ],
-      "price_stress": 36.42,
+      "price_stress": 36.77,
       "drought": 0.4425,
       "crop_dependence": 0.0716,
       "agri_stress": 0.0127,
@@ -3026,7 +3026,7 @@
           "area": 99
         }
       ],
-      "price_stress": 39.61,
+      "price_stress": 39.93,
       "drought": 0.3025,
       "crop_dependence": 0.0974,
       "agri_stress": 0.0118,
@@ -3088,7 +3088,7 @@
           "area": 31
         }
       ],
-      "price_stress": 18.75,
+      "price_stress": 19.03,
       "drought": 0.1575,
       "crop_dependence": 0.1691,
       "agri_stress": 0.0107,
@@ -3155,7 +3155,7 @@
           "area": 34
         }
       ],
-      "price_stress": 7.73,
+      "price_stress": 8.03,
       "drought": 0.2177,
       "crop_dependence": 0.1179,
       "agri_stress": 0.0103,
@@ -3217,7 +3217,7 @@
           "area": 14
         }
       ],
-      "price_stress": 13.52,
+      "price_stress": 13.72,
       "drought": 0.3425,
       "crop_dependence": 0.0705,
       "agri_stress": 0.0097,
@@ -3274,7 +3274,7 @@
           "area": 110
         }
       ],
-      "price_stress": 34.37,
+      "price_stress": 34.78,
       "drought": 0.03,
       "crop_dependence": 0.723,
       "agri_stress": 0.0087,
@@ -3341,7 +3341,7 @@
           "area": 201
         }
       ],
-      "price_stress": 20.91,
+      "price_stress": 21.14,
       "drought": 0.1025,
       "crop_dependence": 0.1991,
       "agri_stress": 0.0082,
@@ -3383,7 +3383,7 @@
           "area": 53
         }
       ],
-      "price_stress": -59.58,
+      "price_stress": -59.11,
       "drought": 1.0,
       "crop_dependence": 0.0069,
       "agri_stress": 0.0069,
@@ -3445,7 +3445,7 @@
           "area": 750
         }
       ],
-      "price_stress": 14.86,
+      "price_stress": 15.13,
       "drought": 0.1625,
       "crop_dependence": 0.1064,
       "agri_stress": 0.0069,
@@ -3487,7 +3487,7 @@
           "area": 47
         }
       ],
-      "price_stress": -63.98,
+      "price_stress": -63.49,
       "drought": 1.0,
       "crop_dependence": 0.0067,
       "agri_stress": 0.0067,
@@ -3529,7 +3529,7 @@
           "area": 386
         }
       ],
-      "price_stress": 12.22,
+      "price_stress": 12.43,
       "drought": 0.8733,
       "crop_dependence": 0.0159,
       "agri_stress": 0.0056,
@@ -3596,7 +3596,7 @@
           "area": 33
         }
       ],
-      "price_stress": 19.71,
+      "price_stress": 20.34,
       "drought": 0.0725,
       "crop_dependence": 0.1943,
       "agri_stress": 0.0056,
@@ -3643,7 +3643,7 @@
           "area": 1
         }
       ],
-      "price_stress": 12.56,
+      "price_stress": 12.76,
       "drought": 0.7975,
       "crop_dependence": 0.016,
       "agri_stress": 0.0051,
@@ -3685,7 +3685,7 @@
           "area": 95
         }
       ],
-      "price_stress": 10.69,
+      "price_stress": 10.9,
       "drought": 1.0,
       "crop_dependence": 0.0034,
       "agri_stress": 0.0014,
@@ -3732,7 +3732,7 @@
           "area": 108
         }
       ],
-      "price_stress": 19.54,
+      "price_stress": 20.47,
       "drought": 0.3025,
       "crop_dependence": 0.002,
       "agri_stress": 0.0002,
@@ -3794,7 +3794,7 @@
           "area": 325
         }
       ],
-      "price_stress": 8.26,
+      "price_stress": 8.45,
       "drought": 0.0,
       "crop_dependence": 0.2365,
       "agri_stress": 0.0,
@@ -3856,7 +3856,7 @@
           "area": 417
         }
       ],
-      "price_stress": 10.66,
+      "price_stress": 10.91,
       "drought": 0.0,
       "crop_dependence": 0.6326,
       "agri_stress": 0.0,
@@ -3918,7 +3918,7 @@
           "area": 2
         }
       ],
-      "price_stress": 13.98,
+      "price_stress": 14.32,
       "drought": 0.0,
       "crop_dependence": 0.0569,
       "agri_stress": 0.0,
@@ -3980,7 +3980,7 @@
           "area": 16
         }
       ],
-      "price_stress": 14.93,
+      "price_stress": 15.23,
       "drought": 0.0,
       "crop_dependence": 0.136,
       "agri_stress": 0.0,
@@ -4037,7 +4037,7 @@
           "area": 142
         }
       ],
-      "price_stress": 16.18,
+      "price_stress": 16.55,
       "drought": 0.0,
       "crop_dependence": 0.0287,
       "agri_stress": 0.0,
@@ -4099,7 +4099,7 @@
           "area": 271
         }
       ],
-      "price_stress": 17.91,
+      "price_stress": 18.35,
       "drought": 0.0,
       "crop_dependence": 0.1414,
       "agri_stress": 0.0,
@@ -4151,7 +4151,7 @@
           "area": 22
         }
       ],
-      "price_stress": 30.72,
+      "price_stress": 31.22,
       "drought": 0.0,
       "crop_dependence": 0.346,
       "agri_stress": 0.0,
@@ -4203,7 +4203,7 @@
           "area": 17
         }
       ],
-      "price_stress": 34.29,
+      "price_stress": 34.59,
       "drought": 0.0,
       "crop_dependence": 0.0969,
       "agri_stress": 0.0,
@@ -4260,7 +4260,7 @@
           "area": 1
         }
       ],
-      "price_stress": 34.37,
+      "price_stress": 34.74,
       "drought": 0.0,
       "crop_dependence": 0.5299,
       "agri_stress": 0.0,
@@ -4312,7 +4312,7 @@
           "area": 27
         }
       ],
-      "price_stress": 35.56,
+      "price_stress": 35.96,
       "drought": 0.0,
       "crop_dependence": 0.1563,
       "agri_stress": 0.0,
@@ -4369,7 +4369,7 @@
           "area": 1
         }
       ],
-      "price_stress": 37.05,
+      "price_stress": 37.37,
       "drought": 0.0,
       "crop_dependence": 0.2311,
       "agri_stress": 0.0,
@@ -4421,7 +4421,7 @@
           "area": 42
         }
       ],
-      "price_stress": 37.45,
+      "price_stress": 37.81,
       "drought": 0.0,
       "crop_dependence": 0.129,
       "agri_stress": 0.0,
@@ -4483,7 +4483,7 @@
           "area": 2
         }
       ],
-      "price_stress": 38.09,
+      "price_stress": 38.45,
       "drought": 0.0,
       "crop_dependence": 0.3163,
       "agri_stress": 0.0,
@@ -4540,7 +4540,7 @@
           "area": 1
         }
       ],
-      "price_stress": 38.41,
+      "price_stress": 38.72,
       "drought": 0.0,
       "crop_dependence": 0.4683,
       "agri_stress": 0.0,
@@ -4592,7 +4592,7 @@
           "area": 9
         }
       ],
-      "price_stress": 39.19,
+      "price_stress": 39.51,
       "drought": 0.0,
       "crop_dependence": 0.1961,
       "agri_stress": 0.0,
@@ -4644,7 +4644,7 @@
           "area": 1
         }
       ],
-      "price_stress": 39.51,
+      "price_stress": 39.82,
       "drought": 0.0,
       "crop_dependence": 0.014,
       "agri_stress": 0.0,
@@ -4696,7 +4696,7 @@
           "area": 18
         }
       ],
-      "price_stress": 40.91,
+      "price_stress": 41.21,
       "drought": 0.0,
       "crop_dependence": 0.2291,
       "agri_stress": 0.0,
