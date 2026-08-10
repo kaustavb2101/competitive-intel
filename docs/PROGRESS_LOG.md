@@ -3,6 +3,34 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-10 — UX loop: `scope="col"` on the command-center impact-card drill table headers (PR #364, merged + deployed + verified)
+
+Autonomous UX-improvement run. The stated backlog's seven original findings are all long-closed, so this run
+continued the active thread — `ux-table-scope-sweep-appjs-REOPENED`, the a11y sweep the last several runs have
+taken surgical slices of (WCAG 1.3.1, Info and Relationships). **Fourth slice:** the two command-center
+**impact-card drill tables** in `platform/app.js` — `icBranchRows` (province→branch drill) and `icProvTable`
+(region→province drill), which render on `#home` plus the Assistance/Exposure/Competition impact strips via
+`renderImpactStrip` — built their column-header rows as inline template literals with bare `<th>` /
+`<th class="ic-ladcol">` / `<th title="…">` (no `scope="col"`), so a screen reader could not reliably associate
+each data cell with its column header on these wide drill tables.
+- **Fix:** added `scope="col"` to all **19 column headers** (8 in `icBranchRows`, 11 in `icProvTable`),
+  including the `ic-ladcol`-classed bucket-ladder header (class attr preserved). `title` tooltips untouched.
+  Diff is a pure `scope="col"` addition — zero visual change (non-presentational a11y attr).
+- **Safeguard protocol (all passed):** (a) `bash tests/run.sh check` → **130 passed · 0 failed** (data
+  validation 455/455); (b) `node --check app.js` clean + headless `#home` render self-reviewed — command
+  center intact (hero verdict card, nav, board thesis), on-theme, nothing broken; (c) no secrets in diff;
+  (d) diff = 2 files (`app.js` + one `docs/UXUI_AUDIT.md` log line), no stray files.
+- **Merge + deploy + verify:** squash-merged own PR #364 → master (`4e3dc61`); auto-deployed to Vercel prod.
+  Verified: production alias root **HTTP 200**, `app.js` **HTTP 200** and serving the NEW scoped content (live
+  `grep` confirms `ic-drilltbl … <th scope="col">Branch (tape)` / `<th scope="col">Province`). No rollback needed.
+- **Next recommended:** continue the REOPENED sweep — the remaining bare-`<th>` app.js families are the
+  **watchlist / decision-queue** tables (`renderWatchlist`, `renderHomeQueue`/`loadDecisionQueue`) and the
+  **assist-occupation** tables (`aodOccTable`/`aodSyncHitList`/`aodRenderLevel` on `#assist`), plus the
+  market/commodities/income table renderers (`renderMarketCollateral`, `renderCommoditiesBoard`,
+  `renderIncome`, `renderScenarios`) — each a clean one-slice surgical run. Test-infra items
+  `qa-visual-overflow-not-in-ci` and `qa-visual-baseline-stale` remain open but are out of scope for a
+  surgical `platform/` run.
+
 ## 2026-08-10 — Intelligence loop (service/deploy-health): the four remaining index-aligned per-branch popup joins (`branch_density`, `branch_fuel`, `branch_vehicles`, `branch_population`) now have deploy probes — shipped to master
 - **The gap fixed (`index-aligned-per-branch-popup-joins-unprobed-deploy-blind-spot`).** A corrected fetched-vs-probed diff — the ACTUAL `fetch('data/X.json')` calls in `app.js` (88 real fetches), not the naive `data/…json` mention grep — first debunked the previous run's named "next batch": `crop_mix.json` and `crop_margin.json` are **not** client-fetched at all (`crop_mix` reaches the page nested inside other layers; `crop_margin` is read SERVER-SIDE by `build_farm_book.py`), so they need no client-fetch probe. Of that batch only `dbd_formation`/`vehicle_registry` are genuinely fetched, and those are keyed/singleton (a broken deploy merely hides the Overview block). The genuinely **dangerous** unprobed class is the **index-aligned per-branch popup joins**: `branch_density.json` (MEASURED Overture buildings ≤10km), `branch_fuel.json` (MEASURED OSM fuel stations ≤10km floor), `branch_vehicles.json` (DLT vehicle-collateral stock, MEASURED mix + ESTIMATED allocation) and `branch_population.json` (ESTIMATED ~10km fallback population). All four are **2015-record lists indexed by BRANCH POSITION** (`BLDGDEN[idxOf(d)]` / `FUELSTN[idxOf(d)]` / `VEHDATA.branches[i]` gated on `n_est>0` / `BPOP[i]`), so a truncated-but-200 CDN body doesn't error — it silently paints the **WRONG branch's** density / fuel / vehicle-mix / population in the popup, with NO phone alert (each client store drops to `null` only on a non-200; a short 200 body misaligns every row after the cut). None had a `_shape_` probe in `pipeline/check_site_health.py`.
 - **The fix.** Added `_shape_branch_density` / `_shape_branch_fuel` / `_shape_branch_vehicles` / `_shape_branch_population` and registered all four in `DATA_FILES` next to the sibling per-branch probes (`branch_cropland`/`branch_agri`/`branch_pico`). Each asserts the render **contract** — shape not values (robust to a future Overture/OSM/DLT/WorldPop vintage): the **2015**-record index-aligned list the popup indexes, plus the specific render read on the first record (`buildings_10km` / `n10` / `fleet`+`n_est`+`pickup_share` on the first `n_est>0` record + the `meta.labels` fleet-row label table / a numeric `.values` entry). One file, `pipeline/check_site_health.py`, +90 lines, zero deletions.
