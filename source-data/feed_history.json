@@ -4,8 +4,8 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 202,
-  "n_series": 28,
+  "n_points": 206,
+  "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
  },
@@ -214,11 +214,12 @@
     "2026-08-07",
     "2026-08-08",
     "2026-08-09",
-    "2026-08-10"
+    "2026-08-10",
+    "2026-08-11"
    ],
    "first_seen": "2026-07-11",
    "label": "River stations above their high mark",
-   "n": 18,
+   "n": 19,
    "path": "platform/data/thaiwater_flood.json",
    "source": "ThaiWater live river/reservoir telemetry",
    "unit": "stations",
@@ -240,7 +241,8 @@
     149.0,
     164.0,
     170.0,
-    165.0
+    165.0,
+    159.0
    ]
   },
   "fuel_diesel": {
@@ -347,6 +349,21 @@
     35.99,
     35.99,
     35.99
+   ]
+  },
+  "macro_usd_thb": {
+   "cadence": "weekly",
+   "dates": [
+    "2026-08-09"
+   ],
+   "first_seen": "2026-08-09",
+   "label": "USD/THB · baht per US dollar",
+   "n": 1,
+   "path": "platform/data/macro_indicators.json",
+   "source": "ECB reference rate (via Frankfurter) — folded by build_macro_indicators.py",
+   "unit": "THB/USD",
+   "values": [
+    33.055
    ]
   },
   "nabc_rice_price": {
@@ -475,11 +492,12 @@
     "2026-08-07",
     "2026-08-08",
     "2026-08-09",
-    "2026-08-10"
+    "2026-08-10",
+    "2026-08-11"
    ],
    "first_seen": "2026-07-10",
    "label": "Provinces with heavy rain somewhere",
-   "n": 18,
+   "n": 19,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "provinces",
@@ -501,7 +519,8 @@
     31.0,
     31.0,
     16.0,
-    25.0
+    25.0,
+    24.0
    ]
   },
   "rain_max_mm": {
@@ -524,11 +543,12 @@
     "2026-08-07",
     "2026-08-08",
     "2026-08-09",
-    "2026-08-10"
+    "2026-08-10",
+    "2026-08-11"
    ],
    "first_seen": "2026-07-10",
    "label": "Heaviest 24h rainfall, any gauge",
-   "n": 18,
+   "n": 19,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "mm",
@@ -550,7 +570,8 @@
     179.5,
     206.4,
     292.1,
-    120.0
+    120.0,
+    110.8
    ]
   },
   "rival_ads_live": {
