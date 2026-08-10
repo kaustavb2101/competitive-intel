@@ -2145,6 +2145,9 @@ function renderOverview(){
   // sections: collateral mix (point 12), diesel share (point 10), the brand tiles (point 8), the
   // truck fleet (point 18) and the used-collateral pulse (point 19). Null-safe: absent → hides.
   renderCollateralBook();
+  // MEASURED book-appraisal-vs-market-recovery check (collateral_census.json) — names the class × age
+  // pools where our book appraisal sits furthest above the measured auction price (obj #1). Null-safe.
+  renderCollatBookCheck();
   // MEASURED new-pickup inflow trend (brand_trends.json, DLT) — the TIME dimension behind the
   // collateral book: how fast the future used-pickup pool replenishes. Null-safe.
   loadBrandTrends().then(renderBrandTrends);
@@ -11101,6 +11104,58 @@ function renderCollateralBook(){
           A <b>new</b> growth cell means the nameplate had no comparable prior-year period (it did not exist a year ago); a <b>—</b> means the year-earlier comparison itself is not available for another reason.
           Never read a blank as 0% or a debut as +100%.</p>`;
     }).catch(()=>{ npz.style.display='none'; });
+  }).catch(()=>{ host.style.display='none'; });
+}
+
+// BOOK APPRAISAL vs MEASURED MARKET RECOVERY (data/collateral_census.json, build_collateral_census.py, obj #1).
+// The collateral book above says we lend N% of assessed value and calls that gap "the headroom a resale
+// fall eats into". This names WHERE that headroom is thinnest: the specific collateral pools (class × age
+// band) whose book appraisal (eval_avg, from the real loan tape) sits furthest above the MEASURED auction
+// price the title would actually recover into, with the pool's 30+ delinquency beside it. Null-safe: absent
+// layer, no priced pools, or a fetch error → the whole block hides itself (no console noise, no half-render).
+function renderCollatBookCheck(){
+  const host=document.getElementById('collat-bookcheck'); if(!host) return;
+  tmliFetch('collateral_census').then(j=>{
+    if(!j||!Array.isArray(j.book_check)||!j.book_check.length){ host.style.display='none'; return; }
+    const num=n=>Number(n).toLocaleString('en-US');
+    const B=v=>v==null?'—':'฿'+Math.round(v).toLocaleString('en-US');
+    const ageLab=s=>String(s||'').replace(/^\d+\./,'').replace(/\s*yr\.?$/,' yr');
+    // priced pools = those with a MEASURED auction comparable and material exposure, ranked by the
+    // book-to-auction gap (higher = less of the appraisal is recoverable at auction).
+    const pools=j.book_check.filter(r=>r.eval_vs_auction&&r.market_auction&&(r.n_accounts||0)>=200)
+      .sort((a,b)=>b.eval_vs_auction-a.eval_vs_auction);
+    if(!pools.length){ host.style.display='none'; return; }
+    host.style.display='';
+    const covered=j.book_check.reduce((a,r)=>a+(r.n_accounts||0),0);
+    const over2acc=pools.filter(r=>r.eval_vs_auction>=2).reduce((a,r)=>a+(r.n_accounts||0),0);
+    const w=pools[0];
+    const wdpd=(w.dpd30p_pct==null)?'':`, on a <b>${w.dpd30p_pct.toFixed(1)}%</b> 30+ delinquency rate`;
+    const rows=pools.slice(0,10).map(r=>{
+      const gapCol=r.eval_vs_auction>=2?'var(--agri)':r.eval_vs_auction>=1.5?'var(--gold)':'var(--merch)';
+      return `<tr>
+        <td><b>${r.collateral_class}</b></td>
+        <td>${ageLab(r.age_band)}</td>
+        <td class="n">${num(r.n_accounts)}</td>
+        <td class="n">${B(r.eval_avg)}</td>
+        <td class="n" title="MEASURED median auction/venue price for this class and age band">${B(r.market_auction)}</td>
+        <td class="n"><b style="color:${gapCol}">${r.eval_vs_auction.toFixed(2)}×</b></td>
+        <td class="n">${r.dpd30p_pct==null?'—':r.dpd30p_pct.toFixed(1)+'%'}</td></tr>`;
+    }).join('');
+    host.innerHTML=`<h4 class="fb-h4">Book appraisal vs measured market recovery — where the gap is widest
+        <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · auction/retail listings × real loan tape</span></h4>
+      <div class="verdict"><b style="color:var(--agri)">On our oldest vehicle pools the book values collateral far above what it fetches at auction.</b>
+        The widest gap is <b>${w.collateral_class}, ${ageLab(w.age_band)}</b>: ${num(w.n_accounts)} accounts appraised at <b>${B(w.eval_avg)}</b> per account against a MEASURED auction price of <b>${B(w.market_auction)}</b> — a <b style="color:var(--agri)">${w.eval_vs_auction.toFixed(2)}×</b> book-to-auction gap${wdpd}.
+        Across the priced pools, <b>${num(over2acc)}</b> accounts sit where the appraisal is at least twice the auction price — the recovery shortfall a default in these pools would expose.
+        <span class="sub">Priced pools cover ${num(covered)} accounts. Ranked by book ÷ auction; a higher ratio means less of the appraisal is recoverable at auction. "Our book" is our own per-account appraisal (eval_avg) from the real loan tape.</span></div>
+      <table class="tbl"><tr>
+        <th scope="col">Collateral class</th><th scope="col">Age</th>
+        <th scope="col" title="Accounts in this class × age-band pool">Accounts</th>
+        <th scope="col" title="Our own per-account appraisal (eval_avg) from the real loan tape">Our book</th>
+        <th scope="col" title="MEASURED median auction/venue price for this class and age band">Mkt auction</th>
+        <th scope="col" title="Book appraisal ÷ measured auction price — higher = less recoverable">Book ÷ auc</th>
+        <th scope="col" title="30+ days-past-due share of accounts in this pool">30+ DPD</th></tr>
+      ${rows}</table>
+      <p class="lead">MEASURED — observed auction lots and retail listings (every cell carries its own n; nothing below 8 is published) × MEASURED book appraisal (eval_avg) from the real loan tape. The mapping of venue brand/model onto the tape's collateral classes is an ESTIMATED classification, and the retail-to-auction corridor is an ESTIMATED corridor, not a realised recovery rate. Blended classes (bare HONDA, land) are withheld from this check.</p>`;
   }).catch(()=>{ host.style.display='none'; });
 }
 
