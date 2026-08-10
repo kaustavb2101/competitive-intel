@@ -16,6 +16,19 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Supersede rather than pile up. `pr-autoresolve` dispatches this workflow once per open PR every
+# time master moves, so two master merges in quick succession put two gate runs on the SAME branch
+# head into the queue — and until now both ran to completion even though the first was answering a
+# question the second had already replaced. On GitHub's runners that was invisible waste; on a
+# single self-hosted runner it is worse than waste, because the stale run occupies the only executor
+# and the useful one waits behind it.
+#
+# Keyed on the PR number where there is one and the ref otherwise, so runs are only ever cancelled
+# by a newer run of the SAME branch — never across branches.
+concurrency:
+  group: qa-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   qa:
     # WHY THIS LEFT ubuntu-latest. Measured over 29 hours / 200 runs: QA was 3,050 of the repo's
