@@ -6737,12 +6737,12 @@ function drawPeerOutliers(){
     if(ro) ro.innerHTML='<b>Peer benchmark not yet computed.</b> <span class="sub">Run pipeline/build_branch_peers.py — the audit-first list fills in on the next data refresh.</span>';
     return;
   }
-  tbl.innerHTML=`<tr><th>#</th><th>Branch</th><th>Province</th><th>Region</th>`+
-    `<th class="h-risk" title="ESTIMATED composite risk proxy (0–100) from branch_risk.json">Risk ▲</th>`+
-    `<th title="Median composite risk of the 15 statistical twins">Twins</th>`+
-    `<th class="h-risk" title="Points above the twin median — the branch-local anomaly">+ vs twins</th>`+
-    `<th title="Component driving the branch's composite (household / agri / occupation / segment)">Driver</th>`+
-    `<th title="The 3 nearest twins (name · risk) — similar measured markets elsewhere">Closest twins</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Branch</th><th scope="col">Province</th><th scope="col">Region</th>`+
+    `<th scope="col" class="h-risk" title="ESTIMATED composite risk proxy (0–100) from branch_risk.json">Risk ▲</th>`+
+    `<th scope="col" title="Median composite risk of the 15 statistical twins">Twins</th>`+
+    `<th scope="col" class="h-risk" title="Points above the twin median — the branch-local anomaly">+ vs twins</th>`+
+    `<th scope="col" title="Component driving the branch's composite (household / agri / occupation / segment)">Driver</th>`+
+    `<th scope="col" title="The 3 nearest twins (name · risk) — similar measured markets elsewhere">Closest twins</th></tr>`+
     rows.map((o,i)=>{
       const tw=(o.twins||[]).map(t=>`${t.name} <span class="mono sub">${t.risk}</span>`).join('<br>');
       return `<tr>
@@ -6782,12 +6782,12 @@ function drawSiegeTable(){
     if(ro) ro.innerHTML='<b>Rival pressure not yet computed.</b> <span class="sub">Run pipeline/build_rival_pressure.py — the besieged list fills in on the next data refresh.</span>';
     return;
   }
-  tbl.innerHTML=`<tr><th>#</th><th>Branch</th><th>Province</th><th>Region</th>`+
-    `<th class="h-risk" title="MEASURED — rival branches within 2 km (merged competitor census)">Rivals ≤2 km</th>`+
-    `<th title="MEASURED — rival branches within 5 km">≤5 km</th>`+
-    `<th title="MEASURED — the closest rival brand and its distance (haversine)">Nearest rival</th>`+
-    `<th title="MEASURED — which brands hold the 2 km ring (brand · count)">Who surrounds it</th>`+
-    `<th class="no-print">3D</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Branch</th><th scope="col">Province</th><th scope="col">Region</th>`+
+    `<th scope="col" class="h-risk" title="MEASURED — rival branches within 2 km (merged competitor census)">Rivals ≤2 km</th>`+
+    `<th scope="col" title="MEASURED — rival branches within 5 km">≤5 km</th>`+
+    `<th scope="col" title="MEASURED — the closest rival brand and its distance (haversine)">Nearest rival</th>`+
+    `<th scope="col" title="MEASURED — which brands hold the 2 km ring (brand · count)">Who surrounds it</th>`+
+    `<th scope="col" class="no-print">3D</th></tr>`+
     rows.map((o,i)=>{
       const by=(o.by2||[]).map(p=>`${p[0]} <span class="mono sub">${p[1]}</span>`).join(' · ');
       return `<tr>
@@ -6836,7 +6836,7 @@ function renderTrendBaseline(deltas){
     if(top.length){
       html+=`<h2 class="risk" style="margin-top:18px">Most-stressed provinces now ${TAG_E}</h2>`+
         `<p class="lead">Top provinces by mean composite risk (0–100) at the current vintage. The flat marker becomes a trend line at the next refresh.</p>`+
-        `<table class="tbl"><tr><th>#</th><th>Province</th><th>Region</th><th title="AutoX branches (measured)">Branches</th><th title="mean of the estimated per-branch composite, 0–100">Mean risk ▲</th><th>p90</th><th>Trend</th></tr>`+
+        `<table class="tbl"><tr><th scope="col">#</th><th scope="col">Province</th><th scope="col">Region</th><th scope="col" title="AutoX branches (measured)">Branches</th><th scope="col" title="mean of the estimated per-branch composite, 0–100">Mean risk ▲</th><th scope="col">p90</th><th scope="col">Trend</th></tr>`+
         top.map((p,i)=>{const mr=p.mean_risk||0; const rc=mr>=60?'var(--agri)':mr>=45?'var(--gold)':'var(--merch)';
           return `<tr><td class="mono sub">${i+1}</td><td><b>${p.province}</b></td><td class="sub">${p.region||''}</td>`+
             `<td class="mono">${p.n_branches||0}</td>`+
@@ -6851,7 +6851,7 @@ function renderTrendBaseline(deltas){
     const top=CSTRESS_LIST.slice(0,6);
     html+=`<h2 class="risk" style="margin-top:18px">Worst crop-household stress now ${TAG_E}</h2>`+
       `<p class="lead">Agri-stress proxy (0–100) per province — crop-price direction (MEASURED Thai farm-gate · NABC/OAE) × drought × crop dependence.</p>`+
-      `<table class="tbl"><tr><th>#</th><th>Province</th><th>Region</th><th>Dominant crop</th><th title="planting-area-weighted crop-price YoY — MEASURED Thai farm-gate (NABC live / OAE); World Bank global proxy is fallback only, for unpriced crops (none in current vintage)">Price YoY</th><th>Agri-stress ▲</th><th>Trend</th></tr>`+
+      `<table class="tbl"><tr><th scope="col">#</th><th scope="col">Province</th><th scope="col">Region</th><th scope="col">Dominant crop</th><th scope="col" title="planting-area-weighted crop-price YoY — MEASURED Thai farm-gate (NABC live / OAE); World Bank global proxy is fallback only, for unpriced crops (none in current vintage)">Price YoY</th><th scope="col">Agri-stress ▲</th><th scope="col">Trend</th></tr>`+
       top.map((w,i)=>{const sv=Math.round((w.agri_stress||0)*100); const sc=sv>=60?'var(--agri)':sv>=40?'var(--gold)':'var(--merch)';
         const crop=(w.crop_mix&&w.crop_mix[0]&&w.crop_mix[0].crop)||'—';
         return `<tr><td class="mono sub">${i+1}</td><td><b>${w.th}</b></td><td class="sub">${w.region||''}</td>`+
@@ -6866,7 +6866,7 @@ function renderTrendBaseline(deltas){
     const top=HHRISK_LIST.slice(0,6);
     html+=`<h2 class="risk" style="margin-top:18px">Highest household leverage now ${TAG_M}</h2>`+
       `<p class="lead">Debt-to-income per province (NSO SES, measured). Higher leverage = thinner repayment buffer on the title book.</p>`+
-      `<table class="tbl"><tr><th>#</th><th>Province</th><th>Region</th><th title="household debt ÷ annual income, NSO measured">DTI ▲</th><th>Trend</th></tr>`+
+      `<table class="tbl"><tr><th scope="col">#</th><th scope="col">Province</th><th scope="col">Region</th><th scope="col" title="household debt ÷ annual income, NSO measured">DTI ▲</th><th scope="col">Trend</th></tr>`+
       top.map((p,i)=>{const dti=p.debt_to_income||0; const dc=dti>=1?'var(--agri)':dti>=0.7?'var(--gold)':'var(--merch)';
         return `<tr><td class="mono sub">${i+1}</td><td><b>${p.province}</b></td><td class="sub">${p.region||''}</td>`+
           `<td>${barHTML(Math.min(dti*60,100),dc)} <span class="mono" style="color:${dc}">${dti.toFixed(2)}×</span></td>`+
