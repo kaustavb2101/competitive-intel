@@ -1640,6 +1640,149 @@ def _shape_branch_pico(d):
     return None
 
 
+def _shape_branch_occupations(d):
+    # The per-branch MEASURED establishment-by-occupation rollup (branch_occupations.json,
+    # pipeline/build_occupations.py — Overture POI points within 10km bucketed into 14
+    # occupation classes). It is load-bearing on TWO surfaces: the #map "estab" lens
+    # (estabCount(d)=OCCDATA.branches[i].t, so the array MUST stay index-aligned to
+    # branches.json) AND the branch popup's occupation-mix block (reads .buckets labels +
+    # per-branch .o[] counts). The client loader sets OCCDATA=null on any fetch/parse
+    # failure and every reader returns 0/'' when the record is missing, so a truncated/404
+    # CDN deploy silently zeroes the estab lens and drops the popup block with NO phone
+    # alert — the same "broken demo" blind spot the branch_cropland / branch_pico probes
+    # closed for their per-branch siblings. Asserts the render contract (the .buckets label
+    # list + the 2015-branch index-aligned array + the numeric .t lens read and .o[] counts
+    # the popup reads) as SHAPE not values, robust to a future Overture-vintage refresh.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    buckets = d.get("buckets")
+    if not isinstance(buckets, list) or not buckets:
+        return "missing/empty 'buckets' label list (popup occupation-row labels + map lens)"
+    recs = d.get("branches")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'branches' array (client OCCDATA gate + estabCount OCCDATA[i] read)"
+    if len(recs) != 2015:
+        return "expected 2015 branch records (index-aligned to branches.json), got %d" % len(recs)
+    r0 = recs[0]
+    if not isinstance(r0, dict):
+        return "first 'branches' record is not an object"
+    if not isinstance(r0.get("o"), list):
+        return "first branch record missing 'o' list (per-bucket establishment counts, popup .o[j] read)"
+    if not isinstance(r0.get("t"), (int, float)) or isinstance(r0.get("t"), bool):
+        return "first branch record missing numeric 't' (total ≤10km — the #map estab lens val())"
+    return None
+
+
+def _shape_branch_workforce(d):
+    # The per-branch ESTIMATED WORKFORCE-mix layer (branch_workforce.json,
+    # pipeline/build_branch_workforce.py — people-by-occupation within 10km, each bucket
+    # from the source that measures it: farmers SPAM×OAE anchored to NSO, factory DIW, the
+    # storefront classes Overture×headcount). Unlike branch_occupations (which counts
+    # BUSINESSES and buries farmers), this is the lead-by-occupation "who WORKS here" read.
+    # It renders the "Workforce mix" block in every branch popup (workforcePopupHTML reads
+    # WFDATA.branches[i], GATES on e.t>0, then the .buckets labels + per-branch .w[]/.mix[]
+    # bars). The client loader sets WFDATA=null on any fetch/parse failure and the helper
+    # returns '' when the record is missing, so a truncated/404 CDN deploy silently drops
+    # the block from every popup with NO phone alert. Asserts the render contract (the
+    # .buckets label list + the 2015-branch index-aligned array + the numeric .t gate and
+    # the .w[]/.mix[] bars) as SHAPE not values, robust to a future vintage refresh.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    buckets = d.get("buckets")
+    if not isinstance(buckets, list) or not buckets:
+        return "missing/empty 'buckets' label list (popup workforce-row labels)"
+    recs = d.get("branches")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'branches' array (client WFDATA gate + popup WFDATA[i] read)"
+    if len(recs) != 2015:
+        return "expected 2015 branch records (index-aligned to branches.json), got %d" % len(recs)
+    r0 = recs[0]
+    if not isinstance(r0, dict):
+        return "first 'branches' record is not an object"
+    for k in ("w", "mix"):
+        if not isinstance(r0.get(k), list):
+            return "first branch record missing '%s' list (per-bucket people/pct, popup bar render read)" % k
+    if not isinstance(r0.get("t"), (int, float)) or isinstance(r0.get("t"), bool):
+        return "first branch record missing numeric 't' (total workers ≤10km — popup render gate)"
+    return None
+
+
+def _shape_branch_agri(d):
+    # The per-branch AGRICULTURE profile (branch_agri.json, obj #1 —
+    # pipeline/build_branch_agri.py): crop exposure (SPAM) + REAL OAE farm-gate price
+    # stress + per-branch drought + est farm income. It renders the "Agriculture — crop
+    # exposure & stress" block in every branch popup (agriPopupHTML reads AGRIDATA.branches[i],
+    # GATES on e.crop_ha>0, then the meta.crops labels + per-crop .ha[]/.sh[] bars +
+    # .price_yoy / .agri_pressure / .rain_anom / .income_est lines). It is DISTINCT from
+    # branch_cropland (absolute AREA, already probed): this carries the price/drought/income
+    # STRESS reads. The client loader sets AGRIDATA=null on any fetch/parse failure and the
+    # helper returns '' when the record is missing, so a truncated/404 CDN deploy silently
+    # drops the obj-#1 agri-stress block from every popup with NO phone alert. Asserts the
+    # render contract (meta.crops label list + the 2015-branch index-aligned array + the
+    # .crop_ha gate and .ha[]/.sh[] bars) as SHAPE not values, robust to a future
+    # OAE-farm-gate / SPAM vintage moving the numbers.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    crops = d.get("meta", {}).get("crops") if isinstance(d.get("meta"), dict) else None
+    if not isinstance(crops, list) or not crops:
+        return "missing/empty meta.crops label list (popup per-crop row labels)"
+    recs = d.get("branches")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'branches' array (client AGRIDATA gate + popup AGRIDATA[i] read)"
+    if len(recs) != 2015:
+        return "expected 2015 branch records (index-aligned to branches.json), got %d" % len(recs)
+    r0 = recs[0]
+    if not isinstance(r0, dict):
+        return "first 'branches' record is not an object"
+    for k in ("ha", "sh"):
+        if not isinstance(r0.get(k), list):
+            return "first branch record missing '%s' list (per-crop hectares/share, popup bar render read)" % k
+    if not isinstance(r0.get("crop_ha"), (int, float)) or isinstance(r0.get("crop_ha"), bool):
+        return "first branch record missing numeric 'crop_ha' (popup crop-area gate render read)"
+    return None
+
+
+def _shape_macro_exposure(d):
+    # The per-branch MACRO-EXPOSURE profile (macro_exposure.json, obj #1 —
+    # pipeline/build_macro_exposure.py: MEASURED occupation shares × ESTIMATED sensitivity
+    # weights × MEASURED macro signals → a share-diluted per-factor exposure). It is
+    # load-bearing on TWO surfaces: the #map "macx" macro-headwind lens (macxHeadwindVal /
+    # macxDomTally read macxVec[i] AND MACX[i] TOGETHER — so BOTH the .vector and .branches
+    # arrays must stay index-aligned to branches.json at 2015, or the lens paints the wrong
+    # branches) AND the branch popup (macxRec(d)=MACX[i] → .t3[] dominant-factor chips,
+    # labelled off meta.factors/meta.factor_keys). The client loader sets MACX/macxVec=null
+    # on any fetch/parse failure and every reader returns 0/null when a record is missing,
+    # so a truncated/404 CDN deploy silently zeroes the macx lens and drops the popup chips
+    # with NO phone alert. Asserts the render contract (meta.factors + meta.factor_keys label
+    # tables + the 2015-branch index-aligned .branches with a .t3 tuple list + the 2015-entry
+    # index-aligned .vector the lens reads) as SHAPE not values, robust to a future vintage.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object (factor label tables)"
+    if not isinstance(meta.get("factors"), list) or not meta.get("factors"):
+        return "missing/empty meta.factors (popup chip factor labels — macxFactor lookup)"
+    if not isinstance(meta.get("factor_keys"), list) or not meta.get("factor_keys"):
+        return "missing/empty meta.factor_keys (map-lens macxDomTally dominant-factor key list)"
+    recs = d.get("branches")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'branches' array (client MACX gate + popup/lens MACX[i] read)"
+    if len(recs) != 2015:
+        return "expected 2015 branch records (index-aligned to branches.json), got %d" % len(recs)
+    r0 = recs[0]
+    if not isinstance(r0, dict) or not isinstance(r0.get("t3"), list):
+        return "first 'branches' record missing 't3' tuple list (popup dominant-factor chips)"
+    vec = d.get("vector")
+    if not isinstance(vec, list) or not vec:
+        return "missing/empty 'vector' array (the #map macx lens macxVec[i] read)"
+    if len(vec) != 2015:
+        return "expected 2015 vector entries (index-aligned to branches.json + MACX), got %d" % len(vec)
+    if not isinstance(vec[0], list):
+        return "first 'vector' entry is not a [dominant-idx, score] list (macx lens read)"
+    return None
+
+
 def _shape_vehicle_mix(d):
     # The collateral board's fleet-mix panel (`cb-mix`, obj #1 — vehicle titles are
     # ~75% of the book, so the stock-vs-new-registration gap by DLT class is a direct
@@ -2364,6 +2507,10 @@ DATA_FILES = [
     # the flood_hazard / branch_labor obj-#1 probes closed for their siblings.
     ("data/branch_cropland.json", _shape_branch_cropland, ".meta.crops + 2015-branch index-aligned .branches with ha[]/crop_ha (per-branch crop-area popup block)"),
     ("data/branch_pico.json", _shape_branch_pico, "2015-branch index-aligned .branches with numeric pico/head/branch/recent (per-branch PICO-rival popup block, obj #2)"),
+    ("data/branch_occupations.json", _shape_branch_occupations, ".buckets labels + 2015-branch index-aligned .branches with t/o[] (per-branch occupation-mix popup + #map estab lens, MEASURED)"),
+    ("data/branch_workforce.json", _shape_branch_workforce, ".buckets labels + 2015-branch index-aligned .branches with t/w[]/mix[] (per-branch workforce-mix popup, lead-by-occupation, ESTIMATED)"),
+    ("data/branch_agri.json", _shape_branch_agri, ".meta.crops + 2015-branch index-aligned .branches with crop_ha/ha[]/sh[] (per-branch agri crop-exposure+stress popup, obj #1)"),
+    ("data/macro_exposure.json", _shape_macro_exposure, ".meta.factors/factor_keys + 2015-branch index-aligned .branches (t3[]) + 2015-entry .vector (per-branch macro-headwind popup + #map macx lens, obj #1)"),
     # The two collateral-board fleet reads from the same DLT wave, both surfaced via
     # tmliFetch and both self-hiding (display='none') on a truncated/404 deploy with no
     # phone alert — annual off-cadence pulls, so neither self-heals from CI (probe = the
