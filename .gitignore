@@ -158,3 +158,8 @@ graphify-out/
 
 # Editor / session-local config
 .vscode/
+
+# Used-collateral price census harvests (pull_collateral_census.py). Multi-GB of raw venue
+# records; regenerable from the pullers, and the auction history alone runs to ~5GB filtered.
+# Aggregates that the app consumes go to platform/data via build_collateral_census.py.
+source-data/census/

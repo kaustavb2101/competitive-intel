@@ -415,6 +415,7 @@ build_province_lfs|source-data/staging/nso_lfs.json
 build_region_debt|source-data/staging/bot_hhdebt.json
 build_amphoe_crops|source-data/staging/amphoe_crops_*.json + doae_amphoe_crops.json
 build_tape_layers|source-data/staging/real_tape_aggregates.json
+build_collateral_census|source-data/staging/collateral_census_agg.json
 build_impact_cards|source-data/branches_final.json + commodity_board.json + employment_by_province.json
 build_income_impact|source-data/commodity_board.json + crop_prov_area.json + energy_prices.json
 build_scenarios|source-data/commodity_board.json
