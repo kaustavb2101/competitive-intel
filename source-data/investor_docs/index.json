@@ -2,7 +2,7 @@
  "meta": {
   "title": "Investor-facing disclosure — 56-1 One Report + SET Opportunity Day decks for the six SET-listed Thai title-loan peers",
   "generated_by": "pipeline/pull_investor_docs.py",
-  "generated_date": "2026-08-09",
+  "generated_date": "2026-08-10",
   "label": "MEASURED — companies' own published investor documents. kind=annual: the 56-1 One Report (Thailand's annual registration statement), the only public document carrying a product/collateral split — the audited notes of all six peers stop at 'loan receivables' + 'hire-purchase receivables'. kind=oppday: SET Opportunity Day quarterly earnings-call slide decks.",
   "source": "Company IR sites (Optiwise / listedcompany.com) + SET Opportunity Day (api.lcp.setgroup.or.th). The 56-1 is NOT filed to SET and NOT available from SEC Thailand — see this script's docstring.",
   "annual_year": 2025,
