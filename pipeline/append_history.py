@@ -352,6 +352,21 @@ REGISTRY = [
          label="Social-listening corpus · total demand documents", unit="documents", cadence="weekly",
          source="app-store reviews + YouTube comments + Pantip threads (build_social_themes.py)",
          pick=_social_corpus_docs),
+
+    # ---- macro FX — the one daily-moving value in the otherwise-quarterly macro file -------------
+    # macro_indicators.json's headline reads (household_debt_gdp, policy_rate) are BIS series that
+    # legitimately sit flat for months — policy_rate = 1.0 across 5 straight periods, the debt ratio
+    # oscillates 87.2–87.5 — so a frozen-value canary on either would cry wolf. usd_thb is the ECB
+    # daily reference rate (via Frankfurter), refreshed on every weekly data-macro.yml pull and
+    # essentially never flat to 3 decimals across two business weeks, so it is the file's true
+    # liveness pulse: it moves whenever the puller reaches ECB and freezes ONLY if that fetch dies
+    # while the file keeps re-committing. TEST-A stale-stamp coverage already exists via live_board's
+    # macro_indicators row, but TEST A is blind to a refreshed meta.pulled over a stale rate — the
+    # exact dead-but-present shape TEST B exists for. `pulled` is the pull stamp the workflow advances.
+    dict(key="macro_usd_thb", path="platform/data/macro_indicators.json", stamp=("pulled",),
+         label="USD/THB · baht per US dollar", unit="THB/USD", cadence="weekly",
+         source="ECB reference rate (via Frankfurter) — folded by build_macro_indicators.py",
+         pick=lambda d: dig(d, "indicators.usd_thb.value")),
 ]
 
 

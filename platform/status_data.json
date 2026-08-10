@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-10T10:24:06+00:00",
-    "commit": "0e3fcac"
+    "generated_at": "2026-08-10T22:30:35+00:00",
+    "commit": "b6b85c3"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,78 @@
   ],
   "activity": [
     {
+      "date": "2026-08-10T22:30:35+00:00",
+      "sha": "b6b85c3",
+      "summary": "health(feed-liveness): add macro_usd_thb frozen-value canary for the weekly macro FX read",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-10T22:06:29+00:00",
+      "sha": "6fc55ff",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-10, run 31436513078)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-10T20:25:05+00:00",
+      "sha": "328759d",
+      "summary": "docs: log ux-loop assist-occupation scope=col slice (PR #366 merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-11T03:22:07+07:00",
+      "sha": "2bb73fd",
+      "summary": "ux: add scope=col to assistance-occupation drill table headers (a11y) (#366)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-10T18:32:40+00:00",
+      "sha": "ca5e9b2",
+      "summary": "health(feed-liveness): add social_corpus_docs frozen-value canary for the #acq social-listening feed",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-10T16:36:23+00:00",
+      "sha": "490a46e",
+      "summary": "health(feed-liveness): add rival_youtube_views frozen-value canary",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-10T16:15:52+00:00",
+      "sha": "c2e59ad",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-10, run 31407596648)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-10T14:53:22+00:00",
+      "sha": "a3af60c",
+      "summary": "docs: log ux-loop scope=col impact-card slice (PR #364 merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-10T21:49:17+07:00",
+      "sha": "4e3dc61",
+      "summary": "ux: add scope=col to impact-card drill table headers (a11y) (#364)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-10T13:13:08+00:00",
+      "sha": "febe487",
+      "summary": "fix(gate): regenerate stale branch_peers.json (+ provenance) to clear a pre-existing determinism drift on master",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-10T10:41:34+00:00",
+      "sha": "b3beed0",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-10, run 31379911630)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-10T10:26:15+00:00",
+      "sha": "7b3c5f1",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the per-branch popup-join deploy-probe ship",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-08-10T10:24:06+00:00",
       "sha": "0e3fcac",
       "summary": "health(deploy): probe the 4 index-aligned per-branch popup joins (branch_density/fuel/vehicles/population)",
@@ -638,78 +710,6 @@
       "sha": "045b8fa",
       "summary": "ux: scope=col on the Competition contested-book tables (a11y, WCAG 1.3.1) (#354)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-10T02:33:06+07:00",
-      "sha": "2b989ea",
-      "summary": "health(deploy): probe branch_pico so a broken deploy of the per-branch PICO-rival popup alerts (#353)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-10T00:48:52+07:00",
-      "sha": "10f6fd3",
-      "summary": "data: market-pulse swarm refresh (run 31322642783) (#349)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-09T16:23:21+00:00",
-      "sha": "b531f87",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the #home coverage-honesty ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-09T23:21:57+07:00",
-      "sha": "c90d7aa",
-      "summary": "fix(home): competitor-coverage row no longer says \"lower-bound census\" at 141% (#350)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-09T15:53:49+00:00",
-      "sha": "e8926b5",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-09, run 31322146652)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-09T14:24:03+00:00",
-      "sha": "4be137b",
-      "summary": "docs(progress): log #sim all-levers screen-reader announcement merge+deploy+verify (PR #348)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-09T21:21:18+07:00",
-      "sha": "06d872c",
-      "summary": "ux: announce all four #sim levers to screen readers (WCAG 4.1.3) (#348)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-09T19:43:15+07:00",
-      "sha": "d50a84a",
-      "summary": "health(feeds+deck): catch feeds that stop MOVING, and decks the data has moved past (#346)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-09T12:28:51+00:00",
-      "sha": "7ae9f34",
-      "summary": "health(deploy): probe collateral_outlook + macro_sensitivity so a broken deploy of these obj-#1 reads alerts",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-09T19:01:51+07:00",
-      "sha": "ad1bf79",
-      "summary": "data: market-pulse swarm refresh (run 31307561513) (#345)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-09T10:30:50+00:00",
-      "sha": "251e147",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the Overview-lead deploy probe ship",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-09T10:29:39+00:00",
-      "sha": "1333162",
-      "summary": "health(deploy): probe the Overview LEAD narrative so a broken deploy of #overview alerts",
-      "pillar": "deployment"
     }
   ]
 }
