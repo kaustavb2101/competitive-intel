@@ -9384,12 +9384,12 @@ function aodOccTable(cells,inc){
       <td class="n">${aodDelta(inc[c.occupation])}</td></tr>`;
   }).join('');
   return `<div class="tbl-wrap"><table class="tbl"><tr>
-    <th>Occupation</th><th>Accounts</th><th>OS</th>
-    <th title="0 dpd — healthy">Current</th>
-    <th title="late but under 30dpd — the pre-emptive assistance window: call these first">X-days · assist</th>
-    <th title="30–89dpd roll pipeline — recoverable middle">Rolling</th>
-    <th title="90+dpd incl. the 180+ legacy — already at risk">At risk 90+</th>
-    <th title="expected income impact for this occupation here — income engine, ESTIMATED first-order">Δ income</th></tr>${rows}</table></div>`;
+    <th scope="col">Occupation</th><th scope="col">Accounts</th><th scope="col">OS</th>
+    <th scope="col" title="0 dpd — healthy">Current</th>
+    <th scope="col" title="late but under 30dpd — the pre-emptive assistance window: call these first">X-days · assist</th>
+    <th scope="col" title="30–89dpd roll pipeline — recoverable middle">Rolling</th>
+    <th scope="col" title="90+dpd incl. the 180+ legacy — already at risk">At risk 90+</th>
+    <th scope="col" title="expected income impact for this occupation here — income engine, ESTIMATED first-order">Δ income</th></tr>${rows}</table></div>`;
 }
 /* The ranked hit-list follows the drill (owner ask 2026-07-28: "the table below should change with
    the drill level — it seems static"). Same ordering as the builder's segments_hit score
@@ -9405,9 +9405,9 @@ function aodSyncHitList(scope,cells){
   }).sort((a,b)=>b.score-a.score||b.n-a.n);
   host.innerHTML=`<div class="ic-drill-h" style="margin:0 0 6px">Ranked for <b>${scope}</b> — worst blend of 90+ severity, roll pressure and X-days slippage</div>`+
     (rows.length?`<table class="tbl"><tr>
-      <th>Occupation</th><th>Accounts</th><th>OS</th>
-      <th title="90+dpd share">90+</th><th title="30–89dpd roll">Roll</th>
-      <th title="X-days slipping">X-days</th><th title="90+% + ½·roll% + ¼·X-days%">Score</th></tr>`+
+      <th scope="col">Occupation</th><th scope="col">Accounts</th><th scope="col">OS</th>
+      <th scope="col" title="90+dpd share">90+</th><th scope="col" title="30–89dpd roll">Roll</th>
+      <th scope="col" title="X-days slipping">X-days</th><th scope="col" title="90+% + ½·roll% + ¼·X-days%">Score</th></tr>`+
       rows.map(x=>`<tr>
         <td><b>${x.occ}</b>${aodBasis(x.basis)}</td>
         <td class="mono">${icN(x.n)}</td><td class="mono sub">${aodTHB(x.os)}</td>
@@ -9435,7 +9435,7 @@ function aodRenderLevel(mount){
     mount.innerHTML=icCrumb([{label:'All regions',lvl:'regions'},{label:st.region}])+
       aodSummary(cells)+aodOccTable(cells,aodIncomeMap(inc,geo,(p,rec)=>provReg[p]===st.region))+
       `<div class="ic-drill-h" style="margin-top:10px"><b>${st.region}</b> — ${provs.length} provinces, biggest pre-emptive workload first · press a province for its occupation mix + branches</div>`+
-      `<div class="tbl-wrap"><table class="tbl"><tr><th>Province</th><th>Accounts</th><th>Top occupation</th><th>X-days · assist</th><th>At risk 90+</th><th></th></tr>`+
+      `<div class="tbl-wrap"><table class="tbl"><tr><th scope="col">Province</th><th scope="col">Accounts</th><th scope="col">Top occupation</th><th scope="col">X-days · assist</th><th scope="col">At risk 90+</th><th scope="col"></th></tr>`+
       provs.map(r=>`<tr class="aod-row" data-p="${r.p}" tabindex="0" role="link">
         <td><b>${r.p}</b></td><td class="mono">${icN(r.n)}</td><td>${r.top}</td>
         <td class="mono" style="color:var(--gold)"><b>${icN(r.w)}</b></td>
@@ -9453,7 +9453,7 @@ function aodRenderLevel(mount){
     mount.innerHTML=icCrumb([{label:'All regions',lvl:'regions'},{label:provReg[st.province]||'—',lvl:'province'},{label:st.province}])+
       aodSummary(cells)+aodOccTable(cells,aodIncomeMap(inc,geo,p=>p===st.province))+
       `<div class="ic-drill-h" style="margin-top:10px"><b>${st.province}</b> — ${brs.length} branches on the tape (n ≥ 30), biggest pre-emptive workload first · press a branch for its occupation split</div>`+
-      `<div class="tbl-wrap"><table class="tbl"><tr><th>Branch</th><th>Accounts</th><th title="occupation cells: measured ≥30 / estimated from the province mix">Split basis</th><th>X-days · assist</th><th>At risk 90+</th><th></th></tr>`+
+      `<div class="tbl-wrap"><table class="tbl"><tr><th scope="col">Branch</th><th scope="col">Accounts</th><th scope="col" title="occupation cells: measured ≥30 / estimated from the province mix">Split basis</th><th scope="col">X-days · assist</th><th scope="col">At risk 90+</th><th scope="col"></th></tr>`+
       brs.map(x=>`<tr class="aod-row" data-b="${x.b.branch}" tabindex="0" role="link">
         <td><b>${x.b.branch}</b></td><td class="mono">${icN(x.b.n)}</td>
         <td class="n">${x.meas} measured${x.est?` · <span style="color:var(--gold)">${x.est} est</span>`:''}</td>
@@ -9519,9 +9519,9 @@ function renderAssistOccMacro(){
     mount.innerHTML=
       `<div style="margin:2px 0 8px">${chips}</div>`+
       `<div class="tbl-wrap"><table class="tbl"><tr>
-        <th>Occupation</th><th>Accounts</th><th title="share of occupation-attributed accounts">% of book</th>
-        <th title="monthly income base — NSO SES individual income where published, otherwise the region's NSO LFS employee wage">Income · NSO</th>
-        <th title="expected monthly income move from the current crop/fuel price moves — book-weighted across provinces, ESTIMATED first-order">Est. impact to income</th></tr>`+
+        <th scope="col">Occupation</th><th scope="col">Accounts</th><th scope="col" title="share of occupation-attributed accounts">% of book</th>
+        <th scope="col" title="monthly income base — NSO SES individual income where published, otherwise the region's NSO LFS employee wage">Income · NSO</th>
+        <th scope="col" title="expected monthly income move from the current crop/fuel price moves — book-weighted across provinces, ESTIMATED first-order">Est. impact to income</th></tr>`+
       all.map(c=>`<tr>
           <td><b>${c.occupation}</b></td>
           <td class="mono">${icN(c.n)}</td>
