@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_place_ratings.py",
   "label": "MEASURED — Google Places (New) Place Details rating + userRatingCount, joined onto the scout's rival place_ids. A SAMPLE (the located subset), not the full census. AutoX-branch reputation is NOT obtainable (our branches have no captured place_ids and are not findable by text search) — stated, not inferred.",
   "source": "Google Places API (New) · Place Details",
-  "n_rated": 1170,
+  "n_rated": 1171,
   "n_scout": 1740
  },
  "ratings": [
@@ -90,7 +90,7 @@
    "brand": "Krungsri",
    "prov": "กรุงเทพมหานคร",
    "rating": 4.7,
-   "n": 54
+   "n": 55
   },
   {
    "place_id": "ChIJk_Zj7J2D4jARLnUIa7wSD0Y",
@@ -1042,7 +1042,7 @@
    "brand": "Muangthai",
    "prov": "นนทบุรี",
    "rating": 5,
-   "n": 3
+   "n": 4
   },
   {
    "place_id": "ChIJUVC-VUGR4jARTbXtvlCmvmw",
@@ -3880,6 +3880,13 @@
    "n": 1
   },
   {
+   "place_id": "ChIJD-1S5AhVHDERZoWp14Pf6UQ",
+   "brand": "Srisawad",
+   "prov": "ปราจีนบุรี",
+   "rating": 5,
+   "n": 1
+  },
+  {
    "place_id": "ChIJW24V5rUFszERU1R8tqjzWX8",
    "brand": "Srisawad",
    "prov": "ปัตตานี",
@@ -5865,7 +5872,7 @@
    "brand": "Tidlor",
    "prov": "นครปฐม",
    "rating": 5,
-   "n": 23
+   "n": 25
   },
   {
    "place_id": "ChIJSQhI-iHl4jARhGSgI4MLhyA",
@@ -6726,7 +6733,7 @@
    "brand": "Tidlor",
    "prov": "ราชบุรี",
    "rating": 5,
-   "n": 17
+   "n": 18
   },
   {
    "place_id": "ChIJWXIJooEp4zARo5WmV3EnyoI",
