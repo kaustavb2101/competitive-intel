@@ -3,6 +3,28 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-10 — UX loop: `scope="col"` on the `#trend` peer/siege/baseline table headers (PR #361, merged + deployed + verified)
+
+Autonomous UX-improvement run. The stated backlog's seven original findings are all long-closed, so this run
+continued the active thread — `ux-table-scope-sweep-appjs-REOPENED`, the a11y sweep that the last two runs
+took surgical slices of (WCAG 1.3.1, Info and Relationships). Third slice: the three `#trend`-route table
+renderers in `platform/app.js` built their column-header rows as inline template literals with bare `<th>` /
+`<th title="…">` (no `scope="col"`), so a screen reader could not reliably associate each data cell with its
+column header.
+- **Fix:** added `scope="col"` to the **28 column headers** across `drawPeerOutliers` (`#peertbl` peer-twin
+  outlier benchmark), `drawSiegeTable` (`#siegetbl` most-besieged rival-pressure top-10) and
+  `renderTrendBaseline` (its three baseline tables — most-stressed provinces, worst crop-household stress,
+  highest household leverage). Class attrs (`h-risk`, `no-print`) and `title` tooltips preserved. Verified the
+  app.js diff is a **pure `scope="col"` addition** (byte-identical after stripping the attr). Zero visual change.
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` **130 passed · 0 failed** (data validation
+  455/455); headless render of `#trend` → `data-errors="[]"`, tables render with intact headers, PNG
+  self-reviewed clean; diff = 2 files (`app.js` + one `docs/UXUI_AUDIT.md` log line), no secrets, no stray files.
+- **Merge + deploy + verify:** squash-merged own PR #361 → master (`fe90232`); auto-deployed to Vercel prod.
+  Verified: production alias root **HTTP 200**, `app.js` **HTTP 200** and serving the NEW scoped content (live
+  ~90s after merge). No rollback needed.
+- **Remaining under the REOPENED item:** the `#home` impact-card / watchlist / decision-queue table families —
+  the next surgical slice.
+
 ## 2026-08-10 — Intelligence loop (service/deploy-health): the four per-branch index-aligned popup/lens joins (`branch_occupations`, `branch_workforce`, `branch_agri`, `macro_exposure`) now have deploy probes — shipped to master
 - **The gap fixed (`per-branch-join-family-unprobed-deploy-blind-spot`).** A corrected fetched-vs-probed diff (the actual `data/X.json` names in the `DATA_FILES` tuples, not the `_shape_` fn names) confirmed these four per-branch layers are fetched by `app.js` but had **no `_shape_` probe** in `pipeline/check_site_health.py`. All four are **index-aligned to `branches.json` (2015)** — the property that makes them silently dangerous: a truncated/misaligned CDN deploy doesn't error, it paints the WRONG branch's data or drops the block, with NO phone alert. They were the "next recommended" batch the last three intelligence runs each left standing. Each degrades SILENTLY (client sets the store to `null`, readers return `0`/`''`/`null`):
   - `branch_occupations.json` (MEASURED, Overture POI ≤10km) — load-bearing on TWO surfaces: the `#map` **"estab" lens** (`estabCount(d)=OCCDATA.branches[i].t`) AND the per-branch occupation-mix popup (`.buckets` labels + `.o[]` counts).
