@@ -3,7 +3,7 @@
   "title": "Title-lender app sentiment — Google Play ratings + newest reviews (incl. our own)",
   "generated_by": "pipeline/pull_app_reviews.py",
   "label": "MEASURED — Google Play store pages (th/th). Star histogram + dated public reviews; review store accumulates across pulls (dedup by reviewId, newest 1500 kept per app).",
-  "pulled_at": "2026-08-09"
+  "pulled_at": "2026-08-10"
  },
  "apps": {
   "AUTOX": {
@@ -12,7 +12,7 @@
    "own": true,
    "stats": {
     "score": 4,
-    "ratings": 1023,
+    "ratings": 1022,
     "reviews_total": 329,
     "installs": "500,000+",
     "histogram": [
@@ -20,7 +20,7 @@
      49,
      89,
      89,
-     641
+     640
     ],
     "app_updated": null,
     "version": "Varies with device"
@@ -1649,16 +1649,16 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.583026,
-    "ratings": 16042,
-    "reviews_total": 5082,
+    "score": 4.584049,
+    "ratings": 16043,
+    "reviews_total": 5083,
     "installs": "1,000,000+",
     "histogram": [
-     837,
-     305,
-     561,
-     1292,
-     13041
+     835,
+     304,
+     560,
+     1289,
+     13050
     ],
     "app_updated": "2026-07-09",
     "version": "3.1.0"
@@ -2165,7 +2165,7 @@
      "at": "2026-08-02",
      "score": 4,
      "content": "ใช้งานได้ดีแต่ตอนกู้จำได้ว่าได้เงินมาแค่สี่หมื่นต้นๆ(พนักงานบอกว่าค่อยมาเอาอีกที่เหลือ)เพราะยอดกู้ได้ห้าหมื่น. . แต่พอไปถามเงินที่เหลือก็ไม่ได้เพิ่ม บอกว่าได้แค่นั้นละ!:วันครบกำหนดจ่ายบิลแจ้งยอดเต็มห้าหมื่นบาท?เสียโง้ให้พนักงานเลยครับและสมุดที่ไปทำไว้สาขามีนบุรีแต่พอไปถามอยู่สาขารามคำแหงอีก...ใครจะกู้อ่านเล้วเอาไปคิดวางแผนอย่าให้เสียใจภายหลังเหมือนผมนะครับ",
-     "thumbs": 1,
+     "thumbs": 2,
      "replied": false
     },
     {
@@ -4448,7 +4448,7 @@
    "own": false,
    "stats": {
     "score": 4.6677165,
-    "ratings": 6387,
+    "ratings": 6389,
     "reviews_total": 2124,
     "installs": "1,000,000+",
     "histogram": [
@@ -4456,7 +4456,7 @@
      70,
      191,
      442,
-     5410
+     5412
     ],
     "app_updated": "2026-05-18",
     "version": "2.5.103"
@@ -6165,21 +6165,37 @@
    "name": "ศรีสวัสดิ์",
    "own": false,
    "stats": {
-    "score": 4.553719,
-    "ratings": 2337,
+    "score": 4.5591836,
+    "ratings": 2340,
     "reviews_total": 836,
     "installs": "500,000+",
     "histogram": [
-     125,
-     77,
-     67,
-     173,
-     1892
+     124,
+     76,
+     66,
+     171,
+     1900
     ],
     "app_updated": "2026-07-01",
     "version": "1.0.60"
    },
    "reviews_store": [
+    {
+     "id": "58d86d7f-a822-4479-8e89-98241750f761",
+     "at": "2026-08-09",
+     "score": 5,
+     "content": "ดีๆ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "b80f0688-185f-4079-bab7-7d91013f9e1f",
+     "at": "2026-08-08",
+     "score": 5,
+     "content": "ใช้ดีมากครับ",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "02cacc62-195e-4898-9cea-9940139efadc",
      "at": "2026-08-08",
@@ -7998,8 +8014,8 @@
      32,
      596
     ],
-    "app_updated": "2026-03-30",
-    "version": "1.0.60-ngernturbo"
+    "app_updated": "2026-08-07",
+    "version": "1.0.61-ngernturbo"
    },
    "reviews_store": [
     {
@@ -9625,16 +9641,16 @@
    "name": "สมหวัง เงินสั่งได้ (TISCO)",
    "own": false,
    "stats": {
-    "score": 4.05,
-    "ratings": 327,
+    "score": 4.03,
+    "ratings": 329,
     "reviews_total": 128,
     "installs": "100,000+",
     "histogram": [
      52,
      16,
-     13,
+     16,
      26,
-     219
+     217
     ],
     "app_updated": "2026-04-24",
     "version": "1.11.0"
@@ -10997,21 +11013,29 @@
    "name": "Good Money เงินดีดี (GSB)",
    "own": false,
    "stats": {
-    "score": 3.9030304,
-    "ratings": 3096,
+    "score": 3.8511326,
+    "ratings": 3099,
     "reviews_total": 1366,
     "installs": "1,000,000+",
     "histogram": [
-     571,
-     196,
+     591,
+     220,
      140,
-     234,
-     1950
+     250,
+     1894
     ],
     "app_updated": "2026-07-09",
     "version": "1.0.44"
    },
    "reviews_store": [
+    {
+     "id": "c4dd3614-ee3d-41f8-a209-976cddd7f402",
+     "at": "2026-08-09",
+     "score": 2,
+     "content": "ไม่สามารถใช้บริการนี้ใด้เนื่องจากหมายเลขบัตรประชาชนนี้ถูกสมัครแล้วคืออะไรคะยังไม่เคยใด้รับสินเชื่อนี้นะคะ",
+     "thumbs": 0,
+     "replied": true
+    },
     {
      "id": "f3f3930b-1940-468c-ad50-bbb1769dabb1",
      "at": "2026-08-07",
@@ -11249,7 +11273,7 @@
      "at": "2026-08-04",
      "score": 5,
      "content": "เป็น app ที่ดีมากๆ ครับ ส่วนตัวผมถือว่าดีมากๆ ครับ เข้ามาในช่วงเวลาฉุกเฉินที่ผมจำเป็นต้องใช้เงินพอดี ดอกเบี้ยก็ถูก ผ่อนจ่ายสบายๆ สมกับเป็นชื่อ app (เงินดี ^_^ ตามชื่อเลยครับ...)",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": true
     },
     {
@@ -13505,16 +13529,16 @@
    "name": "GO by Krungsri Auto",
    "own": false,
    "stats": {
-    "score": 4.352174,
-    "ratings": 9247,
-    "reviews_total": 3799,
+    "score": 4.355507,
+    "ratings": 9251,
+    "reviews_total": 3800,
     "installs": "1,000,000+",
     "histogram": [
-     813,
-     251,
-     532,
-     914,
-     6733
+     796,
+     252,
+     544,
+     927,
+     6728
     ],
     "app_updated": "2026-07-16",
     "version": "8.5.0"

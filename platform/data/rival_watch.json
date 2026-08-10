@@ -4,18 +4,10 @@
    {
     "brand": "Srisawad",
     "key": "SAWAD",
-    "live_pct": 43.2,
-    "n_live": 144,
+    "live_pct": 43.4,
+    "n_live": 145,
     "n_new_30d": 41,
-    "share_of_volume_pct": 26.9
-   },
-   {
-    "brand": "Ngern Tid Lor",
-    "key": "TIDLOR",
-    "live_pct": 22.3,
-    "n_live": 176,
-    "n_new_30d": 38,
-    "share_of_volume_pct": 63.7
+    "share_of_volume_pct": 27.0
    },
    {
     "brand": "Ngern Hai Jai",
@@ -26,6 +18,14 @@
     "share_of_volume_pct": 6.5
    },
    {
+    "brand": "Ngern Tid Lor",
+    "key": "TIDLOR",
+    "live_pct": 22.3,
+    "n_live": 176,
+    "n_new_30d": 26,
+    "share_of_volume_pct": 63.6
+   },
+   {
     "brand": "MoneyDD",
     "key": "GSB_MONEYDD",
     "live_pct": 5.0,
@@ -34,7 +34,7 @@
     "share_of_volume_pct": 1.6
    }
   ],
-  "as_of": "2026-08-09",
+  "as_of": "2026-08-10",
   "disappeared": [],
   "label": "MEASURED — n_new_30d is Google Ads Transparency's own per-creative first_shown date, counted within 30 days of the pull date.",
   "live_total_series": {
@@ -77,7 +77,7 @@
    }
   },
   "label": "MIXED, labelled per section. promos.new and ads.appeared are MEASURED from real per-item/per-creative first_seen/first_shown dates already in the source files. promos.disappeared, ads.disappeared and search_demand movement are all empty by design — none of this pipeline's inputs currently carry the second data point (last_seen, per-creative last_shown, or a prior share-of-search vintage) that an honest 'disappeared' or 'movement' figure requires.",
-  "newest_observation_date": "2026-08-09",
+  "newest_observation_date": "2026-08-10",
   "title": "Rival watch — what changed in the rival field since last time (obj #2)"
  },
  "promos": {
@@ -126,10 +126,10 @@
   "note": "first_seen values span more than one pull; 'new' reflects arrivals since the previous pull."
  },
  "search_demand": {
-  "as_of": "2026-08-09T16:01Z",
+  "as_of": "2026-08-10T05:08Z",
   "label": null,
   "movement": [],
   "n_brands_moved": 0,
-  "note": "EXCLUDED: search_demand.json's per-province brand share-of-search (`sos`) is a single Google Trends snapshot (pulled_at_utc 2026-08-09T16:01Z) with no prior vintage recorded anywhere this script reads. Its own national_ts field is a national query-VOLUME series, not a per-brand share-of-search series, so it cannot substitute. Emitting a movement number here would mean inventing a 'before' that was never measured, so nothing is emitted."
+  "note": "EXCLUDED: search_demand.json's per-province brand share-of-search (`sos`) is a single Google Trends snapshot (pulled_at_utc 2026-08-10T05:08Z) with no prior vintage recorded anywhere this script reads. Its own national_ts field is a national query-VOLUME series, not a per-brand share-of-search series, so it cannot substitute. Emitting a movement number here would mean inventing a 'before' that was never measured, so nothing is emitted."
  }
 }
