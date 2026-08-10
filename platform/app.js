@@ -8498,7 +8498,7 @@ function icBranchCoverage(prov, rows){
 function icBranchRows(prov){
   const rows=(IMPACT.branches||{})[prov]||[];
   if(!rows.length) return `<div class="ic-note">No branch rows for this province — every branch here sits under the 30-account no-PII floor, so none can be published. Branch detail → <a href="data.html">data book</a>.</div>`;
-  return `<div class="ic-scroll"><table class="ic-tbl ic-drilltbl"><thead><tr><th>Branch (tape)</th><th>Accounts</th><th>Book ฿m</th><th class="ic-ladcol">Bucket ladder — Current→180+</th><th>Current</th><th>X · pre-30</th><th>NPL-live</th><th title="measured book delinquency level — not the agri backdrop">Book status</th></tr></thead><tbody>`+
+  return `<div class="ic-scroll"><table class="ic-tbl ic-drilltbl"><thead><tr><th scope="col">Branch (tape)</th><th scope="col">Accounts</th><th scope="col">Book ฿m</th><th scope="col" class="ic-ladcol">Bucket ladder — Current→180+</th><th scope="col">Current</th><th scope="col">X · pre-30</th><th scope="col">NPL-live</th><th scope="col" title="measured book delinquency level — not the agri backdrop">Book status</th></tr></thead><tbody>`+
     rows.map(b=>{
       return `<tr><td>${b.name}</td><td class="n">${icN(b.n)}</td><td class="n">${icN(b.os_m)}</td>
         <td>${icLadder(b)}</td>
@@ -8510,7 +8510,7 @@ function icBranchRows(prov){
 }
 function icProvTable(g){
   const provs=(g.provinces||[]).map(p=>[p,(IMPACT.provinces||{})[p]]).filter(x=>x[1]);
-  return `<div class="ic-scroll"><table class="ic-tbl ic-drilltbl"><thead><tr><th>Province</th><th>Book</th><th class="ic-ladcol">Bucket ladder — Current→180+</th><th>Current</th><th>X · pre-30</th><th title="90–179d, live-book denominator">NPL-live</th><th title="measured book delinquency level — not the agri backdrop">Book</th><th title="debt vs annual household income">DTI</th><th title="dominant measured crops + Pink Sheet price direction (▲ up · ▼ stress · → flat)">Crops</th><th>Rivals</th><th title="AGRI BACKDROP — modelled farm-household risk (crop prices + drought) trend; a forward farm signal, separate from the book delinquency">Agri backdrop</th></tr></thead><tbody>`+
+  return `<div class="ic-scroll"><table class="ic-tbl ic-drilltbl"><thead><tr><th scope="col">Province</th><th scope="col">Book</th><th scope="col" class="ic-ladcol">Bucket ladder — Current→180+</th><th scope="col">Current</th><th scope="col">X · pre-30</th><th scope="col" title="90–179d, live-book denominator">NPL-live</th><th scope="col" title="measured book delinquency level — not the agri backdrop">Book</th><th scope="col" title="debt vs annual household income">DTI</th><th scope="col" title="dominant measured crops + Pink Sheet price direction (▲ up · ▼ stress · → flat)">Crops</th><th scope="col">Rivals</th><th scope="col" title="AGRI BACKDROP — modelled farm-household risk (crop prices + drought) trend; a forward farm signal, separate from the book delinquency">Agri backdrop</th></tr></thead><tbody>`+
     provs.map(([name,p])=>{
       const d=(p.d_agri!=null)?p.d_agri:(g.trend||{}).d_agri;
       const tr=d==null?'—':`<span style="color:${d<0?'var(--merch)':'var(--agri)'}">${d<0?'▼ easing':'▲ rising'}</span>`;
