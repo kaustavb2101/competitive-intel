@@ -1,0 +1,130 @@
+name: Data — used-collateral price census, Union Auction forward book (daily)
+
+# Refreshes the MEASURED market price of the collateral the book is secured on, via
+# pipeline/pull_collateral_census.py --venue auct:
+#   source-data/census/auct.jsonl                      — the forward auction window (gitignored)
+#   source-data/staging/collateral_census_agg.json     — the committed aggregate
+#   platform/data/collateral_census.json               — the app layer
+#
+# WHY THIS FEED IS WORTH A DAILY JOB
+# ---------------------------------
+# The BoT UVPI (EC_EI_040) publishes three series — car, truck, overall. There is NO motorcycle
+# series in it, and motorcycles are 127,628 accounts, the largest collateral type in the book. Until
+# this census, a third of the portfolio was carried at an appraised value with nothing measured to
+# check it against. This is that check.
+#
+# WHY IT RUNS IN CI RATHER THAN ON THE LAPTOP — the whole reason it can be a cron at all.
+# Reachability was measured, not assumed: a throwaway probe run from a US Azure runner returned
+# HTTP 200 from auct.co.th for BOTH asset types. Union Auction is not geoblocked and needs no Thai
+# IP, unlike one2car (403 Cloudflare from any datacenter) and data.go.th. So the single
+# highest-value venue in the census is the one that requires no owner-side machine.
+#
+# WHY DAILY, AND WHY IT IS CHEAP. The venue publishes its forward window through a bulk endpoint:
+# an EMPTY Brand_Name returns the entire upcoming inventory for an asset type, so the whole venue is
+# TWO HTTP requests, not 40,000 page fetches. Auction floors turn over every few days, so a weekly
+# cron would miss most of a lot's life on the board. Daily costs two requests.
+#
+# WHY IT MATTERS THAT THIS ACCUMULATES. The forward window carries the OPENING price; the archive
+# carries what the lot actually fetched. Pulling the forward book daily and letting lots age into
+# the archive is what turns "where we start the bidding" into "what we recovered" — the difference
+# that decides whether a low reserve is a clearing tactic or a loss. Nothing else in the repo can
+# answer that.
+#
+# PDPA. Every raw Union Auction record carries Chassis_No, Engine_No, License_Plate_No, Contract_No
+# and Seller_Contract_No (rival lenders' own account numbers) plus created_user, a named branch
+# employee. None of it reaches disk: the puller projects each record through a STRICT ALLOWLIST,
+# never a denylist, and replaces a consignor name that is not a juristic person with a category.
+# The raw harvest is gitignored regardless; only the aggregate is committed.
+#
+# PR-ONLY, NEVER auto-merge. The output moves a published price layer, so a human sees the diff.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 03:40 UTC = 10:40 Bangkok. Off-minute and off-hour from every other data-*.yml job
+    # (nabc :15, thaiwater :20, swarm :35 x4, set-peers 11:15, set-filings Sat 12:50,
+    # feed-liveness 14:00), so this job's checkout never races one of theirs.
+    - cron: "40 3 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Install ijson
+        # The forward-book pull does not need it, but --history streams multi-hundred-MB responses
+        # and imports it at module level. Cheap to install; a missing import would fail the job for
+        # a reason that has nothing to do with the data.
+        run: pip install ijson
+
+      - name: Pull the Union Auction forward book
+        id: pull
+        run: |
+          # Non-fatal by design. One asset type's call can time out on a large response, and that
+          # must not throw away the other — same principle pull_swarm.py applies per feed. The exit
+          # code is reported in the PR body so a partial pull is visible rather than laundered into
+          # "nothing changed".
+          set +e
+          python pipeline/pull_collateral_census.py --venue auct
+          rc=$?
+          set -e
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning title=auct pull returned $rc::pull_collateral_census.py exited $rc — whatever it wrote is still aggregated below. Check this step's log."
+          fi
+
+      - name: Re-aggregate and rebuild the census layer
+        run: |
+          # Stage 1 reads the gitignored harvests and writes the committed aggregate; stage 2
+          # projects that aggregate into platform/data and is the part the determinism gate owns.
+          python pipeline/build_collateral_census.py --aggregate
+          python pipeline/build_collateral_census.py
+          python pipeline/build_collateral_census.py --check
+
+      - name: Commit to a data branch + open a draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/collateral-census-${{ github.run_id }}
+          PULL_RC: ${{ steps.pull.outputs.rc }}
+        run: |
+          # `add -u` is deliberate and sufficient here, unlike data-set-filings.yml: this job's
+          # outputs are two ALREADY-TRACKED files. The raw jsonl harvests it also writes are
+          # gitignored and must stay that way — `add -A` would be the bug, not the fix.
+          git add -u source-data/staging/collateral_census_agg.json platform/data/collateral_census.json
+          if git diff --cached --quiet; then
+            echo "No change in the forward auction book since the last run. No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          git commit -m "data(census): refresh the Union Auction forward book (run ${{ github.run_id }})"
+          git push -u origin "$DATA_BRANCH"
+          # Body via a file, not an inline heredoc: an unindented EOF at column 0 terminates the
+          # YAML block scalar this whole script lives in, which is a parse error, not a shell one.
+          # data-set-filings.yml uses --body-file for the same reason.
+          {
+            echo "Automated refresh of the used-collateral price census from Union Auction's forward book."
+            echo
+            echo "- puller exit code: \`$PULL_RC\`"
+            echo "- \`build_collateral_census.py --check\` passed in-run, so the committed layer reproduces byte-exact."
+            echo
+            echo "Union Auction is reachable from any IP, so this needs no Thai network and no owner-side"
+            echo "machine. Raw harvest rows stay gitignored; only the aggregate and the app layer are"
+            echo "committed, and every record passed the puller's PDPA allowlist."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data(census): used-collateral price census refresh" \
+            --body-file /tmp/pr_body.md
