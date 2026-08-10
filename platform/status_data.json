@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-09T22:21:45+00:00",
-    "commit": "8992917"
+    "generated_at": "2026-08-10T04:29:53+00:00",
+    "commit": "30f569f"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-09",
+    "eta_date": "2026-08-10",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -532,6 +532,48 @@
   ],
   "activity": [
     {
+      "date": "2026-08-10T04:29:53+00:00",
+      "sha": "30f569f",
+      "summary": "health(deploy): probe branch_peers so a broken deploy of the peer-twin benchmark alerts",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-10T04:13:38+00:00",
+      "sha": "31ad828",
+      "summary": "data: NABC live prices (2026-08-10, run 31354446525)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-10T02:20:22+00:00",
+      "sha": "10500cc",
+      "summary": "docs(progress): log the #acq/#map table-scope a11y slice ship + deploy-verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-10T09:19:23+07:00",
+      "sha": "e991a38",
+      "summary": "ux: scope=col on #acq/#map competitor-coverage lens table headers (#357)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-10T00:37:12+00:00",
+      "sha": "6733444",
+      "summary": "docs(backlog): correct stale 'competitors Rayong-only' claim in NEXT_STEPS",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-10T07:36:31+07:00",
+      "sha": "78780e4",
+      "summary": "feat(census): a measured market price for the collateral we lend against (#347)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-09T22:22:29+00:00",
+      "sha": "944634f",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the front-door-reads probe batch",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-09T22:21:45+00:00",
       "sha": "8992917",
       "summary": "health(deploy): probe 5 obj-#1/#2 front-door reads (debt_source, income_impact, credit_anchor, farm_household, rival_universe)",
@@ -668,48 +710,6 @@
       "sha": "e130658",
       "summary": "health(deploy): schedule the DLT fuel-type refresh so ev_penetration + vehicle_collateral can self-heal",
       "pillar": "service"
-    },
-    {
-      "date": "2026-08-09T11:10:54+07:00",
-      "sha": "b12ba13",
-      "summary": "fix(live): the two social layers the freshness gate could not see (#342)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-09T04:02:24+00:00",
-      "sha": "d9f8c17",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-09T03:59:37+00:00",
-      "sha": "d4436fe",
-      "summary": "data: NABC live prices (2026-08-09, run 31293320768)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-09T10:58:29+07:00",
-      "sha": "11a655b",
-      "summary": "data: market-pulse swarm refresh (run 31291390212) (#339)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-09T10:47:16+07:00",
-      "sha": "138fe40",
-      "summary": "data: social listening refresh (run 31291388481) (#337)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-09T10:24:53+07:00",
-      "sha": "fd40afb",
-      "summary": "fix(feeds): one feed could never succeed in CI, another had no schedule at all (#341)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-09T10:24:26+07:00",
-      "sha": "300998d",
-      "summary": "feat(competition): Wave 2 — pulse becomes the default, four folds, one fewer chip (#340)",
-      "pillar": "data-integration"
     }
   ]
 }
