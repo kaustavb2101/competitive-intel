@@ -2200,6 +2200,92 @@ def _shape_branch_peers(d):
     return None
 
 
+def _shape_branch_density(d):
+    # Per-branch building density (branch_density.json, MEASURED Overture footprint
+    # count ≤10km, projected from source-data/perimeter_counts.json). Consumed in the
+    # branch popup via bldgDensityRec(d) = BLDGDEN[idxOf(d)] — the store is set to
+    # j.branches and indexed by BRANCH POSITION, so a truncated/misaligned file paints
+    # the WRONG branch's building count with NO error (the client sets BLDGDEN=null on a
+    # non-200 and omits the block, but a short-but-200 CDN body silently misaligns every
+    # row after the cut). Asserts the 2015-record index-aligned .branches shape + the
+    # buildings_10km render read on the first record; shape not values.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    brs = d.get("branches")
+    if not isinstance(brs, list):
+        return "missing 'branches' list (bldgDensityRec index read)"
+    if len(brs) != 2015:
+        return "expected 2015 branch records (index-aligned), got %d" % len(brs)
+    if not (isinstance(brs[0], dict) and "buildings_10km" in brs[0]):
+        return "first branch record missing 'buildings_10km' (popup density read)"
+    return None
+
+
+def _shape_branch_fuel(d):
+    # Per-branch fuel-station count (branch_fuel.json, MEASURED OSM ≤10km, a lower-bound
+    # FLOOR). Consumed in the branch popup via fuelStnRec(d) = FUELSTN[idxOf(d)] — the
+    # store is set to j.branches and indexed by BRANCH POSITION, so a truncated file
+    # misaligns every branch's fuel-station read with NO error (FUELSTN=null on non-200
+    # omits the block; a short-but-200 body silently misaligns). Asserts the 2015-record
+    # index-aligned .branches shape + the n10 render read; shape not values.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    brs = d.get("branches")
+    if not isinstance(brs, list):
+        return "missing 'branches' list (fuelStnRec index read)"
+    if len(brs) != 2015:
+        return "expected 2015 branch records (index-aligned), got %d" % len(brs)
+    if not (isinstance(brs[0], dict) and "n10" in brs[0]):
+        return "first branch record missing 'n10' (popup fuel-station read)"
+    return None
+
+
+def _shape_branch_vehicles(d):
+    # Per-branch vehicle-collateral base (branch_vehicles.json, MEASURED DLT province
+    # stock allocated ESTIMATED by population). Consumed in vehiclePopupHTML via
+    # VEHDATA.branches[idxOf(d)], gated on e.n_est>0, rendering the fleet mix off
+    # VEHDATA.meta.labels — indexed by BRANCH POSITION, so a truncated file paints the
+    # WRONG branch's vehicle mix with NO error (VEHDATA=null on non-200 omits the block;
+    # a short-but-200 body silently misaligns). Asserts the .meta.labels render table,
+    # the 2015-record index-aligned .branches shape + the fleet/n_est reads on the first
+    # record with a catchment; shape not values.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    labels = (d.get("meta") or {}).get("labels")
+    if not isinstance(labels, dict) or not labels:
+        return "missing 'meta.labels' (the fleet-row label table the popup reads)"
+    brs = d.get("branches")
+    if not isinstance(brs, list):
+        return "missing 'branches' list (VEHDATA.branches index read)"
+    if len(brs) != 2015:
+        return "expected 2015 branch records (index-aligned), got %d" % len(brs)
+    rec = next((b for b in brs if isinstance(b, dict) and b.get("n_est", 0) > 0), None)
+    if rec is None:
+        return "no branch record with n_est>0 (the popup render gate reads none)"
+    if not (isinstance(rec.get("fleet"), dict) and "n_est" in rec and "pickup_share" in rec):
+        return "branch record missing fleet/n_est/pickup_share (popup vehicle-mix reads)"
+    return None
+
+
+def _shape_branch_population(d):
+    # Per-branch ~10km area-weighted population (branch_population.json, ESTIMATED —
+    # the defensive fallback when the MEASURED WorldPop count in contested_pop.json is
+    # absent). Consumed via BPOP[i] where the store is set to j.values and indexed by
+    # BRANCH POSITION, so a truncated file misaligns every branch's fallback population
+    # with NO error (BPOP=null on non-200; a short-but-200 body silently misaligns).
+    # Asserts the 2015-entry index-aligned .values list of numbers; shape not values.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    vals = d.get("values")
+    if not isinstance(vals, list):
+        return "missing 'values' list (the BPOP index-aligned population read)"
+    if len(vals) != 2015:
+        return "expected 2015 population entries (index-aligned), got %d" % len(vals)
+    if not any(isinstance(v, (int, float)) for v in vals):
+        return "no numeric population entries (the BPOP fallback read is unusable)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -2510,6 +2596,10 @@ DATA_FILES = [
     ("data/branch_occupations.json", _shape_branch_occupations, ".buckets labels + 2015-branch index-aligned .branches with t/o[] (per-branch occupation-mix popup + #map estab lens, MEASURED)"),
     ("data/branch_workforce.json", _shape_branch_workforce, ".buckets labels + 2015-branch index-aligned .branches with t/w[]/mix[] (per-branch workforce-mix popup, lead-by-occupation, ESTIMATED)"),
     ("data/branch_agri.json", _shape_branch_agri, ".meta.crops + 2015-branch index-aligned .branches with crop_ha/ha[]/sh[] (per-branch agri crop-exposure+stress popup, obj #1)"),
+    ("data/branch_density.json", _shape_branch_density, "2015-branch index-aligned .branches with buildings_10km (per-branch building-density popup, MEASURED Overture ≤10km)"),
+    ("data/branch_fuel.json", _shape_branch_fuel, "2015-branch index-aligned .branches with n10 (per-branch fuel-station popup, MEASURED OSM ≤10km floor)"),
+    ("data/branch_vehicles.json", _shape_branch_vehicles, ".meta.labels + 2015-branch index-aligned .branches with fleet/n_est/pickup_share (per-branch vehicle-collateral popup, DLT stock)"),
+    ("data/branch_population.json", _shape_branch_population, "2015-entry index-aligned .values list (per-branch fallback ~10km population, ESTIMATED)"),
     ("data/macro_exposure.json", _shape_macro_exposure, ".meta.factors/factor_keys + 2015-branch index-aligned .branches (t3[]) + 2015-entry .vector (per-branch macro-headwind popup + #map macx lens, obj #1)"),
     # The two collateral-board fleet reads from the same DLT wave, both surfaced via
     # tmliFetch and both self-hiding (display='none') on a truncated/404 deploy with no
