@@ -146,6 +146,35 @@ def _promo_live_count(doc, brand):
                and it.get("brand") == brand and it.get("last_seen") == pulled)
 
 
+def _social_corpus_docs(doc):
+    """Total voice-of-customer demand documents behind social_themes.json — the sum of every
+    app-store review, YouTube comment and Pantip thread in the corpus the #acq themes board renders
+    (meta.demand_docs, which equals the sum of meta.demand_by_source[*].n). This is the frozen-value
+    canary for the aggregate social-listening feed. Reviews and comments ACCUMULATE across pulls (the
+    Play/Apple/YouTube stores dedup-and-append, Pantip adds threads), so this count ticks UP on every
+    genuine rebuild — verified 11,137 → 11,146 → 11,149 → 11,154 across the 2026-08-07 → 08-09
+    vintages. It goes flat ONLY if every upstream social source stops delivering new documents — the
+    exact expired-key / dead-puller shape TEST B exists for, on the one #acq-rendered feed whose own
+    reads had no frozen canary (TEST-A stale-stamp coverage already exists via live_board's
+    social_themes row, but TEST A is blind to a refreshed stamp over a frozen corpus). Falls back to
+    summing demand_by_source when demand_docs is absent in an older vintage, so the --from-git
+    backfill reads every committed shape rather than dropping the ones that predate the scalar."""
+    m = (doc or {}).get("meta") or {}
+    v = m.get("demand_docs")
+    if isinstance(v, (int, float)):
+        return v
+    dbs = m.get("demand_by_source")
+    if isinstance(dbs, dict):
+        tot, seen = 0, False
+        for src in dbs.values():
+            n = (src or {}).get("n") if isinstance(src, dict) else None
+            if isinstance(n, (int, float)):
+                tot += n
+                seen = True
+        return tot if seen else None
+    return None
+
+
 def _youtube_views_total(doc):
     """Total lifetime view count across every tracked rival brand channel (13 in the current pull).
     This is the frozen-value canary for the YouTube feed. Views accrue continuously on any live
@@ -312,6 +341,17 @@ REGISTRY = [
          label="Rival YouTube brand channels · total views", unit="views", cadence="weekly",
          source="YouTube Data API v3 (official) — public brand-channel statistics",
          pick=_youtube_views_total),
+
+    # ---- social-listening corpus — the aggregate voice-of-customer feed behind #acq --------------
+    # social_themes.json's own reads (theme shares, per-brand demand) had no frozen-value canary;
+    # total demand documents is the number that accumulates on every live rebuild and freezes only if
+    # the whole social corpus goes dark. `as_of` is build_social_themes.py's newest-doc-in-data stamp
+    # (never wall clock); weekly cadence matches the data-social-listening.yml Tuesday cron and the
+    # live-board classification of this same feed.
+    dict(key="social_corpus_docs", path="platform/data/social_themes.json", stamp=("as_of",),
+         label="Social-listening corpus · total demand documents", unit="documents", cadence="weekly",
+         source="app-store reviews + YouTube comments + Pantip threads (build_social_themes.py)",
+         pick=_social_corpus_docs),
 ]
 
 
