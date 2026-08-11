@@ -3,6 +3,50 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-11 — Intelligence loop (service/deploy-health): the last two index-aligned per-branch popup joins (`branch_leads`, `branch_recommendations`) now have deploy shape-probes — shipped to master
+
+- **The gap fixed (`index-aligned-per-branch-popup-joins-two-still-unprobed`).** The 2026-08-10 run
+  added `_shape_` probes for the index-aligned per-branch popup joins (`branch_density`,
+  `branch_fuel`, `branch_vehicles`, `branch_population`) and declared "the highest-danger index-aligned
+  per-branch joins are now fully probed." A corrected fetched-vs-probed diff (the ACTUAL
+  `fetch('data/X.json')` calls in `app.js` cross-referenced against the `DATA_FILES` registry in
+  `pipeline/check_site_health.py`) found **two members of that exact danger class were missed**:
+  `branch_leads.json` (the WHO-TO-ACQUIRE lead board, obj #2 — read via `leadsRec(d) = LEADS[idxOf(d)]`,
+  `LEADS=j.branches`) and `branch_recommendations.json` (the per-branch "what to do here" action recs —
+  read via `RECDATA.branches[idxOf(d)]`). Both are **2015-record lists indexed by BRANCH POSITION**, so
+  a truncated-but-200 CDN body doesn't error — the client store drops to `null` only on a non-200; a
+  short 200 body silently paints the **WRONG branch's** lead board / recommendations in the popup, with
+  NO phone alert. Neither had a `_shape_` probe.
+- **The fix.** Added `_shape_branch_leads` (asserts the `.buckets` lookup table the render joins each
+  lead's `.k` to, the 2015-record index-aligned `.branches` shape, and the `leads[].k` render read on
+  the first record carrying leads) and `_shape_branch_recommendations` (asserts the 2015-record
+  index-aligned `.branches` shape + the `recs[].t`/`recs[].tone` render reads on the first record
+  carrying recs), and registered both in `DATA_FILES` next to their siblings. Each asserts the render
+  **contract** — shape not values (robust to a future vintage). One file, `pipeline/check_site_health.py`,
+  +56 lines, zero deletions.
+- **Safeguards (all pass).** (a) `bash tests/run.sh check` → **130 passed · 0 failed** (data integrity
+  455/455); the gate runs `check_site_health.py --local`, now **224/224** with both new probes proving
+  they accept the committed payloads. (b) Negative-tested every validator directly: `None` on the real
+  data, and a distinct specific error for each break mode (not-a-dict / missing `.branches` / truncated
+  to 10 → "expected 2015 … got 10" / `branch_leads` missing `.buckets` / `branch_leads` all-empty leads
+  → "render reads none" / `branch_recommendations` all-empty recs → "render reads none" / rec missing
+  `.t` → the popup text/tone read) — proving neither is a no-op. (c) No secrets in the diff (Python
+  shape assertions only). (d) Diff = `pipeline/check_site_health.py` + this doc entry only, no
+  `platform/data` file altered → no `build_provenance.py` regen, no derived-layer rebuild, no app/visual
+  change → no PR/headless render needed (pure CI health-monitoring); byte-deterministic, no wall-clock
+  dependency.
+- **Deploy-verify:** probe-script only touches CI, not the served app; no served asset altered, so no
+  rollback risk.
+- **Next recommended:** the index-aligned per-branch popup-join danger class is now **genuinely
+  complete** (density/fuel/vehicles/population/leads/recommendations all probed). The remaining
+  fetched-but-unprobed layers are lower-danger keyed/singleton reads — the Overview backdrops
+  `dbd_formation` + `vehicle_registry`, the district-grain `drought_district` / `amphoe_crops` /
+  `amphoe_occupations`, the per-province income floors (`agri_income_by_province` /
+  `factory_income_by_province` / `sme_income_by_province` / `occupation_income` / `province_lfs`) and
+  `snapshots_index` (the `#trend` vintage list) — a coherent next batch. The only genuinely-open *data*
+  items remain owner-side/Thai-IP gated (GISTDA `check-crop` per-branch pull; the flooded-AREA GISTDA
+  dissolve; the BAAC/SME-bank credit raw CSVs) — none CI-doable.
+
 ## 2026-08-10 — Intelligence loop (service/deploy-health): the macro FX read now has a FROZEN-value liveness canary (`macro_usd_thb`) — shipped to master
 
 - **The gap fixed (`macro-indicators-no-frozen-value-canary`).** The two immediately-preceding runs closed the frozen-value (TEST-B) blind spot on the YouTube and social-listening feeds and both named the same next slice: `macro_indicators.json` (weekly BIS/WB/FX, obj #1) — "has TEST-A/freshness coverage but no frozen canary despite `usd_thb` moving daily." `pipeline/check_feed_liveness.py` TEST B is the repo's only guard against a *dead-but-present* feed — a file that keeps serving and passing every shape/provenance/freshness check while its numbers have silently stopped moving (the expired-key shape that froze `youtube_comments.json` at 2,416 for 9 days). A fetched-vs-accumulated cross-check confirmed **`macro_indicators.json` had no series in `append_history.py`'s registry at all**, so TEST B was blind to it. TEST A (stale stamp) already covers the file via `live_board`'s `macro_indicators` row, but TEST A is blind to the precise class TEST B exists for: `pull_macro.py` stamps `meta.pulled` fresh from the wall clock every weekly run while the ECB FX fetch behind `usd_thb` could have gone dark.
