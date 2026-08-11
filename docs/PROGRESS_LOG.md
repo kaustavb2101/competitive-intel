@@ -3,6 +3,33 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-11 — Service/market loop (hygiene): remove 4 orphaned Overview macro loader/renderer pairs from `app.js` — dead since the 2026-08-02 server-side move to `macro_book`
+
+- **The gap fixed (`intel-drop-orphaned-overview-macro-loaders`).** On 2026-08-02 four Overview macro
+  cards — `province_lfs`, `region_debt`, `dbd_formation` (DBD company-formation, a MARKET-pillar layer),
+  `sfi_credit` — were retired from the `#overview` tab and their data folded SERVER-SIDE into
+  `macro_book.json` (`build_macro_book.py`). Their client loaders/renderers were left defined, with a
+  comment claiming "the renderers stay defined (other views and the data-room export still call some of
+  them)." **That claim was false:** `loadProvinceLfs`/`renderProvinceLfs`, `loadRegionDebt`/
+  `renderRegionDebt`, `loadDbdForm`/`renderDbdForm`, `loadSfi`/`renderSfi` had **zero call sites**
+  anywhere in `platform/` (verified by grep across every `.html`/`.js`; the mount-point anchors
+  `#lfs-wrap`/`#regdebt-wrap`/`#dbdform-wrap`/`#sfi-wrap` don't exist in `index.html`). They were dead
+  code carrying never-fired `fetch('data/…')` calls that made `dbd_formation`/`region_debt`/`sfi_credit`
+  read as **live SPA layer reads** in every service audit's fetched-vs-probed diff — the exact confusion
+  that had already produced a stale `check_site_health.py` comment.
+- **What shipped.** Removed all 8 dead functions + their module globals (`LFS`/`REGDEBT`/`DBDFORM`/`SFI`
+  + `*_META`/`*Promise`), 283 lines net out of `app.js` (−292/+8 comment). Verified every removed global
+  was confined to the dead ranges (the many other `LFS` hits were the string "NSO LFS" in labels, not the
+  variable). Rewrote the retirement comment to state the code is gone and the measured signal survives on
+  the drill (business-formation → `macro_book` `national.new_biz_n`, already asserted by
+  `_shape_macro_book`), and corrected the `check_site_health.py` note accordingly.
+- **Verify.** No `platform/data` file altered → provenance byte-unchanged (`build_provenance.py --check`
+  OK), no regen needed. `node --check platform/app.js` OK; determinism gate **132 passed · 0 failed**,
+  data integrity **455/455**, `check_site_health --local` **236/236**. **Headless render self-review
+  (Chromium):** `#overview`/`#home`/`#acq` render with the SAME console errors, zero page errors, same
+  body-text length, and `macro_book` drill present — **byte-identical to the pre-change baseline**
+  (dead-code removal is behaviour-neutral by construction — the functions were never called).
+
 ## 2026-08-11 — UX loop (clarity/honesty): drop stale hardcoded feed counts from `live.html` share metadata — shipped to master (PR #377)
 
 - **The gap fixed (`ux-live-meta-stale-feed-counts`).** `live.html`'s static `<head>` share/meta
