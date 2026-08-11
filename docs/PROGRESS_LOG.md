@@ -3,6 +3,33 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-11 — UX loop: `scope="col"` on the crop-watch + farm-book tables — merged to master; ⚠️ Vercel production deploy blocked by daily rate limit
+
+- **Shipped (`ux-table-scope-cropwatch-farmbook`, PR #375, squash-merged `7c3dc00`).** Eighth slice of
+  the re-opened a11y sweep (`ux-table-scope-sweep-appjs-REOPENED`): added `scope="col"` to all 25
+  column headers across the four crop-watch / farm-book tables in `platform/app.js` (~L11210–11461) —
+  `renderFarmHousehold` (cash-income trend), `renderAssistPriceLens` (falling-crop depend-map + its
+  by-province `<details>` sub-table), `renderAssistBranchLens` (branch-exposure ranking) and
+  `renderAssistAction` (account-lifecycle ladder). Screen readers can now associate each data cell with
+  its column header (WCAG 1.3.1). Zero visual change (scope is non-presentational); `class`/`title`
+  attrs preserved.
+- **Safeguards — all green (offline).** `bash tests/run.sh check` **131 passed / 0 failed**; headless
+  render of `index.html#assist` clean with `data-errors="[]"` and byte-identical layout (self-reviewed
+  PNG); diff is pure `scope="col"` additions — no secrets, no stray files (only `app.js` +
+  `UXUI_AUDIT.md`).
+- **⚠️ Deploy-verify: site HEALTHY but production NOT updated.** Post-merge, the master alias
+  (`competitive-intel-git-master-…vercel.app`) root + `/app.js` both return **HTTP 200**, but the
+  served `app.js` still contains the OLD bare `<th>` — the merge has **not gone live**. Root cause is
+  NOT the change: the Vercel `vercel[bot]` posted on PR #375 that deployment failed with
+  *"Resource is limited — try again in 24 hours (more than 100, code: api-deployments-free-per-day)"* —
+  the **free-tier 100-deploys/day quota is exhausted**, so production is frozen on the last-good build.
+- **Decision: NO rollback.** Rollback is for a *regression*; here nothing regressed (both routes 200,
+  serving a healthy prior build). Reverting a correct, gate-verified change for an unrelated infra cap
+  would be wrong — and the revert itself couldn't deploy either. The merge stays; production will pick
+  up `7c3dc00` when the daily quota resets (~24h) or the next deploy is triggered. **This affects the
+  whole loop today: any merge to master right now lands correctly but will not go live until the Vercel
+  daily limit clears.**
+
 ## 2026-08-11 — Intelligence loop (PROVENANCE): `--check`-gated tripwire linking the peer scoreboard constants to RESEARCH_DIGEST.md §B — shipped to master
 
 - **The gap fixed (`peer-constants-not-cross-checked-vs-research-digest`).** The listed
