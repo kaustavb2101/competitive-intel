@@ -3,6 +3,40 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-11 — Intelligence loop (PROVENANCE): `--check`-gated tripwire linking the peer scoreboard constants to RESEARCH_DIGEST.md §B — shipped to master
+
+- **The gap fixed (`peer-constants-not-cross-checked-vs-research-digest`).** The listed
+  title-lender peers' branch counts, loan books, NPL ladder and MTC's branch-add pace are the
+  backbone of the objective-#2 competitive read, hand-carried as CITED constants in two builders —
+  `build_peer_npl.py` (`PEERS[].npl`) and `build_competitor_coverage.py` (`EXPECTED[]` branch counts
+  + `PEER_FINANCIALS[]` books / net-adds / growth target / YoY). Their sole source of truth is
+  `docs/RESEARCH_DIGEST.md §B`. Only the tape→book link was gate-checked (2026-08-11 SERVICE audit);
+  these IR figures were **not**, so a future IR refresh that updated the digest (or a builder) without
+  the other would leave the peer board silently divergent from the cited research **with a green
+  gate**. This was the exact "next recommended intelligence task" logged on 2026-08-11.
+- **The guard (`pipeline/check_peer_constants.py`, deterministic, network-free, `--check`-gated).**
+  It DERIVES each expected digest substring FROM the live builder constant (imported, not re-typed)
+  and asserts it appears in that brand's own §B FINDING bullet. Scoping to the per-brand FINDING
+  bullet — not the whole section — means a figure repeated in the INTERPRETATION line can't launder a
+  single-line edit, so **both** drift directions turn the gate red: (a) a builder constant edited to a
+  value no longer in §B, and (b) a §B figure edited that the builder didn't follow. 12 constants
+  asserted (3 branch counts, 3 loan books ฿bn→฿m, MTC net-adds/growth-target, Tidlor YoY, 3 NPLs).
+- **Verified drift-detection, not a no-op.** Injected a builder-side edit (MTC NPL 2.53→2.99) → caught;
+  injected a digest-side single-line edit (Tidlor 1,873→1,950 in the FINDING line only) → caught
+  (the earlier whole-section substring approach missed this because "1,873" also appears in the
+  INTERPRETATION line; the per-bullet scoping fixed it). No false-positive substring collisions
+  (e.g. "1.5%" is not a substring of "10.5%" in the same bullet).
+- **Safeguards (all green).** `check_peer_constants.py --check` exits 0 on the current tree;
+  `tests/run.sh check` **131 passed / 0 failed** with the new gate line (was 130); data-integrity
+  455/455; `rederive_drift.py --selftest` parses **140** gated scripts (picks up the new `--check`
+  automatically — no hand-kept list); no `platform/data` file changed, so `build_provenance.py --check`
+  is byte-exact (no regen needed). Change footprint: 1 new script + 1 line in `tests/run.sh`. No app
+  behaviour/visual change → committed straight to master.
+- **Next recommended integration.** The peer scoreboard is now digest-locked; a parallel unguarded
+  constant set is `build_peer_scoreboard.py` — verify whether its figures trace to the same §B source
+  and, if so, fold them into this tripwire. Beyond that the CI-doable data backlog remains
+  Thai-IP/owner-side gated (FPO PICO refresh, DBD/BAAC distillation) per the 2026-08-04 NEXT_STEPS note.
+
 ## 2026-08-11 — Intelligence loop (SERVICE + DEPLOY-HEALTH + PEER): peer-figure cross-consistency audit — no defect found, verification recorded (master)
 
 - **Ran the full intelligence-loop audit across MARKET / SERVICE / PEER / DEPLOYMENT-HEALTH.** The
