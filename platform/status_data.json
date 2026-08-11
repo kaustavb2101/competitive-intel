@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-11T04:31:04+00:00",
-    "commit": "3357195"
+    "generated_at": "2026-08-11T09:20:50+00:00",
+    "commit": "9419af9"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,42 @@
   ],
   "activity": [
     {
+      "date": "2026-08-11T09:20:50+00:00",
+      "sha": "9419af9",
+      "summary": "data: NABC live prices (2026-08-11, run 31476684037)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-11T08:23:49+00:00",
+      "sha": "9832155",
+      "summary": "docs(progress): log impact-card table-scope a11y fix merge+deploy+verify (PR #371)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-11T15:20:47+07:00",
+      "sha": "7eb1700",
+      "summary": "ux: scope=col on impact-card economics/commodity/product table headers (#371)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-11T06:29:23+00:00",
+      "sha": "c979a7b",
+      "summary": "health: shape-probe the last three eager Overview backdrop cards (vehicle_registry, drought_district, amphoe_crops)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-11T04:48:00+00:00",
+      "sha": "8ae246e",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-11, run 31459383904)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-11T04:31:37+00:00",
+      "sha": "3079d13",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the search_demand freshness-guard ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-11T04:31:04+00:00",
       "sha": "3357195",
       "summary": "health(freshness): guard the share-of-search board (search_demand.json) against a dead Trends pull",
@@ -674,42 +710,6 @@
       "sha": "8933942",
       "summary": "health(deploy): probe the 4 per-branch index-aligned joins so a broken deploy alerts",
       "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-10T05:02:55+00:00",
-      "sha": "6744b76",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-10, run 31357151509)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-10T04:32:06+00:00",
-      "sha": "3562c29",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the branch_peers deploy-probe ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-10T04:29:53+00:00",
-      "sha": "30f569f",
-      "summary": "health(deploy): probe branch_peers so a broken deploy of the peer-twin benchmark alerts",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-10T04:13:38+00:00",
-      "sha": "31ad828",
-      "summary": "data: NABC live prices (2026-08-10, run 31354446525)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-10T02:20:22+00:00",
-      "sha": "10500cc",
-      "summary": "docs(progress): log the #acq/#map table-scope a11y slice ship + deploy-verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-10T09:19:23+07:00",
-      "sha": "e991a38",
-      "summary": "ux: scope=col on #acq/#map competitor-coverage lens table headers (#357)",
-      "pillar": "uxui"
     }
   ]
 }
