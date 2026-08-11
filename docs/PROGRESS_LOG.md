@@ -3,6 +3,45 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-11 — Intelligence loop (SERVICE + DEPLOY-HEALTH + PEER): peer-figure cross-consistency audit — no defect found, verification recorded (master)
+
+- **Ran the full intelligence-loop audit across MARKET / SERVICE / PEER / DEPLOYMENT-HEALTH.** The
+  AUTONOMY_PLAN backlog is 98% closed (1 owner-side item), and the freshness-guard / shape-probe
+  backlog is explicitly exhausted, so this run did NOT manufacture another micro-guard. Instead it
+  verified a dimension no prior SERVICE run had checked: **cross-layer numeric consistency of the
+  peer-comparison board** (obj #2's whole point).
+- **Deploy + gate re-verified green up front.** Master production alias **HTTP 200** on `/`,
+  `/data/meta.json`, `/data/competitor_coverage.json`, `/data/peer_province.json`, and today's
+  freshly-pulled `/data/commodities.json` (**78,068 B live == committed** → the NABC daily price
+  auto-merge reached the CDN intact). Determinism gate **130 passed / 0 failed**; data-integrity
+  **455/455**; `build_provenance.py --check` byte-exact; 77/77 catchments; **0 genuine broken refs**;
+  **0 genuine orphan layers**; `site-health.yml` correctly targets the master alias.
+- **Cross-consistency verified end-to-end (all green, nothing fabricated).** (1) AutoX's **฿46.572bn**
+  book reproduces exactly `tape_real.bucket_ladder.book_total.os_sum` (46,572,023,587) → `/1e9` in
+  `build_competitor_coverage.py:_autox_book_bn()` → `competitor_coverage.book_intensity[AutoX].book_bn`
+  (฿23.1m/branch) — and that auto-derived link is **already drift-protected** (`build_competitor_coverage.py --check`
+  at `tests/run.sh` L339; `rederive_drift.py` discovers the gate's `--check` set by parsing `tests/run.sh`,
+  so a future owner-side tape refresh that didn't rebuild the peer board would turn the gate red and
+  block the commit). (2) `peer_npl.json` ladder (TIDLOR 1.5 · MTC 2.53 · SAWAD 3.55) matches
+  `RESEARCH_DIGEST.md §B` FY2025 verbatim. (3) `competitor_coverage` peer branch/book counts (MTC
+  8,673 / ฿183.222bn · Tidlor 1,873 / ฿109.586bn · Srisawad 1,138 / ฿93.155bn) match the cited §B IR
+  lines.
+- **Data-bot drift posture re-confirmed sound.** Direct-to-master data jobs run `rederive_drift.py` +
+  full gate before auto-merge; the 3 gate-skipping committers (`data-collateral-census`,
+  `data-set-filings`, `deck-freshness`) push to a data branch + draft PR only and touch self-`--check`ed
+  or non-derived files — none can land drift on master.
+- **Decision — record, don't fabricate.** With the tree fully healthy and internally consistent and
+  the micro-guard backlog exhausted, the honest deliverable is the recorded cross-consistency audit
+  (a new standing SERVICE dimension in `docs/SERVICE_AUDIT.md`) + a CEO-dashboard refresh, NOT a
+  make-work code change. Docs + `plan_cycle.py` outputs only — no `platform/data` altered, gate
+  byte-unchanged, no provenance regen, no PR/headless render needed.
+- **Next recommended intelligence task:** the peer-NPL / peer-branch-count constants in
+  `build_competitor_coverage.py` + `build_peer_npl.py` are hand-carried from `RESEARCH_DIGEST.md §B`
+  and are NOT gate-cross-checked against that doc (only the tape→book link is). A small, honest,
+  high-value next step is a `--check`-gated assertion that those constants still match the digest's
+  cited figures, so a future IR refresh can't leave the peer board and the research doc silently
+  divergent. Everything else (deploy, freshness, provenance, catchments, orphans) is verified clean.
+
 ## 2026-08-11 — UX loop (a11y): `scope=col` on the impact-card economics/commodity/product table headers — shipped to master (PR #371)
 
 - **Fixed (`ux-table-scope-impactcard-econ-commodity`).** Seventh slice of the re-opened app.js
