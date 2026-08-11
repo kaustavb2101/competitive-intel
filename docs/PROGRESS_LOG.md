@@ -3,6 +3,37 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-11 — Intelligence loop (service/deploy-health): freshness guard for the share-of-search board (`search_demand.json`)
+
+- **The gap (a *newly-emerged* silent-staleness blind spot).** Every prior audit treated
+  `search_demand.json` (obj#2 brand share-of-search, live-`fetch()`'d into `#acq`) as a **monthly**
+  Google-Trends layer — honestly labelled stale, typically 30+ days old, and therefore deliberately
+  **excluded** from `check_site_health.py`'s live freshness guard (a lag was ambiguous, so a guard
+  would false-alarm). That premise is now stale: `data-swarm.yml` (runs **4×/day**) carries a
+  `google_trends` feed that re-pulls + re-derives the board, so it is now a **frequently-refreshed**
+  layer — `meta.pulled_at_utc` advanced **3× in an 18h window** (2026-08-08 21:58 → 08-09 10:08 →
+  08-09 16:01 UTC), live vintage 2 days old. It has a shape probe but **no freshness guard**, so a
+  dead Google-Trends pull would freeze it and ship **green forever** with no phone alert — exactly
+  the class the freshness guard exists to close, and a real regression in coverage since the swarm
+  wired it up.
+- **The fix.** Added `("data/search_demand.json", "pulled_at_utc", 35, …)` to `FRESHNESS_LAYERS`.
+  **Why TTL 35:** the board is refreshed by BOTH the 4×/day swarm feed AND a monthly dedicated
+  backstop cron (`data-search-demand.yml`), and both call the **same** rate-limited
+  `pull_google_trends.py` from the same CI IP range — so a Google block freezes them together and
+  `pulled_at_utc` (stamped fresh on every *successful* pull) stops advancing. A >35-day lag is past
+  both the monthly backstop cadence AND any Google rate-limit cluster (which resolves in days) — an
+  unambiguous "the Trends pull is dead" signal, not a slow week. False-alarm-proof by construction
+  (an unparseable/absent vintage yields "not evaluated", never a failure).
+- **Verified.** Unit-tested the pure `_freshness_result` against the real committed payload: PASS at
+  2 days, PASS at the exact 35-day edge, FAIL at +42 days (guard is real, not a no-op), absent→"not
+  evaluated" (no false alarm). `pulled_at_utc` carries a `T..Z` time tail — `_parse_iso_day` takes
+  `[:10]` so it parses cleanly. Live against the master production alias: `search_demand.json` now
+  freshness-evaluated (2 days old, TTL 35, **PASS**); total **231 → 232** HEALTHY. Freshness is
+  **live-only** (a function of wall-clock now) so the `--local` gate path skips it → the determinism
+  gate output is byte-unchanged (`--local` **224/224 HEALTHY**). Determinism gate **130 passed · 0
+  failed**. Probe-script-only — no `platform/data` file altered → no provenance regen, no visual/app
+  change → no PR/headless render needed. · against `pipeline/check_site_health.py` (`FRESHNESS_LAYERS`).
+
 ## 2026-08-11 — UX loop (a11y): `scope="col"` on the `#market` collateral-concentration table headers — merged + deployed (PR #368)
 
 - **The fix (`ux-table-scope-market-collateral`).** Sixth surgical slice of the re-opened
