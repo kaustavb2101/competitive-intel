@@ -2784,6 +2784,18 @@ FRESHNESS_LAYERS = [
      "is the SET trading date, so it advances every business day the pull succeeds; a "
      ">12-day lag is ~7 missed trading-day pulls (well past any weekend + Thai market "
      "holiday cluster) — an unambiguous 'the SET pull stuck' signal, not a market lull"),
+    ("data/search_demand.json", "pulled_at_utc", 35,
+     "Brand share-of-search board (Google Trends interest for AutoX vs the big-4 rivals "
+     "per province — obj#2 competitive-demand read) — live-fetch()'d into #acq, refreshed "
+     "by BOTH the 4x/day data-swarm.yml google_trends feed AND the monthly dedicated "
+     "data-search-demand.yml backstop cron; build_search_demand.py carries pull_google_trends.py's "
+     "meta.pulled_at_utc, which is stamped fresh on every SUCCESSFUL Trends pull, so it "
+     "advances several times a day when the pull works (observed 3 advances in 18h). It "
+     "CANNOT self-heal: both refresh paths call the same rate-limited pull_google_trends.py "
+     "from the same CI IP range, so a Google-Trends block freezes them together, leaving a "
+     "structurally valid (shape-probe-green) but frozen board shipping forever. A >35-day lag "
+     "is past both the monthly backstop cadence AND any Google rate-limit cluster (which "
+     "resolves in days) — an unambiguous 'the Trends pull is dead' signal, not a slow week"),
 ]
 
 
