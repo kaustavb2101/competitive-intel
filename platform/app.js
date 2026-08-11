@@ -90,23 +90,6 @@ function loadAmphoeCrops(){
   return amphoecropsPromise;
 }
 
-// Provincial labour market — MEASURED, NSO Labour Force Survey 2026 Q1, all 77 provinces
-// (data/province_lfs.json). Carries per-province unemployment_rate_pct + seasonal_share_pct (the
-// share of the labour force "seasonally waiting" — idle between agricultural seasons). Obj #1: an
-// income-timing backdrop behind the agri-PD book. Fully null-guarded: absent file → LFS stays null,
-// the Overview block stays hidden (see renderProvinceLfs), nothing fabricated.
-let LFS=null, LFS_META=null, lfsPromise=null;
-async function loadProvinceLfs(){
-  if(lfsPromise) return lfsPromise;
-  lfsPromise=(async()=>{
-    try{
-      const j = await fetch('data/province_lfs.json').then(r=>r.json());
-      LFS=j.provinces||null; LFS_META=j.meta||null;
-    }catch(e){ LFS=null; LFS_META=null; }
-    return LFS;
-  })();
-  return lfsPromise;
-}
 // RETIRED 2026-08-02 — the client loaders for data/napprang.json (OAE dry-season 2nd-rice area) and
 // data/crop_margin.json (farm-gate price vs OAE cost). Both files are still MAINTAINED and still
 // shipped; they are now read SERVER-SIDE by pipeline/build_farm_book.py and reach the page inside
@@ -140,67 +123,11 @@ async function loadBrandTrends(){
   })();
   return btrendPromise;
 }
-// Regional household-debt backdrop — MEASURED (Bank of Thailand regional letters over NSO Socio-Economic
-// Survey [SES] data; per-series vintages carried, the 4-region debt-per-household cut = SES 2566/2023, the
-// most recent common vintage). Obj #1: household leverage is a DIRECT portfolio-risk backdrop — where
-// borrower households already carry the most debt, an income shock bites soonest. Fully null-guarded:
-// absent file → REGDEBT stays null, the Overview block stays hidden (see renderRegionDebt), nothing faked.
-let REGDEBT=null, REGDEBT_META=null, REGDEBT_HEAD=null, regdebtPromise=null;
-async function loadRegionDebt(){
-  if(regdebtPromise) return regdebtPromise;
-  regdebtPromise=(async()=>{
-    try{
-      const j = await fetch('data/region_debt.json').then(r=>r.json());
-      REGDEBT=(j&&j.series)?j.series:null; REGDEBT_META=j.meta||null; REGDEBT_HEAD=j.headline||null;
-    }catch(e){ REGDEBT=null; REGDEBT_META=null; REGDEBT_HEAD=null; }
-    return REGDEBT;
-  })();
-  return regdebtPromise;
-}
 // RETIRED 2026-08-02 — the client loaders for data/truck_flow.json and data/collateral_flow.json.
 // Both files are still MAINTAINED and still shipped; they are now read SERVER-SIDE by
 // pipeline/build_collateral_book.py and reach the page inside collateral_book.json, where they sit
 // with the rest of the collateral picture instead of in a business-backdrop section (owner points
 // 18 + 19). Two fewer fetches per Overview render, and one place where the join lives.
-
-// Business-formation pulse — MEASURED DBD (Department of Business Development) new juristic-person
-// registrations for the snapshot month (data/dbd_formation.json). Per province: n new firms +
-// registered capital. A DEMAND / economic-vitality backdrop for BOTH objectives: where new small
-// businesses form maps the merchant / small-ticket borrower base AutoX's book draws on. It is ONE
-// month's flow (a formation pulse, not a stock of active firms) and is NOT a competitor layer and NOT
-// an open/expand cue — a vitality read on the footprint we already run. Fully null-guarded: absent
-// file → DBDFORM stays null, the Overview block stays hidden (see renderDbdForm), nothing fabricated.
-let DBDFORM=null, DBDFORM_META=null, dbdformPromise=null;
-async function loadDbdForm(){
-  if(dbdformPromise) return dbdformPromise;
-  dbdformPromise=(async()=>{
-    try{
-      const j = await fetch('data/dbd_formation.json').then(r=>r.json());
-      DBDFORM=j&&typeof j.by_province==='object'?j:null; DBDFORM_META=j&&j.meta?j.meta:null;
-    }catch(e){ DBDFORM=null; DBDFORM_META=null; }
-    return DBDFORM;
-  })();
-  return dbdformPromise;
-}
-
-// SFI system credit-quality backdrop — MEASURED quarterly NPL ratio of Thailand's Specialized Financial
-// Institutions (GSB/BAAC/GHB/SME/EXIM/Islamic Bank) from FPO aggregates (data/sfi_credit.json). Obj #1
-// leading-indicator BACKDROP: GSB (household) + BAAC (rural/agri) system NPL is the closest public read
-// on the repayment stress AutoX's borrowers sit inside — a macro tide, NOT AutoX's own book and NOT
-// per-province. Null-guarded: absent/short file → SFI stays null, the Overview block stays hidden
-// (see renderSfi), nothing fabricated.
-let SFI=null, SFI_META=null, sfiPromise=null;
-async function loadSfi(){
-  if(sfiPromise) return sfiPromise;
-  sfiPromise=(async()=>{
-    try{
-      const j = await fetch('data/sfi_credit.json').then(r=>r.json());
-      SFI=(j&&Array.isArray(j.series)&&j.series.length)?j.series:null; SFI_META=j&&j.meta?j.meta:null;
-    }catch(e){ SFI=null; SFI_META=null; }
-    return SFI;
-  })();
-  return sfiPromise;
-}
 
 // Live flood + rain pulse — MEASURED live ThaiWater telemetry (keyless api-v3.thaiwater.net; refreshed
 // daily by .github/workflows/data-thaiwater.yml). Two per-province station aggregates: water LEVEL
@@ -2188,12 +2115,14 @@ function renderOverview(){
   // MOVED 2026-08-02 into the collateral block (owner points 18 + 19). truck_flow.json is now a
   // per-province column on the collateral drill and collateral_flow.json is the resale-market table
   // at its foot — both read server-side by build_collateral_book.py, so the page fetches neither.
-  // RETIRED 2026-08-02 from this tab — loadProvinceLfs/renderProvinceLfs, loadRegionDebt/
-  // renderRegionDebt, loadDbdForm/renderDbdForm and loadSfi/renderSfi. All four layers are now read
-  // SERVER-SIDE by build_macro_book.py and arrive on the drill above, so the page fetches none of
-  // them. The renderers stay defined (other views and the data-room export still call some of them)
-  // but their Overview mount points are gone, and each already returns early when its wrapper is
-  // absent — no console noise, no half-rendered block.
+  // RETIRED 2026-08-02 from this tab — province_lfs, region_debt, dbd_formation and sfi_credit. All
+  // four layers are now read SERVER-SIDE by build_macro_book.py and arrive on the drill above, so the
+  // page fetches none of them. Their client loaders/renderers (loadProvinceLfs/renderProvinceLfs,
+  // loadRegionDebt/renderRegionDebt, loadDbdForm/renderDbdForm, loadSfi/renderSfi) were fully removed
+  // 2026-08-11: they had zero call sites anywhere (their Overview mount points were gone and no other
+  // view referenced them), so they were dead code carrying never-fired fetch() calls that mis-read as
+  // live layer reads in the service audit. The measured signal survives on the drill (e.g. the
+  // business-formation total lands as macro_book national.new_biz_n, already shape-probed).
   // The live 24h RAIN pulse is kept, demoted to a disclosure under the drill: it is same-day
   // telemetry and worth having, but the flood and drought columns that drive decisions are in the
   // drill itself now (point 22).
@@ -2751,39 +2680,6 @@ function renderAmphoeCrops(j){
     hs.slice(0,10).map((h,i)=>`<tr><td class="mono sub">${i+1}</td><td><b>${h.amphoe_th}</b></td><td class="sub">${h.province_th}</td><td>${h.crop_th||h.crop}</td><td class="mono">${rai(h.planted_rai)}</td><td class="mono" style="color:${col(h.drought)}">${(h.spei).toFixed(2)} <span class="tag" style="color:${col(h.drought)};border:1px solid ${col(h.drought)}">${h.drought}</span></td></tr>`).join('');
 }
 
-/* ---------- provincial labour stress (MEASURED · NSO LFS 2026 Q1, obj #1) ----------
-   Reads data/province_lfs.json. Thai headline unemployment is uniformly low, so the sharper obj-#1
-   signal is the seasonal-waiting share (agri off-season idle labour) — it marks the Isan rice-belt
-   provinces where borrower cash-flow is most seasonal/lumpy, behind the agri-PD book. Leads the table
-   with that, carries unemployment alongside, and states the measured national headline. Null-safe:
-   absent/empty layer → the wrap stays hidden, nothing fabricated. */
-function renderProvinceLfs(){
-  const wrap=$('#lfs-wrap');
-  if(!wrap) return;
-  const rows=Array.isArray(LFS)?LFS.filter(p=>p&&p.name_th):[];
-  if(!rows.length){ wrap.style.display='none'; return; }
-  // MEASURED national headline unemployment (labour-force-weighted, computed from the layer's own rows).
-  const totLf=rows.reduce((s,p)=>s+(p.labor_force_k||0),0);
-  const natUnemp=totLf?rows.reduce((s,p)=>s+(p.unemployment_rate_pct||0)*(p.labor_force_k||0),0)/totLf:0;
-  const topUnemp=rows.slice().sort((a,b)=>(b.unemployment_rate_pct||0)-(a.unemployment_rate_pct||0)).slice(0,3);
-  // lead the table by seasonal-waiting share (the discriminator); carry unemployment alongside.
-  const bySeas=rows.slice().sort((a,b)=>(b.seasonal_share_pct||0)-(a.seasonal_share_pct||0)).slice(0,8);
-  const note=$('#lfs-note');
-  if(note) note.innerHTML=`<b>Measured</b> — NSO Labour Force Survey ${LFS_META&&LFS_META.vintage?LFS_META.vintage:'2026 Q1'}, all 77 provinces. `+
-    `Thailand's headline unemployment is uniformly low (national ${natUnemp.toFixed(1)}%, labour-force-weighted), so the `+
-    `sharper objective-#1 signal is the <b>seasonal-waiting share</b> — the slice of the labour force idle between `+
-    `agricultural seasons, which marks where borrower cash-flow is most seasonal (concentrated in the Isan rice belt, `+
-    `behind the agri-PD book). Highest headline unemployment: ${topUnemp.map(p=>`${p.name_th} ${(p.unemployment_rate_pct||0).toFixed(1)}%`).join(', ')}.`;
-  const tbl=$('#lfstbl');
-  if(tbl) tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th><th scope="col" title="Share of the labour force seasonally waiting — idle between agricultural seasons (measured, NSO LFS)">Seasonal idle ●</th><th scope="col" title="Unemployment rate (measured, NSO LFS)">Unemp. ●</th><th scope="col" title="Labour force, thousands (measured, NSO LFS)">Labour force</th></tr>`+
-    bySeas.map((p,i)=>{const s=p.seasonal_share_pct||0;const c=s>=4?'var(--agri)':s>=2?'var(--gold)':'var(--mid)';
-      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.name_th}</b></td>`+
-        `<td>${barHTML(Math.min(100,s*12),c)} <span class="mono" style="color:${c}">${s.toFixed(1)}%</span></td>`+
-        `<td class="mono">${(p.unemployment_rate_pct||0).toFixed(1)}%</td>`+
-        `<td class="mono sub">${Math.round(p.labor_force_k||0)}k</td></tr>`;}).join('');
-  wrap.style.display='';
-}
-
 /* RETIRED 2026-08-02 — renderCropMargin (the standalone farmer-margin table). Owner: "I like the
    commodities/margin table but expand to cover what we have on data AND consolidate with above
    tables." Both halves are done in renderFarmCrops: widened from the 5 crops with an OAE cost row to
@@ -2913,183 +2809,6 @@ function renderBrandTrends(){
             `<td class="mono sub">${num(r.total)}</td></tr>`;
         }).join('');
     }
-  }
-  wrap.style.display='';
-}
-
-// Regional household-debt backdrop card (Overview, obj #1) — MEASURED Bank of Thailand regional letters
-// over NSO SES. Leads with the national debt-to-GDP macro headline, then the 4-region debt-per-household
-// cut at the most recent COMMON vintage (SES 2566/2023) sorted heaviest-first — the borrower-leverage
-// backdrop behind the book. The layer carries mixed 2009–2023 vintages per series, so we pick one clean
-// comparable cut and flag the rest ("read direction, not decimals"). Null-safe: no clean region rows at
-// the common vintage → the whole block stays hidden (nothing fabricated).
-function renderRegionDebt(){
-  const wrap=$('#regdebt-wrap'); if(!wrap) return;
-  // The BIS/BoT reconciliation line below needs MACROIND, which loads on its own promise. Without
-  // this, whichever layer lost the race silently dropped the reconciliation — the exact failure the
-  // line exists to prevent. Load-then-re-render once; loadMacroIndicators() is promise-cached, so
-  // this costs one extra call at most and cannot loop.
-  if(!MACROIND&&!macroIndDone){ loadMacroIndicators().then(renderRegionDebt); }
-  const S=REGDEBT||{};
-  const money=v=>(v==null||!isFinite(v))?'—':'฿'+Math.round(v).toLocaleString('en-US');
-  // 4-region debt-per-household at the most recent common vintage (SES 2566/2023); dedup by region.
-  const reg=(Array.isArray(S.region)?S.region:[]).filter(r=>r&&r.indicator==='debt_per_household_thb'&&/2566/.test(r.vintage||'')&&r.value!=null);
-  const byGeo={}; reg.forEach(r=>{ byGeo[r.geo]=r; });
-  const rows=Object.values(byGeo).sort((a,b)=>(b.value||0)-(a.value||0));
-  if(!rows.length){ wrap.style.display='none'; return; }
-  const TH_REG={North:'ภาคเหนือ',Northeast:'ภาคอีสาน',Central:'ภาคกลาง',South:'ภาคใต้',Bangkok:'กรุงเทพฯ',East:'ภาคตะวันออก'};
-  const nat=Array.isArray(S.national)?S.national:[];
-  const natOne=ind=>{const c=nat.filter(r=>r&&r.indicator===ind&&r.value!=null); return c.length?c[c.length-1]:null;};
-  const gdp=natOne('household_debt_to_gdp_pct'), cushion=natOne('financial_cushion_under_3mo_share_pct');
-  // BoT's own province examples of the vulnerable-household share (Isan agri belt), if present.
-  const prov=(Array.isArray(S.province)?S.province:[]).filter(r=>r&&r.indicator==='vulnerable_household_share_pct'&&r.value!=null).sort((a,b)=>(b.value||0)-(a.value||0));
-  const max=rows[0].value||1, heaviest=rows[0];
-  const vb=$('#regdebt-verdict');
-  if(vb){
-    vb.className='verdict v-warn'; vb.style.display='block';
-    // TWO measured household-debt-to-GDP figures exist on this tab and used to sit ~400px apart with
-    // no relationship stated: BIS 2025-Q4 = 87.5% (the answer band + the Bottom line) and BoT
-    // Q2/2568 = 87.0% (here). Both are right; they are different compilers on different quarters,
-    // and BIS's own series reads 87.2–87.5 across the same window, so the gap is definitional, not an
-    // error in either. One number has to LEAD or the reader cannot tell which to quote — the band's
-    // BIS figure leads because it is the newer vintage and carries the trend line, and this becomes
-    // the named cross-check. Reconciled 2026-08-02 during the Macro audit.
-    const bisHH=(typeof MACROIND==='object'&&MACROIND&&MACROIND.indicators)?MACROIND.indicators.household_debt_gdp:null;
-    // One decimal on BOTH figures. 87.0 rendered as "87" next to a BIS "87.5" reads as a rounded
-    // number being compared to a precise one, which is the kind of avoidable ambiguity that costs a
-    // slide its credibility. The vintage string already contains its own parentheses — don't nest.
-    const hh1=v=>(v==null||!isFinite(v))?'—':Number(v).toFixed(1);
-    const vint=s=>String(s||'').replace(/^\((.*)\)$/,'$1');
-    vb.innerHTML=`<div class="verdict-line">📉 <b>Household leverage is the macro backdrop under portfolio risk${gdp?`: BoT puts household debt at ${hh1(gdp.value)}% of GDP`:''}${gdp?` · ${vint(gdp.vintage)}`:''}.</b> `+
-      `Regionally the heaviest household debt sits in <b>${TH_REG[heaviest.geo]||heaviest.geo}</b> at ${money(heaviest.value)}/household (SES 2023)</div>`+
-      `<div class="sub" style="margin-top:4px">${cushion?`~${cushion.value}% of Thai households hold under 3 months' financial cushion · ${vint(cushion.vintage)}. `:''}`+
-      `Where households already carry the most debt, an income shock bites soonest — the leverage floor beneath the agri-PD / title book. ${TAG_M}.</div>`+
-      (bisHH&&gdp&&bisHH.value!=null&&bisHH.value!==gdp.value
-        ? `<div class="sub" style="margin-top:4px">Reconciling the two figures on this tab: the headline band quotes <b>${hh1(bisHH.value)}% — BIS, ${bisHH.period}</b>; this line quotes <b>${hh1(gdp.value)}% — BoT, ${vint(gdp.vintage)}</b>. Different compilers on different quarters of the same concept — <b>lead with the BIS figure</b> (newer vintage, and the one carrying the trend), and treat BoT's as the domestic cross-check. The ${Math.abs(bisHH.value-gdp.value).toFixed(1)}pp gap is definitional, not a discrepancy; both point down.</div>`
-        : '');
-  }
-  const note=$('#regdebt-note');
-  if(note) note.innerHTML='<b>Measured</b> — Bank of Thailand regional letters over NSO Socio-Economic Survey (SES) data. '+
-    'BoT publishes no routine province table, so <b>region is the honest grain</b>; the debt-per-household cut below is the '+
-    'most recent <b>common</b> vintage (SES 2566 / 2023). Other series in this layer carry mixed 2009–2023 vintages, so '+
-    '<b>read direction, not decimals</b>.'+
-    (prov.length?` BoT's own province examples put the <b>vulnerable-household share</b> highest in the Isan agri belt — ${prov.slice(0,3).map(p=>`${p.geo} ${p.value}%`).join(', ')} (2019), exactly where the agri-PD book sits.`:'');
-  const tbl=$('#regdebttbl');
-  if(tbl) tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Region</th><th scope="col" title="MEASURED — average debt per household, NSO SES 2566 (2023), carried in BoT regional letters">Debt / household ◆</th></tr>`+
-    rows.map((r,i)=>{const v=r.value||0; const c=v>=200000?'var(--agri)':v>=180000?'var(--gold)':'var(--merch)';
-      return `<tr><td class="mono sub">${i+1}</td><td><b>${TH_REG[r.geo]||r.geo}</b></td>`+
-        `<td>${barHTML(Math.round(100*v/max),c)} <span class="mono" style="color:${c}">${money(v)}</span></td></tr>`;}).join('');
-  wrap.style.display='';
-}
-
-// Logistics-SME pulse card (Overview, obj #1) — MEASURED DLT truck-registration flow. Nationally the
-// fleet is still growing (new registrations outrunning deregistrations), so the card leads with that
-// cushion, then names the province pockets where new-truck DEMAND is contracting YoY — the sharpest
-// segment-stress read the layer carries, and the intended sort ("worst-first by new_regis_yoy_pct").
-// A modest base floor (≥250 new/12m) drops small-sample YoY noise; net fleet flow + used-market
-// transfers carried alongside. Null-safe: no rows → the whole block stays hidden (nothing fabricated).
-/* RETIRED 2026-08-02 — renderTruckFlow + renderCollateralFlow. Owner, points 18 and 19: both belong
-   in the collateral section, and they are there now. Trucks are ฿1.84bn of our own book — a collateral
-   class, not a business-backdrop curiosity — so the truck flow is a per-province column on the
-   collateral drill and a row in the mix. The used-vehicle flow is the resale-market table at the foot
-   of the same block. Point 18 also asked whether the flow exists for other vehicle classes: it does
-   (car, pickup, motorcycle) but DLT publishes that one by registration office, so it is REGION grain
-   while the truck flow is per province — both are labelled with their grain rather than blended. */
-
-function renderDbdForm(){
-  const wrap=$('#dbdform-wrap'); if(!wrap) return;
-  const bp=(DBDFORM&&DBDFORM.by_province&&typeof DBDFORM.by_province==='object')?DBDFORM.by_province:null;
-  // top rows: prefer the layer's own pre-sorted `top` ([prov,n,capital]); else derive from by_province.
-  let rows=Array.isArray(DBDFORM&&DBDFORM.top)?DBDFORM.top.map(t=>({th:t[0],n:t[1],cap:t[2]})):
-    (bp?Object.entries(bp).map(([k,v])=>({th:k,n:v.n||0,cap:v.capital_thb||0})).sort((a,b)=>b.n-a.n):[]);
-  rows=rows.filter(r=>r&&r.th&&r.n>0);
-  if(!rows.length){ wrap.style.display='none'; return; }
-  const m=DBDFORM_META||{};
-  // national totals — prefer the layer's own meta rollup, else sum the province rows.
-  const natN=(typeof m.n_registrations==='number')?m.n_registrations:rows.reduce((s,r)=>s+(r.n||0),0);
-  const natCap=(typeof m.capital_thb_total==='number')?m.capital_thb_total:rows.reduce((s,r)=>s+(r.cap||0),0);
-  const nProv=(typeof m.n_provinces_present==='number')?m.n_provinces_present:Object.keys(bp||{}).length;
-  const num=v=>(v==null||!isFinite(v))?'—':Math.round(v).toLocaleString('en-US');
-  // compact ฿ formatter — bn / m.
-  const baht=v=>{ if(v==null||!isFinite(v)||v<=0) return '—';
-    if(v>=1e9) return '฿'+(v/1e9).toFixed(1)+'bn'; if(v>=1e6) return '฿'+Math.round(v/1e6)+'m'; return '฿'+Math.round(v/1e3)+'k'; };
-  // concentration read (computed client-side from the measured rows) — Bangkok share + top-5 share.
-  const bkk=bp&&bp['กรุงเทพมหานคร']?(bp['กรุงเทพมหานคร'].n||0):(rows.find(r=>r.th==='กรุงเทพมหานคร')||{}).n||0;
-  const bkkShare=natN>0?bkk/natN*100:0;
-  const top5=rows.slice(0,5).reduce((s,r)=>s+(r.n||0),0);
-  const top5Share=natN>0?top5/natN*100:0;
-  const vintage=m.snapshot_month_be?`${m.snapshot_month_be} (${m.vintage||m.snapshot_month||''})`:(m.snapshot_month||'—');
-  const vb=$('#dbdform-verdict');
-  if(vb){
-    vb.className='verdict'; vb.style.display='block';
-    vb.innerHTML=`<div class="verdict-line">🏢 <b>${num(natN)} new businesses formed nationwide in the ${m.snapshot_month||''} snapshot — ${baht(natCap)} registered capital, across ${num(nProv)} provinces.</b> `+
-      `This is the small-business borrower base the merchant / small-ticket book draws on.</div>`+
-      `<div class="sub" style="margin-top:4px">Formation is <b>heavily Bangkok-weighted</b> — กรุงเทพฯ alone is <b>${bkkShare.toFixed(0)}%</b> of new firms and the top-5 provinces <b>${top5Share.toFixed(0)}%</b>, so upcountry business formation (where AutoX's provincial book sits) is thin and concentrated. A demand backdrop, not a stress. ${TAG_M}.</div>`;
-  }
-  const note=$('#dbdform-note');
-  if(note) note.innerHTML='<b>Measured</b> — DBD (Department of Business Development) monthly new juristic-person registrations for the '+
-    `<b>${vintage}</b> snapshot, tallied by the registry's own head-office province. `+
-    'This is <b>one month’s formation flow</b> (a pulse), <b>not</b> a stock of active firms and <b>not</b> annualised; '+
-    'registered capital is <b>authorised at incorporation</b> (overstates deployed capital, skewed by a few large filings). '+
-    'A merchant-demand / economic-vitality backdrop for the existing footprint — it makes <b>no</b> open / close / expand call.';
-  const tbl=$('#dbdformtbl');
-  if(tbl) tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th><th scope="col" title="MEASURED — new juristic-person registrations in the snapshot month">New firms ●</th><th scope="col" title="share of the national monthly total">Share</th><th scope="col" title="MEASURED — registered (authorised) capital at incorporation, snapshot month">Reg. capital ●</th></tr>`+
-    rows.slice(0,12).map((r,i)=>{ const sh=natN>0?r.n/natN*100:0;
-      const c=sh>=15?'var(--merch)':sh>=3?'var(--gold)':'var(--dim)';
-      return `<tr><td class="mono sub">${i+1}</td><td><b>${r.th}</b></td>`+
-        `<td class="mono">${num(r.n)}</td>`+
-        `<td class="mono" style="color:${c}">${sh.toFixed(1)}%</td>`+
-        `<td class="mono sub">${baht(r.cap)}</td></tr>`;}).join('');
-  wrap.style.display='';
-}
-
-// MEASURED SFI system credit-quality backdrop. A national quarterly time-series (not per-province):
-// the last ~8 quarters of the state-bank system gross NPL ratio + a 5y peak/trough marker, with a
-// verdict on the current level and its YoY direction. Requires the layer + a latest quarter; if absent
-// the whole block stays hidden (nothing partial, nothing faked).
-function renderSfi(){
-  const wrap=$('#sfi-wrap'); if(!wrap) return;
-  const m=SFI_META||{}, lt=m.latest;
-  if(!SFI || !lt || lt.npl_ratio==null){ wrap.style.display='none'; return; }
-  const pp=v=>(v==null||!isFinite(v))?'—':(v>0?'+':'')+v.toFixed(2)+'pp';
-  const rat=v=>(v==null||!isFinite(v))?'—':v.toFixed(2)+'%';
-  const yoy=m.yoy_ratio_delta_pp, qoq=m.qoq_ratio_delta_pp;
-  // direction colour: rising NPL = risk-red, easing = merchant-teal, flat = dim.
-  const dirC=(yoy==null)?'var(--dim)':(yoy>0.05?'var(--agri)':(yoy<-0.05?'var(--merch)':'var(--dim)'));
-  const dirW=(yoy==null)?'flat':(yoy>0.05?'rising':(yoy<-0.05?'easing':'roughly flat'));
-  const peak=m.peak_ratio_5y, trough=m.trough_ratio_5y;
-  const vb=$('#sfi-verdict');
-  if(vb){
-    vb.className='verdict'; vb.style.display='block';
-    vb.innerHTML=`<div class="verdict-line">🏦 <b>State-bank system NPL ratio is <span style="color:${dirC}">${rat(lt.npl_ratio)}</span> at ${lt.period} — ${dirW} <span style="color:${dirC}">${pp(yoy)}</span> year-on-year.</b> `+
-      `This is the closest public read on the household + farm repayment stress AutoX's borrowers sit inside.</div>`+
-      `<div class="sub" style="margin-top:4px">The Specialized Financial Institutions (GSB household, BAAC rural/agri, GHB housing …) carry a ฿${(lt.credit_gross/1e6).toFixed(2)}tn book; ${(lt.npl_gross/1e3).toFixed(0)}bn is non-performing.`+
-      (peak?` Over the last 5 years the ratio ran between <b>${rat(trough&&trough.npl_ratio)}</b> (${trough&&trough.period}) and a <b>${rat(peak.npl_ratio)}</b> peak (${peak.period}).`:'')+
-      ` A macro backdrop / direction signal — <b>not</b> AutoX's own NPL and <b>not</b> per-province. ${TAG_M}.</div>`;
-  }
-  const note=$('#sfi-note');
-  if(note) note.innerHTML='<b>Measured</b> — FPO (Fiscal Policy Office) quarterly aggregates for Thailand’s '+
-    'Specialized Financial Institutions: gross NPL outstanding ÷ gross credit outstanding. A national '+
-    '<b>system</b> figure for all state-owned banks combined — <b>not</b> AutoX, <b>not</b> the non-bank '+
-    'title-lender sector, and <b>not</b> split by institution or province. SFI books skew to '+
-    'policy/subsidised lending, so read the <b>direction / trend</b>, not the level; the useful signal is '+
-    'that a rising state-bank NPL tide tends to lead broad household + agri repayment stress. A slow '+
-    'structural backdrop (the flood/rain card is the acute counterpart) — it makes <b>no</b> branch call.';
-  const tbl=$('#sfitbl');
-  if(tbl){
-    const last=SFI.slice(-8);
-    const maxR=Math.max(...last.map(r=>r.npl_ratio||0),0.01);
-    tbl.innerHTML=`<tr><th scope="col">Quarter</th><th scope="col" title="MEASURED — gross NPL outstanding ÷ gross credit outstanding for the SFI system">System NPL ratio ●</th><th scope="col" title="MEASURED — gross NPL outstanding, THB billion">NPL (฿bn) ●</th><th scope="col">Trend</th></tr>`+
-      last.map((r,i)=>{ const prev=i>0?last[i-1].npl_ratio:null;
-        const d=(prev!=null&&r.npl_ratio!=null)?r.npl_ratio-prev:null;
-        const dC=(d==null)?'var(--dim)':(d>0.02?'var(--agri)':(d<-0.02?'var(--merch)':'var(--dim)'));
-        const arrow=(d==null)?'·':(d>0.02?'▲':(d<-0.02?'▼':'▬'));
-        const w=Math.round((r.npl_ratio||0)/maxR*100);
-        const isLast=i===last.length-1;
-        return `<tr><td class="mono${isLast?'':' sub'}">${isLast?'<b>'+r.period+'</b>':r.period}</td>`+
-          `<td class="mono"><span style="display:inline-block;height:7px;width:${w}px;background:var(--agri);opacity:.5;vertical-align:middle;margin-right:6px;border-radius:2px"></span>${rat(r.npl_ratio)}</td>`+
-          `<td class="mono sub">${((r.npl_gross||0)/1e3).toFixed(0)}</td>`+
-          `<td class="mono" style="color:${dC}">${arrow} ${d==null?'—':pp(d)}</td></tr>`;}).join('');
   }
   wrap.style.display='';
 }
