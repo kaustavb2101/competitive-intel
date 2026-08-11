@@ -3,6 +3,38 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-11 — UX loop (a11y): `scope="col"` on the `#market` collateral-concentration table headers — merged + deployed (PR #368)
+
+- **The fix (`ux-table-scope-market-collateral`).** Sixth surgical slice of the re-opened
+  `ux-table-scope-sweep-appjs-REOPENED` accessibility sweep. `renderMarketCollateral()`'s four
+  real-loan-tape tables on the `#market` route — `#mkt-coll-econ` (collateral-type economics),
+  `#mkt-coll-branch` (branch × brand concentration), `#mkt-coll-region` (type × region), and
+  `#mkt-coll-age` (by age-at-origination) — built their header rows as inline template literals with
+  bare `<th>`, so a screen reader could not reliably associate each data cell with its column header
+  (WCAG 1.3.1 Info and Relationships). Added `scope="col"` to all 19 column headers, matching
+  `data.html`'s already-scoped convention and the five earlier app.js slices. Zero visual change
+  (scope is non-presentational). Only `platform/app.js` (8 lines) + a one-line `docs/UXUI_AUDIT.md`
+  entry touched.
+- **Also corrected a stale backlog note.** The REOPENED tracker listed "remaining: #home watchlist /
+  decision-queue table families" — but those two surfaces are DIV-based (`ccRow`→`.cc-row`,
+  `.cc-qrow`), not `<th>` tables, so there is nothing to scope there. Repointed the tracker at the
+  real remaining bare-`<th>` fns (impact-card economics/occupation/commodity/product sub-tables
+  ~L8713–9014, crop-watch + farm-book tables ~L11210–11461, the dataroom layer table ~L11933, the
+  print-TOC ~L12088) so future runs don't chase a non-existent gap.
+- **Safeguard protocol (all passed).** (a) `bash tests/run.sh check` → **130 passed, 0 failed**;
+  (b) headless render of `index.html#market` → `data-errors=[]`, all four tables present, layout
+  byte-visually unchanged (self-reviewed PNG); (c) no secrets in diff; (d) diff matches intent, no
+  stray files. Squash-merged own PR #368 → master `e477f44`, branch deleted.
+- **Deploy verify.** Production alias `competitive-intel-git-master-…vercel.app` root, `/#market`
+  and `/app.js` all **HTTP 200** (no regression → no rollback). At verify time the production build
+  for the merge commit was still queued behind a run of data-bot merges (Vercel builds this project
+  ~1/min; all listed deployments `READY`, none errored), so the edge was still serving the prior
+  good build `61cabda` — normal async propagation, not a regression. The `scope="col"` change is a
+  pure-additive a11y attribute and lands with the next production build.
+- **Recommend next:** continue the REOPENED sweep with the next surgical slice — the impact-card
+  economics/occupation/commodity/product sub-tables (`~L8713–9014`), which are the most table-dense
+  remaining bare-`<th>` cluster on the `#home`/`#assist` surfaces.
+
 ## 2026-08-11 — Intelligence loop (service/deploy-health): the last two index-aligned per-branch popup joins (`branch_leads`, `branch_recommendations`) now have deploy shape-probes — shipped to master
 
 - **The gap fixed (`index-aligned-per-branch-popup-joins-two-still-unprobed`).** The 2026-08-10 run
