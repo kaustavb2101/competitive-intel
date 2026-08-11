@@ -3,6 +3,31 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-11 — UX loop (a11y): `scope=col` on the impact-card economics/commodity/product table headers — shipped to master (PR #371)
+
+- **Fixed (`ux-table-scope-impactcard-econ-commodity`).** Seventh slice of the re-opened app.js
+  table-scope sweep (`ux-table-scope-sweep-appjs-REOPENED`). Four impact-card sub-tables (~L8713–9014)
+  built their column-header rows with bare `<th>` / `<th title="…">` (no `scope="col"`), so a screen
+  reader couldn't reliably associate each data cell with its column header (WCAG 1.3.1): the
+  income-impact engine region table (`renderIncome`), the commodity-board province-spread sub-table,
+  the commodities board (incl. the trailing chevron `<th>`), and the product→segment→driver map
+  (`renderProducts`). Added `scope="col"` to all 23 column headers, matching `data.html`'s convention
+  and the six earlier slices. Zero visual change (scope is non-presentational).
+- **Safeguard protocol (all passed).** `tests/run.sh check` **130 passed / 0 failed**; `node --check`
+  clean. Headless renders of `#home`/`#overview`/`#exposure` → `data-errors=[]`, self-reviewed on-theme,
+  no visible change. Diff = 4 scope-only header lines in `platform/app.js` + 1 `docs/UXUI_AUDIT.md`
+  fix-log line; no secrets, no stray files.
+- **Merge + deploy + verify.** Squash-merged PR #371 → master (`7eb1700`). Production alias
+  `competitive-intel-git-master-…vercel.app` returns **HTTP 200** on `/` and `/app.js`, and the
+  deployed `app.js` carries the `scope="col"` change (deploy picked up the merge despite an unrelated
+  Vercel free-tier PR-preview rate-limit comment). No rollback needed.
+- **Residual (minor).** The merged remote branch `claude/ux-loop-20260811-0812` could not be deleted
+  from this session — the agent proxy rejected the delete refspec ("Everything up-to-date"); harmless
+  (merged), can be pruned from the GitHub UI.
+- **Recommend next.** Continue the REOPENED sweep's remaining bare-`<th>` fns: the crop-watch +
+  farm-book tables (~L11210–11461), the dataroom layer table (`#dr` ~L11933), and the print-TOC
+  (~L12088) — one surgical slice per run.
+
 ## 2026-08-11 — Intelligence loop (service/deploy-health): the last three eager Overview backdrop cards (`vehicle_registry`, `drought_district`, `amphoe_crops`) now have deploy shape-probes — shipped to master
 
 - **The gap fixed (`overview-eager-backdrop-cards-three-still-unprobed`).** A fetched-vs-probed
