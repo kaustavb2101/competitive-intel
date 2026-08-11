@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-11T16:35:31+00:00",
-    "commit": "cf14a1d"
+    "generated_at": "2026-08-12T05:45:49+07:00",
+    "commit": "e47f775"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-11",
+    "eta_date": "2026-08-12",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -532,6 +532,36 @@
   ],
   "activity": [
     {
+      "date": "2026-08-12T05:45:49+07:00",
+      "sha": "e47f775",
+      "summary": "chore(app): remove 4 orphaned Overview macro loader/renderer pairs (dead since 2026-08-02 macro_book move) (#379)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-11T20:25:32+00:00",
+      "sha": "626eeba",
+      "summary": "docs: log ux-live-meta-stale-feed-counts merge + Vercel deploy-verify (PR #377)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-12T03:22:48+07:00",
+      "sha": "054391a",
+      "summary": "ux: drop stale hardcoded feed counts from live.html share metadata (#377)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-11T18:40:00+00:00",
+      "sha": "1569666",
+      "summary": "provenance: mark dormant opportunity_score layer, drop branch-expansion framing",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-11T16:37:57+00:00",
+      "sha": "1822fce",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the AutoX ROE-target tripwire ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-11T16:35:31+00:00",
       "sha": "cf14a1d",
       "summary": "guard(peer): --check tripwire locking AutoX ROE-target reference line to CLAUDE.md",
@@ -680,36 +710,6 @@
       "sha": "b6b85c3",
       "summary": "health(feed-liveness): add macro_usd_thb frozen-value canary for the weekly macro FX read",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-10T22:06:29+00:00",
-      "sha": "6fc55ff",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-10, run 31436513078)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-10T20:25:05+00:00",
-      "sha": "328759d",
-      "summary": "docs: log ux-loop assist-occupation scope=col slice (PR #366 merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T03:22:07+07:00",
-      "sha": "2bb73fd",
-      "summary": "ux: add scope=col to assistance-occupation drill table headers (a11y) (#366)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-10T18:32:40+00:00",
-      "sha": "ca5e9b2",
-      "summary": "health(feed-liveness): add social_corpus_docs frozen-value canary for the #acq social-listening feed",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-10T16:36:23+00:00",
-      "sha": "490a46e",
-      "summary": "health(feed-liveness): add rival_youtube_views frozen-value canary",
-      "pillar": "market"
     }
   ]
 }
