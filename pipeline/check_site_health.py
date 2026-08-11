@@ -2286,6 +2286,60 @@ def _shape_branch_population(d):
     return None
 
 
+def _shape_branch_leads(d):
+    # Per-branch WHO-TO-ACQUIRE lead board (branch_leads.json, obj #2). Consumed in the
+    # branch popup via leadsRec(d) = LEADS[idxOf(d)] where the store is set to j.branches
+    # and indexed by BRANCH POSITION, so a truncated file paints the WRONG branch's lead
+    # board with NO error (LEADS=null on non-200 omits the block; a short-but-200 CDN body
+    # silently misaligns every row after the cut). The render also joins each lead's .k to
+    # the top-level .buckets lookup (leadsBK), so both the index-aligned .branches list and
+    # the .buckets table are render dependencies. Asserts the .buckets lookup, the 2015-
+    # record index-aligned .branches shape + the leads[].k render read on the first record
+    # that carries leads; shape not values.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    buckets = d.get("buckets")
+    if not isinstance(buckets, list) or not buckets:
+        return "missing 'buckets' list (the leadsBK lookup the popup joins each lead to)"
+    if not (isinstance(buckets[0], dict) and "k" in buckets[0]):
+        return "first bucket missing 'k' (the leadsBK key the render looks up)"
+    brs = d.get("branches")
+    if not isinstance(brs, list):
+        return "missing 'branches' list (leadsRec index read)"
+    if len(brs) != 2015:
+        return "expected 2015 branch records (index-aligned), got %d" % len(brs)
+    rec = next((b for b in brs if isinstance(b, dict) and b.get("leads")), None)
+    if rec is None:
+        return "no branch record with a non-empty 'leads' list (the popup render reads none)"
+    if not (isinstance(rec["leads"][0], dict) and "k" in rec["leads"][0]):
+        return "first lead missing 'k' (the bucket-key the popup joins to leadsBK)"
+    return None
+
+
+def _shape_branch_recommendations(d):
+    # Per-branch ACTION recommendations (branch_recommendations.json) — the "what to do
+    # here" triage read at the top of the branch panel. Consumed in recsPopupHTML via
+    # RECDATA.branches[idxOf(d)], indexed by BRANCH POSITION, so a truncated file paints
+    # the WRONG branch's recommendations with NO error (RECDATA=null on non-200 omits the
+    # block; a short-but-200 body silently misaligns every row after the cut). Asserts the
+    # 2015-record index-aligned .branches shape + the recs[].t/.tone render reads on the
+    # first record that carries recs; shape not values.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    brs = d.get("branches")
+    if not isinstance(brs, list):
+        return "missing 'branches' list (RECDATA.branches index read)"
+    if len(brs) != 2015:
+        return "expected 2015 branch records (index-aligned), got %d" % len(brs)
+    rec = next((b for b in brs if isinstance(b, dict) and b.get("recs")), None)
+    if rec is None:
+        return "no branch record with a non-empty 'recs' list (the popup render reads none)"
+    r0 = rec["recs"][0]
+    if not (isinstance(r0, dict) and "t" in r0 and "tone" in r0):
+        return "first rec missing 't'/'tone' (the popup recommendation text + tone reads)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -2600,6 +2654,8 @@ DATA_FILES = [
     ("data/branch_fuel.json", _shape_branch_fuel, "2015-branch index-aligned .branches with n10 (per-branch fuel-station popup, MEASURED OSM ≤10km floor)"),
     ("data/branch_vehicles.json", _shape_branch_vehicles, ".meta.labels + 2015-branch index-aligned .branches with fleet/n_est/pickup_share (per-branch vehicle-collateral popup, DLT stock)"),
     ("data/branch_population.json", _shape_branch_population, "2015-entry index-aligned .values list (per-branch fallback ~10km population, ESTIMATED)"),
+    ("data/branch_leads.json", _shape_branch_leads, ".buckets lookup + 2015-branch index-aligned .branches with leads[].k (per-branch who-to-acquire lead-board popup, obj #2)"),
+    ("data/branch_recommendations.json", _shape_branch_recommendations, "2015-branch index-aligned .branches with recs[].t/.tone (per-branch action-recommendation popup)"),
     ("data/macro_exposure.json", _shape_macro_exposure, ".meta.factors/factor_keys + 2015-branch index-aligned .branches (t3[]) + 2015-entry .vector (per-branch macro-headwind popup + #map macx lens, obj #1)"),
     # The two collateral-board fleet reads from the same DLT wave, both surfaced via
     # tmliFetch and both self-hiding (display='none') on a truncated/404 deploy with no
