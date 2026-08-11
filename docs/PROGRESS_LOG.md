@@ -3,6 +3,56 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-11 — Intelligence loop (service/deploy-health): the last three eager Overview backdrop cards (`vehicle_registry`, `drought_district`, `amphoe_crops`) now have deploy shape-probes — shipped to master
+
+- **The gap fixed (`overview-eager-backdrop-cards-three-still-unprobed`).** A fetched-vs-probed
+  cross-check (the actual `fetch('data/X.json')` calls that fire eagerly on the default `#overview`
+  route in `app.js`, against the `DATA_FILES` registry in `pipeline/check_site_health.py`) found three
+  members of the exec-front-door backdrop family were still unprobed — the same danger class the
+  2026-07-27 → 2026-08-10 runs closed for `collateral_flow` / `truck_flow` / `region_debt` /
+  `sfi_credit`. All three are eagerly loaded on the DEFAULT nav route and each **self-hides** when its
+  layer is absent, so a truncated/404 CDN deploy silently blanks the card with **no phone alert**:
+  - `vehicle_registry.json` (`renderVehReg`, line 2151) — the MEASURED MOT collateral base, obj #1's
+    primary class ("≈half the book is motorcycle title"). Render hides on `!VEHREG.latest`, then paints
+    four class cards from `latest.groups` + a note from `latest.title_base`/`all_vehicles`/`meta.vintage`.
+  - `drought_district.json` (`renderDroughtDistrict`) — the MODELLED OAE-SPEI district drought read
+    behind the province crop-stress verdict. Hides on empty `.districts`; table renders rows with a
+    numeric `spei` + a `cls`; verdict line reads `meta.counts`.
+  - `amphoe_crops.json` (`renderAmphoeCrops`) — MEASURED OAE planted area × that drought, naming the
+    agri-PD exposure under the driest ground. Hides unless a `.hotspots` row survives its own
+    `planted_rai != null && spei != null` filter; the render then reads that row's province/amphoe/
+    crop/planted_rai/spei/drought.
+- **Deliberately NOT added: `dbd_formation.json`.** It appears in the 2026-08-10 "next batch" note, but
+  its client loader (`loadDbdForm`) was **retired from the Overview tab 2026-08-02** — the data now
+  flows server-side into `macro_book` and the page no longer calls `loadDbdForm`, so a probe would
+  assert a dependency the app dropped (the exact anti-pattern the `opportunity_score` registry comment
+  warns against). Verified by grep: `loadDbdForm` has zero live callers.
+- **The fix.** Added `_shape_vehicle_registry`, `_shape_drought_district`, `_shape_amphoe_crops`
+  (each asserting the render **contract** — shape, not values, so a future DLT/OAE vintage still passes)
+  and registered all three in `DATA_FILES` next to the sibling Overview-backdrop probes. One file,
+  `pipeline/check_site_health.py`, +114 lines, zero deletions.
+- **Safeguards (all pass).** (a) `bash tests/run.sh check` → **130 passed · 0 failed** (data integrity
+  455/455); the gate runs `check_site_health.py --local`, now **233/233** with the three new probes
+  proving they accept the committed payloads. (b) Negative-tested every validator directly: `None` on
+  the real data, and a distinct render-mapped error for each break mode (not-a-dict / missing `latest`
+  / empty `groups` / non-numeric `groups.motorcycle` / missing `title_base` / blank `vintage`; empty
+  `districts` / no `spei`+`cls` row / missing `meta.counts`; empty `hotspots` / all `spei`=None / no
+  `amphoe_th`) — proving none is a no-op. (c) No secrets in the diff (Python shape assertions only).
+  (d) Diff = `pipeline/check_site_health.py` + this doc entry only, no `platform/data` file altered →
+  no `build_provenance.py` regen, no derived-layer rebuild, no app/visual change → no PR/headless
+  render needed (pure CI health-monitoring); byte-deterministic, no wall-clock dependency.
+- **Deploy-verify:** probe-script only touches CI, not the served app; no served asset altered, so no
+  rollback risk.
+- **Next recommended:** the eager `#overview` backdrop family is now fully probed. The remaining
+  fetched-but-unprobed layers are lower-danger district/province-keyed reads whose client loaders are
+  confirmed LIVE — check each has a live caller before probing (several 2026-08-02 retirements, like
+  `dbd_formation`/`province_lfs`/`region_debt`'s Overview mounts, left dangling loaders that would be
+  false probe targets): candidates are the `#assist`/deep-dive income floors
+  (`agri_income_by_province` / `factory_income_by_province` / `sme_income_by_province` /
+  `occupation_income`) and `snapshots_index` (the `#trend` vintage list). The only genuinely-open
+  *data* items remain owner-side/Thai-IP gated (GISTDA `check-crop` per-branch pull; the flooded-AREA
+  GISTDA dissolve; the BAAC/SME-bank credit raw CSVs) — none CI-doable.
+
 ## 2026-08-11 — Intelligence loop (service/deploy-health): freshness guard for the share-of-search board (`search_demand.json`)
 
 - **The gap (a *newly-emerged* silent-staleness blind spot).** Every prior audit treated
