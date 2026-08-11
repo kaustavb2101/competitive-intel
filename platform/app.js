@@ -11262,9 +11262,9 @@ function renderFarmHousehold(){
     host.innerHTML=`<p class="lead" style="margin:0 0 8px"><b style="color:var(--merch)">${nf}% of a farm household's cash income is non-farm</b> — so a crop-price fall reaches roughly ${L.farm_share_of_income_pct}% of what the household actually earns, not all of it. In ${L.crop_year} the average farm household took ${B(inc.total)} cash, spent ${B(exp.total)}, and cleared <b>${B(L.net_cash)}</b> for the year — <b>${B(L.net_cash_monthly)}/month</b>.</p>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px">${bar}
         <span class="sub" style="font-size:12px"><span style="color:var(--agri)">■</span> farm ${L.farm_share_of_income_pct}% &nbsp; <span style="color:var(--merch)">■</span> non-farm ${nf}%</span></div>
-      <table class="tbl"><tr><th>Crop year</th><th title="crops + livestock + other farm cash">Farm cash income</th>
-        <th title="wages, remittances, off-season work — untouched by crop prices">Non-farm</th>
-        <th>Cash expense</th><th>Net cash / yr</th><th class="sub">/ month</th><th class="sub">Farm share</th></tr>${trend}</table>
+      <table class="tbl"><tr><th scope="col">Crop year</th><th scope="col" title="crops + livestock + other farm cash">Farm cash income</th>
+        <th scope="col" title="wages, remittances, off-season work — untouched by crop prices">Non-farm</th>
+        <th scope="col">Cash expense</th><th scope="col">Net cash / yr</th><th scope="col" class="sub">/ month</th><th scope="col" class="sub">Farm share</th></tr>${trend}</table>
       <p class="lead sub" style="margin:8px 0 0"><b>Household:</b> head aged ${hh.head_age_years??'—'}, ${hh.household_size??'—'} people, ${hh.workers_15_64??'—'} of working age, ${hh.landholding_rai??'—'} rai held. <b>Reading:</b> ${(j.meta||{}).scope_warning||''} ${(j.meta||{}).not_covered||''}</p>`;
     wrapTables();
   });
@@ -11331,16 +11331,16 @@ function renderAssistPriceLens(){
 
     host.innerHTML=`${stampLine}<p class="lead" style="margin:0 0 10px">${lead}</p>
       <table class="tbl"><tr>
-        <th>Crop</th>
-        <th title="Thai farm-gate price, year-on-year — MEASURED NABC daily national average">Farm-gate YoY</th>
-        <th title="provinces where this crop is at least the dominance share of planted area">Provinces on it</th>
-        <th title="accounts that are Current or only in the X (pre-30dpd) bucket">Healthy accounts riding on it</th>
-        <th title="the whole farm book in those provinces — the tape does not split outstanding by bucket">Farm book</th>
-        <th>Where most of it sits</th></tr>${crops}</table>
+        <th scope="col">Crop</th>
+        <th scope="col" title="Thai farm-gate price, year-on-year — MEASURED NABC daily national average">Farm-gate YoY</th>
+        <th scope="col" title="provinces where this crop is at least the dominance share of planted area">Provinces on it</th>
+        <th scope="col" title="accounts that are Current or only in the X (pre-30dpd) bucket">Healthy accounts riding on it</th>
+        <th scope="col" title="the whole farm book in those provinces — the tape does not split outstanding by bucket">Farm book</th>
+        <th scope="col">Where most of it sits</th></tr>${crops}</table>
       <details style="margin-top:10px"><summary class="sub">By province — falling-crop provinces first, then the largest healthy farm books (15 of ${provs.length})</summary>
         <table class="tbl" style="margin-top:8px"><tr>
-          <th>Province</th><th>Current + X</th><th class="sub">Current / X</th>
-          <th class="sub">Farm accounts</th><th class="sub">Farm book</th><th>Crops it depends on</th></tr>${top}</table></details>
+          <th scope="col">Province</th><th scope="col">Current + X</th><th scope="col" class="sub">Current / X</th>
+          <th scope="col" class="sub">Farm accounts</th><th scope="col" class="sub">Farm book</th><th scope="col">Crops it depends on</th></tr>${top}</table></details>
       <p class="lead sub" style="margin:10px 0 0"><b>Trips when</b> ${trig.rule||'a depended-on crop turns negative'} <b>Reading:</b> the Current/X split is by <b>account count</b>; the farm book figure is the province's whole farm outstanding — the tape aggregate does not expose balance by bucket, and splitting it here would be invention. <b>Sugarcane joined this map on 1 Aug 2026</b> — cane growers register with the OCSB rather than DOAE, so it had no planted area here and its only price was a 2019 OAE snapshot reading <b>+26%</b> when the announced cane price is <b>−17.9%</b>. It now drives most of what has tripped. Livestock and fisheries (pork, shrimp, chicken, eggs) are still absent: they have no planted area to join on.</p>`;
     wrapTables();
   });
@@ -11390,12 +11390,12 @@ function renderAssistBranchLens(){
 
     host.innerHTML=`<p class="lead" style="margin:0 0 10px">${lead}</p>
       <table class="tbl"><tr>
-        <th>Branch</th><th>Province</th>
-        <th title="modelled hectares of the FALLING crop around this branch — the size of the farm economy taking the price cut. ESTIMATED (SPAM), ranks branches against each other">Exposed ha</th>
-        <th class="sub" title="that as a share of the branch&#39;s catchment cropland — concentration, not size: 48% of seven hectares is not a big exposure">Share of catchment</th>
-        <th title="MEASURED farm accounts at this branch — shown only where the tape&#39;s own cell cleared the ≥30 floor">Farm accounts here</th>
-        <th class="sub" title="X-bucket (pre-30dpd) share at this branch">X %</th>
-        <th class="sub" title="the whole province&#39;s Current + X farm accounts — the solid number to work">Province Current+X</th></tr>${rows}</table>
+        <th scope="col">Branch</th><th scope="col">Province</th>
+        <th scope="col" title="modelled hectares of the FALLING crop around this branch — the size of the farm economy taking the price cut. ESTIMATED (SPAM), ranks branches against each other">Exposed ha</th>
+        <th scope="col" class="sub" title="that as a share of the branch&#39;s catchment cropland — concentration, not size: 48% of seven hectares is not a big exposure">Share of catchment</th>
+        <th scope="col" title="MEASURED farm accounts at this branch — shown only where the tape&#39;s own cell cleared the ≥30 floor">Farm accounts here</th>
+        <th scope="col" class="sub" title="X-bucket (pre-30dpd) share at this branch">X %</th>
+        <th scope="col" class="sub" title="the whole province&#39;s Current + X farm accounts — the solid number to work">Province Current+X</th></tr>${rows}</table>
       ${gaps.length?`<p class="lead sub" style="margin:10px 0 0"><b>Not rankable:</b> ${gaps.map(p=>`<b>${p.th}</b>`).join(' · ')} — ${gaps[0].coverage_note||''}</p>`:''}
       <p class="lead sub" style="margin:10px 0 0"><b>Reading:</b> the ranking column is <b>ESTIMATED</b> — a SPAM spatial crop model over a 10km catchment, which is the right shape for ordering branches and the wrong thing to quote about a single borrower. The account counts are <b>MEASURED</b> where shown and deliberately blank where the branch cell fell under the tape's ≥30 floor. ${(m.n_branches_with_measured_accounts!=null&&m.n_branches_ranked)?`<b>${N(m.n_branches_with_measured_accounts)} of ${N(m.n_branches_ranked)}</b> branches here have a published count.`:''} Sugarcane's move is the <b>OCSB announced season price</b>, not a daily quote — administered nationally, so it is certain and every cane household takes it, but it is season-over-season rather than live.</p>`;
     wrapTables();
@@ -11446,10 +11446,10 @@ function renderAssistAction(){
         <b>${N(cx)}</b> farm accounts that are Current or only in the X bucket — <b>${aodTHB(os)}</b> of farm book — in a crop
         whose price is <i>already</i> down. Nothing here has gone wrong yet. That is the whole opportunity.</p>
       <table class="tbl"><tr>
-        <th>Where the account is in its life</th>
-        <th>Accounts</th>
-        <th title="share of that population at 90+ days past due — MEASURED from the real tape">90+</th>
-        <th title="average NPAT margin per account — MEASURED from the real tape">NPAT per account</th></tr>${ladder}</table>
+        <th scope="col">Where the account is in its life</th>
+        <th scope="col">Accounts</th>
+        <th scope="col" title="share of that population at 90+ days past due — MEASURED from the real tape">90+</th>
+        <th scope="col" title="average NPAT margin per account — MEASURED from the real tape">NPAT per account</th></tr>${ladder}</table>
       <p class="lead sub" style="margin:10px 0 0"><b>Read the ladder honestly — it is selection, not cause.</b>
         An account reaches <b>TDR</b> because it was already the worst in the book, so the ${tdr.dpd90p_pct}% is
         <i>not</i> evidence that restructuring makes accounts fail. What it does measure is what is <b>left to work with</b>
