@@ -3,6 +3,58 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-11 — Integration loop (PROVENANCE/MANDATE): retire the last "branch-expansion" framing on the dormant `opportunity_score` layer — shipped to master
+
+- **The gap fixed (`opportunity-score-still-labelled-branch-expansion`).** `platform/data/opportunity_score.json`
+  is a pre-consolidation-pivot artifact: the app already **dropped** its growth/opportunity leaderboard
+  in the strategy pivot (`index.html:700` "no longer surfaced here as a growth leaderboard";
+  `rayong-catchment.html:2908` "a[12] opportunity_score REMOVED (strategy pivot) — slot kept null"), and
+  **nothing reads the file** — every remaining reference across the pipeline is a "dropped/dormant"
+  comment (`build_decision_queue.py:303` "opportunity_score.json … intentionally NOT read here"), a
+  refresh-registry list entry, or the builder's own `OUT =`. Yet the committed file's own `meta.label`
+  and `meta.objective`, plus the whole `build_opportunity_score.py` docstring, still advertised it as
+  *"a ranking aid for branch expansion (objective #2)"* / *"where to expand — rank amphoe by expansion
+  opportunity"* / *"where do we open the next branch?"* — the **exact recommendation CLAUDE.md says the
+  platform makes NONE of** ("the network is consolidating … makes no open/close/where-to-open
+  recommendations"). Its sibling `expansion_plan.json` was correctly given a DORMANT header at the pivot;
+  this one was missed, so it sat on the honesty board (`provenance.json`) mislabelled as an active
+  expansion tool.
+- **The fix (metadata + provenance only — numbers byte-identical).** Reworded `build_opportunity_score.py`'s
+  docstring, `meta.label`, `meta.objective` and the argparse description to mirror `build_expansion_plan.py`'s
+  DORMANT treatment: the layer is now honestly framed as **retained-on-disk-for-reversibility, NOT surfaced,
+  and NOT an open/expand/where-to-open recommendation** (the network is consolidating). Added an explicit
+  `meta.status: "dormant …"` flag for machine-readability. The composite is described for what it still is —
+  a per-district underserved-demand × competitive-gap × agri-stress read — with the "place-to-open" call
+  removed. The 928-district data array is **unchanged** (checksum identical before/after regen); only
+  descriptive strings moved, so no app behaviour or visual changes (the file isn't rendered).
+- **Why this and not a data pull.** The scheduled integration backlog's top items are done or CI-blocked:
+  FPO-PICO census + per-branch cropland (#1/#2) are **already built, gated and wired**; DBD/DIW/MOT
+  distillation is shipped; BAAC/SME-bank (#3) need a Thai-IP re-pull with **no raw cache committed** and
+  data.go.th 403 from CI; GISTDA satellite crop (#4) needs `GISTDA_SPHERE_KEY` (a GHA secret, absent from
+  this session) and the open keyless GISTDA portal only exposes 2015-2018 **cached-tile** rice/landuse
+  MapServers (no statistics/FeatureServer to aggregate server-side) — a dead end for a clean current
+  measured layer, and the measured crop-area path (DOAE-2025) is already shipped. So the highest-value
+  **CI-doable, committed-data-only, fully-verifiable** improvement this run was closing this provenance/
+  mandate contradiction — squarely the project's "honesty about provenance" + "no expansion
+  recommendations" values.
+- **Verified (all green).** `build_opportunity_score.py --check` byte-exact after regen; `build_provenance.py`
+  regenerated + `--check` byte-exact (the honesty board now shows the DORMANT label, verdict still
+  ESTIMATED); `bash tests/run.sh check` **132 passed / 0 failed**, data-integrity **455/455** (incl. the
+  layer's own "estimated-composite label" assertion, which the reworded label still satisfies). Diff is
+  exactly 3 files (builder + the two regenerated JSONs), no strays, no secrets, no numeric change → committed
+  straight to master (no PR/headless render needed). Note: the Vercel free-tier daily-deploy cap logged
+  below may still be in effect, but this changes nothing served (the file isn't rendered), so production is
+  unaffected regardless.
+- **Next recommended integration.** Two smaller committed-data honesty items remain from this run's
+  negative-space sweep: (a) `platform/data/farmgate_prices.json` is a **built + gated but unconsumed dead
+  duplicate** — `build_farmgate_platform.py` copies `source-data/farmgate_prices.json` into `platform/data/`,
+  but every consumer reads the source-data copy and no page fetches the projection (retire it like the old
+  `ingest_loan_tape` bridge, or wire it); (b) `source-data/bot_policy_rate.json` (MEASURED BOT/MPC decision
+  history, pulled by `pull_bot_policy_rate.py`) is **orphaned** — no builder distils it, while the Overview
+  policy-rate card is fed by the laggier BIS quarterly series via `macro_indicators.json`; a BOT-direct
+  distillation would be a more timely macro read (behaviour/visual change → PR + render verify). Everything
+  else CI-doable in the data backlog remains Thai-IP/owner-side gated.
+
 ## 2026-08-11 — Intelligence loop (PEER/PROVENANCE): `--check`-gated tripwire locking AutoX's ROE-target reference line to CLAUDE.md — shipped to master
 
 - **The gap fixed (`autox-self-figure-on-peer-ladder-not-cross-checked`).** Every RIVAL constant on
