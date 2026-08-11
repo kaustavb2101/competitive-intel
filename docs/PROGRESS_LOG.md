@@ -3,6 +3,45 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-11 — Intelligence loop (PEER/PROVENANCE): `--check`-gated tripwire locking AutoX's ROE-target reference line to CLAUDE.md — shipped to master
+
+- **The gap fixed (`autox-self-figure-on-peer-ladder-not-cross-checked`).** Every RIVAL constant on
+  the objective-#2 competitive board is now digest-locked (`check_peer_constants.py` ⇄
+  `RESEARCH_DIGEST.md §B`, shipped earlier 2026-08-11). But the peer ROE ladder also renders ONE
+  **AutoX self-figure** — AutoX's stated **25% ROE TARGET** — as the reference line the exec reads
+  every peer's ROE against. It is hand-carried as a CITED constant, `AUTOX_ROE_TARGET = 25.0` in
+  `pipeline/build_peer_scoreboard.py`, sourced from the CLAUDE.md brief ("… ฿70bn loans, 25% ROE").
+  Unlike every rival figure, **nothing gate-checked it** — so a strategy revision editing CLAUDE.md
+  (or the builder) without the other would silently leave the peer ladder comparing rivals against a
+  STALE AutoX benchmark **with a green gate**. This was the one AutoX self-figure the provenance gate
+  had missed. (Ruled out along the way: the rival branch/loan-book counts in `competitor_coverage` are
+  already guarded or derived — `national_standing.autox_branches` is computed from `branches.json`
+  length via `_autox_branch_count()`, so it auto-updates as AutoX consolidates; no hardcode drift.)
+- **The guard (`pipeline/check_autox_targets.py`, deterministic, network-free, `--check`-gated).**
+  It DERIVES the expected CLAUDE.md substring FROM the live builder constant (imported, not re-typed)
+  — `f"{AUTOX_ROE_TARGET:g}% ROE"` → `"25% ROE"` — and asserts it appears in CLAUDE.md, so BOTH drift
+  directions turn the gate red: (a) the builder constant edited to a value no longer in the brief, and
+  (b) the "25% ROE" line in CLAUDE.md edited without the builder following. Nothing is written (pure
+  cross-consistency assertion → no `platform/data` output, no provenance regen).
+- **Verified drift-detection, not a no-op.** Bare + `--check` exit 0 on the current tree; an in-memory
+  monkeypatch of the constant to 30.0 → `"30% ROE"` correctly reported MISSING (exit 1); a CLAUDE.md
+  edit `25%→28% ROE` → caught. `:g` keeps the render CLAUDE.md-accurate (25.0→"25", 25.5→"25.5").
+- **Safeguards (all green).** `check_autox_targets.py --check` exits 0; `tests/run.sh check` **132
+  passed / 0 failed** with the new gate line (was 131); data-integrity **455/455**;
+  `rederive_drift.py --selftest` now parses **141** gated scripts (picks up the new `--check`
+  automatically — no hand-kept list); no `platform/data` file changed, so `build_provenance.py --check`
+  is byte-exact (no regen). Change footprint: 1 new script + 1 line in `tests/run.sh`. No app
+  behaviour/visual change → committed straight to master (no PR/headless render needed).
+- **Note — Vercel daily deploy cap still in effect today.** As logged below, the free-tier
+  100-deploys/day quota was exhausted earlier; this is a pipeline-only change that alters nothing
+  served, so the live site content is identical regardless of whether the build lands today.
+- **Next recommended intelligence task.** The one remaining hand-carried AutoX brief figures (~1M
+  customers, ฿70bn loan book) are NOT yet surfaced as builder constants anywhere (the tape carries the
+  real book), so there is nothing to lock for them today. Beyond the now-complete constant tripwires,
+  the CI-doable data backlog remains Thai-IP/owner-side gated (competitor-census Places refresh, FPO
+  PICO, DBD/BAAC distillation); the highest-value open lever is a fresh national Places scout run to
+  age down the 38-day `competitors_census.json` that the whole peer board rests on.
+
 ## 2026-08-11 — UX loop: `scope="col"` on the crop-watch + farm-book tables — merged to master; ⚠️ Vercel production deploy blocked by daily rate limit
 
 - **Shipped (`ux-table-scope-cropwatch-farmbook`, PR #375, squash-merged `7c3dc00`).** Eighth slice of
