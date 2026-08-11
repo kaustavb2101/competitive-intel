@@ -3,6 +3,30 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-11 — UX loop (clarity/honesty): drop stale hardcoded feed counts from `live.html` share metadata — shipped to master (PR #377)
+
+- **The gap fixed (`ux-live-meta-stale-feed-counts`).** `live.html`'s static `<head>` share/meta
+  descriptions hardcoded **volatile** feed counts that had drifted out of date: `meta name="description"`
+  said "the stored history behind the **four** feeds that carry a real trend line" and `og:description`
+  said "**20** live feeds … and **151** stored history points behind **four** real trend lines" — but the
+  live board now renders **23 feeds, 8 trend lines, 230 stored points** (its own body note correctly
+  computes "8 of 23 feeds carry one" from data). A link shared internally (a documented "core use of an
+  exec tool" per the earlier `ux-share-metadata` work) unfurled with wrong counts, against the
+  honesty-of-numbers mandate.
+- **Decision — remove the counts, don't chase them.** Every other page's metadata cites only STABLE
+  platform invariants (2,015 branches, 77 provinces); only `live.html` cited counts that grow as feeds
+  land, so they can only ever drift. Reworded both descriptions to drop the volatile numbers (matching the
+  page's own `twitter:description`, which already carries none) — accurate as the feed set grows, no future
+  drift. Pure `<head>` metadata: zero body/visual change, no JS/CSS touched.
+- **Safeguards (all passed).** `tests/run.sh check` → **132 passed / 0 failed**; headless render of
+  `live.html` byte-identical (`data-errors=[]`, body unchanged); no secrets in diff; diff = the two-line
+  meta edit + one `UXUI_AUDIT.md` fix-log line, no stray files.
+- **Merge + deploy + verify.** Squash-merged PR #377 (`054391a`), branch deleted, master auto-deploys to
+  Vercel. Verified after deploy: production alias root **HTTP 200**, `/live` (changed route) **HTTP 200**,
+  and the NEW metadata is live in prod (`og:description` now "every live feed … the feeds that carry a real
+  trend line" — the stale "20 live feeds" is gone). `/live.html` → 308 is the expected `cleanUrls` redirect,
+  not a regression. No rollback needed.
+
 ## 2026-08-11 — Integration loop (PROVENANCE/MANDATE): retire the last "branch-expansion" framing on the dormant `opportunity_score` layer — shipped to master
 
 - **The gap fixed (`opportunity-score-still-labelled-branch-expansion`).** `platform/data/opportunity_score.json`
