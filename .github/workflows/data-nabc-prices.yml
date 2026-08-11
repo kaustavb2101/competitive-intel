@@ -48,6 +48,14 @@ jobs:
         with:
           python-version: "3.11"          # match the determinism gate's Python
 
+      - name: Install numpy (so branch_peers rebuilds + gates authoritatively)
+        # WITHOUT numpy, build_branch_peers.py --check SKIPs in BOTH rederive_drift.py (so the stale
+        # branch_peers.json is never rebuilt) AND the pre-merge `tests/run.sh check` below (so it is
+        # never caught) — the stale layer auto-merges as "green" and only qa.yml, which pins
+        # numpy==2.4.6, then catches the drift and turns master red. Pinned to match qa.yml so the
+        # byte-exact --check reproduces.
+        run: pip install numpy==2.4.6
+
       - name: Offline selftest (prove the parse/aggregate path before the network)
         run: python pipeline/pull_nabc_prices.py --selftest
 
