@@ -8217,7 +8217,7 @@ function renderMarketCollateral(){
   const sev=v=>v==null?'var(--dim)':v<8?'var(--merch)':v<14?'#9CB24E':v<20?'var(--opp)':v<26?'#D97A3A':'var(--agri)';
   const ec=$('#mkt-coll-econ');
   if(ec&&Array.isArray(C.economics_by_type)){
-    ec.innerHTML=`<tr><th>Type</th><th>Accounts</th><th>OS</th><th>Yield</th><th title="yield − opex 8% − CoF 2.5%, before credit loss">Spread</th><th>90+</th></tr>`+
+    ec.innerHTML=`<tr><th scope="col">Type</th><th scope="col">Accounts</th><th scope="col">OS</th><th scope="col">Yield</th><th scope="col" title="yield − opex 8% − CoF 2.5%, before credit loss">Spread</th><th scope="col">90+</th></tr>`+
       C.economics_by_type.map(r=>`<tr><td><b>${r.type}</b></td><td class="mono sub">${N(r.n)}</td>
         <td class="mono sub">${bnf(r.os_sum)}</td><td class="mono">${r.yield_pct}%</td>
         <td class="mono" style="color:${r.gross_spread_pct<6?'var(--opp)':'var(--merch)'}"><b>${r.gross_spread_pct}%</b></td>
@@ -8225,14 +8225,14 @@ function renderMarketCollateral(){
   }
   const br=$('#mkt-coll-branch');
   if(br&&Array.isArray(C.branch_brand_concentration)){
-    br.innerHTML=`<tr><th>Branch</th><th>Brand</th><th>Accounts</th><th>90+</th></tr>`+
+    br.innerHTML=`<tr><th scope="col">Branch</th><th scope="col">Brand</th><th scope="col">Accounts</th><th scope="col">90+</th></tr>`+
       C.branch_brand_concentration.slice(0,15).map(r=>`<tr><td>${(r.branch||'').replace('เงินไชโย','').replace('สาขา','')}</td>
         <td class="sub">${r.brand}</td><td class="mono sub">${N(r.n)}</td>
         <td class="mono" style="color:${sev(r.dpd90p_pct)}">${r.dpd90p_pct}%</td></tr>`).join('');
   }
   const rg=$('#mkt-coll-region');
   if(rg&&Array.isArray(C.type_x_region)){
-    rg.innerHTML=`<tr><th>Type</th><th>Region</th><th>Accounts</th><th>OS</th><th>90+</th></tr>`+
+    rg.innerHTML=`<tr><th scope="col">Type</th><th scope="col">Region</th><th scope="col">Accounts</th><th scope="col">OS</th><th scope="col">90+</th></tr>`+
       C.type_x_region.slice(0,15).map(r=>`<tr><td><b>${r.type}</b></td><td class="sub">${r.region}</td>
         <td class="mono sub">${N(r.n)}</td><td class="mono sub">${bnf(r.os_sum)}</td>
         <td class="mono" style="color:${sev(r.dpd90p_pct)}">${r.dpd90p_pct}%</td></tr>`).join('');
@@ -8241,7 +8241,7 @@ function renderMarketCollateral(){
   if(ag&&C.by_age){
     const AGL={'1.<=5 yr.':'≤5 yr','2.(5-10]yr.':'5–10 yr','3.(10-12]yr.':'10–12 yr','4.(12-15]yr.':'12–15 yr','5.(15-18]yr.':'15–18 yr','6.(18-20]yr.':'18–20 yr','7.(20-25]yr.':'20–25 yr','8.>25 yr.':'>25 yr'};
     const rows=Object.entries(C.by_age).sort((a,b)=>a[0].localeCompare(b[0]));
-    ag.innerHTML=`<tr><th>Age at origination</th><th>Accounts</th><th>90+</th><th>Avg eval</th></tr>`+
+    ag.innerHTML=`<tr><th scope="col">Age at origination</th><th scope="col">Accounts</th><th scope="col">90+</th><th scope="col">Avg eval</th></tr>`+
       rows.map(([k,v])=>`<tr><td>${AGL[k]||k}</td><td class="mono sub">${N(v.n)}</td>
         <td class="mono" style="color:${sev(v.dpd90p_pct)}">${v.dpd90p_pct}%</td>
         <td class="mono sub">${v.eval_avg?kk(v.eval_avg):'—'}</td></tr>`).join('');
