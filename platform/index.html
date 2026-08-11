@@ -509,6 +509,13 @@
          (point 19). Null-safe: absent file → the whole block hides itself. -->
     <div id="collat-book"></div>
 
+    <!-- BOOK APPRAISAL vs MEASURED MARKET RECOVERY (data/collateral_census.json, build_collateral_census.py).
+         Sits directly under the collateral book: that block says we lend N% of assessed value; this names the
+         specific collateral pools (class × age band) where our own book appraisal sits furthest ABOVE the
+         MEASURED auction price the title would actually recover into — the recovery-shortfall risk (obj #1).
+         Rendered by renderCollatBookCheck(); null-safe — absent layer → the whole block hides itself. -->
+    <div id="collat-bookcheck"></div>
+
     <!-- New-pickup inflow TREND (data/brand_trends.json, DLT first registrations) — the TIME dimension
          the diesel-share snapshot above lacks: how fast the future used-pickup collateral pool is
          being replenished at source. Obj #1, collateral outlook. Rendered by renderBrandTrends();
