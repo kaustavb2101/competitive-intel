@@ -405,6 +405,103 @@ def _shape_sfi_credit(d):
     return None
 
 
+def _shape_vehicle_registry(d):
+    # The MEASURED collateral base card on Overview (#overview), obj #1 — the
+    # eager `loadVehReg().then(renderVehReg)` on the default nav route. The render
+    # HIDES the whole block on `!VEHREG || !VEHREG.latest`, then paints four
+    # collateral-class cards from `latest.groups[motorcycle|car|pickup|agri]` and a
+    # note headline from `latest.title_base` / `latest.all_vehicles` / `meta.vintage`.
+    # A truncated/404 CDN deploy that emptied or short-served it would silently blank
+    # the "≈half the book is motorcycle title" collateral read on the exec Overview
+    # with NO phone alert — the exact broken-demo this check exists to catch. Asserts
+    # the render contract (shape, not counts) so a future DLT vintage bump still passes.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    latest = d.get("latest")
+    if not isinstance(latest, dict):
+        return "missing 'latest' object (renderVehReg hide-gate: !VEHREG.latest)"
+    groups = latest.get("groups")
+    if not isinstance(groups, dict) or not groups:
+        return "missing/empty latest.groups (the four collateral-class card render reads)"
+    if not isinstance(groups.get("motorcycle"), (int, float)):
+        return "latest.groups.motorcycle not numeric (the small-ticket title core card, ~half the book)"
+    if not isinstance(latest.get("title_base"), (int, float)):
+        return "latest.title_base not numeric (the note 'NM registered ...' headline read)"
+    if not isinstance(latest.get("all_vehicles"), (int, float)):
+        return "latest.all_vehicles not numeric (the note 'of NM vehicles' read)"
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    if not (isinstance(meta.get("vintage"), str) and meta["vintage"].strip()):
+        return "meta.vintage missing/empty (the note vintage read)"
+    return None
+
+
+def _shape_drought_district(d):
+    # The MODELLED district-grain drought read on Overview (#overview), obj #1 —
+    # eager `loadDroughtDistrict().then(renderDroughtDistrict)` on the default nav
+    # route, sharpening the coarser province crop-stress verdict to the district.
+    # The render HIDES the block on an empty `.districts` list, tallies the
+    # verdict line from `meta.counts` (extreme/severe/moderate), and the
+    # driest-districts table renders only rows carrying a numeric `spei` + a `cls`.
+    # A truncated deploy that emptied it would silently drop the district drought
+    # card with no phone alert. Asserts shape (a non-empty districts list, one
+    # render-eligible row, meta.counts), not values — robust to a future SPEI snapshot.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    ds = d.get("districts")
+    if not isinstance(ds, list) or not ds:
+        return "missing/empty 'districts' list (renderDroughtDistrict hide-gate + table render)"
+    rec = next(
+        (x for x in ds if isinstance(x, dict) and isinstance(x.get("spei"), (int, float)) and x.get("cls")),
+        None,
+    )
+    if rec is None:
+        return "no district row with numeric 'spei' + 'cls' (the driest-districts table render reads none)"
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    if not isinstance(meta.get("counts"), dict):
+        return "missing 'meta.counts' object (the extreme/severe/moderate verdict-line reads)"
+    return None
+
+
+def _shape_amphoe_crops(d):
+    # The crop x drought exposure card on Overview (#overview), obj #1 — eager
+    # `loadAmphoeCrops().then(renderAmphoeCrops)` on the default nav route (which
+    # slice of the agri-PD book sits under the driest ground). The render HIDES the
+    # block unless `.hotspots` has a row with BOTH `planted_rai != null` and
+    # `spei != null` (its own filter), then the largest-exposure verdict + the
+    # exposure table read that row's province_th / amphoe_th / crop / planted_rai /
+    # spei / drought. A truncated deploy that emptied it silently drops the exposure
+    # card with no phone alert. Asserts the render contract (a filter-surviving
+    # hotspot carrying the join keys), not values — robust to a future OAE vintage.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    hs = d.get("hotspots")
+    if not isinstance(hs, list) or not hs:
+        return "missing/empty 'hotspots' list (renderAmphoeCrops hide-gate + table render)"
+    rec = next(
+        (
+            h
+            for h in hs
+            if isinstance(h, dict)
+            and h.get("planted_rai") is not None
+            and h.get("spei") is not None
+            and h.get("province_th")
+            and h.get("amphoe_th")
+            and h.get("drought")
+        ),
+        None,
+    )
+    if rec is None:
+        return "no hotspot with planted_rai+spei+province_th+amphoe_th+drought (the exposure table render reads none)"
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    return None
+
+
 def _shape_peer_province(d):
     # The MEASURED per-province PEER board (obj #2 competitive risk) — the
     # Competition surface's flagship read (drawPeerProvince reads .provinces and,
@@ -2432,6 +2529,23 @@ DATA_FILES = [
     # deploy that guts the FPO NPL series fires a phone alert instead of silently
     # hiding the backdrop card.
     ("data/sfi_credit.json", _shape_sfi_credit, ".series[] (FPO quarterly) + meta.latest.npl_ratio (Overview NPL backdrop)"),
+    # The three remaining eager Overview (#overview) backdrop cards that the
+    # collateral_flow/truck_flow/region_debt/sfi_credit probes above left
+    # uncovered — each loaded on the DEFAULT nav route and each self-hiding when
+    # its layer is missing, so a truncated/404 CDN deploy silently blanks it with
+    # NO phone alert:
+    #  - vehicle_registry (renderVehReg): the MEASURED MOT collateral base, obj #1's
+    #    primary class (moto ~half the book);
+    #  - drought_district (renderDroughtDistrict): the MODELLED OAE-SPEI district
+    #    drought read behind the province crop-stress verdict;
+    #  - amphoe_crops (renderAmphoeCrops): MEASURED OAE planted area x that drought,
+    #    naming the agri-PD exposure under the driest ground.
+    # (dbd_formation was deliberately NOT added: its client loader was retired
+    # 2026-08-02 — the data now flows server-side into macro_book and the page no
+    # longer fetches it, so a probe would assert a dependency the app dropped.)
+    ("data/vehicle_registry.json", _shape_vehicle_registry, "latest.groups (4 classes) + latest.title_base/all_vehicles (Overview collateral base, obj #1)"),
+    ("data/drought_district.json", _shape_drought_district, ".districts (~928) with spei/cls + meta.counts (Overview district drought, obj #1)"),
+    ("data/amphoe_crops.json", _shape_amphoe_crops, ".hotspots (crop x drought exposure w/ planted_rai+spei) (Overview agri-PD exposure, obj #1)"),
     # The competition pillar's flagship exec layer (obj #2) — the per-province
     # peer board (AutoX next to each big-4 rival, per province) that powers the
     # Competition surface + the command-center thesis clause. Every default-route
