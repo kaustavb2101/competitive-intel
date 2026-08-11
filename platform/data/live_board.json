@@ -259,11 +259,11 @@
    "label": "Rain gauges reporting",
    "measured": true,
    "source": "ThaiWater (api-v3.thaiwater.net /public/rain_24h) — live rain-gauge telemetry (DWR/TMD/EGAT networks). Keyless, cloud-reachable.",
-   "stamp": "2026-08-10",
-   "stamp_iso": "2026-08-10",
+   "stamp": "2026-08-11",
+   "stamp_iso": "2026-08-11",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4427,
+   "value": 4412,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -283,11 +283,11 @@
    "label": "River stations above high mark",
    "measured": true,
    "source": "ThaiWater (api-v3.thaiwater.net /public/waterlevel_load) — live river/reservoir water-level telemetry (RID/DWR networks). Keyless, cloud-reachable.",
-   "stamp": "2026-08-10",
-   "stamp_iso": "2026-08-10",
+   "stamp": "2026-08-11",
+   "stamp_iso": "2026-08-11",
    "stamp_kind": "pulled",
    "unit": "of 794",
-   "value": 159,
+   "value": 152,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
