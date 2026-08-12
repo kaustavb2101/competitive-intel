@@ -393,9 +393,10 @@ phase_check(){
   # committed output drifted from its named source (FAIL — regenerate it). Driven from an explicit
   # name|source table (not a bare-name loop) so each FAIL message points at the ACTUAL source rather
   # than blanket-blaming source-data/staging/, and so a grep for "build_X.py --check" over this file
-  # finds every gated builder below (a bare loop hid these 19 from gate-coverage audits):
+  # finds every gated builder below (a bare loop hid these 20 from gate-coverage audits):
   #   build_crop_margin.py --check   build_drought_district.py --check   build_province_lfs.py --check
   #   build_region_debt.py --check   build_amphoe_crops.py --check       build_tape_layers.py --check
+  #   build_collateral_census.py --check
   #   build_impact_cards.py --check  build_income_impact.py --check      build_scenarios.py --check
   #   build_commodities.py --check   build_product_segments.py --check   ingest_ocsb_cane.py --check
   #   build_thai_price_history.py --check  build_farm_household.py --check  build_debt_source.py --check
