@@ -1448,6 +1448,43 @@ def _shape_collateral_outlook(d):
     return None
 
 
+def _shape_collateral_census(d):
+    # The Overview (#overview) collateral section's MEASURED book-appraisal-vs-market-
+    # recovery card (obj #1) — renderCollatBookCheck reads `j.book_check`, filters to
+    # priced pools (`eval_vs_auction` set, `market_auction` set, n_accounts>=200),
+    # sorts by the book-to-auction gap, and renders per-pool `collateral_class` /
+    # `age_band` / `n_accounts` / `eval_avg` (our book) / `market_auction` (MEASURED) /
+    # `eval_vs_auction` (the gap) / `dpd30p_pct` (delinquency). It is MEASURED auction/
+    # retail listings x MEASURED eval_avg from the real loan tape, and it live-degrades
+    # SILENTLY — the render gate hides the whole block when `book_check` is absent/empty
+    # or no pool survives the priced-pool filter, so a truncated/404 CDN deploy would
+    # blank this newly-wired front-door read with NO phone alert, the same "broken demo"
+    # blind spot the collateral_book / collateral_outlook obj-#1 probes closed for their
+    # Overview siblings. This layer folds off owner-side inputs (the real loan tape +
+    # a Thai-IP price census) with no CI cron, so the probe is the only deploy safeguard.
+    # Asserts the render gate + a well-formed priced-pool row, shape not values — robust
+    # to a future auction/tape vintage moving the prices.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    bc = d.get("book_check")
+    if not isinstance(bc, list) or not bc:
+        return "missing/empty 'book_check' list (renderCollatBookCheck gate)"
+    priced = [r for r in bc if isinstance(r, dict)
+              and isinstance(r.get("eval_vs_auction"), (int, float)) and not isinstance(r.get("eval_vs_auction"), bool)
+              and isinstance(r.get("market_auction"), (int, float)) and not isinstance(r.get("market_auction"), bool)
+              and isinstance(r.get("n_accounts"), (int, float)) and not isinstance(r.get("n_accounts"), bool)
+              and r.get("n_accounts", 0) >= 200]
+    if not priced:
+        return "no priced pool survives the renderCollatBookCheck filter (eval_vs_auction+market_auction+n_accounts>=200)"
+    r = priced[0]
+    for k in ("collateral_class", "age_band"):
+        if not (isinstance(r.get(k), str) and r[k].strip()):
+            return "priced pool missing/blank '%s' (table render read)" % k
+    if not isinstance(r.get("eval_avg"), (int, float)) or isinstance(r.get("eval_avg"), bool):
+        return "priced pool 'eval_avg' missing/non-numeric (our-book column render read)"
+    return None
+
+
 def _shape_macro_sensitivity(d):
     # The per-branch "What moves this branch" popup read (obj #1) — msensRec picks
     # MSENS[idxOf(branch)] from `j.branches`, so the list MUST stay index-aligned
@@ -2503,9 +2540,14 @@ DATA_FILES = [
     #    drought read behind the province crop-stress verdict;
     #  - amphoe_crops (renderAmphoeCrops): MEASURED OAE planted area x that drought,
     #    naming the agri-PD exposure under the driest ground.
-    # (dbd_formation was deliberately NOT added: its client loader was retired
-    # 2026-08-02 — the data now flows server-side into macro_book and the page no
-    # longer fetches it, so a probe would assert a dependency the app dropped.)
+    # (dbd_formation is deliberately NOT probed here: its data flows server-side
+    # into macro_book — surfaced as national.new_biz_n, which _shape_macro_book
+    # already asserts — and its orphaned client loader/renderer were fully removed
+    # from app.js 2026-08-11, so the page no longer fetches it. Its siblings
+    # region_debt/sfi_credit remain probed above as committed macro_book INPUTS,
+    # not as live Overview reads — their client renderers were removed in the same
+    # sweep, but the committed files must still serve intact for the next
+    # build_macro_book rebuild.)
     ("data/vehicle_registry.json", _shape_vehicle_registry, "latest.groups (4 classes) + latest.title_base/all_vehicles (Overview collateral base, obj #1)"),
     ("data/drought_district.json", _shape_drought_district, ".districts (~928) with spei/cls + meta.counts (Overview district drought, obj #1)"),
     ("data/amphoe_crops.json", _shape_amphoe_crops, ".hotspots (crop x drought exposure w/ planted_rai+spei) (Overview agri-PD exposure, obj #1)"),
@@ -2661,6 +2703,7 @@ DATA_FILES = [
     # fallback — a truncated CDN deploy would drop the measured recovery read with
     # no phone alert. Asserts the two national gate keys + the 77-province backbone.
     ("data/collateral_outlook.json", _shape_collateral_outlook, ".national recovery-value KPIs (used_veh_yoy_blended + exposure_weighted_outlook) + 77-province backbone (Overview collateral board)"),
+    ("data/collateral_census.json", _shape_collateral_census, ".book_check priced pools (eval_avg vs measured market_auction, eval_vs_auction gap, dpd30p_pct) — Overview book-vs-recovery card"),
     # The per-branch "What moves this branch" drill (obj #1), and the second read
     # the last audit flagged. msensRec picks MSENS[idxOf(branch)] off `.branches`
     # so it MUST stay index-aligned to branches.json, and msensPhrase renders each

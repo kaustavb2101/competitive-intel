@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-11T09:20:50+00:00",
-    "commit": "9419af9"
+    "generated_at": "2026-08-12T04:25:16+00:00",
+    "commit": "d0d2f63"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-11",
+    "eta_date": "2026-08-12",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -532,6 +532,126 @@
   ],
   "activity": [
     {
+      "date": "2026-08-12T04:25:16+00:00",
+      "sha": "d0d2f63",
+      "summary": "fix(liveness): re-calibrate FROZEN test for step-flat retail fuel (fuel_gasohol95 false alarm)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-12T02:23:07+00:00",
+      "sha": "1f6a379",
+      "summary": "docs(progress): log the REOPENED th-scope sweep close (PR #381) merge+deploy+verify",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-12T09:18:58+07:00",
+      "sha": "557a25e",
+      "summary": "ux: scope=col on last 5 app.js tables (closes REOPENED th-scope sweep) (#381)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-11T22:48:59+00:00",
+      "sha": "402acec",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the orphaned-loader cleanup ship (#379)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-12T05:45:49+07:00",
+      "sha": "e47f775",
+      "summary": "chore(app): remove 4 orphaned Overview macro loader/renderer pairs (dead since 2026-08-02 macro_book move) (#379)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-11T20:25:32+00:00",
+      "sha": "626eeba",
+      "summary": "docs: log ux-live-meta-stale-feed-counts merge + Vercel deploy-verify (PR #377)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-12T03:22:48+07:00",
+      "sha": "054391a",
+      "summary": "ux: drop stale hardcoded feed counts from live.html share metadata (#377)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-11T18:40:00+00:00",
+      "sha": "1569666",
+      "summary": "provenance: mark dormant opportunity_score layer, drop branch-expansion framing",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-11T16:37:57+00:00",
+      "sha": "1822fce",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the AutoX ROE-target tripwire ship",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-11T16:35:31+00:00",
+      "sha": "cf14a1d",
+      "summary": "guard(peer): --check tripwire locking AutoX ROE-target reference line to CLAUDE.md",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-11T23:13:54+07:00",
+      "sha": "a569b2e",
+      "summary": "data: market-pulse swarm refresh (run 31482310893) (#372)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-11T14:47:38+00:00",
+      "sha": "f5f134e",
+      "summary": "docs: log ux-table-scope-cropwatch-farmbook merge + Vercel deploy-limit block",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-11T21:42:31+07:00",
+      "sha": "7c3dc00",
+      "summary": "ux: scope=col on the crop-watch + farm-book tables (a11y, WCAG 1.3.1) (#375)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-11T21:36:34+07:00",
+      "sha": "79604af",
+      "summary": "ci(fix): install numpy in the 4 data-price auto-merge workflows so branch_peers can't silently stale-merge (#373)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-11T21:11:06+07:00",
+      "sha": "ec0a09d",
+      "summary": "ci: move QA to a self-hosted Bangkok runner, and schedule the Thai-IP-only feeds (#352)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-11T21:10:45+07:00",
+      "sha": "2b12e0a",
+      "summary": "feat(overview): wire the MEASURED book-vs-market collateral-recovery read into the collateral section (#363)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-11T12:37:08+00:00",
+      "sha": "80fb2b7",
+      "summary": "gate(provenance): --check-gated tripwire binding the peer scoreboard constants to RESEARCH_DIGEST.md §B",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-11T11:37:20+00:00",
+      "sha": "1ef4563",
+      "summary": "fix(gate): regenerate stale branch_peers.json (+ provenance) — recurring drift from the NABC/ThaiWater auto-merge (3rd occurrence)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-11T10:30:26+00:00",
+      "sha": "e94a1e3",
+      "summary": "audit(service): peer-figure cross-consistency verification — tree fully healthy, no defect",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-11T10:16:08+00:00",
+      "sha": "0fc354f",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-11, run 31481138737)",
+      "pillar": "data-integration"
+    },
+    {
       "date": "2026-08-11T09:20:50+00:00",
       "sha": "9419af9",
       "summary": "data: NABC live prices (2026-08-11, run 31476684037)",
@@ -590,126 +710,6 @@
       "sha": "e477f44",
       "summary": "ux: scope=col on #market collateral-concentration table headers (#368)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T00:32:57+00:00",
-      "sha": "61cabda",
-      "summary": "health: shape-probe the last two index-aligned per-branch popup joins (branch_leads, branch_recommendations)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-10T23:21:48+00:00",
-      "sha": "ac3c036",
-      "summary": "data: live fuel prices (2026-08-10, run 31441711025)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-10T22:31:26+00:00",
-      "sha": "d6cfbc3",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the macro_usd_thb feed-liveness canary ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-10T22:30:35+00:00",
-      "sha": "b6b85c3",
-      "summary": "health(feed-liveness): add macro_usd_thb frozen-value canary for the weekly macro FX read",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-10T22:06:29+00:00",
-      "sha": "6fc55ff",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-10, run 31436513078)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-10T20:25:05+00:00",
-      "sha": "328759d",
-      "summary": "docs: log ux-loop assist-occupation scope=col slice (PR #366 merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T03:22:07+07:00",
-      "sha": "2bb73fd",
-      "summary": "ux: add scope=col to assistance-occupation drill table headers (a11y) (#366)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-10T18:32:40+00:00",
-      "sha": "ca5e9b2",
-      "summary": "health(feed-liveness): add social_corpus_docs frozen-value canary for the #acq social-listening feed",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-10T16:36:23+00:00",
-      "sha": "490a46e",
-      "summary": "health(feed-liveness): add rival_youtube_views frozen-value canary",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-10T16:15:52+00:00",
-      "sha": "c2e59ad",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-10, run 31407596648)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-10T14:53:22+00:00",
-      "sha": "a3af60c",
-      "summary": "docs: log ux-loop scope=col impact-card slice (PR #364 merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-10T21:49:17+07:00",
-      "sha": "4e3dc61",
-      "summary": "ux: add scope=col to impact-card drill table headers (a11y) (#364)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-10T13:13:08+00:00",
-      "sha": "febe487",
-      "summary": "fix(gate): regenerate stale branch_peers.json (+ provenance) to clear a pre-existing determinism drift on master",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-10T10:41:34+00:00",
-      "sha": "b3beed0",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-10, run 31379911630)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-10T10:26:15+00:00",
-      "sha": "7b3c5f1",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the per-branch popup-join deploy-probe ship",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-10T10:24:06+00:00",
-      "sha": "0e3fcac",
-      "summary": "health(deploy): probe the 4 index-aligned per-branch popup joins (branch_density/fuel/vehicles/population)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-10T09:54:19+00:00",
-      "sha": "6e5dbad",
-      "summary": "data: NABC live prices (2026-08-10, run 31376171105)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-10T08:30:12+00:00",
-      "sha": "6253087",
-      "summary": "docs: log the #trend table-scope UX ship (PR #361, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-10T15:27:22+07:00",
-      "sha": "fe90232",
-      "summary": "ux: scope=col on #trend peer/siege/baseline table headers (#361)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-10T06:33:07+00:00",
-      "sha": "8933942",
-      "summary": "health(deploy): probe the 4 per-branch index-aligned joins so a broken deploy alerts",
-      "pillar": "deployment"
     }
   ]
 }
