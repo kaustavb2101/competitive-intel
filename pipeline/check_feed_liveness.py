@@ -56,6 +56,28 @@ HISTORY = os.path.join(ROOT, "source-data", "feed_history.json")
 FROZEN_WINDOW = {"daily": 7, "weekly": 35, "monthly": 120, "quarterly": 400, "annual": 1200}
 FROZEN_MIN_POINTS = {"daily": 5, "weekly": 4, "monthly": 3, "quarterly": 3, "annual": 3}
 
+# Per-SERIES overrides for the frozen window, for feeds PULLED on one cadence whose VALUE legitimately
+# MOVES on a slower one. Keyed by the pull cadence, FROZEN_WINDOW would cry wolf on these; keyed by the
+# series' real movement cadence, it stays a live canary. A checker that cries wolf gets muted, and a
+# muted checker is worth less than no checker — so this RE-CALIBRATES the test rather than exempting it
+# (contrast FROZEN_EXEMPT): a flat run past the override window still fails, because past that horizon a
+# flat value really is evidence of a dead upstream.
+FROZEN_WINDOW_OVERRIDE = {
+    # Retail Thai fuel is polled DAILY by the Bangchak API, but the pump price is a step function that
+    # legitimately holds flat for one to two weeks between adjustments. Observed directly, not assumed:
+    # fuel_gasohol95 held ฿36.69 for 11 straight daily readings (2026-07-22 .. 2026-08-04, a 13-day
+    # span) while the puller ran on schedule, then stepped to 35.99 — the series carries 4 distinct
+    # values over its life (37.45 / 34.94 / 36.69 / 35.99), so the value clearly moves; it just does
+    # not move every 7 days. On the 7-day 'daily' window the checker fired FROZEN on 2026-08-11 during
+    # a perfectly normal 6-day hold — a false alarm. TEST A (stale stamp) still watches the puller on
+    # the daily cadence, so a puller that STOPS is caught within 7 days regardless; only TEST B's
+    # value-movement horizon is widened here, to ~2.7x the longest observed legitimate hold.
+    "fuel_gasohol95": 35,
+}
+FROZEN_MIN_POINTS_OVERRIDE = {
+    "fuel_gasohol95": 15,   # ~a month of daily pulls must accumulate before a flat run is judged
+}
+
 # Series that are legitimately allowed to sit flat, with the reason. A checker that cries wolf gets
 # muted, and a muted checker is worth less than no checker — so anything parked here needs a reason
 # that would still read as true to someone who did not write it.
@@ -66,9 +88,10 @@ FROZEN_EXEMPT = {
     # "Gasohol 95 S EVO" as separate fields with separate product names, and the source published its
     # own diesel_delta_tomorrow of 0.0 — the price is pinned upstream, not stuck downstream.
     #
-    # Note what is NOT exempt: fuel_gasohol95, from the same pull and the same file, is un-capped and
-    # moved on 2026-08-05. It stays under the test as the canary for this feed. If the Bangchak API
-    # dies, gasohol freezes and TEST B fires — so exempting diesel costs no coverage of the puller.
+    # Note what is NOT exempt: fuel_gasohol95, from the same pull and the same file, DOES step and
+    # stays the live canary for this puller — but on a slower horizon than diesel's flat weeks, so it
+    # is re-calibrated via FROZEN_WINDOW_OVERRIDE above rather than exempted. If the Bangchak API
+    # dies, gasohol freezes past that horizon and TEST B fires — so coverage of the puller is kept.
     "fuel_diesel": "administered price (Oil Fuel Fund); fuel_gasohol95 is the live canary for this pull",
 }
 
@@ -132,8 +155,10 @@ def test_b_frozen_values(history, asof):
         if key in FROZEN_EXEMPT:
             continue
         cadence = s.get("cadence") or "daily"
-        window = FROZEN_WINDOW.get(cadence)
-        min_pts = FROZEN_MIN_POINTS.get(cadence)
+        # A per-series override wins over the cadence default (see FROZEN_WINDOW_OVERRIDE): it lets a
+        # feed pulled daily but moving on a slower step cadence be judged on its real movement horizon.
+        window = FROZEN_WINDOW_OVERRIDE.get(key, FROZEN_WINDOW.get(cadence))
+        min_pts = FROZEN_MIN_POINTS_OVERRIDE.get(key, FROZEN_MIN_POINTS.get(cadence))
         if window is None or min_pts is None:
             continue
         dates, values = s.get("dates") or [], s.get("values") or []

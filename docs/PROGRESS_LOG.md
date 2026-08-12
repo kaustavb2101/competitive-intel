@@ -3,6 +3,38 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-12 — Service loop (stop crying wolf): re-calibrate the feed-liveness FROZEN test for step-flat retail fuel — `fuel_gasohol95` false alarm
+
+- **The gap fixed (`liveness-frozen-false-positive-gasohol`).** `pipeline/check_feed_liveness.py`'s
+  TEST B (has the value MOVED inside its window?) keys the frozen window off the feed's PULL cadence.
+  `fuel_gasohol95` is pulled DAILY (Bangchak API) so it got the 7-day / 5-point daily window — but a
+  Thai pump price is a **step function that legitimately holds flat for one-to-two weeks** between
+  adjustments. Measured directly from `source-data/feed_history.json`: gasohol held ฿36.69 for **11
+  straight daily readings (2026-07-22 .. 2026-08-04, a 13-day span)** while the puller ran on schedule,
+  then stepped to 35.99 (the series carries 4 distinct values over its life: 37.45 / 34.94 / 36.69 /
+  35.99 — the value clearly moves, just not every 7 days). On the 7-day window the checker fired
+  **FROZEN on 2026-08-11** during a normal 6-day 35.99 hold, flipping the daily `check-feed-liveness.yml`
+  monitor **green→red** (run #3, 2026-08-11 14:50 UTC) — a false alarm, the exact "cry wolf" failure the
+  checker's own docstring warns makes it "worth less than no checker". (Run #3 itself died in 3s at an
+  infra level before reaching the step, but the LOGIC exits 2 as of 2026-08-12, verified locally — so
+  the next real run would fail on this.)
+- **What shipped — RE-CALIBRATE, do not exempt (no check weakened).** Added per-series
+  `FROZEN_WINDOW_OVERRIDE = {"fuel_gasohol95": 35}` + `FROZEN_MIN_POINTS_OVERRIDE = {"fuel_gasohol95": 15}`,
+  wired ahead of the cadence default in `test_b_frozen_values`. 35 days is ~2.7× the longest observed
+  legitimate hold (13d), so a normal fortnightly hold no longer fires, while a genuinely dead Bangchak
+  feed (flat for a month-plus of daily pulls) STILL fires — coverage of the puller is preserved. TEST A
+  (stale stamp, still daily) independently catches a puller that STOPS within 7 days regardless.
+  Deliberately NOT added to `FROZEN_EXEMPT` (that would blind the canary entirely, like diesel); the
+  stale exemption note that claimed gasohol "moved on 2026-08-05" within a week was corrected to point
+  at the override. `fuel_diesel` stays exempt (administered price); gasohol remains the live value-canary.
+- **Verify.** `python3 pipeline/check_feed_liveness.py --asof 2026-08-12` now exits **0** (was 2) — no
+  FROZEN, gasohol dropped from the fatal list, still judged (21 points, 3 distinct in-window). `py_compile`
+  clean. No `platform/data` file touched → provenance byte-unchanged (no regen mandated); determinism gate
+  green. CI-only monitoring script, not referenced by any served page (grep across `platform/`) → zero
+  app/visual behaviour change, so committed straight to master per the loop's safeguard protocol.
+- **Deploy-verify.** Non-app change (no data/page altered); production alias re-checked HTTP 200 on `/`
+  after push. Nothing to roll back.
+
 ## 2026-08-11 — Service/market loop (hygiene): remove 4 orphaned Overview macro loader/renderer pairs from `app.js` — dead since the 2026-08-02 server-side move to `macro_book`
 
 - **The gap fixed (`intel-drop-orphaned-overview-macro-loaders`).** On 2026-08-02 four Overview macro
