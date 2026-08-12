@@ -45,6 +45,38 @@ don't re-litigate settled choices.
   the gate would catch a BIS-only commit as drift), but a future refactor could have pull_macro skip the
   BIS policy-rate fetch entirely.
 
+## 2026-08-12 — Service loop (stop crying wolf): re-calibrate the feed-liveness FROZEN test for step-flat retail fuel — `fuel_gasohol95` false alarm
+
+- **The gap fixed (`liveness-frozen-false-positive-gasohol`).** `pipeline/check_feed_liveness.py`'s
+  TEST B (has the value MOVED inside its window?) keys the frozen window off the feed's PULL cadence.
+  `fuel_gasohol95` is pulled DAILY (Bangchak API) so it got the 7-day / 5-point daily window — but a
+  Thai pump price is a **step function that legitimately holds flat for one-to-two weeks** between
+  adjustments. Measured directly from `source-data/feed_history.json`: gasohol held ฿36.69 for **11
+  straight daily readings (2026-07-22 .. 2026-08-04, a 13-day span)** while the puller ran on schedule,
+  then stepped to 35.99 (the series carries 4 distinct values over its life: 37.45 / 34.94 / 36.69 /
+  35.99 — the value clearly moves, just not every 7 days). On the 7-day window the checker fired
+  **FROZEN on 2026-08-11** during a normal 6-day 35.99 hold, flipping the daily `check-feed-liveness.yml`
+  monitor **green→red** (run #3, 2026-08-11 14:50 UTC) — a false alarm, the exact "cry wolf" failure the
+  checker's own docstring warns makes it "worth less than no checker". (Run #3 itself died in 3s at an
+  infra level before reaching the step, but the LOGIC exits 2 as of 2026-08-12, verified locally — so
+  the next real run would fail on this.)
+- **What shipped — RE-CALIBRATE, do not exempt (no check weakened).** Added per-series
+  `FROZEN_WINDOW_OVERRIDE = {"fuel_gasohol95": 35}` + `FROZEN_MIN_POINTS_OVERRIDE = {"fuel_gasohol95": 15}`,
+  wired ahead of the cadence default in `test_b_frozen_values`. 35 days is ~2.7× the longest observed
+  legitimate hold (13d), so a normal fortnightly hold no longer fires, while a genuinely dead Bangchak
+  feed (flat for a month-plus of daily pulls) STILL fires — coverage of the puller is preserved. TEST A
+  (stale stamp, still daily) independently catches a puller that STOPS within 7 days regardless.
+  Deliberately NOT added to `FROZEN_EXEMPT` (that would blind the canary entirely, like diesel); the
+  stale exemption note that claimed gasohol "moved on 2026-08-05" within a week was corrected to point
+  at the override. `fuel_diesel` stays exempt (administered price); gasohol remains the live value-canary.
+- **Verify.** `python3 pipeline/check_feed_liveness.py --asof 2026-08-12` now exits **0** (was 2) — no
+  FROZEN, gasohol dropped from the fatal list, still judged (21 points, 3 distinct in-window). `py_compile`
+  clean. No `platform/data` file touched → provenance byte-unchanged (no regen mandated); determinism gate
+  green. CI-only monitoring script, not referenced by any served page (grep across `platform/`) → zero
+  app/visual behaviour change, so committed straight to master per the loop's safeguard protocol.
+- **Deploy-verify.** Non-app change (no data/page altered); production alias re-checked HTTP 200 on `/`
+  after push. Nothing to roll back.
+
 ## 2026-08-11 — Service/market loop (hygiene): remove 4 orphaned Overview macro loader/renderer pairs from `app.js` — dead since the 2026-08-02 server-side move to `macro_book`
 
 - **The gap fixed (`intel-drop-orphaned-overview-macro-loaders`).** On 2026-08-02 four Overview macro
@@ -6592,3 +6624,10 @@ Kaustav deploys).
 - **Deploy-verify (PASS, no rollback):** after ~95s the production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/app.js`; `/index.html` → 308 is the expected `cleanUrls` canonical redirect to `/` (the SPA + `#assist` hash route serve from `/`, 200), not a regression. Deployed `app.js` carries the change (`scope="col">Occupation` present). Session auto-unsubscribed from PR #366 on merge.
 - **Process note (recurring trap, self-corrected):** the local `master` ref was **stale** (`cf97241`, an ancestor ~300 lines behind `origin/master`'s `ca5e9b2`); I briefly branched from it and applied edits to the wrong base before catching it via the differing audit tail / app.js line numbers, then `git fetch` + re-based the branch on `origin/master` and re-applied. Same trap the 2026-08-08 entry flagged — **always `git fetch origin master` and branch from `origin/master`, never the local `master` ref.** The `git push --delete` "remote end hung up" sideband is the known git-proxy artifact; the branch was already deleted server-side by the squash-merge.
 - **Next recommended:** continue the REOPENED sweep — one family remains: the **#home watchlist / decision-queue** table families (`renderWatchlist` + the decision-queue render path). After that the sweep is genuinely closed. The rest of the standing backlog is all bigger-than-surgical / device-tested and NOT auto-mergeable unattended (`ux-acquire-taxonomy-mandate`; `ux-viewport-user-scalable-3dpages` + `ux-navmore-3dpages-absolute-overflow`, best batched into one device-tested run; `ux-live-chart-mobile-viewbox-responsive`) plus the two test-infra items (`qa-visual-baseline-stale`, `qa-visual-overflow-not-in-ci`).
+
+## 2026-08-12 — UX loop: ux-table-scope-assist-dataroom-printtoc (a11y, WCAG 1.3.1 — scope=col on the last 5 app.js tables — CLOSES the REOPENED sweep) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260812-0213`, squash-merged PR #381 → `557a25e` on master): the **final slice** of the re-opened app.js table-scope sweep (`ux-table-scope-sweep-appjs-REOPENED`). The last five bare-`<th>` SPA tables built their column headers as inline template literals with no `scope` (**WCAG 1.3.1 Info and Relationships**). Added `scope="col"` to all **24 column headers** across: `renderHomeTape` (`#cc-tape` command-center Assistance radar, 5), `renderAssist`'s `#assist-radar` (5) + `#assist-restr` (7), `renderHomeDataRoom` (`.dr-tbl` dataroom layer table, 4), and `buildPrintSummary` (`.pr-toc` print table-of-contents, 3). A fresh grep now finds **zero real bare `<th>` in app.js** (the one remaining hit is a code-comment mention) — **`ux-table-scope-sweep-appjs-REOPENED` is fully CLOSED**; every SPA + `data.html` table header is now `scope="col"`. `platform/app.js` (13 header lines, 0 net line change) + `docs/UXUI_AUDIT.md` (fix-log entry + tracker flipped to ✅ CLOSED) only.
+- **How it was found:** the seven originally-named backlog priorities are all long-fixed; the live surgical open item was the REOPENED sweep, chipped one slice per run. The prior slices left five bare-`<th>` tables (the two `#assist` tables + `#cc-tape` + dataroom + print-TOC) — a small, coherent final set, so this run closed the whole sweep in one pass.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **132 passed, 0 failed** (incl. data-integrity 455/455 + `node --check` across pages). (b) headless `render.sh index.html#assist` @ 1100×900 → `data-errors="[]"`, `data-leaflet="1"`, impact cards + KPIs + region drill intact, PNG self-reviewed visually identical (`scope` is non-presentational), assist tables render with `scope="col"` in the settled DOM. (c) no secrets in the diff. (d) diff = only `platform/app.js` + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** after ~120s the production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/app.js`; `/index.html` → 308 is the expected `cleanUrls` canonical redirect to `/` (the SPA + `#assist` hash route serve from `/`, 200), not a regression. Deployed `app.js` carries the change — **285** `scope="col"` occurrences, exactly matching local master, and the new `#assist-restr` `<th scope="col">Status</th>` header is live in production. Session auto-unsubscribed from PR #381 on merge.
+- **Next recommended:** the REOPENED table-scope sweep is now genuinely closed, so the standing backlog is down to items that are **NOT auto-mergeable unattended** — do a fresh route self-audit next run to surface a new surgical finding, since the mechanical scope sweep no longer has slices to chip. The remaining tracked items all need a human/device: `ux-acquire-taxonomy-mandate` (content/mandate, bigger-than-surgical, ripples across `pipeline/` + app.js); `ux-viewport-user-scalable-3dpages` + `ux-navmore-3dpages-absolute-overflow` (best batched into one device-tested run on the 3 deck.gl pages); `ux-live-chart-mobile-viewbox-responsive` (touches chart coordinate math); plus test-infra `qa-visual-baseline-stale`, `qa-visual-overflow-not-in-ci`, `qa-live-not-in-overflow-audit-routes`.
