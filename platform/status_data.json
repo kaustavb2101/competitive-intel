@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-12T10:34:17+00:00",
-    "commit": "d0b870e"
+    "generated_at": "2026-08-13T00:00:26+07:00",
+    "commit": "7af5b01"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-12",
+    "eta_date": "2026-08-13",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -532,6 +532,42 @@
   ],
   "activity": [
     {
+      "date": "2026-08-13T00:00:26+07:00",
+      "sha": "7af5b01",
+      "summary": "intel(provenance): stop \"SYNTH\" substring mislabelling 4 MEASURED layers as ESTIMATED (#386)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-12T14:39:17+00:00",
+      "sha": "8e8bdb8",
+      "summary": "docs(progress): log ux-nav-live-tooltip-stale-count merge+deploy+verify (PR #385)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-12T21:36:31+07:00",
+      "sha": "a2ed353",
+      "summary": "ux: drop stale \"four\" trend-line count from Live-board nav tooltip (#385)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-12T12:37:48+00:00",
+      "sha": "3f3be58",
+      "summary": "test(gate): restore grep-coverage invariant — enumerate build_collateral_census",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-12T17:36:17+07:00",
+      "sha": "570b640",
+      "summary": "fix(cost): stop the Google Places bleed — cadence gate + a cache that survives CI (#382)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-12T10:34:54+00:00",
+      "sha": "4df7fcd",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the expansion-framing scrub ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-12T10:34:17+00:00",
       "sha": "d0b870e",
       "summary": "intel(mandate): scrub residual branch-expansion framing from 3 live competitive layers' objective provenance",
@@ -674,42 +710,6 @@
       "sha": "2b12e0a",
       "summary": "feat(overview): wire the MEASURED book-vs-market collateral-recovery read into the collateral section (#363)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-11T12:37:08+00:00",
-      "sha": "80fb2b7",
-      "summary": "gate(provenance): --check-gated tripwire binding the peer scoreboard constants to RESEARCH_DIGEST.md §B",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-11T11:37:20+00:00",
-      "sha": "1ef4563",
-      "summary": "fix(gate): regenerate stale branch_peers.json (+ provenance) — recurring drift from the NABC/ThaiWater auto-merge (3rd occurrence)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-11T10:30:26+00:00",
-      "sha": "e94a1e3",
-      "summary": "audit(service): peer-figure cross-consistency verification — tree fully healthy, no defect",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-11T10:16:08+00:00",
-      "sha": "0fc354f",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-11, run 31481138737)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-11T09:20:50+00:00",
-      "sha": "9419af9",
-      "summary": "data: NABC live prices (2026-08-11, run 31476684037)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-11T08:23:49+00:00",
-      "sha": "9832155",
-      "summary": "docs(progress): log impact-card table-scope a11y fix merge+deploy+verify (PR #371)",
-      "pillar": "uxui"
     }
   ]
 }
