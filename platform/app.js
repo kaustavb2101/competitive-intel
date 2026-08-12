@@ -8910,11 +8910,11 @@ function renderHomeTape(){
   card.style.display='';
   const rows=TAPE.assistance_radar.slice(0,5);
   body.innerHTML=
-    `<div class="tblwrap"><table class="tbl"><tr><th>Province</th>
-      <th title="X-days bucket: late but under 30dpd — assistance still works. Call this week.">Tier 1 · slipping</th>
-      <th title="Current accounts in the same stressed cell — fine today, measured stressor overhead.">Tier 2 · watch</th>
-      <th title="share of the province's districts at severe/extreme OAE SPEI">Drought</th>
-      <th>What they grow (stressed districts)</th></tr>`+
+    `<div class="tblwrap"><table class="tbl"><tr><th scope="col">Province</th>
+      <th scope="col" title="X-days bucket: late but under 30dpd — assistance still works. Call this week.">Tier 1 · slipping</th>
+      <th scope="col" title="Current accounts in the same stressed cell — fine today, measured stressor overhead.">Tier 2 · watch</th>
+      <th scope="col" title="share of the province's districts at severe/extreme OAE SPEI">Drought</th>
+      <th scope="col">What they grow (stressed districts)</th></tr>`+
     rows.map(r=>`<tr>
       <td><b>${r.province}</b> <span class="sub mono">${r.n_farmers.toLocaleString()} farmers</span></td>
       <td class="mono" style="color:var(--gold)"><b>${r.tier1_slipping.toLocaleString()}</b></td>
@@ -11210,10 +11210,10 @@ function renderAssist(){
     // pre-emptive radar (province × drought)
     const rad=(T.assistance_radar||[]).slice(0,12);
     $('#assist-radar').innerHTML = rad.length ? `<table class="tbl"><tr>
-        <th>Province</th><th title="X-days: late but <30dpd — call this week">Tier 1 · slipping</th>
-        <th title="current accounts in the same stressed cell">Tier 2 · watch</th>
-        <th title="share of districts at severe/extreme OAE SPEI">Drought</th>
-        <th>What they grow (stressed districts)</th></tr>`+
+        <th scope="col">Province</th><th scope="col" title="X-days: late but <30dpd — call this week">Tier 1 · slipping</th>
+        <th scope="col" title="current accounts in the same stressed cell">Tier 2 · watch</th>
+        <th scope="col" title="share of districts at severe/extreme OAE SPEI">Drought</th>
+        <th scope="col">What they grow (stressed districts)</th></tr>`+
       rad.map(r=>`<tr>
         <td><b>${r.province}</b> <span class="sub mono">${N(r.n_farmers)} farmers</span></td>
         <td class="mono" style="color:var(--opp)"><b>${N(r.tier1_slipping)}</b></td>
@@ -11231,8 +11231,8 @@ function renderAssist(){
     const ORD=['Normal','Skip','Pre-emptive','TDR'];
     const rows=ORD.map(s=>rs.find(x=>x.status===s)).filter(Boolean);
     $('#assist-restr').innerHTML = rows.length ? `<table class="tbl"><tr>
-        <th>Status</th><th>Accounts</th><th>OS</th><th>X-days</th><th>Roll</th>
-        <th>90+</th><th>180+</th></tr>`+
+        <th scope="col">Status</th><th scope="col">Accounts</th><th scope="col">OS</th><th scope="col">X-days</th><th scope="col">Roll</th>
+        <th scope="col">90+</th><th scope="col">180+</th></tr>`+
       rows.map(r=>`<tr><td><b>${r.status}</b></td>
         <td class="mono">${N(r.n)}</td><td class="mono sub">${bn(r.os_sum)}</td>
         <td class="mono">${r.early_pct}%</td><td class="mono">${r.roll_pct}%</td>
@@ -11705,7 +11705,7 @@ function renderHomeDataRoom(){
   const staleThresh=(fr&&fr.stale_over_days)||180;
   // table: layer | chip | source | vintage/size
   html+=`<div class="dr-tblwrap"><table class="tbl dr-tbl"><thead><tr>`+
-    `<th>Layer</th><th>Provenance</th><th>Source / builder</th><th class="num">Vintage · size</th>`+
+    `<th scope="col">Layer</th><th scope="col">Provenance</th><th scope="col">Source / builder</th><th scope="col" class="num">Vintage · size</th>`+
     `</tr></thead><tbody>`;
   PROVEN.layers.forEach(L=>{
     const fam=L.family;
@@ -11859,7 +11859,7 @@ function buildPrintSummary(view){
     return h?`<tr><td><b>${h}</b></td><td>${w||''}</td><td class="mono">${nT} tables · ${nC} charts</td></tr>`:'';
   }).filter(Boolean);
   if(secs.length) bits.push(`<h3>What follows, in order</h3>`
-    +`<table class="tbl pr-toc"><tr><th>Section</th><th>Contents</th><th>Evidence</th></tr>${secs.join('')}</table>`);
+    +`<table class="tbl pr-toc"><tr><th scope="col">Section</th><th scope="col">Contents</th><th scope="col">Evidence</th></tr>${secs.join('')}</table>`);
   return bits.length?bits.join(''):'<p>This tab has no generated summary block yet — the supporting data follows in full.</p>';
 }
 
