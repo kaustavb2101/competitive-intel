@@ -45,6 +45,31 @@ don't re-litigate settled choices.
   the gate would catch a BIS-only commit as drift), but a future refactor could have pull_macro skip the
   BIS policy-rate fetch entirely.
 
+## 2026-08-12 — Integration loop (self-audit honesty): restore the broken gate-coverage grep-invariant in `tests/run.sh` — `build_collateral_census` was gated but invisible to audits
+
+- **The gap fixed (`gate-coverage-grep-invariant-collateral-census`).** `tests/run.sh`'s
+  deterministic-builder block was deliberately rewritten from a bare `for` loop into an explicit
+  `name|source` heredoc so that "a grep for `build_X.py --check` over this file finds every gated
+  builder below." Because the heredoc entries drop the `.py` suffix (`build_collateral_census|…`), the
+  block carries a hand-maintained comment enumeration (with the `.py --check` suffix) as the thing the
+  grep-invariant actually matches. That enumeration had **drifted**: it listed 19 builders and said
+  "these 19", but the heredoc gates **20** — `build_collateral_census` (added after `build_tape_layers`)
+  was never added to the comment. Net effect: `grep "build_collateral_census.py --check" tests/run.sh`
+  returned **nothing**, so any gate-coverage audit false-flagged a LIVE MEASURED portfolio-risk builder
+  (`collateral_census.json` → `app.js` `tmliFetch('collateral_census')`, the "BOOK APPRAISAL vs MEASURED
+  MARKET RECOVERY" surface on `#overview`, objective #1) as ungated — even though its `--check` runs and
+  byte-reproduces in the gate. This run's own negative-space audit was itself misled by the drift, which
+  is exactly the wasted re-investigation the invariant exists to prevent.
+- **What shipped.** Added `build_collateral_census.py --check` to the comment enumeration (right after
+  `build_tape_layers`, mirroring the heredoc order) and corrected "these 19" → "these 20". Verified by a
+  full re-audit: iterating every heredoc `name|` entry and grepping `name.py --check` now finds **all 20**
+  (zero missing). Comment-only edit to the test harness — no builder, no `platform/data` file, no app/page
+  touched, so no provenance regen was mandated (no new data file created).
+- **Verify.** `bash -n tests/run.sh` clean; determinism gate `bash tests/run.sh check` →
+  **132 passed · 0 failed**, data integrity **455/455** (unchanged from baseline — a comment edit cannot
+  move the gate). Zero app/visual/data behaviour change → committed straight to master per the loop's
+  safeguard protocol.
+
 ## 2026-08-12 — Market/peer loop (mandate honesty): scrub residual branch-EXPANSION framing from 3 live competitive layers' `objective` provenance
 
 - **The gap fixed (`intel-scrub-expansion-framing-live-competitive-layers`).** CLAUDE.md's objective #2
