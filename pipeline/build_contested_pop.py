@@ -169,9 +169,10 @@ def build():
                  "10km catchment population, how many people also live within %.0f km of a rival "
                  "branch. Pure geometry over two committed measured layers — no scores, no "
                  "synthesis." % (CONTEST_M / 1000.0),
-        "objective": "Both objectives: #2 (a highly contested catchment is a fight for share, not "
-                     "white space — weigh expansion elsewhere) and #1 (contested ground is where "
-                     "rate/LTV competition bites the book first).",
+        "objective": "Both objectives: #2 (a highly contested catchment is a fight for share around "
+                     "a branch we already run) and #1 (contested ground is where rate/LTV competition "
+                     "bites the book first). A competitive-pressure read on the existing footprint — "
+                     "no open / close / expand call.",
         "provenance": {
             "population": "MEASURED — WorldPop 2020 gridded population (1km, UN-adjusted to the "
                           "official national total ~69.8M): source-data/worldpop_tha_2020_1km.tif. "

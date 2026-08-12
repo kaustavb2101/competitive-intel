@@ -3,6 +3,35 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-12 — Market/peer loop (mandate honesty): scrub residual branch-EXPANSION framing from 3 live competitive layers' `objective` provenance
+
+- **The gap fixed (`intel-scrub-expansion-framing-live-competitive-layers`).** CLAUDE.md's objective #2
+  was re-scoped to a **competitive-RISK lens on the footprint we ALREADY run — "not branch expansion,
+  makes NO open / close / where-to-open recommendations."** Two waves of that scrub already landed
+  (`1569666` opportunity_score dormant; `peer_province.json`/`branch_leads.json` already say "makes NO
+  open / close / expand"). But three LIVE, MEASURED competitive layers surfaced on `#acq` still carried
+  the old **acquisition/expansion** framing in their editorial `meta.objective` string:
+  - `rival_density.json` — "…so **expansion can contest ceded ground**, not just empty white-space."
+  - `rival_pressure.json` — "…rival proximity **tells expansion** where the ground is already contested vs open."
+  - `contested_pop.json` — "…a fight for share, not white space — **weigh expansion elsewhere**…"
+  These directly contradict the current mandate. They are provenance metadata (NOT rendered in the UI —
+  grep for `.objective` across `platform/*.js|*.html` is empty; they feed the provenance ledger / data-room
+  census), so this is an honesty/mandate-alignment fix, not a visual change.
+- **What shipped.** Rewrote the three `objective` strings in the SOURCE build scripts
+  (`build_rival_density.py`, `build_rival_pressure.py`, `build_contested_pop.py`) to the
+  competitive-pressure-on-the-existing-footprint framing modelled on the already-correct `peer_province.json`
+  ("a competitive-pressure read on the current footprint — no open / close / expand call"), then
+  regenerated all three layers + `provenance.json`. **No numbers changed**: each output is byte-identical
+  to its committed version except the single editorial `objective` string (verified structurally — parsed
+  JSON equal after removing `meta.objective`), and `provenance.json`'s only delta is the three files'
+  byte-sizes (39006→39079, 217879→217966, 103486→103576). Nothing MEASURED was touched.
+- **Verify.** Installed rasterio locally so `build_contested_pop.py` (WorldPop-tif-backed, tif IS committed
+  → CI runs its `--check` for real) regenerated properly rather than drifting. Determinism gate
+  **`bash tests/run.sh check` → 134 passed · 0 failed** (incl. all three `build_*_pop/pressure/density.py
+  --check` + `build_provenance.py --check`); data integrity **455/455**; `check_site_health --local` clean.
+- **Deploy-verify.** Data-only, non-visual change; production alias re-checked HTTP 200 on `/` + a changed
+  data file after push.
+
 ## 2026-08-12 — Service loop (stop crying wolf): re-calibrate the feed-liveness FROZEN test for step-flat retail fuel — `fuel_gasohol95` false alarm
 
 - **The gap fixed (`liveness-frozen-false-positive-gasohol`).** `pipeline/check_feed_liveness.py`'s
