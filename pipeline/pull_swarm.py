@@ -117,10 +117,17 @@ FEEDS = [
          label="NABC per-province agri production (feeds branch_agri + crop_farmer_income)",
          cadence="weekly", ip="any", group="macro", out="source-data/nabc_agri.json"),
 
-    dict(key="oae_prices", script="pull_oae_prices.py", args=["--stamp", STAMP],
-         label="OAE weekly farm-gate prices (measured, replaces the World Bank proxy)",
-         cadence="weekly", ip="any", group="macro", out="source-data/oae_farmgate_prices.json",
-         timeout=1200),   # CKAN package search + resource download can be slow
+    # RETIRED 2026-08-11: `oae_prices` (OAE weekly farm-gate prices) used to sit here and had
+    # failed on EVERY swarm run since the registry was created — source-data/oae_farmgate_prices.json
+    # was never once produced. Three earlier cycles diagnosed it as "the upstream series is gone".
+    # That diagnosis was wrong, and the correction is why it is retired rather than repaired:
+    # the series is alive and reachable token-free through data.go.th's datastore from a Thai IP.
+    # It is just strictly worse than what this registry already pulls four times a day — it covers
+    # 2 of our 6 crops (rice, cassava) against farmgate's 8, is national-only, and ends at CE
+    # 2025-08. build_crop_stress.py's preference chain puts farmgate above NABC above OAE, so even
+    # a perfect pull could not have priced a single published number. Full survey:
+    # docs/DATA_REFRESH_LOG.md 2026-08-11. Keeping a red feed that cannot win is how a swarm
+    # summary learns to read "1 failed" as normal.
 
     dict(key="macro", script="pull_macro.py", args=["--stamp", STAMP],
          label="BIS household debt/policy rate + World Bank CPI/lending-rate/FX", cadence="weekly",
