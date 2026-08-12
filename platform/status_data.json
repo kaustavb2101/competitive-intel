@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-12T05:45:49+07:00",
-    "commit": "e47f775"
+    "generated_at": "2026-08-12T04:25:16+00:00",
+    "commit": "d0d2f63"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,30 @@
   ],
   "activity": [
     {
+      "date": "2026-08-12T04:25:16+00:00",
+      "sha": "d0d2f63",
+      "summary": "fix(liveness): re-calibrate FROZEN test for step-flat retail fuel (fuel_gasohol95 false alarm)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-12T02:23:07+00:00",
+      "sha": "1f6a379",
+      "summary": "docs(progress): log the REOPENED th-scope sweep close (PR #381) merge+deploy+verify",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-12T09:18:58+07:00",
+      "sha": "557a25e",
+      "summary": "ux: scope=col on last 5 app.js tables (closes REOPENED th-scope sweep) (#381)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-11T22:48:59+00:00",
+      "sha": "402acec",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the orphaned-loader cleanup ship (#379)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-12T05:45:49+07:00",
       "sha": "e47f775",
       "summary": "chore(app): remove 4 orphaned Overview macro loader/renderer pairs (dead since 2026-08-02 macro_book move) (#379)",
@@ -686,30 +710,6 @@
       "sha": "e477f44",
       "summary": "ux: scope=col on #market collateral-concentration table headers (#368)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T00:32:57+00:00",
-      "sha": "61cabda",
-      "summary": "health: shape-probe the last two index-aligned per-branch popup joins (branch_leads, branch_recommendations)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-10T23:21:48+00:00",
-      "sha": "ac3c036",
-      "summary": "data: live fuel prices (2026-08-10, run 31441711025)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-10T22:31:26+00:00",
-      "sha": "d6cfbc3",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the macro_usd_thb feed-liveness canary ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-10T22:30:35+00:00",
-      "sha": "b6b85c3",
-      "summary": "health(feed-liveness): add macro_usd_thb frozen-value canary for the weekly macro FX read",
-      "pillar": "feature"
     }
   ]
 }
