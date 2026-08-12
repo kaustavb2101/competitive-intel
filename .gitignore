@@ -136,7 +136,11 @@ source-data/.nso_lfs_status_raw/
 
 .claude/settings.local.json
 
-# Google Places ratings pull scratch cache
+# Google Places ratings pull — LEGACY scratch cache (pre-2026-08-12) only.
+# The live cache is source-data/place_ratings_cache.json and is deliberately COMMITTED: ignoring it
+# meant a CI checkout always started with an empty cache and re-bought all 1,740 billed Place
+# Details calls on every scheduled run. That is the bulk of a USD 300 Places bill. Do not add the
+# committed path here. See the COST note in pipeline/pull_place_ratings.py.
 source-data/.place_ratings_cache.json
 
 # Playwright MCP scratch (page snapshots / console logs)

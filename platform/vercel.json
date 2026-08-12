@@ -1,6 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
+  "//ignoreCommand": "Build ONLY master; skip every other branch. The data workflows open a draft PR per refresh and pr-autoresolve pushes to each open branch every time master moves, so a dozen auto-generated data/* branches were each triggering their own preview build. Those builds share the free tier's daily quota with PRODUCTION, and once the quota is gone prod cannot deploy for 24h and never retries itself — a data-refresh PR nobody was waiting on could silently block the live dashboard. Nothing is lost: those branches only ever change JSON under platform/data/, reviewed in the PR diff rather than by eye on a preview URL. NOTE THE INVERTED EXIT CODES, they are Vercel's and they are easy to get backwards: exit 1 CONTINUES the build, exit 0 SKIPS it. Two configurations were rejected before this one: `github.enabled:false` is deprecated AND disables the whole project including production, and `git.deploymentEnabled:{master:true}` does nothing because unlisted branches default to true. There is no wildcard, and these branch names carry run ids, so an explicit list cannot work — hence a command. To preview a branch, temporarily add it to the test.",
+  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" = \"master\" ]; then exit 1; else exit 0; fi",
   "redirects": [
     { "source": "/rayong-province", "destination": "/rayong-catchment", "permanent": true }
   ],

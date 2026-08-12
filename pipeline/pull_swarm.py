@@ -244,6 +244,89 @@ def _size(path):
     return os.path.getsize(path) if path and os.path.exists(path) else 0
 
 
+# Each feed carries a `cadence`, and until 2026-08-12 that string was PURE DOCUMENTATION — it was
+# printed by --list and read by nothing. Every scheduled swarm therefore ran every selected feed,
+# so a feed labelled "weekly" ran daily and one labelled "monthly" ran ~30x more often than its
+# own registry entry claimed.
+#
+# That was not merely wasteful, it was expensive. `place_ratings` fetches Google Places Details for
+# 1,740 competitor place_ids, and its cache lives at a gitignored path — which never survives a CI
+# checkout, so every scheduled run re-bought all 1,740. Billed daily instead of weekly, that one
+# feed is the bulk of a USD 300 Places bill.
+#
+# Windows are deliberately a little SHORTER than the nominal period so a cron that drifts by a few
+# minutes, or a runner that starts late, does not skip a whole cycle: "daily" re-runs after 20h,
+# not 24h. Erring short costs one extra pull; erring long silently drops a day of data.
+CADENCE_HOURS = {
+    "4x/day":    5,
+    "daily":     20,
+    "weekly":    6 * 24,
+    "monthly":   27 * 24,
+    "quarterly": 85 * 24,
+}
+
+
+def _last_success(runs_path=RUNS_OUT):
+    """feed key -> datetime of the most recent run in which it actually pulled.
+
+    Reads the swarm's own audit trail. "ok" and "changed" both count as a pull that hit the
+    network; "failed"/"timeout"/"skipped" do not, so a broken feed retries on the next run
+    instead of being locked out by its own failure."""
+    out = {}
+    try:
+        with open(runs_path, encoding="utf-8") as fh:
+            runs = json.load(fh).get("runs") or []
+    except (OSError, ValueError):
+        return out                       # no history yet -> nothing is throttled
+    for r in runs:
+        started = r.get("started")
+        if not started:
+            continue
+        try:
+            when = datetime.datetime.strptime(started, "%Y-%m-%dT%H:%M:%SZ").replace(
+                tzinfo=datetime.timezone.utc)
+        except ValueError:
+            continue
+        for f in r.get("feeds") or []:
+            if f.get("status") in ("ok", "changed"):
+                k = f.get("key")
+                if k and (k not in out or when > out[k]):
+                    out[k] = when
+    return out
+
+
+def apply_cadence(pool, args):
+    """Drop feeds that already ran inside their own cadence window.
+
+    Two deliberate escape hatches: naming a feed in --only is an explicit human request and always
+    wins, and --ignore-cadence forces the whole pool. Anything with an unrecognised cadence string
+    is NEVER throttled — an unknown cadence must not silently stop a feed from running."""
+    if getattr(args, "ignore_cadence", False):
+        return pool, []
+    explicit = {k.strip() for k in (args.only or "").split(",") if k.strip()}
+    last = _last_success()
+    now = datetime.datetime.now(datetime.timezone.utc)
+    keep, skipped = [], []
+    for f in pool:
+        window = CADENCE_HOURS.get(f.get("cadence"))
+        prev = last.get(f["key"])
+        if window is None or prev is None or f["key"] in explicit:
+            keep.append(f)
+            continue
+        age_h = (now - prev).total_seconds() / 3600.0
+        if age_h < window:
+            skipped.append((f["key"], f["cadence"], age_h, window))
+        else:
+            keep.append(f)
+    if skipped:
+        print("cadence gate: skipping %d feed(s) that ran inside their own window "
+              "(--ignore-cadence to force):" % len(skipped), file=sys.stderr)
+        for k, cad, age_h, window in sorted(skipped):
+            print("    %-22s %-9s last pulled %.1fh ago, window %dh"
+                  % (k, cad, age_h, window), file=sys.stderr)
+    return keep, skipped
+
+
 def select_feeds(args):
     """The pool this run will touch: any-IP by default, +thai only with --include-thai, then
     --only / --exclude narrow it. Unknown --only keys are a hard error (a typo should not silently
@@ -272,6 +355,7 @@ def select_feeds(args):
             print("NOTE: --exclude key(s) not in the registry (ignored): %s"
                   % ", ".join(sorted(unknown)), file=sys.stderr)
         pool = [f for f in pool if f["key"] not in excl]
+    pool, _ = apply_cadence(pool, args)
     return pool
 
 
@@ -426,6 +510,10 @@ def main():
     ap.add_argument("--skip-browser", action="store_true",
                      help="skip every feed that needs a headless Chromium (for runners without "
                           "`playwright install chromium`)")
+    ap.add_argument("--ignore-cadence", action="store_true",
+                     help="run every selected feed even if it already pulled inside its cadence "
+                          "window (the gate reads source-data/swarm_runs.json; naming a feed in "
+                          "--only also bypasses it)")
     ap.add_argument("--jobs", type=int, default=DEFAULT_JOBS, help="parallel workers (default %d)" % DEFAULT_JOBS)
     ap.add_argument("--dry-run", action="store_true", help="print the plan, touch nothing")
     ap.add_argument("--no-derive", action="store_true",
@@ -439,6 +527,18 @@ def main():
 
     feeds = select_feeds(args)
     if not feeds:
+        # "Everything is already fresh" is a SUCCESS, not a failure. Before the cadence gate the
+        # only way to select nothing was a bad --only/--exclude, which deserved a non-zero exit;
+        # now a 4x/day cron legitimately finds nothing due most of the time, and exiting 1 there
+        # would paint the daily swarm workflow red every single day until nobody read it any more.
+        # Distinguish the two by asking whether anything was throttled.
+        pool_before = [f for f in FEEDS if f["ip"] == "any" or args.include_thai]
+        _, throttled = apply_cadence(pool_before, argparse.Namespace(only=args.only,
+                                                                     ignore_cadence=False))
+        if throttled:
+            print("No feeds due -- every selected feed pulled inside its cadence window. "
+                  "Nothing to do (this is normal).")
+            return 0
         print("No feeds selected -- nothing to do.")
         return 1
 
