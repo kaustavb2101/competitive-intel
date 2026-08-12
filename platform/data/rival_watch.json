@@ -77,52 +77,16 @@
    }
   },
   "label": "MIXED, labelled per section. promos.new and ads.appeared are MEASURED from real per-item/per-creative first_seen/first_shown dates already in the source files. promos.disappeared, ads.disappeared and search_demand movement are all empty by design — none of this pipeline's inputs currently carry the second data point (last_seen, per-creative last_shown, or a prior share-of-search vintage) that an honest 'disappeared' or 'movement' figure requires.",
-  "newest_observation_date": "2026-08-11",
+  "newest_observation_date": "2026-08-12",
   "title": "Rival watch — what changed in the rival field since last time (obj #2)"
  },
  "promos": {
-  "as_of": "2026-08-08",
-  "disappeared": [
-   {
-    "brand": "MTC",
-    "kind": "news",
-    "last_seen": "2026-07-19",
-    "title": "เมืองไทย แคปปิตอล คว้าต่ออายุรับรอง CAC ครั้งที่ 2 ตอกย้ำองค์กรโปร่งใสต่อต้านคอร์รัปชันอย่างต่อเนื่อง",
-    "url": "https://muangthaicap.com/news/mtc-cac-certification-2025/"
-   },
-   {
-    "brand": "MTC",
-    "kind": "news",
-    "last_seen": "2026-07-19",
-    "title": "โครงการ “เมืองไทย ร่วมใจมอบให้ชุมชน”ถูกส่งต่อเพื่อให้เกิดประโยชน์สูงสุดแก่พี่น้องชาวไทย",
-    "url": "https://muangthaicap.com/news/mtc-bicycletrailer-68-2/"
-   }
-  ],
+  "as_of": "2026-08-12",
+  "disappeared": [],
   "label": "MEASURED — dated by each promo's own first_seen (set by pull_rival_promos.py).",
-  "n_disappeared": 2,
-  "n_new": 2,
-  "new": [
-   {
-    "brand": "MTC",
-    "date": "2026-07-25",
-    "first_seen": "2026-08-08",
-    "kind": "news",
-    "product": null,
-    "promo_type": null,
-    "title": "MTC ผนึก Bank of China (Hong Kong) และ Bank of China (Thailand) ปิดดีล Social Loan มูลค่า 70 ล้านดอลลาร์สหรัฐ ตอกย้ำไมโครไฟแนนซ์ เพื่อสังคมไทย มาตรฐานโลก",
-    "url": "https://muangthaicap.com/news/mtc-boc2026/"
-   },
-   {
-    "brand": "MTC",
-    "date": "2026-08-03",
-    "first_seen": "2026-08-08",
-    "kind": "news",
-    "product": null,
-    "promo_type": null,
-    "title": "MTC สุดปลื้ม!คว้ารางวัล Best Social Bond &#8211; Thailand",
-    "url": "https://muangthaicap.com/news/mtc-best-social-bond/"
-   }
-  ],
+  "n_disappeared": 0,
+  "n_new": 0,
+  "new": [],
   "note": "first_seen values span more than one pull; 'new' reflects arrivals since the previous pull."
  },
  "search_demand": {
