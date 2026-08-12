@@ -3,6 +3,39 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-12 — Intelligence loop (provenance honesty): fix `"SYNTH"` substring false-positive that mislabelled 4 MEASURED layers as ESTIMATED on the #home Data-room card
+
+- **The bug (`provenance-synth-false-positive`).** `pipeline/build_provenance.py` decided each layer's
+  MEASURED vs ESTIMATED verdict by scanning its meta text for the marker fragments in `EST_MARKERS`, one
+  of which was the blunt substring `"SYNTH"`. That fragment does not only match the estimated-data word
+  "synthetic" — it also matches the **honest MEASURED disclaimers** several genuinely-measured layers
+  carry: *"every point is a real coordinate; no synthesis"*, *"no modelling, no synthesis. MEASURED …"*,
+  *"no scores, no synthesis"*, *"MEASURED assembly. No index or synthetic value is introduced"*. So four
+  layers that self-declare MEASURED were being counted **ESTIMATED** on the Command-center Data-room
+  honesty card (`renderHomeDataRoom`, the surface the whole measured-vs-estimated mandate is judged on):
+  `competitors_census.json` (the 16,503-rival census — the backbone of the entire PEER pillar,
+  feeding peer_province / competitor_coverage / rival_density / rival_pressure), `sfi_credit.json`
+  (MEASURED FPO quarterly SFI NPL series), `contested_pop.json` (MEASURED WorldPop×census overlay), and
+  `branch_labor.json` (MEASURED Overture/DIW/NSO assembly). A conservative error — it *understated* our
+  measured backbone — but wrong, and on the one card that exists to be exactly right about this.
+- **What shipped.** Removed `"SYNTH"` from the blunt-substring `EST_MARKERS` and replaced it with a
+  negation-aware `_affirmative_synthetic()` helper: the synthetic-data family (`SYNTHETIC` / `SYNTHESIS`
+  / `SYNTHESIZED`) flips a layer to ESTIMATED **only when affirmative** — i.e. its clause (comma/
+  semicolon/sentence-bounded) does not negate it (`no` / `non-` / `without` / `never`) and does not
+  itself assert `MEASURED`. So a genuinely synthetic future layer ("fully synthetic loan tape") is still
+  caught, while the measured disclaimers no longer trip. Every genuinely-estimated layer that happened to
+  also contain "synthesis" (branch_recommendations, decision_queue, catchment_poi, lead_sites,
+  occupation_leads, rival_density, rival_pressure) keeps its ESTIMATED verdict via an independent strong
+  marker (ESTIMATED / EDITORIAL), so real coverage is unchanged.
+- **Verify.** Regenerated `platform/data/provenance.json`: counts moved **79→83 measured · 63→59
+  estimated · 0 unlabelled** — exactly **4 flips, all estimated→measured**, all self-declared-MEASURED,
+  **zero** measured→estimated (wrong-direction) flips. `build_provenance.py --check` reproduces
+  byte-exact; determinism gate `bash tests/run.sh check` → **132 passed · 0 failed**, data integrity
+  **455/455**; `check_site_health.py --local` accepts the payload (the Data-room render contract holds).
+  `app.js` is untouched — the card reads `PROVEN.counts` and `prChip(L.cls)` dynamically, so the only
+  visible change is 4 chips flipping [E]→[M] and the two-digit headline split; code-level render review
+  of `renderHomeDataRoom` confirms no value-specific branch (headless browser render unavailable in CI).
+
 ## 2026-08-12 — Integration loop (self-audit honesty): restore the broken gate-coverage grep-invariant in `tests/run.sh` — `build_collateral_census` was gated but invisible to audits
 
 - **The gap fixed (`gate-coverage-grep-invariant-collateral-census`).** `tests/run.sh`'s

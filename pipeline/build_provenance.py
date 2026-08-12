@@ -89,7 +89,22 @@ PROV_KEYS = ("label", "source", "provenance", "generated_by")
 VERDICT_KEYS = ("label", "source", "provenance", "objective", "title", "note",
                 "honesty_caveat", "generated_with")
 # markers that flip a stamped layer to ESTIMATED (uppercased substring match).
-EST_MARKERS = ("ESTIMATED", "PROXY", "SYNTH", "INFERRED", "EDITORIAL", "SIMULAT")
+# NOTE: the synthetic-data family is handled separately (see _affirmative_synthetic below),
+# NOT as a blunt "SYNTH" substring here. The fragment "SYNTH" false-matched the honest
+# MEASURED disclaimers several genuinely-measured layers carry ("no synthesis", "no
+# synthetic value is introduced"), mislabelling e.g. the MEASURED competitor census and the
+# MEASURED FPO SFI-credit series as ESTIMATED on the Data-room honesty card. Synthetic data
+# is still caught — but only when the layer AFFIRMATIVELY declares it (not when it declares
+# the opposite). Every genuinely-estimated layer also carries a strong marker below, so real
+# coverage is unchanged (verified: only self-declared-MEASURED layers reclassify).
+EST_MARKERS = ("ESTIMATED", "PROXY", "INFERRED", "EDITORIAL", "SIMULAT")
+
+# synthetic-data marker, negation-aware. "SYNTHETIC" / "SYNTHESIS" / "SYNTHESIZED" flip a
+# layer to ESTIMATED only when AFFIRMATIVE — i.e. the clause it sits in is not a measured
+# disclaimer negating it ("no synthesis", "no ... synthetic value", "without synthesis") and
+# does not itself assert MEASURED. Clause = a comma/semicolon/sentence-bounded fragment.
+_SYNTH_RE = re.compile(r"SYNTHE(?:TIC|SI[SZ]E?D?|SIS)")
+_NEG_CUES = ("NO ", "NO-", "NON-", "NON ", "NOT ", "NEVER ", "WITHOUT ")
 
 # per-province geometry basemap families (collapsed to one row each in the card).
 FAMILY_KINDS = ("catchment", "roads", "water", "places", "landuse", "rail")
@@ -137,6 +152,22 @@ def _stamp_meta(d):
     return None
 
 
+def _affirmative_synthetic(hay):
+    """True iff the (uppercased) text AFFIRMATIVELY declares synthetic data — i.e. a
+    'synthetic/synthesis/synthesized' occurrence in a clause that is not negating it and
+    does not assert MEASURED. Splits on sentence/semicolon/comma boundaries so a nearby
+    'no'/'without' that scopes the synthetic word is seen. This is what keeps the honest
+    disclaimer 'every point is a real coordinate; no synthesis' from reading as an estimate."""
+    for clause in re.split(r"[.;,]", hay):
+        if _SYNTH_RE.search(clause):
+            if "MEASURED" in clause:
+                continue
+            if any(cue in clause for cue in _NEG_CUES):
+                continue
+            return True
+    return False
+
+
 def _verdict_from_meta(m):
     """MEASURED / ESTIMATED from a stamped meta dict (repo convention: estimates are tagged)."""
     parts = []
@@ -146,6 +177,8 @@ def _verdict_from_meta(m):
             parts.append(v if isinstance(v, str) else json.dumps(v, ensure_ascii=False))
     hay = " ".join(parts).upper()
     if any(mk in hay for mk in EST_MARKERS):
+        return "estimated"
+    if _affirmative_synthetic(hay):
         return "estimated"
     return "measured"
 
