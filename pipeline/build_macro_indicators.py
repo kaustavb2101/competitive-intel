@@ -28,6 +28,11 @@ INPUTS (all optional independently — an absent input leaves that indicator/key
   - source-data/bot_tourist_arrivals.json → ADDS tourist_arrivals, BOT's own monthly foreign-
     arrivals count, both the latest single month and a trailing-12-month sum (directly comparable
     in scale to the old annual "32.9M / 2025" editorial figure it supersedes).
+  - source-data/bot_policy_rate.json → OVERRIDES policy_rate with BOT's OWN MPC (กนง.) decision
+    history — the authoritative primary source (BIS, in the base file, merely republishes it a
+    quarter laggier). Adds the exact meeting date + Hold/Cut decision + a real easing-path trend;
+    yoy_change recomputed from the same history. The pull is Thai-IP/owner-side, but this fold reads
+    the already-committed source-data file only, so it stays deterministic + network-free.
 
 ORDER OF OPERATIONS (important — read before re-running pull_macro.py): pull_macro.py OVERWRITES
 platform/data/macro_indicators.json from scratch on every run and knows nothing about the three ADDED
@@ -51,6 +56,7 @@ SRC_CPI = os.path.join(ROOT, "source-data", "tpso_cpi.json")
 SRC_GDP = os.path.join(ROOT, "source-data", "nesdc_gdp.json")
 SRC_CA = os.path.join(ROOT, "source-data", "bot_current_account.json")
 SRC_TOUR = os.path.join(ROOT, "source-data", "bot_tourist_arrivals.json")
+SRC_POLICY = os.path.join(ROOT, "source-data", "bot_policy_rate.json")
 
 TH_MON_ORDER = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
                 "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."]
@@ -162,12 +168,60 @@ def _fold_tourist_arrivals(indicators):
     indicators["tourist_arrivals"] = entry
 
 
+def _fold_policy_rate(indicators):
+    """OVERRIDE policy_rate with BOT's OWN MPC (กนง.) decision history — the authoritative primary
+    source. The base file carries the BIS republication of this same rate, which is a quarter laggier
+    (BIS 'policy_rate' periodised '2026-06' vs BOT's exact meeting date + Hold/Cut decision). BOT
+    republishes an XLSX after every meeting, so this reads same-vintage-or-fresher and adds the
+    decision context BIS drops. Recomputed ENTIRELY from source-data/bot_policy_rate.json — never from
+    the base's existing value — so a --check re-run reproduces byte-for-byte.
+
+    NOTE the underlying pull (pull_bot_policy_rate.py) is Thai-IP/owner-side (bot.or.th geoblocks the
+    cloud); this fold reads only the ALREADY-COMMITTED source-data file, so it stays deterministic +
+    network-free. The value is a point-in-time vintage (meta.pulled in the source), not live.
+    """
+    d = _load(SRC_POLICY)
+    if not d:
+        return
+    latest = d.get("latest") or {}
+    hist = d.get("history") or []
+    if latest.get("rate") is None or not latest.get("date"):
+        return
+    rate = latest["rate"]
+    date = latest["date"]           # ISO "YYYY-MM-DD" — the MPC meeting date
+    period = date[:7]               # "YYYY-MM"
+    entry = {
+        "value": rate,
+        "period": period,
+        "unit": "%",
+        "source": "Bank of Thailand (ธปท.) — MPC (กนง.) policy rate, 1-day bilateral repo",
+        "decision": latest.get("decision_en"),   # "Hold" / "Cut 25 bps" / "Raise 25 bps"
+        "decision_date": date,
+    }
+    # yoy_change: the rate IN EFFECT ~12 months before the latest meeting, read off the SAME history.
+    # ISO dates are zero-padded, so lexical <= is chronological; no wall-clock / datetime needed.
+    target = "%04d%s" % (int(date[:4]) - 1, date[4:])   # e.g. "2026-06-24" -> "2025-06-24"
+    prior_rate = None
+    for h in hist:
+        if h.get("date") and h.get("rate") is not None and h["date"] <= target:
+            prior_rate = h["rate"]                       # history is chronological; keep the last <= target
+    if prior_rate is not None:
+        entry["yoy_change"] = round(rate - prior_rate, 2)
+    # trend: the last 6 meeting rates (chronological) — shows the easing path, unlike BIS's flat quarters.
+    trend = [h["rate"] for h in hist[-6:] if h.get("rate") is not None]
+    if trend:
+        entry["trend"] = trend
+    indicators["policy_rate"] = entry
+
+
 # The base file's OWN "indicators" dict is the starting point for every field this builder does
-# NOT touch (household_debt_gdp, policy_rate, lending_rate, usd_thb — carried through unchanged;
+# NOT touch (household_debt_gdp, lending_rate, usd_thb — carried through unchanged; policy_rate is
+# now OVERRIDDEN from BOT's own MPC history when source-data/bot_policy_rate.json is present, else
+# carried through as the base's BIS reading;
 # and cpi_inflation itself IF source-data/tpso_cpi.json happens to be absent on a given run, so a
 # missing input degrades to "leave pull_macro.py's own reading alone" rather than dropping the
 # card). Every field this builder DOES fold (cpi_inflation, gdp_growth, current_account,
-# tourist_arrivals) is fully recomputed from its OWN source-data/ input when that input is present —
+# tourist_arrivals, policy_rate) is fully recomputed from its OWN source-data/ input when that input is present —
 # never derived from whatever value is already sitting in the base — which is what makes re-running
 # the builder idempotent (a --check run reads the just-written file as its own base and must
 # reproduce it byte-for-byte; if any folded field depended on its OWN previous value, a second run
@@ -181,6 +235,7 @@ def build():
     _fold_gdp(indicators)
     _fold_current_account(indicators)
     _fold_tourist_arrivals(indicators)
+    _fold_policy_rate(indicators)
     meta = dict(base.get("meta") or {})
     meta["folded_by"] = "pipeline/build_macro_indicators.py"
     meta["folded_sources"] = {
@@ -188,6 +243,7 @@ def build():
         "gdp_growth": "source-data/nesdc_gdp.json" if os.path.exists(SRC_GDP) else None,
         "current_account": "source-data/bot_current_account.json" if os.path.exists(SRC_CA) else None,
         "tourist_arrivals": "source-data/bot_tourist_arrivals.json" if os.path.exists(SRC_TOUR) else None,
+        "policy_rate": "source-data/bot_policy_rate.json" if os.path.exists(SRC_POLICY) else None,
     }
     return {"meta": meta, "indicators": indicators}
 

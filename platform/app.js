@@ -1750,7 +1750,11 @@ function renderMacroIndicators(){
   if(hh) cards.push([`Household debt`, `${hh.value}%`,
     `of GDP · ${arrow(hh.yoy_change)}${hh.yoy_change!=null?Math.abs(hh.yoy_change)+'pp':''} YoY${hh.yoy_change<0?' (deleveraging)':''} · BIS ${hh.period}`]);
   const pr=I.policy_rate;
-  if(pr) cards.push([`Policy rate`, `${pr.value}%`, `${arrow(pr.yoy_change)}${pr.yoy_change!=null?Math.abs(pr.yoy_change)+'pp':''} YoY · BIS ${pr.period}`]);
+  // Policy rate now folds BOT's own MPC decision history (build_macro_indicators.py) — carries the
+  // Hold/Cut decision + exact source. Falls back to the base's BIS reading when the BOT fold is absent.
+  const prSrc=x=>/bank of thailand|\bBOT\b|ธปท/i.test(String(x||''))?'BOT':'BIS';
+  if(pr){ const dec=pr.decision?` · ${pr.decision}`:'';
+    cards.push([`Policy rate`, `${pr.value}%`, `${arrow(pr.yoy_change)}${pr.yoy_change!=null?Math.abs(pr.yoy_change)+'pp':''} YoY${dec} · ${prSrc(pr.source)} ${pr.period}`]); }
   // "TPSO (Ministry of Commerce) — headline CPI, monthly" → "TPSO". The chip has room for the
   // publisher, not its subtitle; the full string stays in the hover title.
   const srcShort=x=>String(x||'').split(/\s+[—(]/)[0].trim();
@@ -2315,11 +2319,14 @@ function renderAnswerBand(){
         spark:svgSpark(h.trend,{color:'var(--accent)',aria:'household debt to GDP trend',title:'BIS'}),
         sub:'MEASURED BIS'})); }
     if(I.policy_rate) { const p=I.policy_rate;
+      // Prefer BOT-direct provenance (MPC decision history) when folded; else the base BIS reading.
+      const pSrc=/bank of thailand|\bBOT\b|ธปท/i.test(String(p.source||''))?'BOT':'BIS';
+      const pDec=p.decision?` · ${p.decision}`:'';
       T.push(abTile({k:'Policy rate',cad:p.period||'quarterly',cadCls:'q',v:p.value,unit:'%',
-        move:p.yoy_change!=null?`${p.yoy_change<0?'▼':'▲'} ${Math.abs(p.yoy_change)}pt YoY`:'',
+        move:(p.yoy_change!=null?`${p.yoy_change<0?'▼':'▲'} ${Math.abs(p.yoy_change)}pt YoY`:'')+pDec,
         moveColor:'var(--mid)',
-        spark:svgSpark(p.trend,{color:'var(--accent)',aria:'policy rate trend',title:'BIS'}),
-        sub:'MEASURED BIS'})); }
+        spark:svgSpark(p.trend,{color:'var(--accent)',aria:'policy rate trend',title:pSrc}),
+        sub:'MEASURED '+pSrc})); }
     // 6. Our own book, so the backdrop is never read without the thing it acts on. Live book only —
     //    the 180+ legacy stock is held apart on purpose and blending them would flatter the number.
     //    (regex is anchored on "of accounts" — "NPL-live (90-179dpd) 4.92%" otherwise captures the

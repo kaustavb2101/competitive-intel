@@ -3,6 +3,45 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-12 — Integration loop (macro read): fold BOT's own MPC decision history into the Overview policy-rate card — supersedes the laggier BIS republication (PR)
+
+- **The gap fixed (`policy-rate-reads-laggier-BIS-not-orphaned-BOT-direct`).** `source-data/bot_policy_rate.json`
+  (42KB, MEASURED — BOT/ธปท. MPC/กนง. full decision history, 203 meetings, pulled 2026-08-02 by the
+  Thai-IP `pull_bot_policy_rate.py`) sat **orphaned**: no builder distilled it, while the Overview macro
+  strip's **Policy rate** card was fed by the **BIS republication** of the same rate via
+  `macro_indicators.json` — a quarter laggier and stripped of the decision context. BIS periodised it
+  "2026-06" @ 1.0%; BOT carries the exact meeting date (2026-06-24), the decision ("Hold"), and the real
+  easing path. This was logged as an open negative-space item on 2026-08-11.
+- **What shipped.** Added `_fold_policy_rate()` to `pipeline/build_macro_indicators.py` (the existing
+  deterministic, network-free, `--check`-gated fold of committed source-data into `macro_indicators.json`).
+  It OVERRIDES `policy_rate` from the already-committed BOT file — value 1.0%, source BOT, `decision`
+  "Hold", `decision_date` 2026-06-24, `yoy_change` -0.75 (recomputed by walking the same history for the
+  rate in effect ~12 months prior — matches BIS's -0.75 exactly, corroborating the number), and a recent
+  6-meeting trend [1.5,1.5,1.25,1.0,1.0,1.0] showing the cut path. Recomputed ENTIRELY from source (never
+  from the base value) so a `--check` re-run reproduces byte-for-byte. The underlying pull is Thai-IP/
+  owner-side, but the fold reads only the committed file → stays deterministic + CI-doable; honest that it
+  is a point-in-time vintage, not live.
+- **App (two consumers, both corrected).** `renderMacroIndicators()` chip (app.js ~1752) and the
+  `renderAnswerBand()` command-center tile (app.js ~2317) both **hardcoded "BIS"** — folding BOT without
+  touching them would have mislabelled the provenance. Both now derive the source label from `p.source`
+  ("BOT" when the BOT fold is present, else "BIS") and surface the decision. Chip: "▼0.75pp YoY · Hold ·
+  BOT 2026-06". Tile: sparkline title + `sub` now read "MEASURED BOT", move carries "· Hold". Backward-
+  compatible: absent the fold, both degrade to the base BIS reading.
+- **Downstream layer regenerated (`regional_outlook.json`).** `build_regional_outlook.py` reads
+  `macro_indicators.json` and bakes the policy-rate card (incl. its `src`) into the exec Overview's
+  NATIONAL situation narrative (`national.situation[1]`). My macro change made it an affected derived
+  layer, so it was regenerated: the national policy-rate situation line now reads "1.0% · ▼0.75 pp YoY ·
+  deleveraging · Bank of Thailand (ธปท.) — MPC (กนง.)…" instead of "BIS 2026-06" — the one and only leaf
+  that changed (`--check` byte-exact after regen). `provenance.json` re-regenerated on top.
+- **Verify.** `build_macro_indicators.py --check` + `build_regional_outlook.py --check` +
+  `build_provenance.py --check` all byte-exact; `node --check platform/app.js` OK; `bash tests/run.sh
+  check` green (0 failed). Headless render self-review of `#overview` + `#home`. Visual/behaviour change →
+  PR (draft), not a direct commit.
+- **Next recommended integration.** The sibling orphan `source-data/farmgate_prices.json`'s dead
+  platform/data duplicate (`build_farmgate_platform.py` — built + gated but unconsumed) is the remaining
+  logged committed-data hygiene item; or a fresh national Places scout run to age down the 38-day
+  `competitors_census.json` behind the peer board.
+
 ## 2026-08-12 — Service loop (stop crying wolf): re-calibrate the feed-liveness FROZEN test for step-flat retail fuel — `fuel_gasohol95` false alarm
 
 - **The gap fixed (`liveness-frozen-false-positive-gasohol`).** `pipeline/check_feed_liveness.py`'s
