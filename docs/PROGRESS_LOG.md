@@ -3,6 +3,48 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-12 — Integration loop (PROVENANCE/objective-#1): wire the orphaned BOT-direct policy-rate history into the headline macro read — replace the BIS proxy (PR)
+
+- **The gap fixed (`bot-policy-rate-orphaned-macro-shows-bis-proxy`).** `source-data/bot_policy_rate.json`
+  — the authoritative MEASURED BOT/MPC decision history (203 meetings since 2000, the 1-day repo rate,
+  anchor-verified on every pull by `pull_bot_policy_rate.py`) — was **pulled but consumed by nothing**
+  (grep: its only referrer was its own puller). Meanwhile the headline **Policy rate** chip on
+  `#overview` and the Command-center tile on `#home` were sourced from **BIS** (`macro_indicators.json`
+  `policy_rate`, a quarterly *republication* of BOT's own number) and hard-labelled "BIS" / "MEASURED
+  BIS" in `app.js`. So the app showed a lagging proxy for a number BOT itself sets and publishes after
+  every MPC meeting, and mislabelled its provenance — an honesty gap on a headline exec figure.
+- **What shipped.** `build_macro_indicators.py` gains `_fold_policy_rate()` — when
+  `source-data/bot_policy_rate.json` is present it OVERRIDES the `policy_rate` block with the BOT-direct
+  reading: value from the latest meeting, meeting-level trend (last 6 decisions), YoY computed off the
+  meeting on/before the same day one year earlier, plus `as_of`/`meeting`/`decision`/`n_meetings`. Fully
+  recomputed from the BOT file only (never from the base's own value), so `--check` reproduces
+  byte-exact; absent input degrades gracefully to pull_macro's BIS reading (same pattern as every other
+  fold). The two `app.js` render sites now read the source label **off the data** (`srcShort(pr.source)`)
+  instead of hard-coding "BIS", so the chip/tile now read **BOT** and stay honest if the source ever
+  changes again. The live-board macro-feed caption and `macro_indicators.json`/`pull_macro.py` `meta.source`
+  were corrected to attribute the policy rate to BOT (household debt stays BIS — genuinely BIS).
+- **Why the headline number does not move.** BIS just republishes BOT's rate, so value/period/YoY are
+  **identical** (1.0% · 2026-06 · ▼0.75pp) — this is a provenance + freshness + trend-granularity
+  upgrade, not a number flip. What changes visibly: the source label BIS→BOT on the two chips, and a
+  correct meeting-level sparkline `[1.5,1.5,1.25,1.0,1.0,1.0]` (was the quarterly BIS `[1.25,1.0,…]`).
+- **Verified.** `build_macro_indicators.py --check` byte-exact (idempotent); `rederive_drift.py`
+  converged (only `regional_outlook.json` — a rollup that carries a now-BOT-labelled `policy_rate`
+  situation card, **not rendered** since the 2026-08-02 situation-section removal — and `provenance.json`
+  needed rebuilding); `bash tests/run.sh check` → **132 passed / 0 failed**, data-integrity **455/455**.
+  **Headless render self-review (Chromium):** `#overview` chip renders "▼0.75pp YoY · BOT 2026-06" and
+  `#home` tile "MEASURED BOT" (household-debt tile still "MEASURED BIS"), both with `data-errors="[]"`.
+- **Correction to the 2026-08-11 log's "next recommended integration."** That entry flagged
+  `platform/data/farmgate_prices.json` as a "built + gated but unconsumed dead duplicate" to retire. It
+  is **NOT dead** — `build_live_board.py` reads the `platform/data/` projection (line 47 `DATA=platform/
+  data`) to build the Live board's "Farm income" feed. Retiring it would break the board. Do not act on
+  that suggestion. (The check that missed it looked only for a page `fetch()`, not the live-board
+  pipeline consumer.)
+- **Behaviour/visual change (source label + sparkline) → opened as a PR**, not committed to master, per
+  the loop's own rule. Residual minor follow-up: `pull_macro.py` still sets `policy_rate` from BIS as a
+  fallback before the fold overrides it; harmless (the fold always wins when the BOT file is present, and
+  the gate would catch a BIS-only commit as drift), but a future refactor could have pull_macro skip the
+  BIS policy-rate fetch entirely.
+
 ## 2026-08-11 — Service/market loop (hygiene): remove 4 orphaned Overview macro loader/renderer pairs from `app.js` — dead since the 2026-08-02 server-side move to `macro_book`
 
 - **The gap fixed (`intel-drop-orphaned-overview-macro-loaders`).** On 2026-08-02 four Overview macro
