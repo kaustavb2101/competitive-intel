@@ -1764,6 +1764,12 @@ g:hover .cbars-b,g:hover .cdot{filter:brightness(1.25)}
    as a new section. */
 .fb-h4{font-size:12.5px;font-weight:600;color:var(--hi);letter-spacing:.2px;margin:16px 0 7px;
   display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+/* A long provenance .tag inside a collateral-book heading (e.g. the book-check heading's
+   "MEASURED · auction/retail listings × real loan tape") is wider than a phone line even on its
+   OWN row, and .tag is white-space:nowrap globally — so flex-wrap:wrap above drops it below the
+   title but it still bled past the box → sideways page scroll (PAGEX) at 390px. Let such a tag
+   wrap onto multiple lines on phones; desktop has ample room so it stays one line (no-op there). */
+@media(max-width:520px){.fb-h4 .tag{white-space:normal}}
 /* focus tier on a collateral row — the owner's stated core/secondary split, made visible so the
    reader does not have to remember which classes are the ones we actually lend against. */
 .cb-tier{font:600 9px var(--mono);text-transform:uppercase;letter-spacing:.5px;padding:1px 5px;
