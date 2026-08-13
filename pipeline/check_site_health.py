@@ -2540,9 +2540,14 @@ DATA_FILES = [
     #    drought read behind the province crop-stress verdict;
     #  - amphoe_crops (renderAmphoeCrops): MEASURED OAE planted area x that drought,
     #    naming the agri-PD exposure under the driest ground.
-    # (dbd_formation was deliberately NOT added: its client loader was retired
-    # 2026-08-02 — the data now flows server-side into macro_book and the page no
-    # longer fetches it, so a probe would assert a dependency the app dropped.)
+    # (dbd_formation is deliberately NOT probed here: its data flows server-side
+    # into macro_book — surfaced as national.new_biz_n, which _shape_macro_book
+    # already asserts — and its orphaned client loader/renderer were fully removed
+    # from app.js 2026-08-11, so the page no longer fetches it. Its siblings
+    # region_debt/sfi_credit remain probed above as committed macro_book INPUTS,
+    # not as live Overview reads — their client renderers were removed in the same
+    # sweep, but the committed files must still serve intact for the next
+    # build_macro_book rebuild.)
     ("data/vehicle_registry.json", _shape_vehicle_registry, "latest.groups (4 classes) + latest.title_base/all_vehicles (Overview collateral base, obj #1)"),
     ("data/drought_district.json", _shape_drought_district, ".districts (~928) with spei/cls + meta.counts (Overview district drought, obj #1)"),
     ("data/amphoe_crops.json", _shape_amphoe_crops, ".hotspots (crop x drought exposure w/ planted_rai+spei) (Overview agri-PD exposure, obj #1)"),

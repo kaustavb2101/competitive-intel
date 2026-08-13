@@ -51,6 +51,24 @@ from datetime import date
 ISO_VINTAGE_RE = re.compile(r"^(20\d\d)-(\d\d)(?:-(\d\d))?(?=$|[^\d])")
 STALE_DAYS = 180   # a dated layer this many days behind the freshest layer is flagged stale.
 
+# Layers whose committed vintage is CAPPED by an external source that publishes nothing newer —
+# they cannot be made fresher, so counting them in the "stale by neglect" alarm is a false positive
+# (a checker that cries wolf is worth less than no checker). They are still shown as the OLDEST dated
+# layer (transparent — it IS the oldest data we hold) and listed under freshness.upstream_capped WITH
+# the reason, so the exec sees "old because the source stops here", not "old because we forgot to pull".
+# Keyed on (file, EXACT vintage): the exemption applies ONLY while the committed vintage still equals
+# the known upstream-max, so the day a newer pull lands (the vintage string changes) the key no longer
+# matches and normal staleness re-arms automatically. NOT a blanket exempt — it self-corrects.
+# See docs/NEXT_STEPS.md §2 (settled 2026-08-04) + pipeline/pull_dlt_fuel.py for the recheck trigger.
+UPSTREAM_CAPPED = {
+    # DLT dataset_1_1_04 serves a single CSV — stt_car_fuel_at_25690228.csv = 28 Feb 2569 (2026-02-28),
+    # the newest COMPLETE fuel-type registered-stock file DLT publishes (verified via the gdcatalog
+    # CKAN, HTTP 200 from any IP). Re-pulling is byte-identical until a stt_car_fuel_at_2569MMDD.csv
+    # dated after 2569-02-28 lands. Both layers derive from that one file, so both cap on the same date.
+    ("vehicle_collateral.json", "2026-02-28"): "DLT dataset_1_1_04 newest complete vintage (28 Feb 2569); no newer CSV published upstream",
+    ("ev_penetration.json", "2026-02-28"): "DLT dataset_1_1_04 newest complete vintage (28 Feb 2569); no newer CSV published upstream",
+}
+
 
 def _parse_vintage(v):
     """Parse a strict ISO vintage string -> datetime.date, or None if not cleanly ISO."""
@@ -89,7 +107,22 @@ PROV_KEYS = ("label", "source", "provenance", "generated_by")
 VERDICT_KEYS = ("label", "source", "provenance", "objective", "title", "note",
                 "honesty_caveat", "generated_with")
 # markers that flip a stamped layer to ESTIMATED (uppercased substring match).
-EST_MARKERS = ("ESTIMATED", "PROXY", "SYNTH", "INFERRED", "EDITORIAL", "SIMULAT")
+# NOTE: the synthetic-data family is handled separately (see _affirmative_synthetic below),
+# NOT as a blunt "SYNTH" substring here. The fragment "SYNTH" false-matched the honest
+# MEASURED disclaimers several genuinely-measured layers carry ("no synthesis", "no
+# synthetic value is introduced"), mislabelling e.g. the MEASURED competitor census and the
+# MEASURED FPO SFI-credit series as ESTIMATED on the Data-room honesty card. Synthetic data
+# is still caught — but only when the layer AFFIRMATIVELY declares it (not when it declares
+# the opposite). Every genuinely-estimated layer also carries a strong marker below, so real
+# coverage is unchanged (verified: only self-declared-MEASURED layers reclassify).
+EST_MARKERS = ("ESTIMATED", "PROXY", "INFERRED", "EDITORIAL", "SIMULAT")
+
+# synthetic-data marker, negation-aware. "SYNTHETIC" / "SYNTHESIS" / "SYNTHESIZED" flip a
+# layer to ESTIMATED only when AFFIRMATIVE — i.e. the clause it sits in is not a measured
+# disclaimer negating it ("no synthesis", "no ... synthetic value", "without synthesis") and
+# does not itself assert MEASURED. Clause = a comma/semicolon/sentence-bounded fragment.
+_SYNTH_RE = re.compile(r"SYNTHE(?:TIC|SI[SZ]E?D?|SIS)")
+_NEG_CUES = ("NO ", "NO-", "NON-", "NON ", "NOT ", "NEVER ", "WITHOUT ")
 
 # per-province geometry basemap families (collapsed to one row each in the card).
 FAMILY_KINDS = ("catchment", "roads", "water", "places", "landuse", "rail")
@@ -137,6 +170,22 @@ def _stamp_meta(d):
     return None
 
 
+def _affirmative_synthetic(hay):
+    """True iff the (uppercased) text AFFIRMATIVELY declares synthetic data — i.e. a
+    'synthetic/synthesis/synthesized' occurrence in a clause that is not negating it and
+    does not assert MEASURED. Splits on sentence/semicolon/comma boundaries so a nearby
+    'no'/'without' that scopes the synthetic word is seen. This is what keeps the honest
+    disclaimer 'every point is a real coordinate; no synthesis' from reading as an estimate."""
+    for clause in re.split(r"[.;,]", hay):
+        if _SYNTH_RE.search(clause):
+            if "MEASURED" in clause:
+                continue
+            if any(cue in clause for cue in _NEG_CUES):
+                continue
+            return True
+    return False
+
+
 def _verdict_from_meta(m):
     """MEASURED / ESTIMATED from a stamped meta dict (repo convention: estimates are tagged)."""
     parts = []
@@ -146,6 +195,8 @@ def _verdict_from_meta(m):
             parts.append(v if isinstance(v, str) else json.dumps(v, ensure_ascii=False))
     hay = " ".join(parts).upper()
     if any(mk in hay for mk in EST_MARKERS):
+        return "estimated"
+    if _affirmative_synthetic(hay):
         return "estimated"
     return "measured"
 
@@ -420,7 +471,12 @@ def build():
             ({"file": L["file"], "vintage": L["vintage"], "age_days": (ref - dt).days}
              for dt, L in dated),
             key=lambda e: (e["age_days"], e["file"]))
-        stale = [e for e in entries if e["age_days"] > STALE_DAYS]
+        # A layer pinned to its source's newest-available vintage cannot be refreshed, so it must not
+        # trip the neglect alarm — exclude it from `stale` (keyed on the exact committed vintage, so a
+        # newer pull re-arms it). It stays eligible as `oldest` and is named in `upstream_capped`.
+        capped = [e for e in entries if (e["file"], e["vintage"]) in UPSTREAM_CAPPED]
+        stale = [e for e in entries
+                 if e["age_days"] > STALE_DAYS and (e["file"], e["vintage"]) not in UPSTREAM_CAPPED]
         freshness = {
             "reference_date": ref.isoformat(),
             "reference_note": ("age = days behind the freshest dated layer in the committed tree "
@@ -432,6 +488,11 @@ def build():
             "freshest": entries[0],
             "oldest": entries[-1],
             "stale": sorted(stale, key=lambda e: (-e["age_days"], e["file"])),
+            # Old because the upstream source stops here, NOT because a pull was missed. Excluded from
+            # `stale` above; surfaced here (with the reason) so the age is honest, not laundered away.
+            "upstream_capped": sorted(
+                ({**e, "reason": UPSTREAM_CAPPED[(e["file"], e["vintage"])]} for e in capped),
+                key=lambda e: (-e["age_days"], e["file"])),
         }
 
     n_files = sum(L["n_files"] for L in layers)
