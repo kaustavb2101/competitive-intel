@@ -1,12 +1,22 @@
 #!/usr/bin/env python3
 """
-build_opportunity_score.py — composite EXPANSION-OPPORTUNITY score per amphoe
-============================================================================
-Objective #2 (WHERE TO EXPAND). build_amphoe.py already scores demand /
-white-space / risk per district, and crop_stress.json scores agri stress per
-province, and competitors_national.json maps competitor branches nationwide.
-This layer FUSES them into a single, transparent, 0-100 composite that answers
-one question for the strategy team: "where do we open the next branch?"
+build_opportunity_score.py — composite per-amphoe demand × competitive-gap score
+================================================================================
+DORMANT — The network is CONSOLIDATING (not expanding), so this layer makes NO
+open / expand / where-to-open recommendation. The output
+(platform/data/opportunity_score.json) is still generated but is NOT surfaced by
+any page in the platform — its growth/opportunity leaderboard was dropped in the
+strategy pivot (see index.html, rayong-catchment.html, which keep it null). The
+script and file are kept for reversibility only; re-surface by wiring
+opportunity_score.json into app.js if the strategic direction ever changes. This
+mirrors build_expansion_plan.py's DORMANT treatment. See CLAUDE.md for context.
+--------------------------------------------------------------------------------
+What the composite measures (retained as an auditable district read, NOT a place-
+to-open call): build_amphoe.py already scores demand / white-space per district,
+crop_stress.json scores agri stress per province, and competitors_national.json
+maps competitor branches nationwide. This layer FUSES them into a single,
+transparent, 0-100 composite per district — underserved demand, refined by how
+undercompeted and how agriculturally stressed the district is.
 
 The score is an ESTIMATED COMPOSITE. It blends MEASURED signals (white-space
 from OSM footfall + AutoX saturation; competitor density by point-in-polygon)
@@ -224,11 +234,13 @@ def build():
 
     meta = {
         "generated_with": "pipeline/build_opportunity_score.py",
+        "status": "dormant — retained on disk for reversibility, not rendered by any page; the network is consolidating, so it makes no open/expand recommendation",
         "label": "ESTIMATED COMPOSITE — blends MEASURED white-space + competitor density "
-                 "with ESTIMATED province crop-stress. A ranking aid for branch expansion "
-                 "(objective #2), not a measured quantity. Every component is exposed per "
-                 "district for honesty.",
-        "objective": "Acquisition / where to expand — rank amphoe (districts) by expansion opportunity.",
+                 "with ESTIMATED province crop-stress. DORMANT: retained on disk but NOT "
+                 "surfaced by the app and NOT an expansion recommendation — the network is "
+                 "consolidating, so this makes no open/expand/where-to-open call. Every "
+                 "component is exposed per district for honesty.",
+        "objective": "DORMANT (retained, not surfaced) — a per-district composite of underserved demand, competitive gap and agri stress. Makes NO open/expand/where-to-open recommendation; the network is consolidating.",
         "n_districts": len(districts),
         "weights_full": WEIGHTS,
         "weights_effective": eff_weights,
@@ -270,6 +282,6 @@ def run(check=False):
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description="composite expansion-opportunity score per amphoe")
+    ap = argparse.ArgumentParser(description="DORMANT composite per-amphoe demand/competitive-gap score (retained, not surfaced; no expansion recommendation)")
     ap.add_argument("--check", action="store_true")
     raise SystemExit(run(check=ap.parse_args().check))

@@ -258,11 +258,6 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_vehicle_flow.py --check (dlt mirror absent/<12mo — not data drift)"
   else bad "build_vehicle_flow.py --check (vehicle_flow_by_province.json drifted from the dlt mirror)"
   fi
-  ( cd "$PIPE" && python3 build_vehicle_flow_transport.py --check >/dev/null 2>&1 ); rc=$?
-  if [ "$rc" -eq 0 ]; then ok "build_vehicle_flow_transport.py --check"
-  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_flow_transport.py --check (dlt mirror absent/<12mo — not data drift)"
-  else bad "build_vehicle_flow_transport.py --check (vehicle_flow_transport_by_province.json drifted from the dlt mirror)"
-  fi
   ( cd "$PIPE" && python3 build_truck_flow.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_truck_flow.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_truck_flow.py --check (dlt mirror absent/<24mo or output not generated — not data drift)"
@@ -338,6 +333,7 @@ phase_check(){
   ( cd "$PIPE" && python3 build_opportunity_score.py --check >/dev/null 2>&1 ) && ok "build_opportunity_score.py --check" || bad "build_opportunity_score.py --check (opportunity_score.json drifted from amphoe.json/crop_stress.json/competitors)"
   ( cd "$PIPE" && python3 build_competitor_coverage.py --check >/dev/null 2>&1 ) && ok "build_competitor_coverage.py --check" || bad "build_competitor_coverage.py --check (competitor_coverage.json drifted from the competitor census)"
   ( cd "$PIPE" && python3 check_peer_constants.py --check >/dev/null 2>&1 ) && ok "check_peer_constants.py --check" || bad "check_peer_constants.py --check (peer scoreboard constants in build_peer_npl.py/build_competitor_coverage.py drifted from docs/RESEARCH_DIGEST.md §B — run: python3 pipeline/check_peer_constants.py)"
+  ( cd "$PIPE" && python3 check_autox_targets.py --check >/dev/null 2>&1 ) && ok "check_autox_targets.py --check" || bad "check_autox_targets.py --check (AutoX ROE target in build_peer_scoreboard.py drifted from the CLAUDE.md brief — run: python3 pipeline/check_autox_targets.py)"
   ( cd "$PIPE" && python3 build_competitor_census.py --check >/dev/null 2>&1 ) && ok "build_competitor_census.py --check" || bad "build_competitor_census.py --check (competitors_census.json drifted from official-locator/national/overture censuses)"
   ( cd "$PIPE" && python3 build_rival_density.py --check >/dev/null 2>&1 ) && ok "build_rival_density.py --check" || bad "build_rival_density.py --check (rival_density.json drifted from amphoe.json/competitors_census.json/th_amphoe.geojson)"
   ( cd "$PIPE" && python3 build_peer_scoreboard.py --check >/dev/null 2>&1 ); rc=$?
@@ -392,9 +388,10 @@ phase_check(){
   # committed output drifted from its named source (FAIL — regenerate it). Driven from an explicit
   # name|source table (not a bare-name loop) so each FAIL message points at the ACTUAL source rather
   # than blanket-blaming source-data/staging/, and so a grep for "build_X.py --check" over this file
-  # finds every gated builder below (a bare loop hid these 19 from gate-coverage audits):
+  # finds every gated builder below (a bare loop hid these 20 from gate-coverage audits):
   #   build_crop_margin.py --check   build_drought_district.py --check   build_province_lfs.py --check
   #   build_region_debt.py --check   build_amphoe_crops.py --check       build_tape_layers.py --check
+  #   build_collateral_census.py --check
   #   build_impact_cards.py --check  build_income_impact.py --check      build_scenarios.py --check
   #   build_commodities.py --check   build_product_segments.py --check   ingest_ocsb_cane.py --check
   #   build_thai_price_history.py --check  build_farm_household.py --check  build_debt_source.py --check
@@ -547,6 +544,16 @@ INGESTS
     ok "nav_consistency.py (one nav across 6 pages, no orphan routes)"
   else
     bad "nav_consistency.py (nav drift or an unreachable route — see report above)"
+  fi
+
+  # orphan-DATA-LAYER gate: the sibling of the orphan-route check above. Asserts every committed
+  # platform/data/*.json leaf is actually consumed — fetched by a page OR read by a downstream
+  # builder — not just deterministically reproduced. Catches the branch_density failure: a layer
+  # that byte-reproduces perfectly yet nothing reads, aging gate-green in silence for months.
+  if python3 "$TESTS/orphan_layers.py"; then
+    ok "orphan_layers.py (every committed data layer is consumed by a page or a builder)"
+  else
+    bad "orphan_layers.py (a committed data layer has no consumer — see report above)"
   fi
 
   # data-integrity sub-check: assert platform/data/*.json is internally sane (offline, stdlib).

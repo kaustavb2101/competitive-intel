@@ -49,6 +49,13 @@ jobs:
         with:
           python-version: "3.11"          # match the determinism gate's Python
 
+      - name: Install numpy (so branch_peers rebuilds in rederive_drift + gates authoritatively)
+        # WITHOUT numpy, build_branch_peers.py --check exits SKIP (SystemExit 3); rederive_drift.py now
+        # fails LOUD on that (2026-08-13) instead of filing it as a benign absent input, so a stale
+        # branch_peers.json is caught here rather than surfacing as gate-red on master later (the
+        # recurring price/weather stale-merge). Pinned to match qa.yml's byte-exact --check.
+        run: pip install numpy==2.4.6
+
       - name: Install deps
         run: pip install --quiet shapely
 

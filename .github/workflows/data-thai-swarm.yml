@@ -1,0 +1,182 @@
+name: Data — Thai-IP-only swarm feeds (self-hosted, daily)
+
+# The five feeds `pull_swarm.py` fences off behind `--include-thai` have never once run on a
+# schedule. Nothing could run them: they are geoblocked from every datacenter IP, so the
+# ubuntu-latest runner that carries the rest of the swarm would only log a wall of skips. They have
+# only ever refreshed when Kaustav happened to run them by hand from the laptop — which is why
+# `rival_promos.json` and the NSO wage series aged in silence between sessions.
+#
+# This job is that gap closed. It runs on a self-hosted runner on a Bangkok box (GMO-Z.com,
+# AS135161) labelled `thai`, which is a Thai IP by both of the things that matter: the COUNTRY a
+# geo-block keys on, and the ASN a bot-management rule keys on.
+#
+# WHAT WAS ACTUALLY MEASURED FROM THAT BOX (2026-08-10, curl, browser UA, forced IPv4, 45s):
+#   data.go.th          200   <- the aggregator. Blocked from CI since this project started.
+#   tidlor.com          200   <- the only rival with a parseable promo listing, and the market leader.
+#   hengleasing.com     200   <- reachable, but it has no promo page worth parsing.
+#   sawad.co.th         000   <- no HTTP response at all, even on IPv4 with a 45s timeout.
+#   muangthaicap.com    000   <- same.
+#   dataforthai.com     403   <- answered and refused. A deliberate block; a Thai IP does not fix it.
+#   one2car.com/        403   <- Cloudflare bot check on the HTML, NOT geography. See below.
+#
+# So `rival_promos` runs here in a KNOWN-PARTIAL state: Tidlor lands, Sawad and MTC do not. That is
+# still strictly more than the zero it was getting. When either of those two starts answering, it
+# starts landing here with no change to this file.
+#
+# WHAT THIS RUNNER DOES *NOT* UNBLOCK — recorded so nobody re-litigates it. one2car returns 403 on
+# its HTML pages from this box exactly as it does from CI; only `robots.txt` (served off the CDN
+# edge with no inspection) comes back 200. That is bot management, not a geo-block, and no amount of
+# Thai IP addresses changes it. The marketplace harvests in `pull_collateral_census.py` stay an
+# owner-side laptop job.
+#
+# WHY `competitor_branches` IS NOT IN THE DEFAULT SET. It rebuilds the national competitor census
+# from the rivals' own store locators — and two of those four locators are unreachable today. A run
+# would write a census built from half the sources over a committed one built from all of them.
+# It stays available through the `feeds` dispatch input, to be run deliberately once Sawad and MTC
+# answer, never on a timer.
+#
+# WHY PYTHON 3.11 AND NOT THE BOX'S SYSTEM PYTHON. The pull steps do not care, but `rederive_drift`
+# rebuilds derived layers, and those are float outputs the determinism gate checks byte-exact under
+# cpython-3.11. Ubuntu ships 3.12; deriving on it produces last-digit drift that turns the PR red
+# for a reason that has nothing to do with the data. setup-python pins the gate's interpreter.
+#
+# Like every other data job here, this NEVER pushes to a working branch — it commits to a fresh
+# data/thai-<run_id> branch and opens a DRAFT PR for a human to read.
+
+on:
+  workflow_dispatch:
+    inputs:
+      feeds:
+        description: "Comma-separated pull_swarm keys (default: the daily safe set)"
+        required: false
+        default: "rival_promos,datagoth,nso_wages,pantip"
+  schedule:
+    # Daily, 19:20 UTC (= 02:20 Bangkok). Off-hour from the box's own load and from every other
+    # data cron in this repo, so a slow gov sweep never overlaps the collateral census at 03:40 UTC.
+    - cron: "20 19 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# One box, one job. A scheduled run and a hand-dispatched one landing together would have two
+# checkouts fighting over the same working tree and the same source-data files.
+concurrency:
+  group: thai-swarm
+  cancel-in-progress: false
+
+jobs:
+  pull:
+    runs-on: [self-hosted, thai]
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Install numpy (so branch_peers rebuilds in rederive_drift + gates authoritatively)
+        # WITHOUT numpy, build_branch_peers.py --check exits SKIP (SystemExit 3); rederive_drift.py now
+        # fails LOUD on that (2026-08-13) instead of filing it as a benign absent input, so a stale
+        # branch_peers.json is caught here rather than surfacing as gate-red on master later (the
+        # recurring price/weather stale-merge). Pinned to match qa.yml's byte-exact --check.
+        run: pip install numpy==2.4.6
+
+      - name: Install deps
+        run: pip install --quiet requests
+
+      - name: Confirm this runner really is on a Thai IP before pulling anything
+        run: |
+          # A self-hosted runner is a box someone can move, re-image or re-point. If the label says
+          # `thai` but the egress no longer is, every feed below fails one by one and the job reports
+          # five separate mysteries. Checking the one thing they all depend on turns that into a
+          # single legible failure at step 3.
+          CODE="$(curl -sL -4 -o /dev/null -w '%{http_code}' -m 30 \
+            -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36' \
+            https://data.go.th/ || echo 000)"
+          echo "data.go.th -> $CODE"
+          if [ "$CODE" != "200" ]; then
+            echo "::error title=Runner is not on a Thai IP::data.go.th returned $CODE, not 200. Every feed in this job is geoblocked from a non-Thai IP, so nothing below would have worked. Check the box's egress before re-running."
+            exit 1
+          fi
+
+      - name: Pull the Thai-IP-only feeds
+        id: swarm
+        env:
+          FEEDS: ${{ github.event.inputs.feeds || 'rival_promos,datagoth,nso_wages,pantip' }}
+        run: |
+          # pull_swarm exits 0 if AT LEAST ONE feed succeeded — a partial swarm is a success, which
+          # is exactly the state this job expects to live in while Sawad and MTC stay dark. It exits
+          # 1 only if every selected feed failed, and that IS worth failing the step for.
+          # --no-derive: the derive runs as its own step below so a pull failure and a derive
+          # failure are distinguishable in the log.
+          set +e
+          python pipeline/pull_swarm.py --include-thai --only "$FEEDS" --no-derive
+          rc=$?
+          set -e
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          if [ "$rc" -ne 0 ]; then
+            echo "::error title=Every Thai feed failed::pull_swarm.py exited $rc with no feed succeeding. Nothing was written."
+            exit "$rc"
+          fi
+
+      - name: Summarise what ran
+        id: summary
+        run: |
+          SUMMARY="$(python -c "import json;d=json.load(open('source-data/swarm_runs.json',encoding='utf-8'));r=d['runs'][-1];print('%d/%d succeeded (%d changed), %d failed, %d timed out, %d skipped' % (r['n_ok'], len(r['feeds']), r['n_changed'], r['n_failed'], r['n_timeout'], r['n_skipped']))")"
+          echo "$SUMMARY"
+          echo "summary=$SUMMARY" >> "$GITHUB_OUTPUT"
+
+      - name: Rebuild whatever these pulls made stale
+        run: |
+          # rival_promos feeds build_rival_pulse; the rest are inputs to layers discovered rather
+          # than named — rederive_drift iterates the gate's OWN --check set to a fixed point, so a
+          # hand-kept list here cannot go stale the way three earlier ones did.
+          python pipeline/build_rival_pulse.py
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
+
+      - name: Commit to a data branch + open a draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/thai-${{ github.run_id }}
+          SWARM_SUMMARY: ${{ steps.summary.outputs.summary }}
+        run: |
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # and never adds an untracked generated layer or a gitignored raw harvest.
+          git add -u source-data platform/data
+          if git diff --cached --quiet; then
+            echo "No net change vs committed layers. No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          git commit -m "data: Thai-IP-only swarm refresh (run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-thai-swarm.yml on the self-hosted Bangkok runner. $SWARM_SUMMARY"
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated daily refresh of the **Thai-IP-only** feeds (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "\`$SWARM_SUMMARY\`"
+            echo
+            echo "These five feeds are geoblocked from every datacenter IP and so had **never run on a"
+            echo "schedule** — they refreshed only when someone ran them by hand. This job runs them from"
+            echo "a Bangkok box."
+            echo
+            echo "**Known-partial by design:** \`rival_promos\` lands Tidlor. Sawad and Muangthai Capital"
+            echo "return no HTTP response at all from this runner (measured 2026-08-10), so their promo"
+            echo "items are absent, not zero. When either starts answering it lands here automatically."
+            echo
+            echo "All pulled values are **MEASURED** (each rival's own site, each department's own"
+            echo "catalog). The detractor themes downstream in \`rival_pulse.json\` remain **ESTIMATED** —"
+            echo "the Thai phrase lexicon is editorial and ships inside the file."
+            echo
+            echo "Run \`bash tests/run.sh check\` after merge."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: Thai-IP-only swarm refresh (run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md

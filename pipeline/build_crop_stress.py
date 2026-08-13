@@ -8,12 +8,30 @@ Network-free, deterministic. Joins three LOCAL source-data files:
   - branches_final.json    per-branch rain_3mo_anom (drought proxy) + prov/region
 
 PLUS one OPTIONAL measured upgrade (docs/DATA_ACQUISITION_PLAN.md P3):
-  - oae_farmgate_prices.json  MEASURED Thai farm-gate YoY per crop, landed by
-    pipeline/pull_oae_prices.py. When present AND current-vintage, its per-crop
-    YoY REPLACES the World Bank GLOBAL proxy for matching crops and the labels
-    flip to MEASURED-OAE for those crops (meta.price_sources says which). When
-    ABSENT (or stale — the BE-2562 crop_prices.json lesson), the output is
-    BYTE-IDENTICAL to the proxy-only build, so `--check` stays green either way.
+  - oae_farmgate_prices.json  MEASURED Thai farm-gate YoY per crop. When present
+    AND current-vintage, its per-crop YoY REPLACES the World Bank GLOBAL proxy
+    for matching crops and the labels flip to MEASURED-OAE for those crops
+    (meta.price_sources says which). When ABSENT (or stale — the BE-2562
+    crop_prices.json lesson), the output is BYTE-IDENTICAL to the proxy-only
+    build, so `--check` stays green either way.
+
+    THE PRODUCER OF THAT FILE WAS RETIRED 2026-08-11 and the file has never
+    existed. `pipeline/pull_oae_prices.py` + `.github/workflows/data-oae-prices.yml`
+    are gone; see docs/DATA_REFRESH_LOG.md for the full survey. Short version:
+    OAE's farm-gate series is NOT missing (three earlier cycles concluded it was)
+    — it is served by data.go.th's datastore, token-free, from a Thai IP. It is
+    simply worse than what already runs on every axis that matters: 2 of our 6
+    crops (rice, cassava), national-only, and it stops at CE 2025-08, which is
+    exactly the OAE_MAX_LAG_MONTHS guard below. farmgate_prices.json covers 8
+    crops and refreshes daily, and the preference chain overrides OAE with NABC
+    and then with farmgate anyway — so OAE could never have priced a published
+    number even on the day it landed.
+
+    THE READER BELOW DELIBERATELY STAYS. It costs nothing while the file is
+    absent, it is the honest documentation of the preference chain, and if OAE
+    ever resumes publishing, dropping the file in is the whole integration.
+    Do NOT "clean it up": editing the meta strings it emits changes float-output
+    bytes and turns the determinism gate red for no data reason at all.
 
 It computes, PER PROVINCE:
   crop_mix       dominant crops by planting-area share (top 3), with share + raw rai.
@@ -170,7 +188,11 @@ def _board_vintage_months(board):
 
 
 def load_oae(board):
-    """Load the OPTIONAL measured OAE farm-gate file (pull_oae_prices.py).
+    """Load the OPTIONAL measured OAE farm-gate file.
+
+    Its producer was retired 2026-08-11 (see the module docstring), so today this
+    always returns None and the build is the proxy/NABC/farmgate path. Kept as the
+    drop-in point if OAE ever resumes publishing a current, multi-crop series.
 
     Returns the parsed doc, or None when the file is absent, malformed, or
     STALE (more than OAE_MAX_LAG_MONTHS behind the commodity board's own

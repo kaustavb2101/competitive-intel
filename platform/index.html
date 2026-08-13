@@ -77,7 +77,7 @@
       <a href="data.html?branches" role="menuitem" title="All 2,015 branches in the data book — sort, filter and search every measured feature">Branches ↗</a>
       <a data-v="market" href="#market" role="menuitem" title="Per-province measured market numbers (factories, informal workforce, pickup stock, weakest crop price) + CSV">Market assessment</a>
       <a data-v="sim" href="#sim" role="menuitem" title="Client-side portfolio what-if — rate, price and drought levers">Simulator</a>
-      <a href="live.html" role="menuitem" title="Every live feed — freshness against each source's own cadence, plus the four with real stored history">Live board</a>
+      <a href="live.html" role="menuitem" title="Every live feed — freshness against each source's own cadence, plus the feeds that carry real stored history">Live board</a>
     </div>
   </div>
   <button id="printTab" class="no-print" title="Print or save this tab as PDF — summary + every supporting table, nothing collapsed"
@@ -509,6 +509,13 @@
          (point 19). Null-safe: absent file → the whole block hides itself. -->
     <div id="collat-book"></div>
 
+    <!-- BOOK APPRAISAL vs MEASURED MARKET RECOVERY (data/collateral_census.json, build_collateral_census.py).
+         Sits directly under the collateral book: that block says we lend N% of assessed value; this names the
+         specific collateral pools (class × age band) where our own book appraisal sits furthest ABOVE the
+         MEASURED auction price the title would actually recover into — the recovery-shortfall risk (obj #1).
+         Rendered by renderCollatBookCheck(); null-safe — absent layer → the whole block hides itself. -->
+    <div id="collat-bookcheck"></div>
+
     <!-- New-pickup inflow TREND (data/brand_trends.json, DLT first registrations) — the TIME dimension
          the diesel-share snapshot above lacks: how fast the future used-pickup collateral pool is
          being replenished at source. Obj #1, collateral outlook. Rendered by renderBrandTrends();
@@ -833,7 +840,7 @@
     <h3 class="compsub">Competitor coverage · how complete is our rival census?</h3>
     <p class="lead">Our competitor map is now a <b>MEASURED, near-complete</b> census: Muangthai, Srisawad and Tidlor are pulled
       from each operator's <b>official store-locator</b>, and <b>Heng now is too</b> (a province-walk of hengleasing.com) —
-      <b>16,503 real branches across all four brands</b>, no sampled layer left.
+      <b><span class="rivcensus-n">16,503</span> real branches across all four brands</b>, no sampled layer left.
       This panel shows <b style="color:var(--merch)">found</b> (locations we hold, measured) vs <b style="color:var(--gold)">expected</b>
       (each brand's publicly-reported branch count — <b>ESTIMATED-from-public-reports</b>, cited company IR).
       Coverage &gt;100% is expected — a locator lists every service point beyond the IR headline. Read it as a data-completeness flag, <b>not</b> market share.</p>
@@ -841,7 +848,7 @@
     <table class="tbl" id="compcovtbl"></table>
 
     <h3 class="compsub" style="margin-top:18px">Where rivals own ground · districts where AutoX is outnumbered <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
-    <p class="lead">The full official-locator census (16,503 rival branches) makes this concrete: the districts where the big-4
+    <p class="lead">The full official-locator census (<span class="rivcensus-n">16,503</span> rival branches) makes this concrete: the districts where the big-4
       out-station AutoX the most. Ranked by raw branch deficit — <b>defend or concede deliberately</b>. These are measured
       counts (point-in-district), not a proxy.</p>
     <div class="insight" id="rivdenreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
@@ -1248,7 +1255,7 @@
   <section class="view" id="v-branches">
     <h2 class="opp">Branches · all 2,015</h2>
     <p class="lead">All 2,015 AutoX branches — search, sort, and open any branch's 3D scene.</p>
-    <input class="search" id="search" type="search" aria-label="Search branches by name or province" placeholder="Search branch or province…">
+    <input class="search" id="search" type="search" aria-label="Search branches by name or province" placeholder="Search branch or province…" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
     <div class="chips" id="sortchips"></div>
     <table class="tbl" id="branches"></table>
   </section>
@@ -1256,7 +1263,7 @@
   <section class="view" id="v-provinces">
     <h2 class="opp">Provinces · 77 deep-dives</h2>
     <p class="lead">Tap a province for its 3D district deep-dive. <b>Fac/br</b> = DIW factories per AutoX branch — high with few branches = thin coverage of industrial demand.</p>
-    <input class="search" id="provsearch" type="search" aria-label="Search provinces (Thai or English)" placeholder="Search province (Thai or English)…">
+    <input class="search" id="provsearch" type="search" aria-label="Search provinces (Thai or English)" placeholder="Search province (Thai or English)…" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
     <div class="chips" id="provchips"></div>
     <table class="tbl" id="provtbl"></table>
   </section>
@@ -1264,7 +1271,7 @@
   <section class="view" id="v-market">
     <h2 class="risk">Market assessment · measured numbers</h2>
     <p class="lead">Real figures per province — no indices. Factory &amp; informal workforce (NSO/DIW), pickup-truck stock (DLT, the title-loan collateral), and the region's weakest crop price (World Bank). <span id="mktnote" class="sub"></span></p>
-    <input class="search" id="mktsearch" type="search" aria-label="Search provinces by name" placeholder="Search province…">
+    <input class="search" id="mktsearch" type="search" aria-label="Search provinces by name" placeholder="Search province…" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
     <div class="chips" id="mktchips"></div>
     <button id="mktcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
     <table class="tbl" id="mkttbl"></table>
