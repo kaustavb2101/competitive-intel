@@ -858,7 +858,7 @@ function renderBranchBrowse(){
     h+='<h1 class="db-h1">All branches — the network in numbers</h1>';
     h+='<p class="db-sub">Every one of the '+num(BR2.length)+' AutoX branches, with all measured features and the estimated lens scores. Sort any column, filter by region, search, or download. Click a branch for its full readout.</p>';
     h+='<div class="db-chiprow" id="brchips">'+regions.map(function(r){return '<button class="db-chip'+(r===brFilter?' on':'')+'" data-r="'+esc(r)+'">'+(r==='all'?'All 77':esc(r))+'</button>';}).join('')+'</div>';
-    h+='<input class="search" id="brsearch" type="search" aria-label="Search branches by name, province, or district" placeholder="Search branch / province / district…" style="margin-bottom:10px" value="'+esc(brQuery)+'">';
+    h+='<input class="search" id="brsearch" type="search" aria-label="Search branches by name, province, or district" placeholder="Search branch / province / district…" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" style="margin-bottom:10px" value="'+esc(brQuery)+'">';
     h+='<button class="db-chip" id="brcsv" style="margin:0 0 12px">⬇ Download CSV</button>';
     h+='<div class="db-tblwrap"><table class="db-tbl" id="brtbl"><thead><tr>';
     BRCOLS.forEach(function(c,ci){h+='<th data-c="'+ci+'" tabindex="0" role="button">'+esc(c.t)+'</th>';});
