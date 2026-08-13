@@ -3,7 +3,7 @@
   "generated_by": "pipeline/pull_swarm.py",
   "label": "Each row is one swarm run: which feeds were pulled concurrently, whether each one succeeded / changed its declared output file / failed / timed out / was skipped (exit 3, the repo-wide SKIP convention), plus the rc of the append_history.py and rederive_drift.py steps that followed. This file makes the pulse observable.",
   "max_runs": 60,
-  "n_runs": 4,
+  "n_runs": 5,
   "title": "pull_swarm.py run history -- the swarm's own audit trail"
  },
  "runs": [
@@ -514,6 +514,53 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-08-11T10:28:47Z"
+  },
+  {
+   "append_history_rc": null,
+   "feeds": [
+    {
+     "bytes_after": 15373,
+     "bytes_before": 15089,
+     "key": "rival_promos",
+     "rc": 0,
+     "seconds": 5.2,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 7294165,
+     "bytes_before": 5338821,
+     "key": "pantip",
+     "rc": 0,
+     "seconds": 311.1,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 5610,
+     "bytes_before": 0,
+     "key": "datagoth",
+     "rc": 0,
+     "seconds": 135.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 915005,
+     "bytes_before": 915005,
+     "key": "nso_wages",
+     "rc": 0,
+     "seconds": 0.9,
+     "status": "changed"
+    }
+   ],
+   "finished": "2026-08-11T20:13:53Z",
+   "include_thai": true,
+   "jobs": 6,
+   "n_changed": 4,
+   "n_failed": 0,
+   "n_ok": 4,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": null,
+   "started": "2026-08-11T20:08:42Z"
   }
  ]
 }
