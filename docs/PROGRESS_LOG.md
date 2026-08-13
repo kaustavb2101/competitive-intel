@@ -3,6 +3,29 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-13 — UX loop: mobile input hints on the four filter search boxes (`ux-search-input-mobile-hints`) — merged + deployed + verified
+
+- **Shipped (PR #391, squash-merged as `2cdd7be`).** The four filter-as-you-type search boxes —
+  `#search`/`#provsearch`/`#mktsearch` (index.html SPA) + `#brsearch` (data.html "All branches") — carried
+  **no mobile input-hint attributes**. On the exec's Thai handset, a search over branch/province proper
+  nouns and transliterations triggered iOS autocorrect (rewriting a partial name mid-type — which actively
+  **breaks a filter box**), first-letter auto-capitalization, a saved-value autocomplete dropdown over the
+  live results, and spellcheck squiggles. Added `autocomplete="off" autocorrect="off" autocapitalize="none"
+  spellcheck="false"` to all four, extending the existing `ssInput` scene-search house pattern. Attribute-only,
+  zero visual change.
+- **Safeguard protocol — all passed.** (a) `tests/run.sh check` **133 passed / 0 failed** (exit 0);
+  (b) headless renders of both changed pages at 390px mobile — attrs present in settled DOM, `data-errors="[]"`,
+  layout identical (PNG self-reviewed); (c) no secrets in the 3-file diff; (d) diff matches intent, no stray
+  files.
+- **Deploy-verified.** Master auto-deployed to Vercel; production alias `/` **HTTP 200**, `/data` **200**,
+  `/index.html` **200** (the raw `.html` paths 308-redirect via `cleanUrls`, expected). Confirmed the
+  `autocapitalize="none"` attribute is **live in the deployed index.html**. No regression → no rollback.
+- **Backlog.** `ux-search-input-mobile-hints` marked fixed in `docs/UXUI_AUDIT.md`. Remaining open items are
+  all explicitly deferred from unattended auto-merge (device-tested deck.gl pages: `ux-viewport-user-scalable-3dpages`,
+  `ux-navmore-3dpages-absolute-overflow`, `ux-navmore-keyboard-3dpages`; bigger-than-surgical: `ux-acquire-taxonomy-mandate`,
+  `ux-live-chart-mobile-viewbox-responsive`; test-infra: `qa-visual-baseline-stale`, `qa-visual-overflow-not-in-ci`,
+  `qa-live-not-in-overflow-audit-routes`).
+
 ## 2026-08-13 — Intelligence loop (service audit): source-data consumption audit — one benign dormant source layer (`bot_policy_rate`), and a documented "don't ship the source-orphan gate naively" landmine — recorded to master
 
 - **Context.** The prior entry (the orphan-DATA-LAYER gate) recommended as its next pass: "extend the same
