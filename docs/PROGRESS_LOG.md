@@ -3,7 +3,42 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
-## 2026-08-13 — Integration loop (provenance honesty / stop crying wolf): exempt upstream-frozen DLT layers from the Data-room "stale" alarm — shipped to master
+## 2026-08-13 — Intelligence loop (deployment health / pipeline integrity): close the `branch_peers` silent-stale-merge hole for good — root-cause guard + numpy across every rederive workflow — shipped to master
+
+- **The recurring bug.** `build_branch_peers.py` (objective #1 peer-twin outlier benchmark) hard-requires
+  numpy and `raise SystemExit(3)` ("SKIP: numpy not installed … a missing dependency, NOT data drift") when
+  it is absent. `pipeline/rederive_drift.py` — the shared safety net every data-pull workflow runs to
+  re-derive whatever its pull left stale (it iterates the gate's OWN `--check` set to a fixed point, no
+  hand-kept list) — filed that rc=3 under its **benign "an input is absent, not drift"** bucket and declared
+  convergence. So in any CI env without numpy, if a pull drifted a `branch_peers` input
+  (branches / branch_risk / household_risk — e.g. **data-gov-census** pulls DIW factories, a fingerprint
+  input), `branch_peers.json` was **never rebuilt**, auto-merged as "green", and only `qa.yml` (which pins
+  `numpy==2.4.6`) then caught the drift and turned **master red** on an unrelated later commit. This exact
+  stale-merge recurred **3×** to 2026-08-11 (git `1ef4563`); commit `79604af` had patched only the 4
+  price/weather workflows.
+- **The root-cause fix (`pipeline/rederive_drift.py`).** rederive now discriminates a rc=3 skip caused by a
+  missing **Python dependency** (keyed on the builder's OWN skip line — `DEP_MISSING_MARKERS =
+  ("numpy not installed",)`, no hand-kept list of numpy builders to go stale) from a genuine **absent data
+  input**. A dependency skip escalates to **UNRESOLVED → exit 1**, so any numpy-less rederive run fails
+  **LOUD and self-diagnosing** ("install numpy") instead of silently stale-merging. Verified against the real
+  numpy-absent sandbox: `--dry-run` now flags `build_branch_peers` UNRESOLVED (exit 1) touching no files,
+  while `build_branch_population` (numpy optional, graceful shapely fallback) and its cross-method skip and
+  genuine data-absent skips **all correctly stay benign**; `--selftest` (which `tests/run.sh` depends on)
+  unchanged (exit 0, 141 gated scripts parsed).
+- **The completion (11 workflows).** The guard makes numpy mandatory for any rederive run, so every workflow
+  that runs `rederive_drift.py` and lacked it now installs **`pip install numpy==2.4.6`** (pinned to
+  `qa.yml` for byte-exact `--check`): data-gov-census, data-macro, data-sfi-credit, data-search-demand,
+  data-imf-weo, data-set-peers, data-pico-census, data-social-listening, data-swarm, data-thai-swarm — and
+  **data-scenarios** was pinned from an unpinned `pip install numpy` (a distinct version-drift risk). Result:
+  every rederive workflow both rebuilds `branch_peers` authoritatively AND passes the new guard, so the hole
+  cannot silently reopen — a future rederive workflow that forgets numpy fails its own run immediately rather
+  than reddening master days later.
+- **Verify.** No `platform/data` file altered → no provenance regen needed. All 11 workflow YAMLs parse;
+  `rederive_drift.py` compiles; determinism gate **green** (`rederive_drift --selftest` is the only gate
+  touchpoint and is unaffected). Deploy-health re-verified up front: master production alias HTTP 200 on `/`,
+  `/app.js`, `/data/meta.json`, `/data/branches.json`; `site-health.yml` correctly targets the master alias.
+
+
 
 - **The gap fixed (`provenance-freshness-upstream-capped-false-stale`).** `build_provenance.py`'s
   freshness readout — rendered on the mandate-critical #home Data-room card (`app.js` `renderHomeDataRoom`,
