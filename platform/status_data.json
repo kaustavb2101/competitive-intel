@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-14T00:25:40+07:00",
-    "commit": "b7612ac"
+    "generated_at": "2026-08-13T20:33:39+00:00",
+    "commit": "ddc5665"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-14",
+    "eta_date": "2026-08-13",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -21,31 +21,32 @@
     {
       "name": "integration-improvement",
       "owns": "data · feature · deploy",
-      "cadence": "every 6h",
-      "schedule_utc": "00,06,12,18"
+      "cadence": "account-scheduled routine (no committed workflow)",
+      "status": "external"
     },
     {
       "name": "ux-improvement",
       "owns": "UX/UI",
-      "cadence": "every 6h",
-      "schedule_utc": "02,08,14,20"
+      "cadence": "account-scheduled routine (no committed workflow)",
+      "status": "external"
     },
     {
       "name": "intelligence",
       "owns": "market · service · peer · deploy-health",
-      "cadence": "every 6h",
-      "schedule_utc": "04,10,16,22"
+      "cadence": "account-scheduled routine (no committed workflow)",
+      "status": "external"
     },
     {
       "name": "committee-scout",
       "owns": "competitor census",
-      "cadence": "daily"
+      "cadence": "paused — on demand via workflow_dispatch",
+      "status": "paused"
     },
     {
       "name": "committee-planner",
       "owns": "this plan",
-      "cadence": "every 6h",
-      "schedule_utc": "03,09,15,21"
+      "cadence": "paused — on demand via workflow_dispatch",
+      "status": "paused"
     }
   ],
   "pillars": [
@@ -128,7 +129,7 @@
           "title": "Autonomous committee scout cron (gate-guarded auto-merge)",
           "state": "done",
           "priority": 2,
-          "evidence": ".github/workflows/committee-cycle.yml committed",
+          "evidence": ".github/workflows/committee-cycle.yml committed — cron PAUSED (on demand via workflow_dispatch)",
           "owner_side": false
         },
         {
@@ -141,10 +142,10 @@
         },
         {
           "id": "dep-planner-cron",
-          "title": "Autonomy planner cron (this loop, every 6h)",
+          "title": "Autonomy planner cron (this loop)",
           "state": "done",
           "priority": 1,
-          "evidence": ".github/workflows/committee-planner.yml + platform/status.html present",
+          "evidence": ".github/workflows/committee-planner.yml + platform/status.html present — cron PAUSED (on demand via workflow_dispatch)",
           "owner_side": false
         },
         {
@@ -532,6 +533,30 @@
   ],
   "activity": [
     {
+      "date": "2026-08-13T20:33:39+00:00",
+      "sha": "ddc5665",
+      "summary": "docs(progress): log ux-live-chart-aria-latest-value merge+deploy+verify (PR #394)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-14T03:30:21+07:00",
+      "sha": "3a2d065",
+      "summary": "ux: live.html trend-chart aria-labels announce latest value + direction (#394)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T18:50:25+00:00",
+      "sha": "d59cb4b",
+      "summary": "pipeline: retire dead redundant build_vehicle_flow_transport.py (superseded by build_truck_flow.py)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T17:28:10+00:00",
+      "sha": "f36040a",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the rivcensus live-bind ship",
+      "pillar": "data-integration"
+    },
+    {
       "date": "2026-08-14T00:25:40+07:00",
       "sha": "b7612ac",
       "summary": "intel(honesty): live-bind hardcoded \"16,503 rival branches\" census claims on #acq (#392)",
@@ -686,30 +711,6 @@
       "sha": "4e5e29d",
       "summary": "data: Google Trends brand share-of-search refresh (run 31338066795) (#355)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-12T04:27:18+00:00",
-      "sha": "34f31be",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the feed-liveness gasohol re-calibration ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-12T04:25:16+00:00",
-      "sha": "d0d2f63",
-      "summary": "fix(liveness): re-calibrate FROZEN test for step-flat retail fuel (fuel_gasohol95 false alarm)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-12T02:23:07+00:00",
-      "sha": "1f6a379",
-      "summary": "docs(progress): log the REOPENED th-scope sweep close (PR #381) merge+deploy+verify",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-12T09:18:58+07:00",
-      "sha": "557a25e",
-      "summary": "ux: scope=col on last 5 app.js tables (closes REOPENED th-scope sweep) (#381)",
-      "pillar": "uxui"
     }
   ]
 }

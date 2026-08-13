@@ -3,6 +3,38 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-14 — Intelligence loop (PLANNING): stop the CEO autonomy dashboard advertising cron cadences the repo does not run — recorded to master
+
+- **The defect (an honesty defect in the exec-facing dashboard).** `committee/plan_cycle.py` — whose own
+  docstring promises "NEVER fabricates progress: every state is derived from a concrete, committed signal
+  … a workflow is committed" — carried ONE hand-hardcoded block that broke that promise: `LOOPS` advertised
+  **five running autonomous loops with specific cron cadences** on `platform/status.html` + `AUTONOMY_PLAN.md`:
+  - `integration-improvement` / `ux-improvement` / `intelligence` — each shown "every 6h" at fixed UTC hours,
+    but **no `.github/workflows/*` file defines them at all** (they run as account-level scheduled routines —
+    nothing in the repo to verify a cadence against).
+  - `committee-scout` "daily" and `committee-planner` "every 6h" — both workflows exist but their `schedule:`
+    crons are **commented out, PAUSED 2026-07 (owner request)**; they now run on demand via `workflow_dispatch`.
+  So every scheduled-cadence claim on the dashboard was false. The two Deployment roadmap items compounded it,
+  presenting the paused crons as "✅ done … every 6h" with no paused caveat. For objective #2 the exec would
+  read the census as refreshing daily when the scout has been frozen since 2026-07 (the very pause the owner
+  set intentionally).
+- **The fix — derive the schedule, never assert it.** New `workflow_schedule(rel)` reads each committed
+  workflow and classifies its cron state honestly (line-based comment-strip, so a `# schedule:` block reads
+  as paused exactly as GitHub Actions treats it): **active** → the real UTC hours from the cron; **paused** →
+  "on demand via workflow_dispatch"; **absent** → no committed workflow. `LOOPS` became `LOOP_DEFS` + a
+  `build_loops()` projection: the three improvement loops now read "account-scheduled routine (no committed
+  workflow)", the two committee loops read "paused — on demand via workflow_dispatch". A companion `cron_note()`
+  appends the same derived state to the two `dep-*-cron` evidence strings. Unit-checked against a genuinely
+  active cron (`site-health.yml` → correctly "cron ACTIVE: 22 UTC") so paused-detection is not a false blanket.
+- **Zero app-code impact.** `platform/status.html` already renders `loops[].owns/cadence/schedule_utc` (optional)
+  and simply ignores the new `status` field — no HTML/JS changed, no new consumed field, no removed required
+  field, so the render path is provably unaffected (data-only string change). No `platform/data/*.json` changed,
+  so provenance/no-fabrication is untouched. Regenerating `status_data.json` + `AUTONOMY_PLAN.md` and committing
+  straight to master is the planner's own sanctioned flow (its workflow does exactly this, gate-guarded).
+- **Verify.** `python3 committee/plan_cycle.py && python3 committee/plan_cycle.py --check` byte-exact OK;
+  `bash tests/run.sh check` — **0 failed**; grep confirms no hardcoded UTC-hour cadence (`00,06,12,18` …)
+  remains in the script or either output.
+
 ## 2026-08-13 — Integration loop: retire the dead, redundant `build_vehicle_flow_transport.py` (superseded by `build_truck_flow.py`) — recorded to master
 
 - **The defect (a "built but never wired" dead layer, the branch_density shape).** A negative-space
