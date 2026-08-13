@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-13T04:27:41+00:00",
-    "commit": "51c0301"
+    "generated_at": "2026-08-13T08:38:12+00:00",
+    "commit": "69e78f1"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,30 @@
   ],
   "activity": [
     {
+      "date": "2026-08-13T08:38:12+00:00",
+      "sha": "69e78f1",
+      "summary": "docs(progress): log ux-casc-select-label-association merge+deploy+verify (PR #389)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T15:35:02+07:00",
+      "sha": "ce2c7ea",
+      "summary": "ux: associate cascading Region/Province/Branch select labels (a11y) (#389)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T06:52:05+00:00",
+      "sha": "e9a668a",
+      "summary": "test(gate): add orphan-DATA-LAYER check — assert every committed platform/data/*.json is consumed",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-13T04:28:22+00:00",
+      "sha": "890b740",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the branch_peers stale-merge fix ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-13T04:27:41+00:00",
       "sha": "51c0301",
       "summary": "ci(pipeline): close the branch_peers silent-stale-merge hole — rederive guard + numpy on every rederive workflow",
@@ -686,30 +710,6 @@
       "sha": "054391a",
       "summary": "ux: drop stale hardcoded feed counts from live.html share metadata (#377)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T18:40:00+00:00",
-      "sha": "1569666",
-      "summary": "provenance: mark dormant opportunity_score layer, drop branch-expansion framing",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-11T16:37:57+00:00",
-      "sha": "1822fce",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the AutoX ROE-target tripwire ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-11T16:35:31+00:00",
-      "sha": "cf14a1d",
-      "summary": "guard(peer): --check tripwire locking AutoX ROE-target reference line to CLAUDE.md",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-11T23:13:54+07:00",
-      "sha": "a569b2e",
-      "summary": "data: market-pulse swarm refresh (run 31482310893) (#372)",
-      "pillar": "market"
     }
   ]
 }

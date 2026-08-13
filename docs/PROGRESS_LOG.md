@@ -3,6 +3,42 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-13 — Intelligence loop (service audit): source-data consumption audit — one benign dormant source layer (`bot_policy_rate`), and a documented "don't ship the source-orphan gate naively" landmine — recorded to master
+
+- **Context.** The prior entry (the orphan-DATA-LAYER gate) recommended as its next pass: "extend the same
+  producer-aware consumption idea to `source-data/` inputs (assert every committed source layer feeds a
+  builder)." This run audited exactly that dimension and reports the honest result.
+- **Health re-verified green up front.** Master production alias **HTTP 200** on `/`, `/app.js`,
+  `/data/meta.json`; `build_provenance.py --check` byte-exact (**142 layers, 0 stale @180d, 0 unlabelled**;
+  only the KNOWN DLT-upstream-capped `vehicle_collateral`/`ev_penetration` at 164d); **0 broken data refs**
+  (all **107** live `data/*.json` reads across `app.js`+`*.html` resolve); `site-health.yml` targets the
+  master alias; peer board re-confirmed honest (Srisawad 457% `found`-vs-IR is correctly caveated as
+  store-locator group footprint, not a mislabel).
+- **Finding #1 — the source-orphan gate is UNSAFE to ship naively (a warning, not a gate).** A
+  `platform/data` leaf is only ever WRITTEN by its builder, which is why `orphan_layers.py` works there.
+  But a `source-data` layer is READ by pipeline builders that ALSO write their own JSON, so a
+  write-sink→producer heuristic misclassifies genuine consumers (e.g. `build_amphoe.py` reading
+  `vehicles_by_province.json`, 13 refs) as the layer's producer and false-positives **63/76**. A correct
+  source-consumption gate needs real open-then-parse dataflow, not same-file co-occurrence — recorded so a
+  future run doesn't ship a broken red gate.
+- **Finding #2 — one genuinely-dormant source layer, hand-verified, benign.**
+  `source-data/bot_policy_rate.json` is referenced by nothing but its own puller
+  `pull_bot_policy_rate.py` (in no workflow); every other low-ref candidate traced to a real consumer. It is
+  **not a defect**: the app's live `policy_rate` (Overview macro card + `regional_outlook`) sources the SAME
+  MEASURED value **1.0% (2026-06)** from BIS via `pull_macro.py`, verified identical to the BoT-native latest
+  MPC decision in the dormant file (meeting `3/2569`, 2026-06-24, Hold, `rate 1.0`). It is a richer dormant
+  *reference* (203-decision MPC history); wiring it into `build_macro_indicators.py` would change only the
+  source label (`BIS`→`BoT MPC`) for zero numeric gain at real gate + rendered-card risk → **correctly NOT
+  done** in an unattended run. Recorded so future negative-space runs don't re-investigate it.
+- **Outcome + verify.** No concrete data/deploy/consistency defect — a fully-healthy tree. Deliverable is the
+  recorded audit dimension (`docs/SERVICE_AUDIT.md` 2026-08-13 entry) + `plan_cycle.py` dashboard refresh.
+  Docs-only — no `platform/data`/pipeline file altered → determinism gate **133 passed · 0 failed**,
+  byte-unchanged, no provenance regen, no PR/headless render needed. Committed straight to master per the
+  loop safeguard (gate green; no secrets; diff = intent; provenance/no-fabrication intact).
+- **Next recommended task.** A UX/render-polish pass (owned by the ux loop) or a correct open-then-parse
+  `source-data` consumption auditor (per Finding #1) if a future run wants to make source dormancy a gate.
+  The substantive DATA unlocks remain owner-side (Thai-IP pulls) or secret-gated (GISTDA 40m).
+
 ## 2026-08-13 — Intelligence loop (pipeline integrity): new orphan-DATA-LAYER gate — assert every committed `platform/data/*.json` is actually consumed, not just deterministic — shipped to master
 
 - **The gap.** A negative-space audit confirmed the CI-doable DATA backlog is genuinely exhausted (the
