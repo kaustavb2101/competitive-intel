@@ -3092,6 +3092,13 @@ function drawCompCoverage(){
     if(ro) ro.innerHTML='<b>Competitor coverage not yet computed.</b> <span class="sub">This layer is being prepared — it fills in once the competitor census refresh lands.</span>';
     return;
   }
+  // Keep the hand-written census-size copy honest against the live data: the two static "16,503
+  // rival branches" spans (class rivcensus-n) are the ONE measured total that grows/shrinks every
+  // time the scout re-pulls, so pin them to the census total we just loaded (meta.totals.found, or
+  // the brand-found sum as a fallback) instead of a frozen literal. If the count is absent/zero we
+  // leave the static fallback untouched. Same source the readout below already reports (t.found).
+  const censusTot=((COMPCOV.meta&&COMPCOV.meta.totals&&COMPCOV.meta.totals.found)||rows.reduce((s,b)=>s+(b.found||0),0))|0;
+  if(censusTot>0){ document.querySelectorAll('.rivcensus-n').forEach(el=>{ el.textContent=censusTot.toLocaleString(); }); }
   // sort by coverage_pct desc (nulls last) so the best-covered brand leads.
   const list=rows.slice().sort((a,b)=>((b.coverage_pct==null?-1:b.coverage_pct)-(a.coverage_pct==null?-1:a.coverage_pct)));
   tbl.innerHTML=`<tr><th scope="col">Brand</th>`+
