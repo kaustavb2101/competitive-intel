@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-13T08:38:12+00:00",
-    "commit": "69e78f1"
+    "generated_at": "2026-08-14T00:25:40+07:00",
+    "commit": "b7612ac"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-13",
+    "eta_date": "2026-08-14",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -532,6 +532,30 @@
   ],
   "activity": [
     {
+      "date": "2026-08-14T00:25:40+07:00",
+      "sha": "b7612ac",
+      "summary": "intel(honesty): live-bind hardcoded \"16,503 rival branches\" census claims on #acq (#392)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-13T14:59:36+00:00",
+      "sha": "437a21d",
+      "summary": "docs(progress): log ux-search-input-mobile-hints merge+deploy+verify (PR #391)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T21:56:26+07:00",
+      "sha": "2cdd7be",
+      "summary": "ux: mobile input hints on filter search boxes (autocorrect/autocapitalize off) (#391)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T10:30:14+00:00",
+      "sha": "f187b6e",
+      "summary": "intel(service): source-data consumption audit — one benign dormant layer (bot_policy_rate), source-orphan-gate landmine documented",
+      "pillar": "data-integration"
+    },
+    {
       "date": "2026-08-13T08:38:12+00:00",
       "sha": "69e78f1",
       "summary": "docs(progress): log ux-casc-select-label-association merge+deploy+verify (PR #389)",
@@ -685,30 +709,6 @@
       "date": "2026-08-12T09:18:58+07:00",
       "sha": "557a25e",
       "summary": "ux: scope=col on last 5 app.js tables (closes REOPENED th-scope sweep) (#381)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T22:48:59+00:00",
-      "sha": "402acec",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the orphaned-loader cleanup ship (#379)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-12T05:45:49+07:00",
-      "sha": "e47f775",
-      "summary": "chore(app): remove 4 orphaned Overview macro loader/renderer pairs (dead since 2026-08-02 macro_book move) (#379)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T20:25:32+00:00",
-      "sha": "626eeba",
-      "summary": "docs: log ux-live-meta-stale-feed-counts merge + Vercel deploy-verify (PR #377)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-12T03:22:48+07:00",
-      "sha": "054391a",
-      "summary": "ux: drop stale hardcoded feed counts from live.html share metadata (#377)",
       "pillar": "uxui"
     }
   ]
