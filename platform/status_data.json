@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-13T00:00:26+07:00",
-    "commit": "7af5b01"
+    "generated_at": "2026-08-13T04:27:41+00:00",
+    "commit": "51c0301"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,36 @@
   ],
   "activity": [
     {
+      "date": "2026-08-13T04:27:41+00:00",
+      "sha": "51c0301",
+      "summary": "ci(pipeline): close the branch_peers silent-stale-merge hole — rederive guard + numpy on every rederive workflow",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-13T04:06:34+00:00",
+      "sha": "ff5962d",
+      "summary": "intel(provenance): exempt upstream-frozen DLT layers from the Data-room \"stale\" alarm",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-13T03:35:56+00:00",
+      "sha": "c592f65",
+      "summary": "docs(progress): log ux-navmore-keyboard-secondary-pages merge+deploy+verify (PR #388)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T10:33:01+07:00",
+      "sha": "365d3b9",
+      "summary": "ux: keyboard-navigable Explore ▾ menu on live/data/status pages (#388)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-12T17:03:36+00:00",
+      "sha": "b442c3a",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the provenance SYNTH-false-positive fix",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-13T00:00:26+07:00",
       "sha": "7af5b01",
       "summary": "intel(provenance): stop \"SYNTH\" substring mislabelling 4 MEASURED layers as ESTIMATED (#386)",
@@ -679,36 +709,6 @@
       "date": "2026-08-11T23:13:54+07:00",
       "sha": "a569b2e",
       "summary": "data: market-pulse swarm refresh (run 31482310893) (#372)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-11T14:47:38+00:00",
-      "sha": "f5f134e",
-      "summary": "docs: log ux-table-scope-cropwatch-farmbook merge + Vercel deploy-limit block",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T21:42:31+07:00",
-      "sha": "7c3dc00",
-      "summary": "ux: scope=col on the crop-watch + farm-book tables (a11y, WCAG 1.3.1) (#375)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T21:36:34+07:00",
-      "sha": "79604af",
-      "summary": "ci(fix): install numpy in the 4 data-price auto-merge workflows so branch_peers can't silently stale-merge (#373)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-11T21:11:06+07:00",
-      "sha": "ec0a09d",
-      "summary": "ci: move QA to a self-hosted Bangkok runner, and schedule the Thai-IP-only feeds (#352)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-11T21:10:45+07:00",
-      "sha": "2b12e0a",
-      "summary": "feat(overview): wire the MEASURED book-vs-market collateral-recovery read into the collateral section (#363)",
       "pillar": "market"
     }
   ]
