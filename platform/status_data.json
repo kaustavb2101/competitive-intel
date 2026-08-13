@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-13T20:33:39+00:00",
-    "commit": "ddc5665"
+    "generated_at": "2026-08-13T22:36:58+00:00",
+    "commit": "8ddab4e"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,12 @@
   ],
   "activity": [
     {
+      "date": "2026-08-13T22:36:58+00:00",
+      "sha": "8ddab4e",
+      "summary": "intel(planning): derive autonomy-loop schedules from committed workflow state, stop dashboard advertising crons the repo doesn't run",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-08-13T20:33:39+00:00",
       "sha": "ddc5665",
       "summary": "docs(progress): log ux-live-chart-aria-latest-value merge+deploy+verify (PR #394)",
@@ -705,12 +711,6 @@
       "sha": "bcb6149",
       "summary": "data: retire the OAE farm-gate price feed — the series is reachable, it just loses (#376)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-12T14:10:13+07:00",
-      "sha": "4e5e29d",
-      "summary": "data: Google Trends brand share-of-search refresh (run 31338066795) (#355)",
-      "pillar": "market"
     }
   ]
 }
