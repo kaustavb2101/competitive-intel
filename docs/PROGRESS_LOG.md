@@ -3,6 +3,42 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-13 — Intelligence loop (pipeline integrity): new orphan-DATA-LAYER gate — assert every committed `platform/data/*.json` is actually consumed, not just deterministic — shipped to master
+
+- **The gap.** A negative-space audit confirmed the CI-doable DATA backlog is genuinely exhausted (the
+  remaining unlocks — `baac_credit`/`smebank_credit` distillation, the MTC competitor undercount,
+  GISTDA 40m crop-area — are all Thai-IP/owner-side or need a secret this session lacks; PICO + cropland
+  + DBD-formation are all already distilled and wired). It surfaced instead a structural hole **in the
+  test harness**: the gate has an orphan-*route* check (`nav_consistency.py`) and an orphan-*amphoe*
+  check (`validate_data.py`), but **nothing asserts every committed `platform/data/*.json` leaf is
+  actually consumed** — fetched by a page OR read by a downstream builder. This is the exact failure that
+  left `build_branch_density.py`'s output dead and gate-green in silence from 2026-07-02: the determinism
+  gate only asks "does this file byte-reproduce?", never "does anything USE it?". A layer can be perfectly
+  deterministic and completely dead.
+- **What shipped (`tests/orphan_layers.py`, wired into `tests/run.sh` `check` phase).** A new offline,
+  stdlib-only checker (exit 0/1, mirroring `nav_consistency.py`). For each top-level `platform/data/*.json`
+  it asserts consumption: the base name (whole-token) appears in `platform/app.js`/`*.html` (page fetch via
+  `tmliFetch('X')`, no literal `.json` suffix — why a naïve filename grep false-positives), OR in a
+  `pipeline/*.py` that is **not** the script writing it. **Producer detection is structural** — it ties the
+  `"X.json"` literal to an `open(..,'w')` / `.write_text` / `json.dump` sink — so a layer referenced ONLY by
+  its own writer (the branch_density shape) is flagged, while a hand-authored INPUT read by a single builder
+  (`provenance_sidecar.json`, read by `build_provenance.py`) is correctly seen as consumed. Producer
+  detection **fails open** (a missed writer reads as consumption → a missed orphan, never a false RED gate).
+  Excludes the slug-loaded geometry families (`*_catchment/_places/_roads/_water/_landuse.json`, loaded by
+  dynamic `?city=<slug>` URLs, so no per-file literal exists to test) and carries an empty, reasoned `ALLOW`
+  allowlist for future deliberate exceptions (LEGACY_ROUTES-style).
+- **Verify.** Validated three ways before wiring: clean tree → exit 0 (135 layers checked, 0 orphans, 312
+  family-excluded); an injected dead `platform/data/*.json` → exit 1 (caught); an injected layer + a builder
+  that references it → exit 0 (consumed). Full determinism gate `bash tests/run.sh check` → **133 passed, 0
+  failed** (was 132; the new check is the +1), data integrity **455/455**. No `platform/data` file touched →
+  no `build_provenance.py` regen needed; no app/behaviour/visual change → committed straight to master per
+  the loop safeguard.
+- **Next recommended integration.** The three orphan checks (route / amphoe / data-layer) now close the
+  "built but never surfaced" hole from all angles. Remaining CI-doable work is UX/render polish or
+  provenance-honesty extensions; the substantive DATA unlocks are all owner-side (Thai-IP pulls) or
+  secret-gated (GISTDA 40m). A good next pass: a headless-render UX item, or extend the same producer-aware
+  consumption idea to `source-data/` inputs (assert every committed source layer feeds a builder).
+
 ## 2026-08-13 — Intelligence loop (deployment health / pipeline integrity): close the `branch_peers` silent-stale-merge hole for good — root-cause guard + numpy across every rederive workflow — shipped to master
 
 - **The recurring bug.** `build_branch_peers.py` (objective #1 peer-twin outlier benchmark) hard-requires
