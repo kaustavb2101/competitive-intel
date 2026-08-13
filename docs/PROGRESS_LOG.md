@@ -3,6 +3,51 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-13 — Integration loop: retire the dead, redundant `build_vehicle_flow_transport.py` (superseded by `build_truck_flow.py`) — recorded to master
+
+- **The defect (a "built but never wired" dead layer, the branch_density shape).** A negative-space
+  sweep surfaced `pipeline/build_vehicle_flow_transport.py` → `source-data/vehicle_flow_transport_by_province.json`:
+  a MEASURED objective-#1 layer (commercial truck/bus vehicle-collateral registration/cessation flow)
+  that was **gated byte-exact every run but consumed by NOTHING** — no page fetched it, no downstream
+  builder read it (verified: its only references were the builder itself, its output, and the `run.sh`
+  `--check` block; no imports, no workflow, no docs). It distills the **exact same** DLT
+  `dataset_stat_1_009` (การดำเนินการทางทะเบียน, land-transport-law truck/bus registration actions) that
+  `build_truck_flow.py` already distills into the **live, app-consumed** `platform/data/truck_flow.json`.
+  So it was a redundant second distillation of one dataset, the truck signal already reaching the app via
+  its sibling, and (by its own docstring) buses "none individually is collateral-central to a title-loan
+  book". It burned a `--check` per gate run and carried maintenance weight for zero delivered signal.
+- **Decision — retire, don't wire.** Surfacing it would have been *duplicate* surfacing (a second
+  truck-flow readout from the identical data), which is worse, not better; the collateral-central truck
+  pulse is already live via `build_truck_flow.py` (and the car-law sibling via `build_collateral_flow.py`).
+  Retiring matches the codebase's established pattern for superseded dead builders (RETIRED 2026-07-31
+  `ingest_loan_tape.py`→`loan_tape_derived.json`; the `rayong-province.html` stub). `git rm`'d the builder
+  + its committed output; removed the `run.sh` gate block and the `refresh_all.sh` line. Both files stay
+  in git history → fully reversible.
+- **Zero app impact.** The removed layer fed nothing the app renders, so no `platform/data` file changed,
+  no visual/behaviour changed, and `build_provenance.py --check` byte-reproduces unchanged. Committed
+  straight to master per the loop safeguard (gate green; no visual change; no secrets; diff = intent).
+- **Verify.** `bash tests/run.sh check` re-run after the removal — **0 failed** (one fewer `--check`,
+  provenance byte-exact); `bash -n` clean on both edited shell scripts; comprehensive grep confirms no
+  dangling reference to the builder or its output anywhere in the tree.
+- **Next recommended integration (teed up, owner-review).** The highest-value *open* data item is to adopt
+  the **CI-refreshed DIW/DLT census** into the app's factory/vehicle layers: `source-data/factory_census_national.json`
+  (914 districts, +capital/HP) and `source-data/vehicle_census_province.json` (77 provinces, moto/car/pickup
+  split) are committed **weekly** by `.github/workflows/data-gov-census.yml` from a CI-reachable department
+  CKAN, yet are consumed by nothing — while the app's live `factories_by_district.json` / `vehicles_by_province.json`
+  are frozen on the **CI-blocked** data.go.th aggregator (Thai-IP-only). A `--check`-gated
+  `build_gov_census.py` projecting census→live-schema would refresh the whole factory/vehicle fan-out from
+  CI. Deferred here because the blast radius is ~90 committed files (all 77 province files, amphoe,
+  collateral_outlook, vehicle_*, peer_province, branch_labor, pico_district) with hundreds of shifting
+  numbers and app visuals — a **PR for owner review**, not an unattended direct commit; the byte-exact gate
+  proves reproducibility, not that a subtle field/coverage remap didn't silently degrade a signal.
+- **Also recorded (a landmine, do not re-attempt naively).** A static source-data consumption *gate* (the
+  sibling of `tests/orphan_layers.py` for `platform/data`) remains **not cleanly buildable** — re-confirmed
+  this run with named evidence. Even with correct write-sink producer detection, scripts that BOTH refresh
+  (`--pull`/rederive, `open(SRC,'w')`) AND consume (build-mode read via a variable) the same source file get
+  misclassified as producer-only → false positives: `build_debt_source.py`/`nso_debt_by_source.json` and
+  `ingest_ocsb_cane.py`/`ocsb_canearea.csv` both feed live outputs yet flag as dead. A correct gate needs
+  real open-then-parse dataflow, not co-occurrence. Left as a report-only investigation, not shipped.
+
 ## 2026-08-13 — UX loop: mobile input hints on the four filter search boxes (`ux-search-input-mobile-hints`) — merged + deployed + verified
 
 - **Shipped (PR #391, squash-merged as `2cdd7be`).** The four filter-as-you-type search boxes —
