@@ -3,6 +3,32 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-13 — UX loop: keyboard-navigable "Explore ▾" menu on the non-3D secondary pages (PR #388, merged + deployed + verified)
+
+- **Finding (`ux-navmore-keyboard-secondary-pages`, WCAG 2.1.1 Keyboard / 2.4.3 Focus Order).** All top-7
+  backlog findings and the whole `ux-table-scope` sweep are already closed, so this run reviewed a route
+  (`live.html`) directly and surfaced a real inconsistency: `ux-nav-more-keyboard` (2026-07-17) gave
+  **index.html**'s "Explore ▾" nav dropdown the full menu-button keyboard pattern (ArrowDown/Up open into
+  the menu, Arrow/Home/End roam, Escape/Tab close and restore focus to the trigger) — but that was never
+  propagated to the secondary pages, which each carry a byte-identical *copy* of only the click+Escape
+  subset. The same re-parented-to-`<body>` `role="menu"` widget (7 `role="menuitem"` links) was
+  keyboard-roamable on the front door but not elsewhere: a keyboard user could open it yet couldn't arrow
+  between items, focus never moved into the menu on open, Escape didn't restore focus, and tabbing off the
+  button skipped its items straight to the page body.
+- **What shipped.** Ported index.html's keyboard block **verbatim** to the three **non-3D** secondary
+  pages that share the identical script — `live.html`, `data.html`, `status.html` — **without** index's
+  `place()` positioning logic (index-specific; these pages position via styles.css and were left
+  untouched). Purely additive keyboard handling → zero visual change, no positioning change. The three
+  deck.gl pages (`province`/`rayong-catchment`/`branch-explorer`) carry the same simple script but style
+  the menu `position:absolute` in inline CSS and mount a WebGL canvas whose gestures aren't
+  headless-verifiable, so they were left for a device-tested run (tracked as `ux-navmore-keyboard-3dpages`).
+- **Safeguard + ship.** `bash tests/run.sh check` → **132 passed, 0 failed**; headless renders of all three
+  edited pages clean (`data-errors="[]"`, no visual regression, data.html PNG self-reviewed — nav intact);
+  no secrets, diff = 3 platform pages + audit-doc entry. Squash-merged own PR **#388** → master.
+  Vercel auto-deploy verified: `/`, `/live`, `/data`, `/status` all **HTTP 200** on the production alias;
+  no rollback needed. (Cleanup note: the git proxy refused the post-merge branch-delete push — merged
+  branch `claude/ux-loop-20260813-0319` lingers on origin, harmless.)
+
 ## 2026-08-12 — Intelligence loop (provenance honesty): fix `"SYNTH"` substring false-positive that mislabelled 4 MEASURED layers as ESTIMATED on the #home Data-room card
 
 - **The bug (`provenance-synth-false-positive`).** `pipeline/build_provenance.py` decided each layer's
