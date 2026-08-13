@@ -3,6 +3,54 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-13 — Integration loop (provenance honesty / stop crying wolf): exempt upstream-frozen DLT layers from the Data-room "stale" alarm — shipped to master
+
+- **The gap fixed (`provenance-freshness-upstream-capped-false-stale`).** `build_provenance.py`'s
+  freshness readout — rendered on the mandate-critical #home Data-room card (`app.js` `renderHomeDataRoom`,
+  "N of M dated layers >180d stale") — measures each layer's age as *days behind the freshest committed
+  layer* and flags anything past `STALE_DAYS=180` as **stale**. The two DLT collateral layers
+  `vehicle_collateral.json` + `ev_penetration.json` (objective #1 — collateral depreciation / EV-erosion
+  on the title book) both sit at vintage **2026-02-28** = 164 days behind, and they are the platform's
+  `freshness.oldest`. That 2026-02-28 is **DLT's newest COMPLETE vintage, not neglect**: `dataset_1_1_04`
+  serves a single CSV `stt_car_fuel_at_25690228.csv` and publishes nothing newer (re-verified this run via
+  the gdcatalog CKAN — HTTP 200, still only the 28-Feb file; settled note NEXT_STEPS §2, 2026-08-04). At
+  164d they clear the 180d bar **today**, but the freshest layer advances every week — the moment any layer
+  passes ~2026-08-27 both DLT layers cross 180d and turn **red as "stale"** on the exec honesty card: a
+  guaranteed false "neglected data" alarm on two MEASURED layers that literally cannot be refreshed. This
+  session it already mis-fired once: an integration-gap audit spent a full agent run re-picking "refresh the
+  164-day DLT layers" off `freshness.oldest` before the settled note stopped it — the exact wasted
+  re-investigation the alarm's cry-wolf failure produces.
+- **What shipped — EXEMPT the neglect alarm only, keyed on the exact vintage so it self-re-arms (no check
+  weakened).** Added an `UPSTREAM_CAPPED` registry to `build_provenance.py` keyed on `(file, exact vintage)`:
+  `(vehicle_collateral.json, 2026-02-28)` and `(ev_penetration.json, 2026-02-28)`, each carrying the reason
+  ("DLT dataset_1_1_04 newest complete vintage; no newer CSV published upstream"). The freshness stage now
+  (a) **excludes** capped layers from `stale` — they can't be made fresher, so counting them in a neglect
+  signal is a false positive (a checker that cries wolf is worth less than no checker); (b) still shows them
+  as `oldest` — transparent, it *is* the oldest data we hold; and (c) lists them under a new
+  `freshness.upstream_capped` array **with the reason**, so the age is explained ("old because the source
+  stops here"), not laundered away. Keying on the **exact committed vintage** is the safeguard: the day DLT
+  publishes a newer CSV and a fresh pull changes the vintage string, the key no longer matches and normal
+  staleness re-arms automatically — this is NOT a blanket exempt (unlike a bare allowlist), it self-corrects.
+  Any *other* layer that genuinely falls behind still flags.
+- **Verify.** Regenerated `platform/data/provenance.json`: `build_provenance.py --check` reproduces
+  byte-exact; the ONLY delta vs base is the added `freshness.upstream_capped` key (verified structurally —
+  every other top-level key and all of `freshness` identical after removing it), so counts are unchanged
+  (83 measured / 59 estimated / 0 unlabelled) and `stale` stays `[]`. Determinism gate
+  `bash tests/run.sh check` → **132 passed · 0 failed**, data integrity **455/455**;
+  `check_site_health.py --local ../platform` → **236/236** (the Data-room render contract holds). `app.js`
+  is **untouched** — it reads `fr.stale`/`fr.oldest`/`fr.freshest` dynamically and ignores the new key, so
+  the card renders **byte-identically today** (stale was already empty); the change is purely the underlying
+  provenance data + the prevention of the future red alarm. Data-only, zero visual/behaviour change →
+  committed straight to master per the loop safeguard.
+- **Next recommended integration.** The remaining CI-doable data backlog is genuinely exhausted (audit
+  confirmed categories 1–4 airtight: 0 unlabelled, no ungated writer, no page-referenced file missing). The
+  open competitor-undercount fix (`competitors_locator.json`, MTC 6,000+ vs ~2.5k census) and the
+  `baac_credit`/`smebank_credit` penetration layers are all **Thai-IP / owner-side** pulls — not cloud-doable.
+  Best next autonomous pass: extend the same upstream-cap honesty to any OTHER layer whose vintage is pinned
+  to a frozen external source (audit `freshness` after the next weekly refresh crosses the 180d line), or a
+  UX/render pass surfacing `freshness.upstream_capped`'s reason on the Data-room card (PR, needs headless
+  render) so the exec sees *why* the oldest layer is old rather than inferring neglect.
+
 ## 2026-08-13 — UX loop: keyboard-navigable "Explore ▾" menu on the non-3D secondary pages (PR #388, merged + deployed + verified)
 
 - **Finding (`ux-navmore-keyboard-secondary-pages`, WCAG 2.1.1 Keyboard / 2.4.3 Focus Order).** All top-7
