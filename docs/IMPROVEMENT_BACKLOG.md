@@ -494,8 +494,34 @@
       finds farm-gate PRICE series, not qualitative outlook notes. If revisited, budget for finding the
       actual news URL first (may need a targeted web search, not a catalog query) before attempting any
       text extraction. *(LOW, M — harder than previously scoped, not a quick win)*
-- [ ] **`pipeline/pull_oae_prices.py` — ROOT CAUSE FOUND 2026-07-05 (4), re-scope before touching
-      again.** It's not stuck, throttled, or silently failing: `data-oae-prices.yml` (and every other
+- [x] **CLOSED 2026-08-11 — the puller and its workflow are RETIRED. The 2026-07-05 diagnosis below
+      was correct about the symptom and WRONG about the cause; the correction is what closed it.**
+      Every earlier cycle concluded the upstream farm-gate series was *gone* from OAE's catalog. It
+      is not gone. Probed from the Thai laptop (the IP the earlier cycles did not have), OAE's
+      per-crop farm-gate series are alive and readable **token-free through `data.go.th`'s
+      datastore** — `datastore_search?resource_id=...` returns clean monthly records (`year` in
+      Buddhist era, `month`, `regional_name`, `commod`, `Value`). What went wrong was the search
+      shape, not the data: OAE split the one combined series into ~15 **per-commodity packages**
+      (`paddy-rice`, `rice105`, `data-baer-0201`, …), so a single-package search for
+      `ราคาที่เกษตรกรขายได้` could only ever miss. OAE's OWN catalog (`catalog.oae.go.th`) also now
+      auth-gates those resources (`datastore_search` → `ไม่ได้รับอนุญาตให้อ่านทรัพยากร`, CSV download
+      → 403), which is why the catalog-side search kept coming back empty.
+      **It is retired anyway, and the survey is the reason.** Across all 309 OAE packages the
+      reachable price series cover **2 of our 6 target crops** — rice (CE 2023-01..2025-08) and
+      cassava (2022-01..2025-08), national-only, no rubber / oil palm / sugarcane, maize PDF-only —
+      and the daily + weekly variants are frozen at **2019**. Against that, `farmgate_prices.json`
+      carries **8 crops and refreshed today**, and `build_crop_stress.py` ranks farmgate > NABC >
+      OAE, so OAE could not have priced one published number even on a perfect pull. Its newest
+      month also lands exactly on the `OAE_MAX_LAG_MONTHS = 12` staleness guard. Deleted:
+      `pipeline/pull_oae_prices.py` (which also carried a latent `matches = [...] or results`
+      fallback that would have published an arbitrary OAE dataset as farm-gate prices),
+      `.github/workflows/data-oae-prices.yml`, and the `oae_prices` entry in `pull_swarm.py`.
+      The READER in `build_crop_stress.py` deliberately stays — absent-file output is byte-identical,
+      and it is the drop-in point if OAE ever resumes a current multi-crop series. Full survey:
+      `docs/DATA_REFRESH_LOG.md` 2026-08-11.
+- [ ] ~~**`pipeline/pull_oae_prices.py` — ROOT CAUSE FOUND 2026-07-05 (4), re-scope before touching
+      again.**~~ *(superseded by the entry above — kept for the audit trail.)* It's not stuck,
+      throttled, or silently failing: `data-oae-prices.yml` (and every other
       `schedule:`-triggered workflow in this repo — `data-fuel-prices.yml`, `data-nabc-prices.yml`,
       `data-macro.yml`, `site-health.yml`) **has never run once**, because none of them are merged to
       `master` yet. Confirmed via the `github` MCP server: `list_workflows` shows only `QA` registered
@@ -544,8 +570,16 @@
       speculative)*
 
 ## Queue — follow-ups noticed 2026-07-05 (7)
-- [ ] **OAE farm-gate price pull — RE-CONFIRMED dead end 2026-07-05 (7), do not retry the CKAN
-      search path again without a new plan.** Ran `pipeline/pull_oae_prices.py --selftest` (30/30
+- [x] **CLOSED 2026-08-11 — retired, see the "CLOSED 2026-08-11" entry in the 2026-07-05 (6) queue
+      above for the survey.** This entry's instinct was right (stop retrying the CKAN search path)
+      and its stated reason was wrong (the series exists; OAE split it into per-commodity packages
+      and auth-gated its own catalog, while `data.go.th` serves it token-free from a Thai IP). Its
+      recommended fix — "a real fix needs either a Thai-IP `data.go.th` pull or finding the actual
+      OAE URL by hand" — was executed on 2026-08-11: the Thai-IP data.go.th pull WORKS, and the data
+      it returns is 2 of 6 crops ending CE 2025-08, against a `farmgate_prices.json` that carries 8
+      crops and refreshes daily. So the feed was retired rather than repointed. Original text follows.
+- [ ] ~~**OAE farm-gate price pull — RE-CONFIRMED dead end 2026-07-05 (7), do not retry the CKAN
+      search path again without a new plan.**~~ Ran `pipeline/pull_oae_prices.py --selftest` (30/30
       parse-logic assertions pass, offline) then `--dry-run` (real network — `catalog.oae.go.th` is
       reachable) to re-check the 2026-07-05 (5) "harder than scoped" finding with fresh evidence.
       Queried `package_search` directly for the exact search term (`ราคาที่เกษตรกรขายได้`) plus 5

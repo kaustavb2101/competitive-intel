@@ -29,6 +29,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Install numpy (so branch_peers rebuilds + gates authoritatively)
+        # WITHOUT numpy, build_branch_peers.py --check SKIPs in BOTH the re-derive step and the
+        # pre-merge gate below, so a stale branch_peers.json auto-merges as "green" and only qa.yml
+        # (which pins numpy==2.4.6) then catches the drift, turning master red. Pinned to match qa.yml.
+        run: pip install numpy==2.4.6
       - name: Offline selftest
         run: python pipeline/pull_fuel_prices.py --selftest
       - name: Pull live fuel prices

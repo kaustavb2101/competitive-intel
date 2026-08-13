@@ -78,10 +78,27 @@ jobs:
           cp pipeline/resolve_derived_conflicts.sh "$RESOLVER"
 
           # headRepositoryOwner filters out forks — we cannot push to those.
+          #
+          # DRAFTS ARE SKIPPED, and that skip is the single biggest cost lever in this repo. Measured
+          # over 2026-08-10: 1,114 billed job-minutes, of which this workflow was 243 (60.7 per run,
+          # the most expensive job here) and the QA runs IT dispatches were most of the other 835.
+          # The cause is structural rather than wasteful-looking — every master push refreshes every
+          # open PR, and each refresh runs a full gate here AND dispatches qa.yml to run the same
+          # gate again for a visible check. Two gates per PR per master move.
+          #
+          # Seven of the nine open PRs at the time of writing are auto-generated draft data
+          # refreshes. A draft is by definition not about to merge, so re-merging master into it and
+          # double-gating it every time master moves buys nothing: it will be refreshed again the
+          # moment it is marked ready, which is the only point at which its mergeability matters.
+          # Nothing is lost — `gh pr ready` triggers no refresh by itself, but the next master push
+          # picks it up, and a PR being merged goes through the merge queue's own checks regardless.
           PRS=$(gh pr list --state open --base master --limit 50 \
-                  --json number,headRefName,headRepositoryOwner \
-                  --jq ".[] | select(.headRepositoryOwner.login==\"${GITHUB_REPOSITORY_OWNER}\") | \"\(.number) \(.headRefName)\"")
-          if [ -z "$PRS" ]; then echo "No open PRs. Nothing to do."; exit 0; fi
+                  --json number,headRefName,headRepositoryOwner,isDraft \
+                  --jq ".[] | select(.headRepositoryOwner.login==\"${GITHUB_REPOSITORY_OWNER}\") | select(.isDraft|not) | \"\(.number) \(.headRefName)\"")
+          NDRAFT=$(gh pr list --state open --base master --limit 50 --json isDraft --jq '[.[]|select(.isDraft)]|length')
+          # Say what was skipped rather than silently covering less than the name implies.
+          [ "${NDRAFT:-0}" -gt 0 ] && echo "skipping $NDRAFT draft PR(s) — they refresh once marked ready"
+          if [ -z "$PRS" ]; then echo "No non-draft open PRs. Nothing to do."; exit 0; fi
 
           echo "## PR auto-resolve" >> "$GITHUB_STEP_SUMMARY"
           RESOLVED=0; SKIPPED=0; BLOCKED=0

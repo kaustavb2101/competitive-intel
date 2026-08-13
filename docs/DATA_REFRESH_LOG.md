@@ -4,6 +4,73 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-08-11 — RETIRE: the OAE farm-gate price feed. The series was never gone — it is reachable, and it loses to what we already pull
+
+**Task type:** AUDIT + RETIRE (zero `platform/data` values changed; the survey and the removal are
+the deliverable).
+
+**Why this cycle happened.** `data-oae-prices.yml` failed on every run and `oae_prices` failed on
+every `pull_swarm` run since the registry existed — `source-data/oae_farmgate_prices.json` has
+**never once been produced**. Three separate cycles (2026-07-05 (4), (5), (7)) each diagnosed it and
+each concluded the upstream series was **gone from OAE's catalog**.
+
+**That diagnosis was wrong.** Probed from the Thai laptop — the IP the earlier sandbox cycles did
+not have — the series is alive and readable **token-free** through `data.go.th`'s CKAN datastore:
+
+```
+GET https://data.go.th/api/3/action/datastore_search?resource_id=c72f9a58-…&limit=2
+{"success": true, … {"year":2566,"month":1,"regional_name":"ประเทศไทย",
+                     "commod":"ข้าว","product_name":"ข้าวเปลือกเจ้า ความชื้น 15%","Value":9660}}
+```
+
+Two things had hidden it, and neither is "the data was deleted":
+1. **OAE split one combined series into ~15 per-commodity packages** (`paddy-rice`, `rice105`,
+   `data-baer-0201` = cassava, `garlic`, …). `pull_oae_prices.py` searched for a single package
+   titled `ราคาที่เกษตรกรขายได้`, so it could only ever miss. The catalog is not empty — the OAE org
+   publishes **309 packages** on data.go.th.
+2. **OAE's own catalog now auth-gates the resources.** `catalog.oae.go.th` answers `package_show`
+   for these dataset ids with `success: false`, its CSV downloads return **403**, and
+   `datastore_search` returns `ไม่ได้รับอนุญาตให้อ่านทรัพยากร` ("not authorised to read this
+   resource"). Every catalog-side search therefore came back empty while the data was fine — one
+   host away.
+
+**Retired anyway, and the survey is the reason.** Reading every price series across all 309 OAE
+packages (`year`/`month` are **Buddhist era** — fold by 543):
+
+| series | crops | range (CE) | grain |
+|---|---|---|---|
+| monthly per-crop (`data-baer-*`, `paddy-rice`, `rice105`) | rice (2 grades), cassava | 2022-01 → **2025-08** | national, monthly |
+| `ข้อมูลราคาสินค้าเกษตรรายวัน` (daily) | rice, rubber | 2018-10 → **2019-06** | market-level daily |
+| `ข้อมูลราคาที่เกษตรกรขายได้ที่ไร่นา` (weekly) | mixed | → **2019-05** | weekly |
+
+Of our six target crops it reaches **rice and cassava only** — no rubber, no oil palm, no sugarcane,
+and maize is PDF-only. Against that, `source-data/farmgate_prices.json` carries **8 crops** (all six
+targets plus coconut and pineapple) and its vintage is **today**; `nabc_prices.json` carries 5 and
+pulls 4×/day. `build_crop_stress.py` ranks **farmgate > NABC > OAE**, so OAE could not have priced a
+single published number even on a perfect pull — and its newest month (2025-08) lands exactly on the
+builder's own `OAE_MAX_LAG_MONTHS = 12` staleness guard, which would have rejected it regardless.
+
+**What was removed.**
+- `pipeline/pull_oae_prices.py` — deleted. It also carried a latent silent-wrong-data bug:
+  `matches = [p for p in results if is_match(p)] or results` fell back to **any** search result, so
+  a no-match search would have published an arbitrary OAE dataset's numbers as farm-gate prices. The
+  only thing that ever stopped it was `pick_resource()` raising on a missing CSV/XLSX.
+- `.github/workflows/data-oae-prices.yml` — deleted (weekly, red on every run).
+- the `oae_prices` entry in `pipeline/pull_swarm.py` — removed, with the reasoning inline.
+
+**What deliberately stays.** The OAE **reader** in `build_crop_stress.py`. With the file absent its
+output is byte-identical, it documents the preference chain honestly, and it is the entire
+integration if OAE ever resumes a current multi-crop series. Its meta strings feed float outputs, so
+"tidying" it would turn the determinism gate red for no data reason.
+
+**Provenance impact: none.** No `platform/data` file changed; `crop_stress.json` was already
+building on the farmgate/NABC path because the OAE file never existed.
+
+**If someone revisits this:** the working call is `data.go.th`'s `datastore_search` (token-free, Thai
+IP), **not** `catalog.oae.go.th` (auth-gated) and **not** a single-package title search. Revisit only
+if OAE starts publishing rubber/oil palm/sugarcane or resumes past 2025-08 — below that bar it
+cannot outrank farmgate.
+
 ## 2026-07-10 — AUDIT: PR #1 merged — every scheduled data workflow is now live-registered (was dormant since 2026-06-28); RE-DERIVE baseline confirmed green
 
 **Task type:** AUDIT (CI/repo-integrity finding — zero `platform/data`/`source-data` values changed

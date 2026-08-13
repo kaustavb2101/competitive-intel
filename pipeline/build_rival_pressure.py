@@ -180,8 +180,9 @@ def build():
                  "computed over the merged measured competitor census. Pure geometry over real pulled "
                  "coordinates — no scores, no synthesis." % SIEGE_MIN,
         "objective": "Both objectives: #1 (a besieged branch fights price/LTV pressure on its own "
-                     "doorstep) and #2 (rival proximity tells expansion where the ground is already "
-                     "contested vs open).",
+                     "doorstep) and #2 (rival proximity flags where an existing branch already sits "
+                     "on contested ground). A competitive-pressure read on the current footprint — "
+                     "no open / close / expand call.",
         "provenance": {
             "rivals": "MEASURED — platform/data/competitors_census.json .items (%d usable points; %d "
                       "skipped for missing coords/brand). Official store-locator networks for "
