@@ -31,7 +31,10 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install deps
-        run: pip install numpy
+        # numpy pinned to qa.yml's version so build_branch_peers.py --check reproduces byte-exact in
+        # rederive_drift.py — an unpinned numpy could rebuild branch_peers.json with different bytes
+        # than the gate expects and stale-merge that drift onto master.
+        run: pip install numpy==2.4.6
       - name: Rebuild scenarios.json (+ provenance in lockstep)
         run: |
           # scenarios is the layer this job owns, so it is built explicitly; everything downstream is

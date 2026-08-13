@@ -188,8 +188,9 @@ def build():
         "label": "RIVAL DENSITY per district — MEASURED AutoX vs MEASURED competitor branch "
                  "counts for all 928 amphoe, with the rival:AutoX ratio and the districts where "
                  "competitors own the ground (outnumbered, or absent-but-rival-dense).",
-        "objective": "Acquisition (objective #2): find where rivals already hold the district so "
-                     "expansion can contest ceded ground, not just empty white-space.",
+        "objective": "Competitive risk (objective #2): find the districts where rivals already "
+                     "outnumber us around the network we ALREADY run — a competitive-pressure read "
+                     "on the existing footprint. Makes NO open / close / expand recommendation.",
         "provenance": {
             "autox": "MEASURED — per-district AutoX branch count carried verbatim from "
                      "amphoe.json .branches (point-in-polygon of branches_final.json into "

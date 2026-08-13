@@ -85,7 +85,6 @@ build build_opportunity_score.py   "build_opportunity_score.py (district opportu
 #    20MB dlt CSV mirror is not committed) or its output is not yet generated. branch_fuel.json is
 #    intentionally NOT committed (coordinate-dependent; CI Python 3.11 generates it, like cropland).
 build build_vehicle_flow.py            "build_vehicle_flow.py           (province vehicle-flow from dlt mirror, optional src)"
-build build_vehicle_flow_transport.py  "build_vehicle_flow_transport.py (province transport-vehicle flow, optional src)"
 build build_truck_flow.py              "build_truck_flow.py             (province truck-flow momentum, optional src)"
 build build_ev_penetration.py          "build_ev_penetration.py         (province EV penetration, optional src)"
 build build_ev_exposure.py             "build_ev_exposure.py            (province EV-exposure collateral risk)"

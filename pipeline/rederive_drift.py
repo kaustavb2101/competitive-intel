@@ -81,6 +81,16 @@ MAX_PASSES = 6                     # a real fan-out converges in 2-3; more means
 
 RC_CLEAN, RC_ABSENT = 0, 3         # the gate's own convention: 3 = an input is absent, not drift
 
+# A builder can also exit RC_ABSENT because a PYTHON DEPENDENCY (not a data input) is missing — e.g.
+# build_branch_peers.py raises SystemExit(3) with "numpy not installed" when numpy is absent. That is
+# a TRAP, not an honest absence: this env can neither --check nor rebuild the layer, so if its inputs
+# drifted THIS run it silently ships STALE and reddens the gate LATER, in an env that has the dep. That
+# exact stale-merge recurred three times to 2026-08-11 (branch_peers off the NABC/ThaiWater auto-merge)
+# because rederive filed the numpy SKIP under the benign "absent input" bucket and declared convergence.
+# We detect it from the builder's OWN skip line (no hand-kept list of numpy builders to go stale) and
+# escalate to UNRESOLVED so the run fails LOUD ("install numpy") instead of stale-merging in silence.
+DEP_MISSING_MARKERS = ("numpy not installed",)
+
 
 def _run(script, check):
     """Run one pipeline script from pipeline/, returning (rc, combined output)."""
@@ -142,17 +152,26 @@ def main():
     for p in range(1, MAX_PASSES + 1):
         drifted = []
         for name in builders:
-            rc, _ = _run(name, check=True)
+            rc, out = _run(name, check=True)
             if rc == RC_CLEAN:
                 continue
             if rc == RC_ABSENT:
-                if p == 1:
-                    absent.append(name)          # an optional input is missing — honest, not drift
+                if any(m in out.lower() for m in DEP_MISSING_MARKERS):
+                    # A missing PYTHON DEPENDENCY, not a missing data input — see DEP_MISSING_MARKERS.
+                    # This layer is unverifiable AND unrebuildable here, so a drifted input would ship
+                    # stale: surface it loudly rather than let convergence hide it.
+                    if name not in [u[0] for u in unresolved]:
+                        unresolved.append((name, "a required dependency is missing (see the builder's "
+                                                 "SKIP line) — this env cannot re-derive it, so a "
+                                                 "drifted input would silently ship stale"))
+                elif p == 1:
+                    absent.append(name)          # an optional data input is missing — honest, not drift
                 continue
             drifted.append(name)
 
         if not drifted:
-            print(f"pass {p}: no drift — converged.")
+            print(f"pass {p}: no gated builder drifted."
+                  + (f" ({len(unresolved)} UNRESOLVED — see below)" if unresolved else " Converged."))
             break
 
         # Anything we are not allowed to touch stops being retried; it is reported instead.
