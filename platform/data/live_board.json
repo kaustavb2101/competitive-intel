@@ -212,11 +212,11 @@
    "label": "Rice · Thai farm-gate",
    "measured": true,
    "source": "NABC Agricultural Data Service (agriapi.nabc.go.th) — daily market prices, national average across quoting markets, pulled by pipeline/pull_nabc_prices.py (REACHABLE from a Thai IP",
-   "stamp": "2026-08-11",
-   "stamp_iso": "2026-08-11",
+   "stamp": "2026-08-14",
+   "stamp_iso": "2026-08-14",
    "stamp_kind": "pulled",
    "unit": "฿/tonne",
-   "value": 17805.0,
+   "value": 17888.33,
    "what": "what a borrower's crop actually sells for at home, today — the number behind farm repayment capacity, not the world price beside it"
   },
   {
