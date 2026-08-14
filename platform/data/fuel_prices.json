@@ -3,7 +3,7 @@
     "generated_by": "build_fuel_prices.py",
     "source": "Bangchak retail oil-price API (www.bangchak.co.th/api/oilprice) — daily Bangkok reference prices; free, no key, cloud-reachable (EPPO/PTT/data.go.th are geoblocked).",
     "label": "MEASURED — live Thai retail fuel prices (฿/litre, Bangkok reference)",
-    "pulled": "2026-08-11",
+    "pulled": "2026-08-14",
     "unit": "THB/litre",
     "n_fuels": 8,
     "provenance": "Verbatim projection of source-data/fuel_prices.json (pipeline/pull_fuel_prices.py, refreshed daily by .github/workflows/data-fuel-prices.yml). No recomputation — every price carried through unchanged.",
@@ -11,47 +11,47 @@
     "collateral_read": "Diesel = pickup/farm-vehicle title-loan borrowers; gasohol = motorcycle-title borrowers. Rising pump prices compress those borrowers' disposable income."
   },
   "headline": {
-    "diesel": 36.69,
+    "diesel": 37.54,
     "diesel_name": "Hi Diesel S",
     "diesel_delta_tomorrow": 0.0,
-    "gasohol95": 35.99,
+    "gasohol95": 36.84,
     "gasohol95_name": "Gasohol 95 S EVO",
     "gasohol95_delta_tomorrow": 0.0
   },
   "fuels": {
     "DIESEL B20": {
-      "today": 31.69,
-      "tomorrow": 31.69,
+      "today": 32.54,
+      "tomorrow": 32.54,
       "delta_tomorrow": 0.0
     },
     "Gasohol 91 S EVO": {
-      "today": 35.62,
-      "tomorrow": 35.62,
+      "today": 36.47,
+      "tomorrow": 36.47,
       "delta_tomorrow": 0.0
     },
     "Gasohol 95 S EVO": {
-      "today": 35.99,
-      "tomorrow": 35.99,
+      "today": 36.84,
+      "tomorrow": 36.84,
       "delta_tomorrow": 0.0
     },
     "Gasohol E20 S EVO": {
-      "today": 30.99,
-      "tomorrow": 30.99,
+      "today": 31.84,
+      "tomorrow": 31.84,
       "delta_tomorrow": 0.0
     },
     "Gasohol E85 S EVO": {
-      "today": 26.93,
-      "tomorrow": 26.93,
+      "today": 27.78,
+      "tomorrow": 27.78,
       "delta_tomorrow": 0.0
     },
     "Hi Diesel S": {
-      "today": 36.69,
-      "tomorrow": 36.69,
+      "today": 37.54,
+      "tomorrow": 37.54,
       "delta_tomorrow": 0.0
     },
     "Hi Premium 98 Plus": {
-      "today": 48.44,
-      "tomorrow": 48.44,
+      "today": 49.29,
+      "tomorrow": 49.29,
       "delta_tomorrow": 0.0
     },
     "Hi Premium Diesel Plus": {
