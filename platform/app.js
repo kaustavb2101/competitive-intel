@@ -21,7 +21,7 @@ const escHtml=s=>String(s==null?'':s).replace(/[&<>"']/g,
 const LENS = {
   dws:  {pill:'Coverage gap', label:'District coverage gap ◇ est', desc:"COVERAGE · ESTIMATED proxy (0–100) — each branch's whole district demand (a log-normalized, weighted blend of measured POI footfall + DIW workers) minus a penalty for how saturated AutoX already is there. Brighter = thinner AutoX coverage of local demand. The inputs are measured; the blend/weighting is a modelled proxy, not a measured coverage metric.", color:'#E6B450', unit:'coverage gap (0–100, est)', est:true, amp:true, hero:true, tag:'e', val:d=>d._amp?d._amp.whitespace:0},
   brisk:    {pill:'Composite risk', label:'Composite branch risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — one fused 'which branches are getting riskier' read, blending measured household debt + crop/drought stress + occupation concentration + the branch's own segment mix. A triage rank, not a measured default rate.", color:'#E0574F', unit:'composite (est)', est:true, brisk:true, hero:true, tag:'e', val:d=>briskVal(d)},
-  comp:     {pill:'Competitors', label:'Competitor density ◆', desc:'COMPETITIVE PRESSURE · MEASURED (Google Places, a lower bound, not a registry) — rival title-loan branches (Srisawad, Muangthai, Tidlor, Heng) within ~5 km of each AutoX branch. Brighter = denser rival presence around us. Blank until the rival census loads.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, hero:true, tag:'m', val:d=>compCount(d)},
+  comp:     {pill:'Competitors', label:'Competitor density ◆', desc:'COMPETITIVE PRESSURE · MEASURED (official store-locators for all four big brands — a lower bound, sub-scale operators excluded) — rival title-loan branches (Srisawad, Muangthai, Tidlor, Heng) within ~5 km of each AutoX branch. Brighter = denser rival presence around us. Blank until the rival census loads.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, hero:true, tag:'m', val:d=>compCount(d)},
   hhdti:    {pill:'Household DTI', label:'Household debt-to-income ●', desc:"BORROWER STRESS · MEASURED (NSO household survey 2566) — the branch's province household debt as a multiple of annual income. Brighter = more household balance-sheet stress. Hidden until the survey layer loads.", color:'#C8433B', unit:'×100 DTI', hh:true, prov:true, hero:true, tag:'m', val:d=>hhriskVal(d)},
   cstress:  {pill:'Agri PD', label:'Agri crop-stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED triage (0–100) — the branch's province crop-household stress (crop price pressure × drought, scaled by how farm-dependent the area is). A warning flag, not a measured default rate.", color:'#C8433B', unit:'crop-stress (est)', est:true, tag:'e', val:d=>cstressVal(d)},
   estab:    {pill:'Merchant', label:'Establishments ≤10km', desc:'MERCHANT BASE · MEASURED (Overture Places, a sample / lower bound) — total businesses within 10 km of each branch, a proxy for how much trade surrounds it. Brighter = a denser merchant ecosystem.', color:'#1C8C7D', unit:'estab', tag:'m', val:d=>estabCount(d)},
@@ -988,7 +988,7 @@ async function loadCompetitors(){
     let items, srcs;
     if(cen&&Array.isArray(cen.items)&&cen.items.length){
       items=cen.items.filter(it=>it&&it.lat!=null&&it.lng!=null);
-      srcs=['official store-locators + sample']; COMP=cen;
+      srcs=['official store-locators (all four brands)']; COMP=cen;
     }else{
       const [g,o]=await Promise.all([grab('data/competitors_national.json'),grab('data/competitors_overture.json')]);
       srcs=[]; if(g)srcs.push('Google Places'); if(o)srcs.push('Overture');
@@ -3276,7 +3276,7 @@ function drawRivalDensity(){
       `These are the districts where competitors already own the ground — defend or concede deliberately. `+concStr+`${TAG_M}`+
       methodBox(null,
         ['AutoX + rival branch counts are <b>MEASURED</b> (point-in-district); ratio is computed.',
-         'Rivals = the merged census (official store-locators for Muangthai/Srisawad/Tidlor; Heng is a sample).',
+         'Rivals = the merged census (official store-locators for all four big brands: Muangthai/Srisawad/Tidlor/Heng).',
          '<b>Who holds it</b> reads the concentration of the rival field: bold = one brand owns a majority (single-brand-dominated, it sets the local terms); the % is that brand’s share of the district’s rival branches. MEASURED — a straight read of the per-brand census, gated on a ≥'+RIVDEN_CONC_MIN+'-branch field so a thin field can’t score a meaningless 100%.',
          'A high ratio is a competitive-density signal, not a verdict — some dense districts are worth contesting, others conceding.']);
   }
@@ -3443,7 +3443,7 @@ function drawPeerProvince(){
     const satStr=hasSat?` <b>Per 100k registered vehicles</b> (the MEASURED collateral base) the ground carries <b>${(m.national_titlelender_per_100k_veh||0).toFixed(1)}</b> title-lender branches nationally (AutoX ${(m.national_autox_per_100k_veh||0).toFixed(1)} · rivals ${(m.national_rivals_per_100k_veh||0).toFixed(1)}); it is most crowded per unit of collateral in <b style="color:var(--agri)">${ms.province_th||'—'}</b> (${(ms.titlelender_per_100k_veh||0).toFixed(1)}/100k).`:'';
     // Most out-fielded relative to AutoX's OWN presence (rival:AutoX count ratio) — a competitive-
     // pressure lead the density read can't give: where each AutoX branch faces the most rival points.
-    // ratio is a FLOOR (Heng is a lower-bound sample); autox/rivals carried so the exposure is visible.
+    // ratio is a FLOOR (sub-scale operators are absent from the census); autox/rivals carried so the exposure is visible.
     const mo=m.most_outnumbered_province||null;
     const outStr=mo?` Relative to its own footprint, AutoX is most out-fielded in <b style="color:var(--agri)">${mo.province_th}</b> — at least <b>${(mo.ratio||0).toFixed(1)}:1</b> (${mo.autox} AutoX vs ${mo.rivals} big-4 rivals).`:'';
     // AutoX's own standing (MEASURED rank among present operators): where it sits, not just who leads.
@@ -5635,7 +5635,7 @@ function renderContestedGround(){
     `AutoX and the rivals fight for the same people${natSh!=null?`; nationally <b>${natSh}%</b> of our catchment population is contested`:''}.</p>`+
     methodBox('A 1km WorldPop cell counts as CONTESTED when its centre lies within 2km of any rival in the merged census; share = contested people ÷ catchment people.',
       ['Population is <b>measured</b> — WorldPop 2020 (1km grid, UN-adjusted).',
-       'The census misses Heng’s full network (sample) and all sub-scale local operators — contested share is a <b>lower bound</b>.',
+       'The census carries all four big brands’ official store-locators (incl. Heng) but misses all sub-scale local operators — contested share is a <b>lower bound</b>.',
        'Only branches with ≥25k catchment population are ranked (stated rule — keeps tiny catchments from posting empty 100%s).'])+
     `<table class="tbl" id="expo-contested-tbl"><tr><th scope="col">#</th><th scope="col">Branch</th><th scope="col">Province</th>`+
     `<th scope="col" title="WorldPop 2020 population inside the 10km catchment — measured">Catchment pop</th>`+
@@ -6564,9 +6564,9 @@ function drawSiegeTable(){
       <b>${t.nb}</b> at <b style="color:var(--gold)">${t.nd} km</b>. ${m.n_siege||'—'} of ${m.n_branches||'—'} branches
       are under siege (≥3 rivals ≤2 km) — these fight for the same walk-in borrower on the same street, so watch
       pricing/LTV pressure here first.
-      <span class="sub">MEASURED — haversine over the merged competitor census (Muangthai/Srisawad/Tidlor official
-      store locators, measured-complete; Heng is a sample, so pressure is a lower bound). The ≥3 cutoff is a stated
-      rule, not a model.</span>`;
+      <span class="sub">MEASURED — haversine over the merged competitor census (official store-locators for all four
+      big brands: Muangthai/Srisawad/Tidlor/Heng; sub-scale local operators are absent, so pressure is a lower bound).
+      The ≥3 cutoff is a stated rule, not a model.</span>`;
   }
 }
 function renderTrendBaseline(deltas){
@@ -7150,7 +7150,7 @@ function rivalPressureLineHTML(d){
   const near=nb>=0?`nearest ${RIVP.brands[nb]} ${e.d[nb]} km`:'no rival located';
   const col=e.s?'var(--agri)':(e.n2>0?'var(--gold)':'var(--merch)');
   const siege=e.s?` <span style="color:var(--agri);font-weight:700" title="siege = ≥3 rivals within 2 km (stated rule over measured counts)">⚑ under siege</span>`:'';
-  return `<div class="pr" style="margin-top:4px"><span title="measured — haversine vs the merged competitor census (official locators; Heng sample)">Rival pressure (measured)</span>`
+  return `<div class="pr" style="margin-top:4px"><span title="measured — haversine vs the merged competitor census (official locators, all four big brands)">Rival pressure (measured)</span>`
     +`<b style="color:${col}">${e.n2} ≤2 km · ${e.n5} ≤5 km · ${near}${siege}</b></div>`;
 }
 // Licensed-PICO rival line for a branch popup — ONE compact MEASURED line from branch_pico.json:
@@ -7202,7 +7202,7 @@ function catchmentPopupHTML(d,sec,r){
         +(cpct!=null?` · <span style="color:${cc}" title="share of this 10km population also living within 2km of a rival branch — measured WorldPop 2020 × competitor census; census lower bound">${cpct}% contested by rivals</span>`:''), 'var(--accent)'):'')
     + (estab!=null?r('Establishments ≤10km (OSM)', estab.toLocaleString(), 'var(--merch)'):'')
     + (rivals!=null?r('Rival branches ≤10km', `<span style="color:${rc}">${rivals}</span>`, rc):'')
-    + `<div class="sub" style="margin:2px 0 0;font-size:10px">population = ${popMeasured?"WorldPop 2020 (1km raster) inside this branch's 10km circle":"ESTIMATED — district population area-weighted to the 10km circle (WorldPop raster unavailable)"}${cpct!=null?'; contested = share of that population within 2km of any census rival (lower bound — Heng sampled, sub-scale operators missing)':''}; establishments = sum of OSM POI counts ≤10km; rivals = official store-locator census (Muangthai/Srisawad/Tidlor measured-complete; Heng sample)</div>`;
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">population = ${popMeasured?"WorldPop 2020 (1km raster) inside this branch's 10km circle":"ESTIMATED — district population area-weighted to the 10km circle (WorldPop raster unavailable)"}${cpct!=null?'; contested = share of that population within 2km of any census rival (lower bound — sub-scale operators missing)':''}; establishments = sum of OSM POI counts ≤10km; rivals = official store-locator census (all four big brands: Muangthai/Srisawad/Tidlor/Heng)</div>`;
 }
 // Macro cluster brief — a one-line plain-language read of the macro forces on this branch's customer
 // cluster (cluster_brief.json, index-aligned; templated from measured board/crop/occupation signals).
