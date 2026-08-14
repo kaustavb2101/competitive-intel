@@ -3,6 +3,44 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-14 — Integration loop (REGRESSION FIX): master gate was RED — the auction-refresh laundered an empty harvest into the repo; restored the data + guarded the builder — recorded to master
+
+- **The defect (a red master gate + a laundered-block data loss).** A clean `master` checkout FAILED
+  `bash tests/run.sh check` (exit 1) before this run touched anything: `validate_data.py` (collateral
+  census `book_check` list empty + provenance byte-size mismatch), `check_site_health.py --local` (the
+  Overview book-vs-recovery card's committed payload rejected), and `build_provenance.py --check` (drift).
+  Root cause: commit **d4eed15** ("data(census): refresh the Union Auction forward book", run 31357653245)
+  re-harvested the auction venues, got an **empty/blocked feed**, and committed `board:0 / book_check:0`
+  **over** the last-good `board:473 / book_check:71` — plus the emptied stage-1 staging aggregate. A dead
+  pull was laundered into "the auction book went empty", exactly the failure mode the codebase already
+  guards against elsewhere (the Pantip "exit 3, write nothing" rule). Three later targeted refresh
+  commits (`5b0edb8`/`c1a9a9d`/`4389429`, each a "2 +-" provenance touch) never re-ran a full provenance
+  build, so provenance also drifted for 8 unrelated layers.
+- **The fix (restore + a durable guard, no app/behaviour change beyond un-breaking the card).**
+  1. Restored `platform/data/collateral_census.json` + `source-data/staging/collateral_census_agg.json`
+     to their last-good pre-wipe content at `f5f134e` (byte-identical; `build_collateral_census.py --check`
+     reproduces the output from the restored staging byte-exact).
+  2. `build_collateral_census.py`: added two guards so this cannot recur — `aggregate()` REFUSES to
+     overwrite the committed staging when the harvest yields 0 rows / 0 priced cells, and `build()`
+     REFUSES to project an empty staging into an empty committed output. Both leave the last-good data in
+     place and return 3 (skip), so a blocked venue feed can never again wipe the auction book. Inert on
+     the healthy path (`--check` still green).
+  3. Regenerated `provenance.json` (byte-size mandate). Beyond the collateral row this corrected 8
+     pre-existing drifted rows: `branch_labor`/`competitors_census`/`sfi_credit`/`contested_pop` catching
+     up `cls` estimated→**measured** to match their OWN declared MEASURED labels (verified — not
+     laundering; no file's label was authored here), plus real byte/vintage bumps on
+     `rival_density`/`rival_pressure`/`search_demand`/`peer_scoreboard`.
+- **Verify.** `bash tests/run.sh check` — **133 passed, 0 failed** (exit 0; DATA VALIDATION 455/455),
+  up from the pre-fix red state. Committed straight to master per the loop safeguard: the gate is green,
+  the only visible effect is RESTORING the Overview book-vs-recovery card that d4eed15 had emptied (the
+  deploy-probe `check_site_health.py` now accepts the payload), no HTML/JS changed, and the restored data
+  is byte-identical to a prior committed-good state — no new/uncertain behaviour introduced.
+- **Next recommended integration (owner-review).** The auction-refresh WORKFLOW that produced d4eed15
+  should get the same empty-harvest guard at its commit step (belt for the builder's suspenders), so a
+  future empty pull is a no-op commit rather than needing this manual restore; and adopt the CI-refreshed
+  DIW/DLT census into the app's factory/vehicle layers via a `--check`-gated `build_gov_census.py`
+  (deferred as a ~90-file PR, per 2026-08-13).
+
 ## 2026-08-14 — Intelligence loop (PLANNING): stop the CEO autonomy dashboard advertising cron cadences the repo does not run — recorded to master
 
 - **The defect (an honesty defect in the exec-facing dashboard).** `committee/plan_cycle.py` — whose own

@@ -278,6 +278,15 @@ def aggregate():
         if not keep:
             continue
         out["%s|%s|%d" % (cls, body, year)] = {k: _stats(v) for k, v in sorted(keep.items())}
+    # A blocked or dead venue feed harvests zero usable rows. Overwriting the committed staging with
+    # that empty result launders a broken pull into "the auction book went empty" — which is exactly
+    # how run 31357653245 wiped board:473/book_check:71 down to 0 and red-gated master. Refuse to touch
+    # the committed staging when the harvest yielded nothing; leave the last-good aggregate in place.
+    if rows == 0 or not out:
+        print("build_collateral_census.py: REFUSING to overwrite %s — the harvest yielded %d rows / "
+              "%d priced cells (an empty or blocked feed). Committed staging left untouched so a dead "
+              "pull cannot be laundered into empty data." % (STAGING, rows, len(out)), file=sys.stderr)
+        return 3
     agg = dict(
         meta=dict(
             generated_by="pipeline/build_collateral_census.py --aggregate",
@@ -302,6 +311,12 @@ def build():
               file=sys.stderr)
         return 3
     agg = json.load(open(STAGING, encoding="utf-8"))
+    if not agg.get("cells"):
+        # Belt-and-suspenders for the same laundering path: never project an empty staging into an
+        # empty committed output (which strips the Overview book-vs-recovery card). Skip, don't wipe.
+        print("build_collateral_census.py: %s has no cells (empty/blocked harvest) — skipping; the "
+              "committed output is left untouched." % STAGING, file=sys.stderr)
+        return 3
     tape = json.load(open(TAPE, encoding="utf-8")) if os.path.exists(TAPE) else {}
     anchor_year = _year(agg["meta"].get("anchor_date")) or 0
 
