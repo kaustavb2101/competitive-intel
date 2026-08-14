@@ -3,6 +3,42 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-14 — Intelligence loop (PROVENANCE CONSISTENCY): retire the stale "Heng is a Google∪Overture sample" premise from the rival-pressure + contested-pop layers and the whole #acq/#exposure competitive surface — the census promoted Heng to an official-locator brand, but two builders and ~7 app strings still called it a sample (PR + headless-verified)
+
+- **The gap (objective #2, the flagged next-task from the prior Heng peer run).** The committed census
+  (`competitors_census.json`, `official_locator_brands: [Heng, Muangthai, Srisawad, Tidlor]`) has Heng as
+  the operator's OWN official store-locator (450 measured points via `pull_heng_locator.py`, which
+  **replaced** the earlier Google∪Overture sample rather than being unioned). `build_rival_density.py` was
+  already corrected to this. But **`build_rival_pressure.py` and `build_contested_pop.py` still emitted
+  "Heng is a Google∪Overture SAMPLE (lower bound)"** into their shipped JSON `meta.provenance.rivals` +
+  `gaps` — false provenance in `rival_pressure.json` / `contested_pop.json` — and **~7 app.js strings**
+  across the density lens (line 24), the who-holds-it/contested/under-siege method boxes (#acq), the
+  contested-pop caveat (#exposure) and the branch popup still read "Heng is a sample / Heng sampled / Heng
+  sample". A single rival read told two contradictory stories about the same census.
+- **The fix (one coherent surface, honest about what IS still a lower bound).** Corrected both builders'
+  docstrings + `provenance.rivals` + `gaps` to state all four big brands are now official-locator networks
+  (Heng via `pull_heng_locator.py`, sample replaced not unioned), and the 7 app.js strings to match.
+  **Deliberately PRESERVED the "lower bound" framing everywhere it appears** — it was never solely a
+  Heng-sample artifact: the census still misses ALL sub-scale local operators (the long tail facing the
+  Q1-2026 BoT deadline), so contested share / rival pressure / the out-fielded ratio remain a genuine lower
+  bound / floor for that reason. Only the false Heng clause was removed; no claim was upgraded to
+  "measured-complete" that isn't.
+- **No numeric drift.** The census data was untouched, so regenerating `rival_pressure.json` (1119 besieged,
+  16,503 rivals) and `contested_pop.json` (93.8% national contested share, 72 fully contested) changed
+  **only meta strings** — identical counts before/after. `provenance.json` rebuilt (byte-size mandate);
+  layer counts unchanged (142 layers, 83 measured / 59 estimated / **0 unlabelled**) — no reclassification.
+- **Verify.** `build_rival_pressure.py --check` + `build_contested_pop.py --check` (rasterio+WorldPop
+  present) + `build_provenance.py --check` all byte-exact; `node --check platform/app.js` clean;
+  `bash tests/run.sh check` — **135 passed, 0 failed** (DATA VALIDATION 455/455). Headless render
+  (Chromium, `index.html#acq`, 390×844): the corrected strings render live ("all four big brands" ×2,
+  density-lens "sub-scale operators excluded" ×2) and the QA probe reports `data-errors="[]"` — no JS
+  errors. Visible text change → PR + render self-review before self-merge.
+- **Next recommended intelligence task.** With the Heng-sample premise now retired from the census board,
+  the peer-NPL benchmark and the whole competitive surface, the remaining CI-doable data backlog stays
+  exhausted (smebank/baac penetration are Thai-IP/owner-side only; DLT/BAAC re-probes settled dead). A tight
+  follow-up if a fresh negative-space sweep wants one: audit the `rayong_competitors.json` 30-point Rayong
+  fallback references for the same stale-sample language now that the national census supersedes it.
+
 ## 2026-08-14 — Intelligence loop (PEER COMPARISON): promote Heng to a first-class MEASURED brand in the competitor-coverage / national-standing board — the builder was stale (still treated it as a Cloudflare-blocked sample) and app.js openly contradicted itself
 
 - **The gap (objective #2, the flagged next-task from the prior peer run).** `pipeline/build_competitor_coverage.py`

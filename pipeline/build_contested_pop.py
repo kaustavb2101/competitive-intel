@@ -20,8 +20,9 @@ METHOD (both factors measured; the overlay is pure geometry)
              unavailable and fell back); pop10 is the genuine raster count.
   contested  The same sum restricted to CONTESTED cells: a 1km cell is contested when its
              centre lies within 2km of ANY rival in the merged measured competitor census
-             (platform/data/competitors_census.json — official store-locator networks for
-             Muangthai/Srisawad/Tidlor, Google∪Overture sample for Heng).
+             (platform/data/competitors_census.json — official store-locator networks for all
+             four big brands: Muangthai/Srisawad/Tidlor/Heng, Heng via pull_heng_locator.py,
+             which replaced the earlier Google∪Overture sample).
   share      contested / pop10 — computed client-side from the two shipped integers.
 
 Output: platform/data/contested_pop.json (INDEX-ALIGNED to branches.json, stamped with
@@ -183,9 +184,10 @@ def build():
                           "unavailable and fell back); pop10 is the genuine raster count that the "
                           "area-weight figure only approximates." % (RADIUS_M / 1000.0),
             "rivals": "MEASURED — platform/data/competitors_census.json .items (%d usable points; "
-                      "%d skipped for missing coords). Official store-locator networks for "
-                      "Muangthai/Srisawad/Tidlor (measured-complete); Heng is a Google∪Overture "
-                      "SAMPLE (lower bound)." % (len(rivals), skipped),
+                      "%d skipped for missing coords). Official store-locator networks for all four "
+                      "big brands (Muangthai/Srisawad/Tidlor/Heng — Heng via pull_heng_locator.py, "
+                      "which replaced the earlier Google∪Overture sample); sub-scale local operators "
+                      "remain absent, so contested share is a lower bound." % (len(rivals), skipped),
             "contested": "RULE, stated: a 1km cell is CONTESTED when its centre lies within %.0f km "
                          "of ANY census rival (equirectangular metres, same constant family as the "
                          "population builder). contested_pop sums the contested cells of the same "
@@ -219,9 +221,9 @@ def build():
             "WorldPop models population from census + built-area + ancillary layers; it is the "
             "standard measured gridded estimate but still a model, not a headcount. Vintage 2020 — "
             "refresh when a newer year lands.",
-            "The census misses Heng's full network (sample only) and ALL sub-scale local operators "
-            "(the long tail facing the Q1-2026 BoT registration deadline) — contested share is a "
-            "LOWER BOUND on the true contest.",
+            "The census carries all four big brands' OWN official store-locators (incl. Heng, via "
+            "pull_heng_locator.py) but misses ALL sub-scale local operators (the long tail facing the "
+            "Q1-2026 BoT registration deadline) — contested share is a LOWER BOUND on the true contest.",
             "1km cells give ~±1-cell edge granularity on the 2km contest ring; a cell is all-in or "
             "all-out by its centre.",
         ],
