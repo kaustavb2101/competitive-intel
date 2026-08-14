@@ -3,7 +3,7 @@
   "generated_by": "pipeline/pull_swarm.py",
   "label": "Each row is one swarm run: which feeds were pulled concurrently, whether each one succeeded / changed its declared output file / failed / timed out / was skipped (exit 3, the repo-wide SKIP convention), plus the rc of the append_history.py and rederive_drift.py steps that followed. This file makes the pulse observable.",
   "max_runs": 60,
-  "n_runs": 7,
+  "n_runs": 6,
   "title": "pull_swarm.py run history -- the swarm's own audit trail"
  },
  "runs": [
@@ -563,98 +563,51 @@
    "started": "2026-08-11T20:08:42Z"
   },
   {
-   "append_history_rc": null,
+   "append_history_rc": 0,
    "feeds": [
     {
-     "bytes_after": 15373,
-     "bytes_before": 15089,
-     "key": "rival_promos",
+     "bytes_after": 1443,
+     "bytes_before": 1443,
+     "key": "fuel_prices",
      "rc": 0,
-     "seconds": 4.9,
+     "seconds": 1.4,
      "status": "changed"
     },
     {
-     "bytes_after": 7301443,
-     "bytes_before": 5338821,
-     "key": "pantip",
+     "bytes_after": 7109,
+     "bytes_before": 7115,
+     "key": "thaiwater_flood",
      "rc": 0,
-     "seconds": 298.7,
+     "seconds": 4.6,
      "status": "changed"
     },
     {
-     "bytes_after": 5613,
-     "bytes_before": 0,
-     "key": "datagoth",
+     "bytes_after": 8891,
+     "bytes_before": 8890,
+     "key": "thaiwater_rain",
      "rc": 0,
-     "seconds": 134.2,
+     "seconds": 5.2,
      "status": "changed"
     },
     {
-     "bytes_after": 915005,
-     "bytes_before": 915005,
-     "key": "nso_wages",
+     "bytes_after": 3989,
+     "bytes_before": 3989,
+     "key": "nabc_prices",
      "rc": 0,
-     "seconds": 1.0,
-     "status": "changed"
+     "seconds": 125.3,
+     "status": "ok"
     }
    ],
-   "finished": "2026-08-12T20:10:22Z",
-   "include_thai": true,
+   "finished": "2026-08-14T05:20:01Z",
+   "include_thai": false,
    "jobs": 6,
-   "n_changed": 4,
+   "n_changed": 3,
    "n_failed": 0,
    "n_ok": 4,
    "n_skipped": 0,
    "n_timeout": 0,
-   "rederive_drift_rc": null,
-   "started": "2026-08-12T20:05:23Z"
-  },
-  {
-   "append_history_rc": null,
-   "feeds": [
-    {
-     "bytes_after": 15373,
-     "bytes_before": 15089,
-     "key": "rival_promos",
-     "rc": 0,
-     "seconds": 4.8,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 7310912,
-     "bytes_before": 5338821,
-     "key": "pantip",
-     "rc": 0,
-     "seconds": 302.3,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 5610,
-     "bytes_before": 0,
-     "key": "datagoth",
-     "rc": 0,
-     "seconds": 136.3,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 915005,
-     "bytes_before": 915005,
-     "key": "nso_wages",
-     "rc": 0,
-     "seconds": 0.8,
-     "status": "changed"
-    }
-   ],
-   "finished": "2026-08-13T20:05:22Z",
-   "include_thai": true,
-   "jobs": 6,
-   "n_changed": 4,
-   "n_failed": 0,
-   "n_ok": 4,
-   "n_skipped": 0,
-   "n_timeout": 0,
-   "rederive_drift_rc": null,
-   "started": "2026-08-13T20:00:20Z"
+   "rederive_drift_rc": 0,
+   "started": "2026-08-14T05:17:55Z"
   }
  ]
 }
