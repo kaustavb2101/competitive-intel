@@ -75,15 +75,42 @@ jobs:
     # no pipeline, no network pulls — so unlike the data workflows, moving it off ubuntu cannot
     # change any source's reachability or provenance.
     #
-    # The honest cost of that choice: `ci` is ONE serial executor on a 2-core box and it carries the
-    # QA queue, so this job can sit behind a QA run before it gets to merge anything. That is
-    # acceptable here and would not be for qa.yml — nothing downstream is waiting on a merge to the
-    # minute, the job is idempotent, and the workflow_run trigger fires again on the next gate. It
-    # is affordable at all only because qa.yml's duplicate `push: ["**"]` trigger was removed in the
-    # same change; before that the box had no headroom to lend.
-    runs-on: [self-hosted, ci]
+    # THE `thai` BOX, NOT `ci`, for two measured reasons.
+    #
+    # Latency. `ci` is ONE serial executor and it carries the whole QA queue — 7 runs deep at the
+    # time of writing, with the job at the head having waited two hours just to START. A merge
+    # driver parked behind that fires hours after the gate it is reacting to, which reads as
+    # "the automation is broken" long before it reads as "the automation is slow". `thai` runs one
+    # scheduled workflow a day and is idle essentially always.
+    #
+    # Proven dependencies. This job needs `gh` and `python3` and nothing else, and `gh` had never
+    # been exercised on `ci` — no workflow that runs there uses it, so pinning this there made a
+    # never-executed job depend on an unverified binary. On `thai`, data-thai-swarm.yml calls
+    # `gh pr create` on every run and opened #409 an hour ago, so both are known good.
+    #
+    # This does not breach qa.yml's "Thai feeds must never queue behind other work" rule, which is
+    # about a 45-minute QA render blocking a nightly pull. This is a ~30-second sequence of gh API
+    # calls with no checkout, no pipeline and no network pulls of its own; worst case a scheduled
+    # pull starts half a minute late.
+    runs-on: [self-hosted, thai]
     timeout-minutes: 15
     steps:
+      # A self-hosted runner carries whatever its box happens to have, and this job's whole
+      # behaviour is gh plus python3. If either is missing the steps below fail one at a time in
+      # ways that read like logic bugs, on a job whose entire point is to run unattended. Fail once,
+      # loudly, naming the runner instead.
+      - name: Check this runner actually has gh and python3
+        run: |
+          set -uo pipefail
+          MISSING=""
+          command -v gh      >/dev/null 2>&1 || MISSING="$MISSING gh"
+          command -v python3 >/dev/null 2>&1 || MISSING="$MISSING python3"
+          if [ -n "$MISSING" ]; then
+            echo "::error::runner '$RUNNER_NAME' is missing:$MISSING — pr-automerge cannot run here. Install it on the box, or move runs-on to a runner that has it."
+            exit 1
+          fi
+          echo "runner '$RUNNER_NAME': gh $(gh --version | head -1 | awk '{print $3}'), $(python3 --version)"
+
       - name: List every eligible generated PR, oldest first
         id: pick
         env:
