@@ -82,11 +82,16 @@
    "file": "peer_scoreboard.json",
    "fresh_days": 130,
    "group": "Competition",
-   "history": null,
+   "history": {
+    "file": "feed_history.json",
+    "kind": "accumulated",
+    "note": "4 observations from 2026-07-17, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 4,
+    "series": "set_mtc_mcap"
+   },
    "key": "peer_scoreboard",
    "label": "Listed rival scoreboard",
    "measured": true,
-   "no_history": "accumulating — 3 observations since 2026-07-17; the line is drawn once 4 have landed",
    "source": "Stock Exchange of Thailand · set.or.th in-browser JSON API (highlight-data + profile + company-highlight/financial-data)",
    "stamp": "2026-08-13",
    "stamp_iso": "2026-08-13",
@@ -251,8 +256,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "20 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 20,
+    "note": "21 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 21,
     "series": "rain_max_mm"
    },
    "key": "thaiwater_rain",
@@ -263,7 +268,7 @@
    "stamp_iso": "2026-08-14",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4454,
+   "value": 4434,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -275,8 +280,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "20 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 20,
+    "note": "21 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 21,
     "series": "flood_high"
    },
    "key": "thaiwater_flood",
@@ -286,8 +291,8 @@
    "stamp": "2026-08-14",
    "stamp_iso": "2026-08-14",
    "stamp_kind": "pulled",
-   "unit": "of 796",
-   "value": 126,
+   "unit": "of 795",
+   "value": 133,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -478,11 +483,11 @@
  "meta": {
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
-  "history_note": "A trend line is drawn only where a stored series exists. 8 of 23 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 233,
+  "history_note": "A trend line is drawn only where a stored series exists. 9 of 23 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
+  "history_points": 239,
   "missing_files": [],
   "n_feeds": 23,
-  "n_with_history": 8,
+  "n_with_history": 9,
   "source": "Per-feed stamps read from each platform/data layer's own meta block (pulled / as_of / vintage / updated). No value is re-derived here."
  }
 }

@@ -2510,6 +2510,67 @@ def _shape_competitors_overture(d):
     return _shape_competitor_items(d, "Overture sample")
 
 
+def _shape_pantip_panel(d):
+    # The brand-level borrower-voice panel on Competition (#acq, obj #2): drawPantip
+    # live-fetches it and GATES the whole panel on a non-empty .brands array — else it
+    # drops to a "Pantip panel not yet built" placeholder with no phone alert. Per row
+    # it renders .label (the Lender column), the .reported_total / .precision / .est_threads
+    # tallies and the .reply_rate fraction; the readout reads .headline; and the point of
+    # the panel is our OWN book, flagged by is_us. It CANNOT self-heal — Pantip is a Thai
+    # forum, pull_pantip.py is a Thai-IP pull with no CI cron — so a truncated/404 CDN
+    # deploy that guts it has no job to restore it, and this probe is the only safeguard.
+    # Asserts shape not values (robust to a future roster/thread-count refresh).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    brands = d.get("brands")
+    if not isinstance(brands, list) or not brands:
+        return "missing/empty 'brands' list (panel render gate)"
+    b0 = brands[0]
+    if not isinstance(b0, dict):
+        return "first brand row is not an object"
+    if not (isinstance(b0.get("label"), str) and b0["label"].strip()):
+        return "first brand row missing/empty 'label' (Lender column render read)"
+    if "reported_total" not in b0:
+        return "first brand row missing 'reported_total' key (threads-claimed column render read)"
+    if not any(isinstance(b, dict) and b.get("is_us") for b in brands):
+        return "no row flagged is_us — our own book (the panel's point) is absent"
+    return None
+
+
+def _shape_social_themes(d):
+    # The say/hear gap board on Competition (#acq, obj #2): drawSocialThemes live-fetches
+    # it and GATES the whole board on a non-empty .answered array — else it drops to a
+    # "Social themes not yet built" placeholder with no phone alert. Per row it renders
+    # .label, the .supply_share_pct / .demand_share_pct columns and the .unanswered_pts
+    # imbalance (the sort key + colour band); the readout reads meta.supply_docs /
+    # meta.demand_docs as the two denominators. It CANNOT self-heal — its inputs are
+    # Thai-IP / keyed pulls (pull_pantip.py, pull_app_reviews.py, pull_apple_reviews.py,
+    # pull_youtube_comments.py) with no CI cron — so this probe is the only safeguard
+    # against a truncated/404 CDN deploy silently blanking it. Shape not values.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    ans = d.get("answered")
+    if not isinstance(ans, list) or not ans:
+        return "missing/empty 'answered' list (board render gate)"
+    a0 = ans[0]
+    if not isinstance(a0, dict):
+        return "first answered row is not an object"
+    if not (isinstance(a0.get("label"), str) and a0["label"].strip()):
+        return "first answered row missing/empty 'label' (Theme column render read)"
+    if not isinstance(a0.get("unanswered_pts"), (int, float)):
+        return "first answered row missing numeric 'unanswered_pts' (imbalance column + sort key)"
+    if not isinstance(a0.get("supply_share_pct"), (int, float)):
+        return "first answered row missing numeric 'supply_share_pct' (Lenders-say column render read)"
+    m = d.get("meta")
+    if not isinstance(m, dict):
+        return "missing 'meta' object (readout denominators)"
+    if not isinstance(m.get("supply_docs"), (int, float)):
+        return "meta missing numeric 'supply_docs' (readout denominator render read)"
+    if not isinstance(m.get("demand_docs"), (int, float)):
+        return "meta missing numeric 'demand_docs' (readout denominator render read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -2659,6 +2720,15 @@ DATA_FILES = [
     ("data/rival_pulse.json", _shape_rival_pulse, ".sentiment ladder + .promos feed (#acq rival watch)"),
     ("data/rival_ads.json", _shape_rival_ads, ".brands ad-creative board (#acq paid-media pulse)"),
     ("data/rival_youtube.json", _shape_rival_youtube, ".channels video board (#acq video pulse)"),
+    # The two borrower-VOICE reads on the same #acq surface — both live-degrade SILENTLY
+    # to a "not yet built" placeholder with no phone alert, and NEITHER self-heals (their
+    # Pantip / app-review / YouTube pulls are Thai-IP/keyed with no CI cron), so a
+    # truncated CDN deploy that guts either blanks it with no alert. Flagged as the next
+    # probe target by the 2026-08-14 competitor-census run:
+    #  - pantip_panel: the brand-level borrower-voice panel (obj #2), gates on .brands
+    #  - social_themes: the say/hear gap board (obj #2), gates on .answered
+    ("data/pantip_panel.json", _shape_pantip_panel, ".brands borrower-voice panel (#acq Pantip voice)"),
+    ("data/social_themes.json", _shape_social_themes, ".answered say/hear gap board (#acq reception synthesis)"),
     # The three exec-facing reads flagged as the next probe targets by the 2026-08-01
     # province_pressure run — each renders on a default-reachable route and
     # live-degrades SILENTLY when its file is missing, so a truncated CDN deploy
