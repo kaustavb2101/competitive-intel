@@ -3,6 +3,46 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-14 — Intelligence loop (service/deploy-health, obj #2): the two borrower-VOICE reads on Competition (`#acq`) — the Pantip panel + the say/hear gap board — now have deploy probes; both were unprobed silent-deploy blind spots that cannot self-heal
+
+- **The gap fixed (`pantip-social-themes-unprobed-deploy-blind-spot`).** After confirming the live master
+  production alias is **HTTP 200** on `/`, `/data/meta.json`, `/data/competitor_coverage.json` and the
+  scheduled/autonomy backlog is exhausted (AUTONOMY_PLAN 98% — the 1 open item is owner-side), a
+  render-path re-scan of the surfaced-but-unprobed `data/*.json` reads (the class the prior run named
+  as next: the agri/sentiment reads) found the highest-value pair still uncovered: the two **borrower-voice**
+  reads on the `#acq` Competition surface (obj #2). `data/pantip_panel.json` (brand-level Pantip
+  discussion — threads/match-rate/replies-in-public/themes/scrubbed quotes; `drawPantip`) and
+  `data/social_themes.json` (the say/hear gap — what lenders publish vs what customers write against one
+  Thai phrase list; `drawSocialThemes`) are each live-`fetch()`'d and GATE their whole board on a
+  non-empty array (`.brands` / `.answered`).
+- **Why it matters.** Each loader degrades SILENTLY: a truncated/empty/404 CDN deploy of either drops
+  the panel to a calm "…not yet built, run pipeline/pull_*.py" placeholder — masquerading a broken
+  deploy as the normal not-pulled state — with **NO phone alert**. And unlike the census siblings,
+  NEITHER self-heals: their inputs (`pull_pantip.py` — a Thai forum, Thai-IP only — plus
+  `pull_app_reviews.py`/`pull_apple_reviews.py`/`pull_youtube_comments.py`, keyed) have no CI cron, so a
+  gutted deploy has no job to restore it. The deploy probe is the ONLY safeguard — the same blind spot
+  the `rival_pulse`/`rival_ads`/`rival_youtube` probes already closed for the other `#acq` sentiment reads.
+- **The fix.** Added two probe validators to `pipeline/check_site_health.py` and registered them in
+  `DATA_FILES`. `_shape_pantip_panel` asserts the render CONTRACT (shape not values, robust to a roster/
+  thread-count refresh): a non-empty `.brands[]` gate, the first row's `.label` (Lender column) +
+  `reported_total` key, and that ≥1 row carries `is_us` (our own book — the panel's whole point).
+  `_shape_social_themes` asserts a non-empty `.answered[]` gate, the first row's `.label` +
+  numeric `.unanswered_pts` (imbalance column + sort key) + numeric `.supply_share_pct`, and the numeric
+  `meta.supply_docs`/`meta.demand_docs` readout denominators. One file, +70 lines, zero deletions.
+- **Verified.** Unit-tested both (19 cases — the real committed payloads ACCEPTED; 8 pantip + 9
+  social broken shapes — non-dict, empty/short list, missing/blank label, missing tally, no `is_us`,
+  non-numeric imbalance/share, missing `meta`/denominators — all correctly REJECTED). `check_site_health.py
+  --local platform` → **HEALTHY 251/251** (was 245, +6 = 2 files × fetch/parse/shape), exit 0. No
+  `platform/data` file, builder or provenance changed (probe-only) → no rebuild / `build_provenance`
+  needed. `bash tests/run.sh check` → **134 passed · 0 failed** (data integrity 455/455; its deploy-probe
+  self-test now also accepts these two payloads). Test-infra only, no app behaviour/visual change →
+  safeguard-gated direct commit, no PR/headless render needed.
+- **Next recommended.** The two primary borrower-voice reads are now probed. Remaining lower-value
+  agri probe gaps on secondary/province routes: `crop_mix` (obj #1 farm-income correction, `#overview`),
+  `crop_landuse` + `crop_farmer_income` (province deep-dive `province.html`). The genuinely-open DATA
+  items still need an owner-side/Thai-IP window (GISTDA `check-crop` 40m per-branch pull; commit the
+  BAAC/SME-bank raw CSVs to unblock the formal-credit penetration layer).
+
 ## 2026-08-14 — Intelligence loop (service/deploy-health, obj #2): the RAW competitor-census layers — the point data the ENTIRE Competition (`#acq`) readout is built from — now have deploy probes; all three were unprobed silent-deploy blind spots
 
 - **The gap fixed (`competitor-census-unprobed-deploy-blind-spot`).** A negative-space sweep (after
