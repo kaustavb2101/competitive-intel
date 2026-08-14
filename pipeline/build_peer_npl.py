@@ -4,9 +4,11 @@
 Assembles platform/data/peer_npl.json from two committed, in-repo sources — no network:
 
   1. The listed title-lender peers' OWN reported NPL ratios — hand-curated from
-     docs/RESEARCH_DIGEST.md §B (each company's FY2025 / 2025 IR figure), carried as
-     cited constants below. They are the source of truth (they change ~yearly and are
-     published, not pulled), so hard-coding them here — with their citation — is honest.
+     docs/RESEARCH_DIGEST.md §B (each company's FY2025 / 2025 IR figure; Heng's is its
+     H1-2026 SET-filed Stage-3 credit-impaired share, the loan-quality analog for a TFRS9
+     hire-purchase/leasing lender), carried as cited constants below. They are the source of
+     truth (they change ~yearly and are published, not pulled), so hard-coding them here —
+     with their citation — is honest.
 
   2. AutoX / Ngern Chaiyo's OWN book quality — MEASURED, computed live from the real
      loan tape (platform/data/tape_real.json `bucket_ladder`), so the anchor always
@@ -64,6 +66,22 @@ PEERS = [
         "collateral": "cars/pickups/heavy-vehicle + land/house/condo",
         "source": "2025 IR oppday deck — NPL guidance 3.5–3.6%",
     },
+    {
+        # The one CONTRACTING listed peer, and the only reported peer whose loan-quality figure
+        # brackets AutoX's own ~6% tape-measured impaired share (objective #2: "compliant" is not
+        # "thriving"). Heng is a hire-purchase / leasing lender, so it reports a TFRS9/IFRS-9
+        # Stage-3 (credit-impaired) share rather than a bank-style 90+ NPL — the loan-quality
+        # analog for its accounting basis, and arguably a CLOSER basis-match to AutoX's own
+        # impaired-share read than the other peers' headline NPLs. The mixed basis is disclosed
+        # in the row source, the meta.note, and the app's method box — this stays consistent with
+        # the layer's standing "NOT a like-for-like league table" framing.
+        "ticker": "HENG",
+        "name": "Heng Leasing & Capital",
+        "npl": 6.78,
+        "collateral": "motorcycle / car / land title + hire-purchase (contracting)",
+        "source": "Heng SET filing, H1-2026 — Stage 3 credit-impaired 6.78% of gross book "
+                  "(฿542.8m/฿8,002.8m), 30 Jun 2026; TFRS9/IFRS-9 basis (loan-quality analog)",
+    },
 ]
 
 # Buckets in tape_real.json's ladder that are 90+ days past due (the strict BoT NPL
@@ -118,11 +136,16 @@ def build():
         "meta": {
             "title": "Peer NPL benchmark (reported) + AutoX measured anchor",
             "note": ("Listed title-loan peers' reported NPL ratios (their own FY2025 / 2025 IR "
-                     "figures) shown next to AutoX/Ngern Chaiyo's OWN book quality, MEASURED from "
-                     "the real loan tape. NOT a like-for-like league table — peers report on their "
-                     "own bases and write off / provision out deep-delinquent stock that AutoX "
-                     "carries SEPARATELY as 180+ legacy workout inventory — so AutoX is a distinct "
-                     "MEASURED anchor, not ranked inside the reported-peer list. The spread tracks "
+                     "figures; Heng's is its H1-2026 SET-filed TFRS9 Stage-3 credit-impaired "
+                     "share — the loan-quality metric a hire-purchase/leasing lender publishes in "
+                     "place of a bank-style 90+ NPL, and the closest basis-match to AutoX's own "
+                     "impaired-share read) shown next to AutoX/Ngern Chaiyo's OWN book quality, "
+                     "MEASURED from the real loan tape. NOT a like-for-like league table — peers "
+                     "report on their own bases and write off / provision out deep-delinquent stock "
+                     "that AutoX carries SEPARATELY as 180+ legacy workout inventory — so AutoX is a "
+                     "distinct MEASURED anchor, not ranked inside the reported-peer list. Heng is "
+                     "the one CONTRACTING peer and the only reported peer whose figure brackets "
+                     "AutoX's own impaired share ('compliant' is not 'thriving'). The spread tracks "
                      "collateral mix: gold/vehicle books run lower NPL, land/agri/heavy-vehicle "
                      "books higher."),
             "measured": "peers = reported by the companies; AutoX = measured from the real loan tape",
