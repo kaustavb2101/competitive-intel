@@ -893,6 +893,15 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
   .tblwrap{width:100%!important;max-width:none!important;overflow:visible!important;border:none!important}
   .tbl{width:100%!important;max-width:none!important;border-collapse:collapse!important;break-inside:avoid}
   .tbl th,.tbl td{color:#111!important;border-color:#ccc!important}
+  /* Keep the data-viz colour when the board prints the brief. Chrome/Safari strip element
+     BACKGROUNDS from print + "Save as PDF" unless "Background graphics" is ticked (off by default),
+     so the whole-book delinquency ladder and every proportion bar — whose ONLY encoding is the
+     background fill — print as blank white boxes, gutting the exec/board readout (the surrounding
+     card fills are deliberately whitened above; these marks are the exception that must keep colour).
+     print-color-adjust:exact forces the fill to render regardless of that setting. Scoped to the
+     data-viz marks only, so nothing the print block intentionally whitens is affected. */
+  .ic-lad,.ic-lad-seg,.ic-lad-leg i,.rz-bar,.rz-bar span,.bar,.bar>i,.conc-legend i{
+    -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 
 /* ---------- scenario simulator ---------- */
