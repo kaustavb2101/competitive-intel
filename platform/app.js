@@ -1726,8 +1726,14 @@ async function boot(){
     // idempotent no-op when the pill is already fully visible.
     try{ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{ const on=document.querySelector('#nav a[data-v].on'); if(on){ try{ on.scrollIntoView({block:'nearest',inline:'nearest'}); }catch(e){} } }); }catch(e){}
   }catch(err){
+    // Exec-facing, actionable error — the front door is the most-used page, and its reader is the
+    // owner/board, not a developer. If the critical fetch fails in production (a transient network
+    // hiccup on the Thai laptop, a CDN blip), tell them what happened and give them the one action
+    // that fixes it (reload), not an unactionable "make sure the JSON files sit next to this page".
+    // The technical detail is kept, demoted to a muted line, for whoever is actually debugging.
     document.querySelector('main').insertAdjacentHTML('afterbegin',
-      `<div class="insight" style="border-left-color:var(--agri)">Couldn't load data files. Make sure <b>data/branches.json</b> and <b>data/meta.json</b> sit next to this page. (${err})</div>`);
+      `<div class="insight" id="booterr" style="border-left-color:var(--agri)"><b>Couldn't load the dashboard data.</b> This is usually a brief network hiccup — reload to try again. If it keeps happening, the data service may be momentarily unavailable.<div style="margin-top:8px"><button type="button" id="bootReload" class="chip">↻ Reload</button></div><div class="sub" style="font-size:11px;margin-top:8px;opacity:.7">Technical detail: ${err}</div></div>`);
+    var rb=document.getElementById('bootReload'); if(rb) rb.addEventListener('click',function(){location.reload();});
   }
 }
 
