@@ -3,6 +3,181 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-14 — Intelligence loop (service/deploy-health, obj #2): the RAW competitor-census layers — the point data the ENTIRE Competition (`#acq`) readout is built from — now have deploy probes; all three were unprobed silent-deploy blind spots
+
+- **The gap fixed (`competitor-census-unprobed-deploy-blind-spot`).** A negative-space sweep (after
+  confirming the scheduled data backlog is exhausted here — FPO PICO census / per-branch cropland /
+  DBD-DIW-MOT vehicle+formation layers all shipped + wired, and the genuinely-open items — GISTDA 40m,
+  BAAC/SME-bank penetration — need a `GISTDA_SPHERE_KEY` / Thai-IP window this CI session lacks) found
+  that the **raw** competitor-census point layers are fetched by `app.js` but absent from
+  `check_site_health.py`'s `DATA_FILES`. `data/competitors_census.json` (16,503 MEASURED merged
+  all-brand rivals — the primary overlay), `data/competitors_national.json` (2,556 Google-Places
+  points) and `data/competitors_overture.json` (2,458 Overture points — the two fallback sources) are
+  read by `loadCompetitors()` (prefers the merged census, falls back to national ∪ overture) and
+  `loadCompetitorCensus()` (the per-branch 10km catchment rival read), and drive the whole Competition
+  surface + every branch's 5km/10km `_comp` rival count + the National-map competitor-density lens. The
+  district/province AGGREGATES built on this census (`competitor_coverage`, `rival_density`,
+  `pico_district`, `peer_province`) were all probed — but the raw point layers they and the live overlay
+  are built FROM were the unprobed base of that whole pyramid.
+- **Why it matters.** Each loader is null-guarded: on a truncated / empty / 404 CDN deploy of these
+  files the client sets `COMP=null` / `ccenItems=[]` and the rival overlay silently collapses to its
+  quiet "run pull_competitors.py" note while every branch's rival-proximity count zeroes — with **NO
+  phone alert**. None self-heals from CI (the census is a Thai-IP Google-Places / official-locator pull,
+  no CI cron), so the deploy probe is the ONLY safeguard — the exact "broken demo" blind spot the
+  `competitor_coverage` / `rival_density` probes already close for the aggregates.
+- **The fix.** Added one shared `_shape_competitor_items(d, layer_desc)` render-contract checker plus
+  three thin named wrappers (`_shape_competitors_census/_national/_overture`) and registered all three in
+  `DATA_FILES`. Each asserts the render **contract** — shape not values (robust to a future census
+  refresh shifting counts): a non-empty `.items[]`, and on the first geocoded item the numeric
+  `.lat`/`.lng` the client haversine reads plus the non-empty `.brand` the per-brand tally + dot colour
+  reads. One file, `pipeline/check_site_health.py`, +54 lines, zero deletions.
+- **Verified.** Negative-tested the checker (6 broken shapes — empty items, missing key, no/non-numeric
+  lat, no brand, non-dict — all correctly REJECTED; the real committed files ACCEPTED). `check_site_health.py
+  --local platform` → **HEALTHY 245/245** (was 236, +9 = 3 files × fetch/parse/shape), exit 0. No
+  `platform/data` file, builder or provenance changed (probe-only), so no rebuild / `build_provenance`
+  needed. `bash tests/run.sh check` → **0 failed** (its deploy-probe self-test now also accepts these
+  three payloads). Test-infra only, no app behaviour/visual change → safeguard-gated direct commit.
+- **Next recommended.** The obj-#2 competitive surface base layers are now all probed. The negative-space
+  sweep's remaining lower-value probe gaps: the agri/sentiment reads (`crop_mix`, `crop_margin`,
+  `crop_landuse`, `crop_farmer_income`, `pantip_panel`, `social_themes`) and the auxiliary scene layers.
+  The genuinely-open DATA items still need an owner-side/Thai-IP window (GISTDA `check-crop` 40m
+  per-branch pull to supersede the SPAM baseline in `build_branch_cropland.py`; commit the BAAC/SME-bank
+  raw CSVs to unblock the formal-credit penetration layer).
+
+## 2026-08-14 — Intelligence loop (PROVENANCE CONSISTENCY, obj #2): retire the last stale "Heng is a Cloudflare-blocked SAMPLE / under-counts" caveat — it survived only in `build_peer_province.py`, so the per-province peer board mislabelled its own MEASURED official-locator data as an under-counting estimate
+
+- **The gap.** The prior three intelligence runs promoted Heng to a first-class MEASURED brand across the
+  census (`competitors_census.json`, 450 branches from `pull_heng_locator.py`'s official hengleasing.com
+  province-walk), the competitor-coverage board, the peer-NPL benchmark, and app.js's `#acq` narrative
+  (which now reads "all four rivals' official locators … no sampled layer remains"). But
+  `pipeline/build_peer_province.py` was missed: its docstring, ~5 inline comments and — the material part
+  — the emitted **`peer_province.json` .meta.caveats[0]** still declared *"the rival census is a LOWER
+  BOUND … Heng is a Google/Overture SAMPLE (its locator is Cloudflare-blocked), so Heng per-province
+  counts under-count more than the others."* That is false and self-contradictory: `rival_density.json`
+  — the very layer `peer_province` is aggregated FROM — already describes the same 450 Heng points as
+  "the operators' OWN official store-locators (Heng included)". So the per-province peer board shipped a
+  provenance note telling the reader its measured official-locator data was an under-counting sample.
+- **The fix (text-only, zero numeric change).** Rewrote every stale reference in `build_peer_province.py`
+  to `rival_density.py`'s already-corrected framing: all four brands are their OWN official store-locators
+  (Heng's earlier Google/Overture sample REPLACED, not unioned), so the census is near-complete for the
+  big-4 rather than a per-brand lower bound; the floor that remains is that only the 4 big compliant brands
+  are censused (sub-scale local operators absent) → big-4 density, not total competitive density. The
+  "every ratio is a FLOOR" reasoning is preserved but re-anchored on the correct reason (sub-scale
+  operators excluded), not the retired Heng-sample claim.
+- **Verified.** Rebuilt `peer_province.json` — meta no longer contains "Cloudflare"/"Google/Overture
+  SAMPLE"/"under-count"; **all counts identical** (Heng still 450 across 61 provinces, totals unchanged),
+  so the correction is honesty-only, not a data move. Regenerated `provenance.json` (142 layers, 0
+  unlabelled). `bash tests/run.sh check` → **133 passed, 0 failed**. Not user-visible: app.js and
+  data.html render hardcoded (already-corrected) narrative, not `peer_province.meta.caveats`, so no
+  visual/behaviour change → safeguard-gated direct commit, no PR needed.
+- **Next recommended intelligence task.** The stale-Heng-sample premise is now fully retired across the
+  competitive surface (census, coverage, peer-NPL, rival-pressure, contested-pop, and now per-province
+  peer). A tight follow-up if a negative-space sweep wants one: audit the 30-point `rayong_competitors.json`
+  Rayong fallback (surfaced via `rayong_province.json`) for the same stale-sample language, now that the
+  national census supersedes it.
+
+## 2026-08-14 — UX loop (a11y, WCAG 4.1.2): command-center verdict "hero" card was a link mislabelled `role="button"` — dropped the role so it announces + behaves as the navigating link it is (PR #406, safeguard-gated auto-merge + deploy-verified)
+
+- **The finding.** The front-door "Watching…" verdict hero (`renderHomeHero`, `platform/app.js` ~L11464)
+  rendered as `<a class="cc-hero-card" data-v="…" href="#…" role="button">` — a real navigation link
+  (routes to a `#hash` view via the `#main-content a[data-v]` click delegation) that `role="button"` made a
+  screen reader announce as a *button*. Twofold mismatch: it misnames the element (navigates, doesn't act)
+  and misrepresents the keyboard contract — buttons activate on **Space**, anchors do **not** — so an AT user
+  who heard "button" and pressed Space got page-scroll, not activation. Every sibling content jump-link
+  (`.cc-link`/`.pill`/`.story-next`) is a plain `<a href>` link; the hero was the lone outlier (grep: 1 of 2
+  `role="button"` in the SPA — the other, `#msheet-handle`, is a correct `<div role="button">` with its own
+  Enter/Space handler).
+- **The fix.** Removed the `role="button"` attribute (the only functional change + a 4-line explanatory
+  comment). Enter still activates it natively; styling is class-based (`.cc-hero-card`) and no CSS/JS reads
+  the role, so **zero visual change** and routing is untouched.
+- **Safeguards (all passed).** `bash tests/run.sh check` — **133 passed, 0 failed**. Headless render of
+  `index.html` (1100×900) + PNG self-review — hero card visually identical (red accent, "measured + estimated"
+  tag, "Map view →" CTA); settled DOM confirms `<a class="cc-hero-card risk" … href="#map">` with **no**
+  `role="button"`. No secrets; clean 2-file diff (`platform/app.js` +5/−1, `docs/UXUI_AUDIT.md` +1).
+- **Merge + deploy-verify.** Squash-merged PR #406 to master (auto-deploys to Vercel). Production alias
+  verified: `/` → **200**, `/index.html` → 308→**200** (expected `cleanUrls` redirect), `/app.js` → **200**
+  with the fix live (served `app.js` shows the hero anchor with no `role="button"`). No rollback needed.
+- **Next recommended.** The UXUI_AUDIT backlog's remaining OPEN items are all flagged unsuitable for
+  unattended surgical auto-merge — three test-infra items outside `platform/` (`qa-visual-baseline-stale`,
+  `qa-visual-overflow-not-in-ci`, `qa-live-not-in-overflow-audit-routes`; the visual-regression baseline
+  refresh in particular would restore CI signal), two deck.gl device-tested items (`ux-viewport-user-scalable-3dpages`,
+  `ux-navmore-keyboard-3dpages`/`ux-navmore-3dpages-absolute-overflow`), and one bigger-than-surgical content
+  pass (`ux-acquire-taxonomy-mandate`). A future surgical run should keep reviewing routes for fresh
+  name-role-value / keyboard-contract mismatches like this one.
+
+## 2026-08-14 — Intelligence loop (PROVENANCE CONSISTENCY): retire the stale "Heng is a Google∪Overture sample" premise from the rival-pressure + contested-pop layers and the whole #acq/#exposure competitive surface — the census promoted Heng to an official-locator brand, but two builders and ~7 app strings still called it a sample (PR + headless-verified)
+
+- **The gap (objective #2, the flagged next-task from the prior Heng peer run).** The committed census
+  (`competitors_census.json`, `official_locator_brands: [Heng, Muangthai, Srisawad, Tidlor]`) has Heng as
+  the operator's OWN official store-locator (450 measured points via `pull_heng_locator.py`, which
+  **replaced** the earlier Google∪Overture sample rather than being unioned). `build_rival_density.py` was
+  already corrected to this. But **`build_rival_pressure.py` and `build_contested_pop.py` still emitted
+  "Heng is a Google∪Overture SAMPLE (lower bound)"** into their shipped JSON `meta.provenance.rivals` +
+  `gaps` — false provenance in `rival_pressure.json` / `contested_pop.json` — and **~7 app.js strings**
+  across the density lens (line 24), the who-holds-it/contested/under-siege method boxes (#acq), the
+  contested-pop caveat (#exposure) and the branch popup still read "Heng is a sample / Heng sampled / Heng
+  sample". A single rival read told two contradictory stories about the same census.
+- **The fix (one coherent surface, honest about what IS still a lower bound).** Corrected both builders'
+  docstrings + `provenance.rivals` + `gaps` to state all four big brands are now official-locator networks
+  (Heng via `pull_heng_locator.py`, sample replaced not unioned), and the 7 app.js strings to match.
+  **Deliberately PRESERVED the "lower bound" framing everywhere it appears** — it was never solely a
+  Heng-sample artifact: the census still misses ALL sub-scale local operators (the long tail facing the
+  Q1-2026 BoT deadline), so contested share / rival pressure / the out-fielded ratio remain a genuine lower
+  bound / floor for that reason. Only the false Heng clause was removed; no claim was upgraded to
+  "measured-complete" that isn't.
+- **No numeric drift.** The census data was untouched, so regenerating `rival_pressure.json` (1119 besieged,
+  16,503 rivals) and `contested_pop.json` (93.8% national contested share, 72 fully contested) changed
+  **only meta strings** — identical counts before/after. `provenance.json` rebuilt (byte-size mandate);
+  layer counts unchanged (142 layers, 83 measured / 59 estimated / **0 unlabelled**) — no reclassification.
+- **Verify.** `build_rival_pressure.py --check` + `build_contested_pop.py --check` (rasterio+WorldPop
+  present) + `build_provenance.py --check` all byte-exact; `node --check platform/app.js` clean;
+  `bash tests/run.sh check` — **135 passed, 0 failed** (DATA VALIDATION 455/455). Headless render
+  (Chromium, `index.html#acq`, 390×844): the corrected strings render live ("all four big brands" ×2,
+  density-lens "sub-scale operators excluded" ×2) and the QA probe reports `data-errors="[]"` — no JS
+  errors. Visible text change → PR + render self-review before self-merge.
+- **Next recommended intelligence task.** With the Heng-sample premise now retired from the census board,
+  the peer-NPL benchmark and the whole competitive surface, the remaining CI-doable data backlog stays
+  exhausted (smebank/baac penetration are Thai-IP/owner-side only; DLT/BAAC re-probes settled dead). A tight
+  follow-up if a fresh negative-space sweep wants one: audit the `rayong_competitors.json` 30-point Rayong
+  fallback references for the same stale-sample language now that the national census supersedes it.
+
+## 2026-08-14 — Intelligence loop (PEER COMPARISON): promote Heng to a first-class MEASURED brand in the competitor-coverage / national-standing board — the builder was stale (still treated it as a Cloudflare-blocked sample) and app.js openly contradicted itself
+
+- **The gap (objective #2, the flagged next-task from the prior peer run).** `pipeline/build_competitor_coverage.py`
+  still handled Heng under its OLD premise — "locator Cloudflare-blocked → `found` is a Google/Overture
+  SAMPLE (lower bound)" and "no nationwide branch count cited → EXPECTED null." **Both are now false.**
+  The committed census (`competitors_census.json`) meta says Heng's locator was **province-walked from
+  hengleasing.com via `pull_heng_locator.py` from a Thai IP and REPLACED the earlier sample** — Heng is now
+  one of four `official_locator_brands`, 450 measured points — and Heng's **450-branch count IS cited**
+  (its own SET filings, 30 Jun 2026; branch trajectory 1,018→743→450, `RESEARCH_DIGEST.md §B`). So the one
+  *contracting* rival was silently dropped from the network-size standing, the measured-footprint ranking,
+  and the coverage board. Worse, **app.js already contradicted itself on screen**: its method box said
+  "Heng is now on the same footing … No sampled layer remains in the census," while the same box and the
+  footprint line still read "Heng excluded (locator Cloudflare-blocked → lower bound)."
+- **The fix (one coherent board, honestly promoted).** In `build_competitor_coverage.py`: `EXPECTED["Heng"]=450`
+  (cited SET-filing source added to `expected_sources`); added Heng to `LOCATOR_COMPLETE_BRANDS` so it enters
+  the measured-footprint ranking; rewrote every stale "Cloudflare-blocked / sample / lower-bound / uncited /
+  excluded" caveat across the docstrings, `_footprint_measured`, `_national_standing`, and the `build()`
+  meta. Result: Heng now ranks in **national standing (AutoX #2 of 5 — MTC 8,673 › AutoX 2,015 › Tidlor
+  1,873 › Srisawad 1,138 › Heng 450)** and **measured footprint (AutoX #3 of 5, Heng 450 pts)**, and its
+  coverage reads **450/450 = 100%** (honest — official locator ≈ cited count). **Deliberately kept Heng OUT
+  of the book-per-branch read** — it reports a GROSS hire-purchase/leasing receivable (฿8.0bn), a different
+  basis from the others' total loans outstanding, so mixing it would not be apples-to-apples; the exclusion
+  reason string was corrected from the now-false "no cited book" to that basis note. `app.js`: fixed the
+  three stale Heng-exclusion strings (footprint sub, book-intensity sub, method box) to match.
+- **Downstream regen (affected layers).** `rival_threat.json` (derived from `competitor_coverage.json`)
+  regenerated — Heng's `branches_reported` null→450 (verdict/tier unchanged, footprint was already 0.22×
+  from the found-fallback). `build_provenance.py` rebuilt; provenance counts unchanged (142 layers, 83
+  measured / 59 estimated / **0 unlabelled**), so no reclassification and no fabrication introduced.
+- **Verify.** `build_competitor_coverage.py --check` + `build_rival_threat.py --check` + `build_provenance.py
+  --check` all byte-exact; `check_peer_constants.py` unaffected (it asserts only MTC/Tidlor/Srisawad vs §B);
+  `node --check platform/app.js` clean; `bash tests/run.sh check` — 0 failed. Visual/behaviour change → PR +
+  headless render self-review before self-merge.
+- **Next recommended intelligence task.** The SAME stale-Heng premise ("Heng is a sample / lower bound")
+  survives in ~6 OTHER app.js strings outside this board — contested-pop caveats (≈5638, 7205), rival-pressure
+  (≈6568), and the density-lens desc (line 24) — all now inconsistent with the census reality. A tight
+  follow-up: sweep those to "official locator (all four brands)" so the whole #acq surface tells one story.
+
 ## 2026-08-14 — UX loop (PRINT): keep the delinquency-ladder + proportion-bar colour in the printed board brief — VERIFIED against a real PDF, squash-merged + deploy-verified
 
 - **Shipped** (branch `claude/ux-loop-20260814-0905`, squash-merged PR #401 → `f522ccb` on master): a **print / exec-brief** fix. The command-center / `#exposure` "🖨 Print / PDF" is an explicit board-facing feature, but Chrome & Safari strip element **backgrounds** from print + "Save as PDF" unless the "Background graphics" box is ticked (OFF by default), and no page declared `print-color-adjust`. So on a real default PDF the whole-book **delinquency ladder** (`.ic-lad-seg`) and its colour **legend** (`.ic-lad-leg i`) — whose ONLY encoding is the background fill — printed as **blank white boxes**, gutting the core risk readout; the sibling proportion bars (`.rz-bar`, `.bar>i`, `.conc-legend i`) share the defect. Foreground colour (the red status dot, tag borders/text) already survived — only background-encoded marks were lost. Fix: one `@media print` rule setting `-webkit-print-color-adjust:exact;print-color-adjust:exact` on exactly those data-viz marks, so the fill renders regardless of the background-graphics setting. **Scoped to data-viz only** — the print block still deliberately whitens **card fills** (`.cc-card`/`.mcard`), untouched. `platform/styles.css` (+9).

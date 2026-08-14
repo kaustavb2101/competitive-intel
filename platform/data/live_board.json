@@ -126,8 +126,8 @@
    "measured": true,
    "no_history": "each pull overwrites the last, and it can only be pulled from a Thai IP, so any series would have irregular gaps rather than a weekly cadence",
    "source": "pantip.com public search + comment endpoints (no auth, no login)",
-   "stamp": "2026-08-11",
-   "stamp_iso": "2026-08-11",
+   "stamp": "2026-08-13",
+   "stamp_iso": "2026-08-13",
    "stamp_kind": "pulled",
    "unit": "lenders tracked",
    "value": 15,
@@ -452,7 +452,7 @@
    "stamp_iso": "2026-06-30",
    "stamp_kind": "vintage",
    "unit": "juristic persons",
-   "value": 7511,
+   "value": 7972,
    "what": "merchant-segment formation — new small firms are the merchant book's feedstock"
   },
   {

@@ -2474,6 +2474,42 @@ def _shape_branch_recommendations(d):
     return None
 
 
+def _shape_competitor_items(d, layer_desc):
+    # Shared render-contract check for the three MEASURED rival-branch census layers
+    # behind the Competition (#acq) readout + the per-branch catchment/5km rival counts.
+    # app.js (loadCompetitors / loadCompetitorCensus) reads `.items[]` and, per item,
+    # `.lat`/`.lng` (client-side haversine into the AutoX branch join) and `.brand`
+    # (the per-brand tally + dot colour). A truncated/empty `.items` collapses the whole
+    # competitor overlay to its quiet "run pull_competitors.py" note with NO error
+    # surfaced. Asserts render shape, not values (robust to a future census refresh).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    items = d.get("items")
+    if not isinstance(items, list) or not items:
+        return "missing/empty 'items' list (%s — competitor overlay read)" % layer_desc
+    it0 = next((x for x in items if isinstance(x, dict) and x.get("lat") is not None), None)
+    if it0 is None:
+        return "no item carries a 'lat' (the haversine branch-join read)"
+    for k in ("lat", "lng"):
+        if not isinstance(it0.get(k), (int, float)):
+            return "first geocoded item missing numeric '%s' (haversine rival-proximity read)" % k
+    if not (isinstance(it0.get("brand"), str) and it0["brand"].strip()):
+        return "first item missing 'brand' (per-brand tally + dot-colour read)"
+    return None
+
+
+def _shape_competitors_census(d):
+    return _shape_competitor_items(d, "merged all-brand census")
+
+
+def _shape_competitors_national(d):
+    return _shape_competitor_items(d, "Google Places sample")
+
+
+def _shape_competitors_overture(d):
+    return _shape_competitor_items(d, "Overture sample")
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -2879,6 +2915,24 @@ DATA_FILES = [
     # for their siblings. Asserts the 2015-index-aligned .branches shape + the outlier
     # row render reads, not values — robust to a future risk-vintage refresh.
     ("data/branch_peers.json", _shape_branch_peers, ".branches index-aligned (2015) with dev + .outliers audit rows (name/prov/risk/peer_median/dev/top_driver/twins) (#trend peer-twin benchmark + #map lens, obj #1)"),
+    # The RAW competitor-census layers (obj #2) that feed the ENTIRE Competition
+    # (#acq) readout + the per-branch 5km/10km rival counts, and the National map's
+    # competitor-density lens. app.js loadCompetitors() prefers the merged
+    # competitors_census.json and falls back to competitors_national ∪
+    # competitors_overture; loadCompetitorCensus() reads the merged census again for
+    # the catchment 10km rival read. All three were UNPROBED — the coverage ROLLUP
+    # (competitor_coverage.json) and the district/province aggregates (rival_density /
+    # pico_district / peer_province) were probed, but the raw point layers they and the
+    # whole #acq overlay are built FROM were not. Each is null-guarded, so a
+    # truncated/empty/404 CDN deploy silently drops the rival overlay to its quiet
+    # "run pull_competitors.py" note and zeroes every branch's `_comp` rival count with
+    # NO phone alert — the same "broken demo" blind spot the competitor_coverage /
+    # rival_density probes closed for the aggregates. None self-heals from CI (the
+    # census is a Thai-IP Google-Places / official-locator pull, no CI cron), so the
+    # probe is the ONLY deploy safeguard. Each asserts render shape, not values.
+    ("data/competitors_census.json", _shape_competitors_census, ".items[] merged all-brand rival census (lat/lng/brand) — the primary #acq competitor overlay + per-branch catchment rival read (obj #2)"),
+    ("data/competitors_national.json", _shape_competitors_national, ".items[] Google-Places rival sample (lat/lng/brand) — census fallback source for the #acq overlay (obj #2)"),
+    ("data/competitors_overture.json", _shape_competitors_overture, ".items[] Overture rival sample (lat/lng/brand) — census fallback source for the #acq overlay (obj #2)"),
 ]
 
 

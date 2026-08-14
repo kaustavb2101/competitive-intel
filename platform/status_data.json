@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-14T11:50:40+07:00",
-    "commit": "5ea78c0"
+    "generated_at": "2026-08-14T17:47:55+00:00",
+    "commit": "29147b1"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,78 @@
   ],
   "activity": [
     {
+      "date": "2026-08-14T17:47:55+00:00",
+      "sha": "29147b1",
+      "summary": "intel(peer): retire the last stale 'Heng is a Cloudflare-blocked SAMPLE' caveat from the per-province peer board (obj #2)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-14T16:12:16+00:00",
+      "sha": "ce11ba6",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-14, run 31817848218)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-14T15:12:29+00:00",
+      "sha": "14149ac",
+      "summary": "docs(progress): log ux-hero-card-role-button merge + deploy-verify (PR #406)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-14T22:09:16+07:00",
+      "sha": "c13a319",
+      "summary": "ux: hero verdict card is a link, not a button (WCAG 4.1.2) (#406)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-14T21:31:52+07:00",
+      "sha": "5ed9f74",
+      "summary": "intel(acq): retire the stale \"Heng is a sample\" premise across rival-pressure + contested-pop (obj #2) (#405)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-14T10:54:33+00:00",
+      "sha": "197ac98",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the Heng competitor-coverage ship (#403)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-14T17:52:24+07:00",
+      "sha": "844dd96",
+      "summary": "intel(peer): promote Heng to a first-class MEASURED brand in the competitor-coverage board (obj #2) (#403)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-14T10:22:31+00:00",
+      "sha": "559b760",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-14, run 31791631212)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-14T09:12:11+00:00",
+      "sha": "4675e8d",
+      "summary": "docs(progress): log ux-print-color-adjust-dataviz merge + deploy-verify (PR #401)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-14T16:08:58+07:00",
+      "sha": "f522ccb",
+      "summary": "ux: keep delinquency-ladder + proportion-bar colour in the printed board brief (#401)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-14T05:13:40+00:00",
+      "sha": "df1a17a",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-14, run 31772117663)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-14T04:53:25+00:00",
+      "sha": "faaf5b3",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer-NPL Heng ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-14T11:50:40+07:00",
       "sha": "5ea78c0",
       "summary": "intel(peer): add Heng — the distressed rival — to the peer NPL benchmark (obj #2) (#397)",
@@ -639,78 +711,6 @@
       "sha": "f36040a",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the rivcensus live-bind ship",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-14T00:25:40+07:00",
-      "sha": "b7612ac",
-      "summary": "intel(honesty): live-bind hardcoded \"16,503 rival branches\" census claims on #acq (#392)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-13T14:59:36+00:00",
-      "sha": "437a21d",
-      "summary": "docs(progress): log ux-search-input-mobile-hints merge+deploy+verify (PR #391)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-13T21:56:26+07:00",
-      "sha": "2cdd7be",
-      "summary": "ux: mobile input hints on filter search boxes (autocorrect/autocapitalize off) (#391)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-13T10:30:14+00:00",
-      "sha": "f187b6e",
-      "summary": "intel(service): source-data consumption audit — one benign dormant layer (bot_policy_rate), source-orphan-gate landmine documented",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-13T08:38:12+00:00",
-      "sha": "69e78f1",
-      "summary": "docs(progress): log ux-casc-select-label-association merge+deploy+verify (PR #389)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-13T15:35:02+07:00",
-      "sha": "ce2c7ea",
-      "summary": "ux: associate cascading Region/Province/Branch select labels (a11y) (#389)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-13T06:52:05+00:00",
-      "sha": "e9a668a",
-      "summary": "test(gate): add orphan-DATA-LAYER check — assert every committed platform/data/*.json is consumed",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-13T04:28:22+00:00",
-      "sha": "890b740",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the branch_peers stale-merge fix ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-13T04:27:41+00:00",
-      "sha": "51c0301",
-      "summary": "ci(pipeline): close the branch_peers silent-stale-merge hole — rederive guard + numpy on every rederive workflow",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-13T04:06:34+00:00",
-      "sha": "ff5962d",
-      "summary": "intel(provenance): exempt upstream-frozen DLT layers from the Data-room \"stale\" alarm",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-13T03:35:56+00:00",
-      "sha": "c592f65",
-      "summary": "docs(progress): log ux-navmore-keyboard-secondary-pages merge+deploy+verify (PR #388)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-13T10:33:01+07:00",
-      "sha": "365d3b9",
-      "summary": "ux: keyboard-navigable Explore ▾ menu on live/data/status pages (#388)",
-      "pillar": "uxui"
     }
   ]
 }
