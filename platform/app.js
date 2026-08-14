@@ -1755,7 +1755,8 @@ function renderMacroIndicators(){
   const pr=I.policy_rate;
   // Policy rate is BOT-direct (source-data/bot_policy_rate.json, MPC decisions), not the BIS
   // republication — read the label off the data so it stays honest if the source ever changes.
-  if(pr) cards.push([`Policy rate`, `${pr.value}%`, `${arrow(pr.yoy_change)}${pr.yoy_change!=null?Math.abs(pr.yoy_change)+'pp':''} YoY · ${srcShort(pr.source)||'BOT'} ${pr.period}`]);
+  // The Hold/Cut decision is what BIS's republication drops, so surface it when the fold is present.
+  if(pr) cards.push([`Policy rate`, `${pr.value}%`, `${arrow(pr.yoy_change)}${pr.yoy_change!=null?Math.abs(pr.yoy_change)+'pp':''} YoY${pr.decision?' · '+pr.decision:''} · ${srcShort(pr.source)||'BOT'} ${pr.period}`]);
   const cpi=I.cpi_inflation;
   if(cpi) cards.push([`Inflation`, `${cpi.value>0?'+':''}${cpi.value}%`,
     `headline CPI YoY · ${srcShort(cpi.source)||'CPI'} ${cpi.period}`]);
@@ -2320,7 +2321,7 @@ function renderAnswerBand(){
       // BOT-direct (MPC decision history), not the BIS republication — label off the data.
       const psrc=String(p.source||'BOT').split(/\s+[—(]/)[0].trim()||'BOT';
       T.push(abTile({k:'Policy rate',cad:p.period||'quarterly',cadCls:'q',v:p.value,unit:'%',
-        move:p.yoy_change!=null?`${p.yoy_change<0?'▼':'▲'} ${Math.abs(p.yoy_change)}pt YoY`:'',
+        move:(p.yoy_change!=null?`${p.yoy_change<0?'▼':'▲'} ${Math.abs(p.yoy_change)}pt YoY`:'')+(p.decision?` · ${p.decision}`:''),
         moveColor:'var(--mid)',
         spark:svgSpark(p.trend,{color:'var(--accent)',aria:'policy rate trend',title:psrc}),
         sub:'MEASURED '+psrc})); }
@@ -3096,6 +3097,13 @@ function drawCompCoverage(){
     if(ro) ro.innerHTML='<b>Competitor coverage not yet computed.</b> <span class="sub">This layer is being prepared — it fills in once the competitor census refresh lands.</span>';
     return;
   }
+  // Keep the hand-written census-size copy honest against the live data: the two static "16,503
+  // rival branches" spans (class rivcensus-n) are the ONE measured total that grows/shrinks every
+  // time the scout re-pulls, so pin them to the census total we just loaded (meta.totals.found, or
+  // the brand-found sum as a fallback) instead of a frozen literal. If the count is absent/zero we
+  // leave the static fallback untouched. Same source the readout below already reports (t.found).
+  const censusTot=((COMPCOV.meta&&COMPCOV.meta.totals&&COMPCOV.meta.totals.found)||rows.reduce((s,b)=>s+(b.found||0),0))|0;
+  if(censusTot>0){ document.querySelectorAll('.rivcensus-n').forEach(el=>{ el.textContent=censusTot.toLocaleString(); }); }
   // sort by coverage_pct desc (nulls last) so the best-covered brand leads.
   const list=rows.slice().sort((a,b)=>((b.coverage_pct==null?-1:b.coverage_pct)-(a.coverage_pct==null?-1:a.coverage_pct)));
   tbl.innerHTML=`<tr><th scope="col">Brand</th>`+

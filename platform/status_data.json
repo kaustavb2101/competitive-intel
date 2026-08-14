@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-12T10:34:17+00:00",
-    "commit": "d0b870e"
+    "generated_at": "2026-08-13T22:36:58+00:00",
+    "commit": "8ddab4e"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-12",
+    "eta_date": "2026-08-13",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -21,31 +21,32 @@
     {
       "name": "integration-improvement",
       "owns": "data · feature · deploy",
-      "cadence": "every 6h",
-      "schedule_utc": "00,06,12,18"
+      "cadence": "account-scheduled routine (no committed workflow)",
+      "status": "external"
     },
     {
       "name": "ux-improvement",
       "owns": "UX/UI",
-      "cadence": "every 6h",
-      "schedule_utc": "02,08,14,20"
+      "cadence": "account-scheduled routine (no committed workflow)",
+      "status": "external"
     },
     {
       "name": "intelligence",
       "owns": "market · service · peer · deploy-health",
-      "cadence": "every 6h",
-      "schedule_utc": "04,10,16,22"
+      "cadence": "account-scheduled routine (no committed workflow)",
+      "status": "external"
     },
     {
       "name": "committee-scout",
       "owns": "competitor census",
-      "cadence": "daily"
+      "cadence": "paused — on demand via workflow_dispatch",
+      "status": "paused"
     },
     {
       "name": "committee-planner",
       "owns": "this plan",
-      "cadence": "every 6h",
-      "schedule_utc": "03,09,15,21"
+      "cadence": "paused — on demand via workflow_dispatch",
+      "status": "paused"
     }
   ],
   "pillars": [
@@ -128,7 +129,7 @@
           "title": "Autonomous committee scout cron (gate-guarded auto-merge)",
           "state": "done",
           "priority": 2,
-          "evidence": ".github/workflows/committee-cycle.yml committed",
+          "evidence": ".github/workflows/committee-cycle.yml committed — cron PAUSED (on demand via workflow_dispatch)",
           "owner_side": false
         },
         {
@@ -141,10 +142,10 @@
         },
         {
           "id": "dep-planner-cron",
-          "title": "Autonomy planner cron (this loop, every 6h)",
+          "title": "Autonomy planner cron (this loop)",
           "state": "done",
           "priority": 1,
-          "evidence": ".github/workflows/committee-planner.yml + platform/status.html present",
+          "evidence": ".github/workflows/committee-planner.yml + platform/status.html present — cron PAUSED (on demand via workflow_dispatch)",
           "owner_side": false
         },
         {
@@ -532,6 +533,150 @@
   ],
   "activity": [
     {
+      "date": "2026-08-13T22:36:58+00:00",
+      "sha": "8ddab4e",
+      "summary": "intel(planning): derive autonomy-loop schedules from committed workflow state, stop dashboard advertising crons the repo doesn't run",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-13T20:33:39+00:00",
+      "sha": "ddc5665",
+      "summary": "docs(progress): log ux-live-chart-aria-latest-value merge+deploy+verify (PR #394)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-14T03:30:21+07:00",
+      "sha": "3a2d065",
+      "summary": "ux: live.html trend-chart aria-labels announce latest value + direction (#394)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T18:50:25+00:00",
+      "sha": "d59cb4b",
+      "summary": "pipeline: retire dead redundant build_vehicle_flow_transport.py (superseded by build_truck_flow.py)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T17:28:10+00:00",
+      "sha": "f36040a",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the rivcensus live-bind ship",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-14T00:25:40+07:00",
+      "sha": "b7612ac",
+      "summary": "intel(honesty): live-bind hardcoded \"16,503 rival branches\" census claims on #acq (#392)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-13T14:59:36+00:00",
+      "sha": "437a21d",
+      "summary": "docs(progress): log ux-search-input-mobile-hints merge+deploy+verify (PR #391)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T21:56:26+07:00",
+      "sha": "2cdd7be",
+      "summary": "ux: mobile input hints on filter search boxes (autocorrect/autocapitalize off) (#391)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T10:30:14+00:00",
+      "sha": "f187b6e",
+      "summary": "intel(service): source-data consumption audit — one benign dormant layer (bot_policy_rate), source-orphan-gate landmine documented",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-13T08:38:12+00:00",
+      "sha": "69e78f1",
+      "summary": "docs(progress): log ux-casc-select-label-association merge+deploy+verify (PR #389)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T15:35:02+07:00",
+      "sha": "ce2c7ea",
+      "summary": "ux: associate cascading Region/Province/Branch select labels (a11y) (#389)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T06:52:05+00:00",
+      "sha": "e9a668a",
+      "summary": "test(gate): add orphan-DATA-LAYER check — assert every committed platform/data/*.json is consumed",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-13T04:28:22+00:00",
+      "sha": "890b740",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the branch_peers stale-merge fix ship",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-13T04:27:41+00:00",
+      "sha": "51c0301",
+      "summary": "ci(pipeline): close the branch_peers silent-stale-merge hole — rederive guard + numpy on every rederive workflow",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-13T04:06:34+00:00",
+      "sha": "ff5962d",
+      "summary": "intel(provenance): exempt upstream-frozen DLT layers from the Data-room \"stale\" alarm",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-13T03:35:56+00:00",
+      "sha": "c592f65",
+      "summary": "docs(progress): log ux-navmore-keyboard-secondary-pages merge+deploy+verify (PR #388)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-13T10:33:01+07:00",
+      "sha": "365d3b9",
+      "summary": "ux: keyboard-navigable Explore ▾ menu on live/data/status pages (#388)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-12T17:03:36+00:00",
+      "sha": "b442c3a",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the provenance SYNTH-false-positive fix",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-13T00:00:26+07:00",
+      "sha": "7af5b01",
+      "summary": "intel(provenance): stop \"SYNTH\" substring mislabelling 4 MEASURED layers as ESTIMATED (#386)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-12T14:39:17+00:00",
+      "sha": "8e8bdb8",
+      "summary": "docs(progress): log ux-nav-live-tooltip-stale-count merge+deploy+verify (PR #385)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-12T21:36:31+07:00",
+      "sha": "a2ed353",
+      "summary": "ux: drop stale \"four\" trend-line count from Live-board nav tooltip (#385)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-12T12:37:48+00:00",
+      "sha": "3f3be58",
+      "summary": "test(gate): restore grep-coverage invariant — enumerate build_collateral_census",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-12T17:36:17+07:00",
+      "sha": "570b640",
+      "summary": "fix(cost): stop the Google Places bleed — cadence gate + a cache that survives CI (#382)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-12T10:34:54+00:00",
+      "sha": "4df7fcd",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the expansion-framing scrub ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-12T10:34:17+00:00",
       "sha": "d0b870e",
       "summary": "intel(mandate): scrub residual branch-expansion framing from 3 live competitive layers' objective provenance",
@@ -566,150 +711,6 @@
       "sha": "bcb6149",
       "summary": "data: retire the OAE farm-gate price feed — the series is reachable, it just loses (#376)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-12T14:10:13+07:00",
-      "sha": "4e5e29d",
-      "summary": "data: Google Trends brand share-of-search refresh (run 31338066795) (#355)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-12T04:27:18+00:00",
-      "sha": "34f31be",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the feed-liveness gasohol re-calibration ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-12T04:25:16+00:00",
-      "sha": "d0d2f63",
-      "summary": "fix(liveness): re-calibrate FROZEN test for step-flat retail fuel (fuel_gasohol95 false alarm)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-12T02:23:07+00:00",
-      "sha": "1f6a379",
-      "summary": "docs(progress): log the REOPENED th-scope sweep close (PR #381) merge+deploy+verify",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-12T09:18:58+07:00",
-      "sha": "557a25e",
-      "summary": "ux: scope=col on last 5 app.js tables (closes REOPENED th-scope sweep) (#381)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T22:48:59+00:00",
-      "sha": "402acec",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the orphaned-loader cleanup ship (#379)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-12T05:45:49+07:00",
-      "sha": "e47f775",
-      "summary": "chore(app): remove 4 orphaned Overview macro loader/renderer pairs (dead since 2026-08-02 macro_book move) (#379)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T20:25:32+00:00",
-      "sha": "626eeba",
-      "summary": "docs: log ux-live-meta-stale-feed-counts merge + Vercel deploy-verify (PR #377)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-12T03:22:48+07:00",
-      "sha": "054391a",
-      "summary": "ux: drop stale hardcoded feed counts from live.html share metadata (#377)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T18:40:00+00:00",
-      "sha": "1569666",
-      "summary": "provenance: mark dormant opportunity_score layer, drop branch-expansion framing",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-11T16:37:57+00:00",
-      "sha": "1822fce",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the AutoX ROE-target tripwire ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-11T16:35:31+00:00",
-      "sha": "cf14a1d",
-      "summary": "guard(peer): --check tripwire locking AutoX ROE-target reference line to CLAUDE.md",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-11T23:13:54+07:00",
-      "sha": "a569b2e",
-      "summary": "data: market-pulse swarm refresh (run 31482310893) (#372)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-11T14:47:38+00:00",
-      "sha": "f5f134e",
-      "summary": "docs: log ux-table-scope-cropwatch-farmbook merge + Vercel deploy-limit block",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T21:42:31+07:00",
-      "sha": "7c3dc00",
-      "summary": "ux: scope=col on the crop-watch + farm-book tables (a11y, WCAG 1.3.1) (#375)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-11T21:36:34+07:00",
-      "sha": "79604af",
-      "summary": "ci(fix): install numpy in the 4 data-price auto-merge workflows so branch_peers can't silently stale-merge (#373)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-11T21:11:06+07:00",
-      "sha": "ec0a09d",
-      "summary": "ci: move QA to a self-hosted Bangkok runner, and schedule the Thai-IP-only feeds (#352)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-11T21:10:45+07:00",
-      "sha": "2b12e0a",
-      "summary": "feat(overview): wire the MEASURED book-vs-market collateral-recovery read into the collateral section (#363)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-11T12:37:08+00:00",
-      "sha": "80fb2b7",
-      "summary": "gate(provenance): --check-gated tripwire binding the peer scoreboard constants to RESEARCH_DIGEST.md §B",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-11T11:37:20+00:00",
-      "sha": "1ef4563",
-      "summary": "fix(gate): regenerate stale branch_peers.json (+ provenance) — recurring drift from the NABC/ThaiWater auto-merge (3rd occurrence)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-11T10:30:26+00:00",
-      "sha": "e94a1e3",
-      "summary": "audit(service): peer-figure cross-consistency verification — tree fully healthy, no defect",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-11T10:16:08+00:00",
-      "sha": "0fc354f",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-11, run 31481138737)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-11T09:20:50+00:00",
-      "sha": "9419af9",
-      "summary": "data: NABC live prices (2026-08-11, run 31476684037)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-11T08:23:49+00:00",
-      "sha": "9832155",
-      "summary": "docs(progress): log impact-card table-scope a11y fix merge+deploy+verify (PR #371)",
-      "pillar": "uxui"
     }
   ]
 }

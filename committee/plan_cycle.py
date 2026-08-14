@@ -26,6 +26,7 @@ import glob
 import json
 import math
 import os
+import re
 import subprocess
 import sys
 from datetime import date, timedelta
@@ -127,6 +128,49 @@ def doc_has(rel, substr):
         return False
 
 
+def workflow_schedule(rel):
+    """Derive a committed workflow's ACTUAL schedule state from the repo — honest, not aspirational.
+
+    Returns (status, schedule_utc):
+      ("scheduled", "<hh,hh,..>")  an UNCOMMENTED `cron:` line is present -> the loop really runs on cron
+      ("paused", None)             the workflow file exists but every cron is commented out / absent
+                                   (still runnable on demand via workflow_dispatch)
+      ("absent", None)             no such workflow is committed
+    Comment-stripping is line-based (everything from the first '#'), so a `# schedule:` / `#   - cron:`
+    block reads as paused — matching how GitHub Actions itself treats a commented-out schedule. The
+    hours field (cron position 2) is surfaced so a re-enabled cron shows its real UTC hours, never a
+    hardcoded cadence the repo does not run."""
+    p = os.path.join(ROOT, rel)
+    if not os.path.exists(p):
+        return ("absent", None)
+    hours = []
+    try:
+        with open(p, encoding="utf-8") as f:
+            for line in f:
+                code = line.split("#", 1)[0]           # drop inline + full-line comments
+                if "cron:" in code:
+                    m = re.search(r"cron:\s*[\"']?([^\"']+)", code)
+                    if m:
+                        fields = m.group(1).split()
+                        if len(fields) >= 2 and fields[1] not in hours:
+                            hours.append(fields[1])
+    except Exception:
+        return ("absent", None)
+    return ("scheduled", ",".join(hours)) if hours else ("paused", None)
+
+
+def cron_note(rel):
+    """A short, DERIVED honesty suffix for a roadmap item's evidence string: whether the committed
+    workflow's cron is actually live, paused, or the file is missing. Keeps 'cron done' items from
+    implying an active schedule the repo has switched off."""
+    st, hours = workflow_schedule(rel)
+    if st == "scheduled":
+        return " (cron ACTIVE: %s UTC)" % hours
+    if st == "paused":
+        return " — cron PAUSED (on demand via workflow_dispatch)"
+    return ""
+
+
 def state(done, in_progress=False):
     return "done" if done else ("in_progress" if in_progress else "open")
 
@@ -179,13 +223,13 @@ def build_items():
         "LIVE on Vercel production (master auto-deploys); verified 200 on /, /app.js, data layers, 3D scenes + /status")
     add("deployment", "dep-committee-cron", "Autonomous committee scout cron (gate-guarded auto-merge)",
         state(rexists(".github/workflows/committee-cycle.yml")), 2,
-        ".github/workflows/committee-cycle.yml committed")
+        ".github/workflows/committee-cycle.yml committed" + cron_note(".github/workflows/committee-cycle.yml"))
     add("deployment", "dep-gov-census-ci", "Gov census CI (DIW/DLT from any cloud IP)",
         state(rexists(".github/workflows/data-gov-census.yml")), 2,
         ".github/workflows/data-gov-census.yml committed")
-    add("deployment", "dep-planner-cron", "Autonomy planner cron (this loop, every 6h)",
+    add("deployment", "dep-planner-cron", "Autonomy planner cron (this loop)",
         state(rexists(".github/workflows/committee-planner.yml") and rexists("platform/status.html")), 1,
-        ".github/workflows/committee-planner.yml + platform/status.html present")
+        ".github/workflows/committee-planner.yml + platform/status.html present" + cron_note(".github/workflows/committee-planner.yml"))
     add("deployment", "dep-qa-gate", "Determinism QA gate in CI (tests/run.sh check)",
         state(rexists(".github/workflows/qa.yml") and rexists("tests/run.sh")), 2,
         ".github/workflows/qa.yml + tests/run.sh committed")
@@ -329,13 +373,42 @@ PILLAR_LABELS = [
     ("3d-enrichment", "3D enrichment"),
 ]
 
-LOOPS = [
-    {"name": "integration-improvement", "owns": "data · feature · deploy", "cadence": "every 6h", "schedule_utc": "00,06,12,18"},
-    {"name": "ux-improvement", "owns": "UX/UI", "cadence": "every 6h", "schedule_utc": "02,08,14,20"},
-    {"name": "intelligence", "owns": "market · service · peer · deploy-health", "cadence": "every 6h", "schedule_utc": "04,10,16,22"},
-    {"name": "committee-scout", "owns": "competitor census", "cadence": "daily"},
-    {"name": "committee-planner", "owns": "this plan", "cadence": "every 6h", "schedule_utc": "03,09,15,21"},
+# Autonomous loops. Each loop's schedule is DERIVED from its committed workflow (or honestly marked
+# external / paused), never asserted — deriving it here stops the CEO dashboard advertising fixed cron
+# cadences the repo does not actually run. The three improvement loops run as account-level scheduled
+# routines with NO committed workflow file (there is nothing in .github/workflows to verify a cadence
+# against — their real activity is the git feed below). The two committee loops HAVE workflows whose
+# crons were paused 2026-07 (owner request) and now run on demand via workflow_dispatch.
+LOOP_DEFS = [
+    {"name": "integration-improvement", "owns": "data · feature · deploy", "workflow": None},
+    {"name": "ux-improvement", "owns": "UX/UI", "workflow": None},
+    {"name": "intelligence", "owns": "market · service · peer · deploy-health", "workflow": None},
+    {"name": "committee-scout", "owns": "competitor census", "workflow": ".github/workflows/committee-cycle.yml"},
+    {"name": "committee-planner", "owns": "this plan", "workflow": ".github/workflows/committee-planner.yml"},
 ]
+
+
+def build_loops():
+    """Project LOOP_DEFS into display rows with a schedule that reflects the committed repo state."""
+    out = []
+    for d in LOOP_DEFS:
+        wf = d.get("workflow")
+        sched = None
+        if wf is None:
+            status, cadence = "external", "account-scheduled routine (no committed workflow)"
+        else:
+            st, hours = workflow_schedule(wf)
+            if st == "scheduled":
+                status, cadence, sched = "scheduled", "cron", hours
+            elif st == "paused":
+                status, cadence = "paused", "paused — on demand via workflow_dispatch"
+            else:
+                status, cadence = "absent", "workflow not committed"
+        row = {"name": d["name"], "owns": d["owns"], "cadence": cadence, "status": status}
+        if sched:
+            row["schedule_utc"] = sched
+        out.append(row)
+    return out
 
 # activity-feed pillar classification (keyword → pillar; first match wins; specific before generic)
 _CLASSIFY = [
@@ -434,7 +507,7 @@ def assemble():
             "open_autonomous": open_autonomous,
             "total_items": total_items,
         },
-        "loops": LOOPS,
+        "loops": build_loops(),
         "pillars": pillars,
         "activity": build_activity(),
     }

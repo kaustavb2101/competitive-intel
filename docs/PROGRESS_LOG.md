@@ -3,6 +3,287 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-14 — Intelligence loop (PLANNING): stop the CEO autonomy dashboard advertising cron cadences the repo does not run — recorded to master
+
+- **The defect (an honesty defect in the exec-facing dashboard).** `committee/plan_cycle.py` — whose own
+  docstring promises "NEVER fabricates progress: every state is derived from a concrete, committed signal
+  … a workflow is committed" — carried ONE hand-hardcoded block that broke that promise: `LOOPS` advertised
+  **five running autonomous loops with specific cron cadences** on `platform/status.html` + `AUTONOMY_PLAN.md`:
+  - `integration-improvement` / `ux-improvement` / `intelligence` — each shown "every 6h" at fixed UTC hours,
+    but **no `.github/workflows/*` file defines them at all** (they run as account-level scheduled routines —
+    nothing in the repo to verify a cadence against).
+  - `committee-scout` "daily" and `committee-planner` "every 6h" — both workflows exist but their `schedule:`
+    crons are **commented out, PAUSED 2026-07 (owner request)**; they now run on demand via `workflow_dispatch`.
+  So every scheduled-cadence claim on the dashboard was false. The two Deployment roadmap items compounded it,
+  presenting the paused crons as "✅ done … every 6h" with no paused caveat. For objective #2 the exec would
+  read the census as refreshing daily when the scout has been frozen since 2026-07 (the very pause the owner
+  set intentionally).
+- **The fix — derive the schedule, never assert it.** New `workflow_schedule(rel)` reads each committed
+  workflow and classifies its cron state honestly (line-based comment-strip, so a `# schedule:` block reads
+  as paused exactly as GitHub Actions treats it): **active** → the real UTC hours from the cron; **paused** →
+  "on demand via workflow_dispatch"; **absent** → no committed workflow. `LOOPS` became `LOOP_DEFS` + a
+  `build_loops()` projection: the three improvement loops now read "account-scheduled routine (no committed
+  workflow)", the two committee loops read "paused — on demand via workflow_dispatch". A companion `cron_note()`
+  appends the same derived state to the two `dep-*-cron` evidence strings. Unit-checked against a genuinely
+  active cron (`site-health.yml` → correctly "cron ACTIVE: 22 UTC") so paused-detection is not a false blanket.
+- **Zero app-code impact.** `platform/status.html` already renders `loops[].owns/cadence/schedule_utc` (optional)
+  and simply ignores the new `status` field — no HTML/JS changed, no new consumed field, no removed required
+  field, so the render path is provably unaffected (data-only string change). No `platform/data/*.json` changed,
+  so provenance/no-fabrication is untouched. Regenerating `status_data.json` + `AUTONOMY_PLAN.md` and committing
+  straight to master is the planner's own sanctioned flow (its workflow does exactly this, gate-guarded).
+- **Verify.** `python3 committee/plan_cycle.py && python3 committee/plan_cycle.py --check` byte-exact OK;
+  `bash tests/run.sh check` — **0 failed**; grep confirms no hardcoded UTC-hour cadence (`00,06,12,18` …)
+  remains in the script or either output.
+
+## 2026-08-13 — Integration loop: retire the dead, redundant `build_vehicle_flow_transport.py` (superseded by `build_truck_flow.py`) — recorded to master
+
+- **The defect (a "built but never wired" dead layer, the branch_density shape).** A negative-space
+  sweep surfaced `pipeline/build_vehicle_flow_transport.py` → `source-data/vehicle_flow_transport_by_province.json`:
+  a MEASURED objective-#1 layer (commercial truck/bus vehicle-collateral registration/cessation flow)
+  that was **gated byte-exact every run but consumed by NOTHING** — no page fetched it, no downstream
+  builder read it (verified: its only references were the builder itself, its output, and the `run.sh`
+  `--check` block; no imports, no workflow, no docs). It distills the **exact same** DLT
+  `dataset_stat_1_009` (การดำเนินการทางทะเบียน, land-transport-law truck/bus registration actions) that
+  `build_truck_flow.py` already distills into the **live, app-consumed** `platform/data/truck_flow.json`.
+  So it was a redundant second distillation of one dataset, the truck signal already reaching the app via
+  its sibling, and (by its own docstring) buses "none individually is collateral-central to a title-loan
+  book". It burned a `--check` per gate run and carried maintenance weight for zero delivered signal.
+- **Decision — retire, don't wire.** Surfacing it would have been *duplicate* surfacing (a second
+  truck-flow readout from the identical data), which is worse, not better; the collateral-central truck
+  pulse is already live via `build_truck_flow.py` (and the car-law sibling via `build_collateral_flow.py`).
+  Retiring matches the codebase's established pattern for superseded dead builders (RETIRED 2026-07-31
+  `ingest_loan_tape.py`→`loan_tape_derived.json`; the `rayong-province.html` stub). `git rm`'d the builder
+  + its committed output; removed the `run.sh` gate block and the `refresh_all.sh` line. Both files stay
+  in git history → fully reversible.
+- **Zero app impact.** The removed layer fed nothing the app renders, so no `platform/data` file changed,
+  no visual/behaviour changed, and `build_provenance.py --check` byte-reproduces unchanged. Committed
+  straight to master per the loop safeguard (gate green; no visual change; no secrets; diff = intent).
+- **Verify.** `bash tests/run.sh check` re-run after the removal — **0 failed** (one fewer `--check`,
+  provenance byte-exact); `bash -n` clean on both edited shell scripts; comprehensive grep confirms no
+  dangling reference to the builder or its output anywhere in the tree.
+- **Next recommended integration (teed up, owner-review).** The highest-value *open* data item is to adopt
+  the **CI-refreshed DIW/DLT census** into the app's factory/vehicle layers: `source-data/factory_census_national.json`
+  (914 districts, +capital/HP) and `source-data/vehicle_census_province.json` (77 provinces, moto/car/pickup
+  split) are committed **weekly** by `.github/workflows/data-gov-census.yml` from a CI-reachable department
+  CKAN, yet are consumed by nothing — while the app's live `factories_by_district.json` / `vehicles_by_province.json`
+  are frozen on the **CI-blocked** data.go.th aggregator (Thai-IP-only). A `--check`-gated
+  `build_gov_census.py` projecting census→live-schema would refresh the whole factory/vehicle fan-out from
+  CI. Deferred here because the blast radius is ~90 committed files (all 77 province files, amphoe,
+  collateral_outlook, vehicle_*, peer_province, branch_labor, pico_district) with hundreds of shifting
+  numbers and app visuals — a **PR for owner review**, not an unattended direct commit; the byte-exact gate
+  proves reproducibility, not that a subtle field/coverage remap didn't silently degrade a signal.
+- **Also recorded (a landmine, do not re-attempt naively).** A static source-data consumption *gate* (the
+  sibling of `tests/orphan_layers.py` for `platform/data`) remains **not cleanly buildable** — re-confirmed
+  this run with named evidence. Even with correct write-sink producer detection, scripts that BOTH refresh
+  (`--pull`/rederive, `open(SRC,'w')`) AND consume (build-mode read via a variable) the same source file get
+  misclassified as producer-only → false positives: `build_debt_source.py`/`nso_debt_by_source.json` and
+  `ingest_ocsb_cane.py`/`ocsb_canearea.csv` both feed live outputs yet flag as dead. A correct gate needs
+  real open-then-parse dataflow, not co-occurrence. Left as a report-only investigation, not shipped.
+
+## 2026-08-13 — UX loop: mobile input hints on the four filter search boxes (`ux-search-input-mobile-hints`) — merged + deployed + verified
+
+- **Shipped (PR #391, squash-merged as `2cdd7be`).** The four filter-as-you-type search boxes —
+  `#search`/`#provsearch`/`#mktsearch` (index.html SPA) + `#brsearch` (data.html "All branches") — carried
+  **no mobile input-hint attributes**. On the exec's Thai handset, a search over branch/province proper
+  nouns and transliterations triggered iOS autocorrect (rewriting a partial name mid-type — which actively
+  **breaks a filter box**), first-letter auto-capitalization, a saved-value autocomplete dropdown over the
+  live results, and spellcheck squiggles. Added `autocomplete="off" autocorrect="off" autocapitalize="none"
+  spellcheck="false"` to all four, extending the existing `ssInput` scene-search house pattern. Attribute-only,
+  zero visual change.
+- **Safeguard protocol — all passed.** (a) `tests/run.sh check` **133 passed / 0 failed** (exit 0);
+  (b) headless renders of both changed pages at 390px mobile — attrs present in settled DOM, `data-errors="[]"`,
+  layout identical (PNG self-reviewed); (c) no secrets in the 3-file diff; (d) diff matches intent, no stray
+  files.
+- **Deploy-verified.** Master auto-deployed to Vercel; production alias `/` **HTTP 200**, `/data` **200**,
+  `/index.html` **200** (the raw `.html` paths 308-redirect via `cleanUrls`, expected). Confirmed the
+  `autocapitalize="none"` attribute is **live in the deployed index.html**. No regression → no rollback.
+- **Backlog.** `ux-search-input-mobile-hints` marked fixed in `docs/UXUI_AUDIT.md`. Remaining open items are
+  all explicitly deferred from unattended auto-merge (device-tested deck.gl pages: `ux-viewport-user-scalable-3dpages`,
+  `ux-navmore-3dpages-absolute-overflow`, `ux-navmore-keyboard-3dpages`; bigger-than-surgical: `ux-acquire-taxonomy-mandate`,
+  `ux-live-chart-mobile-viewbox-responsive`; test-infra: `qa-visual-baseline-stale`, `qa-visual-overflow-not-in-ci`,
+  `qa-live-not-in-overflow-audit-routes`).
+
+## 2026-08-13 — Intelligence loop (service audit): source-data consumption audit — one benign dormant source layer (`bot_policy_rate`), and a documented "don't ship the source-orphan gate naively" landmine — recorded to master
+
+- **Context.** The prior entry (the orphan-DATA-LAYER gate) recommended as its next pass: "extend the same
+  producer-aware consumption idea to `source-data/` inputs (assert every committed source layer feeds a
+  builder)." This run audited exactly that dimension and reports the honest result.
+- **Health re-verified green up front.** Master production alias **HTTP 200** on `/`, `/app.js`,
+  `/data/meta.json`; `build_provenance.py --check` byte-exact (**142 layers, 0 stale @180d, 0 unlabelled**;
+  only the KNOWN DLT-upstream-capped `vehicle_collateral`/`ev_penetration` at 164d); **0 broken data refs**
+  (all **107** live `data/*.json` reads across `app.js`+`*.html` resolve); `site-health.yml` targets the
+  master alias; peer board re-confirmed honest (Srisawad 457% `found`-vs-IR is correctly caveated as
+  store-locator group footprint, not a mislabel).
+- **Finding #1 — the source-orphan gate is UNSAFE to ship naively (a warning, not a gate).** A
+  `platform/data` leaf is only ever WRITTEN by its builder, which is why `orphan_layers.py` works there.
+  But a `source-data` layer is READ by pipeline builders that ALSO write their own JSON, so a
+  write-sink→producer heuristic misclassifies genuine consumers (e.g. `build_amphoe.py` reading
+  `vehicles_by_province.json`, 13 refs) as the layer's producer and false-positives **63/76**. A correct
+  source-consumption gate needs real open-then-parse dataflow, not same-file co-occurrence — recorded so a
+  future run doesn't ship a broken red gate.
+- **Finding #2 — one genuinely-dormant source layer, hand-verified, benign.**
+  `source-data/bot_policy_rate.json` is referenced by nothing but its own puller
+  `pull_bot_policy_rate.py` (in no workflow); every other low-ref candidate traced to a real consumer. It is
+  **not a defect**: the app's live `policy_rate` (Overview macro card + `regional_outlook`) sources the SAME
+  MEASURED value **1.0% (2026-06)** from BIS via `pull_macro.py`, verified identical to the BoT-native latest
+  MPC decision in the dormant file (meeting `3/2569`, 2026-06-24, Hold, `rate 1.0`). It is a richer dormant
+  *reference* (203-decision MPC history); wiring it into `build_macro_indicators.py` would change only the
+  source label (`BIS`→`BoT MPC`) for zero numeric gain at real gate + rendered-card risk → **correctly NOT
+  done** in an unattended run. Recorded so future negative-space runs don't re-investigate it.
+- **Outcome + verify.** No concrete data/deploy/consistency defect — a fully-healthy tree. Deliverable is the
+  recorded audit dimension (`docs/SERVICE_AUDIT.md` 2026-08-13 entry) + `plan_cycle.py` dashboard refresh.
+  Docs-only — no `platform/data`/pipeline file altered → determinism gate **133 passed · 0 failed**,
+  byte-unchanged, no provenance regen, no PR/headless render needed. Committed straight to master per the
+  loop safeguard (gate green; no secrets; diff = intent; provenance/no-fabrication intact).
+- **Next recommended task.** A UX/render-polish pass (owned by the ux loop) or a correct open-then-parse
+  `source-data` consumption auditor (per Finding #1) if a future run wants to make source dormancy a gate.
+  The substantive DATA unlocks remain owner-side (Thai-IP pulls) or secret-gated (GISTDA 40m).
+
+## 2026-08-13 — Intelligence loop (pipeline integrity): new orphan-DATA-LAYER gate — assert every committed `platform/data/*.json` is actually consumed, not just deterministic — shipped to master
+
+- **The gap.** A negative-space audit confirmed the CI-doable DATA backlog is genuinely exhausted (the
+  remaining unlocks — `baac_credit`/`smebank_credit` distillation, the MTC competitor undercount,
+  GISTDA 40m crop-area — are all Thai-IP/owner-side or need a secret this session lacks; PICO + cropland
+  + DBD-formation are all already distilled and wired). It surfaced instead a structural hole **in the
+  test harness**: the gate has an orphan-*route* check (`nav_consistency.py`) and an orphan-*amphoe*
+  check (`validate_data.py`), but **nothing asserts every committed `platform/data/*.json` leaf is
+  actually consumed** — fetched by a page OR read by a downstream builder. This is the exact failure that
+  left `build_branch_density.py`'s output dead and gate-green in silence from 2026-07-02: the determinism
+  gate only asks "does this file byte-reproduce?", never "does anything USE it?". A layer can be perfectly
+  deterministic and completely dead.
+- **What shipped (`tests/orphan_layers.py`, wired into `tests/run.sh` `check` phase).** A new offline,
+  stdlib-only checker (exit 0/1, mirroring `nav_consistency.py`). For each top-level `platform/data/*.json`
+  it asserts consumption: the base name (whole-token) appears in `platform/app.js`/`*.html` (page fetch via
+  `tmliFetch('X')`, no literal `.json` suffix — why a naïve filename grep false-positives), OR in a
+  `pipeline/*.py` that is **not** the script writing it. **Producer detection is structural** — it ties the
+  `"X.json"` literal to an `open(..,'w')` / `.write_text` / `json.dump` sink — so a layer referenced ONLY by
+  its own writer (the branch_density shape) is flagged, while a hand-authored INPUT read by a single builder
+  (`provenance_sidecar.json`, read by `build_provenance.py`) is correctly seen as consumed. Producer
+  detection **fails open** (a missed writer reads as consumption → a missed orphan, never a false RED gate).
+  Excludes the slug-loaded geometry families (`*_catchment/_places/_roads/_water/_landuse.json`, loaded by
+  dynamic `?city=<slug>` URLs, so no per-file literal exists to test) and carries an empty, reasoned `ALLOW`
+  allowlist for future deliberate exceptions (LEGACY_ROUTES-style).
+- **Verify.** Validated three ways before wiring: clean tree → exit 0 (135 layers checked, 0 orphans, 312
+  family-excluded); an injected dead `platform/data/*.json` → exit 1 (caught); an injected layer + a builder
+  that references it → exit 0 (consumed). Full determinism gate `bash tests/run.sh check` → **133 passed, 0
+  failed** (was 132; the new check is the +1), data integrity **455/455**. No `platform/data` file touched →
+  no `build_provenance.py` regen needed; no app/behaviour/visual change → committed straight to master per
+  the loop safeguard.
+- **Next recommended integration.** The three orphan checks (route / amphoe / data-layer) now close the
+  "built but never surfaced" hole from all angles. Remaining CI-doable work is UX/render polish or
+  provenance-honesty extensions; the substantive DATA unlocks are all owner-side (Thai-IP pulls) or
+  secret-gated (GISTDA 40m). A good next pass: a headless-render UX item, or extend the same producer-aware
+  consumption idea to `source-data/` inputs (assert every committed source layer feeds a builder).
+
+## 2026-08-13 — Intelligence loop (deployment health / pipeline integrity): close the `branch_peers` silent-stale-merge hole for good — root-cause guard + numpy across every rederive workflow — shipped to master
+
+- **The recurring bug.** `build_branch_peers.py` (objective #1 peer-twin outlier benchmark) hard-requires
+  numpy and `raise SystemExit(3)` ("SKIP: numpy not installed … a missing dependency, NOT data drift") when
+  it is absent. `pipeline/rederive_drift.py` — the shared safety net every data-pull workflow runs to
+  re-derive whatever its pull left stale (it iterates the gate's OWN `--check` set to a fixed point, no
+  hand-kept list) — filed that rc=3 under its **benign "an input is absent, not drift"** bucket and declared
+  convergence. So in any CI env without numpy, if a pull drifted a `branch_peers` input
+  (branches / branch_risk / household_risk — e.g. **data-gov-census** pulls DIW factories, a fingerprint
+  input), `branch_peers.json` was **never rebuilt**, auto-merged as "green", and only `qa.yml` (which pins
+  `numpy==2.4.6`) then caught the drift and turned **master red** on an unrelated later commit. This exact
+  stale-merge recurred **3×** to 2026-08-11 (git `1ef4563`); commit `79604af` had patched only the 4
+  price/weather workflows.
+- **The root-cause fix (`pipeline/rederive_drift.py`).** rederive now discriminates a rc=3 skip caused by a
+  missing **Python dependency** (keyed on the builder's OWN skip line — `DEP_MISSING_MARKERS =
+  ("numpy not installed",)`, no hand-kept list of numpy builders to go stale) from a genuine **absent data
+  input**. A dependency skip escalates to **UNRESOLVED → exit 1**, so any numpy-less rederive run fails
+  **LOUD and self-diagnosing** ("install numpy") instead of silently stale-merging. Verified against the real
+  numpy-absent sandbox: `--dry-run` now flags `build_branch_peers` UNRESOLVED (exit 1) touching no files,
+  while `build_branch_population` (numpy optional, graceful shapely fallback) and its cross-method skip and
+  genuine data-absent skips **all correctly stay benign**; `--selftest` (which `tests/run.sh` depends on)
+  unchanged (exit 0, 141 gated scripts parsed).
+- **The completion (11 workflows).** The guard makes numpy mandatory for any rederive run, so every workflow
+  that runs `rederive_drift.py` and lacked it now installs **`pip install numpy==2.4.6`** (pinned to
+  `qa.yml` for byte-exact `--check`): data-gov-census, data-macro, data-sfi-credit, data-search-demand,
+  data-imf-weo, data-set-peers, data-pico-census, data-social-listening, data-swarm, data-thai-swarm — and
+  **data-scenarios** was pinned from an unpinned `pip install numpy` (a distinct version-drift risk). Result:
+  every rederive workflow both rebuilds `branch_peers` authoritatively AND passes the new guard, so the hole
+  cannot silently reopen — a future rederive workflow that forgets numpy fails its own run immediately rather
+  than reddening master days later.
+- **Verify.** No `platform/data` file altered → no provenance regen needed. All 11 workflow YAMLs parse;
+  `rederive_drift.py` compiles; determinism gate **green** (`rederive_drift --selftest` is the only gate
+  touchpoint and is unaffected). Deploy-health re-verified up front: master production alias HTTP 200 on `/`,
+  `/app.js`, `/data/meta.json`, `/data/branches.json`; `site-health.yml` correctly targets the master alias.
+
+
+
+- **The gap fixed (`provenance-freshness-upstream-capped-false-stale`).** `build_provenance.py`'s
+  freshness readout — rendered on the mandate-critical #home Data-room card (`app.js` `renderHomeDataRoom`,
+  "N of M dated layers >180d stale") — measures each layer's age as *days behind the freshest committed
+  layer* and flags anything past `STALE_DAYS=180` as **stale**. The two DLT collateral layers
+  `vehicle_collateral.json` + `ev_penetration.json` (objective #1 — collateral depreciation / EV-erosion
+  on the title book) both sit at vintage **2026-02-28** = 164 days behind, and they are the platform's
+  `freshness.oldest`. That 2026-02-28 is **DLT's newest COMPLETE vintage, not neglect**: `dataset_1_1_04`
+  serves a single CSV `stt_car_fuel_at_25690228.csv` and publishes nothing newer (re-verified this run via
+  the gdcatalog CKAN — HTTP 200, still only the 28-Feb file; settled note NEXT_STEPS §2, 2026-08-04). At
+  164d they clear the 180d bar **today**, but the freshest layer advances every week — the moment any layer
+  passes ~2026-08-27 both DLT layers cross 180d and turn **red as "stale"** on the exec honesty card: a
+  guaranteed false "neglected data" alarm on two MEASURED layers that literally cannot be refreshed. This
+  session it already mis-fired once: an integration-gap audit spent a full agent run re-picking "refresh the
+  164-day DLT layers" off `freshness.oldest` before the settled note stopped it — the exact wasted
+  re-investigation the alarm's cry-wolf failure produces.
+- **What shipped — EXEMPT the neglect alarm only, keyed on the exact vintage so it self-re-arms (no check
+  weakened).** Added an `UPSTREAM_CAPPED` registry to `build_provenance.py` keyed on `(file, exact vintage)`:
+  `(vehicle_collateral.json, 2026-02-28)` and `(ev_penetration.json, 2026-02-28)`, each carrying the reason
+  ("DLT dataset_1_1_04 newest complete vintage; no newer CSV published upstream"). The freshness stage now
+  (a) **excludes** capped layers from `stale` — they can't be made fresher, so counting them in a neglect
+  signal is a false positive (a checker that cries wolf is worth less than no checker); (b) still shows them
+  as `oldest` — transparent, it *is* the oldest data we hold; and (c) lists them under a new
+  `freshness.upstream_capped` array **with the reason**, so the age is explained ("old because the source
+  stops here"), not laundered away. Keying on the **exact committed vintage** is the safeguard: the day DLT
+  publishes a newer CSV and a fresh pull changes the vintage string, the key no longer matches and normal
+  staleness re-arms automatically — this is NOT a blanket exempt (unlike a bare allowlist), it self-corrects.
+  Any *other* layer that genuinely falls behind still flags.
+- **Verify.** Regenerated `platform/data/provenance.json`: `build_provenance.py --check` reproduces
+  byte-exact; the ONLY delta vs base is the added `freshness.upstream_capped` key (verified structurally —
+  every other top-level key and all of `freshness` identical after removing it), so counts are unchanged
+  (83 measured / 59 estimated / 0 unlabelled) and `stale` stays `[]`. Determinism gate
+  `bash tests/run.sh check` → **132 passed · 0 failed**, data integrity **455/455**;
+  `check_site_health.py --local ../platform` → **236/236** (the Data-room render contract holds). `app.js`
+  is **untouched** — it reads `fr.stale`/`fr.oldest`/`fr.freshest` dynamically and ignores the new key, so
+  the card renders **byte-identically today** (stale was already empty); the change is purely the underlying
+  provenance data + the prevention of the future red alarm. Data-only, zero visual/behaviour change →
+  committed straight to master per the loop safeguard.
+- **Next recommended integration.** The remaining CI-doable data backlog is genuinely exhausted (audit
+  confirmed categories 1–4 airtight: 0 unlabelled, no ungated writer, no page-referenced file missing). The
+  open competitor-undercount fix (`competitors_locator.json`, MTC 6,000+ vs ~2.5k census) and the
+  `baac_credit`/`smebank_credit` penetration layers are all **Thai-IP / owner-side** pulls — not cloud-doable.
+  Best next autonomous pass: extend the same upstream-cap honesty to any OTHER layer whose vintage is pinned
+  to a frozen external source (audit `freshness` after the next weekly refresh crosses the 180d line), or a
+  UX/render pass surfacing `freshness.upstream_capped`'s reason on the Data-room card (PR, needs headless
+  render) so the exec sees *why* the oldest layer is old rather than inferring neglect.
+
+## 2026-08-13 — UX loop: keyboard-navigable "Explore ▾" menu on the non-3D secondary pages (PR #388, merged + deployed + verified)
+
+- **Finding (`ux-navmore-keyboard-secondary-pages`, WCAG 2.1.1 Keyboard / 2.4.3 Focus Order).** All top-7
+  backlog findings and the whole `ux-table-scope` sweep are already closed, so this run reviewed a route
+  (`live.html`) directly and surfaced a real inconsistency: `ux-nav-more-keyboard` (2026-07-17) gave
+  **index.html**'s "Explore ▾" nav dropdown the full menu-button keyboard pattern (ArrowDown/Up open into
+  the menu, Arrow/Home/End roam, Escape/Tab close and restore focus to the trigger) — but that was never
+  propagated to the secondary pages, which each carry a byte-identical *copy* of only the click+Escape
+  subset. The same re-parented-to-`<body>` `role="menu"` widget (7 `role="menuitem"` links) was
+  keyboard-roamable on the front door but not elsewhere: a keyboard user could open it yet couldn't arrow
+  between items, focus never moved into the menu on open, Escape didn't restore focus, and tabbing off the
+  button skipped its items straight to the page body.
+- **What shipped.** Ported index.html's keyboard block **verbatim** to the three **non-3D** secondary
+  pages that share the identical script — `live.html`, `data.html`, `status.html` — **without** index's
+  `place()` positioning logic (index-specific; these pages position via styles.css and were left
+  untouched). Purely additive keyboard handling → zero visual change, no positioning change. The three
+  deck.gl pages (`province`/`rayong-catchment`/`branch-explorer`) carry the same simple script but style
+  the menu `position:absolute` in inline CSS and mount a WebGL canvas whose gestures aren't
+  headless-verifiable, so they were left for a device-tested run (tracked as `ux-navmore-keyboard-3dpages`).
+- **Safeguard + ship.** `bash tests/run.sh check` → **132 passed, 0 failed**; headless renders of all three
+  edited pages clean (`data-errors="[]"`, no visual regression, data.html PNG self-reviewed — nav intact);
+  no secrets, diff = 3 platform pages + audit-doc entry. Squash-merged own PR **#388** → master.
+  Vercel auto-deploy verified: `/`, `/live`, `/data`, `/status` all **HTTP 200** on the production alias;
+  no rollback needed. (Cleanup note: the git proxy refused the post-merge branch-delete push — merged
+  branch `claude/ux-loop-20260813-0319` lingers on origin, harmless.)
+
 ## 2026-08-12 — Integration loop (PROVENANCE/objective-#1): wire the orphaned BOT-direct policy-rate history into the headline macro read — replace the BIS proxy (PR)
 
 - **The gap fixed (`bot-policy-rate-orphaned-macro-shows-bis-proxy`).** `source-data/bot_policy_rate.json`
@@ -44,6 +325,39 @@ don't re-litigate settled choices.
   fallback before the fold overrides it; harmless (the fold always wins when the BOT file is present, and
   the gate would catch a BIS-only commit as drift), but a future refactor could have pull_macro skip the
   BIS policy-rate fetch entirely.
+
+## 2026-08-12 — Intelligence loop (provenance honesty): fix `"SYNTH"` substring false-positive that mislabelled 4 MEASURED layers as ESTIMATED on the #home Data-room card
+
+- **The bug (`provenance-synth-false-positive`).** `pipeline/build_provenance.py` decided each layer's
+  MEASURED vs ESTIMATED verdict by scanning its meta text for the marker fragments in `EST_MARKERS`, one
+  of which was the blunt substring `"SYNTH"`. That fragment does not only match the estimated-data word
+  "synthetic" — it also matches the **honest MEASURED disclaimers** several genuinely-measured layers
+  carry: *"every point is a real coordinate; no synthesis"*, *"no modelling, no synthesis. MEASURED …"*,
+  *"no scores, no synthesis"*, *"MEASURED assembly. No index or synthetic value is introduced"*. So four
+  layers that self-declare MEASURED were being counted **ESTIMATED** on the Command-center Data-room
+  honesty card (`renderHomeDataRoom`, the surface the whole measured-vs-estimated mandate is judged on):
+  `competitors_census.json` (the 16,503-rival census — the backbone of the entire PEER pillar,
+  feeding peer_province / competitor_coverage / rival_density / rival_pressure), `sfi_credit.json`
+  (MEASURED FPO quarterly SFI NPL series), `contested_pop.json` (MEASURED WorldPop×census overlay), and
+  `branch_labor.json` (MEASURED Overture/DIW/NSO assembly). A conservative error — it *understated* our
+  measured backbone — but wrong, and on the one card that exists to be exactly right about this.
+- **What shipped.** Removed `"SYNTH"` from the blunt-substring `EST_MARKERS` and replaced it with a
+  negation-aware `_affirmative_synthetic()` helper: the synthetic-data family (`SYNTHETIC` / `SYNTHESIS`
+  / `SYNTHESIZED`) flips a layer to ESTIMATED **only when affirmative** — i.e. its clause (comma/
+  semicolon/sentence-bounded) does not negate it (`no` / `non-` / `without` / `never`) and does not
+  itself assert `MEASURED`. So a genuinely synthetic future layer ("fully synthetic loan tape") is still
+  caught, while the measured disclaimers no longer trip. Every genuinely-estimated layer that happened to
+  also contain "synthesis" (branch_recommendations, decision_queue, catchment_poi, lead_sites,
+  occupation_leads, rival_density, rival_pressure) keeps its ESTIMATED verdict via an independent strong
+  marker (ESTIMATED / EDITORIAL), so real coverage is unchanged.
+- **Verify.** Regenerated `platform/data/provenance.json`: counts moved **79→83 measured · 63→59
+  estimated · 0 unlabelled** — exactly **4 flips, all estimated→measured**, all self-declared-MEASURED,
+  **zero** measured→estimated (wrong-direction) flips. `build_provenance.py --check` reproduces
+  byte-exact; determinism gate `bash tests/run.sh check` → **132 passed · 0 failed**, data integrity
+  **455/455**; `check_site_health.py --local` accepts the payload (the Data-room render contract holds).
+  `app.js` is untouched — the card reads `PROVEN.counts` and `prChip(L.cls)` dynamically, so the only
+  visible change is 4 chips flipping [E]→[M] and the two-digit headline split; code-level render review
+  of `renderHomeDataRoom` confirms no value-specific branch (headless browser render unavailable in CI).
 
 ## 2026-08-12 — Integration loop (self-audit honesty): restore the broken gate-coverage grep-invariant in `tests/run.sh` — `build_collateral_census` was gated but invisible to audits
 
@@ -6692,3 +7006,29 @@ Kaustav deploys).
 - **Safeguards (all pass):** (a) `bash tests/run.sh check` → **132 passed, 0 failed** (incl. `node --check` on every page's inline JS + all data-integrity checks); gate was already 0-failed on `origin/master` — no provenance/commodities drift to restore this run. (b) `tests/visual_overflow.js` @ 390px re-run after the fix → **clean across all 11 routes** (was PAGEX 1 + BLEED 1 on macro); direct measurement of the heading → `bleed 0` (was 78), `docSW 390 == vw 390` (PAGEX gone, was 422); targeted mobile PNG self-reviewed — the long pill now wraps to two lines inside its bordered box (green `--merch` border intact, on-theme), nothing visibly broken. (c) no secrets in the CSS-only diff. (d) diff = only `platform/styles.css` + `docs/UXUI_AUDIT.md`, no stray files (scratch renders removed pre-commit).
 - **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/styles.css` (the changed asset); `/index.html` → **308** (expected `cleanUrls` redirect to `/`, not a regression). Polled the edge until the new build propagated — after ~106s the **deployed** `/styles.css` served the new rule (`grep max-width:520px){.fb-h4 .tag{white-space:normal}` = 1), confirming the fix is live in production, not just merged. Session auto-unsubscribed from PR #384 on merge; branch deleted on merge.
 - **Next recommended:** the surgical + headless-verifiable queue is drained again — the standing backlog remains all bigger-than-surgical or device-tested and NOT auto-mergeable unattended: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" expansion language in `build_regional_outlook.py` + app.js as competitive-RISK, ripples across national/regional/province + app.js); `ux-viewport-user-scalable-3dpages` + its sibling `ux-navmore-3dpages-absolute-overflow` (the 3 deck.gl pages — drop `maximum-scale=1` + add `touch-action:none`, and their `position:absolute` Explore menu spills past the right edge on a phone — both need real-device pinch/gesture testing, best batched into one device-tested run); `ux-live-chart-mobile-viewbox-responsive` (narrower viewBox on phones so `live.html`'s SVG geometry+labels scale together — touches `lineChart()` coordinate math). Two **test-infra** wins would harden the loop itself and are worth a dedicated run: `qa-visual-overflow-not-in-ci` (wire `tests/visual_overflow.js` to the global Playwright so this bleed/page-x gate actually runs in `tests/run.sh check` instead of relying on a manual invocation — this run found a real PAGEX the gate would have caught automatically) and `qa-live-not-in-overflow-audit-routes` (add `live.html` + the 3 deck.gl pages to the audit's ROUTES). Also standing: `qa-visual-baseline-stale` (deliberate `tests/run.sh baseline` refresh) and the recurring pipeline-hygiene ask (fold a `build_provenance.py`/`build_commodities.py` regen into the data-bot commit path).
+
+## 2026-08-12 — UX loop: ux-nav-live-tooltip-stale-count (Live-board nav tooltip stale count) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260812-1423`, squash-merged PR #385 → `a2ed353` on master): a real **honesty-of-numbers** clarity fix. The "Live board" Explore-menu tooltip — `title="Every live feed — freshness against each source's own cadence, plus the four with real stored history"` repeated verbatim on all **6 nav pages** carrying the Explore menu (`index.html`, `data.html`, `status.html`, `province.html`, `rayong-catchment.html`, `branch-explorer.html`) — hardcoded the volatile trend-line count "**the four**", but the live board now renders **8** trend lines (its own body computes "8 of 23 feeds carry one" from data, confirmed in the headless `live.html` DOM). So hovering the Live-board affordance promised four stored series when there are eight — a stale, wrong count on an exec tool. Following the just-merged `ux-live-meta-stale-feed-counts` precedent (a count that grows as feeds land can only ever drift → drop it, don't re-pin), reworded all 6 to "plus **the feeds that carry** real stored history". `title`-attribute copy only. `live.html` itself carries no self-link tooltip → no change needed.
+- **How it was found:** the seven named backlog priorities and the whole standing fix-log are long-since closed and the surgical/headless-verifiable queue was drained, so this run reviewed the routes directly. Grepping for the recently-flagged volatile-feed-count drift class (sibling of `ux-live-meta-stale-feed-counts`) surfaced the identical stale "four" still living in the nav tooltip across 6 pages — the meta fix had corrected `live.html`'s own `<head>` but never the nav affordance that points at it.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **132 passed, 0 failed** (incl. `node --check` on every page's inline JS + all data-integrity checks); gate was already 0-failed on `origin/master` — no drift to restore this run. (b) headless render of a changed page (`index.html`) → **pixel-identical** before/after (203,766 B, `cmp` equal — a `title` attr is not rendered content), `data-errors=[]`, and the new tooltip string present in the settled DOM. (c) no secrets in the diff. (d) diff = 6 identical `title` edits + one `docs/UXUI_AUDIT.md` fix-log line, no stray files.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/`, `/data`, `/status`, `/province`, `/branch-explorer`, `/rayong-catchment` (all six changed routes; `.html` URLs 308-redirect via `cleanUrls`, expected). Polled the edge until the new build propagated (~30s after an initial poll still serving the prior build) — the **deployed** `/` then served the new copy (`grep 'plus the feeds that carry real stored history'` = 1, stale "four" = 0), confirming the fix is live in production, not just merged. Session auto-unsubscribed from PR #385 on merge; branch deleted on merge.
+- **Next recommended:** the surgical + headless-verifiable queue is drained again — the standing backlog remains all bigger-than-surgical or device-tested and NOT auto-mergeable unattended: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" expansion language in `build_regional_outlook.py` + app.js as competitive-RISK); `ux-viewport-user-scalable-3dpages` + `ux-navmore-3dpages-absolute-overflow` (the 3 deck.gl pages — drop `maximum-scale=1` + add `touch-action:none`, and fix their `position:absolute` Explore menu right-edge spill — both need real-device pinch/gesture testing, best batched into one device-tested run); `ux-live-chart-mobile-viewbox-responsive` (narrower viewBox on phones so `live.html`'s SVG geometry+labels scale together). Two **test-infra** wins would harden the loop itself: `qa-visual-overflow-not-in-ci` (wire `tests/visual_overflow.js` to the global Playwright so the bleed/page-x gate runs inside `tests/run.sh check` automatically) and `qa-live-not-in-overflow-audit-routes` (add `live.html` + the 3 deck.gl pages to the audit ROUTES). Also standing: `qa-visual-baseline-stale` (deliberate `tests/run.sh baseline` refresh) and the recurring pipeline-hygiene ask (fold a `build_provenance.py`/`build_commodities.py` regen into the data-bot commit path).
+
+## 2026-08-13 — UX loop: ux-casc-select-label-association (deck.gl cascading select labels) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260813-0814`, squash-merged PR #389 → `ce2c7ea` on master): a real **a11y** fix (WCAG 1.3.1 / 4.1.2 / 3.3.2). The left-panel cascading **Region / Province / Branch** `<select>` controls (`#cscRegion` / `#cscProv` / `#cscBranch`, the `.casc` block) on the two deck.gl pages `province.html` + `rayong-catchment.html` paired each select with a visible `<label>` that was a **bare sibling** — no `for=` and not wrapping the control — so the label was never the control's accessible name: a screen reader announced each as an unnamed "combobox", and the visible "Region"/"Province"/"Branch" text was not a click target to focus/open the select. Fix: add `for="cscRegion"` / `for="cscProv"` / `for="cscBranch"` to the three labels on both pages (6 selects). Pure static-HTML association — a `for=` attr has zero paint footprint, no JS touched. Unlike the deferred deck.gl backlog items (`ux-viewport-user-scalable-3dpages`, the navmore-3dpages pair), this needs no map/canvas/gesture device-testing — it is headless-verifiable and paint-neutral, so safe for the unattended auto-merge.
+- **How it was found:** the seven named backlog priorities and the whole standing fix-log are long-since closed, and the remaining open backlog is all bigger-than-surgical / device-tested / test-infra (not auto-mergeable unattended), so this run reviewed routes directly. A sweep of every `<input>`/`<select>`/`<textarea>` across the pages surfaced these six selects as the last controls with a visible-but-unassociated label — the sibling gap `ux-search-a11y`/`ux-sim-slider-labels`/`ux-databook-search-aria-label` never reached because it looked only at the SPA + data.html search/slider controls, not the deck.gl compare-scene selectors.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **133 passed, 0 failed** (incl. `node --check` on both changed pages' inline JS + all data-integrity checks); gate was already 0-failed on `origin/master` — no provenance/commodities drift to restore this run. (b) render self-review: `province.html` — which carries the **byte-identical** change to the same `.casc` block — rendered clean at 1440×900 (nav, district polygons, POI chips, branch markers all intact) and its settled DOM confirmed the `for=` attrs landed live (`<label for="cscRegion">` …). `rayong-catchment.html`'s heavy Overture 3D scene does not settle in the headless harness at any budget — confirmed **pre-existing** (the master copy fails to render identically), an environmental limit of that page, not a regression; the change is provably paint-neutral there and its inline JS `node --check`-passes in the gate. (c) no secrets in the HTML-only diff. (d) diff = 6 `for=` label edits (2 pages) + one `docs/UXUI_AUDIT.md` fix-log line, no stray files (scratch renders kept out of the commit).
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and on both changed clean routes `/province` + `/rayong-catchment` (the `.html` URLs 308-redirect via `cleanUrls`, expected — not a regression); the **deployed** `/province` then served the new markup (`grep 'label for="csc…'` = 3), confirming the fix is live in production, not just merged. Session auto-unsubscribed from PR #389 on merge; branch deleted on merge.
+- **Next recommended:** the surgical + headless-verifiable queue is drained again — the standing backlog remains all bigger-than-surgical or device-tested and NOT auto-mergeable unattended: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" expansion language in `build_regional_outlook.py` + app.js as competitive-RISK, ripples across national/regional/province + app.js); `ux-viewport-user-scalable-3dpages` + `ux-navmore-3dpages-absolute-overflow` + `ux-navmore-keyboard-3dpages` (the 3 deck.gl pages — drop `maximum-scale=1` + add `touch-action:none`, fix the `position:absolute` Explore-menu right-edge spill, and port index's full menu-button keyboard pattern — all three need real-device pinch/gesture/canvas-focus testing, best batched into one device-tested run); `ux-live-chart-mobile-viewbox-responsive` (narrower viewBox on phones so `live.html`'s SVG geometry+labels scale together). Two **test-infra** wins would harden the loop itself: `qa-visual-overflow-not-in-ci` (wire `tests/visual_overflow.js` to the global Playwright so the bleed/page-x gate runs inside `tests/run.sh check` automatically) and `qa-live-not-in-overflow-audit-routes` (add `live.html` + the 3 deck.gl pages to the audit ROUTES). Also standing: `qa-visual-baseline-stale` (deliberate `tests/run.sh baseline` refresh) and the recurring pipeline-hygiene ask (fold a `build_provenance.py`/`build_commodities.py` regen into the data-bot commit path).
+
+## 2026-08-13 — Intelligence loop (PEER/SERVICE, honesty-of-numbers): live-bind the two hardcoded "16,503 rival branches" census claims on #acq so they can't silently go stale after a scout refresh — merged + deployed + verified
+- **Shipped** (branch `claude/intel-loop-20260813-rivcensus-live-count`): the exec front-door **Competition (`#acq`)** panel stated the measured competitor-census size as a **frozen literal "16,503 real branches"** in two static-HTML `<p class="lead">` copy spots (`index.html` coverage-panel intro + the "where rivals own ground" lead). That number is the ONE competitor total that changes every time `committee/scout` re-pulls and `build_competitor_census.py` rebuilds — so on the next census refresh both claims would silently assert a **wrong MEASURED count** on the CEO's rival-coverage readout. Fix follows the project's honesty-of-numbers precedent (`ux-live-meta-stale-feed-counts`: a count that drifts must be derived, not re-pinned): wrapped both numbers in `<span class="rivcensus-n">` (keeping `16,503` as the correct-today static fallback) and, in `drawCompCoverage()` — the fn that already loads `competitor_coverage.json` and reports `meta.totals.found` in its readout — pinned every `.rivcensus-n` to the **live** census total (`meta.totals.found`, or the brand-`found` sum as a fallback; left untouched when the census is absent/zero). Same measured source the panel's own readout uses, so the copy and the table can never disagree. `platform/index.html` (2 spans) + `platform/app.js` (7 lines in `drawCompCoverage`) only — no data layer touched, so no provenance regen needed.
+- **How it was found:** deployment-health + freshness + peer-layer audits this run all came back green (prod alias 200 on `/`,`/app.js`,`/data/meta.json`,`/data/competitor_coverage.json`,`/data/tape_real.json`; `build_provenance.py` → 142 layers, 0 stale over 180d, 0 unlabelled; `peer_province.json` internally consistent — `by_brand` sums == `rivals`, all 4 brands incl. Heng across 61 provinces, 0 ratio mismatches; 0 genuine broken data refs), so the run swept the app for the project's recurring drift class — hardcoded data-derived numbers in copy — and found `16,503` hardcoded in 6 places: 3 are code comments (harmless), 1 (`app.js:3257`) is already data-driven with a literal fallback, and **2 are user-facing static claims** with no live binding. Those two were the fix.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **133 passed, 0 failed** (incl. 455/455 data-integrity + `check_site_health.py --local` + `node --check` across pages). (b) headless `render.sh index.html#acq` @ 1100×950 → `data-errors="[]"`, `#compcovtbl` populated with brand rows (proves `drawCompCoverage` ran → the injection line ran), both `.rivcensus-n` spans render `16,503` in the settled DOM (equals the live total today → visually identical, the value only diverges after a real refresh); injection logic independently unit-checked — 16,503→16,503, a grown census 17,250→17,250, no-totals→brand-sum, absent/zero→static fallback left untouched. (c) no secrets in the HTML/JS-only diff. (d) diff = only `platform/app.js` + `platform/index.html` + this log entry, no stray files, no data layer altered.
+
+## 2026-08-13 — UX loop: ux-live-chart-aria-latest-value (live.html trend-chart accessible names carry the answer) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260813-2022`, squash-merged PR #394 → `3a2d065` on master): a real **a11y + lead-with-the-answer** fix (WCAG 1.1.1 Non-text Content). `live.html`'s five inline-SVG trend charts (System NPL · commodity prices · real-GDP+IMF projection · household debt · accumulated daily feeds) each PRINT their latest value as an on-chart `.lb-lastv` label at the line's end — "4.48%", "494", "2.5%", "87.5% GDP", "36.69 ฿/L", the single most important number a sighted reader takes off the chart — but the SVG `role="img"` **aria-label named only what the series IS** ("SFI system NPL ratio by quarter since 2008-Q1"), so a screen-reader user learned where the data STARTED but never where the line now SITS or which way it heads: the "answer" was invisible to AT even though it's drawn on screen. Fix: enriched the accessible name in ONE place — `lineChart()`'s return, so all five charts benefit — appending "; latest <value><unit>, <rising/falling/flat> across the series", reusing the same `fmtNum(pts[li].y)+unit` the visible last-value label uses and deriving direction from first-vs-last point. Now AT announces e.g. "…since 2008-Q1; latest 4.48%, falling across the series", matching the on-screen label AND each caption (household "deleveraging"→falling, diesel "▼"→falling). `platform/live.html` only (+8/−1).
+- **How it was found:** the seven named backlog priorities and the whole standing fix-log are long-since closed, and the remaining open backlog is all bigger-than-surgical / device-tested / test-infra (not auto-mergeable unattended), so this run reviewed routes directly. First ran the standing overflow audit (`tests/visual_overflow.js` via the global Playwright) — **clean across all 11 routes × 2 viewports** (no bleed/clip/page-x). Then reviewed `live.html` (the newest nav route, added after both site-wide table-a11y sweeps and outside the swept surfaces): its head/noscript/skip-link/table-a11y coverage all check out, but the chart SVGs' `role="img"` aria-labels were descriptive-only, omitting the current reading + direction the charts visibly show — the last-value label is the page's whole point ("where it is headed").
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **133 passed, 0 failed** (incl. `node --check` on all `live.html` inline scripts + 455/455 data-integrity + `check_site_health.py --local`); gate was already 0-failed on `origin/master` — no provenance/commodities drift to restore this run. (b) render self-review: `render.sh live.html` before AND after — the two PNGs are **byte-identical** (`diffpng` mean_diff 0.0, both 221407 bytes; aria is a non-visual attr), and the settled headless DOM confirms all five enriched aria-labels landed correctly with honest directions (NPL 4.48% falling, rice 494 rising, GDP 2.5% rising, household 87.5% GDP falling, diesel 36.69฿/L falling). (c) no secrets in the HTML-only diff. (d) diff = the single `lineChart()` return edit + one `docs/UXUI_AUDIT.md` fix-log line, no stray files.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and on the changed clean route `/live` (the `/live.html` URL 308-redirects via `cleanUrls` → `/live` → 200, expected — not a regression); the **deployed** `/live` source then served the new markup (`grep "latest ' + lastLbl + ', ' + dir + ' across the series"` = 1), confirming the fix is live in production, not just merged. Session auto-unsubscribed from PR #394 on merge. **Residual:** the remote feature branch `claude/ux-loop-20260813-2022` could not be deleted — every `git push --delete` retry hit a transient proxy `send-pack: unexpected disconnect` (branch creation/push worked fine earlier; the disconnect is specific to the delete refspec through the agent proxy). Merge to master is complete and unaffected; the leftover merged branch is cosmetic and can be pruned from the GitHub UI or a later run.
+- **Next recommended:** the surgical + headless-verifiable queue stays drained — the standing backlog remains all bigger-than-surgical or device-tested and NOT auto-mergeable unattended: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" expansion language in `build_regional_outlook.py` + app.js as competitive-RISK, ripples across national/regional/province + app.js); the three deck.gl-page items best batched into one real-device run (`ux-viewport-user-scalable-3dpages` drop `maximum-scale=1`+add `touch-action:none`; `ux-navmore-3dpages-absolute-overflow` right-edge Explore-menu spill; `ux-navmore-keyboard-3dpages` port index's full menu-button keyboard pattern); `ux-live-chart-mobile-viewbox-responsive` (narrower viewBox on phones so `live.html`'s SVG geometry+labels scale together). Two **test-infra** wins would harden the loop itself and are the highest-leverage next step: `qa-visual-overflow-not-in-ci` (wire `tests/visual_overflow.js` to the global Playwright at `/opt/node22/lib/node_modules` so the bleed/page-x gate runs inside `tests/run.sh check` automatically — it already runs fine that way, it's just not wired) and `qa-live-not-in-overflow-audit-routes` (add `live.html` + the 3 deck.gl pages to the audit ROUTES). Also standing: `qa-visual-baseline-stale` (deliberate `tests/run.sh baseline` refresh) and the recurring pipeline-hygiene ask (fold a `build_provenance.py`/`build_commodities.py` regen into the data-bot commit path). NOTE for the next run: `bash tests/run.sh check` took ~20 min in this environment (heavy `build_provenance.py --check` memory/CPU) — budget for it.

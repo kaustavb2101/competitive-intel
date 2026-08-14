@@ -258,11 +258,6 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_vehicle_flow.py --check (dlt mirror absent/<12mo — not data drift)"
   else bad "build_vehicle_flow.py --check (vehicle_flow_by_province.json drifted from the dlt mirror)"
   fi
-  ( cd "$PIPE" && python3 build_vehicle_flow_transport.py --check >/dev/null 2>&1 ); rc=$?
-  if [ "$rc" -eq 0 ]; then ok "build_vehicle_flow_transport.py --check"
-  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_flow_transport.py --check (dlt mirror absent/<12mo — not data drift)"
-  else bad "build_vehicle_flow_transport.py --check (vehicle_flow_transport_by_province.json drifted from the dlt mirror)"
-  fi
   ( cd "$PIPE" && python3 build_truck_flow.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_truck_flow.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_truck_flow.py --check (dlt mirror absent/<24mo or output not generated — not data drift)"
@@ -549,6 +544,16 @@ INGESTS
     ok "nav_consistency.py (one nav across 6 pages, no orphan routes)"
   else
     bad "nav_consistency.py (nav drift or an unreachable route — see report above)"
+  fi
+
+  # orphan-DATA-LAYER gate: the sibling of the orphan-route check above. Asserts every committed
+  # platform/data/*.json leaf is actually consumed — fetched by a page OR read by a downstream
+  # builder — not just deterministically reproduced. Catches the branch_density failure: a layer
+  # that byte-reproduces perfectly yet nothing reads, aging gate-green in silence for months.
+  if python3 "$TESTS/orphan_layers.py"; then
+    ok "orphan_layers.py (every committed data layer is consumed by a page or a builder)"
+  else
+    bad "orphan_layers.py (a committed data layer has no consumer — see report above)"
   fi
 
   # data-integrity sub-check: assert platform/data/*.json is internally sane (offline, stdlib).
