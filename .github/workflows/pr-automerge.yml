@@ -1,0 +1,242 @@
+name: PR — auto-merge generated PRs once the gate is green
+
+# WHY THIS EXISTS
+# ---------------
+# Nineteen workflows in this repo open PRs (data refreshes, census pulls, deck rebuilds), and the
+# autonomous loop opens more. None of them could merge themselves, so every one waited on a human
+# to click merge — and because master moves constantly, whatever was not merged promptly rotted
+# into a conflict that the same human then had to resolve by hand. `pr-autoresolve.yml` already
+# removes the *conflict* half of that chore. This removes the *clicking* half.
+#
+# WHAT MAKES THAT SAFE — and what it does not
+# -------------------------------------------
+# The determinism gate proves every committed platform/data layer reproduces byte-exactly from
+# committed sources, plus `node --check` over every page's JS. For a data refresh that is a
+# complete verification: there is nothing left for a human to judge. For a generated change to
+# pipeline/ or app.js it is NOT complete — the gate proves the code parses and the data reproduces,
+# not that the change is a good idea. Merging those unreviewed is a deliberate choice made by the
+# owner (2026-08-15), traded for never hand-merging again. Master auto-deploys to Vercel, so
+# anything this job merges is live within minutes.
+#
+# THE STALE-GREEN TRAP, which is the failure mode that actually bites
+# ------------------------------------------------------------------
+# A PR page showing a green check proves nothing on its own: qa.yml sets
+# `concurrency: cancel-in-progress`, pushes made with GITHUB_TOKEN do not trigger workflows at all,
+# and `pull_request`-triggered runs on bot commits sit at `action_required` and never execute. So a
+# branch can easily carry a green tick that belongs to an OLDER commit, or no real run at all.
+# This job therefore never reads "is the PR green" — it requires a qa.yml run whose headSha equals
+# the PR's CURRENT head, whose status is completed and whose conclusion is success. Anything else
+# gets a fresh gate dispatched and is left for the next tick.
+#
+# WHY ONE PR PER RUN
+# ------------------
+# Merging with GITHUB_TOKEN pushes master WITHOUT triggering any workflow. So merging two PRs in
+# one pass would land the second having gated it against a master that no longer exists, and would
+# leave every other open PR dirty with nothing scheduled to refresh them. Instead: merge exactly
+# one, then explicitly dispatch pr-autoresolve so the rest are re-merged and re-gated against the
+# new master. The QA-completion trigger below then brings us straight back here. The queue drains
+# serially, and every PR is verified against the tree it actually lands on.
+
+on:
+  # Fires the moment any gate finishes, so a PR merges as soon as it goes green rather than
+  # waiting for the next cron tick.
+  workflow_run:
+    workflows: ["QA"]
+    types: [completed]
+  # Safety net only — the workflow_run trigger above already fires ~30x/day, so this exists purely
+  # to recover a PR whose gate was cancelled or never dispatched. Every 6h, not hourly: on a repo
+  # this size a cron that adds nothing still costs a billed minute every time it wakes up.
+  schedule:
+    - cron: "25 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write         # merge the PR
+  pull-requests: write    # mark ready + merge
+  actions: write          # dispatch qa.yml / pr-autoresolve.yml
+
+concurrency:
+  # Two of these racing would each pick a candidate against a different master and double-merge.
+  group: pr-automerge
+  cancel-in-progress: false
+
+jobs:
+  automerge:
+    # SELF-HOSTED ON PURPOSE — this is a private repo, so every GitHub-hosted minute is billed, and
+    # the workflow_run trigger fires this once per QA completion (~66x/day). Billing rounds UP to
+    # the minute per job, so even a 15-second run costs a full minute: ~2,000 billed minutes a month
+    # for a job that usually decides there is nothing to do. It only calls the gh API — no checkout,
+    # no pipeline, no network pulls — so unlike the data workflows, moving it off ubuntu cannot
+    # change any source's reachability or provenance.
+    #
+    # The honest cost of that choice: `ci` is ONE serial executor on a 2-core box and it carries the
+    # QA queue, so this job can sit behind a QA run before it gets to merge anything. That is
+    # acceptable here and would not be for qa.yml — nothing downstream is waiting on a merge to the
+    # minute, the job is idempotent, and the workflow_run trigger fires again on the next gate. It
+    # is affordable at all only because qa.yml's duplicate `push: ["**"]` trigger was removed in the
+    # same change; before that the box had no headroom to lend.
+    runs-on: [self-hosted, ci]
+    timeout-minutes: 15
+    steps:
+      - name: Pick the oldest eligible generated PR
+        id: pick
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          set -uo pipefail
+          gh pr list --state open --base master --limit 50 \
+            --json number,author,isDraft,headRefName,headRefOid,headRepositoryOwner,body,createdAt,mergeable,mergeStateStatus \
+            > /tmp/prs.json
+
+          # Python rather than a --jq one-liner: the eligibility rule spans two authorship classes
+          # and three mergeability states, and shell-quoting that into jq is how it silently starts
+          # matching the wrong PRs.
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os, re
+
+          owner = os.environ["OWNER"]
+          prs = json.load(open("/tmp/prs.json"))
+
+          # The two classes of generated PR, which do NOT share an author:
+          #   * data refreshes / census pulls / deck rebuilds -> app/github-actions
+          #   * the autonomous loop's own PRs                 -> run under the OWNER's account, so
+          #     they are indistinguishable from hand-written ones by author. They carry a
+          #     "Generated by/with [Claude Code]" line in the body; that marker is the only
+          #     reliable discriminator, so a hand-written PR stays untouched.
+          MARKER = re.compile(r"Generated (?:by|with) \[Claude Code\]", re.I)
+
+          def generated(pr):
+              if pr["author"]["login"] in ("github-actions", "github-actions[bot]"):
+                  return True
+              return bool(MARKER.search(pr.get("body") or ""))
+
+          skipped = []
+          promote = []
+          cand = None
+          for pr in sorted(prs, key=lambda p: p["createdAt"]):        # oldest first, drain in order
+              n = pr["number"]
+              if (pr.get("headRepositoryOwner") or {}).get("login") != owner:
+                  continue                                            # fork: cannot push or trust
+              if not generated(pr):
+                  skipped.append("#%d hand-written, left for a human" % n)
+                  continue
+              # DEADLOCK GUARD. pr-autoresolve skips drafts (a cost decision) and this job skips
+              # DIRTY ones (they are autoresolve's job) — so a generated PR that is BOTH would be
+              # touched by neither and wedge forever. Every generated PR is meant to merge, so
+              # promote them all out of draft on sight; that hands drafts to autoresolve and is
+              # what makes them merge-eligible here.
+              if pr["isDraft"]:
+                  promote.append(n)
+              st = pr.get("mergeStateStatus")
+              if st == "DIRTY":
+                  skipped.append("#%d conflicts — pr-autoresolve's job" % n)
+                  continue
+              if st == "UNKNOWN" or pr.get("mergeable") == "UNKNOWN":
+                  skipped.append("#%d mergeability still computing" % n)
+                  continue
+              cand = pr
+              break
+
+          for s in skipped:
+              print("::notice::%s" % s)
+
+          print("promote=%s" % " ".join(str(n) for n in promote))
+          if cand is None:
+              print("found=none")
+          else:
+              print("found=yes")
+              print("number=%d" % cand["number"])
+              print("branch=%s" % cand["headRefName"])
+              print("sha=%s" % cand["headRefOid"])
+              print("draft=%s" % str(cand["isDraft"]).lower())
+          PY
+
+      # Runs even when nothing is mergeable this tick: a wedged draft must be promoted so that
+      # pr-autoresolve starts refreshing it, which is what eventually makes it mergeable at all.
+      - name: Promote generated drafts so autoresolve stops skipping them
+        if: steps.pick.outputs.promote != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROMOTE: ${{ steps.pick.outputs.promote }}
+        run: |
+          set -uo pipefail
+          for n in $PROMOTE; do
+            gh pr ready "$n" && echo "marked #$n ready (was a generated draft)" \
+              || echo "::warning::could not mark #$n ready"
+          done
+
+      - name: Require a gate run on THIS EXACT head, then merge
+        if: steps.pick.outputs.found == 'yes'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUM: ${{ steps.pick.outputs.number }}
+          BRANCH: ${{ steps.pick.outputs.branch }}
+          SHA: ${{ steps.pick.outputs.sha }}
+          DRAFT: ${{ steps.pick.outputs.draft }}
+        run: |
+          set -uo pipefail
+
+          # Only runs whose headSha IS this PR's current head count. See the stale-green note above.
+          gh run list --workflow qa.yml --limit 80 \
+            --json headSha,status,conclusion,databaseId > /tmp/runs.json
+          # 'cancelled' and 'action_required' are NOT verdicts — they mean the gate never ran.
+          # Treating them as red is the bug that silently wedges a PR forever, and qa.yml cancels
+          # runs routinely (cancel-in-progress on every push) while bot PRs land on
+          # action_required by default. Only a real failure/timed_out counts as red; everything
+          # inconclusive falls through to 'absent', which dispatches a fresh gate.
+          VERDICT=$(python3 -c "
+          import json,os
+          sha=os.environ['SHA']
+          runs=[r for r in json.load(open('/tmp/runs.json')) if r['headSha']==sha]
+          done=[r for r in runs if r['status']=='completed']
+          concl={str(r['conclusion']) for r in done}
+          bad={'failure','timed_out','startup_failure'}
+          if 'success' in concl:            print('green')
+          elif len(done)<len(runs):         print('running')   # queued/in_progress -> do not touch
+          elif concl & bad:                 print('red:'+','.join(sorted(concl & bad)))
+          else:                             print('absent')    # none, cancelled, action_required
+          ")
+          echo "PR #$NUM ($BRANCH @ ${SHA:0:8}) gate verdict: $VERDICT"
+
+          case "$VERDICT" in
+            running)
+              echo "::notice::#$NUM — gate still running on the current head; next tick will merge it."
+              exit 0 ;;
+            absent)
+              # Expected for a freshly-opened bot PR: its push was made with GITHUB_TOKEN (no
+              # workflow trigger) and its pull_request run sits at action_required. Ask for a real
+              # one; the workflow_run trigger brings us back when it finishes.
+              echo "::notice::#$NUM — no gate run exists for this head. Dispatching qa.yml."
+              gh workflow run qa.yml --ref "$BRANCH" \
+                && echo "dispatched qa.yml on $BRANCH" \
+                || echo "::error::qa.yml dispatch FAILED for #$NUM — merge it by hand or re-dispatch."
+              exit 0 ;;
+            red:*)
+              echo "::error::#$NUM — gate on the current head concluded ${VERDICT#red:}. NOT merging; this one needs you."
+              exit 0 ;;
+          esac
+
+          # A draft cannot be merged, and pr-autoresolve deliberately skips drafts — so a generated
+          # PR left as a draft would never be refreshed OR merged. Promote it now that it is green.
+          if [ "$DRAFT" = "true" ]; then
+            gh pr ready "$NUM" && echo "marked #$NUM ready (was a draft)"
+          fi
+
+          if gh pr merge "$NUM" --squash --delete-branch; then
+            echo "merged #$NUM" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::error::#$NUM — merge call failed (branch moved, or a check turned required mid-run)."
+            exit 0
+          fi
+
+          # This merge pushed master with GITHUB_TOKEN, which triggers NOTHING — not pr-autoresolve,
+          # not qa. Every other open PR is now stale with nothing scheduled to fix it, so ask
+          # explicitly. This is the step that keeps the queue draining without a human.
+          gh workflow run pr-autoresolve.yml \
+            && echo "dispatched pr-autoresolve to refresh the remaining PRs" \
+            || echo "::error::pr-autoresolve dispatch FAILED — remaining PRs may sit stale until the next master push."
+
+      - name: Nothing to do
+        if: steps.pick.outputs.found == 'none'
+        run: echo "No eligible generated PR is ready to merge." >> "$GITHUB_STEP_SUMMARY"

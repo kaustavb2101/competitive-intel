@@ -11,8 +11,20 @@ name: QA
 # are intentionally blank in renders. This mirrors what the sandbox can do.
 
 on:
+  # `push` is master-ONLY on purpose. It used to be ["**"], which meant every human push to a branch
+  # with an open PR started TWO identical gate runs — one for `push`, one for `pull_request` — on the
+  # same commit. Measured 2026-08-14 over 7 days: 706 QA runs booking 21,989 runner-minutes on a
+  # single serial self-hosted executor, i.e. more wall time than the week physically contains. The
+  # box was not slow, it was queueing, and roughly a third of the queue was this duplicate.
+  #
+  # Coverage is unchanged for everything that can merge: a human push to a branch with an open PR is
+  # still gated by `pull_request`; a commit written by a workflow is gated by the explicit
+  # workflow_dispatch that pr-autoresolve/pr-automerge issue (a GITHUB_TOKEN push triggers no event
+  # at all, so `push: ["**"]` never covered those anyway); and master itself is gated below.
+  # What is genuinely given up: a branch pushed with NO open PR is no longer gated until a PR
+  # exists. Open the PR, or dispatch this workflow by hand.
   push:
-    branches: ["**"]
+    branches: [master]
   pull_request:
   workflow_dispatch:
 
@@ -25,9 +37,17 @@ on:
 #
 # Keyed on the PR number where there is one and the ref otherwise, so runs are only ever cancelled
 # by a newer run of the SAME branch — never across branches.
+#
+# MASTER IS EXEMPT FROM CANCELLATION, and that is a correctness fix rather than a tuning knob. For a
+# PR branch a superseded run is genuinely worthless — a newer commit already replaced the question.
+# For master it is the opposite: every master commit is a distinct state that ships to Vercel, so
+# cancelling one does not supersede it, it leaves it permanently ungated. That was actively
+# happening — commits 5b0edb80, f9ffcf74, 5d99648b and a76de7f0 each cancelled the one before, so
+# four consecutive master states reached production with no gate result at all. pr-automerge merges
+# one PR at a time, which pushes master in exactly the bursts that trigger this.
 concurrency:
   group: qa-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 jobs:
   qa:

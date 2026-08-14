@@ -517,6 +517,12 @@ INGESTS
   # unattended job and a wrongly-resolved conflict in source-data/ or in code. Fixture-based, seconds.
   bash "$REPO/tests/test_resolve_derived_conflicts.sh" >/dev/null 2>&1 && ok "resolve_derived_conflicts.sh (41 fixture cases)" || bad "resolve_derived_conflicts.sh fixture tests (run: bash tests/test_resolve_derived_conflicts.sh)"
 
+  # pr-automerge.yml merges generated PRs to master unattended and master auto-deploys, so its
+  # eligibility rule and its "did the gate really pass on THIS head" rule are the last thing
+  # between a bot commit and the live site. A workflow cannot be tested by running it, so this
+  # extracts both embedded Python blocks from the YAML and exercises them. Fixture-based, seconds.
+  python3 "$REPO/tests/test_pr_automerge_logic.py" >/dev/null 2>&1 && ok "pr-automerge.yml logic (24 fixture cases)" || bad "pr-automerge.yml fixture tests (run: python3 tests/test_pr_automerge_logic.py)"
+
   node --check "$PLATFORM/app.js" >/dev/null 2>&1 && ok "node --check app.js" || bad "node --check app.js (syntax error)"
 
   # every page: extract each inline <script> (that has no src) and node --check it.
