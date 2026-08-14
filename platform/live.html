@@ -306,8 +306,15 @@ function lineChart(pts, o) {
   s.push('<text class="lb-lastv" x="' + (X(li) + 8).toFixed(1) + '" y="' + (Y(pts[li].y) + 4).toFixed(1) +
     '" fill="' + col + '">' + esc(fmtNum(pts[li].y)) + (o.unit ? esc(o.unit) : '') + '</text>');
 
+  // Accessible name carries the same "answer" a sighted reader takes off the chart — the latest-value
+  // label (drawn above) plus the overall direction — not just what the series IS. Without this a screen
+  // reader hears "…ratio by quarter since 2008-Q1" and never learns where the line sits or which way it
+  // heads (WCAG 1.1.1 Non-text Content; lead-with-the-answer). Reuses the visible last-value formatting.
+  var lastLbl = fmtNum(pts[li].y) + (o.unit || '');
+  var dir = pts[li].y > pts[0].y ? 'rising' : pts[li].y < pts[0].y ? 'falling' : 'flat';
+  var ariaFull = (o.aria || 'trend line') + '; latest ' + lastLbl + ', ' + dir + ' across the series';
   return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' +
-    esc(o.aria || 'trend line') + '">' + s.join('') + '</svg>';
+    esc(ariaFull) + '">' + s.join('') + '</svg>';
 }
 
 /* ---------------------------------------------------------------- render */

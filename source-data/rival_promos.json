@@ -177,8 +177,18 @@
    "kind": "promotion",
    "title": "ประวัติดีมีเฮ จัดสินเชื่อรถบรรทุกซื้อขาย รับดอกเบี้ยคงที่เริ่มต้น 0.50% ต่อเดือน",
    "detail": "&amp;lt;p&amp;gt;สิทธิพิเศษสำหรับคนเครดิตดี สินเชื่อรถบรรทุกซื้อขาย ดอกเบี้ยคงที่เริ่มต้น 0.50% ต่อเดือน&amp;lt;/p&amp;gt;",
-   "date": "2024-02-06",
+   "date": "2024-12-31",
    "url": "https://www.tidlor.com/th/promotion-activity/usedtruck-low-interest-q1-2024",
+   "first_seen": "2026-07-19",
+   "last_seen": "2026-08-13"
+  },
+  {
+   "brand": "TIDLOR",
+   "kind": "promotion",
+   "title": "โอนเงินสินเชื่อเข้าบัญชีใน 1 นาที ฉุกเฉินเมื่อไหร่ ไม่ต้องรอ!",
+   "detail": "โอนเงินสินเชื่อ โอนเงินด่วนเข้าบัญชี พร้อมทุกสถานการณ์ ภาระหนักแค่ไหนก็มีเงินใช้พร้อมโอนเข้าบัญชีได้ภายใน 1 นาที สมัครเลย!",
+   "date": "2024-12-31",
+   "url": "https://www.tidlor.com/th/promotion-activity/e-withdrawal-campaign",
    "first_seen": "2026-07-19",
    "last_seen": "2026-08-13"
   },
@@ -189,16 +199,6 @@
    "detail": null,
    "date": "2024-01-19",
    "url": "https://www.sawad.co.th/5-things-to-know-before-buying-car-insurance/",
-   "first_seen": "2026-07-19",
-   "last_seen": "2026-08-13"
-  },
-  {
-   "brand": "TIDLOR",
-   "kind": "promotion",
-   "title": "โอนเงินสินเชื่อเข้าบัญชีใน 1 นาที ฉุกเฉินเมื่อไหร่ ไม่ต้องรอ!",
-   "detail": "โอนเงินสินเชื่อ โอนเงินด่วนเข้าบัญชี พร้อมทุกสถานการณ์ ภาระหนักแค่ไหนก็มีเงินใช้พร้อมโอนเข้าบัญชีได้ภายใน 1 นาที สมัครเลย!",
-   "date": "2023-11-30",
-   "url": "https://www.tidlor.com/th/promotion-activity/e-withdrawal-campaign",
    "first_seen": "2026-07-19",
    "last_seen": "2026-08-13"
   },
