@@ -102,6 +102,39 @@ don't re-litigate settled choices.
   `ux-navmore-3dpages-absolute-overflow`, `ux-navmore-keyboard-3dpages`; bigger-than-surgical: `ux-acquire-taxonomy-mandate`,
   `ux-live-chart-mobile-viewbox-responsive`; test-infra: `qa-visual-baseline-stale`, `qa-visual-overflow-not-in-ci`,
   `qa-live-not-in-overflow-audit-routes`).
+## 2026-08-13 — Intelligence loop (data-honesty fix): correct the Heng competitor caption on `#acq` so its 3-point decline is labelled with all 3 dates (was a 3-value trajectory under a 2-date span) — PR
+
+- **Context.** This run first re-confirmed the CI-doable DATA-pull backlog is genuinely exhausted: the
+  three named integration targets are all already shipped+wired (FPO PICO → `pico_census`/`pico_competitors`/
+  `pico_district`/`branch_pico`; per-branch cropland → `branch_cropland.json`, surfaced in `app.js`;
+  DBD company-formation → `dbd_formation.json`). The remaining gov sources are not cleanly CI-pullable:
+  **MOT** CKAN is reachable (HTTP 200) but its province-granular vehicle file is stale to 2019 (national
+  `whole.csv` is fresh but not province-keyed, so it can't wire into the province/branch architecture);
+  **Excise** (`catalog.excise.go.th`) and **OSMEP** (`opendata.sme.go.th`) both fail with a TLS handshake
+  error (curl exit 35) from this cloud IP; **SME-bank** routes through the `data.go.th` aggregator (403).
+  A negative-space audit then confirmed the usual gap classes are all closed (orphan-layer / nav /
+  provenance gates green, 447/447 labelled, 77/77 province+catchment coverage) and surfaced exactly one
+  CI-shippable defect.
+- **The defect (objective #2, competitive-risk readout).** On `#acq`, the "Rival fragility" insight box
+  (`platform/index.html:927`) summarised Heng's SET-filed contraction as "branches 1,018→743→450 and gross
+  loan book ฿13,206.2m→฿8,002.8m, **Dec 2024→Jun 2026**" — a **three-value** branch trajectory (and a
+  two-value loan-book endpoint) carrying only a **two-date** label. The authoritative full caveat 6 lines
+  below (`index.html:933-934`) already gives the correct 3-point form: branches 1,018→743→450, loan book
+  ฿13,206.2m→**฿9,412.7m**→฿8,002.8m, **Dec 2024→Dec 2025→Jun 2026**. A trajectory shown with fewer dates
+  than points is exactly the kind of small mislabel this project guards against.
+- **The fix.** Aligned line 927 with the authoritative caveat: restored the loan book's Dec-2025 midpoint
+  (`→฿9,412.7m→`) and the Dec-2025 date, so branches, loan book and the date span are all consistent
+  3-point sequences. NB the tempting one-line fix (change only the dates) would have introduced a NEW
+  mismatch — the loan book on 927 was a 2-value endpoint pair — so the loan-book midpoint had to be
+  restored too. Pure caption correction; no number changed meaning, no data file touched.
+- **Verify.** No `platform/data/*.json` altered → no `build_provenance.py` regen needed. Full determinism
+  gate `bash tests/run.sh check` → **133 passed, 0 failed**, data integrity **455/455**. Because the change
+  is a visible app caption, opened as a PR rather than committed to master, per the loop's visual-change
+  rule.
+- **Next recommended integration.** The CI-doable data + consumption backlog is exhausted; the substantive
+  remaining unlocks are all owner-side (Thai-IP pulls: `baac_credit` xlsx, MTC competitor undercount, DLT
+  refresh once upstream publishes past Feb-2026) or secret-gated (GISTDA 40m crop-area). A good next
+  autonomous pass is a headless-render UX/polish item or a provenance-honesty extension.
 
 ## 2026-08-13 — Intelligence loop (service audit): source-data consumption audit — one benign dormant source layer (`bot_policy_rate`), and a documented "don't ship the source-orphan gate naively" landmine — recorded to master
 
