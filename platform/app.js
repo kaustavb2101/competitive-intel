@@ -11461,7 +11461,11 @@ function renderHomeHero(){
   if(!heroes.length){ box.innerHTML=''; return; }
   box.innerHTML=heroes.map(h=>{
     const col=h.tone==='opp'?'var(--gold)':'var(--agri)';
-    return `<a class="cc-hero-card ${h.tone}" data-v="${h.v}" href="#${h.v}" role="button" style="--hc:${col}">`+
+    // A real link (navigates to a #hash route), NOT a button: role="button" made AT announce it as a
+    // button (implying Space activates it — it doesn't; anchors ignore Space), mismatching every sibling
+    // jump-link (.cc-link/.pill are plain <a href>). Enter still activates it natively; styling is
+    // class-based, so dropping the role is zero-visual and fixes the WCAG 4.1.2 name/role/value mismatch.
+    return `<a class="cc-hero-card ${h.tone}" data-v="${h.v}" href="#${h.v}" style="--hc:${col}">`+
       `<div class="cc-hero-big">${h.big}</div>`+
       `<div class="cc-hero-sub">${h.sub}</div>`+
       `<div class="cc-hero-foot"><span class="cc-hero-tag">${h.tag}</span><span class="cc-hero-cta">${h.cta}</span></div>`+
