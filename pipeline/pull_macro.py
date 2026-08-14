@@ -157,10 +157,15 @@ def build(hh, pr, cpi, lend, fx, stamp, fx_daily=None):
     ind["usd_thb"] = _fx_out(fx_daily or {}, fx)
     return {
         "meta": {
-            "source": "BIS Statistics (stats.bis.org, household debt + policy rate) + World Bank "
-                      "(api.worldbank.org, CPI + lending rate) + ECB daily reference rates via "
-                      "Frankfurter (api.frankfurter.dev, USD/THB). Keyless, cloud-reachable; BOT's "
-                      "own API is geoblocked (laptop-only).",
+            # NB: policy_rate is set here from BIS as a fallback, but build_macro_indicators.py
+            # OVERRIDES it with the BOT-direct MPC decision history (source-data/bot_policy_rate.json)
+            # whenever that file is present — so the shipped figure is BOT, not BIS. This source
+            # string reflects the shipped state.
+            "source": "BIS Statistics (stats.bis.org, household debt) + BOT (ธปท./กนง.) MPC "
+                      "decision history (policy rate) + World Bank (api.worldbank.org, CPI + "
+                      "lending rate) + ECB daily reference rates via Frankfurter (api.frankfurter.dev, "
+                      "USD/THB). Keyless, cloud-reachable; BIS carries household debt because BOT's "
+                      "own stat API is geoblocked (laptop-only).",
             "label": "MEASURED — Thai macro-risk indicators (leverage · rates · inflation · FX)",
             "generated_by": "pipeline/pull_macro.py",
             "pulled": stamp,

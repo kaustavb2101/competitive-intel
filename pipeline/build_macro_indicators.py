@@ -14,9 +14,13 @@ JSON, not re-fetched here) — so this step can and must be a deterministic, net
 inputs, it reproduces byte-for-byte.
 
 INPUTS (all optional independently — an absent input leaves that indicator/key untouched):
-  - platform/data/macro_indicators.json  (BASE — the file itself; household_debt_gdp, policy_rate,
-    lending_rate and usd_thb are carried through UNCHANGED, since those are already fresh/correct
-    per the owner's own review and this builder does not touch them)
+  - platform/data/macro_indicators.json  (BASE — the file itself; household_debt_gdp, lending_rate
+    and usd_thb are carried through UNCHANGED, since those are already fresh/correct per the owner's
+    own review and this builder does not touch them)
+  - source-data/bot_policy_rate.json → OVERRIDES policy_rate with the BOT-DIRECT primary reading
+    (MPC decision history, `pull_bot_policy_rate.py`) instead of pull_macro.py's BIS republication:
+    same headline rate to the decimal, but labelled BOT (not the quarterly BIS proxy) and carrying
+    a meeting-level trend. Previously orphaned — pulled every meeting but consumed by nothing.
   - source-data/tpso_cpi.json      → OVERRIDES cpi_inflation with the MONTHLY headline CPI YoY from
     the Ministry of Commerce / TPSO (the actual compiler of Thai CPI — not BOT, not World Bank's
     annual average), period becomes "YYYY-MM" instead of a bare year.
@@ -51,6 +55,7 @@ SRC_CPI = os.path.join(ROOT, "source-data", "tpso_cpi.json")
 SRC_GDP = os.path.join(ROOT, "source-data", "nesdc_gdp.json")
 SRC_CA = os.path.join(ROOT, "source-data", "bot_current_account.json")
 SRC_TOUR = os.path.join(ROOT, "source-data", "bot_tourist_arrivals.json")
+SRC_POLICY = os.path.join(ROOT, "source-data", "bot_policy_rate.json")
 
 TH_MON_ORDER = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
                 "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."]
@@ -162,8 +167,48 @@ def _fold_tourist_arrivals(indicators):
     indicators["tourist_arrivals"] = entry
 
 
+def _fold_policy_rate(indicators):
+    """OVERRIDE policy_rate with the BOT-direct MEASURED reading.
+
+    pull_macro.py sets policy_rate from BIS — a monthly-but-derivative republication of BOT's own
+    number, attributed to BIS. We already pull the primary source (BOT/MPC's own decision-history
+    XLSX, `pipeline/pull_bot_policy_rate.py` → `source-data/bot_policy_rate.json`, 200+ meetings
+    since 2000, anchor-verified on every pull) but it was orphaned — no builder consumed it. This
+    folds it in so the headline policy-rate chip reads the authoritative primary at MEETING
+    granularity (not a quarterly proxy) and is labelled BOT, not BIS. The headline value/period/YoY
+    match BIS to the decimal (BIS just republishes the same rate); what changes is the provenance
+    label and a correct meeting-level trend. Fully recomputed from bot_policy_rate.json only (never
+    from the base's own policy_rate), so a --check re-run reproduces byte-for-byte. Absent input →
+    leave pull_macro.py's BIS reading in place (graceful degrade, same as every other fold)."""
+    d = _load(SRC_POLICY)
+    if not d:
+        return
+    latest = d.get("latest") or {}
+    hist = sorted((d.get("history") or []), key=lambda m: m["date"])
+    if latest.get("rate") is None or not latest.get("date") or not hist:
+        return
+    y, mm, _dd = latest["date"].split("-")
+    period = "%s-%s" % (y, mm)
+    # YoY: the rate set by the most recent meeting on/before the same calendar day one year earlier
+    # (ISO date strings compare lexicographically). round to kill float noise.
+    target = "%04d-%s-%s" % (int(y) - 1, mm, _dd)
+    prior = [m for m in hist if m["date"] <= target]
+    ref = prior[-1] if prior else hist[0]
+    yoy = round(latest["rate"] - ref["rate"], 2)
+    # Meeting-level trend: the last six decisions' rates, chronological — the same length the
+    # sparkline drew for the BIS quarterly trend, but at the cadence the rate actually moves.
+    trend = [m["rate"] for m in hist[-6:]]
+    indicators["policy_rate"] = {
+        "value": latest["rate"], "period": period, "yoy_change": yoy, "unit": "%",
+        "source": "BOT (ธปท./กนง.) — 1-day repo, MPC decision history",
+        "trend": trend,
+        "as_of": latest["date"], "meeting": latest.get("meeting"),
+        "decision": latest.get("decision_en"), "n_meetings": len(hist),
+    }
+
+
 # The base file's OWN "indicators" dict is the starting point for every field this builder does
-# NOT touch (household_debt_gdp, policy_rate, lending_rate, usd_thb — carried through unchanged;
+# NOT touch (household_debt_gdp, lending_rate, usd_thb — carried through unchanged;
 # and cpi_inflation itself IF source-data/tpso_cpi.json happens to be absent on a given run, so a
 # missing input degrades to "leave pull_macro.py's own reading alone" rather than dropping the
 # card). Every field this builder DOES fold (cpi_inflation, gdp_growth, current_account,
@@ -181,6 +226,7 @@ def build():
     _fold_gdp(indicators)
     _fold_current_account(indicators)
     _fold_tourist_arrivals(indicators)
+    _fold_policy_rate(indicators)
     meta = dict(base.get("meta") or {})
     meta["folded_by"] = "pipeline/build_macro_indicators.py"
     meta["folded_sources"] = {
@@ -188,6 +234,7 @@ def build():
         "gdp_growth": "source-data/nesdc_gdp.json" if os.path.exists(SRC_GDP) else None,
         "current_account": "source-data/bot_current_account.json" if os.path.exists(SRC_CA) else None,
         "tourist_arrivals": "source-data/bot_tourist_arrivals.json" if os.path.exists(SRC_TOUR) else None,
+        "policy_rate": "source-data/bot_policy_rate.json" if os.path.exists(SRC_POLICY) else None,
     }
     return {"meta": meta, "indicators": indicators}
 
@@ -218,7 +265,7 @@ def main():
         f.write(payload)
     after = json.loads(payload)["indicators"]
     print("wrote %s" % OUT)
-    for k in ("cpi_inflation", "gdp_growth", "current_account", "tourist_arrivals"):
+    for k in ("cpi_inflation", "gdp_growth", "current_account", "tourist_arrivals", "policy_rate"):
         b, a = before.get(k), after.get(k)
         if b == a:
             print("  %-16s unchanged: %s" % (k, a))

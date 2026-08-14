@@ -312,7 +312,8 @@ REGISTRY = [
          what="the national leverage backdrop every borrower sits inside",
          pick=lambda d: (dig(d, "indicators.household_debt_gdp.value"), "% GDP"), measured=True,
          history=dict(file="macro_indicators.json", kind="bis", points=6,
-                      note="6 quarters — BIS household debt + policy rate")),
+                      note="6 quarters — BIS household debt (the policy-rate figure in the same "
+                           "file is now BOT-direct, MPC decision history)")),
     dict(key="sfi_credit", file="sfi_credit.json", cadence="quarterly",
          label="SFI system NPL", group="Macro",
          what="18 years of state-lender credit quality — the closest public read on the same borrower",
