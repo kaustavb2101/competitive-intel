@@ -3,6 +3,35 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-14 — UX loop (a11y, WCAG 4.1.2): command-center verdict "hero" card was a link mislabelled `role="button"` — dropped the role so it announces + behaves as the navigating link it is (PR #406, safeguard-gated auto-merge + deploy-verified)
+
+- **The finding.** The front-door "Watching…" verdict hero (`renderHomeHero`, `platform/app.js` ~L11464)
+  rendered as `<a class="cc-hero-card" data-v="…" href="#…" role="button">` — a real navigation link
+  (routes to a `#hash` view via the `#main-content a[data-v]` click delegation) that `role="button"` made a
+  screen reader announce as a *button*. Twofold mismatch: it misnames the element (navigates, doesn't act)
+  and misrepresents the keyboard contract — buttons activate on **Space**, anchors do **not** — so an AT user
+  who heard "button" and pressed Space got page-scroll, not activation. Every sibling content jump-link
+  (`.cc-link`/`.pill`/`.story-next`) is a plain `<a href>` link; the hero was the lone outlier (grep: 1 of 2
+  `role="button"` in the SPA — the other, `#msheet-handle`, is a correct `<div role="button">` with its own
+  Enter/Space handler).
+- **The fix.** Removed the `role="button"` attribute (the only functional change + a 4-line explanatory
+  comment). Enter still activates it natively; styling is class-based (`.cc-hero-card`) and no CSS/JS reads
+  the role, so **zero visual change** and routing is untouched.
+- **Safeguards (all passed).** `bash tests/run.sh check` — **133 passed, 0 failed**. Headless render of
+  `index.html` (1100×900) + PNG self-review — hero card visually identical (red accent, "measured + estimated"
+  tag, "Map view →" CTA); settled DOM confirms `<a class="cc-hero-card risk" … href="#map">` with **no**
+  `role="button"`. No secrets; clean 2-file diff (`platform/app.js` +5/−1, `docs/UXUI_AUDIT.md` +1).
+- **Merge + deploy-verify.** Squash-merged PR #406 to master (auto-deploys to Vercel). Production alias
+  verified: `/` → **200**, `/index.html` → 308→**200** (expected `cleanUrls` redirect), `/app.js` → **200**
+  with the fix live (served `app.js` shows the hero anchor with no `role="button"`). No rollback needed.
+- **Next recommended.** The UXUI_AUDIT backlog's remaining OPEN items are all flagged unsuitable for
+  unattended surgical auto-merge — three test-infra items outside `platform/` (`qa-visual-baseline-stale`,
+  `qa-visual-overflow-not-in-ci`, `qa-live-not-in-overflow-audit-routes`; the visual-regression baseline
+  refresh in particular would restore CI signal), two deck.gl device-tested items (`ux-viewport-user-scalable-3dpages`,
+  `ux-navmore-keyboard-3dpages`/`ux-navmore-3dpages-absolute-overflow`), and one bigger-than-surgical content
+  pass (`ux-acquire-taxonomy-mandate`). A future surgical run should keep reviewing routes for fresh
+  name-role-value / keyboard-contract mismatches like this one.
+
 ## 2026-08-14 — Intelligence loop (PROVENANCE CONSISTENCY): retire the stale "Heng is a Google∪Overture sample" premise from the rival-pressure + contested-pop layers and the whole #acq/#exposure competitive surface — the census promoted Heng to an official-locator brand, but two builders and ~7 app strings still called it a sample (PR + headless-verified)
 
 - **The gap (objective #2, the flagged next-task from the prior Heng peer run).** The committed census
