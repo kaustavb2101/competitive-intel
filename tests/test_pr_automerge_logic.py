@@ -65,13 +65,26 @@ TMP = tempfile.mkdtemp()
 
 
 def run_pick(prs, owner="kaustavb2101"):
+    """Returns stdout (annotations) + the $GITHUB_OUTPUT the block wrote, concatenated.
+
+    The block writes its step outputs to $GITHUB_OUTPUT and its ::notice:: lines to stdout, and
+    keeping them apart is load-bearing: redirecting both into $GITHUB_OUTPUT is what made the
+    runner reject the file with "Invalid format" and fail the step.
+    """
     p = os.path.join(TMP, "prs.json")
     with open(p, "w", encoding="utf-8") as f:
         json.dump(prs, f)
+    gho = os.path.join(TMP, "gh_output")
+    open(gho, "w").close()
     src = PICK_SRC.replace('"/tmp/prs.json"', json.dumps(p))
-    env = dict(os.environ, OWNER=owner)
-    return subprocess.run([sys.executable, "-c", src], capture_output=True,
-                          text=True, env=env).stdout
+    env = dict(os.environ, OWNER=owner, GITHUB_OUTPUT=gho)
+    r = subprocess.run([sys.executable, "-c", src], capture_output=True, text=True, env=env)
+    written = open(gho, encoding="utf-8").read()
+    # A step output line may never contain a newline mid-value, and `candidates` is JSON built by
+    # hand — if it ever wrapped, the runner would silently truncate the candidate list.
+    for line in written.splitlines():
+        assert "=" in line, "malformed $GITHUB_OUTPUT line: %r" % line
+    return r.stdout + written + r.stderr
 
 
 def run_decide(runs, cands):
@@ -95,8 +108,16 @@ def qa(sha, status="completed", conclusion="success"):
 
 
 def pr(n, login, body="", draft=False, state="CLEAN", created="2026-08-01",
-       owner="kaustavb2101"):
-    return {"number": n, "author": {"login": login}, "isDraft": draft,
+       owner="kaustavb2101", is_bot=None):
+    """`is_bot` defaults to what gh actually reports: true for any 'app/...' login.
+
+    This helper previously hard-coded login="github-actions" with no is_bot field, which is NOT
+    what the API returns and is why the suite passed while the workflow merged nothing in
+    production. Fixtures must use the real shape.
+    """
+    if is_bot is None:
+        is_bot = login.startswith("app/")
+    return {"number": n, "author": {"login": login, "is_bot": is_bot}, "isDraft": draft,
             "headRefName": "b%d" % n, "headRefOid": "a" * 40, "body": body,
             "createdAt": created, "mergeable": "MERGEABLE", "mergeStateStatus": state,
             "headRepositoryOwner": {"login": owner}}
@@ -114,8 +135,17 @@ def check(name, got, expect, contains=False):
 
 
 ELIGIBILITY = [
-    ("actions bot is eligible", [pr(1, "github-actions")], "found=yes"),
-    ("actions bot, bracketed login", [pr(1, "github-actions[bot]")], "found=yes"),
+    # THE REGRESSION THAT MATTERED. `gh pr list --json author` reports the App as
+    # "app/github-actions" with is_bot=true. Matching only the un-prefixed spellings made the job
+    # call every bot PR hand-written and merge nothing, silently, while appearing to work — and the
+    # suite passed anyway because these fixtures used a login the API never returns.
+    ("REAL gh shape: app/github-actions is eligible",
+     [pr(1, "app/github-actions")], "found=yes"),
+    ("REAL gh shape: is_bot alone is enough, whatever the login",
+     [pr(1, "app/some-other-bot", is_bot=True)], "found=yes"),
+    ("actions bot, un-prefixed login still accepted",
+     [pr(1, "github-actions", is_bot=False)], "found=yes"),
+    ("actions bot, bracketed login", [pr(1, "github-actions[bot]", is_bot=False)], "found=yes"),
     ("hand-written owner PR is left alone",
      [pr(2, "kaustavb2101", body="just a fix")], "found=none"),
     ("loop PR carrying the Claude marker is eligible",
@@ -145,6 +175,20 @@ ELIGIBILITY = [
      [pr(12, "github-actions", draft=True, state="CLEAN")], "found=yes"),
     ("a hand-written draft is NOT promoted",
      [pr(13, "kaustavb2101", draft=True, body="mine")], "promote="),
+    ("a real bot draft IS promoted",
+     [pr(15, "app/github-actions", draft=True)], "promote=15"),
+]
+
+# (name, prs, substring that must NOT appear anywhere in the output)
+NEVER = [
+    ("a real bot PR is never reported as hand-written",
+     [pr(1, "app/github-actions")], "hand-written"),
+    ("a real bot draft PR is never reported as hand-written",
+     [pr(2, "app/github-actions", draft=True)], "hand-written"),
+    # $GITHUB_OUTPUT must carry ONLY key=value lines. Annotations going in there is what made the
+    # runner reject the file outright with "Invalid format" and fail the step.
+    ("annotations never land in the step outputs",
+     [pr(3, "kaustavb2101", body="mine")], "::notice::found"),
 ]
 
 A, B, C = "a" * 40, "b" * 40, "c" * 40
@@ -210,8 +254,12 @@ def main():
         check(name, run_decide(runs, cands)[0], expect)
     for name, runs, cands, expect in NOTES:
         check(name, run_decide(runs, cands)[1], expect, contains=True)
+    for name, prs, forbidden in NEVER:
+        got = run_pick(prs)
+        if forbidden in got:
+            FAILED.append("%s\n      %r must NOT appear, but did" % (name, forbidden))
 
-    total = len(ELIGIBILITY) + len(DECISIONS) + len(NOTES)
+    total = len(ELIGIBILITY) + len(DECISIONS) + len(NOTES) + len(NEVER)
     if FAILED:
         print("pr-automerge logic: %d/%d passed, %d FAILED" % (total - len(FAILED), total,
                                                                len(FAILED)))
