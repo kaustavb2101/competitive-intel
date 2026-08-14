@@ -88,8 +88,8 @@
    "measured": true,
    "no_history": "accumulating — 3 observations since 2026-07-17; the line is drawn once 4 have landed",
    "source": "Stock Exchange of Thailand · set.or.th in-browser JSON API (highlight-data + profile + company-highlight/financial-data)",
-   "stamp": "2026-08-10",
-   "stamp_iso": "2026-08-10",
+   "stamp": "2026-08-13",
+   "stamp_iso": "2026-08-13",
    "stamp_kind": "price_asof",
    "unit": "listed peers",
    "value": 6,
@@ -126,8 +126,8 @@
    "measured": true,
    "no_history": "each pull overwrites the last, and it can only be pulled from a Thai IP, so any series would have irregular gaps rather than a weekly cadence",
    "source": "pantip.com public search + comment endpoints (no auth, no login)",
-   "stamp": "2026-08-11",
-   "stamp_iso": "2026-08-11",
+   "stamp": "2026-08-13",
+   "stamp_iso": "2026-08-13",
    "stamp_kind": "pulled",
    "unit": "lenders tracked",
    "value": 15,
@@ -263,7 +263,7 @@
    "stamp_iso": "2026-08-14",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4447,
+   "value": 4454,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -286,8 +286,8 @@
    "stamp": "2026-08-14",
    "stamp_iso": "2026-08-14",
    "stamp_kind": "pulled",
-   "unit": "of 795",
-   "value": 130,
+   "unit": "of 796",
+   "value": 126,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -452,7 +452,7 @@
    "stamp_iso": "2026-06-30",
    "stamp_kind": "vintage",
    "unit": "juristic persons",
-   "value": 7511,
+   "value": 7972,
    "what": "merchant-segment formation — new small firms are the merchant book's feedstock"
   },
   {
