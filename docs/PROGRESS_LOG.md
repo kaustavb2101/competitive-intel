@@ -3,6 +3,58 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-14 — Intelligence loop (COMPETITOR COVERAGE): make Heng — the one *contracting* rival — first-class across the whole competitor-coverage board, now that its count / locator / book are all cited in-repo (obj #2) — PR + headless-verified
+
+- **The gap (a stale-exclusion honesty defect, obj #2).** `pipeline/build_competitor_coverage.py`
+  still excluded Heng from **all three** of its sub-rankings with reasons that had gone false months ago:
+  `EXPECTED["Heng"]=None` ("no nationwide branch count cited"), `LOCATOR_COMPLETE_BRANDS` lacked Heng
+  ("locator Cloudflare-blocked → lower-bound sample"), and `PEER_FINANCIALS["Heng"]=None` ("no cited
+  book"). Every one of those was contradicted by the current repo: Heng's official branch-finder was
+  province-walked **2026-07-04** (`ingest_heng.py` → `competitors_official.json`, **450 branches**, the
+  census meta already labels all four brands "FULL networks"), and `docs/RESEARCH_DIGEST.md §B` cites
+  Heng's **450 branches (30 Jun 2026)** and **฿8.003bn book** from its SET filings. So the census, the
+  peer-NPL layer and the research digest all treated Heng as a first-class rival — but this builder still
+  dropped the one *contracting* peer from the national-standing size rank, the measured-footprint rank
+  and the book-per-branch rank. The app even contradicted itself: `app.js` line ~3187 already said "Heng
+  is now on the same footing… no sampled layer remains," while lines ~3168/3181/3189 still printed "Heng
+  excluded (Cloudflare-blocked → lower bound / no cited book / no cited count)."
+- **The fix (make Heng first-class, consistently, or not at all).** Set `EXPECTED["Heng"]=450`,
+  added Heng to `LOCATOR_COMPLETE_BRANDS`, and gave `PEER_FINANCIALS["Heng"]` its cited ฿8.003bn book —
+  all three cited to the SET filings / official census. Doing only one would have left the other two
+  caveats stale ("no cited book" is false once the book is cited), so the coherent unit was all three.
+  Heng now ranks in the national-standing chain (AutoX #2 of **5**: MTC 8,673 › AutoX 2,015 › Tidlor
+  1,873 › Srisawad 1,138 › **Heng 450**), the measured-footprint chain (**Heng 450** official points),
+  the book-per-branch chain (**Heng ฿17.8m/branch**, the thin end), the coverage table (found 450 /
+  expected 450 = **100%**), and — as a clean downstream effect — the rival-threat matrix
+  (`build_rival_threat.py` re-derived: Heng "[Footprint only]", 0.22× AutoX).
+- **The honesty guard I added (why Heng in an "Expansion pace" chain needed care).** `net_adds` is kept
+  `None` for Heng on purpose: its branch delta is **negative** (743→450) and the app renders net-adds
+  only as a positive "+N branches" chip, so surfacing the contraction as a structured figure would
+  misrender. Instead the `expansion_note` now names it in prose — "Heng runs the other way — the one
+  CONTRACTING peer, its book down ฿13.2bn → ฿8.0bn and branches 1,018 → 450 over 18 months (SET filings),
+  a reminder that a compliant rival is not always a thriving one (obj #2)" — so Heng's ฿8.003bn book
+  appearing beside MTC's +518 and Tidlor's +5.4% reads as contraction, not growth. Every stale
+  "excluded / sample / Cloudflare-blocked / uncited" string in the builder AND the three `drawCompCoverage`
+  readout lines in `app.js` were rewritten to the true state.
+- **Scope note (what was deliberately NOT touched).** app.js still has ~6 *other* "Heng sample / lower
+  bound" strings on **different** features (the `#map` competitor-density lens, per-branch rival pressure,
+  contested-population share). Those are a separate sweep: their "lower bound" conclusion still holds for
+  a different reason (sub-scale operators missing from the census), so folding them into this change would
+  have ballooned scope and risk. Left as a documented follow-up.
+- **Verify.** `build_competitor_coverage.py --check` + `build_rival_threat.py --check` byte-exact;
+  `build_provenance.py` regenerated (0 unlabelled of 142 layers); the three sibling downstreams
+  (`peer_province`, `rival_threat_region`, `impact_cards`) confirmed byte-exact (no regen needed);
+  `node --check platform/app.js` clean; **`bash tests/run.sh check` — 133 passed, 0 failed** (DATA
+  VALIDATION 455/455, incl. `competitor_coverage entries sane` with Heng's new 450/450/100%). **Headless
+  render (Chromium, #acq)**: all three national-standing chains + the rival-threat matrix render Heng
+  correctly, the book-scale line shows the contraction note, **0 JS/page errors**.
+- **Ship.** Visual/behaviour change (Heng now appears across the Competition surface) → PR + headless
+  self-review before merge, per the loop safeguard.
+- **Next recommended.** The separate app.js "Heng sample / lower bound" sweep noted above (the map
+  competitor-density lens, per-branch rival-pressure and contested-share copy), keeping the honest
+  "census is still a lower bound because sub-scale operators are missing" conclusion while dropping the
+  now-false "Heng is a sample" clause.
+
 ## 2026-08-14 — Intelligence loop (PEER COMPARISON): add Heng — the one *distressed* rival — to the peer NPL benchmark; it was the only peer missing yet the closest bracket to AutoX's own impaired share — PR + headless-verified
 
 - **The gap (a peer-comparison blind spot, objective #2).** `pipeline/build_peer_npl.py` benchmarked
