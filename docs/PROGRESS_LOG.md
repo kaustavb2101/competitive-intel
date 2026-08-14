@@ -3,6 +3,38 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-14 — Intelligence loop (PROVENANCE CONSISTENCY, obj #2): retire the last stale "Heng is a Cloudflare-blocked SAMPLE / under-counts" caveat — it survived only in `build_peer_province.py`, so the per-province peer board mislabelled its own MEASURED official-locator data as an under-counting estimate
+
+- **The gap.** The prior three intelligence runs promoted Heng to a first-class MEASURED brand across the
+  census (`competitors_census.json`, 450 branches from `pull_heng_locator.py`'s official hengleasing.com
+  province-walk), the competitor-coverage board, the peer-NPL benchmark, and app.js's `#acq` narrative
+  (which now reads "all four rivals' official locators … no sampled layer remains"). But
+  `pipeline/build_peer_province.py` was missed: its docstring, ~5 inline comments and — the material part
+  — the emitted **`peer_province.json` .meta.caveats[0]** still declared *"the rival census is a LOWER
+  BOUND … Heng is a Google/Overture SAMPLE (its locator is Cloudflare-blocked), so Heng per-province
+  counts under-count more than the others."* That is false and self-contradictory: `rival_density.json`
+  — the very layer `peer_province` is aggregated FROM — already describes the same 450 Heng points as
+  "the operators' OWN official store-locators (Heng included)". So the per-province peer board shipped a
+  provenance note telling the reader its measured official-locator data was an under-counting sample.
+- **The fix (text-only, zero numeric change).** Rewrote every stale reference in `build_peer_province.py`
+  to `rival_density.py`'s already-corrected framing: all four brands are their OWN official store-locators
+  (Heng's earlier Google/Overture sample REPLACED, not unioned), so the census is near-complete for the
+  big-4 rather than a per-brand lower bound; the floor that remains is that only the 4 big compliant brands
+  are censused (sub-scale local operators absent) → big-4 density, not total competitive density. The
+  "every ratio is a FLOOR" reasoning is preserved but re-anchored on the correct reason (sub-scale
+  operators excluded), not the retired Heng-sample claim.
+- **Verified.** Rebuilt `peer_province.json` — meta no longer contains "Cloudflare"/"Google/Overture
+  SAMPLE"/"under-count"; **all counts identical** (Heng still 450 across 61 provinces, totals unchanged),
+  so the correction is honesty-only, not a data move. Regenerated `provenance.json` (142 layers, 0
+  unlabelled). `bash tests/run.sh check` → **133 passed, 0 failed**. Not user-visible: app.js and
+  data.html render hardcoded (already-corrected) narrative, not `peer_province.meta.caveats`, so no
+  visual/behaviour change → safeguard-gated direct commit, no PR needed.
+- **Next recommended intelligence task.** The stale-Heng-sample premise is now fully retired across the
+  competitive surface (census, coverage, peer-NPL, rival-pressure, contested-pop, and now per-province
+  peer). A tight follow-up if a negative-space sweep wants one: audit the 30-point `rayong_competitors.json`
+  Rayong fallback (surfaced via `rayong_province.json`) for the same stale-sample language, now that the
+  national census supersedes it.
+
 ## 2026-08-14 — UX loop (a11y, WCAG 4.1.2): command-center verdict "hero" card was a link mislabelled `role="button"` — dropped the role so it announces + behaves as the navigating link it is (PR #406, safeguard-gated auto-merge + deploy-verified)
 
 - **The finding.** The front-door "Watching…" verdict hero (`renderHomeHero`, `platform/app.js` ~L11464)
