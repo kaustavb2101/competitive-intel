@@ -23,7 +23,9 @@ and docs/RESEARCH_DIGEST.md §B "Competitors — listed peers' 2025 scoreboard")
   Muangthai (MTC) 8,673  — FY2025, opened 518 new branches in 2025 (company IR / kaohoon)
   Tidlor          1,873  — FY2025 (thaipr / company IR, tidlorinvestor.com)
   Srisawad        1,138  — late 2025 (SAWAD IR oppday deck)
-  Heng             null  — no nationwide branch count cited in our research; left null
+  Heng              450  — 30 Jun 2026 (Heng SET filings; branches 1,018→743→450, the ONE
+                          contracting listed peer — RESEARCH_DIGEST.md §B). Now cited AND
+                          confirmed by its own official locator (see below).
 
 Output: platform/data/competitor_coverage.json
   { meta:{...provenance + citation...}, brands:[{brand, found, expected, coverage_pct}, ...] }
@@ -41,9 +43,10 @@ OUT  = os.path.join(DATA, "competitor_coverage.json")
 BRANCHES = os.path.join(DATA, "branches.json")
 TAPE = os.path.join(DATA, "tape_real.json")
 
-# The MERGED full census (official store-locators for Muangthai/Srisawad/Tidlor + Google/Overture
-# sample for Heng — already deduped). For 3 of 4 brands this is now the near-COMPLETE network, so
-# found ≈ (often ≥) the public headline; Heng alone remains a partial sample.
+# The MERGED full census (official store-locators for ALL four big brands — Muangthai/Srisawad/Tidlor
+# from their web locators, Heng province-walked from hengleasing.com via pull_heng_locator.py from a
+# Thai IP, already deduped). For all 4 brands this is now the near-COMPLETE network, so
+# found ≈ (often ≥) the public headline; no sampled layer remains (competitors_census.json meta).
 CENSUS_FILES = ["competitors_census.json"]
 
 # Canonical brand order (matches validate_data.KNOWN_COMPETITOR_BRANDS).
@@ -51,10 +54,11 @@ BRANDS = ["Muangthai", "Tidlor", "Srisawad", "Heng"]
 
 # Brands whose `found` count is a near-COMPLETE official store-locator pull (comparable to AutoX's
 # own operating-network count) — so their MEASURED points-on-the-ground can be ranked apples-to-apples.
-# Heng is deliberately excluded: its locator is Cloudflare-blocked, so its `found` is a Google/Overture
-# SAMPLE (lower bound), and ranking AutoX above an undercount would be unsafe (mirrors the never-invent
-# rule that keeps uncited Heng out of the IR-count ranking).
-LOCATOR_COMPLETE_BRANDS = ["Muangthai", "Srisawad", "Tidlor"]
+# Heng is now included: the earlier Cloudflare-blocked Google/Overture SAMPLE was REPLACED by an
+# official province-walk of hengleasing.com (pull_heng_locator.py, from a Thai IP), so its `found`
+# (450) is now a near-complete official locator — and it matches Heng's cited SET-filing count (450),
+# confirming completeness. All four rivals are on the same official-locator footing.
+LOCATOR_COMPLETE_BRANDS = ["Muangthai", "Srisawad", "Tidlor", "Heng"]
 
 # EXPECTED nationwide branch counts — CITED real public figures (ESTIMATED-from-public-reports).
 # Source per brand recorded in meta.expected_sources. Leave null when no figure can be cited.
@@ -62,7 +66,8 @@ EXPECTED = {
     "Muangthai": 8673,   # FY2025 total branches (MTC company IR / kaohoon)
     "Tidlor":    1873,   # FY2025 branches (Ngern Tid Lor IR, tidlorinvestor.com)
     "Srisawad":  1138,   # ~late-2025 branches (SAWAD IR oppday deck)
-    "Heng":      None,   # no nationwide branch count cited in our research — do NOT invent
+    "Heng":      450,    # 30 Jun 2026 branches (Heng SET filings; 1,018→743→450, contracting) —
+                         # cited AND confirmed by its own official locator (450 measured points)
 }
 EXPECTED_SOURCES = {
     "Muangthai": "MTC FY2025 — 8,673 total branches (opened 518 in 2025); company IR / kaohoon. "
@@ -70,7 +75,10 @@ EXPECTED_SOURCES = {
     "Tidlor":    "Ngern Tid Lor FY2025 — 1,873 branches; company IR / thaipr. "
                  "https://www.tidlorinvestor.com/en/home",
     "Srisawad":  "Srisawad (SAWAD) ~late-2025 — ~1,138 branches; IR oppday deck.",
-    "Heng":      "No nationwide branch count cited in docs/RESEARCH_DIGEST.md — left null (not invented).",
+    "Heng":      "Heng Leasing & Capital (HENG) — 450 branches as of 30 Jun 2026, per its own SET "
+                 "filings (branch count 1,018→743→450 over Dec 2024→Dec 2025→Jun 2026, the one "
+                 "contracting listed title-lender); docs/RESEARCH_DIGEST.md §B. Confirmed by the "
+                 "official hengleasing.com locator (450 measured points).",
 }
 
 # REPORTED peer SCALE + EXPANSION PACE — the direction behind the static branch counts, from the
@@ -93,7 +101,10 @@ PEER_FINANCIALS = {
     "Srisawad":  {"loan_book_bn": 93.155, "net_adds_yr": None, "net_adds_year": 2025,
                   "prior_year_branches": None, "book_yoy_pct": None, "book_asof": "30 Jun 2025",
                   "growth_target_pct": None},
-    "Heng":      None,   # no cited book / branch-delta in our research — omitted, not invented
+    "Heng":      None,   # cited branch count (450) now in EXPECTED, but its book is a GROSS
+                         # hire-purchase/leasing receivable (฿8,002.8m, 30 Jun 2026) on a different
+                         # basis from the others' total loans OUTSTANDING — omitted from the
+                         # apples-to-apples book-per-branch read (not invented, and not mixed-basis)
 }
 PEER_FINANCIALS_SOURCES = {
     "Muangthai": "MTC FY2025 — loan portfolio ฿183,222m, opened 518 branches in 2025 (→ 8,673 "
@@ -176,8 +187,10 @@ def _book_intensity(autox_n, autox_book_bn):
     carries a cited book. It reframes the raw book-scale chain (peers' bigger books) as a STRUCTURAL
     density read: how much book each door carries. AutoX's book is MEASURED (real tape, current
     outstanding); each peer's is REPORTED (cited FY2025 / 2025 IR). Branch counts follow the network-size
-    ranking (AutoX MEASURED own network; peers REPORTED listed-entity IR). Heng is excluded (no cited
-    book AND no cited branch count — never invented). Returns None when the AutoX book or count is
+    ranking (AutoX MEASURED own network; peers REPORTED listed-entity IR). Heng is excluded — it now
+    carries a cited branch count (450) but reports a GROSS hire-purchase/leasing receivable, a
+    different basis from the others' total loans OUTSTANDING, so mixing it into a book-per-branch
+    density read would not be apples-to-apples. Returns None when the AutoX book or count is
     unavailable, so the block degrades honestly."""
     if not autox_n or not autox_book_bn:
         return None
@@ -234,7 +247,9 @@ def _book_intensity(autox_n, autox_book_bn):
                   "their latest reported IR figures (FY2025 / 30 Jun 2025), and AutoX branches are the "
                   "own-network count vs peers' listed-entity IR counts — so book-per-branch is a "
                   "STRUCTURAL intensity read (how much book each branch carries), NOT profitability, "
-                  "NPL or market share. Heng is excluded (no cited book and no cited branch count).",
+                  "NPL or market share. Heng is excluded — it reports a GROSS hire-purchase/leasing "
+                  "receivable (฿8.0bn, 30 Jun 2026), a different basis from the others' total loans "
+                  "outstanding, so a book-per-branch read would not be apples-to-apples.",
     }
 
 
@@ -244,8 +259,9 @@ def _footprint_measured(autox_n, counts):
     rival's de-duplicated store-locator count (the SAME `found` figures on the brand board). Unlike the
     IR ranking (peers = REPORTED listed-entity counts), every number here is MEASURED, so it answers a
     different question: not "who reports the biggest listed-entity network" but "who has the most doors
-    open on the ground". Heng is excluded (its locator is Cloudflare-blocked -> `found` is a lower-bound
-    SAMPLE). Returns None when the AutoX count is unavailable."""
+    open on the ground". All four rivals now carry an official locator (Heng was province-walked from
+    hengleasing.com, replacing its earlier sample), so all are ranked. Returns None when the AutoX
+    count is unavailable."""
     if not autox_n:
         return None
     pool = [{"operator": "AutoX", "points": autox_n,
@@ -260,7 +276,8 @@ def _footprint_measured(autox_n, counts):
     for i, o in enumerate(ranked, 1):
         o["rank"] = i
     autox_rank = next(o["rank"] for o in ranked if o["operator"] == "AutoX")
-    # brands in our set NOT ranked here (no near-complete locator) -> disclosed as lower bounds.
+    # brands in our set NOT ranked here (no near-complete locator) -> disclosed. All four now have an
+    # official locator, so this is empty; kept for honest degradation if a brand's locator is ever lost.
     excluded = [b for b in BRANDS if b not in LOCATOR_COMPLETE_BRANDS]
     return {
         "autox_rank": autox_rank,
@@ -271,11 +288,11 @@ def _footprint_measured(autox_n, counts):
                  "each near-complete-locator rival's de-duplicated store-locator count (the same MEASURED "
                  "`found` figures on the brand board). Every number is MEASURED; complements the IR-count "
                  "ranking, which uses peers' REPORTED listed-entity counts.",
-        "caveat": "Heng is excluded — its locator is Cloudflare-blocked, so its count is a lower-bound "
-                  "SAMPLE, not a near-complete network. A store-locator lists every service point, so for "
-                  "a GROUP brand this footprint exceeds the listed-entity IR count (Srisawad's 5,203 "
-                  "locator points ≈ 4.6× its 1,138 listed-entity figure). Points on the ground ≠ market "
-                  "share.",
+        "caveat": "All four rivals are official-locator networks now (Heng's hengleasing.com province-walk "
+                  "replaced its earlier Cloudflare-blocked sample), so all are ranked. A store-locator "
+                  "lists every service point, so for a GROUP brand this footprint exceeds the listed-entity "
+                  "IR count (Srisawad's 5,203 locator points ≈ 4.6× its 1,138 listed-entity figure). Points "
+                  "on the ground ≠ market share.",
     }
 
 
@@ -283,8 +300,8 @@ def _national_standing(autox_n, counts):
     """Where AutoX sits nationally among the big-4 by BRANCH-NETWORK SIZE — the read the
     found-vs-expected board hides (it never places AutoX in its own peer set). AutoX's size is
     MEASURED (its own committed network); each peer's size is its cited public 'expected' figure
-    (REPORTED). Only operators with a cited figure enter the ranking pool — Heng (uncited) is
-    listed but excluded from the rank, mirroring the never-invent rule. This is a NETWORK-SIZE
+    (REPORTED). Only operators with a cited figure enter the ranking pool; all four rivals now carry
+    one (Heng's 450 is cited in its SET filings), so all are ranked. This is a NETWORK-SIZE
     comparison, NOT market share and NOT the local per-province density read (peer_province.json,
     where clustering makes AutoX read as a modal-3rd) — the two answer different questions and are
     cross-referenced in the caveat. Returns None when the AutoX count is unavailable."""
@@ -356,9 +373,9 @@ def _national_standing(autox_n, counts):
                   "2nd-largest title-loan network. It is a DIFFERENT question from the per-province "
                   "density board (peer_province.json), where rivals cluster in dense provinces and "
                   "AutoX reads as a modal-3rd locally — national scale and local density tell "
-                  "different stories, both true. Heng carries no cited branch count so it is excluded "
-                  "from the rank (never invented). Peer figures are listed-ENTITY IR counts; a group's "
-                  "full retail footprint can be larger (see the Srisawad note above).",
+                  "different stories, both true. All four rivals carry a cited count now (Heng 450, "
+                  "the one contracting peer, per its SET filings). Peer figures are listed-ENTITY IR "
+                  "counts; a group's full retail footprint can be larger (see the Srisawad note above).",
         "expansion_label": "REPORTED — each peer's own FY2025 / 2025 IR (loan book ฿bn, branch net-adds "
                            "where disclosed). AutoX is MEASURED own-network + CONSOLIDATING posture "
                            "(no branch-growth target). Direction, not just static counts.",
@@ -399,19 +416,20 @@ def build():
         "totals": {"found": total_found, "expected": total_expected or None,
                    "coverage_pct": overall_cov},
         "national_standing": national_standing,
-        "caveat": "found now comes from each operator's OFFICIAL store-locator for Muangthai, "
-                  "Srisawad and Tidlor (the near-complete network), so coverage_pct is ~100% and "
-                  "can exceed 100% because a locator lists every service point / sub-branch beyond "
-                  "the company's headline branch count. Heng is the ONE exception — still a Google/"
-                  "Overture SAMPLE (its locator is behind a Cloudflare challenge), so Heng's count is "
-                  "a genuine lower bound. Read coverage as a data-completeness flag, not market share.",
-        "note": "expected counts are CITED real figures (not modelled); Heng expected is null because "
-                "no nationwide branch count was cited in our research — never invented. coverage_pct "
-                ">100% for the official-locator brands is expected, not an error: a locator lists every "
-                "service point, and for a GROUP brand it covers the whole retail network while the IR "
-                "'branches' figure counts only the LISTED ENTITY. Srisawad is the clearest case — the "
-                "sawad.co.th locator returns 5,203 measured points vs the 1,138 listed-entity IR "
-                "figure, i.e. the SAWAD group's retail footprint is ~4.6x its reported branch count.",
+        "caveat": "found now comes from each operator's OFFICIAL store-locator for all four big brands "
+                  "(Muangthai, Srisawad, Tidlor from their web locators; Heng province-walked from "
+                  "hengleasing.com, replacing its earlier Cloudflare-blocked sample), so coverage_pct is "
+                  "~100% and can exceed 100% because a locator lists every service point / sub-branch "
+                  "beyond the company's headline branch count. Heng's 450 measured points match its cited "
+                  "450-branch SET-filing count (30 Jun 2026). Read coverage as a data-completeness flag, "
+                  "not market share.",
+        "note": "expected counts are CITED real figures (not modelled). coverage_pct >100% for the "
+                "official-locator brands is expected, not an error: a locator lists every service point, "
+                "and for a GROUP brand it covers the whole retail network while the IR 'branches' figure "
+                "counts only the LISTED ENTITY. Srisawad is the clearest case — the sawad.co.th locator "
+                "returns 5,203 measured points vs the 1,138 listed-entity IR figure, i.e. the SAWAD "
+                "group's retail footprint is ~4.6x its reported branch count. Heng is the one contracting "
+                "listed peer (branches 1,018→743→450 over Dec 2024→Jun 2026, SET filings).",
     }
     return {"meta": meta, "brands": brands}
 

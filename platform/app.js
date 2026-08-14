@@ -3165,7 +3165,7 @@ function drawCompCoverage(){
         const fchain=fp.ranking.map(o=>`${o.operator==='AutoX'?'<b style="color:var(--accent)">AutoX</b>':o.operator} ${(o.points||0).toLocaleString()}`).join(' &rsaquo; ');
         nstxt+=`<div style="margin-top:6px"><b>By MEASURED store-locator footprint AutoX is only ${ordLabel(fp.autox_rank)}</b> `+
           `of ${fp.n_ranked} — points on the ground: ${fchain}. ${TAG_M} `+
-          `<span class="sub">Every number here is measured (own network + rivals' official locators); a locator counts a group's whole retail network, beyond its listed-entity IR count, so Srisawad's full footprint overtakes AutoX even though AutoX leads on cited branch count. Heng excluded (locator Cloudflare-blocked → lower bound).</span></div>`;
+          `<span class="sub">Every number here is measured (own network + all four rivals' official locators — Heng's hengleasing.com province-walk replaced its earlier sample); a locator counts a group's whole retail network, beyond its listed-entity IR count, so Srisawad's full footprint overtakes AutoX even though AutoX leads on cited branch count.</span></div>`;
       }
       // BOOK PER BRANCH — the raw book-scale chain (peers' bigger books) reframed as a STRUCTURAL
       // intensity read: how much book each door carries. AutoX book = MEASURED (real loan tape,
@@ -3178,7 +3178,7 @@ function drawCompCoverage(){
           return `${nm} <span class="mono">฿${o.book_per_branch_m}m</span>${tag}`;
         }).join(' &rsaquo; ');
         nstxt+=`<div style="margin-top:6px"><b>Book per branch — a structural intensity read</b>: ${bchain}. ${TAG_M} ${TAG_E} `+
-          `<span class="sub">${bi.insight||''} AutoX book is <b>measured</b> (real loan tape ◆, current outstanding); peer books are <b>reported</b> IR (★). Structural density, not profitability, NPL or market share; Heng excluded (no cited book).</span></div>`;
+          `<span class="sub">${bi.insight||''} AutoX book is <b>measured</b> (real loan tape ◆, current outstanding); peer books are <b>reported</b> IR (★). Structural density, not profitability, NPL or market share; Heng excluded here (it reports a gross hire-purchase/leasing book, a different basis from the others' loans outstanding).</span></div>`;
       }
     }
     ro.innerHTML=`<b>The census is now the near-complete rival network.</b> ${ttxt} ${TAG_M} ${TAG_E}${nstxt}`+
@@ -3186,7 +3186,7 @@ function drawCompCoverage(){
         ['Muangthai, Srisawad &amp; Tidlor are pulled from each operator’s <b>official store-locator</b> (the full network) — coverage ~100%, and &gt;100% is expected because a locator lists every service point beyond the IR “branches” headline (SAWAD group ≈4.6× its listed-entity count).',
          'Heng is now on the same footing — <b>pull_heng_locator.py</b> province-walks hengleasing.com from a Thai IP, and that official set REPLACED the earlier Google/Overture sample rather than being unioned with it. No sampled layer remains in the census.',
          'Coverage % is a data-completeness flag, <b>not</b> market share.',
-         '<b>National standing</b> is read two ways. (1) By branch-network SIZE — AutoX = <b>MEASURED</b> own network; peers = <b>REPORTED</b> cited IR counts (Heng excluded, no cited count). (2) By MEASURED store-locator FOOTPRINT — all points on the ground, AutoX own network vs rivals’ official locators (Heng excluded, its locator is Cloudflare-blocked → lower bound). A locator counts a group’s whole retail network beyond its listed-entity IR figure, so the two rankings can differ — both true. Neither is market share, and both differ from the local per-province density read.']);
+         '<b>National standing</b> is read two ways. (1) By branch-network SIZE — AutoX = <b>MEASURED</b> own network; peers = <b>REPORTED</b> cited IR counts (all four now cited — Heng’s 450, the one contracting peer, per its SET filings). (2) By MEASURED store-locator FOOTPRINT — all points on the ground, AutoX own network vs all four rivals’ official locators. A locator counts a group’s whole retail network beyond its listed-entity IR figure, so the two rankings can differ — both true. Neither is market share, and both differ from the local per-province density read.']);
   }
 }
 

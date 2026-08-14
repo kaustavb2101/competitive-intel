@@ -3,6 +3,43 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-14 — Intelligence loop (PEER COMPARISON): promote Heng to a first-class MEASURED brand in the competitor-coverage / national-standing board — the builder was stale (still treated it as a Cloudflare-blocked sample) and app.js openly contradicted itself
+
+- **The gap (objective #2, the flagged next-task from the prior peer run).** `pipeline/build_competitor_coverage.py`
+  still handled Heng under its OLD premise — "locator Cloudflare-blocked → `found` is a Google/Overture
+  SAMPLE (lower bound)" and "no nationwide branch count cited → EXPECTED null." **Both are now false.**
+  The committed census (`competitors_census.json`) meta says Heng's locator was **province-walked from
+  hengleasing.com via `pull_heng_locator.py` from a Thai IP and REPLACED the earlier sample** — Heng is now
+  one of four `official_locator_brands`, 450 measured points — and Heng's **450-branch count IS cited**
+  (its own SET filings, 30 Jun 2026; branch trajectory 1,018→743→450, `RESEARCH_DIGEST.md §B`). So the one
+  *contracting* rival was silently dropped from the network-size standing, the measured-footprint ranking,
+  and the coverage board. Worse, **app.js already contradicted itself on screen**: its method box said
+  "Heng is now on the same footing … No sampled layer remains in the census," while the same box and the
+  footprint line still read "Heng excluded (locator Cloudflare-blocked → lower bound)."
+- **The fix (one coherent board, honestly promoted).** In `build_competitor_coverage.py`: `EXPECTED["Heng"]=450`
+  (cited SET-filing source added to `expected_sources`); added Heng to `LOCATOR_COMPLETE_BRANDS` so it enters
+  the measured-footprint ranking; rewrote every stale "Cloudflare-blocked / sample / lower-bound / uncited /
+  excluded" caveat across the docstrings, `_footprint_measured`, `_national_standing`, and the `build()`
+  meta. Result: Heng now ranks in **national standing (AutoX #2 of 5 — MTC 8,673 › AutoX 2,015 › Tidlor
+  1,873 › Srisawad 1,138 › Heng 450)** and **measured footprint (AutoX #3 of 5, Heng 450 pts)**, and its
+  coverage reads **450/450 = 100%** (honest — official locator ≈ cited count). **Deliberately kept Heng OUT
+  of the book-per-branch read** — it reports a GROSS hire-purchase/leasing receivable (฿8.0bn), a different
+  basis from the others' total loans outstanding, so mixing it would not be apples-to-apples; the exclusion
+  reason string was corrected from the now-false "no cited book" to that basis note. `app.js`: fixed the
+  three stale Heng-exclusion strings (footprint sub, book-intensity sub, method box) to match.
+- **Downstream regen (affected layers).** `rival_threat.json` (derived from `competitor_coverage.json`)
+  regenerated — Heng's `branches_reported` null→450 (verdict/tier unchanged, footprint was already 0.22×
+  from the found-fallback). `build_provenance.py` rebuilt; provenance counts unchanged (142 layers, 83
+  measured / 59 estimated / **0 unlabelled**), so no reclassification and no fabrication introduced.
+- **Verify.** `build_competitor_coverage.py --check` + `build_rival_threat.py --check` + `build_provenance.py
+  --check` all byte-exact; `check_peer_constants.py` unaffected (it asserts only MTC/Tidlor/Srisawad vs §B);
+  `node --check platform/app.js` clean; `bash tests/run.sh check` — 0 failed. Visual/behaviour change → PR +
+  headless render self-review before self-merge.
+- **Next recommended intelligence task.** The SAME stale-Heng premise ("Heng is a sample / lower bound")
+  survives in ~6 OTHER app.js strings outside this board — contested-pop caveats (≈5638, 7205), rival-pressure
+  (≈6568), and the density-lens desc (line 24) — all now inconsistent with the census reality. A tight
+  follow-up: sweep those to "official locator (all four brands)" so the whole #acq surface tells one story.
+
 ## 2026-08-14 — UX loop (PRINT): keep the delinquency-ladder + proportion-bar colour in the printed board brief — VERIFIED against a real PDF, squash-merged + deploy-verified
 
 - **Shipped** (branch `claude/ux-loop-20260814-0905`, squash-merged PR #401 → `f522ccb` on master): a **print / exec-brief** fix. The command-center / `#exposure` "🖨 Print / PDF" is an explicit board-facing feature, but Chrome & Safari strip element **backgrounds** from print + "Save as PDF" unless the "Background graphics" box is ticked (OFF by default), and no page declared `print-color-adjust`. So on a real default PDF the whole-book **delinquency ladder** (`.ic-lad-seg`) and its colour **legend** (`.ic-lad-leg i`) — whose ONLY encoding is the background fill — printed as **blank white boxes**, gutting the core risk readout; the sibling proportion bars (`.rz-bar`, `.bar>i`, `.conc-legend i`) share the defect. Foreground colour (the red status dot, tag borders/text) already survived — only background-encoded marks were lost. Fix: one `@media print` rule setting `-webkit-print-color-adjust:exact;print-color-adjust:exact` on exactly those data-viz marks, so the fill renders regardless of the background-graphics setting. **Scoped to data-viz only** — the print block still deliberately whitens **card fills** (`.cc-card`/`.mcard`), untouched. `platform/styles.css` (+9).
