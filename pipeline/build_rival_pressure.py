@@ -3,8 +3,9 @@
 build_rival_pressure.py — per-branch RIVAL PRESSURE (objective #1 + #2, MEASURED)
 =================================================================================
 For each of the 2,015 AutoX branches, against the MERGED measured competitor census
-(platform/data/competitors_census.json — official store-locator networks for
-Muangthai / Srisawad / Tidlor, Google∪Overture sample for Heng):
+(platform/data/competitors_census.json — official store-locator networks for all four
+big brands: Muangthai / Srisawad / Tidlor / Heng — Heng from pull_heng_locator.py, which
+REPLACED the earlier Google∪Overture sample rather than being unioned with it):
 
   - distance to the NEAREST rival of EACH brand (km, great-circle haversine);
   - how many rival branches sit within 2 km and within 5 km (all brands);
@@ -185,9 +186,10 @@ def build():
                      "no open / close / expand call.",
         "provenance": {
             "rivals": "MEASURED — platform/data/competitors_census.json .items (%d usable points; %d "
-                      "skipped for missing coords/brand). Official store-locator networks for "
-                      "Muangthai/Srisawad/Tidlor (measured-complete); Heng is a Google∪Overture "
-                      "SAMPLE (lower bound), so its nearest-distance can only be an UPPER bound."
+                      "skipped for missing coords/brand). Official store-locator networks for all four "
+                      "big brands (Muangthai/Srisawad/Tidlor/Heng — Heng from pull_heng_locator.py, "
+                      "which replaced the earlier Google∪Overture sample); sub-scale local operators "
+                      "are not in the census, so counts remain a lower bound."
                       % (len(rivals), skipped),
             "distances": "MEASURED — great-circle haversine (R=%.4f km) between the branch coordinate "
                          "and each rival coordinate; nearest-per-brand exact over the census point set." % R_EARTH,
@@ -219,8 +221,9 @@ def build():
                               "([brand, count-within-2km] pairs)." % TOP_SIEGE,
         },
         "gaps": [
-            "Heng census is a Places/Overture sample, not the operator's full network — Heng pressure "
-            "is understated and its nearest-distance is an upper bound.",
+            "All four big brands (incl. Heng, via pull_heng_locator.py) are now their operators' OWN "
+            "official store-locators in the census — the earlier Heng Google∪Overture sample was "
+            "replaced, not unioned, so Heng pressure is no longer understated.",
             "Sub-scale local operators (the long tail facing the Q1-2026 BoT registration deadline) are "
             "not in the census at all — total pressure is a lower bound.",
         ],

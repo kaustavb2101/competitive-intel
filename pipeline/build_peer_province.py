@@ -38,12 +38,14 @@ gated, --check-reproducible), so provenance is inherited verbatim:
                         how many of the province's districts carry rival_density's
                         'outnumbered' flag (AutoX present but outnumbered).
 
-INHERITED CAVEATS (do not restate as if new): the rival census is a LOWER BOUND (Google caps
-~60/query/province; Heng is a Google/Overture SAMPLE because its locator is Cloudflare-blocked
-— Muangthai/Srisawad/Tidlor are near-complete official-locator networks). AutoX district
-counts are point-in-polygon, so a handful of branches that fall off every amphoe polygon are
-not assigned (rival_density total_autox = 2000 vs 2015 committed) — the shortfall is disclosed
-in rival_density.json .meta and carried forward here, NOT silently reconciled.
+INHERITED CAVEATS (do not restate as if new): the rival census is all four brands' OWN
+official store-locators (Heng included, via pull_heng_locator.py — its earlier Google/Overture
+sample was REPLACED, not unioned), so it is near-complete for the big-4 rather than a per-brand
+lower bound. The floor that remains is that only the 4 big compliant brands are censused, so
+this is big-4 density, not total competitive density (sub-scale local operators are absent).
+AutoX district counts are point-in-polygon, so a handful of branches that fall off every amphoe
+polygon are not assigned (rival_density total_autox = 2000 vs 2015 committed) — the shortfall is
+disclosed in rival_density.json .meta and carried forward here, NOT silently reconciled.
 
 DETERMINISTIC + NETWORK-FREE: reads one committed file, no network, no wall clock, no
 randomness. Byte-exact reproducible -> carries --check (the QA gate runs it). Input may be
@@ -259,7 +261,7 @@ def build():
     # invisible in the national tally. This rolls the same MEASURED `leader` field up by region so
     # the board can name the single operator holding the most provinces in each of the ~5 regions
     # and how concentrated that lead is. Pure aggregation of the per-record (region, leader) pair;
-    # inherits leader's Heng-under-count caveat. Ordered most-provinces-first for a stable, JSON-
+    # inherits the leader field's big-4-only caveat. Ordered most-provinces-first for a stable, JSON-
     # deterministic list, with a fixed tie-break (region name asc); the per-region tally keeps the
     # AutoX-first + census-brand order and drops zero-count operators.
     order = ["AutoX"] + brands
@@ -334,8 +336,8 @@ def build():
     # and a DIFFERENT read from most_saturated_province (density per vehicle): a province
     # can be only modestly dense yet leave AutoX heavily out-numbered where its own
     # footprint is thin (e.g. น่าน 16:1 on 7 branches), while the most-saturated market
-    # by vehicle is elsewhere. `rivals` is the LOWER-BOUND census (Heng is a
-    # Cloudflare-blocked sample), so every ratio here is a FLOOR ("outnumbered at least
+    # by vehicle is elsewhere. `rivals` is the big-4-only census (sub-scale local operators
+    # are not censused), so every ratio here is a FLOOR ("outnumbered at least
     # X:1"), never over-stated. MEASURED counts, COMPUTED ratio; only AutoX-present
     # provinces are rankable (ratio is null where autox == 0). autox/rivals are carried
     # so the exec judges the EXPOSURE behind each ratio, not the bare multiple.
@@ -405,7 +407,7 @@ def build():
                       "how lopsided the competitor field is: a high share means one rival dominates "
                       "the local field (it sets the pricing AutoX competes against), a low share "
                       "means a fragmented multi-brand field. MEASURED counts, computed share; null "
-                      "where the province has no rival branches. Inherits Heng's lower-bound caveat.",
+                      "where the province has no rival branches. Inherits the big-4-only census caveat.",
             "rival concentration (meta)": "COMPUTED — over provinces with a SUBSTANTIAL rival field "
                       "(>= rival_concentration_min_rivals big-4 branches, so a 1-2-branch field can't "
                       "score a meaningless 100%), n_provinces_rival_concentrated counts those whose "
@@ -416,7 +418,7 @@ def build():
             "provinces_led_by (meta)": "COMPUTED — a national tally of the `leader` field: how many "
                                        "of the 77 provinces each operator is the single largest "
                                        "network in. Pure aggregation of MEASURED counts; inherits "
-                                       "leader's Heng-under-count caveat.",
+                                       "the leader field's big-4-only caveat.",
             "region_brand_leaders (meta)": "COMPUTED — the same `leader` field rolled up by region: "
                                            "for each of the ~5 regions, the single operator leading "
                                            "the most provinces (`leader`/`n_led`), the region's "
@@ -424,8 +426,8 @@ def build():
                                            "(`led_by`). Names WHERE each network dominates, which the "
                                            "national provinces_led_by tally hides (e.g. a rival whose "
                                            "leads are entirely one regional stronghold). Pure "
-                                           "aggregation of MEASURED counts; inherits leader's "
-                                           "Heng-under-count caveat.",
+                                           "aggregation of MEASURED counts; inherits the leader "
+                                           "field's big-4-only caveat.",
             "autox_rank": "COMPUTED — AutoX's 1-based rank by branch count among the operators "
                           "PRESENT in the province ({AutoX} + every big-4 brand with >0 branches), "
                           "same deterministic tie-break as `leader` (AutoX ahead on an equal "
@@ -464,15 +466,16 @@ def build():
                 "COMPUTED — branches per 100,000 registered vehicles (AutoX / big-4 rivals / both), "
                 "2 dp. A SATURATION read: how crowded the province is relative to the vehicle pool "
                 "we can lend against, which raw counts cannot show. Numerator inherits the MEASURED "
-                "census's lower-bound caveat; denominator is MEASURED DLT stock. null where vehicles "
+                "census's big-4-only caveat; denominator is MEASURED DLT stock. null where vehicles "
                 "is null.",
         },
         "caveats": [
-            "The rival census is a LOWER BOUND: Muangthai / Srisawad / Tidlor are near-complete "
-            "official-locator networks, but Heng is a Google/Overture SAMPLE (its locator is "
-            "Cloudflare-blocked), so Heng per-province counts under-count more than the others. "
-            "Only the 4 big compliant brands are censused — sub-scale local operators are not, so "
-            "this is big-4 density, not total competitive density.",
+            "The rival census is all four brands' OWN official store-locators (Muangthai / "
+            "Srisawad / Tidlor / Heng — Heng via pull_heng_locator.py, its earlier Google/Overture "
+            "sample REPLACED not unioned), so it is near-complete for the big-4, not a per-brand "
+            "lower bound. The floor that remains: only the 4 big compliant brands are censused — "
+            "sub-scale local operators are not, so this is big-4 density, not total competitive "
+            "density.",
             "AutoX per-province counts are point-in-polygon, so branches that fall off every "
             "amphoe polygon are unassigned: total_autox here = %d vs 2015 committed branches "
             "(the shortfall is disclosed in rival_density.json .meta and carried forward, not "
@@ -489,7 +492,7 @@ def build():
             "coordinate census, so it is not comparable district-by-district and is never summed "
             "into the big-4 'rivals' total. A province's pico=0 (สิงห์บุรี, อ่างทอง) is a MEASURED "
             "zero from the registry, while pico=null would mean the layer was unavailable.",
-            "The *_per_100k_veh saturation reads divide the (lower-bound) big-4 census by MEASURED "
+            "The *_per_100k_veh saturation reads divide the big-4-only census by MEASURED "
             "DLT registered-vehicle stock. The vehicle stock counts ALL registered vehicles, while "
             "the rivals also lend against gold and cashflow — so this is a relative crowding proxy "
             "over the vehicle collateral base, not a literal branches-per-titleable-vehicle. It "

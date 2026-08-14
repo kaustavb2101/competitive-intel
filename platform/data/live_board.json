@@ -126,8 +126,8 @@
    "measured": true,
    "no_history": "each pull overwrites the last, and it can only be pulled from a Thai IP, so any series would have irregular gaps rather than a weekly cadence",
    "source": "pantip.com public search + comment endpoints (no auth, no login)",
-   "stamp": "2026-08-11",
-   "stamp_iso": "2026-08-11",
+   "stamp": "2026-08-13",
+   "stamp_iso": "2026-08-13",
    "stamp_kind": "pulled",
    "unit": "lenders tracked",
    "value": 15,
@@ -180,19 +180,19 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "22 observations from 2026-07-05, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 22,
+    "note": "23 observations from 2026-07-05, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 23,
     "series": "fuel_diesel"
    },
    "key": "fuel_prices",
    "label": "Diesel · retail pump",
    "measured": true,
    "source": "Bangchak retail oil-price API (www.bangchak.co.th/api/oilprice) — daily Bangkok reference prices; free, no key, cloud-reachable (EPPO/PTT/data.go.th are geoblocked).",
-   "stamp": "2026-08-11",
-   "stamp_iso": "2026-08-11",
+   "stamp": "2026-08-14",
+   "stamp_iso": "2026-08-14",
    "stamp_kind": "pulled",
    "unit": "฿/L",
-   "value": 36.69,
+   "value": 37.54,
    "what": "the cost line under every vehicle-collateral borrower — pickups and trucks run on it"
   },
   {
@@ -263,7 +263,7 @@
    "stamp_iso": "2026-08-14",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4450,
+   "value": 4454,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -287,7 +287,7 @@
    "stamp_iso": "2026-08-14",
    "stamp_kind": "pulled",
    "unit": "of 796",
-   "value": 125,
+   "value": 126,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -452,7 +452,7 @@
    "stamp_iso": "2026-06-30",
    "stamp_kind": "vintage",
    "unit": "juristic persons",
-   "value": 7511,
+   "value": 7972,
    "what": "merchant-segment formation — new small firms are the merchant book's feedstock"
   },
   {
@@ -479,7 +479,7 @@
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
   "history_note": "A trend line is drawn only where a stored series exists. 8 of 23 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 232,
+  "history_points": 233,
   "missing_files": [],
   "n_feeds": 23,
   "n_with_history": 8,
