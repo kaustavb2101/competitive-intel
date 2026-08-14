@@ -125,11 +125,16 @@ jobs:
           # Python rather than a --jq one-liner: the eligibility rule spans two authorship classes
           # and three mergeability states, and shell-quoting that into jq is how it silently starts
           # matching the wrong PRs.
-          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          # Step outputs are written to $GITHUB_OUTPUT explicitly rather than by redirecting this
+          # whole block into it. Redirecting sends the ::notice:: annotations there too, and the
+          # runner rejects the file with "Invalid format" — which fails the step for a reason that
+          # has nothing to do with the decision it just made.
+          python3 - <<'PY'
           import json, os, re
 
           owner = os.environ["OWNER"]
           prs = json.load(open("/tmp/prs.json"))
+          out = open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8")
 
           # The two classes of generated PR, which do NOT share an author:
           #   * data refreshes / census pulls / deck rebuilds -> app/github-actions
@@ -139,8 +144,18 @@ jobs:
           #     reliable discriminator, so a hand-written PR stays untouched.
           MARKER = re.compile(r"Generated (?:by|with) \[Claude Code\]", re.I)
 
+          # BOT LOGINS ARE NOT WHAT THEY LOOK LIKE. `gh pr list --json author` reports a GitHub App
+          # as login "app/github-actions" — not "github-actions", and not "github-actions[bot]"
+          # either, which is the form that appears in the web UI and in most documentation. Matching
+          # only the un-prefixed spellings made this job classify every single bot PR as
+          # hand-written and merge nothing at all, silently, while looking like it was working.
+          # `is_bot` is the field that actually means what it says; the login set is kept as a
+          # belt-and-braces fallback and is compared on the last path segment.
           def generated(pr):
-              if pr["author"]["login"] in ("github-actions", "github-actions[bot]"):
+              a = pr.get("author") or {}
+              if a.get("is_bot"):
+                  return True
+              if (a.get("login") or "").split("/")[-1] in ("github-actions", "github-actions[bot]"):
                   return True
               return bool(MARKER.search(pr.get("body") or ""))
 
@@ -180,11 +195,12 @@ jobs:
                             "sha": pr["headRefOid"], "draft": bool(pr["isDraft"])})
 
           for s in skipped:
-              print("::notice::%s" % s)
+              print("::notice::%s" % s)                      # stdout -> log annotation
 
-          print("promote=%s" % " ".join(str(n) for n in promote))
-          print("found=%s" % ("yes" if cands else "none"))
-          print("candidates=%s" % json.dumps(cands, separators=(",", ":")))
+          out.write("promote=%s\n" % " ".join(str(n) for n in promote))
+          out.write("found=%s\n" % ("yes" if cands else "none"))
+          out.write("candidates=%s\n" % json.dumps(cands, separators=(",", ":")))
+          out.close()
           PY
 
       # Runs even when nothing is mergeable this tick: a wedged draft must be promoted so that
