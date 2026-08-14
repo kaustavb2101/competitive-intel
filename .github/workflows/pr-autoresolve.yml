@@ -20,8 +20,10 @@ name: PR — keep open branches mergeable after master moves
 # DESTROYS telemetry). Everything else outside platform/data/ is left exactly as it was and reported
 # in the run summary for a human.
 #
-# Whatever it does write, it then GATES before pushing — see the comment on that step for why
-# nothing else can.
+# Whatever it does write is gated before it can MERGE, but not by this job: it dispatches qa.yml
+# against the head it pushes, and pr-automerge.yml will not merge a PR whose qa.yml run is not green
+# on that exact head. See the comment in the loop for why the gate that used to run here as well was
+# removed — it was 84% of this repo's Actions bill, duplicating a check that already ran for free.
 
 on:
   push:
@@ -40,8 +42,15 @@ concurrency:
 
 jobs:
   refresh:
+    # STAYS ON ubuntu-latest, deliberately. The obvious saving is to move this to the self-hosted
+    # `ci` box like qa.yml, and it is the wrong move: that box is 2 cores / 4 GB with ONE serial
+    # executor, and it is already the binding constraint (QA alone booked 21,989 runner-minutes in
+    # 7 days — more wall time than the week contains, i.e. a standing queue). Parking a multi-PR
+    # re-derive loop in front of that queue would delay every PR's gate to save a few dollars. The
+    # `thai` runner is out for the reason given in qa.yml: the Thai-IP data pulls must not queue
+    # behind anything. So this job is made CHEAP instead of moved — see the loop below.
     runs-on: ubuntu-latest
-    timeout-minutes: 180   # a full gate run per PR now, not just a re-derive
+    timeout-minutes: 60    # merge + re-derive per PR; the gate no longer runs here
     steps:
       - uses: actions/checkout@v4
         with:
@@ -79,12 +88,12 @@ jobs:
 
           # headRepositoryOwner filters out forks — we cannot push to those.
           #
-          # DRAFTS ARE SKIPPED, and that skip is the single biggest cost lever in this repo. Measured
-          # over 2026-08-10: 1,114 billed job-minutes, of which this workflow was 243 (60.7 per run,
-          # the most expensive job here) and the QA runs IT dispatches were most of the other 835.
-          # The cause is structural rather than wasteful-looking — every master push refreshes every
-          # open PR, and each refresh runs a full gate here AND dispatches qa.yml to run the same
-          # gate again for a visible check. Two gates per PR per master move.
+          # DRAFTS ARE SKIPPED, and that skip is a real cost lever: every master push refreshes
+          # every open PR, so the work here is (open PRs x master pushes) and drafts multiply it for
+          # nothing. Measured 2026-08-14 over 7 days, this workflow was 4,389 of 5,223 billed
+          # minutes (84%) across 165 runs — one run per master push — at 26.6 min each. Removing the
+          # duplicate gate from the loop takes roughly two thirds off that; skipping drafts takes
+          # the multiplier off what remains.
           #
           # Seven of the nine open PRs at the time of writing are auto-generated draft data
           # refreshes. A draft is by definition not about to merge, so re-merging master into it and
@@ -122,20 +131,27 @@ jobs:
             rc=0
             bash "$RESOLVER" origin/master || rc=$?
             if [ "$rc" -eq 0 ]; then
-              # GATE BEFORE PUSHING. A push made with the default GITHUB_TOKEN does NOT trigger
-              # further workflow runs — that is GitHub's loop prevention — so qa.yml never fires on
-              # the commits this job creates. Without this step every branch it refreshes would sit
-              # there unverified, and the first thing to notice would be master going red after a
-              # merge. The job that writes the commit is the only one that can check it.
-              if ! bash tests/run.sh check > /tmp/gate-$NUM.log 2>&1; then
-                echo "GATE FAILED after re-derive — not pushing:"
-                tail -25 /tmp/gate-$NUM.log
-                echo "- #$NUM \`$BRANCH\` — re-derived but the gate went RED, left unpushed" >> "$GITHUB_STEP_SUMMARY"
-                BLOCKED=$((BLOCKED+1)); echo "::endgroup::"; continue
-              fi
-              echo "gate: $(grep -E '^RESULT' /tmp/gate-$NUM.log || echo 'passed')"
+              # NO GATE RUN HERE — and that is a cost decision with a measured basis, not a
+              # loosening. This job used to run `tests/run.sh check` before every push, then
+              # dispatch qa.yml two lines below to run the SAME gate again. Measured on run
+              # 31825684202, per PR: 2.5 min to merge + re-derive, then 5.6 min to gate, then a
+              # dispatch that gated it a second time. Over 7 days this workflow was 4,389 of the
+              # repo's 5,223 billed minutes — 84% of the bill — and roughly two thirds of that was
+              # the duplicated half.
+              #
+              # What used to justify it: a push made with the default GITHUB_TOKEN does NOT trigger
+              # further workflow runs (GitHub's loop prevention), so without an explicit check the
+              # commits this job creates were unverified. That hole is now closed twice over — the
+              # dispatch below asks qa.yml for a real run on the pushed head, and pr-automerge.yml
+              # refuses to merge anything whose qa.yml run is not `success` on that EXACT headSha.
+              # So the gate still happens on every commit this job writes; it happens once, on the
+              # self-hosted box where it costs nothing, instead of twice with the first copy billed.
+              #
+              # What genuinely changes: a re-derive that goes red is now pushed and shows red on the
+              # PR, where it used to be withheld and the PR left silently dirty. That is the better
+              # failure — visible, and still unmergeable.
               if git push origin "HEAD:$BRANCH"; then
-                echo "- #$NUM \`$BRANCH\` — merged master + re-derived, gate green, mergeable again" >> "$GITHUB_STEP_SUMMARY"
+                echo "- #$NUM \`$BRANCH\` — merged master + re-derived, mergeable again (gate runs via the dispatch below)" >> "$GITHUB_STEP_SUMMARY"
                 RESOLVED=$((RESOLVED+1))
                 # A push made with GITHUB_TOKEN is exempt from GitHub's loop-prevention, so qa.yml's
                 # own `push` trigger never fires on this new head — the PR page would keep showing

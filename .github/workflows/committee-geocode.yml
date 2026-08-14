@@ -18,8 +18,8 @@ on:
   workflow_dispatch:
     inputs:
       max_cycles:
-        description: "geocoder cycles (batch 100 each)"
-        default: "5"
+        description: "geocoder cycles (batch 100 each) — every cycle is up to 100 BILLED Google calls"
+        default: "1"
   schedule:
     # Weekly, Monday 03:10 UTC — after the gov-census job.
     - cron: "10 3 * * 1"
@@ -60,7 +60,12 @@ jobs:
           GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY || secrets.GOOGLE_PLACES_KEY }}
         run: |
           cd committee
-          python3 run_cycle.py --member geocoder --batch 100 --loop --max-cycles "${{ github.event.inputs.max_cycles || '5' }}"
+          # The `|| '1'` is the SCHEDULED path — github.event.inputs is empty on a cron run, so this
+          # fallback, not the input default, is what spends money unattended every Monday. It was 5,
+          # which is up to 500 billed Google calls a week that nobody asked for and nobody reads the
+          # result of. One cycle (<=100 calls) still drains the backlog steadily; raise it by hand
+          # via workflow_dispatch when you actually want a big catch-up run and will watch the spend.
+          python3 run_cycle.py --member geocoder --batch 100 --loop --max-cycles "${{ github.event.inputs.max_cycles || '1' }}"
 
       - name: Rebuild every derived layer + run the determinism gate
         if: env.SKIP != '1'
