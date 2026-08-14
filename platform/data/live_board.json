@@ -337,13 +337,13 @@
    "history": {
     "file": "macro_indicators.json",
     "kind": "bis",
-    "note": "6 quarters — BIS household debt + policy rate",
+    "note": "6 quarters — BIS household debt (the policy-rate figure in the same file is now BOT-direct, MPC decision history)",
     "points": 6
    },
    "key": "macro_indicators",
    "label": "Household debt",
    "measured": true,
-   "source": "BIS Statistics (stats.bis.org, household debt + policy rate) + World Bank (api.worldbank.org, CPI + lending rate) + ECB daily reference rates via Frankfurter (api.frankfurter.dev, ",
+   "source": "BIS Statistics (stats.bis.org, household debt) + BOT (ธปท./กนง.) MPC decision history (policy rate) + World Bank (api.worldbank.org, CPI + lending rate) + ECB daily reference rates",
    "stamp": "2026-08-11",
    "stamp_iso": "2026-08-11",
    "stamp_kind": "pulled",

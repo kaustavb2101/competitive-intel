@@ -1746,14 +1746,17 @@ function renderMacroIndicators(){
   const host=$('#macro'); if(!host||!MACROIND||!MACROIND.indicators) return;
   const I=MACROIND.indicators, cards=[];
   const arrow=v=>v==null?'':(v<0?'▼':(v>0?'▲':'●'));
+  // "TPSO (Ministry of Commerce) — headline CPI, monthly" → "TPSO". The chip has room for the
+  // publisher, not its subtitle; the full string stays in the hover title.
+  const srcShort=x=>String(x||'').split(/\s+[—(]/)[0].trim();
   const hh=I.household_debt_gdp;
   if(hh) cards.push([`Household debt`, `${hh.value}%`,
     `of GDP · ${arrow(hh.yoy_change)}${hh.yoy_change!=null?Math.abs(hh.yoy_change)+'pp':''} YoY${hh.yoy_change<0?' (deleveraging)':''} · BIS ${hh.period}`]);
   const pr=I.policy_rate;
-  if(pr) cards.push([`Policy rate`, `${pr.value}%`, `${arrow(pr.yoy_change)}${pr.yoy_change!=null?Math.abs(pr.yoy_change)+'pp':''} YoY · BIS ${pr.period}`]);
-  // "TPSO (Ministry of Commerce) — headline CPI, monthly" → "TPSO". The chip has room for the
-  // publisher, not its subtitle; the full string stays in the hover title.
-  const srcShort=x=>String(x||'').split(/\s+[—(]/)[0].trim();
+  // Policy rate is BOT-direct (source-data/bot_policy_rate.json, MPC decisions), not the BIS
+  // republication — read the label off the data so it stays honest if the source ever changes.
+  // The Hold/Cut decision is what BIS's republication drops, so surface it when the fold is present.
+  if(pr) cards.push([`Policy rate`, `${pr.value}%`, `${arrow(pr.yoy_change)}${pr.yoy_change!=null?Math.abs(pr.yoy_change)+'pp':''} YoY${pr.decision?' · '+pr.decision:''} · ${srcShort(pr.source)||'BOT'} ${pr.period}`]);
   const cpi=I.cpi_inflation;
   if(cpi) cards.push([`Inflation`, `${cpi.value>0?'+':''}${cpi.value}%`,
     `headline CPI YoY · ${srcShort(cpi.source)||'CPI'} ${cpi.period}`]);
@@ -2315,11 +2318,13 @@ function renderAnswerBand(){
         spark:svgSpark(h.trend,{color:'var(--accent)',aria:'household debt to GDP trend',title:'BIS'}),
         sub:'MEASURED BIS'})); }
     if(I.policy_rate) { const p=I.policy_rate;
+      // BOT-direct (MPC decision history), not the BIS republication — label off the data.
+      const psrc=String(p.source||'BOT').split(/\s+[—(]/)[0].trim()||'BOT';
       T.push(abTile({k:'Policy rate',cad:p.period||'quarterly',cadCls:'q',v:p.value,unit:'%',
-        move:p.yoy_change!=null?`${p.yoy_change<0?'▼':'▲'} ${Math.abs(p.yoy_change)}pt YoY`:'',
+        move:(p.yoy_change!=null?`${p.yoy_change<0?'▼':'▲'} ${Math.abs(p.yoy_change)}pt YoY`:'')+(p.decision?` · ${p.decision}`:''),
         moveColor:'var(--mid)',
-        spark:svgSpark(p.trend,{color:'var(--accent)',aria:'policy rate trend',title:'BIS'}),
-        sub:'MEASURED BIS'})); }
+        spark:svgSpark(p.trend,{color:'var(--accent)',aria:'policy rate trend',title:psrc}),
+        sub:'MEASURED '+psrc})); }
     // 6. Our own book, so the backdrop is never read without the thing it acts on. Live book only —
     //    the 180+ legacy stock is held apart on purpose and blending them would flatter the number.
     //    (regex is anchored on "of accounts" — "NPL-live (90-179dpd) 4.92%" otherwise captures the
