@@ -3,6 +3,47 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-14 — Intelligence loop (service/deploy-health, obj #2): the RAW competitor-census layers — the point data the ENTIRE Competition (`#acq`) readout is built from — now have deploy probes; all three were unprobed silent-deploy blind spots
+
+- **The gap fixed (`competitor-census-unprobed-deploy-blind-spot`).** A negative-space sweep (after
+  confirming the scheduled data backlog is exhausted here — FPO PICO census / per-branch cropland /
+  DBD-DIW-MOT vehicle+formation layers all shipped + wired, and the genuinely-open items — GISTDA 40m,
+  BAAC/SME-bank penetration — need a `GISTDA_SPHERE_KEY` / Thai-IP window this CI session lacks) found
+  that the **raw** competitor-census point layers are fetched by `app.js` but absent from
+  `check_site_health.py`'s `DATA_FILES`. `data/competitors_census.json` (16,503 MEASURED merged
+  all-brand rivals — the primary overlay), `data/competitors_national.json` (2,556 Google-Places
+  points) and `data/competitors_overture.json` (2,458 Overture points — the two fallback sources) are
+  read by `loadCompetitors()` (prefers the merged census, falls back to national ∪ overture) and
+  `loadCompetitorCensus()` (the per-branch 10km catchment rival read), and drive the whole Competition
+  surface + every branch's 5km/10km `_comp` rival count + the National-map competitor-density lens. The
+  district/province AGGREGATES built on this census (`competitor_coverage`, `rival_density`,
+  `pico_district`, `peer_province`) were all probed — but the raw point layers they and the live overlay
+  are built FROM were the unprobed base of that whole pyramid.
+- **Why it matters.** Each loader is null-guarded: on a truncated / empty / 404 CDN deploy of these
+  files the client sets `COMP=null` / `ccenItems=[]` and the rival overlay silently collapses to its
+  quiet "run pull_competitors.py" note while every branch's rival-proximity count zeroes — with **NO
+  phone alert**. None self-heals from CI (the census is a Thai-IP Google-Places / official-locator pull,
+  no CI cron), so the deploy probe is the ONLY safeguard — the exact "broken demo" blind spot the
+  `competitor_coverage` / `rival_density` probes already close for the aggregates.
+- **The fix.** Added one shared `_shape_competitor_items(d, layer_desc)` render-contract checker plus
+  three thin named wrappers (`_shape_competitors_census/_national/_overture`) and registered all three in
+  `DATA_FILES`. Each asserts the render **contract** — shape not values (robust to a future census
+  refresh shifting counts): a non-empty `.items[]`, and on the first geocoded item the numeric
+  `.lat`/`.lng` the client haversine reads plus the non-empty `.brand` the per-brand tally + dot colour
+  reads. One file, `pipeline/check_site_health.py`, +54 lines, zero deletions.
+- **Verified.** Negative-tested the checker (6 broken shapes — empty items, missing key, no/non-numeric
+  lat, no brand, non-dict — all correctly REJECTED; the real committed files ACCEPTED). `check_site_health.py
+  --local platform` → **HEALTHY 245/245** (was 236, +9 = 3 files × fetch/parse/shape), exit 0. No
+  `platform/data` file, builder or provenance changed (probe-only), so no rebuild / `build_provenance`
+  needed. `bash tests/run.sh check` → **0 failed** (its deploy-probe self-test now also accepts these
+  three payloads). Test-infra only, no app behaviour/visual change → safeguard-gated direct commit.
+- **Next recommended.** The obj-#2 competitive surface base layers are now all probed. The negative-space
+  sweep's remaining lower-value probe gaps: the agri/sentiment reads (`crop_mix`, `crop_margin`,
+  `crop_landuse`, `crop_farmer_income`, `pantip_panel`, `social_themes`) and the auxiliary scene layers.
+  The genuinely-open DATA items still need an owner-side/Thai-IP window (GISTDA `check-crop` 40m
+  per-branch pull to supersede the SPAM baseline in `build_branch_cropland.py`; commit the BAAC/SME-bank
+  raw CSVs to unblock the formal-credit penetration layer).
+
 ## 2026-08-14 — Intelligence loop (PROVENANCE CONSISTENCY, obj #2): retire the last stale "Heng is a Cloudflare-blocked SAMPLE / under-counts" caveat — it survived only in `build_peer_province.py`, so the per-province peer board mislabelled its own MEASURED official-locator data as an under-counting estimate
 
 - **The gap.** The prior three intelligence runs promoted Heng to a first-class MEASURED brand across the
