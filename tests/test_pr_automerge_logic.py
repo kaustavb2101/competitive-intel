@@ -20,6 +20,11 @@ The two questions worth protecting, because getting either wrong is silent rathe
      PRs land on action_required). Reading either as a verdict is the bug: as "green" it
      merges ungated code, as "red" it wedges the PR forever.
 
+  3. That ONE unmergeable PR cannot block the ones behind it. The queue is drained oldest-first,
+     so if a red (or ungated, or still-running) PR at the head stopped the scan, every PR behind
+     it would wait for as long as that one stayed open — which for a red bot PR is indefinitely.
+     The decision block must skip past it and keep looking.
+
 Deliberately does NOT import yaml — the gate's interpreter is not guaranteed to have it, and
 the blocks are extracted from the raw text with the same indentation rules YAML would apply.
 """
@@ -46,15 +51,15 @@ def extract():
     m = re.search(r"[ \t]*python3 - <<'PY'[^\n]*\n(.*?)\n[ \t]*PY\b", src, re.S)
     if not m:
         raise SystemExit("FAIL: could not find the eligibility block in %s" % WF)
-    m2 = re.search(r'[ \t]*VERDICT=\$\(python3 -c "\n(.*?)\n[ \t]*"\)', src, re.S)
+    m2 = re.search(r'[ \t]*DECIDE=\$\(python3 -c "\n(.*?)\n[ \t]*"\)', src, re.S)
     if not m2:
-        raise SystemExit("FAIL: could not find the gate-verdict block in %s" % WF)
+        raise SystemExit("FAIL: could not find the decision block in %s" % WF)
     return _dedent_block(m.group(1)), _dedent_block(m2.group(1))
 
 
-PICK_SRC, VERDICT_SRC = extract()
+PICK_SRC, DECIDE_SRC = extract()
 compile(PICK_SRC, "pick", "exec")
-compile(VERDICT_SRC, "verdict", "exec")
+compile(DECIDE_SRC, "decide", "exec")
 
 TMP = tempfile.mkdtemp()
 
@@ -69,14 +74,24 @@ def run_pick(prs, owner="kaustavb2101"):
                           text=True, env=env).stdout
 
 
-def run_verdict(runs, sha):
+def run_decide(runs, cands):
+    """Returns (decision_line, all_output) — the decision is the LAST line, as bash reads it."""
     p = os.path.join(TMP, "runs.json")
     with open(p, "w", encoding="utf-8") as f:
         json.dump(runs, f)
-    src = VERDICT_SRC.replace("'/tmp/runs.json'", json.dumps(p))
-    env = dict(os.environ, SHA=sha)
+    src = DECIDE_SRC.replace("'/tmp/runs.json'", json.dumps(p))
+    env = dict(os.environ, CANDS=json.dumps(cands))
     r = subprocess.run([sys.executable, "-c", src], capture_output=True, text=True, env=env)
-    return (r.stdout.strip() or r.stderr.strip())
+    out = r.stdout.strip() or r.stderr.strip()
+    return (out.splitlines()[-1] if out else ""), out
+
+
+def cand(n, sha, draft=False):
+    return {"number": n, "branch": "b%d" % n, "sha": sha, "draft": draft}
+
+
+def qa(sha, status="completed", conclusion="success"):
+    return {"headSha": sha, "status": status, "conclusion": conclusion}
 
 
 def pr(n, login, body="", draft=False, state="CLEAN", created="2026-08-01",
@@ -114,9 +129,12 @@ ELIGIBILITY = [
     ("UNKNOWN mergeability waits for GitHub to finish computing",
      [pr(6, "github-actions", state="UNKNOWN")], "found=none"),
     ("a fork is never merged", [pr(7, "github-actions", owner="someone-else")], "found=none"),
-    ("oldest eligible PR goes first",
+    ("oldest eligible PR is offered first",
      [pr(8, "github-actions", created="2026-08-09"),
-      pr(9, "github-actions", created="2026-08-02")], "number=9"),
+      pr(9, "github-actions", created="2026-08-02")], '"number":9,'),
+    ("every eligible PR is offered, not just the first",
+     [pr(8, "github-actions", created="2026-08-09"),
+      pr(9, "github-actions", created="2026-08-02")], '"number":8,'),
     # The deadlock guard: pr-autoresolve skips drafts and this job skips DIRTY, so a PR that is
     # both would be touched by neither and sit wedged forever. It must still be promoted.
     ("draft+DIRTY is promoted even though it cannot merge",
@@ -129,38 +147,71 @@ ELIGIBILITY = [
      [pr(13, "kaustavb2101", draft=True, body="mine")], "promote="),
 ]
 
-VERDICTS = [
-    ("success on this head is green",
-     [{"headSha": SHA, "status": "completed", "conclusion": "success"}], "green"),
+A, B, C = "a" * 40, "b" * 40, "c" * 40
+
+# (name, qa runs, candidates, expected decision line)
+DECISIONS = [
+    ("success on this head merges it",
+     [qa(A)], [cand(1, A)], "merge|1|b1|%s|false" % A),
     ("success on a DIFFERENT head does not count (the stale-green trap)",
-     [{"headSha": "b" * 40, "status": "completed", "conclusion": "success"}], "absent"),
+     [qa(B)], [cand(1, A)], "dispatch|1|b1||"),
     ("cancelled means the gate never ran, not that it failed",
-     [{"headSha": SHA, "status": "completed", "conclusion": "cancelled"}], "absent"),
+     [qa(A, conclusion="cancelled")], [cand(1, A)], "dispatch|1|b1||"),
     ("action_required means the gate never ran either",
-     [{"headSha": SHA, "status": "completed", "conclusion": "action_required"}], "absent"),
-    ("a run still going is 'running'",
-     [{"headSha": SHA, "status": "in_progress", "conclusion": None}], "running"),
-    ("a real failure is red",
-     [{"headSha": SHA, "status": "completed", "conclusion": "failure"}], "red:failure"),
-    ("timed_out is red",
-     [{"headSha": SHA, "status": "completed", "conclusion": "timed_out"}], "red:timed_out"),
+     [qa(A, conclusion="action_required")], [cand(1, A)], "dispatch|1|b1||"),
+    ("a run still going is left alone, and NOT re-dispatched onto itself",
+     [qa(A, status="in_progress", conclusion=None)], [cand(1, A)], "none|||"),
+    ("a real failure is not merged",
+     [qa(A, conclusion="failure")], [cand(1, A)], "none|||"),
+    ("timed_out is not merged",
+     [qa(A, conclusion="timed_out")], [cand(1, A)], "none|||"),
     ("an earlier failure is superseded by a later success",
-     [{"headSha": SHA, "status": "completed", "conclusion": "failure"},
-      {"headSha": SHA, "status": "completed", "conclusion": "success"}], "green"),
-    ("a queued run alongside a cancelled one is 'running' (never re-dispatch onto ourselves)",
-     [{"headSha": SHA, "status": "completed", "conclusion": "cancelled"},
-      {"headSha": SHA, "status": "queued", "conclusion": None}], "running"),
-    ("no runs at all is absent", [], "absent"),
+     [qa(A, conclusion="failure"), qa(A)], [cand(1, A)], "merge|1|b1|%s|false" % A),
+    ("a queued run alongside a cancelled one waits (never re-dispatch onto ourselves)",
+     [qa(A, conclusion="cancelled"), qa(A, status="queued", conclusion=None)],
+     [cand(1, A)], "none|||"),
+    ("no runs at all asks for a gate", [], [cand(1, A)], "dispatch|1|b1||"),
+    ("a green draft is merged and flagged for promotion",
+     [qa(A)], [cand(1, A, draft=True)], "merge|1|b1|%s|true" % A),
+
+    # HEAD-OF-LINE. The queue drains oldest-first, so anything that stops the scan at the first
+    # unmergeable PR blocks everything behind it. A red bot PR stays red until a human looks at it.
+    ("a RED PR at the head does not block a green one behind it",
+     [qa(A, conclusion="failure"), qa(B)], [cand(1, A), cand(2, B)],
+     "merge|2|b2|%s|false" % B),
+    ("an UNGATED PR at the head does not block a green one behind it",
+     [qa(B)], [cand(1, A), cand(2, B)], "merge|2|b2|%s|false" % B),
+    ("a RUNNING PR at the head does not block a green one behind it",
+     [qa(A, status="queued", conclusion=None), qa(B)], [cand(1, A), cand(2, B)],
+     "merge|2|b2|%s|false" % B),
+    ("with a red head and an ungated tail, the tail gets the gate",
+     [qa(A, conclusion="failure")], [cand(1, A), cand(2, B)], "dispatch|2|b2||"),
+    ("only ONE gate is dispatched per tick, for the oldest ungated PR",
+     [], [cand(1, A), cand(2, B), cand(3, C)], "dispatch|1|b1||"),
+    ("the OLDEST green PR wins when several are green",
+     [qa(A), qa(B)], [cand(1, A), cand(2, B)], "merge|1|b1|%s|false" % A),
+    ("green beats dispatching, even when an older PR is ungated",
+     [qa(B)], [cand(1, A), cand(2, B)], "merge|2|b2|%s|false" % B),
+]
+
+# (name, qa runs, candidates, substring that must appear in the FULL output)
+NOTES = [
+    ("a skipped red PR is reported as an error annotation",
+     [qa(A, conclusion="failure")], [cand(7, A)], "::error::#7"),
+    ("a red PR says it is being skipped, not that the run stopped",
+     [qa(A, conclusion="failure")], [cand(7, A)], "Skipping it"),
 ]
 
 
 def main():
     for name, prs, expect in ELIGIBILITY:
         check(name, run_pick(prs), expect, contains=True)
-    for name, runs, expect in VERDICTS:
-        check(name, run_verdict(runs, SHA), expect)
+    for name, runs, cands, expect in DECISIONS:
+        check(name, run_decide(runs, cands)[0], expect)
+    for name, runs, cands, expect in NOTES:
+        check(name, run_decide(runs, cands)[1], expect, contains=True)
 
-    total = len(ELIGIBILITY) + len(VERDICTS)
+    total = len(ELIGIBILITY) + len(DECISIONS) + len(NOTES)
     if FAILED:
         print("pr-automerge logic: %d/%d passed, %d FAILED" % (total - len(FAILED), total,
                                                                len(FAILED)))
