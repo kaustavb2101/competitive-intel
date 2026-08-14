@@ -3,6 +3,48 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-14 — Intelligence loop (PEER COMPARISON): add Heng — the one *distressed* rival — to the peer NPL benchmark; it was the only peer missing yet the closest bracket to AutoX's own impaired share — PR + headless-verified
+
+- **The gap (a peer-comparison blind spot, objective #2).** `pipeline/build_peer_npl.py` benchmarked
+  AutoX's MEASURED own-book NPL (6.06% OS live-book, from the real loan tape) against only THREE reported
+  peers — TIDLOR 1.5% / MTC 2.53% / SAWAD 3.5–3.6% — all of which sit *well below* AutoX. It **dropped
+  Heng**, the one *contracting* listed title-lender, even though Heng is present in every OTHER peer layer
+  (`competitors_census.json` 450 branches, `peer_scoreboard.json`, the `#acq` fragility caveat) AND the
+  repo already holds Heng's asset-quality figure authoritatively: `platform/index.html` cites, from Heng's
+  own SET filings, **Stage 3 (credit-impaired) receivables at 6.78% of the gross book as of 30 Jun 2026
+  (฿542.8m/฿8,002.8m)**. That is precisely the most decision-relevant comparator — worst-in-class asset
+  quality and the **only** reported peer that *brackets* AutoX's own ~6% impaired share — and the single
+  data point that best substantiates the platform's own "compliant ≠ thriving" thesis (objective #2).
+- **The fix (one peer row, honestly based).** Added Heng to `PEERS` (`npl: 6.78`) with its basis made
+  explicit everywhere it renders: Heng is a hire-purchase/leasing lender, so its figure is a **TFRS9/IFRS-9
+  Stage-3 credit-impaired share**, not a bank-style 90+ NPL — the loan-quality analog for its accounting
+  basis, and arguably a *closer* basis-match to AutoX's own tape-measured impaired share than the other
+  peers' headline NPLs. The mixed basis is disclosed in the row `source` cell, the `meta.note`, the table
+  header tooltip, and a new method-box bullet. Also added the Heng finding to `docs/RESEARCH_DIGEST.md §B`
+  (the cited source-of-truth) so `meta.source` ("…§B") stays truthful, with the SET-filing citation +
+  branch/book trajectory (1,018→743→450, ฿13.2bn→฿9.4bn→฿8.0bn) + covenant-waiver context.
+- **The honesty ripple I had to fix (why this was a render change, not a data-only add).** The readout
+  hard-asserted AutoX sits *"at/above the top of that reported-peer band"* — true when the band topped out
+  at SAWAD 3.55%, but **false** once Heng (6.78%) becomes the new band-top and AutoX (6.06%) sits just
+  below it. Rewrote that line in `app.js` to be **computed from the data, never hard-asserted**: when AutoX
+  exceeds every peer it reads "at/above the top"; otherwise it names the position ("near the top … above 3
+  of the 4 reported peers, just below Heng's distressed 6.78%"). So the claim stays honest across any future
+  peer add/refresh.
+- **Verify.** `build_peer_npl.py --check` reproduces byte-exact (4 peers); `build_provenance.py` regenerated
+  (`peer_npl.json` count 3→4, bytes 2571→3297, still `measured` / labelled) and `--check` byte-exact;
+  `node --check platform/app.js` clean; `bash tests/run.sh check` — **0 failed**. **Headless render
+  (Chromium, #acq)**: peer table renders all 4 peers sorted (Tidlor→MTC→Sawad→**Heng 6.78**) with the AutoX
+  MEASURED anchor row at 6.06% below the band; the readout reads honestly ("near the top … just below
+  Heng's distressed 6.78%"); method box carries the Stage-3 basis disclosure; **0 JS/page errors** from the
+  change (one environmental `ERR_CONNECTION_RESET` on an external resource, unrelated).
+- **Ship.** Visual/behaviour change → PR + headless self-review before self-merge, per the loop safeguard.
+- **Next recommended intelligence task.** Finding #2 from this run's negative-space sweep (MEDIUM): the
+  Heng-null rationale in `build_competitor_coverage.py` (`EXPECTED["Heng"]=None`, "no cited branch count")
+  is now **stale** — Heng's 30-Jun-2026 count (450) IS cited in-repo (SET filings, = the measured census),
+  so the coverage/standing board silently drops the one *contracting* rival; set `EXPECTED["Heng"]=450`
+  (cited) so it surfaces honestly. (Finding #3, LOW: a stale `~4,384` census-size comment at `app.js:1052`
+  vs the live 16,503.)
+
 ## 2026-08-14 — Integration loop (REGRESSION FIX): master gate was RED — the auction-refresh laundered an empty harvest into the repo; restored the data + guarded the builder — recorded to master
 
 - **The defect (a red master gate + a laundered-block data loss).** A clean `master` checkout FAILED

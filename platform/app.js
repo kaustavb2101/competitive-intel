@@ -4501,7 +4501,7 @@ function drawPeerNpl(){
   const ax=(PEERNPL&&PEERNPL.autox)?PEERNPL.autox:null;
   const axMax=ax?Math.max(hi,ax.npl_live_os_pct||0,4):Math.max(hi,4);
   tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Peer</th>`+
-    `<th scope="col" title="the operator's own reported non-performing-loan ratio (FY2025 / 2025 IR)">Reported NPL</th>`+
+    `<th scope="col" title="the operator's own reported loan-quality ratio — headline NPL (FY2025 / 2025 IR), or for Heng its H1-2026 TFRS9 Stage-3 credit-impaired share">Reported NPL</th>`+
     `<th scope="col" title="the collateral mix that drives the NPL level">Collateral book</th>`+
     `<th scope="col">Source</th></tr>`+
     list.map((p,i)=>{
@@ -4526,11 +4526,27 @@ function drawPeerNpl(){
   if(ro){
     const best=list[0], worst=list[list.length-1];
     const spread=(vals.length>1)?`from <b style="color:var(--merch)">${best.name} ${best.npl}%</b> (${best.collateral}) to <b style="color:var(--agri)">${worst.name} ${(worst.npl_label||worst.npl)}%</b> (${worst.collateral})`:'';
-    const axLine=ax?` <b>AutoX's own book — measured from the real tape — runs NPL-live (90–179dpd) at <span style="color:var(--accent)">${ax.npl_live_os_pct.toFixed(2)}% OS-weighted</span></b>, at/above the top of that reported-peer band, consistent with its heavier motorcycle / pickup + land collateral mix.`:'';
+    // AutoX's position vs the reported-peer band — computed from the data (never hard-asserted),
+    // so it stays honest as peers are added/refreshed. When AutoX exceeds every peer it is
+    // "at/above the top"; otherwise name the nearest higher peer it sits just below.
+    const axv=ax?ax.npl_live_os_pct:null;
+    let axPos='';
+    if(axv!=null){
+      if(axv>=hi){ axPos='at/above the top of that reported-peer band'; }
+      else {
+        const nBelowAx=vals.filter(v=>v<axv).length;
+        const higher=list.filter(p=>typeof p.npl==='number'&&p.npl>axv);
+        const near=higher[0];
+        axPos=`near the top of that reported-peer band — above ${nBelowAx} of the ${vals.length} reported peers`+
+          (near?`, just below ${near.name}'s distressed ${(near.npl_label||near.npl)}%`:'');
+      }
+    }
+    const axLine=ax?` <b>AutoX's own book — measured from the real tape — runs NPL-live (90–179dpd) at <span style="color:var(--accent)">${ax.npl_live_os_pct.toFixed(2)}% OS-weighted</span></b>, ${axPos}, consistent with its heavier motorcycle / pickup + land collateral mix.`:'';
     ro.innerHTML=`<b>The listed title-lenders' reported loan quality spans ${(hi-lo).toFixed(1)}pp</b> — ${spread}. `+
       `The gap is a <b>collateral story</b>: vehicle/gold books run the cleanest, land / heavy-vehicle / agri books the highest NPL.${axLine} ${TAG_M}`+
       methodBox(m.note||null,
         [`Peer figures are <b>reported by the companies themselves</b> (FY2025 / 2025 IR) — docs/RESEARCH_DIGEST.md §B. Vintage ${m.updated||'2026-06'}.`,
+         list.some(p=>p.ticker==='HENG')?`<b>Heng's figure is a TFRS9 Stage-3 (credit-impaired) share</b>, not a bank-style 90+ NPL — the loan-quality metric a hire-purchase/leasing lender publishes, and the closest basis-match to AutoX's own tape-measured impaired share. It is the one <b>contracting</b> peer and the only reported peer that brackets AutoX's ~6% impaired share ("compliant" is not "thriving").`:'',
          ax?`<b>The AutoX row is MEASURED</b> from the real loan tape (${ax.basis?ax.basis.replace('MEASURED — ',''):'OS-weighted'}), not reported. ${ax.caveat||''}`:'',
          'The spread tracks collateral mix, not operator skill alone: a heavier land / agri / heavy-vehicle book carries structurally higher NPL than a vehicle/gold book at the same underwriting discipline.'].filter(Boolean));
   }
