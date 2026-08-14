@@ -36,6 +36,12 @@ name: PR — auto-merge generated PRs once the gate is green
 # one, then explicitly dispatch pr-autoresolve so the rest are re-merged and re-gated against the
 # new master. The QA-completion trigger below then brings us straight back here. The queue drains
 # serially, and every PR is verified against the tree it actually lands on.
+#
+# One per run is NOT one CONSIDERED per run, and the difference matters. The queue is drained
+# oldest-first, so if the scan stopped at the first PR it could not merge, a single red bot PR would
+# block every PR behind it for as long as it stayed open — and a red one stays red until a human
+# looks at it. So the scan skips past anything red, ungated or still running (reporting each) and
+# merges the first PR that is genuinely green.
 
 on:
   # Fires the moment any gate finishes, so a PR merges as soon as it goes green rather than
@@ -78,7 +84,7 @@ jobs:
     runs-on: [self-hosted, ci]
     timeout-minutes: 15
     steps:
-      - name: Pick the oldest eligible generated PR
+      - name: List every eligible generated PR, oldest first
         id: pick
         env:
           GH_TOKEN: ${{ github.token }}
@@ -111,9 +117,14 @@ jobs:
                   return True
               return bool(MARKER.search(pr.get("body") or ""))
 
+          # EVERY eligible PR, not just the first. The gate verdict is not known yet at this point,
+          # and a PR whose gate is red is still "eligible" here — so returning only the oldest would
+          # hand the next step a single candidate that it might have to reject, with nothing else to
+          # fall back to. One stuck red PR would then block every PR behind it for as long as it
+          # stayed open. The next step walks this list and skips past the ones it cannot merge.
           skipped = []
           promote = []
-          cand = None
+          cands = []
           for pr in sorted(prs, key=lambda p: p["createdAt"]):        # oldest first, drain in order
               n = pr["number"]
               if (pr.get("headRepositoryOwner") or {}).get("login") != owner:
@@ -133,23 +144,20 @@ jobs:
                   skipped.append("#%d conflicts — pr-autoresolve's job" % n)
                   continue
               if st == "UNKNOWN" or pr.get("mergeable") == "UNKNOWN":
+                  # Routine rather than exceptional: GitHub recomputes mergeability lazily, so every
+                  # open PR reads UNKNOWN for a while after master moves — which is exactly when this
+                  # job runs. Waiting a tick is correct; the next gate completion brings us back.
                   skipped.append("#%d mergeability still computing" % n)
                   continue
-              cand = pr
-              break
+              cands.append({"number": n, "branch": pr["headRefName"],
+                            "sha": pr["headRefOid"], "draft": bool(pr["isDraft"])})
 
           for s in skipped:
               print("::notice::%s" % s)
 
           print("promote=%s" % " ".join(str(n) for n in promote))
-          if cand is None:
-              print("found=none")
-          else:
-              print("found=yes")
-              print("number=%d" % cand["number"])
-              print("branch=%s" % cand["headRefName"])
-              print("sha=%s" % cand["headRefOid"])
-              print("draft=%s" % str(cand["isDraft"]).lower())
+          print("found=%s" % ("yes" if cands else "none"))
+          print("candidates=%s" % json.dumps(cands, separators=(",", ":")))
           PY
 
       # Runs even when nothing is mergeable this tick: a wedged draft must be promoted so that
@@ -170,52 +178,82 @@ jobs:
         if: steps.pick.outputs.found == 'yes'
         env:
           GH_TOKEN: ${{ github.token }}
-          NUM: ${{ steps.pick.outputs.number }}
-          BRANCH: ${{ steps.pick.outputs.branch }}
-          SHA: ${{ steps.pick.outputs.sha }}
-          DRAFT: ${{ steps.pick.outputs.draft }}
+          CANDS: ${{ steps.pick.outputs.candidates }}
         run: |
           set -uo pipefail
 
           # Only runs whose headSha IS this PR's current head count. See the stale-green note above.
-          gh run list --workflow qa.yml --limit 80 \
+          gh run list --workflow qa.yml --limit 100 \
             --json headSha,status,conclusion,databaseId > /tmp/runs.json
-          # 'cancelled' and 'action_required' are NOT verdicts — they mean the gate never ran.
-          # Treating them as red is the bug that silently wedges a PR forever, and qa.yml cancels
-          # runs routinely (cancel-in-progress on every push) while bot PRs land on
-          # action_required by default. Only a real failure/timed_out counts as red; everything
-          # inconclusive falls through to 'absent', which dispatches a fresh gate.
-          VERDICT=$(python3 -c "
-          import json,os
-          sha=os.environ['SHA']
-          runs=[r for r in json.load(open('/tmp/runs.json')) if r['headSha']==sha]
-          done=[r for r in runs if r['status']=='completed']
-          concl={str(r['conclusion']) for r in done}
-          bad={'failure','timed_out','startup_failure'}
-          if 'success' in concl:            print('green')
-          elif len(done)<len(runs):         print('running')   # queued/in_progress -> do not touch
-          elif concl & bad:                 print('red:'+','.join(sorted(concl & bad)))
-          else:                             print('absent')    # none, cancelled, action_required
-          ")
-          echo "PR #$NUM ($BRANCH @ ${SHA:0:8}) gate verdict: $VERDICT"
 
-          case "$VERDICT" in
-            running)
-              echo "::notice::#$NUM — gate still running on the current head; next tick will merge it."
-              exit 0 ;;
-            absent)
-              # Expected for a freshly-opened bot PR: its push was made with GITHUB_TOKEN (no
-              # workflow trigger) and its pull_request run sits at action_required. Ask for a real
-              # one; the workflow_run trigger brings us back when it finishes.
-              echo "::notice::#$NUM — no gate run exists for this head. Dispatching qa.yml."
-              gh workflow run qa.yml --ref "$BRANCH" \
-                && echo "dispatched qa.yml on $BRANCH" \
-                || echo "::error::qa.yml dispatch FAILED for #$NUM — merge it by hand or re-dispatch."
-              exit 0 ;;
-            red:*)
-              echo "::error::#$NUM — gate on the current head concluded ${VERDICT#red:}. NOT merging; this one needs you."
-              exit 0 ;;
-          esac
+          # Walks the candidates oldest-first and returns ONE action. Kept in Python, and kept as a
+          # decision rather than an action, so tests/test_pr_automerge_logic.py can extract and
+          # exercise it against fixtures — a workflow cannot otherwise be tested without merging
+          # something for real.
+          DECIDE=$(python3 -c "
+          import json,os
+          cands=json.loads(os.environ['CANDS'])
+          runs=json.load(open('/tmp/runs.json'))
+          bad={'failure','timed_out','startup_failure'}
+          def verdict(sha):
+              rs=[r for r in runs if r['headSha']==sha]
+              done=[r for r in rs if r['status']=='completed']
+              concl={str(r['conclusion']) for r in done}
+              # 'cancelled' and 'action_required' are NOT verdicts — they mean the gate never ran.
+              # Treating them as red is the bug that silently wedges a PR forever, and qa.yml
+              # cancels runs routinely while bot PRs land on action_required by default. Only a
+              # real failure/timed_out counts as red; everything inconclusive falls to 'absent'.
+              if 'success' in concl:    return 'green'
+              if len(done)<len(rs):     return 'running'
+              if concl & bad:           return 'red:'+','.join(sorted(concl & bad))
+              return 'absent'
+          decision='none|||'
+          first_absent=None
+          notes=[]
+          for c in cands:
+              v=verdict(c['sha'])
+              if v=='green':
+                  decision='merge|%d|%s|%s|%s'%(c['number'],c['branch'],c['sha'],
+                                                str(c['draft']).lower())
+                  break
+              if v.startswith('red'):
+                  # NOT fatal to the run. A red PR is skipped and the queue behind it keeps moving;
+                  # stopping here is what would let one stuck PR block every other one.
+                  notes.append('::error::#%d — gate on the current head concluded %s. Skipping it; '
+                               'this one needs you.'%(c['number'],v[4:]))
+              elif v=='running':
+                  notes.append('::notice::#%d — gate still running on its current head.'%c['number'])
+              else:
+                  notes.append('::notice::#%d — no gate run exists for its current head.'%c['number'])
+                  if first_absent is None: first_absent=c
+          if decision=='none|||' and first_absent is not None:
+              # At most ONE dispatch per tick. Asking for a gate on every ungated PR at once would
+              # queue several 40-minute runs onto a single serial self-hosted executor, and the
+              # workflow_run trigger brings us straight back here when the first one lands anyway.
+              decision='dispatch|%d|%s||'%(first_absent['number'],first_absent['branch'])
+          for n in notes: print(n)
+          print(decision)
+          ")
+          echo "$DECIDE"
+          ACTION=$(printf '%s' "$DECIDE" | tail -1)
+          IFS='|' read -r VERB NUM BRANCH SHA DRAFT <<< "$ACTION"
+
+          if [ "$VERB" = "none" ]; then
+            echo "Nothing mergeable this tick." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [ "$VERB" = "dispatch" ]; then
+            # Expected for a freshly-opened bot PR: its push was made with GITHUB_TOKEN (no workflow
+            # trigger) and its pull_request run sits at action_required. Ask for a real one; the
+            # workflow_run trigger brings us back when it finishes.
+            gh workflow run qa.yml --ref "$BRANCH" \
+              && echo "dispatched qa.yml on $BRANCH (for #$NUM)" \
+              || echo "::error::qa.yml dispatch FAILED for #$NUM — merge it by hand or re-dispatch."
+            exit 0
+          fi
+
+          echo "PR #$NUM ($BRANCH @ ${SHA:0:8}) is green on its current head — merging."
 
           # A draft cannot be merged, and pr-autoresolve deliberately skips drafts — so a generated
           # PR left as a draft would never be refreshed OR merged. Promote it now that it is green.
