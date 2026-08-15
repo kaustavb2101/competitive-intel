@@ -133,6 +133,25 @@ FEEDS = [
          label="BIS household debt/policy rate + World Bank CPI/lending-rate/FX", cadence="weekly",
          ip="any", group="macro", out="platform/data/macro_indicators.json"),
 
+    # The two Thai-official macro-board series that OVERRIDE pull_macro's fallbacks: build_macro_
+    # indicators.py overlays source-data/tpso_cpi.json onto cpi_inflation (the MONTHLY headline CPI,
+    # replacing the World Bank ANNUAL average) and folds ilostat_labour.json into labour_context.json /
+    # occupation_income_individual.json. BOTH pullers are cloud-reachable + keyless (verified from their
+    # own docstrings and re-verified from CI 2026-08-15: TPSO's static COICOP-2018 workbook at
+    # uploads.tpso.go.th, the ILO's THA mirror at rplumber.ilo.org — NSO's own hosts are geoblocked, the
+    # ILO mirror is not) yet neither was in ANY scheduler: tpso_cpi.json last moved 2026-08-02 and
+    # ilostat_labour.json had never once been stamped (`pulled: ""`). A puller nobody runs is a feed that
+    # goes stale in silence and build_macro_indicators.py keeps overlaying the same frozen month — the
+    # registry is what stops that (same reasoning as nabc_agri above). Their builders are --check-gated,
+    # so rederive_drift.py rebuilds the macro board + labour layers automatically on the next fresh pull.
+    dict(key="tpso_cpi", script="pull_tpso_cpi.py", args=["--stamp", STAMP],
+         label="TPSO monthly headline CPI/inflation YoY (overrides macro-board cpi_inflation)",
+         cadence="monthly", ip="any", group="macro", out="source-data/tpso_cpi.json"),
+
+    dict(key="ilostat_labour", script="pull_ilostat_labour.py", args=["--stamp", STAMP],
+         label="ILOSTAT Thai labour battery: sector employment / informality / unemployment / earnings",
+         cadence="quarterly", ip="any", group="macro", out="source-data/ilostat_labour.json"),
+
     dict(key="google_trends", script="pull_google_trends.py", args=[],
          label="Google Trends demand + brand share-of-search (ESTIMATED)", cadence="monthly",
          ip="any", group="competitive", out="source-data/google_trends.json", timeout=1200),
