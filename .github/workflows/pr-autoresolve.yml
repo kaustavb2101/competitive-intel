@@ -102,8 +102,8 @@ jobs:
           # Nothing is lost — `gh pr ready` triggers no refresh by itself, but the next master push
           # picks it up, and a PR being merged goes through the merge queue's own checks regardless.
           PRS=$(gh pr list --state open --base master --limit 50 \
-                  --json number,headRefName,headRepositoryOwner,isDraft \
-                  --jq ".[] | select(.headRepositoryOwner.login==\"${GITHUB_REPOSITORY_OWNER}\") | select(.isDraft|not) | \"\(.number) \(.headRefName)\"")
+                  --json number,headRefName,headRepositoryOwner,isDraft,mergeStateStatus \
+                  --jq ".[] | select(.headRepositoryOwner.login==\"${GITHUB_REPOSITORY_OWNER}\") | select(.isDraft|not) | \"\(.number) \(.headRefName) \(.mergeStateStatus)\"")
           NDRAFT=$(gh pr list --state open --base master --limit 50 --json isDraft --jq '[.[]|select(.isDraft)]|length')
           # Say what was skipped rather than silently covering less than the name implies.
           [ "${NDRAFT:-0}" -gt 0 ] && echo "skipping $NDRAFT draft PR(s) — they refresh once marked ready"
@@ -112,7 +112,7 @@ jobs:
           echo "## PR auto-resolve" >> "$GITHUB_STEP_SUMMARY"
           RESOLVED=0; SKIPPED=0; BLOCKED=0
 
-          while read -r NUM BRANCH; do
+          while read -r NUM BRANCH MSS; do
             [ -z "${NUM:-}" ] && continue
             echo "::group::PR #$NUM ($BRANCH)"
             git checkout -q --force -B "$BRANCH" "origin/$BRANCH" || { echo "cannot check out"; echo "::endgroup::"; continue; }
@@ -120,6 +120,30 @@ jobs:
 
             if git merge-base --is-ancestor origin/master HEAD; then
               echo "already up to date."
+              SKIPPED=$((SKIPPED+1)); echo "::endgroup::"; continue
+            fi
+
+            # DO NOT REWRITE A PR THAT DOES NOT NEED IT. Refreshing a branch changes its head, which
+            # discards whatever gate result it had and requires a new one — and qa.yml's per-branch
+            # concurrency then CANCELS the queued run this job's own previous pass asked for. On a
+            # single serial runner that is a livelock, not an inefficiency: master moves faster than
+            # 4 PRs can be gated, so every gate is killed before it starts and nothing ever merges.
+            # Observed 2026-08-15 — pr-automerge ran 8 times over 3 hours, correctly, and merged
+            # nothing, because no PR ever held a stable head long enough to finish a gate.
+            #
+            # Of the four master pushes that caused it, THREE could not have affected any PR:
+            # b5813e4b and dea5f698 touched docs/ + pipeline/check_site_health.py, 60685b5a touched
+            # docs/ + platform/status_data.json. Only f5b63c20 touched platform/data and
+            # source-data. A merge is only capable of producing stale derived output if master
+            # actually moved the derived layers or their committed inputs, so that is the test.
+            #
+            # A conflicted PR is always refreshed regardless — that is this job's whole purpose —
+            # and UNKNOWN is treated as conflicted, because it means GitHub has not finished
+            # computing and guessing "clean" would skip a PR that genuinely needs resolving.
+            BASE=$(git merge-base origin/master HEAD)
+            DERIVED_MOVED=$(git diff --name-only "$BASE" origin/master -- platform/data source-data | head -1)
+            if [ -z "$DERIVED_MOVED" ] && [ "${MSS:-UNKNOWN}" != "DIRTY" ] && [ "${MSS:-UNKNOWN}" != "UNKNOWN" ]; then
+              echo "master moved, but not in platform/data or source-data, and this PR is $MSS — leaving it alone so its gate stays valid."
               SKIPPED=$((SKIPPED+1)); echo "::endgroup::"; continue
             fi
 
