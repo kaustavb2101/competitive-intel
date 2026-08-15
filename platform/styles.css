@@ -902,6 +902,14 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
      data-viz marks only, so nothing the print block intentionally whitens is affected. */
   .ic-lad,.ic-lad-seg,.ic-lad-leg i,.rz-bar,.rz-bar span,.bar,.bar>i,.conc-legend i{
     -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  /* Same background-strip defect on the MEASURED provenance marker: the leading dot of a
+     measured pill (.prov.m .pd / .cc-tag.m::before) is a SOLID disc encoded ONLY by background
+     fill with NO border, so the default board PDF drops it to an invisible box — while the
+     ESTIMATED (border ring) and UNLABELLED (border square) markers survive on their borders.
+     That silently erases the single most important honesty signal (measured vs estimated) from
+     the printed brief. Force the fill so the measured dot + pill tint render like on screen. */
+  .prov,.prov .pd,.cc-tag,.cc-tag::before{
+    -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 
 /* ---------- scenario simulator ---------- */
