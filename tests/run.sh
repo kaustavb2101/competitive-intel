@@ -517,6 +517,17 @@ INGESTS
   # unattended job and a wrongly-resolved conflict in source-data/ or in code. Fixture-based, seconds.
   bash "$REPO/tests/test_resolve_derived_conflicts.sh" >/dev/null 2>&1 && ok "resolve_derived_conflicts.sh (41 fixture cases)" || bad "resolve_derived_conflicts.sh fixture tests (run: bash tests/test_resolve_derived_conflicts.sh)"
 
+  # The union-mergers decide what happens to data that CANNOT BE RE-PULLED — feed_history holds the
+  # only copy of yesterday's gauge reading, swarm_runs the only record of a run. Each ships its own
+  # fixtures; neither was actually being run by this gate, so a regression in either would have
+  # surfaced as silently deleted telemetry during an unattended merge. Seconds, offline.
+  ( cd "$PIPE" && python3 merge_feed_history.py --selftest >/dev/null 2>&1 ) \
+    && ok "merge_feed_history.py --selftest (accumulator union + later-pull tie-break)" \
+    || bad "merge_feed_history.py --selftest (run: python3 pipeline/merge_feed_history.py --selftest)"
+  ( cd "$PIPE" && python3 merge_swarm_runs.py --selftest >/dev/null 2>&1 ) \
+    && ok "merge_swarm_runs.py --selftest (run-log union)" \
+    || bad "merge_swarm_runs.py --selftest (run: python3 pipeline/merge_swarm_runs.py --selftest)"
+
   # pr-automerge.yml merges generated PRs to master unattended and master auto-deploys, so its
   # eligibility rule and its "did the gate really pass on THIS head" rule are the last thing
   # between a bot commit and the live site. A workflow cannot be tested by running it, so this
