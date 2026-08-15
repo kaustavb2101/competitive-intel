@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-15T04:24:13+00:00",
-    "commit": "804e752"
+    "generated_at": "2026-08-15T10:27:48+00:00",
+    "commit": "3525028"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-08-15T10:27:48+00:00",
+      "sha": "3525028",
+      "summary": "intel(deploy-health): read a Vercel SSO redirect as up+gated, not a false outage",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-15T09:46:50+00:00",
+      "sha": "5d72ffe",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-15, run 31877654902)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T08:52:04+00:00",
+      "sha": "c7eeef8",
+      "summary": "docs(progress-log): record ux-print-color-adjust-h2-accent merge+deploy+verify (PR #419)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-15T15:47:23+07:00",
+      "sha": "a48f725",
+      "summary": "ux: print — keep h2 segment-accent bars in the board PDF (#419)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-15T08:24:07+00:00",
+      "sha": "3099377",
+      "summary": "data: market-pulse swarm refresh (run 31844200805) (#414)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-15T07:57:34+00:00",
+      "sha": "6e93a15",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 31862364669) (#408)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-15T07:26:56+00:00",
+      "sha": "f6eab7d",
+      "summary": "data: market-pulse swarm refresh (run 31863527138) (#418)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-15T06:29:43+00:00",
+      "sha": "1eb22ae",
+      "summary": "intel(deploy-health): shape-probe the new-vehicle registration TREND (brand_trends.json, obj #1)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-15T06:06:54+00:00",
+      "sha": "23547b9",
+      "summary": "fix(ci): make unattended merging actually converge — conflict mergers + the gate livelock (#417)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-15T04:24:51+00:00",
+      "sha": "059c2a8",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the ThaiWater shape-probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-15T04:24:13+00:00",
       "sha": "804e752",
       "summary": "intel(deploy-health): shape-probe the LIVE ThaiWater flood + rain pulse (obj #1)",
@@ -650,66 +710,6 @@
       "date": "2026-08-15T02:17:37+07:00",
       "sha": "1d00598",
       "summary": "data: market-pulse swarm refresh (run 31772501280) (#399)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-15T02:15:34+07:00",
-      "sha": "5068c0f",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 31825669383) (#398)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-15T02:15:19+07:00",
-      "sha": "f105b45",
-      "summary": "data: Thai-IP-only swarm refresh (run 31738633514) (#393)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-14T18:27:23+00:00",
-      "sha": "44cf19b",
-      "summary": "intel(service): deploy-probe the RAW competitor-census layers — the point data the whole #acq readout is built from (obj #2)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-14T17:48:11+00:00",
-      "sha": "3e23f77",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the per-province peer caveat fix",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-14T17:47:55+00:00",
-      "sha": "29147b1",
-      "summary": "intel(peer): retire the last stale 'Heng is a Cloudflare-blocked SAMPLE' caveat from the per-province peer board (obj #2)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-14T16:12:16+00:00",
-      "sha": "ce11ba6",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-14, run 31817848218)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-14T15:12:29+00:00",
-      "sha": "14149ac",
-      "summary": "docs(progress): log ux-hero-card-role-button merge + deploy-verify (PR #406)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-14T22:09:16+07:00",
-      "sha": "c13a319",
-      "summary": "ux: hero verdict card is a link, not a button (WCAG 4.1.2) (#406)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-14T21:31:52+07:00",
-      "sha": "5ed9f74",
-      "summary": "intel(acq): retire the stale \"Heng is a sample\" premise across rival-pressure + contested-pop (obj #2) (#405)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-14T10:54:33+00:00",
-      "sha": "197ac98",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the Heng competitor-coverage ship (#403)",
       "pillar": "market"
     }
   ]
