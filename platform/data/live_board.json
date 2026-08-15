@@ -150,8 +150,8 @@
    "measured": true,
    "no_history": "channel stats are point-in-time; subscriber history is not stored",
    "source": "YouTube Data API v3 (official)",
-   "stamp": "2026-08-11",
-   "stamp_iso": "2026-08-11",
+   "stamp": "2026-08-15",
+   "stamp_iso": "2026-08-15",
    "stamp_kind": "pulled",
    "unit": "channels",
    "value": 13,
@@ -297,7 +297,7 @@
    "stamp_iso": "2026-08-15",
    "stamp_kind": "pulled",
    "unit": "of 797",
-   "value": 131,
+   "value": 130,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
