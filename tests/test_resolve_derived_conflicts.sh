@@ -27,6 +27,7 @@ setup(){
   cp "$SRC" pipeline/resolve_derived_conflicts.sh
   cp "$HERE/../pipeline/merge_append_log.py" pipeline/merge_append_log.py
   cp "$HERE/../pipeline/merge_feed_history.py" pipeline/merge_feed_history.py
+  cp "$HERE/../pipeline/merge_swarm_runs.py" pipeline/merge_swarm_runs.py
   cp "$HERE/../pipeline/pick_newer_stamp.py" pipeline/pick_newer_stamp.py
   printf '# PROGRESS LOG\n\nReverse-chronological.\n\n## 2026-08-01 — the entry both sides start from\n\nbody\n' > docs/PROGRESS_LOG.md
   # stand-in for rederive_drift.py: provenance is a deterministic census of source-data
@@ -203,13 +204,50 @@ VALS=$(python3 -c "import json;print(','.join(str(v) for v in json.load(open('so
 [ "$VALS" = "132.0,136.0,140.0" ] && ok "values stayed aligned to their dates" || no "values are $VALS"
 
 echo
-echo "=== 11. two DIFFERENT readings for the same day is contested and must ABORT ==="
-# Not hypothetical: this is what raising the pull cadence above once a day would produce.
+echo "=== 11. two DIFFERENT readings for the same day resolve to the LATER PULL ==="
+# This used to abort for a human, and that was right while the feeds pulled once a day: two
+# different numbers for one date meant a real disagreement. At 4x/day it means the gauge moved
+# between two honest reads, neither is wrong, and the later one is simply current. PR #414 sat
+# blocked overnight on exactly this (flood_high 134.0 vs 133.0 on 2026-08-15) with nothing for a
+# human to actually decide. Recency is established from each side's last commit touching the file
+# — laptop is committed after mobile here, so laptop's reading is the one that survives.
 setup
 fh 2026-08-04 132; python3 pipeline/rederive_drift.py >/dev/null; git add -A; git commit -qm "base history"
+# Commit stamps are pinned rather than taken from the clock. `git log --format=%ct` has one-second
+# resolution, and two fixture commits land in the same second, which ties — and a tie deliberately
+# falls back to `theirs` (master, the conservative side). Real pulls are minutes to hours apart, so
+# pinning is what makes this fixture test the intended path instead of the tie-breaker's fallback.
 git checkout -q -B mobile master; fh 2026-08-04 132 2026-08-05 136
-python3 pipeline/rederive_drift.py >/dev/null; git commit -qam mobile
+python3 pipeline/rederive_drift.py >/dev/null
+GIT_AUTHOR_DATE="2026-08-15T10:00:00Z" GIT_COMMITTER_DATE="2026-08-15T10:00:00Z" git commit -qam mobile
 git checkout -q -B laptop master; fh 2026-08-04 132 2026-08-05 999
+python3 pipeline/rederive_drift.py >/dev/null
+GIT_AUTHOR_DATE="2026-08-15T10:10:00Z" GIT_COMMITTER_DATE="2026-08-15T10:10:00Z" git commit -qam laptop
+bash pipeline/resolve_derived_conflicts.sh mobile > "$TMP/out11.txt" 2>&1; rc=$?
+[ "$rc" -eq 0 ] && ok "exit 0 (resolved by recency, not escalated)" || no "exit $rc, expected 0"
+GOT11=$(python3 -c "import json;d=json.load(open('source-data/feed_history.json'));s=d['series']['flood'];print(dict(zip(s['dates'],s['values'])).get('2026-08-05'))")
+[ "$GOT11" = "999.0" ] && ok "kept the later pull's reading (999.0)" || no "kept $GOT11, expected 999.0"
+grep -q "resolved by recency" "$TMP/out11.txt" \
+  && ok "reported the dropped reading instead of silently discarding it" \
+  || no "no override was reported (a dropped reading must never be silent)"
+
+echo
+echo "=== 12. a contested LABEL still needs a human, even though readings no longer do ==="
+# The recency tie-break is only ever about measurements. Two different labels for one series is
+# editorial — nobody's gauge moved — so it must still stop rather than pick the newer wording.
+setup
+fh 2026-08-04 132; python3 pipeline/rederive_drift.py >/dev/null; git add -A; git commit -qm "base history"
+relabel(){ python3 - "$1" <<'PY'
+import json, sys
+p = "source-data/feed_history.json"
+d = json.load(open(p))
+d["series"]["flood"]["label"] = sys.argv[1]
+json.dump(d, open(p, "w", newline="\n"), indent=1, sort_keys=True)
+PY
+}
+git checkout -q -B mobile master; fh 2026-08-04 132 2026-08-05 136; relabel "Flood — mobile wording"
+python3 pipeline/rederive_drift.py >/dev/null; git commit -qam mobile
+git checkout -q -B laptop master; fh 2026-08-04 132 2026-08-06 140; relabel "Flood — laptop wording"
 python3 pipeline/rederive_drift.py >/dev/null; git commit -qam laptop
 BEFORE=$(git rev-parse HEAD)
 bash pipeline/resolve_derived_conflicts.sh mobile >/dev/null 2>&1; rc=$?
@@ -262,15 +300,65 @@ git diff --quiet -- platform/data/provenance.json \
   && ok "provenance reproduces from the merged sources" || no "provenance did not reproduce"
 
 echo
-echo "=== 14. pick_newer_stamp's own unit cases ==="
+echo "=== 14. the swarm's run log unions instead of blocking (the other half of PR #414) ==="
+# source-data/swarm_runs.json had no merger at all, so it fell through to "REAL CONFLICT" and
+# stopped the run — for an append-only audit trail where the two sides disagreed about nothing.
+# Every row is the only record of a run that cannot be replayed, so neither side may be taken whole.
+sw(){ python3 - "$@" <<'PY'
+import json, sys
+runs = [{"started": s, "finished": s, "n_ok": 10, "jobs": 6} for s in sys.argv[1:]]
+doc = {"meta": {"generated_by": "pipeline/pull_swarm.py", "max_runs": 60, "n_runs": len(runs)},
+       "runs": runs}
+with open("source-data/swarm_runs.json", "w", newline="\n") as fh:
+    fh.write(json.dumps(doc, ensure_ascii=False, indent=1, sort_keys=True) + "\n")
+PY
+}
+setup
+sw 2026-08-09T02:57:25Z; python3 pipeline/rederive_drift.py >/dev/null; git add -A; git commit -qm "base runs"
+git checkout -q -B mobile master; sw 2026-08-09T02:57:25Z 2026-08-11T10:28:47Z
+python3 pipeline/rederive_drift.py >/dev/null; git commit -qam mobile
+git checkout -q -B laptop master; sw 2026-08-09T02:57:25Z 2026-08-14T10:36:23Z
+python3 pipeline/rederive_drift.py >/dev/null; git commit -qam laptop
+bash pipeline/resolve_derived_conflicts.sh mobile >/dev/null 2>&1; rc=$?
+[ "$rc" -eq 0 ] && ok "exit 0 (unioned, not escalated to a human)" || no "exit $rc, expected 0"
+GOT=$(python3 -c "import json;print(' '.join(r['started'] for r in json.load(open('source-data/swarm_runs.json'))['runs']))")
+[ "$GOT" = "2026-08-09T02:57:25Z 2026-08-11T10:28:47Z 2026-08-14T10:36:23Z" ] \
+  && ok "kept every run from both sides, ordered by start stamp" \
+  || no "got '$GOT' — a run record was lost"
+python3 pipeline/rederive_drift.py >/dev/null
+git diff --quiet -- platform/data/provenance.json \
+  && ok "provenance reproduces from the unioned run log" || no "provenance did not reproduce"
+
+# ...but a REWRITTEN run — same start stamp, different outcome — is not an append, and must stop.
+setup
+sw 2026-08-09T02:57:25Z; python3 pipeline/rederive_drift.py >/dev/null; git add -A; git commit -qm "base runs"
+bend(){ python3 - "$1" <<'PY'
+import json, sys
+p = "source-data/swarm_runs.json"
+d = json.load(open(p))
+d["runs"][0]["n_ok"] = int(sys.argv[1])
+with open(p, "w", newline="\n") as fh:
+    fh.write(json.dumps(d, ensure_ascii=False, indent=1, sort_keys=True) + "\n")
+PY
+}
+git checkout -q -B mobile master; bend 3; python3 pipeline/rederive_drift.py >/dev/null; git commit -qam mobile
+git checkout -q -B laptop master; bend 7; python3 pipeline/rederive_drift.py >/dev/null; git commit -qam laptop
+BEFORE=$(git rev-parse HEAD)
+bash pipeline/resolve_derived_conflicts.sh mobile >/dev/null 2>&1; rc=$?
+[ "$rc" -eq 2 ] && ok "a rewritten run record still needs a human (exit 2)" || no "exit $rc, expected 2"
+[ "$(git rev-parse HEAD)" = "$BEFORE" ] && ok "branch left untouched" || no "branch was modified"
+
+echo
+echo "=== 15. pick_newer_stamp's own unit cases ==="
 setup
 python3 pipeline/pick_newer_stamp.py --selftest >/dev/null 2>&1 \
   && ok "pick_newer_stamp --selftest (13 cases)" || no "pick_newer_stamp --selftest"
 
 echo
-echo "=== 12. the mergers' own unit cases ==="
+echo "=== 16. the mergers' own unit cases ==="
 python3 pipeline/merge_append_log.py   --selftest >/dev/null 2>&1 && ok "merge_append_log --selftest (13 cases)"   || no "merge_append_log --selftest failed"
-python3 pipeline/merge_feed_history.py --selftest >/dev/null 2>&1 && ok "merge_feed_history --selftest (11 cases)" || no "merge_feed_history --selftest failed"
+python3 pipeline/merge_feed_history.py --selftest >/dev/null 2>&1 && ok "merge_feed_history --selftest (20 cases)" || no "merge_feed_history --selftest failed"
+python3 pipeline/merge_swarm_runs.py   --selftest >/dev/null 2>&1 && ok "merge_swarm_runs --selftest (12 cases)"   || no "merge_swarm_runs --selftest failed"
 
 echo
 echo "==================== $PASS passed, $FAIL failed ===================="

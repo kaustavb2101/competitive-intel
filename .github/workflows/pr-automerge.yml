@@ -306,6 +306,18 @@ jobs:
 
           if gh pr merge "$NUM" --squash --delete-branch; then
             echo "merged #$NUM" >> "$GITHUB_STEP_SUMMARY"
+
+            # The branch is gone but its gate is not. Deleting a branch does NOT cancel the qa.yml
+            # runs already queued against it, and on a single serial self-hosted runner those keep
+            # their place in line and execute in full for a PR that no longer exists. Observed
+            # 2026-08-15: a 40-minute gate for an already-merged branch was holding the executor
+            # while three live PRs waited behind it. Free the box.
+            for R in $(gh run list --workflow qa.yml --branch "$BRANCH" --limit 20 \
+                         --json databaseId,status \
+                         --jq '.[]|select(.status!="completed")|.databaseId'); do
+              gh run cancel "$R" >/dev/null 2>&1 \
+                && echo "cancelled qa run $R (branch $BRANCH is merged and deleted)"
+            done
           else
             echo "::error::#$NUM — merge call failed (branch moved, or a check turned required mid-run)."
             exit 0
