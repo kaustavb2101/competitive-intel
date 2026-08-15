@@ -33,27 +33,45 @@ The proof that it is a real check and not a bypass, measured 2026-08-15 against 
 
 If the fix were a bypass, the first row would have succeeded too.
 
-## The one file here
+## The files here
 
-`sectigo_public_server_auth_ca_dv_r36.pem`
+All three are loaded by `pipeline/lib/ca_bundle.py`, which any puller can use:
+`curl_ca_args()` for curl-based pullers, `ssl_context()` for `urllib`-based ones. Each one verifies
+`OK` against the untouched system store.
 
-- **Subject:** `C=GB, O=Sectigo Limited, CN=Sectigo Public Server Authentication CA DV R36`
-- **Issuer:** `C=GB, O=Sectigo Limited, CN=Sectigo Public Server Authentication Root R46` — a public
-  root present in the standard `ca-certificates` bundle, so `openssl verify` of this file alone
-  returns `OK` against the untouched system store.
-- **Expires:** 2036-03-21 — no near-term renewal cliff.
-- **Needed by:** `pipeline/pull_collateral_census.py` (Union Auction, `--venue auct`).
-- **Fetched from** the AIA URL named by the leaf itself:
-  `http://crt.sectigo.com/SectigoPublicServerAuthenticationCADVR36.crt` (DER → PEM).
+| file | serves | expires |
+| --- | --- | --- |
+| `sectigo_public_server_auth_ca_dv_r36.pem` | `service.auct.co.th` (Union Auction census) | 2036-03-21 |
+| `sectigo_public_server_auth_ca_dv_e36.pem` | `muangthaicap.com` (rival promos) | 2036-03-21 |
+| `globalsign_gcc_r6_alphassl_ca_2025.pem` | `www.sawad.co.th` (rival promos) | **2027-05-21** |
+
+The GlobalSign one is the only near-term renewal to watch. When Sawad rotates its certificate, refetch
+the intermediate from the leaf's AIA URL using the recipe below — the symptom will be the rival promo
+feed going FROZEN again.
+
+Each was fetched from the AIA URL named by the leaf itself:
+
+- `http://crt.sectigo.com/SectigoPublicServerAuthenticationCADVR36.crt`
+- `http://crt.sectigo.com/SectigoPublicServerAuthenticationCADVE36.crt`
+- `http://secure.globalsign.com/cacert/gsgccr6alphasslca2025.crt`
 
 ## What this cost before it was found
 
-`data-collateral-census.yml` runs daily. From roughly 2026-08-10 the Union Auction pull returned
-nothing, because `pull_collateral_census.py` passed `-s` to curl and **never checked curl's exit
-code** — a TLS failure therefore surfaced only as `json.loads` complaining
-`Expecting value: line 1 column 1 (char 0)`, which reads like a bad response body rather than a
-connection that never completed. It was misread as a datacenter geoblock. The puller now reports
-curl's exit status and stderr, so the next occurrence names itself.
+Three separate feeds, all recorded as geoblocks:
+
+- **`data-collateral-census.yml`** (daily) returned nothing from roughly 2026-08-10, because
+  `pull_collateral_census.py` passed `-s` to curl and **never checked curl's exit code**. A TLS
+  failure therefore surfaced only as `json.loads` complaining `Expecting value: line 1 column 1
+  (char 0)` — a message that reads like a bad response body rather than a connection that never
+  completed. The puller now reports curl's exit status and names exit 60 as a chain failure.
+- **The rival promo feed** sat FROZEN for 35 days — `check_feed_liveness.py` reported "4 identical
+  readings 2026-07-19 .. 2026-08-13" for both Sawad and Tidlor — because Sawad and Muangthai were
+  recorded in `data-thai-swarm.yml` as answering `000`, "no HTTP response at all". curl reports
+  `000` for **any** transfer that did not complete, including one our own verification refused.
+
+**The lesson worth keeping:** a geoblock *answers and refuses* (403, like `dataforthai.com`). A
+broken chain never gets far enough to answer. Run `openssl s_client -connect host:443` before
+recording any host as blocked — it distinguishes the two in one command.
 
 ## Adding another certificate here
 

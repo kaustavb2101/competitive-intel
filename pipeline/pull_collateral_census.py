@@ -156,59 +156,9 @@ AUCT_TYPES = {"car": "รถยนต์", "moto": "รถจักรยาน�
 # extension; OpenSSL/curl on Linux do not, so every Linux CI runner fails the handshake with
 # "unable to get local issuer certificate" while the same URL works fine in a browser and from the
 # owner's Windows laptop. That asymmetry is why this was misread as a datacenter geoblock for days.
-# We supply the omitted intermediate instead — see pipeline/certs/README.md for why this is a chain
-# repair and NOT `curl -k`: verification stays on, and the anchor is a root the system already had.
-AUCT_CA_EXTRA = os.path.join(HERE, "certs", "sectigo_public_server_auth_ca_dv_r36.pem")
-_CA_BUNDLE_CACHE = []          # one temp bundle per process, built lazily
-
-
-def _ca_bundle_args():
-    """curl args that trust the system roots PLUS the intermediate auct.co.th forgets to send.
-
-    Returns [] when the extra certificate is missing, so the call still runs (and fails loudly with
-    a real TLS error) rather than the puller dying on a missing repo file.
-    """
-    if _CA_BUNDLE_CACHE:
-        return _CA_BUNDLE_CACHE[0]
-    if not os.path.exists(AUCT_CA_EXTRA):
-        print("  ! %s missing — proceeding with system roots only; expect a TLS chain failure."
-              % os.path.relpath(AUCT_CA_EXTRA, ROOT), file=sys.stderr)
-        _CA_BUNDLE_CACHE.append([])
-        return []
-
-    import ssl
-    import tempfile
-
-    # --cacert REPLACES the trust store rather than adding to it, so concatenate: system roots first,
-    # then the intermediate. Anchoring on the real root (not on the intermediate) keeps the full
-    # signature chain under test.
-    system = ssl.get_default_verify_paths().cafile
-    if not system or not os.path.exists(system):
-        try:
-            import certifi
-            system = certifi.where()
-        except Exception:
-            system = None
-
-    fd, path = tempfile.mkstemp(prefix="auct_ca_", suffix=".pem")
-    with os.fdopen(fd, "wb") as out:
-        if system:
-            with open(system, "rb") as fh:
-                out.write(fh.read())
-                out.write(b"\n")
-        else:
-            # No discoverable system bundle (some Windows setups). Anchoring at the intermediate is
-            # narrower than ideal but is still a genuine signature check, unlike --insecure.
-            print("  ! no system CA bundle found — anchoring on the Sectigo intermediate alone.",
-                  file=sys.stderr)
-        with open(AUCT_CA_EXTRA, "rb") as fh:
-            out.write(fh.read())
-
-    import atexit
-    atexit.register(lambda: os.path.exists(path) and os.unlink(path))
-
-    _CA_BUNDLE_CACHE.append(["--cacert", path])
-    return _CA_BUNDLE_CACHE[0]
+# lib/ca_bundle supplies the omitted intermediate — a chain repair, NOT `curl -k`: verification
+# stays on and the anchor is a root the system already trusted. See pipeline/certs/README.md.
+from lib.ca_bundle import curl_ca_args as _ca_bundle_args   # noqa: E402
 
 # STRICT ALLOWLIST — an allowlist, deliberately, not a denylist. Every record carries
 # Chassis_No, Engine_No, License_Plate_No, Contract_No, Seller_Contract_No (populated 1147/1147 when
