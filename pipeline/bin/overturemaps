@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+"""overturemaps CLI shim — restores release discovery after Overture deleted catalog.json.
+
+WHAT BROKE (measured 2026-08-15)
+--------------------------------
+`overturemaps` 1.0.1 discovers which data releases exist by fetching
+
+    https://stac.overturemaps.org/catalog.json      -> HTTP 404
+
+That document is gone. Every invocation now dies before it does any work:
+
+    Exception: Could not fetch STAC catalog: HTTP Error 404: Not Found
+
+The failure is in a *click callback* (`cli.validate_release`), which runs on EVERY command and calls
+`get_available_releases()` even when you pass an explicit `--release`. So there is no flag that
+avoids it, and pinning an older version does not help either: releases <= 0.20 hardcode
+`release/2025-03-19.0/`, which Overture has since deleted (they keep only the last two monthly
+releases, ~60 days, for GDPR compliance). Old versions point at a dead release; the new one points
+at a dead catalog.
+
+NOTHING ELSE UPSTREAM IS BROKEN — that is the important part:
+
+    https://overturemaps-us-west-2.s3.amazonaws.com/?list-type=2&prefix=release/&delimiter=/
+        -> HTTP 200, lists release/2026-06-17.0/ and release/2026-07-22.0/
+    https://stac.overturemaps.org/2026-07-22.0/collections.parquet
+        -> HTTP 200
+
+Only the top-level discovery document was removed. So this shim answers "which releases exist?" from
+the S3 bucket that still serves them, and hands everything else to the real CLI untouched.
+
+WHY A SHIM RATHER THAN EDITING THE PULLERS
+------------------------------------------
+Six scripts shell out to this CLI by name (pull_overture_places, pull_overture_buildings,
+pull_overture_national, pull_all_provinces, pull_bangkok_full, build_building_tiles). Shadowing the
+executable on PATH fixes all of them at once and leaves every caller's `--cli` / OVERTURE_CLI
+override working. When Overture restores catalog.json this file can simply be deleted from PATH —
+and until then, `_releases_from_s3` falls back to the vendor implementation if the S3 listing ever
+fails, so a restored catalog keeps working without anyone editing this.
+
+USAGE — put this directory first on PATH:
+    export PATH="$(git rev-parse --show-toplevel)/pipeline/bin:$PATH"
+    overturemaps download --bbox=... -f geojsonseq --type=place -o out.geojsonseq
+"""
+import re
+import sys
+import urllib.request
+
+S3_LIST = ("https://overturemaps-us-west-2.s3.amazonaws.com/"
+           "?list-type=2&prefix=release/&delimiter=/&max-keys=1000")
+# Overture releases are date-stamped "YYYY-MM-DD.N". Anchoring on that shape keeps a stray
+# non-release prefix in the bucket from being offered as a data release.
+_RELEASE_RE = re.compile(r"<Prefix>release/(\d{4}-\d{2}-\d{2}\.\d+)/</Prefix>")
+
+
+def _releases_from_s3():
+    """(all_releases, latest) read from the bucket listing — same contract as the vendor function.
+
+    Lexicographic sort is chronological for YYYY-MM-DD.N, so the last element is the newest.
+    """
+    with urllib.request.urlopen(S3_LIST, timeout=30) as resp:
+        xml = resp.read().decode("utf-8", "replace")
+    releases = sorted(set(_RELEASE_RE.findall(xml)))
+    if not releases:
+        raise RuntimeError("no release/YYYY-MM-DD.N prefixes in the Overture S3 listing")
+    return releases, releases[-1]
+
+
+def main():
+    from overturemaps import cli, core
+
+    _vendor_available = core.get_available_releases
+
+    def get_available_releases():
+        try:
+            return _releases_from_s3()
+        except Exception as exc:                      # noqa: BLE001 - any failure is worth falling back on
+            print("overturemaps-shim: S3 release listing failed (%s); trying the vendor STAC path."
+                  % exc, file=sys.stderr)
+            return _vendor_available()
+
+    def get_latest_release():
+        return get_available_releases()[1]
+
+    # Patch BOTH modules: cli.py does `from .core import get_latest_release`, so rebinding only
+    # core.* would leave the click callback still calling the original.
+    for mod in (core, cli):
+        if hasattr(mod, "get_available_releases"):
+            mod.get_available_releases = get_available_releases
+        if hasattr(mod, "get_latest_release"):
+            mod.get_latest_release = get_latest_release
+
+    return cli.cli()
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -52,7 +52,36 @@ jobs:
 
       - name: Deps
         if: env.SKIP != '1'
-        run: pip install --quiet shapely openlocationcode || true
+        # rasterio is NOT optional here, despite build_contested_pop.py treating it as such. A
+        # geocode moves branch coordinates, which invalidates every fingerprint-stamped layer; if
+        # build_contested_pop.py cannot run it leaves contested_pop.json stamped with the OLD
+        # fingerprint and the determinism gate correctly fails the run with "stale layer". Without
+        # this install the job failed at the gate every single time (6/6 since 2026-07-12) and never
+        # reached the step that opens the PR.
+        run: pip install --quiet shapely openlocationcode rasterio || true
+
+      - name: Preflight — can this run actually produce a mergeable PR?
+        if: env.SKIP != '1'
+        # WHY THIS RUNS BEFORE THE GEOCODER, NOT AFTER.
+        # Each geocoder cycle spends up to 100 BILLED Google Places calls. Those calls were being
+        # spent every Monday and then thrown away, because the run could never pass the gate: it
+        # rebuilds every coordinate-dependent layer, and build_occupations.py cannot run in CI at
+        # all. Its input (source-data/overture_places.json, ~54MB) is gitignored, so a fresh
+        # checkout never has it; the builder exits non-zero, branch_occupations.json keeps its old
+        # branches_fingerprint, and the tamper-evident gate fails — correctly, because that layer
+        # really would be describing the wrong branch coordinates.
+        #
+        # The gate is right and must not be relaxed. The honest response is to not spend the money
+        # until the input is available, and to say plainly what is missing.
+        run: |
+          if [ ! -f source-data/overture_places.json ]; then
+            echo "::warning title=geocode skipped::source-data/overture_places.json is absent, so build_occupations.py cannot rebuild branch_occupations.json after a coordinate change. The determinism gate would fail and no PR could open, so the geocoder is NOT being run — this saves up to 100 billed Google Places calls. Restore the input (pipeline/pull_overture_places.py --preset national, then publish it where CI can fetch it) to re-enable this job."
+            # SKIP=1 is what the remaining steps already gate on, so the job ends GREEN with the
+            # warning above rather than red — a run that correctly declines to start is not a failure.
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          else
+            echo "overture_places.json present — every fingerprinted layer is rebuildable."
+          fi
 
       - name: Run gated geocoder cycles (merges accepted patches into the master)
         if: env.SKIP != '1'

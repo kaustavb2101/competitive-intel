@@ -27,6 +27,8 @@ import re
 import sys
 import urllib.request
 
+from lib.ca_bundle import ssl_context
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "source-data", "rival_promos.json")
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -39,8 +41,14 @@ TH_MONTHS = {"มกราคม": 1, "กุมภาพันธ์": 2, "ม�
 
 
 def fetch(url, timeout=30):
+    # context= supplies the intermediates that www.sawad.co.th and muangthaicap.com omit from their
+    # chains. Both were recorded here as "blocked from a foreign IP"; neither is. They send a leaf
+    # with no intermediate, which a browser silently repairs via the leaf's AIA extension and Python
+    # does not — so the pull failed everywhere except a browser, and the rival promo feed sat FROZEN
+    # for 35 days (4 identical readings, 2026-07-19 .. 2026-08-13) while the puller exited 0.
+    # Verification stays fully on; see pipeline/lib/ca_bundle.py.
     req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept-Language": "th,en;q=0.8"})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
+    with urllib.request.urlopen(req, timeout=timeout, context=ssl_context()) as r:
         return r.read().decode("utf-8", "replace")
 
 
