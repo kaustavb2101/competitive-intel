@@ -3,6 +3,52 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-15 — Integration loop (service/deploy-health, obj #1): the four surfaced-but-unprobed AGRI CROP reads — crop_mix (#overview farm-income), crop_landuse + crop_farmer_income + province_cropland (province deep-dive) — now have deploy probes; all four were silent-deploy blind spots the crop_stress/branch_cropland probes left uncovered
+
+- **Why this, this run.** The high-value INTEGRATION backlog is exhausted here: items #1 (FPO PICO
+  competitor registry → `pico_census`/`pico_district`/`branch_pico`), #2 (per-branch `branch_cropland`),
+  and #3 (data.go.th DBD/DIW/MOT distillation → `dbd_formation`/`vehicle_*`/`collateral_census`) are all
+  SHIPPED and wired into `app.js`/`province.html` (verified by grep this run); item #4 (GISTDA 40m
+  `check-crop` per-branch pull) is **blocked** — `GISTDA_SPHERE_KEY` is unset in this CI env, so it was
+  skipped, not faked (as instructed). That left item #5 — the concrete unblocked next step, which the
+  last two log entries named explicitly: the fetched-but-unprobed **agri crop** reads (obj #1 farm-income
+  risk). This is the same deploy-probe safeguard pattern the prior runs applied to the competitor-census
+  and borrower-voice reads, now extended to the last uncovered obj-#1 agri surfaces.
+- **The gap fixed (`agri-crop-reads-unprobed-deploy-blind-spot`).** `platform/data/crop_mix.json` (obj #1
+  — the farm-income correction weighting all 8 priced crops by province area; `renderMacroSoWhat` +
+  the CROP MIX→FARM INCOME geo-drill on the default `#overview` route), plus three province deep-dive
+  (`province.html`) reads — `crop_landuse.json` (SPAM-2010 ESTIMATED district Crops lens), `crop_farmer_income.json`
+  (MEASURED gross+net per-person farm income by crop), and `province_cropland.json` (MEASURED DOAE-2568
+  planted-area magnitude line) — are each live-`fetch()`'d and null-guarded, so a truncated/empty/404 CDN
+  deploy of any of them SILENTLY drops its read (the `#overview` crop-mix so-what row + farm-income drill;
+  the province Crops lens; the province farmer-income drill; the province measured-area line) with **NO
+  phone alert**. They were the last surfaced obj-#1 agri reads with no deploy probe — `crop_stress`,
+  `branch_cropland` and `amphoe_crops` were already covered.
+- **The fix.** Added four render-CONTRACT validators to `pipeline/check_site_health.py`
+  (`_shape_crop_mix`/`_shape_crop_landuse`/`_shape_crop_farmer_income`/`_shape_province_cropland`) and
+  registered all four in `DATA_FILES`. Each asserts the render **contract** — shape not values, robust to
+  a future farm-gate/DOAE/SPAM vintage refresh moving the numbers: `crop_mix` → `.national` with numeric
+  `book_weighted_shock_pct` + non-empty `worst[]` and a Thai-keyed `.provinces` map whose rows carry the
+  numeric `shock_pct` the drill sorts on; `crop_landuse` → a ~928-row `.amphoe` list with the `name_en`
+  join key + `province_th` filter key + `dominant_crop` colour key; `crop_farmer_income` → non-empty
+  `.crops` with the label + numeric `price_thb_per_kg` + per-province `.provinces` rows; `province_cropland`
+  → a slug-keyed `.provinces` map whose rows carry the numeric `total_ha` the line gates on. One file,
+  +~150 lines, zero deletions.
+- **Verified.** Unit-tested all four (4 real committed payloads ACCEPTED; 13 broken shapes — non-dict,
+  missing/empty `national`/`worst`/`crops`/`provinces`, truncated amphoe list, missing join/colour key,
+  non-numeric `shock_pct`/`price_thb_per_kg`/`total_ha`, missing `meta.crops` — all correctly REJECTED).
+  `check_site_health.py --local platform` → **HEALTHY 263/263** (was 251, +12 = 4 files × fetch/parse/shape),
+  exit 0. No `platform/data` file, builder or provenance changed (probe-only) → no rebuild / `build_provenance`
+  needed. `bash tests/run.sh check` → **134 passed · 0 failed** (data integrity 455/455; its deploy-probe
+  self-test now also accepts these four payloads). Test-infra only, no app behaviour/visual change →
+  safeguard-gated direct commit, no PR/headless render needed.
+- **Next recommended.** The surfaced obj-#1 agri crop reads are now all probed. Remaining lower-value
+  province-route probe gaps: `occupation_income_individual` + `nso_wage_anchor` (province occupation panel).
+  The genuinely-open DATA items still need an owner-side/Thai-IP window: the GISTDA `check-crop` 40m
+  per-branch crop pull (needs the `GISTDA_SPHERE_KEY` secret wired into a CI job or a Thai-IP run — this
+  would supersede the SPAM baseline in `build_branch_cropland.py` with 40m measured values), and committing
+  the BAAC/SME-bank raw CSVs to unblock the formal-credit penetration layer.
+
 ## 2026-08-14 — Intelligence loop (service/deploy-health, obj #2): the two borrower-VOICE reads on Competition (`#acq`) — the Pantip panel + the say/hear gap board — now have deploy probes; both were unprobed silent-deploy blind spots that cannot self-heal
 
 - **The gap fixed (`pantip-social-themes-unprobed-deploy-blind-spot`).** After confirming the live master
