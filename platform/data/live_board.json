@@ -268,7 +268,7 @@
    "stamp_iso": "2026-08-15",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4433,
+   "value": 4438,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -291,8 +291,8 @@
    "stamp": "2026-08-15",
    "stamp_iso": "2026-08-15",
    "stamp_kind": "pulled",
-   "unit": "of 796",
-   "value": 124,
+   "unit": "of 797",
+   "value": 125,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
