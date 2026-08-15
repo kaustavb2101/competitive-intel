@@ -519,6 +519,13 @@ def build():
             "n_creatives": (b or {}).get("n_creatives", 0),
             "n_ads_recent": sum(1 for a in ads if a["key"] == key),
             "n_ads_pricing": sum(1 for a in ads if a["key"] == key and a["pricing"]),
+            # HOW MUCH OF THIS OPERATOR WE CAN ACTUALLY READ. Google exposes a creative's
+            # copy only intermittently — the payload is present on some pulls and absent on
+            # others, so coverage accumulates run over run and a newly-tracked operator starts
+            # near zero. Without this number, "Turbo: 0 pricing ads" reads as "Turbo does not
+            # compete on price" when it actually means "we have read 6% of Turbo's ads".
+            "copy_coverage_pct": (b or {}).get("copy_coverage_pct"),
+            "n_with_copy": (b or {}).get("n_with_copy", 0),
             "state": state,
             "why": (excluded.get(key) or {}).get("why") if state == "excluded" else None,
         })
@@ -575,6 +582,13 @@ def build():
                         "keyword themes."
                         % (RECENT_DAYS, MIN_OCR_ADS),
             "tier_coverage": tier_cov,
+            "read_note": "An operator's ad VOLUME is measured on the first pull, but its ad "
+                         "COPY is not: Google returns a creative's readable payload only "
+                         "intermittently, so copy coverage accumulates across pulls and a "
+                         "newly-pinned operator starts near zero. Read copy_coverage_pct "
+                         "before reading n_ads_pricing — a low pricing count on a "
+                         "poorly-read operator is OUR blind spot, not evidence that it does "
+                         "not compete on price.",
             "coverage_note": "Only operators that actually advertise on Google appear here. "
                              "Silent operators are listed in no_account_found and are NOT "
                              "evidence of no advertising — they may run Facebook or LINE, "

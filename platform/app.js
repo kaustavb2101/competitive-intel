@@ -3898,8 +3898,15 @@ function drawAdsCoverage(){
       // materially different from never having advertised, and a competitive signal in itself.
       const quiet=c.state==='advertising'&&!c.n_ads_recent;
       if(quiet){ lbl='has an account but ran nothing in the window'; col='var(--gold)'; }
+      // Google hands back a creative's copy only intermittently, so a newly-pinned operator's
+      // read rate starts near zero and climbs run over run. Say so ON the chip: otherwise
+      // "0 pricing ads" reads as a finding about the rival instead of a limit on us.
+      const cov=c.copy_coverage_pct;
+      const unread=c.state==='advertising'&&!quiet&&cov!=null&&cov<50;
+      if(unread){ lbl='we have read only '+cov+'% of its ad copy so far — its pricing is not yet visible to us'; col='var(--gold)'; }
       const n=c.n_ads_pricing?` <span class="mono">${c.n_ads_pricing}</span>`
-             :quiet?' <span class="sub" style="font-size:10px">quiet</span>':'';
+             :quiet?' <span class="sub" style="font-size:10px">quiet</span>'
+             :unread?` <span class="sub mono" style="font-size:10px">${cov}% read</span>`:'';
       return `<span class="chip" style="cursor:default;border-color:${col};color:${c.state==='advertising'?'var(--hi)':'var(--mid)'}" title="${lbl}${c.why?' — '+c.why.replace(/"/g,''):''}">${c.brand}${n}</span>`;
     }).join(' ');
     return `<div style="margin:4px 0"><div class="sub mono" style="font-size:11px">${ADF_TIER[t]||t} — ${tc[t].advertising} of ${tc[t].n} advertise on Google</div>
@@ -3908,7 +3915,7 @@ function drawAdsCoverage(){
   box.innerHTML=`<details style="margin:6px 0"><summary style="cursor:pointer" class="sub">
       <b>Coverage — who is in this table, and who is dark.</b> ${cov.filter(c=>c.state==='advertising').length} of ${cov.length} tracked operators advertise on Google; the number on each chip is its pricing ads.</summary>
     ${rows}
-    <p class="sub" style="font-size:11px">A grey operator was <b>searched and has no Thai Google advertiser account</b> — a measured absence of paid Google presence, not a gap in the pull. It is <b>not</b> evidence they run no advertising: Facebook's ad library rejects the credit category for Thailand, so Meta and LINE cannot be read at all (pipeline/spike_meta_ads.py). Gold = an account exists but review found it is not this lender's title-loan marketing.</p></details>`;
+    <p class="sub" style="font-size:11px">A grey operator was <b>searched and has no Thai Google advertiser account</b> — a measured absence of paid Google presence, not a gap in the pull. It is <b>not</b> evidence they run no advertising: Facebook's ad library rejects the credit category for Thailand, so Meta and LINE cannot be read at all (pipeline/spike_meta_ads.py). Gold = either an account that review found is not this lender's title-loan marketing, or an operator whose copy we have <b>read too little of to judge</b> — Google returns a creative's text only intermittently, so a newly-tracked rival starts near 0% read and fills in over successive daily pulls. Read the % before reading the pricing count.</p></details>`;
 }
 function drawAdsFeed(){
   const box=$('#pulseadsfeed'); if(!box) return;

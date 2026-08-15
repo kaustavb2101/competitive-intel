@@ -408,19 +408,19 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 
 <div id="ctl">
   <div class="grp">
-    <div class="glab">Basemap</div>
-    <div class="seg">
-      <button data-b="light">Light</button>
-      <button data-b="voyager">Streets</button>
-      <button data-b="dark" class="on">Dark</button>
+    <div class="glab" id="baseLbl">Basemap</div>
+    <div class="seg" role="group" aria-labelledby="baseLbl">
+      <button data-b="light" aria-pressed="false">Light</button>
+      <button data-b="voyager" aria-pressed="false">Streets</button>
+      <button data-b="dark" class="on" aria-pressed="true">Dark</button>
     </div>
   </div>
   <div class="grp">
     <div class="glab">Layers</div>
     <div class="acts">
-      <button id="ringtog" class="on">10 km reach rings</button>
-      <button id="croptog" title="Colour districts by dominant crop (SPAM 2010 — estimated, model-allocated crop areas)">Crops ◇ est</button>
-      <button id="orbittog" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
+      <button id="ringtog" class="on" aria-pressed="true">10 km reach rings</button>
+      <button id="croptog" aria-pressed="false" title="Colour districts by dominant crop (SPAM 2010 — estimated, model-allocated crop areas)">Crops ◇ est</button>
+      <button id="orbittog" aria-pressed="false" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
     </div>
   </div>
 </div>
@@ -446,10 +446,10 @@ html[data-theme="light"] .lg.on b{color:#11151F}
   <button class="xbtn" data-x="right">✕</button>
   <div class="cardttl"><div class="a" id="provTitle">Province</div><div class="b" id="provSub">—</div></div>
   <div class="subtabs">
-    <button class="stb on" data-v="impacts">What moves incomes</button>
-    <button class="stb" data-v="districts">Districts</button>
-    <button class="stb" data-v="near">Nearest</button>
-    <button class="stb" data-v="comp">Competitors</button>
+    <button class="stb on" data-v="impacts" aria-pressed="true">What moves incomes</button>
+    <button class="stb" data-v="districts" aria-pressed="false">Districts</button>
+    <button class="stb" data-v="near" aria-pressed="false">Nearest</button>
+    <button class="stb" data-v="comp" aria-pressed="false">Competitors</button>
   </div>
   <div class="scroll">
     <div class="view on" id="v-impacts"></div>
@@ -596,7 +596,7 @@ const INTRO=Object.assign({},FRAMED,{zoom:Math.max(5.5,(FRAMED.zoom||8)-1.6),pit
 let VIEW=Object.assign({},INTRO);
 let orbitOn=false, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0, SOFT_GL=false;  // default OFF: calmer first paint + no view-dependent shimmer (toggle re-enables)
 const ORBIT_DPS=2.4;                 // degrees / second — gentle (~2-3 dps target)
-function setOrbitUI(on){const t=document.getElementById('orbittog'); if(t)t.classList.toggle('on',on);}
+function setOrbitUI(on){const t=document.getElementById('orbittog'); if(t){t.classList.toggle('on',on);t.setAttribute('aria-pressed',String(on));}}
 function userInteract(){ orbitPausedByUser=true; setOrbitUI(false); }
 let _programmatic=false;             // guards our own setProps from being mistaken for user input
 function pushView(extra){ _programmatic=true;
@@ -1197,17 +1197,17 @@ function buildLegend(){
   if(!POI_TYPES.length){host.innerHTML='<span class="lgttl" style="margin:0">No mapped POI layers for this province</span>';return;}
   host.innerHTML=POI_TYPES.map(t=>{
     const c=POI_COLORS[t], n=(POIS[t]||[]).length;
-    return `<button class="lg ${poiOn[t]?'on':''}" data-t="${t}">
+    return `<button class="lg ${poiOn[t]?'on':''}" data-t="${t}" aria-pressed="${poiOn[t]?'true':'false'}">
       <span class="sw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>${POI_LABEL[t]||t}<b>${n}</b></button>`;
   }).join('');
   host.querySelectorAll('.lg').forEach(el=>el.onclick=()=>{
-    const t=el.dataset.t; poiOn[t]=!poiOn[t]; el.classList.toggle('on',poiOn[t]); render();});
+    const t=el.dataset.t; poiOn[t]=!poiOn[t]; el.classList.toggle('on',poiOn[t]); el.setAttribute('aria-pressed',String(poiOn[t])); render();});
 }
 
 /* controls */
 document.querySelectorAll('#ctl [data-b]').forEach(b=>b.onclick=()=>{
-  basemap=b.dataset.b;document.querySelectorAll('#ctl [data-b]').forEach(x=>x.classList.toggle('on',x===b));render();});
-document.getElementById('ringtog').onclick=function(){showRings=!showRings;this.classList.toggle('on',showRings);render();};
+  basemap=b.dataset.b;document.querySelectorAll('#ctl [data-b]').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-pressed',String(x===b));});render();});
+document.getElementById('ringtog').onclick=function(){showRings=!showRings;this.classList.toggle('on',showRings);this.setAttribute('aria-pressed',String(showRings));render();};
 // Crops lens: colour districts categorically by dominant crop (SPAM 2010, ESTIMATED). Self-disables
 // when this province has no crop_landuse rows (file absent, or SPAM had no cells inside its amphoe).
 function renderCropLegend(){
@@ -1235,11 +1235,11 @@ function measuredCropSpan(){
 }
 (function(){var ct=document.getElementById('croptog');if(!ct)return;
   if(!hasCrop){ct.disabled=true;ct.style.opacity='.45';ct.style.cursor='not-allowed';ct.title='No crop data (SPAM) for this province';return;}
-  ct.onclick=function(){cropLens=!cropLens;this.classList.toggle('on',cropLens);renderCropLegend();render();};})();
+  ct.onclick=function(){cropLens=!cropLens;this.classList.toggle('on',cropLens);this.setAttribute('aria-pressed',String(cropLens));renderCropLegend();render();};})();
 // Orbit toggle: master on/off. Turning it ON clears any "paused by user" state so the scene resumes
 // breathing; turning it OFF parks the camera where it sits.
 (function(){var ot=document.getElementById('orbittog');if(!ot)return;
-  ot.onclick=function(){orbitOn=!orbitOn; if(orbitOn)orbitPausedByUser=false; this.classList.toggle('on',orbitOn); lastT=0;};})();
+  ot.onclick=function(){orbitOn=!orbitOn; if(orbitOn)orbitPausedByUser=false; this.classList.toggle('on',orbitOn); this.setAttribute('aria-pressed',String(orbitOn)); lastT=0;};})();
 // Mobile bottom-sheet toggles: Branch reach (#left) / Province (#right) / Layers (#ctl). Opening any
 // one closes the other two so a single overlay shows at a time and the map stays usable full-screen.
 (function(){
@@ -1252,7 +1252,7 @@ function measuredCropSpan(){
 })();
 document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.x).classList.remove('show'));
 document.querySelectorAll('.stb').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('.stb').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.stb').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-pressed',String(x===b));});
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.v));});
 // collapsible POI legend rail — tap the header to fold it away so it never occludes the scene
 (function(){const wrap=document.getElementById('legendwrap'),head=document.getElementById('lghead');
