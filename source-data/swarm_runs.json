@@ -3,7 +3,7 @@
   "generated_by": "pipeline/pull_swarm.py",
   "label": "Each row is one swarm run: which feeds were pulled concurrently, whether each one succeeded / changed its declared output file / failed / timed out / was skipped (exit 3, the repo-wide SKIP convention), plus the rc of the append_history.py and rederive_drift.py steps that followed. This file makes the pulse observable.",
   "max_runs": 60,
-  "n_runs": 8,
+  "n_runs": 9,
   "title": "pull_swarm.py run history -- the swarm's own audit trail"
  },
  "runs": [
@@ -694,6 +694,45 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-08-14T21:51:59Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7109,
+     "bytes_before": 7111,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 3.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8917,
+     "bytes_before": 8914,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 4.3,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 3989,
+     "bytes_before": 3989,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 118.2,
+     "status": "ok"
+    }
+   ],
+   "finished": "2026-08-15T04:08:27Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 2,
+   "n_failed": 0,
+   "n_ok": 3,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-08-15T04:06:29Z"
   }
  ]
 }
