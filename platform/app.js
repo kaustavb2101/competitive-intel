@@ -3808,6 +3808,7 @@ function drawRivalAds(){
           </tr>`).join('')+`</table></details>`;
     }).join('')||'<p class="lead sub">No ad copy captured yet — run the pull without --no-text (and with --ocr to read image banners).</p>';
   }
+  drawAdsFeed();
   if(ro){
     const top=brands[0], us=brands.find(b=>b.is_us);
     const pushers=brands.filter(b=>(b.n_new_30d||0)>0)
@@ -3823,6 +3824,18 @@ function drawRivalAds(){
     let rateLine='';
     if(perMo.length) rateLine+=` Cheapest monthly quote in market copy: <b>${perMo[0].brand} at ${perMo[0].value}%/mo</b>.`;
     if(perYr.length) rateLine+=` Cheapest annual quote: <b>${perYr[0].brand} at ${perYr[0].value}%/yr</b>.`;
+    // Who is actually competing on PRICE, split bank vs non-bank — the exec framing of this tab.
+    const ads=Array.isArray(RIVADS.ads)?RIVADS.ads:[];
+    const pr=ads.filter(a=>a.pricing);
+    if(pr.length){
+      const byTier=t=>new Set(pr.filter(a=>a.tier===t).map(a=>a.brand));
+      const nb=byTier('nonbank'), bk=byTier('bank');
+      const part=[];
+      if(nb.size) part.push(`<b>${icN(pr.filter(a=>a.tier==='nonbank').length)}</b> from non-banks (${Array.from(nb).join(', ')})`);
+      if(bk.size) part.push(`<b>${icN(pr.filter(a=>a.tier==='bank').length)}</b> from bank-backed lenders (${Array.from(bk).join(', ')})`);
+      rateLine+=` <b>${icN(pr.length)} of the ${icN(ads.length)} creatives running in the last ${m.recent_days||90} days compete on price</b>`+
+                (part.length?` — ${part.join(' and ')}`:'')+`.`;
+    }
     ro.innerHTML=lead+rateLine+` <span class="sub">${icN(live)} of ${icN(tot)} tracked creatives are live as of ${m.pulled||'the last pull'}.</span>`;
   }
   if(note){
@@ -3835,6 +3848,177 @@ function drawRivalAds(){
   // boot, so the boot-time wrapTables() never reached them — an unwrapped wide table can push
   // the #acq page sideways on mobile. Re-run the idempotent wrapper (matches drawRivalPulse).
   wrapTables();
+}
+
+/* ---------- the per-ad feed: every recent creative, its rate and its conditions ----------
+   The rollup above answers "how hard is Tidlor pushing". This answers the question an exec
+   actually asks — show me the ads, what they charge, and on what terms. It opens filtered to
+   PRICING ads because the decision it feeds is how we price against the field.
+
+   It states its own coverage in the same view, deliberately. Only 5 of the 18 tracked operators
+   advertise on Google at all; the rest were searched and have no Thai advertiser account, and
+   Facebook publishes no Thai credit ads to read (Meta rejects the credit slice for TH — see
+   pipeline/spike_meta_ads.py). Without that line "every recent ad" would be read as "the whole
+   field", which is not what we measured. */
+const ADF={brand:'',theme:'',tier:'',pricing:true,q:'',n:60};
+const ADF_TIER={nonbank:'Non-bank',bank:'Bank-backed',broker:'Broker',us:'Us'};
+const ADF_PAGE=60;
+// Rates keep the basis the ad stated. %/mo and %/yr are never converted into one another here
+// (1.25%/month is not 1.25%/year), so each figure is printed with the basis its own copy gave.
+function adfRateCell(a){
+  const rates=a.rates||[];
+  if(rates.length){
+    // A line like "ดอกเบี้ย 10% ต่อปี" can also yield the bare figure with no basis attached;
+    // printing both would show one rate twice, so a stated basis wins where one exists.
+    const stated=rates.filter(r=>r.basis!=='unstated');
+    const unit={month:'<span class="sub">/mo</span>',year:'<span class="sub">/yr</span>',
+                unstated:'<span class="sub" title="the copy gives a percentage but no per-month or per-year basis, and we do not assume one">basis n/s</span>'};
+    return (stated.length?stated:rates).slice(0,4)
+      .map(r=>`<b class="mono">${r.value}%</b>${unit[r.basis]||''}`).join('<br>');
+  }
+  if(a.n_rates_dropped)
+    return '<span class="sub" style="color:var(--gold)" title="this ad DID quote a rate, but only an OCR read of the image produced it and the figure never recurred across the brand&#39;s creatives — printing it could be wrong by a digit">quoted · unreadable</span>';
+  return '<span class="sub">—</span>';
+}
+// Who is in this view and who is dark — per tier, because the ask was bank AND non-bank.
+function drawAdsCoverage(){
+  const box=$('#pulseadscov'); if(!box) return;
+  const cov=(RIVADS&&Array.isArray(RIVADS.coverage))?RIVADS.coverage:[];
+  const m=(RIVADS&&RIVADS.meta)||{}, tc=m.tier_coverage||{};
+  if(!cov.length){ box.innerHTML=''; return; }
+  const state={advertising:['runs Google ads','var(--merch)'],
+               silent:['no Google ad account','var(--dim)'],
+               excluded:['account exists, not this product','var(--gold)'],
+               untracked:['not searched yet','var(--gold)']};
+  const rows=['nonbank','bank','broker','us'].filter(t=>tc[t]).map(t=>{
+    const ops=cov.filter(c=>c.tier===t);
+    const chips=ops.map(c=>{
+      let [lbl,col]=state[c.state]||['—','var(--dim)'];
+      // An operator with a pinned account but nothing running in the window has GONE QUIET —
+      // materially different from never having advertised, and a competitive signal in itself.
+      const quiet=c.state==='advertising'&&!c.n_ads_recent;
+      if(quiet){ lbl='has an account but ran nothing in the window'; col='var(--gold)'; }
+      const n=c.n_ads_pricing?` <span class="mono">${c.n_ads_pricing}</span>`
+             :quiet?' <span class="sub" style="font-size:10px">quiet</span>':'';
+      return `<span class="chip" style="cursor:default;border-color:${col};color:${c.state==='advertising'?'var(--hi)':'var(--mid)'}" title="${lbl}${c.why?' — '+c.why.replace(/"/g,''):''}">${c.brand}${n}</span>`;
+    }).join(' ');
+    return `<div style="margin:4px 0"><div class="sub mono" style="font-size:11px">${ADF_TIER[t]||t} — ${tc[t].advertising} of ${tc[t].n} advertise on Google</div>
+      <div class="chips" style="margin:3px 0">${chips}</div></div>`;
+  }).join('');
+  box.innerHTML=`<details style="margin:6px 0"><summary style="cursor:pointer" class="sub">
+      <b>Coverage — who is in this table, and who is dark.</b> ${cov.filter(c=>c.state==='advertising').length} of ${cov.length} tracked operators advertise on Google; the number on each chip is its pricing ads.</summary>
+    ${rows}
+    <p class="sub" style="font-size:11px">A grey operator was <b>searched and has no Thai Google advertiser account</b> — a measured absence of paid Google presence, not a gap in the pull. It is <b>not</b> evidence they run no advertising: Facebook's ad library rejects the credit category for Thailand, so Meta and LINE cannot be read at all (pipeline/spike_meta_ads.py). Gold = an account exists but review found it is not this lender's title-loan marketing.</p></details>`;
+}
+function drawAdsFeed(){
+  const box=$('#pulseadsfeed'); if(!box) return;
+  const all=(RIVADS&&Array.isArray(RIVADS.ads))?RIVADS.ads:[];
+  const m=(RIVADS&&RIVADS.meta)||{}, lab=m.theme_label||{};
+  const cnt=$('#pulseadsfeedcount'), ctl=$('#pulseadsfeedctl'), qbox=$('#pulseadsq');
+  drawAdsCoverage();
+  if(!all.length){
+    box.innerHTML='<p class="lead sub">No creative was still running in the last '+(m.recent_days||90)+' days — run pipeline/pull_google_ads.py, then build_google_ads.py.</p>';
+    if(ctl) ctl.innerHTML=''; if(cnt) cnt.textContent=''; if(qbox) qbox.style.display='none';
+    return;
+  }
+  if(qbox) qbox.style.display='';
+  // --- controls, built once from the data actually present -------------------------------
+  if(ctl&&!ctl.dataset.init){
+    const brands=[];
+    all.forEach(a=>{ if(!brands.some(b=>b.key===a.key)) brands.push({key:a.key,brand:a.brand,tier:a.tier}); });
+    const themes=[];
+    all.forEach(a=>(a.themes||[]).forEach(t=>{ if(themes.indexOf(t)<0) themes.push(t); }));
+    themes.sort((x,y)=>(lab[x]||x).localeCompare(lab[y]||y));
+    const tiers=['nonbank','bank'].filter(t=>brands.some(b=>b.tier===t));
+    ctl.innerHTML=
+      `<button class="chip${ADF.pricing?' on':''}" data-k="pricing" aria-pressed="${ADF.pricing}" title="ads that compete on cost: a rate, a rate we refused to transcribe, or copy about instalment size, fees or credit limit">💰 Rate &amp; pricing only</button>`+
+      `<span class="sub" style="margin:0 2px">·</span>`+
+      `<button class="chip on" data-k="tier" data-v="" aria-pressed="true">All operators</button>`+
+      tiers.map(t=>`<button class="chip" data-k="tier" data-v="${t}" aria-pressed="false">${ADF_TIER[t]}</button>`).join('')+
+      `<select class="chip" id="pulseadsbrand" aria-label="Filter by operator" style="font-family:inherit"><option value="">Every operator</option>`+
+        brands.map(b=>`<option value="${b.key}">${b.brand}</option>`).join('')+`</select>`+
+      `<select class="chip" id="pulseadstheme" aria-label="Filter by condition" style="font-family:inherit"><option value="">Any condition</option>`+
+        themes.map(t=>`<option value="${t}">${lab[t]||t}</option>`).join('')+`</select>`+
+      `<button class="chip" id="pulseadscsv" title="download the filtered rows as CSV">⬇ CSV</button>`;
+    ctl.onclick=e=>{
+      const b=e.target.closest('.chip'); if(!b||!b.dataset.k) return;
+      if(b.dataset.k==='pricing'){ ADF.pricing=!ADF.pricing; }
+      else if(b.dataset.k==='tier'){ ADF.tier=b.dataset.v; ADF.brand=''; const s=$('#pulseadsbrand'); if(s) s.value=''; }
+      ADF.n=ADF_PAGE; drawAdsFeed();
+    };
+    $('#pulseadsbrand').onchange=e=>{ADF.brand=e.target.value; ADF.n=ADF_PAGE; drawAdsFeed();};
+    $('#pulseadstheme').onchange=e=>{ADF.theme=e.target.value; ADF.n=ADF_PAGE; drawAdsFeed();};
+    $('#pulseadscsv').onclick=adsFeedCSV;
+    if(qbox) qbox.addEventListener('input',()=>{ADF.q=qbox.value.trim().toLowerCase(); ADF.n=ADF_PAGE; drawAdsFeed();});
+    ctl.dataset.init='1';
+  }
+  if(ctl){
+    ctl.querySelectorAll('.chip[data-k="pricing"]').forEach(c=>{c.classList.toggle('on',ADF.pricing);c.setAttribute('aria-pressed',String(ADF.pricing));});
+    ctl.querySelectorAll('.chip[data-k="tier"]').forEach(c=>{const on=c.dataset.v===ADF.tier;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));});
+  }
+  const rows=adsFeedRows();
+  if(cnt) cnt.textContent=`${icN(rows.length)} ad${rows.length===1?'':'s'}`;
+  if(!rows.length){
+    box.innerHTML='<p class="lead sub">Nothing matches that filter. '+
+      (ADF.pricing?'Try turning off <b>Rate &amp; pricing only</b> — most creatives sell speed or convenience, not price.':'Clear the search or the operator filter.')+'</p>';
+    return;
+  }
+  const shown=rows.slice(0,ADF.n);
+  box.innerHTML=`<table class="tbl"><tr>
+      <th scope="col">Last shown</th><th scope="col">Operator</th>
+      <th scope="col" title="the rate this individual ad advertises, in the basis its own copy states">Rate</th>
+      <th scope="col" title="ESTIMATED — the collateral and propositions this ad's copy attaches, read by keyword">Conditions</th>
+      <th scope="col">What the ad says</th>
+      <th scope="col" title="how long this creative has been running, first shown → last shown">Run</th>
+      <th scope="col">Source</th></tr>`+
+    shown.map(a=>{
+      const conds=(a.themes||[]).map(t=>`<span class="chip" style="cursor:default;padding:2px 7px;font-size:10.5px">${lab[t]||t}</span>`).join(' ')||'<span class="sub">—</span>';
+      const tier=a.tier?`<div class="sub" style="font-size:10.5px">${ADF_TIER[a.tier]||a.tier}</div>`:'';
+      // OCR text visibly mangles Thai, so it is shown but never presented as a verbatim quote.
+      const ocr=a.src==='ocr';
+      const copy=(a.copy||'').replace(/[<>]/g,'')||'<span class="sub">no readable copy — image creative we could not transcribe</span>';
+      return `<tr${a.is_us?' style="background:rgba(230,180,80,.05)"':''}>
+        <td class="mono sub">${a.last||'—'}</td>
+        <td><b>${a.brand}</b>${tier}</td>
+        <td class="mono">${adfRateCell(a)}</td>
+        <td>${conds}</td>
+        <td style="font-size:12px;max-width:520px${ocr?';color:var(--mid)':''}">${copy}${a.copy_truncated?'<span class="sub"> …</span>':''}</td>
+        <td class="mono sub">${a.days!=null?a.days+'d':'—'}</td>
+        <td class="sub mono" style="font-size:11px">${ocr?'<span style="color:var(--gold)">OCR · est.</span>':'render · measured'}</td>
+      </tr>`;}).join('')+`</table>`;
+  if(rows.length>shown.length){
+    box.innerHTML+=`<button class="chip" id="pulseadsmore" style="margin-top:6px">Show ${icN(Math.min(ADF_PAGE,rows.length-shown.length))} more of ${icN(rows.length)}</button>`;
+    $('#pulseadsmore').onclick=()=>{ADF.n+=ADF_PAGE; drawAdsFeed();};
+  }
+  wrapTables();
+}
+function adsFeedRows(){
+  const all=(RIVADS&&Array.isArray(RIVADS.ads))?RIVADS.ads:[];
+  return all.filter(a=>
+    (!ADF.pricing||a.pricing) &&
+    (!ADF.tier||a.tier===ADF.tier) &&
+    (!ADF.brand||a.key===ADF.brand) &&
+    (!ADF.theme||(a.themes||[]).indexOf(ADF.theme)>=0) &&
+    (!ADF.q||((a.copy||'')+' '+(a.brand||'')+' '+(a.name_th||'')).toLowerCase().indexOf(ADF.q)>=0));
+}
+// CSV of exactly what is on screen — the format the deck actually gets built from.
+function adsFeedCSV(){
+  const lab=((RIVADS&&RIVADS.meta)||{}).theme_label||{};
+  const hdr=['last_shown','first_shown','operator','tier','rate_measured_or_ocr_trusted','rate_basis',
+             'rate_quoted_but_unreadable','pricing_ad','conditions_est','ad_copy','run_days',
+             'copy_source','ad_id'];
+  const lines=[hdr.join(',')].concat(adsFeedRows().map(a=>{
+    const r=(a.rates||[])[0]||{};
+    return [a.last||'',a.first||'',a.brand||'',a.tier||'',
+            r.value!=null?r.value:'',r.basis||'',a.n_rates_dropped?'yes':'',
+            a.pricing?'yes':'',(a.themes||[]).map(t=>lab[t]||t).join('; '),
+            a.copy||'',a.days!=null?a.days:'',a.src||'',a.id||'']
+      .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
+  // BOM or Excel reads the Thai copy as mojibake — this file exists to be opened in Excel.
+  const blob=new Blob(['\ufeff',lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='autox_rival_ads_'+(((RIVADS&&RIVADS.meta)||{}).pulled||'latest')+'.csv';
+  a.click(); URL.revokeObjectURL(a.href);
 }
 
 /* ---------- rival VIDEO pulse · YouTube Data API v3 (obj #2, MEASURED) ----------
