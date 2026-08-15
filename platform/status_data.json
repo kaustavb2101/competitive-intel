@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-15T16:24:19+00:00",
-    "commit": "6e7ed47"
+    "generated_at": "2026-08-16T05:37:39+07:00",
+    "commit": "0c65825"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-15",
+    "eta_date": "2026-08-16",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,96 @@
   ],
   "activity": [
     {
+      "date": "2026-08-16T05:37:39+07:00",
+      "sha": "0c65825",
+      "summary": "peer(#acq): flag >100% coverage as census≥cited, not \"share located\" (#436)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-15T22:23:59+00:00",
+      "sha": "2128116",
+      "summary": "data(census): refresh the Union Auction forward book (run 31893411869) (#427)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T21:58:54+00:00",
+      "sha": "fb7a092",
+      "summary": "data: Thai-IP-only swarm refresh (run 31904306759) (#433)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T21:44:01+00:00",
+      "sha": "a07ae31",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-15, run 31910049466)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T21:23:54+00:00",
+      "sha": "333b24b",
+      "summary": "data: social listening refresh (run 31888335921) (#423)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T20:29:27+00:00",
+      "sha": "fc20d7f",
+      "summary": "docs(progress): log ux-deckgl-toggle-aria-pressed-province (PR #434) + flag Vercel production-deploy stall",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-16T03:19:47+07:00",
+      "sha": "d03167d",
+      "summary": "ux: province.html deck.gl toggles expose aria-pressed (WCAG 4.1.2) (#434)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-15T19:55:40+00:00",
+      "sha": "42b266c",
+      "summary": "feat(acq): Turbo was never silent — widen the roster, and say how much of it we can read (#432)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-15T19:25:57+00:00",
+      "sha": "6f1e5c5",
+      "summary": "data: Thai-IP-only swarm refresh (run 31893415805) (#428)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T18:52:58+00:00",
+      "sha": "9701f7f",
+      "summary": "feat(acq): per-ad pricing feed — every recent rival creative, its rate and its conditions (#431)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-15T18:30:39+00:00",
+      "sha": "57ed249",
+      "summary": "integ(macro): schedule two cloud-reachable macro pullers that were ageing in silence",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T18:12:39+00:00",
+      "sha": "8038b02",
+      "summary": "data: macro indicators (2026-08-15, run 31888337907) (#422)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T17:29:28+00:00",
+      "sha": "6dde173",
+      "summary": "feat(swarm): social listening + rival ads move from weekly to daily (owner request) (#429)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-15T16:59:57+00:00",
+      "sha": "38e2d93",
+      "summary": "data: market-pulse swarm refresh (run 31893811879) (#430)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-15T16:24:49+00:00",
+      "sha": "4d53594",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer-rollup tripwire ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-15T16:24:19+00:00",
       "sha": "6e7ed47",
       "summary": "intel(peer): cross-surface peer-rollup tripwire — the two obj-#2 boards must agree per brand",
@@ -621,96 +711,6 @@
       "sha": "3099377",
       "summary": "data: market-pulse swarm refresh (run 31844200805) (#414)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-15T07:57:34+00:00",
-      "sha": "6e93a15",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 31862364669) (#408)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-15T07:26:56+00:00",
-      "sha": "f6eab7d",
-      "summary": "data: market-pulse swarm refresh (run 31863527138) (#418)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-15T06:29:43+00:00",
-      "sha": "1eb22ae",
-      "summary": "intel(deploy-health): shape-probe the new-vehicle registration TREND (brand_trends.json, obj #1)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-15T06:06:54+00:00",
-      "sha": "23547b9",
-      "summary": "fix(ci): make unattended merging actually converge — conflict mergers + the gate livelock (#417)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-15T04:24:51+00:00",
-      "sha": "059c2a8",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the ThaiWater shape-probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-15T04:24:13+00:00",
-      "sha": "804e752",
-      "summary": "intel(deploy-health): shape-probe the LIVE ThaiWater flood + rain pulse (obj #1)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-15T04:02:24+00:00",
-      "sha": "1bce6d9",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-15, run 31863180124)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T03:38:40+00:00",
-      "sha": "1c14e25",
-      "summary": "data: market-pulse swarm refresh (run 31819362442) (#407)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-15T03:10:10+00:00",
-      "sha": "cc13c7c",
-      "summary": "data: NABC live prices (2026-08-15, run 31860798723)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T02:18:28+00:00",
-      "sha": "c7a0ccb",
-      "summary": "docs: log ux-print-color-adjust-provenance-dot merge+deploy (#416)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-15T09:15:33+07:00",
-      "sha": "814d4ef",
-      "summary": "ux: keep the MEASURED provenance dot visible in board PDFs (#416)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-15T01:49:54+00:00",
-      "sha": "260dfcf",
-      "summary": "data: Thai-IP-only swarm refresh (run 31835584840) (#409)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T08:48:32+07:00",
-      "sha": "dd1a1e9",
-      "summary": "fix(autoresolve): stop rewriting PRs that master could not have affected (#415)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-15T00:25:47+00:00",
-      "sha": "b5813e4",
-      "summary": "health: deploy-probe the four surfaced-but-unprobed agri crop reads (obj #1)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-14T22:22:52+00:00",
-      "sha": "60685b5",
-      "summary": "chore(dashboard): refresh autonomy plan after #acq borrower-voice probes",
-      "pillar": "feature"
     }
   ]
 }
