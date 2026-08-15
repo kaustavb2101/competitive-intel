@@ -1,0 +1,379 @@
+
+[SHEET: BS 2-4]
+Saksiam Leasing Public Company Limited and its Subsidiaries													
+Statement of financial position													
+							Consolidated				Separate		
+							financial statements				financial statements		
+							30 June		31 December		30 June		31 December
+Assets					Note		2026		2025		2026		2025
+							(Unaudited)				(Unaudited)		
+							(in Baht)						
+Current assets													
+Cash and cash equivalents							471470469		602555090		440080011		572516862
+Current portion of hire purchase													
+	receivables				3		252811566		243214790		252811566		243214790
+Current portion of loan receivables					4		8698305102		8269588903		8698305102		8269588903
+Trade and other current receivables							2155293		1200961		1942919		2111870
+Inventories							7017880		6332194		0		0
+Foreclosed assets							18772979		8841891		18772979		8841891
+Other current assets							28576795		23099874		28265741		22485133
+Non-current assets classified as													
+	held for sale						0		1865		0		0
+Total current assets							9479110084		9154835568		9440178318		9118759449
+Non-current assets													
+Hire purchase receivables					3		347802970		311373731		347802970		311373731
+Loan receivables					4		5578459169		5305142476		5578459169		5305142476
+Investments in subsidiaries					6		0		0		34588433		38097103
+Property, plant and equipment							145829608		142799532		140126873		134617499
+Right-of-use assets					7		452424453		467720174		451248980		466152878
+Intangible assets							133242879		134403543		130578652		131575839
+Deferred tax assets							113803953		113150910		119886266		118531489
+Other non-current assets							14222672		13879094		14222672		13879094
+Total non-current assets							6785785704		6488469460		6816914015		6519370109
+Total assets							16264895788		15643305028		16257092333		15638129558
+Saksiam Leasing Public Company Limited and its Subsidiaries													
+Statement of financial position													
+							Consolidated				Separate		
+							financial statements				financial statements		
+							30 June		31 December		30 June		31 December
+Liabilities and equity					Note		2026		2025		2026		2025
+							(Unaudited)				(Unaudited)		
+							(in Baht)						
+Current liabilities													
+Short-term borrowings													
+	from financial institutions				8		3110000000		2400000000		3110000000		2400000000
+Short-term borrowings													
+	from related parties				2, 9				0				0
+Current portion of long-term													
+	borrowings from financial institutions				8		2899964102		3055954453		2899964102		3055954453
+Current portion of long-term													
+	borrowing from other parties				8		0		41666667		0		41666667
+Current portion of debentures					9		362493786		362013165		362493786		362013165
+Trade and other current payables					10		131823282		122753317		128026884		121333644
+Current portion of lease liabilities							107405301		101392620		106604156		100609514
+Corporate income tax payable							118125098		113910930		117298971		113496032
+Other current liabilities							15514225		17801626		15542739		16954198
+Total current liabilities							6745325794		6215492778		6739930638		6212027673
+Non-current liabilities													
+Long-term borrowings from													
+	financial institutions				8		2153266000		2101470000		2153266000		2101470000
+Long-term borrowings from													
+	other parties				8				0				0
+Debentures					9				0				0
+Lease liabilities							344853390		349525678		344438924		348706077
+Non-current provisions for													
+	employee benefits						137615080		129114820		137615080		129114820
+Total non-current liabilities							2635734470		2580110498		2635320004		2579290897
+Total liabilities							9381060264		8795603276		9375250642		8791318570
+Saksiam Leasing Public Company Limited and its Subsidiaries													
+Statement of financial position													
+							Consolidated				Separate		
+							financial statements				financial statements		
+							30 June		31 December		30 June		31 December
+Liabilities and equity							2026		2025		2026		2025
+							(Unaudited)				(Unaudited)		
+							(in Baht)						
+Equity													
+Share capital													
+	Authorised share capital												
+	(2,096,000,000 ordinary shares,												
+	par value at Baht 1 per share)						2096000000		2096000000		2096000000		2096000000
+	Issued and paid-up share capital												
+	(2,096,000,000 ordinary shares,												
+	par value at Baht 1 per share)						2096000000		2096000000		2096000000		2096000000
+Share premium on ordinary shares							1902427997		1902427997		1902427997		1902427997
+Retained earnings													
+	Appropriated												
+		Legal reserve					209600000		209600000		209600000		209600000
+	Unappropriated						2672504862		2636270027		2673813694		2638782991
+Equity attributable to owners of the parent							6880532859		6844298024		6881841691		6846810988
+Non-controlling interests							3302665		3403728		0		0
+Total equity							6883835524		6847701752		6881841691		6846810988
+Total liabilities and equity							16264895788		15643305028		16257092333		15638129558
+							0		0		0		0
+
+[SHEET: PL 5]
+Saksiam Leasing Public Company Limited and its Subsidiaries																
+Statement of comprehensive income (Unaudited)																
+								Consolidated				Separate				
+								financial statements				financial statements				
+								Three-month period ended				Three-month period ended				
+								30 June				30 June				
+								2026		2025		2026		2025		
+								(in Baht)								
+Income																
+Interest income								806453974		826717951		806453974		826717951		
+Revenue from sales and services								55983144		15331086		0		0		
+Fee and service income								11027378		11394302		11027378		11394302		
+Other income								9388328		6059895		9057932		7904496		
+Total income								882852824		859503234		826539284		846016749		
+Expenses																
+Cost of sales and services								50586129		12345232		0		0		
+Selling expenses								7057479		5414392		5346031		4972924		
+Administrative expenses								410603840		405306551		405193055		401277320		
+Total expenses								468247448		423066175		410539086		406250244		
+Profit from operating activities								414605376		436437059		416000198		439766505		
+Expected credit loss								44863034		62123105		44863034		61717361		
+Finance costs								87336810		101320435		87315385		101266821		
+Profit before income tax								282405532		272993519		283821779		276782323		
+Tax expense								57574611		57652279		56749196		55371357		
+Profit for the period								224830921		215341240		227072583		221410966		
+Other comprehensive income								0		0		0		0		
+Total comprehensive income																
+	for the period							224830921		215341240		227072583		221410966		
+Saksiam Leasing Public Company Limited and its Subsidiaries																
+Statement of comprehensive income (Unaudited)																
+								Consolidated				Separate				
+								financial statements				financial statements				
+								Three-month period ended				Three-month period ended				
+								31 March				31 March				
+								2026		2025		2026		2025		
+								(in Baht)								
+Profit (loss) attributable to:																
+	Owners of parent							225826323		219793261		227072583		221410966		
+	Non-controlling interests							-995402		-4452021		0		0		
+								224830921		215341240		227072583		221410966		0
+Total comprehensive income (expense)																
+	attributable to:															
+	Owners of parent							225826323		219793261		227072583		221410966		
+	Non-controlling interests							-995402		-4452021		0		0		
+								224830921		215341240		227072583		221410966		0
+Basic earnings per share								0.11		0.1		0.11		0.11		
+
+[SHEET: PL 6]
+Saksiam Leasing Public Company Limited and its Subsidiaries																
+Statement of comprehensive income (Unaudited)																
+								Consolidated				Separate				
+								financial statements				financial statements				
+								Six-month period ended				Six-month period ended				
+								30 June				30 June				
+						Note		2026		2025		2026		2025		
+								(in Baht)								
+Income																
+Interest income								1585815728		1625052565		1585815728		1625052565		
+Revenue from sales and services								61190780		27203977		0		0		
+Fee and service income								20914583		20961078		20914583		20961078		
+Other income								18047824		12005703		18729556		14374505		
+Total income								1685968915		1685223323		1625459867		1660388148		
+Expenses																
+Cost of sales and services								54223961		20941720		0		0		
+Selling expenses								11477159		11537215		9520666		10610951		
+Administrative expenses								803223982		773373712		800482724		778786089		
+Total expenses								868925102		805852647		810003390		789397040		
+Profit from operating activities								817043813		879370676		815456477		870991108		
+Expected credit loss								74801134		122323170		74801134		121917426		
+Finance costs								170519889		198468641		170480909		198357897		
+Profit before income tax								571722790		558578865		570174434		550715785		
+Tax expense						12		117479137		119286037		115944195		110241811		
+Profit for the period								454243653		439292828		454230239		440473974		
+Other comprehensive income								0		0		0		0		
+Total comprehensive income																
+	for the period							454243653		439292828		454230239		440473974		
+Saksiam Leasing Public Company Limited and its Subsidiaries																
+Statement of comprehensive income (Unaudited)																
+								Consolidated				Separate				
+								financial statements				financial statements				
+								Three-month period ended				Three-month period ended				
+								31 March				31 March				
+								2026		2025		2026		2025		
+								(in Baht)								
+Profit (loss) attributable to:																
+	Owners of parent							455434371		445762081		454230239		440473974		
+	Non-controlling interests							-1190718		-6469253		0		0		
+								454243653		439292828		454230239		440473974		0
+Total comprehensive income (expense)																
+	attributable to:															
+	Owners of parent							455434371		445762081		454230239		440473974		
+	Non-controlling interests							-1190718		-6469253		0		0		
+								454243653		439292828		454230239		440473974		0
+Basic earnings per share								0.22		0.21		0.22		0.21		
+
+[SHEET: CH conso 7-8]
+Saksiam Leasing Public Company Limited and its Subsidiaries																					
+Statement of changes in equity (Unaudited)																					
+								Consolidated financial statements													
+												Retained earnings									
+																Equity					
+								Issued and								attributable to		Non-			
+								paid-up		Share						owners of		controlling			
+						Note		share capital		premium		Legal reserve		Unappropriated		the parent		interests		Total equity	
+								(in Baht)													
+Six-month period ended 30 June 2025																					
+Balance at 1 January 2025							0	2096000000	0	1902427997	0	209600000	0	2128787107.0000002		6336815104		10230717		6347045821	
+Transactions with owners, recorded directly in equity																					
+	Distributions to owners of the parent																				
+	Dividends					13		0		0		0		-377279618		-377279618		0		-377279618	
+Total transactions with owners, recorded directly in equity								0		0		0		-377279618		-377279618		0		-377279618	
+Comprehensive income (expense) for the period																					
+	Profit (loss)							0		0		0		445762081		445762081		-6469253		439292828	
+Total comprehensive income (expense) for the period								0		0		0		445762081		445762081		-6469253		439292828	
+Balance at 30 June 2025								2096000000		1902427997		209600000		2197269570		6405297567		3761464		6409059031	
+Saksiam Leasing Public Company Limited and its Subsidiaries																					
+Statement of changes in equity (Unaudited)																					
+								Consolidated financial statements													
+												Retained earnings									
+																Equity					
+								Issued and								attributable to		Non-			
+								paid-up		Share						owners of		controlling			
+						Note		share capital		premium		Legal reserve		Unappropriated		the parent		interests		Total equity	
+								(in Baht)													
+Six-month period ended 30 June 2026																					
+Balance at 1 January 2026								2096000000		1902427997		209600000		2636270027		6844298024		3403728		6847701752	0
+																					0
+Transactions with owners, recorded directly in equity																					
+	Distributions to owners of the parent																				
+	Dividends					13		0		0		0		-419199536		-419199536		0		-419199536	
+	Total distributions to owners of the parent							0		0		0		-419199536		-419199536		0		-419199536	
+	Changes in ownership interests in subsidiaries																				
+	Acquisition of non-controlling interests							0		0		0		0		0		22499999.999999996		22499999.999999996	
+	Loss in control over a subsidiary					6		0		0		0		0		0		-21410345		-21410345	
+	Total changes in ownership interests in subsidiaries							0		0		0		0		0		1089654.9999999963		1089654.9999999963	
+Total transactions with owners, recorded directly in equity								0		0		0		-419199536		-419199536		1089654.9999999963		-418109881	
+Comprehensive income (expense) for the period																					
+	Profit (loss)							0		0		0		455434371		455434371		-1190718		454243653	
+Total comprehensive income (expense) for the period								0		0		0		455434371		455434371		-1190718		454243653	
+Balance at 30 June 2026								2096000000		1902427997		209600000		2672504862		6880532859		3302664.9999999963		6883835524	0
+																					0
+
+[SHEET: CH sep 9-10]
+Saksiam Leasing Public Company Limited and its Subsidiaries																				
+Statement of changes in equity (Unaudited)																				
+								Separate financial statements												
+												Retained earnings								
+								Issued and												
+								paid-up		Share										
+						Note		share capital		premium		Legal reserve		Unappropriated		Total equity				
+								(in Baht)												
+Six-month period ended 30 June 2025																				
+Balance at 1 January 2025								2096000000	0	1902427997	0	209600000	0	2139806311.0000002		6347834308				
+Transactions with owners, recorded directly in equity																				
+	Distributions to owners																			
+	Dividends					13		0	0	0		0		-377279618		-377279618				
+Total transactions with owners, recorded directly in equity								0		0		0		-377279618		-377279618				
+Comprehensive income for the period																				
+	Profit							0		0		0		440473974		440473974				
+Total comprehensive income for the period								0		0		0		440473974		440473974				
+Balance at 30 June 2025								2096000000		1902427997		209600000		2203000667		6411028664				
+Saksiam Leasing Public Company Limited and its Subsidiaries																				
+Statement of changes in equity (Unaudited)																				
+								Separate financial statements												
+												Retained earnings								
+								Issued and												
+								paid-up		Share										
+						Note		share capital		premium		Legal reserve		Unappropriated		Total equity				
+								(in Baht)												
+Six-month period ended 30 June 2026																				
+Balance at 1 January 2026								2096000000		1902427997		209600000		2638782991		6846810988	0			
+																	0			
+Transactions with owners, recorded directly in equity																				
+	Distributions to owners																			
+	Dividends					13		0		0		0		-419199536		-419199536				
+Total transactions with owners, recorded directly in equity								0		0		0		-419199536		-419199536				
+Comprehensive income for the period																				
+	Profit							0		0		0		454230239		454230239				
+Total comprehensive income for the period								0		0		0		454230239		454230239				
+Balance at 30 June 2026								2096000000		1902427997		209600000		2673813694		6881841691	0			
+																	0			
+
+[SHEET: CF 11-12]
+Saksiam Leasing Public Company Limited and its Subsidiaries													
+Statement of cash flows (Unaudited)													
+						Consolidated				Separate			
+						financial statements				financial statements			
+						Six-month period ended				Six-month period ended			
+						30 June				30 June			
+				Note		2026		2025		2026		2025	
+						(in Baht)							
+Cash flows from operating activities													
+Profit before income tax						571722790		558578865		570174434		550715785	
+Adjustments to reconcile profit to cash													
+	receipts (payments)												
+Depreciation and amortisation						90923515		84479577		89937537		81734236	
+Loss on written-off of equipment and intangible assets						9682365		1336		9682365		1336	
+Expected credit loss						74801134		122323170		74801134		121917426	
+(Reversal of) impairment loss						-9896327		8818594		-6387657		23996276	
+Loss on inventories devaluation						0		559430		0		0	
+Loss on disposal of foreclosed assets						4771712		8514893		4771712		8514893	
+Gain on disposal of equipment						-40400		-266283		-335679		-239492	
+Gain on disposal of investment in a subsidiary				6		-1331800		0		0		0	
+Provision for employee benefit						8973860		9927651		8973860		8941651	
+Interest income						-1585815728		-1625052565		-1585815728		-1625052565	
+Finance costs						170519889		198468641		170480909		198357897	
+Interest received						1576421850		1617484028		1576421850		1617484028	
+Interest paid						-164069428		-195412210		-164069428		-195412210	
+						746663432		788425127		748635309		790959261	
+Changes in operating assets and liabilities													
+Hire-purchase receivables						-50392156		-28510657		-50392156		-28510657	
+Loan receivables						-810547534		-783440387		-810547534		-783440387	
+Inventories						-685686		-1115163		0		0	
+Foreclosed assets						29322342		44511522		29322342		44511522	
+Trade and other current receivables						-1024977		309461		168951		-551615	
+Non-current assets classified as held for sale						1865		-133206		0		0	
+Other assets						-5421878		-4955867		-5643565		-5157972	
+Trade and other current payables						14348664		-25983147		11037703		-27302742	
+Other liabilities						-2287401		3004115		-1411459		1173220	
+Employee benefit paid						-473600		-1332506		-473600		-940000	
+Net cash used in operations						-80496929		-9220708		-79304009		-9259370	
+Taxes paid						-113918012		-119835634		-113496033		-119813809	
+Net cash used in operating activities						-194414941		-129056342		-192800042		-129073179	
+Saksiam Leasing Public Company Limited and its Subsidiaries													
+Statement of cash flows (Unaudited)													
+						Consolidated				Separate			
+						financial statements				financial statements			
+						Six-month period ended				Six-month period ended			
+						30 June				30 June			
+				Note		2026		2025		2026		2025	
+						(in Baht)							
+Cash flows from investing activities													
+Proceeds from disposals of equipment						1290999		1035160		401768		300402	
+Acquisition of equipment						-11856892		-26989614		-11820108		-25215683	
+Acquisition of intangible assets						-4892395		-7656162		-4859225		-7656162	
+Acquisition of a subsidiary				6		0		0		-27500000		0	
+Proceeds (payment) from disposal of a subsidiary,													
+	net of cash of a subsidiary disposed of			6		-19901145		0		27500000		0	
+Net cash used in investing activities						-35359433		-33610616		-16277565		-32571443	
+Saksiam Leasing Public Company Limited and its Subsidiaries													
+Statement of cash flows (Unaudited)													
+						Consolidated				Separate			
+						financial statements				financial statements			
+						Six-month period ended				Six-month period ended			
+						30 June				30 June			
+				Note		2026		2025		2026		2025	
+						(in Baht)							
+Cash flows from financing activities													
+Proceeds from short-term borrowings													
+	from financial institutions			8		960000000		1000000000		960000000		1000000000	
+Repayment of short-term borrowings													
+	from financial institutions			8		-250000000		-800000000		-250000000		-800000000	
+Proceeds from short-term borrowings													
+	from related parties			8		0		200000000		0		200000000	
+Proceeds from long-term borrowings													
+	from financial institutions			8		2311268750		2249400000		2311268750		2249400000	
+Repayment of long-term borrowings													
+	from financial institutions			8		-2416134000		-1808918000		-2416134000		-1808918000	
+Repayment of long-term borrowings													
+	from other parties			8		-41666667		-50000000		-41666667		-50000000	
+Payment of lease liabilities				7		-68176829		-63709819		-67725826		-62010589	
+Dividends paid						-419101501		-377237211		-419101501		-377237211	
+Proceeds from acquisition													
+	of non-controlling interests					22500000		0		0		0	
+Net cash from financing activities						98689753		349534970		76640756		351234200	
+Net (decrease) increase in cash and cash equivalents						-131084621		186868012		-132436851		189589578	
+Cash and cash equivalents at 1 January						602555090		196583795		572516862		171911646	
+Cash and cash equivalents at 30 June						471470469		383451807		440080011		361501224	
+Non-cash transactions													
+Accounts payables from equipment purchased						517445		425838		517445		425838	
+Accounts payables from intangible assets						517445				517445			
+	purchased					517445		0		517445		0	
+Transfer foreclosed assets to fixed assets						431653		510938		431653		510938	
+Transfer loan receivables to foreclosed													
+	assets for debt payment					47473527		66070675		47473527		66070675	
+Acquisition of right-of-use assets													
+	under lease contracts			7		60776264		113495958		59108158		111240172	
+Transfer right-of-use assets to fixed assets						19948696		1656487		19948696		1656487	
+Transfer inventories to non-current assets													
+	classified as held for sale					0		119289		0		0	
+Transfer fixed assets to non-current assets													
+	classified as held for sale					0		13917		0		0	
+						0				0			
+						0				0			
