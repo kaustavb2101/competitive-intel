@@ -3,6 +3,49 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-15 — Intelligence loop (DEPLOYMENT HEALTH): the nightly site-health probe now reads a **Vercel Authentication (SSO) redirect** as "up + access-protected", not an outage — it was silently following the SSO 30x to `vercel.com/login` (a 200 login page) and FAILING every content check, so a genuinely-healthy protected deployment would file a FALSE "site down" GitHub issue + phone alert
+
+- **Why this, this run.** The autonomy backlog is at 98% (49/50 done; the 1 OPEN item is owner-side —
+  Vercel access protection). Opened with the mandated deploy-health probe of the master production alias
+  and found a live, self-consistent DEPLOYMENT-HEALTH bug in the monitor itself. Ground truth from the
+  Vercel API: the project now has **`ssoProtection.enabled = true` (`all_except_custom_domains`)**,
+  `passwordProtection = false`, and **no custom domain** (all three aliases are `*.vercel.app`) — so
+  every URL of the deployment, including the alias `site-health.yml` monitors, is behind Vercel
+  Authentication. (This is a valid state for the sensitive branch-level PD; whether it's the owner's
+  intent is an owner call — flagged, not changed.)
+- **The bug (`site-health-false-outage-on-vercel-sso-redirect`).** Vercel Authentication does NOT answer
+  with a 401 (the case `check_site_health.py` already treats as healthy-but-gated) — it **307/302-redirects**
+  an unauthenticated request to `vercel.com/login?next=/sso-api?url=<deployment>&nonce=…`. `urllib`
+  silently follows that to a **200 login page**, so `fetch()` saw `status == 200` (passed the status
+  guard) but `body` = Vercel's login HTML — no `AutoX` wordmark, not JSON. Downstream, every page-wordmark
+  and every data-file parse/shape check would FAIL → the nightly `site-health.yml` files a "Site health
+  check **FAILED**" issue (owner's phone) for a site that is actually UP and correctly protected. Verified
+  live: `curl` and a `urllib` probe both land on `vercel.com/login` (200). This is the classic false-alarm
+  a monitor must never raise.
+- **The fix.** Added `_vercel_sso_gate(base_url, final_url)` — a pure detector that trips only when
+  `resp.geturl()` shows the request was redirected OFF our deployment host onto Vercel's auth endpoint
+  (`vercel.com` / `*.vercel.com` with a `/sso`|`/login`|`sso-api` path/query); a healthy same-host 200 or
+  same-host `cleanUrls` 30x never trips it. `fetch()` captures `final_url` and raises `AuthGated` on a
+  gate — the SAME healthy-but-gated path the 401 uses. The pre-flight now labels the state
+  "access-protected (auth-gated)" and, for SSO, records deep checks SKIPPED with the honest reason (an SSO
+  gate needs a Vercel session cookie, so `SITE_PASSWORD` cannot unlock it from CI; deep-probing needs an
+  SSO-exempt custom domain). Module header + `AuthGated` docstring updated to document both gate shapes.
+- **Verified.** Live: the full checker against the SSO-gated alias now prints **HEALTHY 2/2, exit 0**
+  (was: would fail every content check). Offline unit test (added to `tests/run.sh`, pure/no-network):
+  the detector trips on the two real SSO-redirect shapes and stays quiet on same-host 200 / `cleanUrls`
+  30x / same-host data URL / an unrelated third-party host. `check_site_health.py --local platform` still
+  **HEALTHY 272/272, exit 0** (validators untouched). `bash tests/run.sh check` → **137 passed · 0 failed**
+  (was 136; +1 = the new SSO-gate self-test), data integrity 455/455. No `platform/data` file, builder or
+  provenance changed (monitor + gate-test only) → no rebuild / `build_provenance` needed, no app
+  behaviour/visual change → safeguard-gated direct commit, no PR/headless render.
+- **Owner note (flagged, not acted on).** The deployment is currently reachable only through a Vercel
+  login — fine if the owner logs in via Vercel, but a board/demo audience without team access is blocked.
+  To make it publicly viewable, attach an SSO-exempt custom domain or disable Vercel Authentication for
+  the alias (an owner-side Vercel setting; not changed autonomously).
+- **Next recommended.** Two default-route silent-hide reads remain deploy-unprobed: `farm_income_impact.json`
+  (`#overview`, obj #1 — crop→farm-income margin-shock engine) and `vintage_digest.json` (`#trend` lead
+  card) — both deterministic/`--check`-gated and CI-doable, the natural next two probe runs.
+
 ## 2026-08-15 — Integration loop (service/deploy-health, obj #1): the new-vehicle first-registration TREND (`brand_trends.json`) — the leading indicator for tomorrow's used-title collateral pool — now has a deploy shape probe; it was the highest-value remaining silent-deploy blind spot AND had the weakest fetch guard on the default Overview route
 
 - **Why this, this run.** The high-value INTEGRATION backlog is exhausted or blocked: #1 (FPO PICO →

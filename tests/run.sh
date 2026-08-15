@@ -597,6 +597,37 @@ INGESTS
     printf '%s\n' "$hc_out" | grep -E '\[FAIL\]|ERROR|Traceback' | head -12 | sed 's/^/      /'
     bad "check_site_health.py --local (a deploy probe validator rejects its committed payload — see above)"
   fi
+
+  # SSO-gate self-test (pure, no network): the nightly LIVE probe must read a Vercel
+  # Authentication redirect (Deployment Protection -> vercel.com/login?next=/sso-api/…)
+  # as "site up + access-protected", NOT as an outage. urllib silently follows that
+  # 30x to a 200 login page, so without this detector every wordmark/JSON check would
+  # fail and the probe would file a FALSE "site down" issue. Assert the detector trips
+  # on the real SSO redirect shape and stays quiet on a healthy same-host 200 / cleanUrls.
+  sso_out="$( python3 - "$PIPE/check_site_health.py" <<'PY' 2>&1
+import importlib.util, sys
+spec = importlib.util.spec_from_file_location("csh", sys.argv[1])
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+g = m._vercel_sso_gate
+base = "https://competitive-intel-git-master-kaustav-bagchis-projects.vercel.app"
+# GATED: redirected off our host onto Vercel's SSO login (the real observed shape).
+assert g(base, "https://vercel.com/login?next=%2Fsso-api%3Furl%3D" + base), "SSO login redirect not detected"
+assert g(base, "https://vercel.com/sso-api?url=" + base + "&nonce=x"), "sso-api redirect not detected"
+# HEALTHY (must NOT trip): stayed on our own deployment host.
+assert not g(base, base + "/"), "healthy same-host 200 wrongly flagged"
+assert not g(base, base + "/index"), "same-host cleanUrls 30x wrongly flagged"
+assert not g(base, base + "/data/branches.json"), "same-host data URL wrongly flagged"
+# Not our SSO gate: a redirect to some other third-party host is a real anomaly, not a gate.
+assert not g(base, "https://example.com/login"), "unrelated host wrongly flagged as Vercel SSO"
+print("SSO-GATE-OK")
+PY
+)"; rc=$?
+  if [ "$rc" -eq 0 ] && printf '%s' "$sso_out" | grep -q "SSO-GATE-OK"; then
+    ok "check_site_health.py Vercel-SSO gate detector (reads SSO redirect as up+gated, not an outage)"
+  else
+    printf '%s\n' "$sso_out" | head -8 | sed 's/^/      /'
+    bad "check_site_health.py Vercel-SSO gate detector (see above)"
+  fi
 }
 
 # ---------------------------------------------------------------------------

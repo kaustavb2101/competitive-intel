@@ -25,13 +25,20 @@
 #   python3 pipeline/check_site_health.py --local platform --json /tmp/h.json
 #   SITE_PASSWORD=... python3 pipeline/check_site_health.py --base-url ...      # auth-gated site
 #
-# ACCESS-PROTECTED DEPLOYMENTS: the production alias runs middleware.js HTTP
-# Basic Auth (any username, password = SITE_PASSWORD). Supply the same password
-# via --site-password or the SITE_PASSWORD env var and the probe authenticates
-# and runs the full deep checks. WITHOUT a password, a 401 from the live site is
-# treated as HEALTHY ("up and correctly access-protected") rather than a
-# breakage — the deep page/data checks are reported as SKIPPED, not FAILED, so
-# the nightly probe never fires a false alarm just because it lacks the secret.
+# ACCESS-PROTECTED DEPLOYMENTS: two mechanisms, both handled as HEALTHY.
+#   (1) middleware.js HTTP Basic Auth (any username, password = SITE_PASSWORD):
+#       supply the same password via --site-password or the SITE_PASSWORD env var
+#       and the probe authenticates and runs the full deep checks. WITHOUT it, a
+#       401 is treated as "up and correctly access-protected" and the deep checks
+#       are SKIPPED, not FAILED.
+#   (2) Vercel Authentication (SSO Deployment Protection): the alias 30x-redirects
+#       an unauthenticated request to vercel.com/login. urllib follows it to a 200
+#       login page, so a naive check sees 200 + non-site content and would fire a
+#       FALSE outage. The probe detects the off-host redirect to Vercel's auth
+#       endpoint and reports "up + access-protected (SSO)", deep checks SKIPPED. An
+#       SSO gate needs a Vercel session cookie, so SITE_PASSWORD cannot unlock it
+#       from CI — deep-probing requires an SSO-exempt custom domain.
+# Either way the nightly probe never fires a false alarm just because it is gated.
 
 import argparse
 import base64
@@ -41,6 +48,7 @@ import os
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 # Sanity cap: no single served asset should exceed this. The largest committed
@@ -62,11 +70,43 @@ WORDMARK = "AutoX"
 
 # ---------------------------------------------------------------------------
 class AuthGated(RuntimeError):
-    """The live deployment returned 401 (middleware.js Basic Auth). The site is UP
-    and correctly access-protected — a healthy state, not a breakage — whether the
-    probe supplied no credential OR supplied one the deployment rejected. Either
-    way the deep checks are skipped, not failed; unlocking them just needs the CI
-    SITE_PASSWORD secret to match the deployment's own SITE_PASSWORD."""
+    """The live deployment answered an access-protection challenge, NOT an outage.
+    Two shapes, both HEALTHY ("site up + correctly access-protected"):
+      - 401 (middleware.js HTTP Basic Auth), or
+      - a 30x redirect off our host onto Vercel's own Authentication (SSO) login
+        (Vercel "Deployment Protection" -> vercel.com/login?next=/sso-api/...).
+    In both cases the deep checks are skipped, not failed. The 401/basic-auth gate
+    can be unlocked from CI by matching the SITE_PASSWORD secret; the SSO gate
+    CANNOT (it needs a Vercel session cookie, not a password), so a password does
+    not help there — the probe just reports up-and-gated."""
+
+
+def _vercel_sso_gate(base_url, final_url):
+    """Return the Vercel-auth URL if the request was redirected OFF the deployment
+    onto Vercel's Authentication (SSO) login, else "".
+
+    Vercel "Deployment Protection" (Vercel Authentication / SSO) does NOT answer
+    with a 401 — it 307/302-redirects an unauthenticated request to
+    https://vercel.com/login?next=/sso-api?url=<deployment>&nonce=... . urllib
+    follows that silently, so the final response is a 200 *login page*, not our
+    site — every downstream wordmark / JSON check would then fail and the nightly
+    probe would fire a FALSE outage alarm. Detect the tell-tale off-host redirect
+    to the Vercel auth endpoint so fetch() can raise AuthGated (healthy-but-gated)
+    instead. A normal deployment 200 (and Vercel's same-host cleanUrls 30x) keeps
+    the final host on our own deployment, so this never trips on a healthy site."""
+    try:
+        base_host = urllib.parse.urlsplit(base_url).netloc.lower()
+        f = urllib.parse.urlsplit(final_url)
+    except Exception:
+        return ""
+    fhost = f.netloc.lower()
+    if not fhost or fhost == base_host:
+        return ""  # stayed on our own deployment -> not an SSO redirect
+    # Redirected onto a different host: only treat Vercel's auth endpoint as a gate.
+    if fhost == "vercel.com" or fhost.endswith(".vercel.com"):
+        if "/sso" in f.path or "/login" in f.path or "sso-api" in (f.query or ""):
+            return final_url
+    return ""
 
 
 # Fetchers — one code path for validation, two transports.
@@ -92,6 +132,7 @@ class HttpFetcher:
         try:
             with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as resp:
                 status = resp.getcode()
+                final_url = resp.geturl()
                 body = resp.read(MAX_BYTES + 1)
         except urllib.error.HTTPError as e:
             if e.code == 401:
@@ -116,6 +157,21 @@ class HttpFetcher:
             raise RuntimeError("unreachable: %s" % e.reason)
         except Exception as e:  # timeout, TLS, protocol
             raise RuntimeError("fetch error: %r" % e)
+        # Vercel Authentication (SSO Deployment Protection) does NOT 401 — it 30x-
+        # redirects an unauthenticated request onto vercel.com/login. urllib follows
+        # it, so `status` is 200 but `final_url`/`body` are Vercel's login page, not
+        # our site. Detect that off-host redirect and treat it exactly like the 401
+        # basic-auth gate: UP + access-protected (healthy), never a false outage.
+        gate = _vercel_sso_gate(self.base, final_url)
+        if gate:
+            raise AuthGated(
+                "HTTP %d -> %s — live site is up and protected by Vercel "
+                "Authentication (SSO Deployment Protection); the probe was redirected "
+                "to Vercel's login. An SSO gate needs a Vercel session cookie, not a "
+                "password, so SITE_PASSWORD cannot unlock the deep checks from CI%s"
+                % (status, gate,
+                   " (SITE_PASSWORD was supplied but does not apply to an SSO gate)"
+                   if self.password else ""))
         # urllib follows redirects (Vercel cleanUrls 308s *.html -> clean route),
         # so a 200 here means the final response was OK.
         if status != 200:
@@ -3404,16 +3460,29 @@ def run_checks(fetcher):
     def record(name, ok, detail=""):
         results.append({"name": name, "ok": bool(ok), "detail": detail})
 
-    # Pre-flight: distinguish "site up + correctly access-protected (401)" from a
-    # real breakage. A protected production alias returning 401 to a
-    # credential-less probe is HEALTHY — report it and skip the deep checks
-    # rather than firing a false alarm. (LocalFetcher never raises AuthGated;
-    # supplying SITE_PASSWORD authenticates past this and runs the full suite.)
+    # Pre-flight: distinguish "site up + correctly access-protected" from a real
+    # breakage. A protected alias that answers a credential-less probe with a 401
+    # (basic auth) OR a redirect to Vercel's SSO login is HEALTHY — report it and
+    # skip the deep checks rather than firing a false alarm. (LocalFetcher never
+    # raises AuthGated; for the basic-auth gate, supplying SITE_PASSWORD
+    # authenticates past this and runs the full suite — an SSO gate cannot be
+    # passed from CI at all.)
     try:
         fetcher.fetch(PAGES[0])
     except AuthGated as e:
-        record("live site is up and access-protected (401)", True, str(e))
-        if getattr(fetcher, "password", ""):
+        detail = str(e)
+        record("live site is up and access-protected (auth-gated)", True, detail)
+        if "SSO" in detail:
+            # Vercel Authentication (SSO): no CI-supplyable credential satisfies it
+            # (it needs a Vercel session cookie). Deep checks are correctly SKIPPED,
+            # not failed — this is the healthy up-and-protected state, and the only
+            # way to deep-probe is to exempt the alias (custom domain) or disable SSO.
+            record("deep page/data checks", True,
+                   "SKIPPED — deployment is behind Vercel Authentication (SSO); the "
+                   "probe cannot authenticate past an SSO gate from CI. Site is up + "
+                   "protected. To deep-probe, expose it via an SSO-exempt custom "
+                   "domain or turn off Vercel Authentication for this alias.")
+        elif getattr(fetcher, "password", ""):
             # A credential was supplied but the deployment rejected it. The site is
             # healthy; the probe simply cannot see past the gate. Skip (not fail) the
             # deep checks and say exactly how to unlock them — align the CI
