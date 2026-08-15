@@ -3115,11 +3115,17 @@ function drawCompCoverage(){
   tbl.innerHTML=`<tr><th scope="col">Brand</th>`+
     `<th scope="col" title="MEASURED — locations of this brand in our de-duplicated census (a lower bound)">Found ◆ measured</th>`+
     `<th scope="col" title="ESTIMATED-from-public-reports — the brand's publicly-reported nationwide branch count (cited company IR / annual reports)">Expected ★ public</th>`+
-    `<th scope="col" title="found ÷ expected — the share of the brand's reported network we have located so far. A confidence flag, NOT market share.">Coverage</th>`+
+    `<th scope="col" title="found ÷ expected. BELOW 100% = we have located only part of the brand's cited network (a lower-bound confidence flag). AT/ABOVE 100% = our census MEETS or EXCEEDS the cited count — for a group brand the official store-locator also lists service points beyond listed title-loan branches, so >100% is a completeness signal, not an overcount error. NOT market share.">Coverage</th>`+
     `<th scope="col">Census completeness</th></tr>`+
     list.map(b=>{
       const exp=b.expected, cov=b.coverage_pct;
-      const covtxt=(cov==null)?'<span class="sub">n/a</span>':`<span class="mono" style="color:var(--gold)"><b>${cov.toFixed(1)}%</b></span>`;
+      // >100% is a valid MEASURED state, not an error: a group brand's official locator lists service
+      // points beyond its listed title-loan branches (Srisawad's 5,203 locator points ≈ 4.6× its 1,138
+      // cited figure — see competitor_coverage.json footprint_measured caveat). Flag it inline so a
+      // bare "457.2%" in a column titled "Coverage" is not misread as a share-located-so-far or a bug.
+      const covtxt=(cov==null)?'<span class="sub">n/a</span>'
+        :`<span class="mono" style="color:var(--gold)"><b>${cov.toFixed(1)}%</b></span>`
+         +(cov>100?` <span class="sub" title="Our census meets/exceeds the brand's cited branch count. For a group brand the official store-locator also lists service points beyond listed title-loan branches, so >100% is a completeness signal — not an overcount error, and NOT market share.">census ≥ cited</span>`:'');
       const exptxt=(exp==null)?'<span class="sub" title="no nationwide branch count cited in our research — not invented">n/a (uncited)</span>':`<span class="mono">${exp.toLocaleString()}</span>`;
       const bar=(cov==null)?'<span class="sub">—</span>':barHTML(cov,'var(--merch)');
       return `<tr>
