@@ -85,8 +85,9 @@ jobs:
 
       - name: Install feed dependencies
         run: |
-          # google-play-scraper (app_reviews), pytrends (google_trends), openpyxl (oae_prices' XLSX
-          # fallback), pdfplumber (investor_docs).
+          # google-play-scraper (app_reviews), pytrends (google_trends), openpyxl (tpso_cpi's COICOP
+          # CPI workbook — the reason openpyxl is here since oae_prices was retired), pdfplumber
+          # (investor_docs).
           # Deliberately NO playwright/chromium here — see the --skip-browser note above.
           #
           # pdfplumber was missing until 2026-08-09, and investor_docs is registered with
