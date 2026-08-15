@@ -9,7 +9,7 @@
    ],
    "key": "GSB_MONEYDD",
    "n": 21,
-   "n_new_this_run": 1,
+   "n_new_this_run": 0,
    "n_with_text": 21,
    "name_en": "MoneyDD",
    "name_th": "เงินดีดี (Good Money by GSB)",
@@ -46,8 +46,8 @@
     }
    ],
    "key": "NGERNHAIJAI",
-   "n": 122,
-   "n_new_this_run": 41,
+   "n": 131,
+   "n_new_this_run": 9,
    "n_with_text": 45,
    "name_en": "Ngern Hai Jai",
    "name_th": "เงินให้ใจ",
@@ -66,7 +66,7 @@
    ],
    "key": "SAWAD",
    "n": 353,
-   "n_new_this_run": 14,
+   "n_new_this_run": 0,
    "n_with_text": 276,
    "name_en": "Srisawad",
    "name_th": "ศรีสวัสดิ์ เงินสดทันใจ",
@@ -85,7 +85,7 @@
    ],
    "key": "TIDLOR",
    "n": 798,
-   "n_new_this_run": 7,
+   "n_new_this_run": 0,
    "n_with_text": 689,
    "name_en": "Ngern Tid Lor",
    "name_th": "เงินติดล้อ",
@@ -115,7 +115,7 @@
    ],
    "key": "WSOL_CARFINN",
    "n": 4,
-   "n_new_this_run": 4,
+   "n_new_this_run": 0,
    "n_with_text": 0,
    "name_en": "CarFinn (WSOL Public Company Limited, formerly SABUY Technology)",
    "name_th": "คาร์ฟินน์ (CarFinn)",
@@ -1277,6 +1277,20 @@
    ],
    "text_src": "ocr"
   },
+  "CR00691416557003210753": {
+   "advertiser_id": "AR14376384815463137281",
+   "advertiser_name": "บริษัท เงินให้ใจ จำกัด",
+   "brand": "NGERNHAIJAI",
+   "first_pull": "2026-08-15",
+   "first_shown": "2026-08-14",
+   "format": 3,
+   "image_url": null,
+   "kind": "render",
+   "last_pull": "2026-08-15",
+   "last_shown": "2026-08-15",
+   "text": [],
+   "text_src": null
+  },
   "CR00694887302895239169": {
    "advertiser_id": "AR05287991188266156033",
    "advertiser_name": "Srisawad Power 2014 Co.,Ltd",
@@ -1496,7 +1510,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [],
    "text_src": null
   },
@@ -2222,7 +2236,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "เงินติดล้อ",
     "เงินติสล้อ",
@@ -3281,6 +3295,20 @@
    ],
    "text_src": "ocr"
   },
+  "CR01876215102722539521": {
+   "advertiser_id": "AR14376384815463137281",
+   "advertiser_name": "บริษัท เงินให้ใจ จำกัด",
+   "brand": "NGERNHAIJAI",
+   "first_pull": "2026-08-15",
+   "first_shown": "2026-08-14",
+   "format": 3,
+   "image_url": null,
+   "kind": "render",
+   "last_pull": "2026-08-15",
+   "last_shown": "2026-08-15",
+   "text": [],
+   "text_src": null
+  },
   "CR01893180704578076673": {
    "advertiser_id": "AR14376384815463137281",
    "advertiser_name": "บริษัท เงินให้ใจ จำกัด",
@@ -3636,7 +3664,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "๑ เงินติดล้อ",
     "รริ๑2 ร สินเชือทะเบียนรถ เงินติดล้อ - มอเตอร์ไซค์ สินเชื่อทะเบียนรถ อนุมัติไว อาชีพใหนก็ขอสินเชื่อไ ต้องโอนเล่ม ตอบทุกคําถาม จ่ายค่างวดได้ผ่าน ล00 สิทธิลูกหนี้ สิน"
@@ -3951,7 +3979,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "ได้รับการสนับสนุน",
     "พมพภพ.ธสพลสผ่.00.ไก",
@@ -4897,7 +4925,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "เพ.ธสพลสผู่.00.ป่า",
     "สินเชื่อรถยนต์",
@@ -4918,7 +4946,7 @@
    "image_url": null,
    "kind": "render",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "ศรีสวัสดิ์ สินเชื่อบ้านแลกเงิน - ศรีสวัสดิ์บ้านแลกเงิน",
     "สินเชื่อบ้าน",
@@ -5125,6 +5153,20 @@
    "kind": "other",
    "last_pull": "2026-08-15",
    "last_shown": "2026-01-29",
+   "text": [],
+   "text_src": null
+  },
+  "CR03185284850659622913": {
+   "advertiser_id": "AR14376384815463137281",
+   "advertiser_name": "บริษัท เงินให้ใจ จำกัด",
+   "brand": "NGERNHAIJAI",
+   "first_pull": "2026-08-15",
+   "first_shown": "2026-08-14",
+   "format": 3,
+   "image_url": null,
+   "kind": "render",
+   "last_pull": "2026-08-15",
+   "last_shown": "2026-08-15",
    "text": [],
    "text_src": null
   },
@@ -5367,7 +5409,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "งมเพพ.ธสพเลผ่.00.ป่า",
     "สินเชื่อรถยนต์",
@@ -5710,7 +5752,7 @@
    "image_url": null,
    "kind": "render",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [],
    "text_src": null
   },
@@ -5940,7 +5982,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "เด้รับการสนับสนุน 1",
     "พิธงไธพธ"
@@ -6121,7 +6163,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [],
    "text_src": null
   },
@@ -6311,7 +6353,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [],
    "text_src": null
   },
@@ -8843,7 +8885,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [],
    "text_src": null
   },
@@ -10274,7 +10316,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [],
    "text_src": null
   },
@@ -10499,7 +10541,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "เงินติดล้อ",
     "อนุมัติไว ให้วงเงินสูงสุด 160%",
@@ -10612,7 +10654,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [],
    "text_src": null
   },
@@ -11483,7 +11525,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "๑ เงินติดล้อ",
     "สินเชือทะเบียนรถ เงนตดลอ- สินเชือทะเบียนรถ มอเตอร์ไซค์ สินเชื่อทะเบียนรถ อนุมัติไว อาชีพไหนก็ขอสินเชื่อได้ ไม่ต้องมีคนค้า",
@@ -12926,6 +12968,20 @@
    ],
    "text_src": "ocr"
   },
+  "CR08381664764459220993": {
+   "advertiser_id": "AR14376384815463137281",
+   "advertiser_name": "บริษัท เงินให้ใจ จำกัด",
+   "brand": "NGERNHAIJAI",
+   "first_pull": "2026-08-15",
+   "first_shown": "2026-08-14",
+   "format": 3,
+   "image_url": null,
+   "kind": "render",
+   "last_pull": "2026-08-15",
+   "last_shown": "2026-08-15",
+   "text": [],
+   "text_src": null
+  },
   "CR08389280463029534721": {
    "advertiser_id": "AR12032973375124013057",
    "advertiser_name": "บริษัท เงินติดล้อ จำกัด (มหาชน)",
@@ -13366,7 +13422,7 @@
    "first_shown": "2026-02-04",
    "format": 2,
    "image_url": null,
-   "kind": "other",
+   "kind": "render",
    "last_pull": "2026-08-15",
    "last_shown": "2026-08-15",
    "text": [
@@ -13689,7 +13745,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "เงินติดล้อ",
     "ขุเซ",
@@ -14064,7 +14120,7 @@
    "image_url": null,
    "kind": "render",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [],
    "text_src": null
   },
@@ -14101,6 +14157,20 @@
     "การตั้งค่าโฆษณา"
    ],
    "text_src": "render"
+  },
+  "CR09001191188199374849": {
+   "advertiser_id": "AR14376384815463137281",
+   "advertiser_name": "บริษัท เงินให้ใจ จำกัด",
+   "brand": "NGERNHAIJAI",
+   "first_pull": "2026-08-15",
+   "first_shown": "2026-08-14",
+   "format": 3,
+   "image_url": null,
+   "kind": "render",
+   "last_pull": "2026-08-15",
+   "last_shown": "2026-08-15",
+   "text": [],
+   "text_src": null
   },
   "CR09012029555350700033": {
    "advertiser_id": "AR05287991188266156033",
@@ -14477,7 +14547,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "ใไปประกันติ",
     "เมื่อซื้อประทันชีวิตติดโล่ จ่ายชิล คืนชัวร์ ตั้งแต่วันที่ 8 ท.ค. 69 - 31 ส.ค. 69 ประทันชีวิต",
@@ -14886,7 +14956,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "เงินติดล้อ",
     "รับรถบรรทุกอายุสูงสุด 30 ปี - รถผ่อนอยู่",
@@ -15657,7 +15727,7 @@
    "image_url": null,
    "kind": "render",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [],
    "text_src": null
   },
@@ -16626,6 +16696,20 @@
    ],
    "text_src": "ocr"
   },
+  "CR10567317958617464833": {
+   "advertiser_id": "AR14376384815463137281",
+   "advertiser_name": "บริษัท เงินให้ใจ จำกัด",
+   "brand": "NGERNHAIJAI",
+   "first_pull": "2026-08-15",
+   "first_shown": "2026-08-14",
+   "format": 3,
+   "image_url": null,
+   "kind": "render",
+   "last_pull": "2026-08-15",
+   "last_shown": "2026-08-15",
+   "text": [],
+   "text_src": null
+  },
   "CR10582989985042923521": {
    "advertiser_id": "AR12032973375124013057",
    "advertiser_name": "บริษัท เงินติดล้อ จำกัด (มหาชน)",
@@ -17164,7 +17248,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "ประกันติดโล่",
     "งพพม.ดเลลทนส่!อท.6อทา",
@@ -17381,7 +17465,7 @@
    "image_url": null,
    "kind": "render",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [],
    "text_src": null
   },
@@ -18188,7 +18272,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "ได้รับการสนับสนุน เซ เร",
     "ฆ เฉ ผ่อนสัน-ยาวสูงสุด 60 เดือน - ไม่ต้องใช้สลิป ไม่ ต้องมีคนค้า",
@@ -18572,7 +18656,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "งมพเพ.ธสพสผ่.00.ป่า",
     "สินเชื่อรถยนต์",
@@ -18785,7 +18869,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "งมเพพ.ธสพเลผ่.00.ป่า",
     "สินเชื่อรถยนต์",
@@ -19407,7 +19491,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "บัตรติดล้อหมุนใช้ยามฉุกเฉิน 24 ชม.",
     "สินเชื่อทะเบียนรถเก๋ง-กระบะ พร้อมบัตรติดล้อ อนุมัติไว ให้เงินเร็ว ขั้นตอนไม่ยุ่งยาก",
@@ -19744,6 +19828,20 @@
    "text": [],
    "text_src": null
   },
+  "CR12819962197232844801": {
+   "advertiser_id": "AR14376384815463137281",
+   "advertiser_name": "บริษัท เงินให้ใจ จำกัด",
+   "brand": "NGERNHAIJAI",
+   "first_pull": "2026-08-15",
+   "first_shown": "2026-08-14",
+   "format": 3,
+   "image_url": null,
+   "kind": "render",
+   "last_pull": "2026-08-15",
+   "last_shown": "2026-08-15",
+   "text": [],
+   "text_src": null
+  },
   "CR12852132507302232065": {
    "advertiser_id": "AR00343519610412204033",
    "advertiser_name": "บริษัท เงินติดล้อ จำกัด (มหาชน)",
@@ -19857,7 +19955,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "ทา๐เธ"
    ],
@@ -21247,6 +21345,20 @@
    "text": [],
    "text_src": null
   },
+  "CR13835523913204891649": {
+   "advertiser_id": "AR14376384815463137281",
+   "advertiser_name": "บริษัท เงินให้ใจ จำกัด",
+   "brand": "NGERNHAIJAI",
+   "first_pull": "2026-08-15",
+   "first_shown": "2026-08-14",
+   "format": 3,
+   "image_url": null,
+   "kind": "render",
+   "last_pull": "2026-08-15",
+   "last_shown": "2026-08-15",
+   "text": [],
+   "text_src": null
+  },
   "CR13838573339985051649": {
    "advertiser_id": "AR12032973375124013057",
    "advertiser_name": "บริษัท เงินติดล้อ จำกัด (มหาชน)",
@@ -21727,7 +21839,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "ได้รับการสนับสนุน",
     "งเพหพเปิด!อห.๐0ทา",
@@ -23095,7 +23207,7 @@
    "image_url": null,
    "kind": "render",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "เปลี่ยนบ้านเป็นเงิน ศรีสวัสดิ์ - บ้านแลกเงินศรีสวัสดิ์ รู้ผลไว",
     "สินเชื่อบ้าน",
@@ -23103,6 +23215,20 @@
     "สินเชื่อบ้านแลกเงิน มีเงินใช้ทันใจ บ้านยังอยู่ ดอกต่ำ ผ่อนต่อเดือนได้นานสูงสุด 120 งวด เปลี่ยนบ้านเป็นเงินก้อนใหญ่กับศรีสวัสดิ์ สภาพคล่องไม่มีสดุด..."
    ],
    "text_src": "render"
+  },
+  "CR15174218902440771585": {
+   "advertiser_id": "AR14376384815463137281",
+   "advertiser_name": "บริษัท เงินให้ใจ จำกัด",
+   "brand": "NGERNHAIJAI",
+   "first_pull": "2026-08-15",
+   "first_shown": "2026-08-14",
+   "format": 3,
+   "image_url": null,
+   "kind": "render",
+   "last_pull": "2026-08-15",
+   "last_shown": "2026-08-15",
+   "text": [],
+   "text_src": null
   },
   "CR15204754470647889921": {
    "advertiser_id": "AR05287991188266156033",
@@ -24740,7 +24866,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [],
    "text_src": null
   },
@@ -25043,7 +25169,7 @@
    "image_url": null,
    "kind": "render",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [],
    "text_src": null
   },
@@ -25081,7 +25207,7 @@
    "image_url": null,
    "kind": "other",
    "last_pull": "2026-08-15",
-   "last_shown": "2026-08-14",
+   "last_shown": "2026-08-15",
    "text": [
     "ประกันติดโล่",
     "นูพหม.ดเลลทนิเส!อท.6อทา",

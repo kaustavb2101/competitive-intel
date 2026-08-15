@@ -7,15 +7,15 @@
     "live_pct": 45.9,
     "n_live": 162,
     "n_new_30d": 52,
-    "share_of_volume_pct": 24.6
+    "share_of_volume_pct": 24.4
    },
    {
     "brand": "Ngern Hai Jai",
     "key": "NGERNHAIJAI",
-    "live_pct": 31.1,
-    "n_live": 38,
-    "n_new_30d": 40,
-    "share_of_volume_pct": 8.5
+    "live_pct": 35.9,
+    "n_live": 47,
+    "n_new_30d": 49,
+    "share_of_volume_pct": 9.1
    },
    {
     "brand": "Ngern Tid Lor",
@@ -23,7 +23,7 @@
     "live_pct": 20.9,
     "n_live": 167,
     "n_new_30d": 16,
-    "share_of_volume_pct": 55.6
+    "share_of_volume_pct": 55.3
    },
    {
     "brand": "MoneyDD",
@@ -38,12 +38,12 @@
   "disappeared": [],
   "label": "MEASURED — n_new_30d is Google Ads Transparency's own per-creative first_shown date, counted within 30 days of the pull date.",
   "live_total_series": {
-   "delta_vs_prior_pull": 7.0,
+   "delta_vs_prior_pull": 46.0,
    "first_seen": "2026-07-30",
-   "latest_date": "2026-08-11",
-   "latest_value": 363.0,
-   "n_observations": 3,
-   "prior_date": "2026-08-09"
+   "latest_date": "2026-08-15",
+   "latest_value": 409.0,
+   "n_observations": 4,
+   "prior_date": "2026-08-11"
   },
   "n_appeared_brands": 4,
   "n_disappeared_brands": 0,

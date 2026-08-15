@@ -150,8 +150,8 @@
    "measured": true,
    "no_history": "channel stats are point-in-time; subscriber history is not stored",
    "source": "YouTube Data API v3 (official)",
-   "stamp": "2026-08-11",
-   "stamp_iso": "2026-08-11",
+   "stamp": "2026-08-15",
+   "stamp_iso": "2026-08-15",
    "stamp_kind": "pulled",
    "unit": "channels",
    "value": 13,
@@ -163,11 +163,16 @@
    "file": "rival_ads.json",
    "fresh_days": 10,
    "group": "Competition",
-   "history": null,
+   "history": {
+    "file": "feed_history.json",
+    "kind": "accumulated",
+    "note": "4 observations from 2026-07-30, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 4,
+    "series": "rival_ads_live"
+   },
    "key": "rival_ads",
    "label": "Rivals running paid ads",
    "measured": true,
-   "no_history": "accumulating — 3 observations since 2026-07-30; the line is drawn once 4 have landed",
    "source": "Google Ads Transparency Center",
    "stamp": "2026-08-15",
    "stamp_iso": "2026-08-15",
@@ -256,8 +261,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "21 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 21,
+    "note": "22 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 22,
     "series": "rain_max_mm"
    },
    "key": "thaiwater_rain",
@@ -268,7 +273,7 @@
    "stamp_iso": "2026-08-15",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4424,
+   "value": 4351,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -280,8 +285,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "21 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 21,
+    "note": "22 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 22,
     "series": "flood_high"
    },
    "key": "thaiwater_flood",
@@ -292,7 +297,7 @@
    "stamp_iso": "2026-08-15",
    "stamp_kind": "pulled",
    "unit": "of 797",
-   "value": 131,
+   "value": 130,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -483,11 +488,11 @@
  "meta": {
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
-  "history_note": "A trend line is drawn only where a stored series exists. 9 of 23 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 240,
+  "history_note": "A trend line is drawn only where a stored series exists. 10 of 23 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
+  "history_points": 246,
   "missing_files": [],
   "n_feeds": 23,
-  "n_with_history": 9,
+  "n_with_history": 10,
   "source": "Per-feed stamps read from each platform/data layer's own meta block (pulled / as_of / vintage / updated). No value is re-derived here."
  }
 }
