@@ -14,14 +14,24 @@ name: Data — Thai-IP-only swarm feeds (self-hosted, daily)
 #   data.go.th          200   <- the aggregator. Blocked from CI since this project started.
 #   tidlor.com          200   <- the only rival with a parseable promo listing, and the market leader.
 #   hengleasing.com     200   <- reachable, but it has no promo page worth parsing.
-#   sawad.co.th         000   <- no HTTP response at all, even on IPv4 with a 45s timeout.
-#   muangthaicap.com    000   <- same.
+#   sawad.co.th         200   <- FIXED 2026-08-15. Was recorded as 000 "no HTTP response at all".
+#   muangthaicap.com    301   <- FIXED 2026-08-15. Same cause.
 #   dataforthai.com     403   <- answered and refused. A deliberate block; a Thai IP does not fix it.
 #   one2car.com/        403   <- Cloudflare bot check on the HTML, NOT geography. See below.
 #
-# So `rival_promos` runs here in a KNOWN-PARTIAL state: Tidlor lands, Sawad and MTC do not. That is
-# still strictly more than the zero it was getting. When either of those two starts answering, it
-# starts landing here with no change to this file.
+# THE 000 READING WAS MISDIAGNOSED, AND IT COST 35 DAYS OF THIS FEED.
+# curl reports HTTP 000 whenever the transfer never completed — which includes a handshake that was
+# REFUSED BY OUR OWN VERIFICATION, not only a server that stayed silent. Reading it as "no response
+# at all" turned a five-minute certificate fix into a permanent "they block us" entry. Both hosts
+# send their leaf certificate and omit the intermediate; a browser repairs that silently via the
+# leaf's AIA extension, OpenSSL does not. Measured on this box on 2026-08-15:
+#     openssl s_client   -> verify error:num=20 unable to get local issuer certificate
+#     curl -k            -> 200 / 301   (proving the server was answering the whole time)
+# pipeline/lib/ca_bundle.py now supplies the two intermediates, with verification left fully ON, and
+# all three brands land: TIDLOR 6, MTC 11, SAWAD 5 items.
+#
+# Before recording any future host as blocked, run `openssl s_client -connect host:443` first. A
+# geoblock answers and refuses (403, like dataforthai below); a broken chain never gets that far.
 #
 # WHAT THIS RUNNER DOES *NOT* UNBLOCK — recorded so nobody re-litigates it. one2car returns 403 on
 # its HTML pages from this box exactly as it does from CI; only `robots.txt` (served off the CDN

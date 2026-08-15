@@ -107,6 +107,13 @@ jobs:
           python-version: "3.11"
       - name: Install Overture CLI
         run: pip install overturemaps
+      - name: Put the CLI shim first on PATH (Overture deleted its release catalog)
+        # overturemaps 1.0.1 resolves "which release?" from https://stac.overturemaps.org/catalog.json,
+        # which now 404s, so EVERY invocation aborts before pulling a byte — this workflow last
+        # succeeded 2026-08-01 and would have failed silently from here on. pipeline/bin/overturemaps
+        # answers that one question from the S3 bucket Overture still serves and delegates the rest
+        # to the real CLI. Delete this step once upstream restores the catalog.
+        run: echo "$GITHUB_WORKSPACE/pipeline/bin" >> "$GITHUB_PATH"
       - name: Pull chunk (${{ matrix.chunk.slugs }})
         env:
           SLUGS: ${{ matrix.chunk.slugs }}

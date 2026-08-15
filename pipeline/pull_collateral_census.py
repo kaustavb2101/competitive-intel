@@ -151,6 +151,15 @@ def one2car_parse(html, url):
 AUCT_API = "https://service.auct.co.th:2368/webauction/products_new"
 AUCT_TYPES = {"car": "รถยนต์", "moto": "รถจักรยานยนต์"}
 
+# service.auct.co.th sends ONLY its leaf certificate and omits the Sectigo intermediate that chains
+# it to a trusted root. Browsers hide this by fetching the missing intermediate from the leaf's AIA
+# extension; OpenSSL/curl on Linux do not, so every Linux CI runner fails the handshake with
+# "unable to get local issuer certificate" while the same URL works fine in a browser and from the
+# owner's Windows laptop. That asymmetry is why this was misread as a datacenter geoblock for days.
+# lib/ca_bundle supplies the omitted intermediate — a chain repair, NOT `curl -k`: verification
+# stays on and the anchor is a root the system already trusted. See pipeline/certs/README.md.
+from lib.ca_bundle import curl_ca_args as _ca_bundle_args   # noqa: E402
+
 # STRICT ALLOWLIST — an allowlist, deliberately, not a denylist. Every record carries
 # Chassis_No, Engine_No, License_Plate_No, Contract_No, Seller_Contract_No (populated 1147/1147 when
 # checked) plus created_user, which is a named branch employee. Chassis/engine/plate identify a
@@ -220,8 +229,9 @@ def auct_history(outpath, brands=None, sleep_s=20):
         body = "Asset_Type=%s&Brand_Name=%s&Passed=1" % (urllib.parse.quote(thai_type),
                                                          urllib.parse.quote(brand))
         proc = subprocess.Popen(
-            ["curl", "-s", "--compressed", "--max-time", "900", "-A", UA,
-             "-H", "Referer: https://www.auct.co.th/", "--data", body, AUCT_API],
+            ["curl", "-s", "--compressed", "--max-time", "900", "-A", UA]
+            + _ca_bundle_args()
+            + ["-H", "Referer: https://www.auct.co.th/", "--data", body, AUCT_API],
             stdout=subprocess.PIPE)
         n = 0
         try:
@@ -293,13 +303,28 @@ def auct_harvest(outpath, _limit=None, _workers=None):
     for kind, thai in AUCT_TYPES.items():
         body = "Asset_Type=%s&Brand_Name=&Passed=0" % urllib.parse.quote(thai)
         p = subprocess.run(
-            ["curl", "-s", "--compressed", "--max-time", "180", "-A", UA,
-             "-H", "Referer: https://www.auct.co.th/", "--data", body, AUCT_API],
+            ["curl", "-s", "--compressed", "--max-time", "180", "-A", UA]
+            + _ca_bundle_args()
+            + ["-H", "Referer: https://www.auct.co.th/", "--data", body, AUCT_API],
             capture_output=True, timeout=240)
+        # Check curl's OWN exit status before trying to parse. Without this, a handshake that never
+        # completed produced an empty stdout and surfaced as "Expecting value: line 1 column 1",
+        # which reads like a malformed response body and sent a diagnosis down the wrong path for
+        # days. curl 60 = certificate problem, 6 = DNS, 7 = connection refused, 28 = timeout.
+        if p.returncode != 0:
+            err = p.stderr.decode("utf-8", "replace").strip().splitlines()
+            print("  ! %s: curl failed (exit %d)%s" % (kind, p.returncode,
+                  " — " + err[-1] if err else " — no stderr (curl ran with -s)"), file=sys.stderr)
+            if p.returncode == 60:
+                print("    exit 60 is a TLS chain failure. The venue omits its intermediate CA; "
+                      "pipeline/certs/ supplies it. Check that PEM exists and has not expired.",
+                      file=sys.stderr)
+            continue
         try:
             doc = json.loads(p.stdout.decode("utf-8", "replace"))
         except Exception as exc:
-            print("  ! %s: response did not parse (%s)" % (kind, exc), file=sys.stderr)
+            print("  ! %s: response did not parse (%s); %d bytes received"
+                  % (kind, exc, len(p.stdout)), file=sys.stderr)
             continue
         prods = doc.get("product") or []
         print("  %-5s %-16s %5d lots" % (kind, thai, len(prods)))

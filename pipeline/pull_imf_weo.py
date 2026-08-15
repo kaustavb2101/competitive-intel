@@ -50,28 +50,66 @@ N_HIST = 6   # recent years of Thailand series to keep
 GAP = 9      # seconds between indicator requests (avoid the burst rate-limit)
 BACKOFF = [20, 45, 90, 150]   # 403 retry waits
 
+# WALL-CLOCK BUDGET FOR THE WHOLE PULL — the difference between a clean no-op and a red workflow.
+#
+# The retry ladder is per-indicator: 5 attempts x 45s timeout + 305s of backoff is ~8.8 minutes for
+# ONE indicator, and there are 5 of them plus 9s pacing — about 44 minutes when Cloudflare blocks
+# every request. data-imf-weo.yml sets timeout-minutes: 15, so GitHub force-cancelled the job at 15
+# minutes EVERY time and the workflow had never once succeeded. The irony is that the code below
+# already handles a total block correctly: assemble() returns empty, main() keeps the committed file
+# and exits 0. It simply never got to run.
+#
+# So bound the retries by a deadline instead of by attempt count. When the budget is gone we stop
+# retrying and let the empty-pull guard do its job, which turns a guaranteed red run into an honest
+# "blocked today, keeping the good file" green one. Default 600s leaves headroom inside the 15-minute
+# job for checkout, pip install and the downstream re-derive.
+BUDGET_S = int(os.environ.get("IMF_PULL_BUDGET_S", "600"))
+_START = time.monotonic()
+
+
+def _budget_left():
+    return BUDGET_S - (time.monotonic() - _START)
+
 
 def get_json(url, timeout=45):
-    """Fetch with browser headers; retry 403/errors with escalating backoff."""
+    """Fetch with browser headers; retry 403/errors with escalating backoff, inside BUDGET_S."""
     last = None
     for wait in [0] + BACKOFF:
+        left = _budget_left()
+        if left <= 0:
+            raise last or RuntimeError("pull budget of %ds exhausted before the first attempt" % BUDGET_S)
         if wait:
+            if wait >= left:
+                # Sleeping this backoff would spend the rest of the budget and still leave no time to
+                # issue the request. Give up on this indicator now so the others (and the graceful
+                # no-op) still get their turn.
+                print("  giving up: %ss backoff exceeds the %ds budget remaining" % (wait, int(left)))
+                break
             time.sleep(wait)
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS), timeout=timeout) as r:
+            # Never let one socket outlive the budget.
+            with urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS),
+                                        timeout=max(5, min(timeout, _budget_left()))) as r:
                 return json.loads(r.read())
         except Exception as e:
             last = e
             print("  retry (%s) after %ss…" % (str(e)[:50], BACKOFF[0] if wait == 0 else wait))
-    raise last
+    raise last or RuntimeError("no attempt completed within the %ds budget" % BUDGET_S)
 
 
 def fetch_raw():
     """Live pull: one request per indicator (returns ALL economies). code -> {iso -> {year:val}}."""
     raw = {}
     for i, code in enumerate(IND):
+        if _budget_left() <= 0:
+            # Stop cleanly rather than being force-cancelled by the job timeout mid-request: a
+            # partial raw{} still assembles whatever indicators DID come back, and a fully empty one
+            # takes the keep-the-committed-file path in main().
+            print("budget of %ds exhausted — stopping after %d/%d indicators."
+                  % (BUDGET_S, i, len(IND)))
+            break
         if i:
-            time.sleep(GAP)   # pace requests to avoid the Cloudflare burst limit
+            time.sleep(min(GAP, max(0, _budget_left())))   # pace to avoid the Cloudflare burst limit
         try:
             data = get_json("%s/%s" % (API, code))
         except Exception as e:
