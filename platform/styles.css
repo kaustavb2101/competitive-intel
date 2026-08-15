@@ -910,6 +910,14 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
      the printed brief. Force the fill so the measured dot + pill tint render like on screen. */
   .prov,.prov .pd,.cc-tag,.cc-tag::before{
     -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  /* Last background-encoded mark: the section-heading accent bar (h2::before, a 3px gradient rail
+     with NO border). Its SEMANTIC variants carry the segment lens — h2.risk (agri), h2.demand
+     (merchant), h2.collat (collateral), h2.opp (gold) — which organises the whole brief by segment,
+     yet the default board PDF strips the fill and every section marker vanishes to blank. Force the
+     fill so the on-screen segment colour-coding survives on paper. Negligible ink (3px per heading);
+     card fills stay deliberately whitened above. Closes the print-colour-strip series. */
+  h2::before{
+    -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 
 /* ---------- scenario simulator ---------- */
