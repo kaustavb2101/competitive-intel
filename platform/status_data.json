@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-15T10:27:48+00:00",
-    "commit": "3525028"
+    "generated_at": "2026-08-15T16:24:19+00:00",
+    "commit": "6e7ed47"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-08-15T16:24:19+00:00",
+      "sha": "6e7ed47",
+      "summary": "intel(peer): cross-surface peer-rollup tripwire — the two obj-#2 boards must agree per brand",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-15T15:46:21+00:00",
+      "sha": "334e0f5",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-15T15:42:58+00:00",
+      "sha": "31a0ff4",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-15, run 31893262524)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T15:38:35+00:00",
+      "sha": "a035a94",
+      "summary": "fix(ci): repair four broken data feeds — TLS chain, Overture catalog, IMF retry budget (#425)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-15T14:33:23+00:00",
+      "sha": "44231eb",
+      "summary": "docs(progress-log): record ux-loop aria-pressed branch-explorer merge+deploy+verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-15T21:30:38+07:00",
+      "sha": "338ef61",
+      "summary": "ux: aria-pressed on branch-explorer basemap/layer toggle buttons (#426)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-15T13:56:31+00:00",
+      "sha": "4f4e8ca",
+      "summary": "data: SET peer filings refresh (run 31886903843) (#421)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-15T12:36:54+00:00",
+      "sha": "99772a1",
+      "summary": "intel(deploy-health): shape-probe the two remaining default-route silent-hide reads",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-15T11:18:50+00:00",
+      "sha": "c403824",
+      "summary": "data: market-pulse swarm refresh (run 31878131912) (#420)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-15T10:30:40+00:00",
+      "sha": "adc7827",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the Vercel-SSO false-outage fix",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-08-15T10:27:48+00:00",
       "sha": "3525028",
       "summary": "intel(deploy-health): read a Vercel SSO redirect as up+gated, not a false outage",
@@ -651,66 +711,6 @@
       "sha": "60685b5",
       "summary": "chore(dashboard): refresh autonomy plan after #acq borrower-voice probes",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-14T22:22:25+00:00",
-      "sha": "dea5f69",
-      "summary": "health: probe the two #acq borrower-voice reads (pantip_panel + social_themes)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-15T05:01:00+07:00",
-      "sha": "39c10c6",
-      "summary": "fix(automerge): match the bot login gh actually returns, and stop corrupting step outputs (#413)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-14T21:49:00+00:00",
-      "sha": "f5b63c2",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-14, run 31843710897)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T04:37:56+07:00",
-      "sha": "2108226",
-      "summary": "fix(automerge): run on the idle `thai` box, and fail loudly on a runner without gh (#412)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-15T04:28:19+07:00",
-      "sha": "ff8b7bd",
-      "summary": "fix(automerge): one unmergeable PR must not block the queue behind it (#411)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-15T04:19:37+07:00",
-      "sha": "dbc6c29",
-      "summary": "ci: cut Actions spend ~84%, un-hide master's gate, and auto-merge generated PRs (#410)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-14T20:53:45+00:00",
-      "sha": "50183ff",
-      "summary": "data: NABC live prices (2026-08-14, run 31839491992)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T02:21:34+07:00",
-      "sha": "60cfd5b",
-      "summary": "data: SET listed-peer scoreboard refresh (run 31798080328) (#404)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-15T02:20:47+07:00",
-      "sha": "9e6fb3a",
-      "summary": "data: market-pulse swarm refresh (run 31792820250) (#402)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-15T02:17:37+07:00",
-      "sha": "1d00598",
-      "summary": "data: market-pulse swarm refresh (run 31772501280) (#399)",
-      "pillar": "market"
     }
   ]
 }
