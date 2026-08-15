@@ -1,0 +1,282 @@
+Operating Performance Summary
+Ngernturbo Public Company Limited
+Management Discussion and Analysis (MD&A)
+For the second quarter of 2026 and the six-month period ended 30 June 2026
+(Consolidated financial statements, unaudited | Unit: THB million unless otherwise stated)
+EXECUTIVE SUMMARY
+01
+Operating Performance Summary
+Net profit — Q2/2026 Net profit — 1H 2026 Net loan portfolio — Q2/2026 NPL ratio (% Stage 3)
+154.1 329.1 11,984.3 3.49
+THB mn THB mn THB mn %
+▲ improved from 3.68% at
+▲ +69.5% YoY ▲ +39.5% YoY ▲ +11.3% YoY end-Q1/2026
+Six-quarter performance (THB mn)
+Item (THB mn) Q1/2025 Q2/2025 Q3/2025 Q4/2025 Q1/2026 Q2/2026
+Total revenue 748.6 769.0 762.9 814.2 816.7 859.6
+Administrative expenses 337.2 356.3 377.1 405.0 381.8 421.7
+Expected credit loss (ECL) 123.6 199.4 132.1 145.0 131.0 161.2
+Finance costs 107.8 104.5 100.0 89.8 87.4 89.1
+Net profit 145.0 90.9 125.7 141.5 175.0 154.1
+Earnings per share (THB per
+0.065 0.041 0.056 0.053 0.066 0.058
+share)
+In the second quarter of 2026, the Company recorded net profit of THB 154.1 million, an increase of 69.5% from the
+same quarter of the previous year, bringing first-half net profit to THB 329.1 million, up 39.5%. This performance was
+driven by four main factors, as follows:
+01 Accelerating loan portfolio growth (Growth) Even as the Company maintained strict lending standards, the net loan
+portfolio expanded to THB 11,984.3 million, representing growth of 4.3% quarter-on-quarter and 7.9% from year-
+end 2025 (11.3% YoY), while Yield on Loan was maintained at a high level of approximately 25.0% — reflecting
+growth achieved while keeping returns commensurate with risk.
+02 Increased revenue diversification (Revenue Diversification) Income from the insurance brokerage business and
+other income amounted to THB 114.8 million (+35.7% YoY, +10.3% QoQ), of which brokerage commissions and
+other remuneration from the insurance business accounted for THB 112.4 million (+35.6% YoY), marking the third
+consecutive quarter above THB 100 million. Non-interest income accordingly rose to 15.0% of total revenue, from
+13.8%.
+Management Discussion and Analysis · Ngernturbo Public Company Limited · For the six-month period ended 30 June 2026 1 / 8
+Key Highlights
+03 Proactive funding cost management (Funding Cost Management) Finance costs declined 14.7% YoY to THB 89.1
+million, following the repayment of THB 357.7 million of maturing debentures in the first half. Interest-bearing debt
+rose 5.5% from year-end, below the 7.9% expansion of the loan portfolio.
+04 Improving asset quality with a thicker provisioning buffer (Asset Quality) The NPL ratio (% Stage 3) continued to
+decline from 3.96% at year-end 2025 and 3.68% at end-Q1/2026 to 3.49%, while % Stage 1 rose to 91.4%.
+Expected credit loss (ECL) consequently fell 19.2% YoY, notwithstanding continued expansion of the loan portfolio.
+Although overall asset quality improved, the NPL Coverage Ratio increased from 100.3% to 117.7% as the Company
+elected to establish an additional Management Overlay.
+KEY HIGHLIGHTS
+02
+Key Highlights
+Indicator Q2/2026 Q1/2026 Q2/2025 6M 2026 6M 2025
+Profitability
+Net profit (THB mn) 154.1 175.0 90.9 329.1 235.9
+Total revenue (THB mn) 859.6 816.7 769.0 1,676.3 1,517.6
+Basic earnings per share (THB) 0.058 0.066 0.041 0.123 0.106
+Return on Assets (ROA, Annualized) 4.61% 5.50% 2.90% 4.98% 3.73%
+Net Interest Margin (NIM) 21.0% 20.8% 20.3% 20.9% 20.0%
+Cost to Income 54.7% 52.4% 53.7% 53.6% 53.2%
+Loan portfolio
+Net loan portfolio at period end (THB mn) 11,984.3 11,494.6 10,768.5 11,984.3 10,768.5
+Yield on Loan 25.0% 24.8% 24.6% 24.8% 24.4%
+Loan quality
+Performing loan ratio (% Stage 1) at
+91.4% 91.3% 86.6% 91.4% 86.6%
+period end
+NPL ratio (% Stage 3) at period end 3.49% 3.68% 4.10% 3.49% 4.10%
+NPL Coverage Ratio 117.7% 106.7% 107.1% 117.7% 107.1%
+% Credit Cost (Annualized) 5.3% 4.5% 7.1% 4.9% 5.6%
+Other related indicators
+Number of branches (branches) 1,004 998 996 1,004 996
+Loans per branch (THB mn per branch) 12.4 12.0 11.3 12.4 11.3
+Revenue per employee (THB mn per
+1.41 1.37 1.25 1.37 1.21
+employee)
+Note: 1) Based on information as at 30 June 2025 publicly disclosed by the Company during the period of its initial public offering (IPO).
+Management Discussion and Analysis · Ngernturbo Public Company Limited · For the six-month period ended 30 June 2026 2 / 8
+Analysis of Operating Performance
+FINANCIAL PERFORMANCE
+03
+Analysis of Operating Performance
+3.1 Revenue
+Total revenue in Q2/2026 stood at THB 859.6 million, an increase of 11.8% YoY and 5.3% QoQ, with the YoY growth rate
+accelerating from 9.1% in the preceding quarter and representing the Company's highest quarterly revenue to date. For
+the first half, total revenue amounted to THB 1,676.3 million, up 10.5%. Movements in each revenue component were as
+follows:
+Interest income stood at THB 730.5 million, up 10.3% YoY and 5.6% QoQ, driven by the accelerating expansion of the
+net loan portfolio to THB 11,984.3 million (+4.3% QoQ, +7.9% from year-end 2025), while Yield on Loan remained stable
+at a high level of approximately 25.0% — reflecting the Company's ability to grow the portfolio while maintaining returns
+commensurate with the level of risk assumed.
+Income from the insurance brokerage business and other income (reported within the "Other income" line) stood at
+THB 114.8 million, an increase of THB 30.3 million or 35.7% YoY, and returned to growth of 10.3% QoQ. Brokerage
+commissions and other remuneration from the non-life and life insurance brokerage businesses totalled THB 112.4
+million, up 35.6% YoY (THB 214.6 million for the first half, up 49.7%), reflecting the broadening of the product range and
+the expansion of the insurer partner network. Non-interest income rose to 15.0% of total revenue from 13.8% in the
+same quarter of the previous year, reducing reliance on interest income alone and generating income that requires no
+capital to absorb credit risk.
+Fees and service income stood at THB 9.2 million, a decrease of THB 6.9 million or 43.03% YoY, mainly because
+customers are servicing their obligations more punctually, leading to a continued reduction in collection-related fees.
+While this weighs on reported revenue, it constitutes a structural change that reflects the improving quality of the loan
+portfolio (further detail in Section 3.3).
+Sales income stood at THB 5.2 million, down 10.2% YoY.
+3.2 Administrative Expenses
+Administrative expenses stood at THB 421.7 million, up 18.3% YoY and 10.4% QoQ, taking Cost to Income to 54.7%
+compared with 52.4% in the preceding quarter. The main drivers were the accelerated modernisation of branches to
+enhance their image and the increase in litigation and debt-collection expenses, together with personnel costs to
+support branch expansion.
+For the first half, Cost to Income stood at 53.6%, broadly in line with 53.2% in the corresponding period of the previous
+year. The Company continues to apply technology across its operating processes.
+Management Discussion and Analysis · Ngernturbo Public Company Limited · For the six-month period ended 30 June 2026 3 / 8
+Analysis of Operating Performance
+3.3 Asset Quality and Expected Credit Loss
+Asset quality improved across every dimension. The non-performing loan ratio (% Stage 3) declined from 3.96% at year-
+end 2025 and 3.68% at end-Q1/2026 to 3.49%, with Stage 3 balances falling in absolute terms to THB 436.3 million
+from THB 457.5 million at year-end 2025 (a decrease of 4.6%), even as contractual receivables expanded 8.1% over the
+same period. Stage 2 balances likewise declined to THB 639.8 million, or 5.1% of the portfolio (from 5.7% at year-end
+2025), while performing loans (% Stage 1) rose to 91.4%. The reduction in non-performing loans reflects more effective
+management of collateral disposal — assets held for sale declined from THB 16.4 million to THB 9.3 million, a decrease
+of 43.4% — together with proactive debt collection, evidenced by more punctual customer repayment and consistent
+with the 43.03% YoY decline in collection fees, which provides practical corroboration of the improvement in loan
+quality.
+Expected credit loss (ECL) amounted to THB 161.2 million, a decrease of THB 38.2 million or 19.2% from the same
+quarter of the previous year, notwithstanding continued portfolio expansion. Relative to the preceding quarter, ECL
+increased by THB 30.2 million or 23.1%, in line with the accelerating growth of the portfolio and the Company's prudent
+provisioning policy. Credit Cost (Annualised) accordingly rose to 5.3%, compared with 4.5% in the preceding quarter
+(approximately 4.9% for the first half, with total ECL of THB 292.2 million, down 9.5% YoY). As a result of this approach,
+the total allowance for expected credit loss increased to THB 513.7 million, equivalent to an NPL Coverage Ratio of
+117.7%, up from 100.3% at year-end 2025, while the Stage 3 allowance as a proportion of Stage 3 balances rose to
+49.0% from 44.6%. The allowance also incorporates a Management Overlay established in accordance with the
+Company's prudent provisioning policy.
+Management is of the view that maintaining a prudent level of provisioning at a time when the loan portfolio is
+expanding at an accelerating pace constitutes an appropriate means of building long-term protection into the financial
+statements, notwithstanding the continued improvement in loan quality indicators.
+3.4 Finance Costs
+Finance costs stood at THB 89.1 million, down 14.8% YoY and up only 1.9% QoQ, significantly below the rate of growth
+in liabilities and reflecting a continued decline in the average cost of funds. For the first half, finance costs fell 16.9% to
+THB 176.5 million, even as interest-bearing debt (borrowings and debentures) increased from THB 8,458.7 million to THB
+8,922.4 million (+5.5%) to support the 7.9% expansion of the portfolio. This was mainly attributable to proactive
+management of the funding structure, namely the repayment of THB 357.7 million of maturing debentures — reducing
+debentures outstanding from THB 917.4 million to THB 562.3 million — and the arrangement of replacement long-term
+borrowings from financial institutions, predominantly at floating rates, which continued to benefit from the policy rate
+reductions in December 2025 and February 2026 and from the rate being held at 1.00% throughout the quarter. As at
+the period end, the Group complied in full with the financial ratio covenants under its loan agreements and the terms
+and conditions of its debentures.
+Management Discussion and Analysis · Ngernturbo Public Company Limited · For the six-month period ended 30 June 2026 4 / 8
+Financial Position
+Statement of comprehensive income (THB mn)
+Statement of comprehensive income (THB
+Q2/2026 Q1/2026 QoQ % Q2/2025 YoY %
+mn)
+Interest income 730.5 691.6 +5.6% 662.6 +10.2%
+Fees and service income 9.2 10.9 (15.6%) 16.1 (42.9%)
+Sales income 5.2 10.1 (48.5%) 5.8 (10.3%)
+Other income 114.8 104.1 +10.3% 84.5 +35.9%
+Total revenue 859.6 816.7 +5.3% 769.0 +11.8%
+Administrative expenses (421.7) (381.8) 10.5% (356.3) 18.4%
+Expected credit loss (ECL) (161.2) (131.0) 23.1% (199.4) (19.2%)
+Finance costs (89.1) (87.4) +1.9% (104.5) (14.7%)
+Total expenses (672.1) (600.3) 12.0% (660.4) +1.8%
+Profit before income tax 187.6 216.3 (13.3%) 108.6 +72.7%
+Income tax (33.5) (41.3) (18.9%) (17.7) +89.3%
+Net profit 154.1 175.0 (11.9%) 90.9 +69.5%
+FINANCIAL POSITION
+04
+Financial Position
+4.1 Assets
+As at 30 June 2026, the Company reported total assets of THB 13,761.2 million, an increase of 6.3% from the end of the
+preceding quarter and 8.6% from year-end 2025. The increase of THB 1,084.0 million from year-end was driven mainly by
+loans and hire-purchase receivables, net, of THB 881.8 million (+4.3% QoQ, +7.9% from year-end), together with an
+increase of THB 257.7 million in other current receivables, mainly reflecting consideration received in advance under a
+commercial cooperation and strategic partnership agreement with an insurance company.
+4.2 Liabilities, Liquidity and Capital Management
+Total liabilities stood at THB 9,651.1 million, an increase of 7.3% from the end of the preceding quarter and 8.4% from
+year-end 2025, consistent with the expansion of the loan portfolio. The Company restructured its funding sources
+through the repayment of THB 357.7 million of debentures, replaced with long-term borrowings from financial
+institutions under accommodative interest rate conditions, which translated directly into lower finance costs. On
+liquidity, cash flow from operations before changes in working capital for the first half stood at THB 786.2 million, up
+5.8% YoY, while net cash used in operating activities was THB 383.5 million, reflecting a net increase in lending of THB
+1,135.7 million — an investment in income-generating assets rather than an operating loss. Supported by THB 378.5
+million from financing activities, cash at the period end stood at THB 217.6 million, broadly unchanged from year-end
+2025.
+Management Discussion and Analysis · Ngernturbo Public Company Limited · For the six-month period ended 30 June 2026 5 / 8
+Sustainability Performance (ESG)
+4.3 Shareholders' Equity and Capital Structure
+Shareholders' equity stood at THB 4,110.1 million, an increase of 3.9% from the end of the preceding quarter in line with
+higher retained earnings (unappropriated retained earnings of THB 1,096.3 million, from THB 767.2 million at year-end
+2025), and an increase of 44.4% from THB 2,847.0 million as at 30 June 2025, attributable to the IPO proceeds and to
+sustained earnings generation. The debt-to-equity ratio accordingly stood at 2.35 times, broadly in line with 2.28 times
+at end-Q1/2026 and significantly lower than 3.55 times at end-Q1/2025 and 3.39 times as at 30 June 2025. This
+strengthened capital base (i) is sufficient to support further expansion of the portfolio in the period ahead, and (ii)
+represents structural preparation for the standards applicable to Development Banks in the future.
+Statement of financial position (THB mn)
+Statement of financial position (THB mn) 30 Jun 2026 31 Mar 2026 QoQ % 31 Dec 2025 vs YE %
+Loans and hire-purchase receivables, net 11,984.3 11,494.6 +4.3% 11,102.5 +7.9%
+Total assets 13,761.2 12,951.5 +6.3% 12,677.2 +8.6%
+Total liabilities 9,651.1 8,997.3 +7.3% 8,899.9 +8.4%
+Total equity 4,110.1 3,954.2 +3.9% 3,777.3 +8.8%
+Debt-to-equity ratio (D/E, times) 2.35 2.28 +0.07x 2.36 (0.01x)
+SUSTAINABILITY
+05
+Sustainability Performance (ESG)
+Amid a challenging economic environment, the Company remains committed to conducting its business alongside
+enhancing the quality of life of society. In the second quarter of 2026, the Company focused on operating in accordance
+with the principles of responsible and fair lending (Responsible Lending), in order to create sustainability for both
+customers and the Company, as follows:
+Expanding opportunity and promoting access to funding Through a network of more than 1,004 branches covering
+54 provinces, the Company has delivered financial assistance to the grassroots population on a comprehensive basis,
+taking loan receivables in this quarter to THB 12,497.6 million. This figure reflects the trust placed in the Company
+and the liquidity support extended to customers — including those without documentary evidence of regular income
+— enabling them to deploy funding to develop their livelihoods and alleviate hardship when required.
+Sustainable debt management The Company places importance on assessing customers' affordability alongside the
+provision of financial counselling. The Company also provides assistance measures and debt restructuring on a
+timely basis to customers affected by economic conditions, which, in addition to alleviating customer hardship, has
+enabled the Company to manage its non-performing loan (NPL) ratio to a controlled level of 3.49%.
+Promoting financial knowledge and discipline in society Recognising the importance of addressing household debt
+sustainably, the Company has initiated financial literacy education for the general public through readily accessible
+online platforms such as TikTok and Facebook, presenting content on financial planning and rational spending, as
+part of building financial resilience, preventing over-indebtedness and enhancing the long-term quality of life of the
+grassroots population.
+These activities are aligned with the Company's vision of delivering sustainable growth. Further information on the
+Company's ESG performance is available at https://investor.turbo.co.th/th/downloads/one-reports
+Management Discussion and Analysis · Ngernturbo Public Company Limited · For the six-month period ended 30 June 2026 6 / 8
+Management Outlook
+MANAGEMENT OUTLOOK
+06
+Management Outlook
+6.1 Assessment of the Operating Environment
+Operating performance in the first half of 2026 was in line with management's expectations, in particular the Company's
+ability to accelerate loan portfolio growth while simultaneously reducing the non-performing loan ratio, alongside
+strengthening the adequacy of provisions and lowering finance costs. On the economic environment, the Monetary Policy
+Committee (MPC) resolved to hold the policy rate at 1.00% per annum at its April and June 2026 meetings, and revised
+upwards its forecast for Thai economic growth in 2026 to 2.3%, both of which are supportive of the Company's funding
+costs and of retail customers' purchasing power. Management nonetheless recognises that the following factors warrant
+close monitoring:
+Geopolitical tensions and international trade policy, which may affect the Thai economy indirectly through energy
+prices, supply chains, and consumer and business confidence.
+The purchasing power and debt-servicing capacity of retail consumers under persistently elevated household debt,
+particularly among customer segments whose income is linked to the agricultural season.
+6.2 Operating Priorities
+Against this backdrop, the Company will continue to prioritise four main directions, namely:
+Quality growth of the loan portfolio within a prudent risk management framework, maintaining the balance between
+expansion, returns and asset quality, including extending the service footprint through broader branch coverage.
+Enhancement of operating efficiency through the application of technology across operating processes, in order to
+return Cost to Income to a sustained downward trajectory.
+Diversification of revenue sources through the expansion of the insurance brokerage business and the development
+of new products aligned with customer requirements, which has delivered clear results for a third consecutive
+quarter.
+Preparation for the standards applicable to Development Banks, encompassing capital structure, provisioning
+adequacy, risk management and internal governance systems.
+The Company wishes to thank its shareholders, customers, business partners and all employees for their part in the
+Company's performance during the past quarter.
+6.3 Forward-Looking Statements
+This report contains certain forward-looking statements which reflect the views and expectations of management as at
+the date of the report and are based on assumptions regarding the economic, market and competitive environment, all
+of which are subject to change. Actual future performance may differ materially from that projected. Users of this report
+should exercise caution in considering such statements and should not regard them as a guarantee of future
+performance. The Company undertakes no obligation to update these forward-looking statements except as required by
+applicable laws or regulations.
+Management Discussion and Analysis · Ngernturbo Public Company Limited · For the six-month period ended 30 June 2026 7 / 8
+Notes and Ratio Definitions
+APPENDIX
+A
+Notes and Ratio Definitions
+Ratios for the three-month and six-month periods derived from the income statement have been annualised in order
+to permit comparison.
+Figures and calculated results are based on rounded numbers, which may give rise to minor differences when
+compared with calculations derived from the full financial statements.
+The Credit Cost ratio is calculated from average gross contractual receivables in accordance with the interim
+financial statements.
+Loan staging and the allowance for expected credit loss are presented in accordance with Notes 8 and 10 to the
+interim financial statements. The interim financial information was approved by the Board of Directors on 13 August
+2026.
+Information as at 30 June 2025 is based on information publicly disclosed by the Company during the initial public
+offering (IPO), consistent with the Company's published full-year 2025 totals.
+Calculation formulas
+Cost to Income = Administrative expenses ÷ (Total revenue − Finance costs)
+Yield on Loan = Interest income (annualised) ÷ Average net loan portfolio
+Net Interest Margin (NIM) = Yield on Loan − Finance costs
+ROA = Net profit (annualised) ÷ Average total assets
+NPL Coverage Ratio = Total allowance for expected credit loss ÷ Stage 3 receivables
+D/E = Total liabilities ÷ Total equity
+Loans per branch = Loan balance ÷ Number of branches
+Revenue per employee = Total revenue (annualised) ÷ Average number of employees
+Note: Interest income and finance costs are annualised on the basis of the actual number of days in the accounting period.
+Management Discussion and Analysis · Ngernturbo Public Company Limited · For the six-month period ended 30 June 2026 8 / 8
