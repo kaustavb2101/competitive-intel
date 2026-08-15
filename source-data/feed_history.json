@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 259,
+  "n_points": 276,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -18,11 +18,12 @@
     "2026-08-04",
     "2026-08-08",
     "2026-08-09",
-    "2026-08-11"
+    "2026-08-11",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-19",
    "label": "AutoX app · 1-star share",
-   "n": 6,
+   "n": 7,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (th.co.autox.chaiyo)",
    "unit": "%",
@@ -32,7 +33,8 @@
     14.8622,
     14.833,
     14.7348,
-    14.7493
+    14.7493,
+    13.8235
    ]
   },
   "app_autox_score": {
@@ -43,11 +45,12 @@
     "2026-08-04",
     "2026-08-08",
     "2026-08-09",
-    "2026-08-11"
+    "2026-08-11",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-19",
    "label": "AutoX app (Ngern Chaiyo) - Play Store rating",
-   "n": 6,
+   "n": 7,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (th.co.autox.chaiyo)",
    "unit": "stars",
@@ -57,7 +60,8 @@
     3.9802,
     3.9901,
     4.0,
-    4.0
+    4.0,
+    4.0693
    ]
   },
   "app_mtc_1star_pct": {
@@ -68,11 +72,12 @@
     "2026-08-04",
     "2026-08-08",
     "2026-08-09",
-    "2026-08-11"
+    "2026-08-11",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC app · 1-star share",
-   "n": 6,
+   "n": 7,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (co.th.muangthaileasing.mtls)",
    "unit": "%",
@@ -82,7 +87,8 @@
     4.4155,
     4.4051,
     4.245,
-    4.239
+    4.239,
+    4.2038
    ]
   },
   "app_mtc_score": {
@@ -93,11 +99,12 @@
     "2026-08-04",
     "2026-08-08",
     "2026-08-09",
-    "2026-08-11"
+    "2026-08-11",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC app · Play Store rating",
-   "n": 6,
+   "n": 7,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (co.th.muangthaileasing.mtls)",
    "unit": "stars",
@@ -107,7 +114,8 @@
     4.6603,
     4.6609,
     4.6677,
-    4.6651
+    4.6651,
+    4.6625
    ]
   },
   "app_sawad_1star_pct": {
@@ -118,11 +126,12 @@
     "2026-08-04",
     "2026-08-08",
     "2026-08-09",
-    "2026-08-11"
+    "2026-08-11",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD app · 1-star share",
-   "n": 6,
+   "n": 7,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.srisawad.mobileApplications)",
    "unit": "%",
@@ -132,7 +141,8 @@
     5.1791,
     5.4054,
     5.3556,
-    5.4661
+    5.4661,
+    4.5779
    ]
   },
   "app_sawad_score": {
@@ -143,11 +153,12 @@
     "2026-08-04",
     "2026-08-08",
     "2026-08-09",
-    "2026-08-11"
+    "2026-08-11",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD app · Play Store rating",
-   "n": 6,
+   "n": 7,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.srisawad.mobileApplications)",
    "unit": "stars",
@@ -157,7 +168,8 @@
     4.5844,
     4.5565,
     4.5537,
-    4.6118
+    4.6118,
+    4.6375
    ]
   },
   "app_tidlor_1star_pct": {
@@ -168,11 +180,12 @@
     "2026-08-04",
     "2026-08-08",
     "2026-08-09",
-    "2026-08-11"
+    "2026-08-11",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-19",
    "label": "Tidlor app · 1-star share",
-   "n": 6,
+   "n": 7,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.ntl.cxm_mobile)",
    "unit": "%",
@@ -182,7 +195,8 @@
     5.1466,
     5.2747,
     5.2195,
-    5.2275
+    5.2275,
+    4.9823
    ]
   },
   "app_tidlor_score": {
@@ -193,11 +207,12 @@
     "2026-08-04",
     "2026-08-08",
     "2026-08-09",
-    "2026-08-11"
+    "2026-08-11",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-19",
    "label": "Tidlor app · Play Store rating",
-   "n": 6,
+   "n": 7,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.ntl.cxm_mobile)",
    "unit": "stars",
@@ -207,7 +222,8 @@
     4.5783,
     4.5789,
     4.583,
-    4.5813
+    4.5813,
+    4.5952
    ]
   },
   "flood_high": {
@@ -233,11 +249,12 @@
     "2026-08-10",
     "2026-08-11",
     "2026-08-14",
-    "2026-08-15"
+    "2026-08-15",
+    "2026-08-16"
    ],
    "first_seen": "2026-07-11",
    "label": "River stations above their high mark",
-   "n": 21,
+   "n": 22,
    "path": "platform/data/thaiwater_flood.json",
    "source": "ThaiWater live river/reservoir telemetry",
    "unit": "stations",
@@ -262,6 +279,7 @@
     165.0,
     155.0,
     126.0,
+    131.0,
     131.0
    ]
   },
@@ -391,17 +409,19 @@
    "cadence": "weekly",
    "dates": [
     "2026-08-09",
-    "2026-08-11"
+    "2026-08-11",
+    "2026-08-15"
    ],
    "first_seen": "2026-08-09",
    "label": "USD/THB · baht per US dollar",
-   "n": 2,
+   "n": 3,
    "path": "platform/data/macro_indicators.json",
    "source": "ECB reference rate (via Frankfurter) — folded by build_macro_indicators.py",
    "unit": "THB/USD",
    "values": [
     33.055,
-    33.013
+    33.013,
+    33.125
    ]
   },
   "nabc_rice_price": {
@@ -545,11 +565,12 @@
     "2026-08-10",
     "2026-08-11",
     "2026-08-14",
-    "2026-08-15"
+    "2026-08-15",
+    "2026-08-16"
    ],
    "first_seen": "2026-07-10",
    "label": "Provinces with heavy rain somewhere",
-   "n": 21,
+   "n": 22,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "provinces",
@@ -574,7 +595,8 @@
     25.0,
     14.0,
     17.0,
-    22.0
+    22.0,
+    19.0
    ]
   },
   "rain_max_mm": {
@@ -600,11 +622,12 @@
     "2026-08-10",
     "2026-08-11",
     "2026-08-14",
-    "2026-08-15"
+    "2026-08-15",
+    "2026-08-16"
    ],
    "first_seen": "2026-07-10",
    "label": "Heaviest 24h rainfall, any gauge",
-   "n": 21,
+   "n": 22,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "mm",
@@ -629,7 +652,8 @@
     120.0,
     137.4,
     96.0,
-    122.0
+    122.0,
+    134.0
    ]
   },
   "rival_ads_live": {
@@ -637,18 +661,20 @@
    "dates": [
     "2026-07-30",
     "2026-08-09",
-    "2026-08-11"
+    "2026-08-11",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-30",
    "label": "Rival ad creatives running now",
-   "n": 3,
+   "n": 4,
    "path": "platform/data/rival_ads.json",
    "source": "Google Ads Transparency Center",
    "unit": "creatives",
    "values": [
     368.0,
     356.0,
-    363.0
+    363.0,
+    409.0
    ]
   },
   "rival_promo_live_mtc": {
@@ -658,11 +684,12 @@
     "2026-08-08",
     "2026-08-11",
     "2026-08-13",
-    "2026-08-14"
+    "2026-08-14",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC · live promo/news items",
-   "n": 5,
+   "n": 6,
    "path": "source-data/rival_promos.json",
    "source": "muangthaicap.com (own-site pull)",
    "unit": "items",
@@ -671,7 +698,8 @@
     11.0,
     13.0,
     13.0,
-    13.0
+    13.0,
+    11.0
    ]
   },
   "rival_promo_live_sawad": {
@@ -681,15 +709,17 @@
     "2026-08-08",
     "2026-08-11",
     "2026-08-13",
-    "2026-08-14"
+    "2026-08-14",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD · live promo/news items",
-   "n": 5,
+   "n": 6,
    "path": "source-data/rival_promos.json",
    "source": "sawad.co.th (own-site pull)",
    "unit": "items",
    "values": [
+    5.0,
     5.0,
     5.0,
     5.0,
@@ -704,15 +734,17 @@
     "2026-08-08",
     "2026-08-11",
     "2026-08-13",
-    "2026-08-14"
+    "2026-08-14",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-19",
    "label": "TIDLOR · live promo/news items",
-   "n": 5,
+   "n": 6,
    "path": "source-data/rival_promos.json",
    "source": "tidlor.com (own-site pull)",
    "unit": "items",
    "values": [
+    6.0,
     6.0,
     6.0,
     6.0,
@@ -890,11 +922,12 @@
     "2026-08-07",
     "2026-08-08",
     "2026-08-09",
-    "2026-08-11"
+    "2026-08-11",
+    "2026-08-15"
    ],
    "first_seen": "2026-08-07",
    "label": "Social-listening corpus · total demand documents",
-   "n": 4,
+   "n": 5,
    "path": "platform/data/social_themes.json",
    "source": "app-store reviews + YouTube comments + Pantip threads (build_social_themes.py)",
    "unit": "documents",
@@ -902,7 +935,8 @@
     11137.0,
     11146.0,
     11154.0,
-    12143.0
+    12143.0,
+    12223.0
    ]
   }
  }
