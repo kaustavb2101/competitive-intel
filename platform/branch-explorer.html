@@ -341,18 +341,18 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
 <div id="vignette"></div>
 <div class="ctl">
   <div class="grp">
-    <div class="glab">Basemap</div>
-    <div class="seg">
-      <button id="b-light" class="base on">Light</button>
-      <button id="b-voyager" class="base">Streets</button>
-      <button id="b-dark" class="base">Dark</button>
+    <div class="glab" id="baseLbl">Basemap</div>
+    <div class="seg" role="group" aria-labelledby="baseLbl">
+      <button id="b-light" class="base on" aria-pressed="true">Light</button>
+      <button id="b-voyager" class="base" aria-pressed="false">Streets</button>
+      <button id="b-dark" class="base" aria-pressed="false">Dark</button>
     </div>
   </div>
   <div class="grp">
     <div class="glab">Layers</div>
     <div class="acts">
-      <button id="t-ring" class="on">3 / 5 / 10 km rings</button>
-      <button id="t-orbit" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
+      <button id="t-ring" class="on" aria-pressed="true">3 / 5 / 10 km rings</button>
+      <button id="t-orbit" title="Gentle auto-orbit (pauses when you move the map)" aria-pressed="false">Auto-orbit</button>
       <button id="t-reload">↻ Reload buildings</button>
     </div>
   </div>
@@ -698,7 +698,7 @@ const INTRO=Object.assign({},FRAMED,{zoom:Math.max(11,(FRAMED.zoom||15)-2.4),pit
 let VIEW=Object.assign({},INTRO);
 let orbitOn=false, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0, SOFT_GL=false;  // default OFF
 const ORBIT_DPS=2.5;                 // degrees / second — gentle (~2-3 dps target)
-function setOrbitUI(on){const t=document.getElementById('t-orbit'); if(t)t.classList.toggle('on',on);}
+function setOrbitUI(on){const t=document.getElementById('t-orbit'); if(t){t.classList.toggle('on',on); t.setAttribute('aria-pressed',String(on));}}
 function userInteract(){ orbitPausedByUser=true; setOrbitUI(false); }
 let _programmatic=false;
 function pushView(extra){ if(!deckgl)return; _programmatic=true;
@@ -1185,16 +1185,16 @@ function init(){
       }
       return viewState;
     }});
-  $('#t-ring').onclick=()=>{ showRing=!showRing; $('#t-ring').classList.toggle('on',showRing); render(); };
+  $('#t-ring').onclick=()=>{ showRing=!showRing; $('#t-ring').classList.toggle('on',showRing); $('#t-ring').setAttribute('aria-pressed',String(showRing)); render(); };
   // Orbit toggle: master on/off; turning ON clears the user-pause so the scene resumes breathing.
   (function(){var ot=$('#t-orbit');if(!ot)return;
-    ot.onclick=function(){orbitOn=!orbitOn; if(orbitOn)orbitPausedByUser=false; ot.classList.toggle('on',orbitOn); lastT=0;};})();
+    ot.onclick=function(){orbitOn=!orbitOn; if(orbitOn)orbitPausedByUser=false; ot.classList.toggle('on',orbitOn); ot.setAttribute('aria-pressed',String(orbitOn)); lastT=0;};})();
   $('#t-reload').onclick=()=>{ loadBuildings(); loadPOIs(); };
   // basemap toggle (light Positron default / voyager / dark) — re-styles buildings + markers for the base.
   const baseBtns={light:$('#b-light'),voyager:$('#b-voyager'),dark:$('#b-dark')};
   Object.keys(baseBtns).forEach(k=>{ if(!baseBtns[k])return;
     baseBtns[k].onclick=()=>{ basemap=k;
-      Object.keys(baseBtns).forEach(j=>baseBtns[j]&&baseBtns[j].classList.toggle('on',j===k)); render(); };});
+      Object.keys(baseBtns).forEach(j=>{ if(!baseBtns[j])return; baseBtns[j].classList.toggle('on',j===k); baseBtns[j].setAttribute('aria-pressed',String(j===k)); }); render(); };});
   // ---- MOBILE BOTTOM-SHEET TOGGLES ----------------------------------------------------------------
   // On phone the map is full-screen; the info #panel and the .ctl control frame (which carries the
   // building + POI legends) slide in via these buttons. Opening one closes the other so they never
