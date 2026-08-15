@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-14T17:47:55+00:00",
-    "commit": "29147b1"
+    "generated_at": "2026-08-15T04:24:13+00:00",
+    "commit": "804e752"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-14",
+    "eta_date": "2026-08-15",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,150 @@
   ],
   "activity": [
     {
+      "date": "2026-08-15T04:24:13+00:00",
+      "sha": "804e752",
+      "summary": "intel(deploy-health): shape-probe the LIVE ThaiWater flood + rain pulse (obj #1)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-15T04:02:24+00:00",
+      "sha": "1bce6d9",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-15, run 31863180124)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T03:38:40+00:00",
+      "sha": "1c14e25",
+      "summary": "data: market-pulse swarm refresh (run 31819362442) (#407)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-15T03:10:10+00:00",
+      "sha": "cc13c7c",
+      "summary": "data: NABC live prices (2026-08-15, run 31860798723)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T02:18:28+00:00",
+      "sha": "c7a0ccb",
+      "summary": "docs: log ux-print-color-adjust-provenance-dot merge+deploy (#416)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-15T09:15:33+07:00",
+      "sha": "814d4ef",
+      "summary": "ux: keep the MEASURED provenance dot visible in board PDFs (#416)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-15T01:49:54+00:00",
+      "sha": "260dfcf",
+      "summary": "data: Thai-IP-only swarm refresh (run 31835584840) (#409)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T08:48:32+07:00",
+      "sha": "dd1a1e9",
+      "summary": "fix(autoresolve): stop rewriting PRs that master could not have affected (#415)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-15T00:25:47+00:00",
+      "sha": "b5813e4",
+      "summary": "health: deploy-probe the four surfaced-but-unprobed agri crop reads (obj #1)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-14T22:22:52+00:00",
+      "sha": "60685b5",
+      "summary": "chore(dashboard): refresh autonomy plan after #acq borrower-voice probes",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-14T22:22:25+00:00",
+      "sha": "dea5f69",
+      "summary": "health: probe the two #acq borrower-voice reads (pantip_panel + social_themes)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-15T05:01:00+07:00",
+      "sha": "39c10c6",
+      "summary": "fix(automerge): match the bot login gh actually returns, and stop corrupting step outputs (#413)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-14T21:49:00+00:00",
+      "sha": "f5b63c2",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-14, run 31843710897)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T04:37:56+07:00",
+      "sha": "2108226",
+      "summary": "fix(automerge): run on the idle `thai` box, and fail loudly on a runner without gh (#412)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-15T04:28:19+07:00",
+      "sha": "ff8b7bd",
+      "summary": "fix(automerge): one unmergeable PR must not block the queue behind it (#411)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-15T04:19:37+07:00",
+      "sha": "dbc6c29",
+      "summary": "ci: cut Actions spend ~84%, un-hide master's gate, and auto-merge generated PRs (#410)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-14T20:53:45+00:00",
+      "sha": "50183ff",
+      "summary": "data: NABC live prices (2026-08-14, run 31839491992)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-15T02:21:34+07:00",
+      "sha": "60cfd5b",
+      "summary": "data: SET listed-peer scoreboard refresh (run 31798080328) (#404)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-15T02:20:47+07:00",
+      "sha": "9e6fb3a",
+      "summary": "data: market-pulse swarm refresh (run 31792820250) (#402)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-15T02:17:37+07:00",
+      "sha": "1d00598",
+      "summary": "data: market-pulse swarm refresh (run 31772501280) (#399)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-15T02:15:34+07:00",
+      "sha": "5068c0f",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 31825669383) (#398)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-15T02:15:19+07:00",
+      "sha": "f105b45",
+      "summary": "data: Thai-IP-only swarm refresh (run 31738633514) (#393)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-14T18:27:23+00:00",
+      "sha": "44cf19b",
+      "summary": "intel(service): deploy-probe the RAW competitor-census layers — the point data the whole #acq readout is built from (obj #2)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-14T17:48:11+00:00",
+      "sha": "3e23f77",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the per-province peer caveat fix",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-14T17:47:55+00:00",
       "sha": "29147b1",
       "summary": "intel(peer): retire the last stale 'Heng is a Cloudflare-blocked SAMPLE' caveat from the per-province peer board (obj #2)",
@@ -567,150 +711,6 @@
       "sha": "197ac98",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the Heng competitor-coverage ship (#403)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-14T17:52:24+07:00",
-      "sha": "844dd96",
-      "summary": "intel(peer): promote Heng to a first-class MEASURED brand in the competitor-coverage board (obj #2) (#403)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-14T10:22:31+00:00",
-      "sha": "559b760",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-14, run 31791631212)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-14T09:12:11+00:00",
-      "sha": "4675e8d",
-      "summary": "docs(progress): log ux-print-color-adjust-dataviz merge + deploy-verify (PR #401)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-14T16:08:58+07:00",
-      "sha": "f522ccb",
-      "summary": "ux: keep delinquency-ladder + proportion-bar colour in the printed board brief (#401)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-14T05:13:40+00:00",
-      "sha": "df1a17a",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-14, run 31772117663)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-14T04:53:25+00:00",
-      "sha": "faaf5b3",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer-NPL Heng ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-14T11:50:40+07:00",
-      "sha": "5ea78c0",
-      "summary": "intel(peer): add Heng — the distressed rival — to the peer NPL benchmark (obj #2) (#397)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-14T04:26:01+00:00",
-      "sha": "822cd2f",
-      "summary": "data: NABC live prices (2026-08-14, run 31769417300)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-14T02:23:55+00:00",
-      "sha": "a84bd0c",
-      "summary": "docs(progress): log ux-boot-error-exec-facing merge + deploy-verify (PR #396)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-14T09:20:05+07:00",
-      "sha": "c9b8a35",
-      "summary": "ux: exec-facing front-door data-load error state + reload action (#396)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-14T01:09:34+00:00",
-      "sha": "307d404",
-      "summary": "fix(census): restore the auction collateral book the empty-harvest refresh wiped + guard against re-wipe",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-14T07:21:40+07:00",
-      "sha": "a76de7f",
-      "summary": "fix(acq): label Heng decline with all 3 dates in rival-fragility caption (#390)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-14T07:21:29+07:00",
-      "sha": "5d99648",
-      "summary": "integrate(macro): source the policy-rate chip from BOT-direct MPC history, not the BIS proxy (#380)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-14T06:48:42+07:00",
-      "sha": "f9ffcf7",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 31755008036) (#395)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-14T06:46:01+07:00",
-      "sha": "5b0edb8",
-      "summary": "data: Thai-IP-only swarm refresh (run 31531103048) (#378)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-14T06:45:23+07:00",
-      "sha": "c1a9a9d",
-      "summary": "data(census): refresh the Union Auction forward book (run 31459820383) (#369)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-14T06:44:49+07:00",
-      "sha": "4389429",
-      "summary": "data: SET listed-peer scoreboard refresh (run 31488703365) (#374)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-14T06:44:08+07:00",
-      "sha": "d4eed15",
-      "summary": "data(census): refresh the Union Auction forward book (run 31357653245) (#359)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-13T22:37:04+00:00",
-      "sha": "54e211d",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the loop-schedule honesty fix",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-13T22:36:58+00:00",
-      "sha": "8ddab4e",
-      "summary": "intel(planning): derive autonomy-loop schedules from committed workflow state, stop dashboard advertising crons the repo doesn't run",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-13T20:33:39+00:00",
-      "sha": "ddc5665",
-      "summary": "docs(progress): log ux-live-chart-aria-latest-value merge+deploy+verify (PR #394)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-14T03:30:21+07:00",
-      "sha": "3a2d065",
-      "summary": "ux: live.html trend-chart aria-labels announce latest value + direction (#394)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-13T18:50:25+00:00",
-      "sha": "d59cb4b",
-      "summary": "pipeline: retire dead redundant build_vehicle_flow_transport.py (superseded by build_truck_flow.py)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-13T17:28:10+00:00",
-      "sha": "f36040a",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the rivcensus live-bind ship",
-      "pillar": "data-integration"
     }
   ]
 }

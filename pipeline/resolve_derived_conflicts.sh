@@ -73,30 +73,53 @@ if [ -z "$CONFLICTS" ]; then
 else
   OUTSIDE="$(echo "$CONFLICTS" | grep -v '^platform/data/' || true)"
 
-  # APPEND-ONLY FILES. Two of them collide on every concurrent branch for the same reason:
-  #   docs/PROGRESS_LOG.md        both sides insert a new entry at the top of a reverse-chron log
+  # APPEND-ONLY FILES. Three of them collide on every concurrent branch for the same reason:
+  #   docs/PROGRESS_LOG.md           both sides insert a new entry at the top of a reverse-chron log
   #   source-data/feed_history.json  both sides append a day to an accumulator whose sources
-  #                               publish only "now" and keep no archive
-  # Neither is a disagreement — each side holds something the other never saw. The two mergers
-  # union them, but each does a real 3-way merge per entry / per (series, date) first and REFUSES
+  #                                  publish only "now" and keep no archive
+  #   source-data/swarm_runs.json    both sides append a row to the swarm's own audit trail; the
+  #                                  runs are not re-playable, so either side taken whole loses one
+  # None is a disagreement — each side holds something the other never saw. The mergers union them,
+  # but each does a real 3-way merge per entry / per (series, date) / per run first and REFUSES
   # (exit 3) if both sides changed the same one differently. Anything they refuse stays in OUTSIDE
   # and aborts the run exactly as before, so no contested text or measurement is ever auto-decided.
+  #
+  # The ONE exception, added after PR #414 sat blocked overnight on it: feed_history's per-date
+  # measurement clash. At 4x/day two pulls of the same gauge on the same date legitimately differ,
+  # neither is wrong, and paging a human to say "take the later one" every time is not automation.
+  # That case now resolves to the later pull — established below from git, never guessed inside the
+  # merger — and prints what it dropped. A contested LABEL still stops, because that is editorial.
   if [ -n "$OUTSIDE" ]; then
     REMAINING=""
     STAGE="$(mktemp -d)"
     while IFS= read -r f; do
       [ -z "$f" ] && continue
-      MERGER=""
+      MERGER=""; MERGER_ARGS=""
       case "$f" in
-        docs/PROGRESS_LOG.md)          MERGER=pipeline/merge_append_log.py ;;
-        source-data/feed_history.json) MERGER=pipeline/merge_feed_history.py ;;
+        docs/PROGRESS_LOG.md)            MERGER=pipeline/merge_append_log.py ;;
+        source-data/swarm_runs.json)     MERGER=pipeline/merge_swarm_runs.py ;;
+        source-data/feed_history.json)
+          MERGER=pipeline/merge_feed_history.py
+          # WHICH SIDE IS THE LATER PULL. The merger refuses when both sides recorded a different
+          # value for the same series on the same date, and at 4x/day that is now routine: the
+          # gauge simply moved between two honest reads. The right answer is the later reading,
+          # but nothing INSIDE the file proves recency — so establish it here, where git can,
+          # from the last commit that touched this file on each side. HEAD is the PR branch
+          # (ours); $BASE is master (theirs). Equal stamps or missing history fall back to
+          # theirs, which is master, which is the more conservative of the two.
+          OURS_T="$(git log -1 --format=%ct HEAD -- "$f" 2>/dev/null || echo 0)"
+          THEIRS_T="$(git log -1 --format=%ct "$BASE" -- "$f" 2>/dev/null || echo 0)"
+          if [ "${OURS_T:-0}" -gt "${THEIRS_T:-0}" ]; then PREFER=ours; else PREFER=theirs; fi
+          MERGER_ARGS="--prefer-on-conflict $PREFER"
+          echo "  feed_history: later pull is '$PREFER' (ours=${OURS_T:-0} theirs=${THEIRS_T:-0})"
+          ;;
       esac
       if [ -n "$MERGER" ] && [ -f "$MERGER" ]; then
         git show ":1:$f" > "$STAGE/base"   2>/dev/null || : > "$STAGE/base"
         git show ":2:$f" > "$STAGE/ours"   2>/dev/null || : > "$STAGE/ours"
         git show ":3:$f" > "$STAGE/theirs" 2>/dev/null || : > "$STAGE/theirs"
         if python3 "$MERGER" --base "$STAGE/base" --ours "$STAGE/ours" \
-                             --theirs "$STAGE/theirs" --out "$f"; then
+                             --theirs "$STAGE/theirs" --out "$f" $MERGER_ARGS; then
           git add -- "$f"
           echo "union-merged $f (append-only — kept both sides' rows)"
           continue

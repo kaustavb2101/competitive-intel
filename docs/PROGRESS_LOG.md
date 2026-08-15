@@ -3,6 +3,159 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-15 — Intelligence loop (service/deploy-health, obj #1): the LIVE ThaiWater flood + rain pulse now has SHAPE probes — the two layers were freshness-probed but shape-unprobed, leaving the Overview's acute collections+collateral card a silent-deploy blind spot — SHIPPED to master + deploy-verified
+
+- **Why this, this run.** The autonomy backlog is at 98% (49/50 done; the 1 OPEN item is owner-side —
+  Vercel `SITE_PASSWORD`), so no OPEN autonomous item exists to pull. Fell to the continuous
+  service/deploy-health audit. Verified healthy up front: production alias **HTTP 200** on `/`, `/app.js`,
+  `/data/branches.json`, `/data/meta.json`; `build_provenance.py --check` **byte-exact**; **0 broken data
+  refs** (all live `data/*.json` reads resolve — the only "missing" hits were `source-data/` paths inside
+  code comments); `site-health.yml` targets the correct master alias; the peer/competitor boards
+  (`peer_province.json` per-province ×brand incl. Heng) are complete and current. One genuine, self-consistent
+  gap surfaced.
+- **The gap.** `check_site_health.py` already had `thaiwater_flood.json` + `thaiwater_rain.json` in
+  **FRESHNESS_LAYERS** (their live vintage IS checked, TTL 14d), but NEITHER had a **shape** probe in
+  `DATA_FILES` — so the freshness block's own stated premise, *"the fetch + shape probes already own 'does
+  the file serve and parse'"*, was **unmet for these two layers**. They are MEASURED per-province ThaiWater
+  station telemetry (flood `situation_level` 1→5 / 24h rain mm), eager-loaded on the DEFAULT `#overview`
+  route via `loadThaiwater().then(renderThaiwater)`, and `renderThaiwater` **hides the whole block** on
+  `!TWFLOOD || !TWRAIN` — so a truncated/404 CDN deploy would silently blank the acute obj-#1
+  collections+collateral card with NO phone alert, the exact "broken demo" blind spot the sibling
+  `collateral_flow` / `drought_district` probes closed. Self-healing (`data-thaiwater.yml` re-pulls every
+  few hours), so a probe here is actionable.
+- **What shipped.** Two shape validators — `_shape_thaiwater_flood` (asserts a non-empty `.provinces`
+  dict whose rows carry numeric `max_level` + `n_stations`, plus `meta`) and `_shape_thaiwater_rain`
+  (numeric `max_mm` + `pct_heavy`, plus `meta`) — asserting the **render contract as SHAPE not values**, so
+  they stay green through a calm-weather / dry-spell vintage (every province at level ≤3, `pct_heavy` 0).
+  Both files registered in `DATA_FILES` alongside the other Overview obj-#1 entries. Negative-tested: each
+  validator rejects empty-provinces / missing-numeric-field / no-meta / wrong-type payloads and accepts the
+  committed files. CI-only change (a pipeline probe, not deployed to Vercel) — no `platform/` file, no data,
+  and no `provenance.json` touched, so nothing user-facing changes.
+- **Safeguard gate (all passed).** `bash tests/run.sh check` = **134 passed / 0 failed** (exit 0), which
+  RUNS `check_site_health.py --local platform` — the two new probes evaluate and PASS (local run:
+  269/269). No secrets in the diff; scope = `pipeline/check_site_health.py` (+77) + this log entry, no stray
+  files; no-fabrication intact (probes read real committed data, assert structure only).
+- **Recommend next.** The freshness-vs-shape coverage contract is now closed for the daily/self-healing
+  CI-refreshed layers I can see. A future service run could sweep the remaining app-fetched layers with a
+  render-and-hide degrade path that are neither shape- nor freshness-probed (e.g. `macro_indicators` is
+  freshness-probed; check whether `snapshots_index` — the Risk-trend tab — and the flood/rain STRUCTURAL
+  siblings warrant shape probes), keeping the rule "any silently-degrading default-route MEASURED read gets a
+  deploy probe" fully applied.
+
+## 2026-08-15 — UX loop (print, honesty-of-provenance): the MEASURED provenance dot survives the board PDF — SHIPPED + auto-merged (#416) + deploy-verified
+
+- **What shipped (`ux-print-color-adjust-provenance-dot`).** Follow-up to yesterday's
+  `ux-print-color-adjust-dataviz`: the leading dot of a **measured** provenance pill —
+  `.prov.m .pd` and `.cc-tag.m::before` (both `background:#5fd6c2`, **no border**) — is a solid disc
+  encoded ONLY by background fill. Chrome/Safari strip element backgrounds from print / "Save as PDF"
+  by default, so on a board-facing PDF the measured dot dropped to an invisible box, while the
+  ESTIMATED (border ring) and UNLABELLED (border square) markers survived on their `border`. The single
+  most important honesty signal — measured, the trustworthy number — silently vanished from the printed
+  brief. Fix: added `.prov,.prov .pd,.cc-tag,.cc-tag::before` to the existing `@media print`
+  `print-color-adjust:exact` rule (the proven one that already keeps the data-viz fills alive). Print-only
+  CSS → screen render byte-identical.
+- **Safeguard gate (all passed).** `bash tests/run.sh check` = 134 passed / 0 failed (exit 0);
+  headless `index.html #home` render `data-errors="[]"`, layout correct, `● measured + estimated` pill
+  unchanged on screen (print-only edit); no secrets in the diff; scope = `platform/styles.css` (+8) +
+  `docs/UXUI_AUDIT.md` (+1), no stray files.
+- **Merge + deploy + verify.** Squash-merged own PR #416 to master (sha `814d4ef`). Vercel production
+  deploy verified after ~95s: production alias root → HTTP 200, `/index.html` → 308 (expected `cleanUrls`
+  redirect) → 200 on follow, `/styles.css` → 200, and the fix confirmed LIVE in the deployed CSS (both the
+  new `.cc-tag::before{` selector and the provenance comment marker present). No rollback needed.
+- **Recommend next.** The remaining OPEN UX backlog is dominated by the deck.gl-page items
+  (`ux-viewport-user-scalable-3dpages`, `ux-navmore-3dpages-absolute-overflow`,
+  `ux-navmore-keyboard-3dpages`) which are explicitly gated on a **device-tested run, NOT unattended
+  auto-merge** (gesture/WebGL behaviour isn't headless-verifiable), plus `ux-acquire-taxonomy-mandate`
+  (a bigger-than-surgical pipeline-side reframe of the forbidden "expand" taxonomy). A future headless-safe
+  surgical run could take the lower-value print residual the parent fix noted (decorative `h2::before`
+  accent bars stripped in the PDF) or a fresh route self-review.
+
+## 2026-08-15 — Integration loop (service/deploy-health, obj #1): the four surfaced-but-unprobed AGRI CROP reads — crop_mix (#overview farm-income), crop_landuse + crop_farmer_income + province_cropland (province deep-dive) — now have deploy probes; all four were silent-deploy blind spots the crop_stress/branch_cropland probes left uncovered
+
+- **Why this, this run.** The high-value INTEGRATION backlog is exhausted here: items #1 (FPO PICO
+  competitor registry → `pico_census`/`pico_district`/`branch_pico`), #2 (per-branch `branch_cropland`),
+  and #3 (data.go.th DBD/DIW/MOT distillation → `dbd_formation`/`vehicle_*`/`collateral_census`) are all
+  SHIPPED and wired into `app.js`/`province.html` (verified by grep this run); item #4 (GISTDA 40m
+  `check-crop` per-branch pull) is **blocked** — `GISTDA_SPHERE_KEY` is unset in this CI env, so it was
+  skipped, not faked (as instructed). That left item #5 — the concrete unblocked next step, which the
+  last two log entries named explicitly: the fetched-but-unprobed **agri crop** reads (obj #1 farm-income
+  risk). This is the same deploy-probe safeguard pattern the prior runs applied to the competitor-census
+  and borrower-voice reads, now extended to the last uncovered obj-#1 agri surfaces.
+- **The gap fixed (`agri-crop-reads-unprobed-deploy-blind-spot`).** `platform/data/crop_mix.json` (obj #1
+  — the farm-income correction weighting all 8 priced crops by province area; `renderMacroSoWhat` +
+  the CROP MIX→FARM INCOME geo-drill on the default `#overview` route), plus three province deep-dive
+  (`province.html`) reads — `crop_landuse.json` (SPAM-2010 ESTIMATED district Crops lens), `crop_farmer_income.json`
+  (MEASURED gross+net per-person farm income by crop), and `province_cropland.json` (MEASURED DOAE-2568
+  planted-area magnitude line) — are each live-`fetch()`'d and null-guarded, so a truncated/empty/404 CDN
+  deploy of any of them SILENTLY drops its read (the `#overview` crop-mix so-what row + farm-income drill;
+  the province Crops lens; the province farmer-income drill; the province measured-area line) with **NO
+  phone alert**. They were the last surfaced obj-#1 agri reads with no deploy probe — `crop_stress`,
+  `branch_cropland` and `amphoe_crops` were already covered.
+- **The fix.** Added four render-CONTRACT validators to `pipeline/check_site_health.py`
+  (`_shape_crop_mix`/`_shape_crop_landuse`/`_shape_crop_farmer_income`/`_shape_province_cropland`) and
+  registered all four in `DATA_FILES`. Each asserts the render **contract** — shape not values, robust to
+  a future farm-gate/DOAE/SPAM vintage refresh moving the numbers: `crop_mix` → `.national` with numeric
+  `book_weighted_shock_pct` + non-empty `worst[]` and a Thai-keyed `.provinces` map whose rows carry the
+  numeric `shock_pct` the drill sorts on; `crop_landuse` → a ~928-row `.amphoe` list with the `name_en`
+  join key + `province_th` filter key + `dominant_crop` colour key; `crop_farmer_income` → non-empty
+  `.crops` with the label + numeric `price_thb_per_kg` + per-province `.provinces` rows; `province_cropland`
+  → a slug-keyed `.provinces` map whose rows carry the numeric `total_ha` the line gates on. One file,
+  +~150 lines, zero deletions.
+- **Verified.** Unit-tested all four (4 real committed payloads ACCEPTED; 13 broken shapes — non-dict,
+  missing/empty `national`/`worst`/`crops`/`provinces`, truncated amphoe list, missing join/colour key,
+  non-numeric `shock_pct`/`price_thb_per_kg`/`total_ha`, missing `meta.crops` — all correctly REJECTED).
+  `check_site_health.py --local platform` → **HEALTHY 263/263** (was 251, +12 = 4 files × fetch/parse/shape),
+  exit 0. No `platform/data` file, builder or provenance changed (probe-only) → no rebuild / `build_provenance`
+  needed. `bash tests/run.sh check` → **134 passed · 0 failed** (data integrity 455/455; its deploy-probe
+  self-test now also accepts these four payloads). Test-infra only, no app behaviour/visual change →
+  safeguard-gated direct commit, no PR/headless render needed.
+- **Next recommended.** The surfaced obj-#1 agri crop reads are now all probed. Remaining lower-value
+  province-route probe gaps: `occupation_income_individual` + `nso_wage_anchor` (province occupation panel).
+  The genuinely-open DATA items still need an owner-side/Thai-IP window: the GISTDA `check-crop` 40m
+  per-branch crop pull (needs the `GISTDA_SPHERE_KEY` secret wired into a CI job or a Thai-IP run — this
+  would supersede the SPAM baseline in `build_branch_cropland.py` with 40m measured values), and committing
+  the BAAC/SME-bank raw CSVs to unblock the formal-credit penetration layer.
+
+## 2026-08-14 — Intelligence loop (service/deploy-health, obj #2): the two borrower-VOICE reads on Competition (`#acq`) — the Pantip panel + the say/hear gap board — now have deploy probes; both were unprobed silent-deploy blind spots that cannot self-heal
+
+- **The gap fixed (`pantip-social-themes-unprobed-deploy-blind-spot`).** After confirming the live master
+  production alias is **HTTP 200** on `/`, `/data/meta.json`, `/data/competitor_coverage.json` and the
+  scheduled/autonomy backlog is exhausted (AUTONOMY_PLAN 98% — the 1 open item is owner-side), a
+  render-path re-scan of the surfaced-but-unprobed `data/*.json` reads (the class the prior run named
+  as next: the agri/sentiment reads) found the highest-value pair still uncovered: the two **borrower-voice**
+  reads on the `#acq` Competition surface (obj #2). `data/pantip_panel.json` (brand-level Pantip
+  discussion — threads/match-rate/replies-in-public/themes/scrubbed quotes; `drawPantip`) and
+  `data/social_themes.json` (the say/hear gap — what lenders publish vs what customers write against one
+  Thai phrase list; `drawSocialThemes`) are each live-`fetch()`'d and GATE their whole board on a
+  non-empty array (`.brands` / `.answered`).
+- **Why it matters.** Each loader degrades SILENTLY: a truncated/empty/404 CDN deploy of either drops
+  the panel to a calm "…not yet built, run pipeline/pull_*.py" placeholder — masquerading a broken
+  deploy as the normal not-pulled state — with **NO phone alert**. And unlike the census siblings,
+  NEITHER self-heals: their inputs (`pull_pantip.py` — a Thai forum, Thai-IP only — plus
+  `pull_app_reviews.py`/`pull_apple_reviews.py`/`pull_youtube_comments.py`, keyed) have no CI cron, so a
+  gutted deploy has no job to restore it. The deploy probe is the ONLY safeguard — the same blind spot
+  the `rival_pulse`/`rival_ads`/`rival_youtube` probes already closed for the other `#acq` sentiment reads.
+- **The fix.** Added two probe validators to `pipeline/check_site_health.py` and registered them in
+  `DATA_FILES`. `_shape_pantip_panel` asserts the render CONTRACT (shape not values, robust to a roster/
+  thread-count refresh): a non-empty `.brands[]` gate, the first row's `.label` (Lender column) +
+  `reported_total` key, and that ≥1 row carries `is_us` (our own book — the panel's whole point).
+  `_shape_social_themes` asserts a non-empty `.answered[]` gate, the first row's `.label` +
+  numeric `.unanswered_pts` (imbalance column + sort key) + numeric `.supply_share_pct`, and the numeric
+  `meta.supply_docs`/`meta.demand_docs` readout denominators. One file, +70 lines, zero deletions.
+- **Verified.** Unit-tested both (19 cases — the real committed payloads ACCEPTED; 8 pantip + 9
+  social broken shapes — non-dict, empty/short list, missing/blank label, missing tally, no `is_us`,
+  non-numeric imbalance/share, missing `meta`/denominators — all correctly REJECTED). `check_site_health.py
+  --local platform` → **HEALTHY 251/251** (was 245, +6 = 2 files × fetch/parse/shape), exit 0. No
+  `platform/data` file, builder or provenance changed (probe-only) → no rebuild / `build_provenance`
+  needed. `bash tests/run.sh check` → **134 passed · 0 failed** (data integrity 455/455; its deploy-probe
+  self-test now also accepts these two payloads). Test-infra only, no app behaviour/visual change →
+  safeguard-gated direct commit, no PR/headless render needed.
+- **Next recommended.** The two primary borrower-voice reads are now probed. Remaining lower-value
+  agri probe gaps on secondary/province routes: `crop_mix` (obj #1 farm-income correction, `#overview`),
+  `crop_landuse` + `crop_farmer_income` (province deep-dive `province.html`). The genuinely-open DATA
+  items still need an owner-side/Thai-IP window (GISTDA `check-crop` 40m per-branch pull; commit the
+  BAAC/SME-bank raw CSVs to unblock the formal-credit penetration layer).
+
 ## 2026-08-14 — Intelligence loop (service/deploy-health, obj #2): the RAW competitor-census layers — the point data the ENTIRE Competition (`#acq`) readout is built from — now have deploy probes; all three were unprobed silent-deploy blind spots
 
 - **The gap fixed (`competitor-census-unprobed-deploy-blind-spot`).** A negative-space sweep (after
