@@ -447,6 +447,7 @@ INGESTS
   else bad "build_rival_threat_region.py --check (rival_threat_region.json drifted from peer_province.json/rival_reputation.json — run: python3 pipeline/build_rival_threat_region.py)"
   fi
   ( cd "$PIPE" && python3 build_peer_province.py --check >/dev/null 2>&1 ) && ok "build_peer_province.py --check" || bad "build_peer_province.py --check (peer_province.json drifted from rival_density.json — run: python3 pipeline/build_peer_province.py)"
+  ( cd "$PIPE" && python3 check_peer_rollup.py --check >/dev/null 2>&1 ) && ok "check_peer_rollup.py --check" || bad "check_peer_rollup.py --check (the two obj-#2 peer surfaces disagree per brand: competitor_coverage.json direct-census found != peer_province.json province rollup — run: python3 pipeline/check_peer_rollup.py)"
   ( cd "$PIPE" && python3 build_province_pressure.py --check >/dev/null 2>&1 ) && ok "build_province_pressure.py --check" || bad "build_province_pressure.py --check (province_pressure.json drifted from province_stress_index.json/peer_province.json — run: python3 pipeline/build_province_pressure.py)"
   ( cd "$PIPE" && python3 build_rival_pressure.py --check >/dev/null 2>&1 ) && ok "build_rival_pressure.py --check" || bad "build_rival_pressure.py --check (rival_pressure.json drifted from branches.json/competitors_census.json)"
   ( cd "$PIPE" && python3 ingest_heng.py --check >/dev/null 2>&1 ) && ok "ingest_heng.py --check" || bad "ingest_heng.py --check (Heng official-locator merge drifted from source-data/heng_branches.json — run: python3 pipeline/ingest_heng.py)"
