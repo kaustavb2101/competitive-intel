@@ -3,6 +3,34 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-15 — UX loop (print, honesty-of-provenance): the MEASURED provenance dot survives the board PDF — SHIPPED + auto-merged (#416) + deploy-verified
+
+- **What shipped (`ux-print-color-adjust-provenance-dot`).** Follow-up to yesterday's
+  `ux-print-color-adjust-dataviz`: the leading dot of a **measured** provenance pill —
+  `.prov.m .pd` and `.cc-tag.m::before` (both `background:#5fd6c2`, **no border**) — is a solid disc
+  encoded ONLY by background fill. Chrome/Safari strip element backgrounds from print / "Save as PDF"
+  by default, so on a board-facing PDF the measured dot dropped to an invisible box, while the
+  ESTIMATED (border ring) and UNLABELLED (border square) markers survived on their `border`. The single
+  most important honesty signal — measured, the trustworthy number — silently vanished from the printed
+  brief. Fix: added `.prov,.prov .pd,.cc-tag,.cc-tag::before` to the existing `@media print`
+  `print-color-adjust:exact` rule (the proven one that already keeps the data-viz fills alive). Print-only
+  CSS → screen render byte-identical.
+- **Safeguard gate (all passed).** `bash tests/run.sh check` = 134 passed / 0 failed (exit 0);
+  headless `index.html #home` render `data-errors="[]"`, layout correct, `● measured + estimated` pill
+  unchanged on screen (print-only edit); no secrets in the diff; scope = `platform/styles.css` (+8) +
+  `docs/UXUI_AUDIT.md` (+1), no stray files.
+- **Merge + deploy + verify.** Squash-merged own PR #416 to master (sha `814d4ef`). Vercel production
+  deploy verified after ~95s: production alias root → HTTP 200, `/index.html` → 308 (expected `cleanUrls`
+  redirect) → 200 on follow, `/styles.css` → 200, and the fix confirmed LIVE in the deployed CSS (both the
+  new `.cc-tag::before{` selector and the provenance comment marker present). No rollback needed.
+- **Recommend next.** The remaining OPEN UX backlog is dominated by the deck.gl-page items
+  (`ux-viewport-user-scalable-3dpages`, `ux-navmore-3dpages-absolute-overflow`,
+  `ux-navmore-keyboard-3dpages`) which are explicitly gated on a **device-tested run, NOT unattended
+  auto-merge** (gesture/WebGL behaviour isn't headless-verifiable), plus `ux-acquire-taxonomy-mandate`
+  (a bigger-than-surgical pipeline-side reframe of the forbidden "expand" taxonomy). A future headless-safe
+  surgical run could take the lower-value print residual the parent fix noted (decorative `h2::before`
+  accent bars stripped in the PDF) or a fresh route self-review.
+
 ## 2026-08-15 — Integration loop (service/deploy-health, obj #1): the four surfaced-but-unprobed AGRI CROP reads — crop_mix (#overview farm-income), crop_landuse + crop_farmer_income + province_cropland (province deep-dive) — now have deploy probes; all four were silent-deploy blind spots the crop_stress/branch_cropland probes left uncovered
 
 - **Why this, this run.** The high-value INTEGRATION backlog is exhausted here: items #1 (FPO PICO
