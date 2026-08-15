@@ -571,6 +571,45 @@ def _shape_vehicle_registry(d):
     return None
 
 
+def _shape_brand_trends(d):
+    # The MEASURED new-vehicle first-registration TREND on Overview (#overview),
+    # obj #1 collateral — `loadBrandTrends().then(renderBrandTrends)`, eager on the
+    # default nav route. This is the leading indicator for the FUTURE used-title
+    # collateral pool: a shrinking new-pickup stream means a shrinking pool AutoX
+    # will lend against and recover on years out. renderBrandTrends HIDES the whole
+    # block (`wrap.style.display='none'`) unless `new_regis_trend` yields >=2 year
+    # rows carrying a non-null `pickup`; the verdict then reads `pickup` and `total`
+    # off the first and last of those rows (the "far faster than the whole
+    # new-vehicle market" line) — `ytd.ev_only_share_pct` is the only optional read
+    # (the EV line degrades). Its fetch (app.js loadBrandTrends) has the WEAKEST
+    # guard of the Overview set — a bare `.then(r=>r.json())` with no `r.ok` check —
+    # so a truncated/404 CDN deploy that served an HTML error page throws into the
+    # loader's catch, nulls BTREND, and SILENTLY blanks the collateral-trend block
+    # with no phone alert. It is neither shape- nor freshness-probed until now.
+    # Asserts the render contract (shape, not counts) so a future DLT registration
+    # vintage bump still passes.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    trend = d.get("new_regis_trend")
+    if not isinstance(trend, dict) or not trend:
+        return "missing/empty 'new_regis_trend' object (loader gate: !j.new_regis_trend => BTREND null => block hidden)"
+    # the render hide-gate: >=2 year rows whose value is a dict carrying a numeric
+    # pickup (renderBrandTrends: yrs = keys where t[y].pickup != null; hide if <2).
+    good = []
+    for yr, row in trend.items():
+        if isinstance(row, dict) and isinstance(row.get("pickup"), (int, float)) \
+                and isinstance(row.get("total"), (int, float)):
+            good.append(yr)
+    if len(good) < 2:
+        return ("new_regis_trend has %d year row(s) with numeric pickup+total; "
+                "renderBrandTrends hides the block below 2 (the pickup verdict + "
+                "whole-market comparison read)" % len(good))
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    return None
+
+
 def _shape_drought_district(d):
     # The MODELLED district-grain drought read on Overview (#overview), obj #1 —
     # eager `loadDroughtDistrict().then(renderDroughtDistrict)` on the default nav
@@ -2846,6 +2885,13 @@ DATA_FILES = [
     # sweep, but the committed files must still serve intact for the next
     # build_macro_book rebuild.)
     ("data/vehicle_registry.json", _shape_vehicle_registry, "latest.groups (4 classes) + latest.title_base/all_vehicles (Overview collateral base, obj #1)"),
+    # The new-vehicle first-registration TREND (renderBrandTrends, eager on the
+    # default #overview route) — the leading indicator for the FUTURE used-title
+    # collateral pool, obj #1. Whole-block silent-hide when new_regis_trend lacks
+    # >=2 pickup-bearing year rows, and its loader has the weakest fetch guard of
+    # the Overview set (bare r.json(), no r.ok), so a truncated/404 deploy blanks
+    # it with no phone alert. Neither shape- nor freshness-probed before this.
+    ("data/brand_trends.json", _shape_brand_trends, "new_regis_trend >=2 year rows w/ numeric pickup+total (Overview new-registration collateral trend, obj #1)"),
     ("data/drought_district.json", _shape_drought_district, ".districts (~928) with spei/cls + meta.counts (Overview district drought, obj #1)"),
     ("data/amphoe_crops.json", _shape_amphoe_crops, ".hotspots (crop x drought exposure w/ planted_rai+spei) (Overview agri-PD exposure, obj #1)"),
     # The LIVE flood + 24h-rain pulse (renderThaiwater, eager on the default

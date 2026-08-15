@@ -3,6 +3,50 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-15 — Integration loop (service/deploy-health, obj #1): the new-vehicle first-registration TREND (`brand_trends.json`) — the leading indicator for tomorrow's used-title collateral pool — now has a deploy shape probe; it was the highest-value remaining silent-deploy blind spot AND had the weakest fetch guard on the default Overview route
+
+- **Why this, this run.** The high-value INTEGRATION backlog is exhausted or blocked: #1 (FPO PICO →
+  `pico_census`/`pico_district`/`branch_pico`), #2 (per-branch `branch_cropland`), #3 (data.go.th
+  DIW/MOT/DBD distillation) are all SHIPPED and wired (re-verified on disk this run); #4 (GISTDA 40m
+  `check-crop`) is **blocked** — `GISTDA_SPHERE_KEY` is unset in this CI env, so it was skipped not faked;
+  BAAC/SME-bank distillation stays blocked (data.go.th aggregator 403 from cloud IPs). That left item #5 —
+  the concrete unblocked next step. A negative-space sweep ranked the remaining fetched-but-unprobed
+  `platform/data` layers: of the ~40, most fail loudly or only drop a supplementary line, but **three**
+  silently hide a whole default-route card, and `brand_trends.json` was the clear #1.
+- **The gap fixed (`brand-trends-unprobed-weak-guard-deploy-blind-spot`).** `platform/data/brand_trends.json`
+  is the MEASURED DLT new-vehicle first-registration TREND — obj #1 collateral, the leading indicator for
+  the FUTURE used-title collateral pool (a shrinking new-pickup stream = a shrinking pool AutoX lends
+  against and recovers on). It is eager-loaded on the DEFAULT `#overview` route (`loadBrandTrends().then(
+  renderBrandTrends)`), and `renderBrandTrends` HIDES the whole block (`wrap.style.display='none'`) unless
+  `new_regis_trend` yields ≥2 pickup-bearing year rows. Critically, its loader (`app.js` `loadBrandTrends`)
+  has the **weakest fetch guard of the whole Overview set** — a bare `.then(r=>r.json())` with NO `r.ok`
+  check — so a truncated/404 CDN deploy that served an HTML error page throws into the loader's `catch`,
+  nulls `BTREND`, and SILENTLY blanks the collateral-trend block with no phone alert. It was neither
+  shape- nor freshness-probed. (The `try/catch` means the bad guard degrades gracefully rather than
+  breaking neighbouring Overview render — so no app code change is warranted; the deploy probe is the fix.)
+- **The fix.** Added `_shape_brand_trends` to `pipeline/check_site_health.py` and registered
+  `data/brand_trends.json` in `DATA_FILES` (Overview-collateral group, beside `vehicle_registry`). The
+  validator asserts the render CONTRACT (shape not values, robust to a future DLT vintage bump): top-level
+  dict → non-empty `new_regis_trend` object → ≥2 year rows each carrying numeric `pickup`+`total` (the
+  exact hide-gate `renderBrandTrends` applies, plus the whole-market-comparison read) → `meta` present.
+  `ytd.ev_only_share_pct` is deliberately NOT asserted (the EV line degrades independently). One file,
+  +46 lines, zero deletions.
+- **Verified.** Unit-tested (1 real committed payload ACCEPTED; 8 broken shapes — non-dict, missing/empty/
+  non-dict `new_regis_trend`, only-1-pickup-row, non-numeric pickup, missing `total`, missing `meta` — all
+  correctly REJECTED). `check_site_health.py --local platform` → **HEALTHY 272/272** (was 269, +3 =
+  fetch/parse/shape), exit 0. No `platform/data` file, builder or provenance changed (probe-only) → no
+  rebuild / `build_provenance` needed. `bash tests/run.sh check` → **136 passed · 0 failed** (data
+  integrity 455/455; the deploy-probe self-test now also accepts this payload). Test-infra only, no app
+  behaviour/visual change → safeguard-gated direct commit, no PR/headless render needed.
+- **Next recommended.** Two default-route silent-hide reads remain unprobed after this: `farm_income_impact.json`
+  (`#overview`, obj #1 — the crop→farm-income margin-shock engine; `.catch(()=>null)` drops the impact
+  columns) and `vintage_digest.json` (`#trend` lead "Since last vintage" exec card; `if(!VDIGEST){hide}`).
+  Both are deterministic/`--check`-gated and CI-doable — the natural next two probe runs. The genuinely-open
+  DATA items still need an owner-side/Thai-IP window (GISTDA 40m `check-crop` per-branch pull; committing
+  the BAAC/SME-bank raw CSVs). A separate lower-value thread: `brand_trends`/`vehicle_fleet` are
+  collateral-vintage-bearing but not freshness-probed — worth a freshness entry if a self-refresh workflow
+  starts landing them.
+
 ## 2026-08-15 — Intelligence loop (service/deploy-health, obj #1): the LIVE ThaiWater flood + rain pulse now has SHAPE probes — the two layers were freshness-probed but shape-unprobed, leaving the Overview's acute collections+collateral card a silent-deploy blind spot — SHIPPED to master + deploy-verified
 
 - **Why this, this run.** The autonomy backlog is at 98% (49/50 done; the 1 OPEN item is owner-side —
