@@ -185,16 +185,16 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "23 observations from 2026-07-05, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 23,
+    "note": "24 observations from 2026-07-05, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 24,
     "series": "fuel_diesel"
    },
    "key": "fuel_prices",
    "label": "Diesel · retail pump",
    "measured": true,
    "source": "Bangchak retail oil-price API (www.bangchak.co.th/api/oilprice) — daily Bangkok reference prices; free, no key, cloud-reachable (EPPO/PTT/data.go.th are geoblocked).",
-   "stamp": "2026-08-14",
-   "stamp_iso": "2026-08-14",
+   "stamp": "2026-08-15",
+   "stamp_iso": "2026-08-15",
    "stamp_kind": "pulled",
    "unit": "฿/L",
    "value": 37.54,
@@ -268,7 +268,7 @@
    "stamp_iso": "2026-08-15",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4433,
+   "value": 4438,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -291,7 +291,7 @@
    "stamp": "2026-08-15",
    "stamp_iso": "2026-08-15",
    "stamp_kind": "pulled",
-   "unit": "of 796",
+   "unit": "of 797",
    "value": 124,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
@@ -484,7 +484,7 @@
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
   "history_note": "A trend line is drawn only where a stored series exists. 9 of 23 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 239,
+  "history_points": 240,
   "missing_files": [],
   "n_feeds": 23,
   "n_with_history": 9,
