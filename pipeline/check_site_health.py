@@ -188,6 +188,140 @@ def _shape_crop_stress(d):
     return None
 
 
+def _shape_crop_mix(d):
+    # The Overview (#overview) CROP-MIX -> FARM-INCOME read (crop_mix.json, obj #1 —
+    # the farm-income correction that weights ALL EIGHT priced crops by province area,
+    # so falling crop mixes in coconut/sugarcane/pineapple provinces stop being
+    # invisible; pipeline/build_crop_mix.py). It is load-bearing on TWO default-route
+    # #overview surfaces: renderMacroSoWhat reads cm.national.book_weighted_shock_pct +
+    # cm.national.worst[] and, per province, cm.provinces[th].shock_pct (the "% of the
+    # farm book in rising vs falling crop mixes" so-what row), and the CROP MIX -> FARM
+    # INCOME geo-drill reads the same national/provinces split. The client loader
+    # (tmliFetch) resolves to null on any fetch/parse failure and every reader is
+    # null-guarded, so a truncated/404 CDN deploy silently drops the crop-mix so-what
+    # row + farm-income drill from the exec's first screen with NO phone alert — the
+    # same "broken demo" blind spot the crop_stress / branch_cropland obj-#1 probes
+    # closed for their agri siblings, and this was the last unprobed obj-#1 read on the
+    # default #overview route. Asserts the render contract (the .national dict with the
+    # numeric book_weighted_shock_pct headline + the worst[] list the so-what row names,
+    # the Thai-keyed .provinces map whose rows carry the numeric shock_pct the drill
+    # sorts on, and the meta.crops label list) as SHAPE not values, robust to a future
+    # farm-gate / DOAE-vintage refresh moving the shock percentages.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'national' object (renderMacroSoWhat headline read)"
+    bw = nat.get("book_weighted_shock_pct")
+    if not isinstance(bw, (int, float)) or isinstance(bw, bool):
+        return "national.book_weighted_shock_pct not numeric (so-what headline read)"
+    if not isinstance(nat.get("worst"), list) or not nat.get("worst"):
+        return "missing/empty national.worst list (steepest-fall names the so-what row lists)"
+    provs = d.get("provinces")
+    if not isinstance(provs, dict) or not provs:
+        return "missing/empty 'provinces' map (per-province cm.provinces[th] drill read)"
+    p0 = next(iter(provs.values()))
+    if not isinstance(p0, dict) or not isinstance(p0.get("shock_pct"), (int, float)) or isinstance(p0.get("shock_pct"), bool):
+        return "first province missing numeric 'shock_pct' (so-what falling/rising split + drill sort key)"
+    crops = d.get("meta", {}).get("crops") if isinstance(d.get("meta"), dict) else None
+    if not isinstance(crops, list) or not crops:
+        return "missing/empty meta.crops label list"
+    return None
+
+
+def _shape_crop_landuse(d):
+    # The province deep-dive (province.html) CROP lens (crop_landuse.json — SPAM-2010
+    # model-allocated district crop areas, ESTIMATED; pipeline/build_crop_landuse.py).
+    # initProvince builds CROPBYNAME from cl.amphoe filtered to the focal province
+    # (join key amphoe.name_en == th_amphoe shapeName), and the Crops toggle colours
+    # each district by rec.dominant_crop; when the file is absent/empty CROPBYNAME is
+    # empty and the toggle self-disables. The fetch is `r.ok ? r.json() : null`-guarded,
+    # so a truncated/404 CDN deploy silently greys out the province Crops lens on all 77
+    # deep-dives with NO phone alert — the same "broken demo" blind spot the crop_stress
+    # / branch_cropland obj-#1 probes closed. Asserts the render contract (the ~928-row
+    # .amphoe list whose records carry the name_en join key + province_th filter key +
+    # the dominant_crop colour key, plus the meta.crops label list) as SHAPE not values,
+    # robust to a future SPAM/DOAE refresh moving the allocations.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    amp = d.get("amphoe")
+    if not isinstance(amp, list) or not amp:
+        return "missing/empty 'amphoe' list (client CROPBYNAME build + Crops-lens gate)"
+    if len(amp) < 900:  # 928 districts expected; well below = truncated build
+        return "only %d amphoe rows (expected ~928)" % len(amp)
+    a0 = amp[0]
+    if not isinstance(a0, dict):
+        return "first 'amphoe' record is not an object"
+    if not a0.get("name_en"):
+        return "first amphoe missing 'name_en' (district join key to th_amphoe shapeName)"
+    if not a0.get("province_th"):
+        return "first amphoe missing 'province_th' (per-province CROPBYNAME filter key)"
+    if "dominant_crop" not in a0:
+        return "first amphoe missing 'dominant_crop' key (Crops-lens colour read)"
+    crops = d.get("meta", {}).get("crops") if isinstance(d.get("meta"), dict) else None
+    if not isinstance(crops, list) or not crops:
+        return "missing/empty meta.crops label list"
+    return None
+
+
+def _shape_crop_farmer_income(d):
+    # The province deep-dive (province.html) "Farmer income by crop" drill
+    # (crop_farmer_income.json, obj #1 — MEASURED gross+net per-person farm income by
+    # crop x province; pipeline/build_crop_farmer_income.py). The panel reads CF.crops,
+    # maps each crop to its focal-province row (c.provinces.find(province==provTh)) and
+    # leads with the worst net floor / at-a-loss crops, labelling each with c.crop_en and
+    # c.price_thb_per_kg. The fetch is `r.ok ? r.json() : null`-guarded and the renderer
+    # returns early when CF/CF.crops is missing, so a truncated/404 CDN deploy silently
+    # drops the farmer-income drill from every province deep-dive with NO phone alert.
+    # Asserts the render contract (the non-empty .crops list whose records carry the
+    # crop label, the numeric price_thb_per_kg the row prints, and the per-province
+    # .provinces rows the drill joins on) as SHAPE not values, robust to a future OAE
+    # price/yield vintage refresh.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    crops = d.get("crops")
+    if not isinstance(crops, list) or not crops:
+        return "missing/empty 'crops' list (client CF.crops gate + per-crop row map)"
+    c0 = crops[0]
+    if not isinstance(c0, dict):
+        return "first 'crops' record is not an object"
+    if not (c0.get("crop") or c0.get("crop_en")):
+        return "first crop missing 'crop'/'crop_en' label (row name read)"
+    if not isinstance(c0.get("price_thb_per_kg"), (int, float)) or isinstance(c0.get("price_thb_per_kg"), bool):
+        return "first crop missing numeric 'price_thb_per_kg' (row price read)"
+    if not isinstance(c0.get("provinces"), list) or not c0.get("provinces"):
+        return "first crop missing/empty 'provinces' list (per-province drill join)"
+    return None
+
+
+def _shape_province_cropland(d):
+    # The province deep-dive (province.html) MEASURED crop-area legend line
+    # (province_cropland.json — DOAE farmer-registry 2568/2025 planted area by crop,
+    # keyed by province slug; pipeline/build_province_cropland.py). measuredCropSpan
+    # reads pc.provinces[SLUG] and renders "◆ measured · DOAE 2568: N ha planted, led by
+    # <dominant>" — the authoritative measured MAGNITUDE anchoring the ESTIMATED SPAM
+    # crop lens. The fetch is `r.ok ? r.json() : null`-guarded and the helper returns ''
+    # when the record/total is missing, so a truncated/404 CDN deploy silently drops the
+    # measured-area line from every province deep-dive with NO phone alert. Asserts the
+    # render contract (the slug-keyed .provinces map whose rows carry the numeric total_ha
+    # the line gates on + prints, plus the meta.crops label list) as SHAPE not values,
+    # robust to a future DOAE-vintage refresh moving the hectares.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    provs = d.get("provinces")
+    if not isinstance(provs, dict) or not provs:
+        return "missing/empty 'provinces' map (client pc.provinces[SLUG] read)"
+    p0 = next(iter(provs.values()))
+    if not isinstance(p0, dict):
+        return "first province record is not an object"
+    if not isinstance(p0.get("total_ha"), (int, float)) or isinstance(p0.get("total_ha"), bool):
+        return "first province missing numeric 'total_ha' (measuredCropSpan gate + printed total)"
+    crops = d.get("meta", {}).get("crops") if isinstance(d.get("meta"), dict) else None
+    if not isinstance(crops, list) or not crops:
+        return "missing/empty meta.crops label list"
+    return None
+
+
 def _shape_branch_labor(d):
     recs = d.get("branches") if isinstance(d, dict) else None
     if not isinstance(recs, list):
@@ -2648,6 +2782,21 @@ DATA_FILES = [
     ("data/vehicle_registry.json", _shape_vehicle_registry, "latest.groups (4 classes) + latest.title_base/all_vehicles (Overview collateral base, obj #1)"),
     ("data/drought_district.json", _shape_drought_district, ".districts (~928) with spei/cls + meta.counts (Overview district drought, obj #1)"),
     ("data/amphoe_crops.json", _shape_amphoe_crops, ".hotspots (crop x drought exposure w/ planted_rai+spei) (Overview agri-PD exposure, obj #1)"),
+    # The four surfaced-but-unprobed AGRI CROP reads (obj #1 farm-income risk) that the
+    # crop_stress / branch_cropland / amphoe_crops probes above left uncovered — one on
+    # the default #overview route, three on the province deep-dive (province.html). Each
+    # fetch is null-guarded and each reader self-hides when its layer is missing, so a
+    # truncated/404 CDN deploy silently drops the read with NO phone alert:
+    #  - crop_mix (renderMacroSoWhat + CROP MIX->FARM INCOME drill): the obj-#1 farm-income
+    #    correction that weights all 8 priced crops — the last unprobed obj-#1 read on the
+    #    default #overview route;
+    #  - crop_landuse (province.html Crops lens): SPAM-2010 ESTIMATED district crop colouring;
+    #  - crop_farmer_income (province.html): MEASURED gross+net per-person farm income by crop;
+    #  - province_cropland (province.html): MEASURED DOAE 2568 planted-area magnitude line.
+    ("data/crop_mix.json", _shape_crop_mix, ".national (book_weighted_shock_pct + worst[]) + Thai-keyed .provinces w/ shock_pct (Overview farm-income, obj #1)"),
+    ("data/crop_landuse.json", _shape_crop_landuse, ".amphoe (~928, name_en/province_th/dominant_crop) + meta.crops (province Crops lens)"),
+    ("data/crop_farmer_income.json", _shape_crop_farmer_income, ".crops (price_thb_per_kg + per-province rows) (province farmer-income drill, obj #1)"),
+    ("data/province_cropland.json", _shape_province_cropland, "slug-keyed .provinces w/ total_ha + meta.crops (province measured-area line, obj #1)"),
     # The competition pillar's flagship exec layer (obj #2) — the per-province
     # peer board (AutoX next to each big-4 rival, per province) that powers the
     # Competition surface + the command-center thesis clause. Every default-route
