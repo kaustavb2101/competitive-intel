@@ -74,6 +74,11 @@ ADVERTISERS = {
     ],
     "SAWAD": [
         ("AR05287991188266156033", "Srisawad Power 2014 Co.,Ltd — SAWAD group operating co"),
+        # Same operator, adjacent product: the group's home/land-title arm. Pinned under SAWAD
+        # rather than as a new key because the census counts one Srisawad. The legal name is
+        # unambiguously Srisawad's own entity — unlike the private individuals and unrelated
+        # firms a ศรีสวัสดิ์ search returns, ศรีสวัสดิ์ being a common Thai surname.
+        ("AR18420769142295494657", "บริษัท ศรีสวัสดิ์ โฮม จำกัด — SAWAD group home/land lender"),
     ],
     "MTC": [
         ("AR03790918283557863425", "Muangthai Capital Public Company Limited — MTC"),
@@ -81,9 +86,29 @@ ADVERTISERS = {
     "NGERNHAIJAI": [
         ("AR02829134420034715649", "บริษัท เงินให้ใจ จำกัด — KBank-backed lender, acct 1"),
         ("AR14376384815463137281", "บริษัท เงินให้ใจ จำกัด — KBank-backed lender, acct 2"),
+        # No corporate marker in the name, so --discover files it under "individual, skip".
+        # Vetted 2026-08-16 by reading its creatives: 8 of 8 are เงินให้ใจ's own title-loan
+        # copy ("สินเชื่อรถจากเงินให้ใจ … สมัครง่ายผ่านธนาคารกสิกรไทย"), naming the KBank
+        # parent. A private individual does not advertise a bank's lending product.
+        ("AR11022866559675662337", "เงินให้ใจ — same lender, acct 3 (41 ads; brand-name "
+                                   "account with no corporate suffix, copy-vetted)"),
     ],
     "GSB_MONEYDD": [
         ("AR16341765122877816833", "บริษัท เงินดีดี จำกัด — GSB's MoneyDD lending entity"),
+    ],
+    # TURBO advertises through its INSURANCE-BROKER entity, which is why a name search files it
+    # as "individual, skip" and why this operator read as having no paid Google presence at all
+    # until 2026-08-16. It has 121 creatives. Vetted by reading them: 7 of 7 sampled are
+    # จำนำทะเบียน copy ("จำนำเล่มทะเบียนรถยนต์ที่เงินเทอร์โบ ไม่ต้องมีคนค้ำ … ไม่ต้องโอนเล่ม"),
+    # i.e. the group's LENDING marketing, merely billed to the broker company. Contrast KKP
+    # below, whose only account genuinely sells a different product.
+    "TURBO": [
+        ("AR13508192232099807233", "NGERNTURBO INSURANCE BROKER COMPANY LIMITED — เงินเทอร์โบ "
+                                   "group; copy-vetted 2026-08-16 as title-loan advertising"),
+    ],
+    "WSOL_CARFINN": [
+        ("AR11374489330266406913", "บริษัท คาร์ฟินน์ อินเตอร์ กรุ๊ป จำกัด — CarFinn, the online "
+                                   "broker already in the census"),
     ],
 }
 
@@ -101,6 +126,26 @@ EXCLUDED = {
                                                "เงินดีดี but is a separate legal entity we "
                                                "could not tie to the GSB product; left out "
                                                "rather than guessed."),
+    # --- Thai brand-name collisions, recorded so nobody re-adds them next quarter ------------
+    # These are the accounts a name search surfaces that belong to DIFFERENT COMPANIES. The
+    # เมืองไทย one is the dangerous one: 700-800 creatives, more than every title lender we
+    # track combined, and folding it in would have made MTC look like the dominant advertiser
+    # in the market on the strength of a life insurer's marketing.
+    "MTC_LIFE":     ("AR13571366837337194497", "บริษัท เมืองไทยประกันชีวิต จำกัด (มหาชน) — Muang "
+                                               "Thai LIFE INSURANCE, an unrelated company. "
+                                               "700-800 ads. 'เมืองไทย' is a generic name."),
+    "MTC_TRAVEL":   ("AR00610429528388403201", "บริษัท เมืองไทย ทราเวล จำกัด — a travel agency."),
+    "MTC_MEDIA":    ("AR05428757573161451521", "MTC Media Ltd — unrelated; the MTC initialism "
+                                               "also returns MTCGAME, MTCH AG and a German "
+                                               "electronics firm."),
+    "MTC_MITR":     ("AR15716447253566586881", "บริษัท มิตรเมืองไทย จำกัด — unrelated."),
+    "SOMWANG_LERT": ("AR10449566370726150145", "บริษัท สมหวังเลิศมงคล จำกัด — 93 ads, but TISCO's "
+                                               "สมหวัง operates as บริษัท ไฮเวย์ จำกัด. สมหวัง is "
+                                               "an ordinary Thai word ('wish fulfilled'); the "
+                                               "same search also returns a flower shop."),
+    "CAR4CASH_SUMO": ("AR17925099482198835201", "ซูโม่คาร์ จำกัด — a car dealer, not Krungsri's "
+                                                "Car4Cash. The คาร์ token matches garages and "
+                                                "rental firms across the whole country."),
 }
 
 # Operators checked with --discover and found to have NO advertiser account in Thailand. A
@@ -108,8 +153,12 @@ EXCLUDED = {
 # output and rendered — but ONLY add a key here after a clean, non-throttled --discover run,
 # because a 429 also returns zero suggestions. The run behind this list logged ZERO throttle
 # errors across all 17 operators (2026-07-30), so these empties are real.
+# TURBO left this list on 2026-08-16: it DOES advertise, through its insurance-broker entity,
+# and a --discover run cannot see that because the entity name carries no lending token. A
+# "no account" finding is only as good as the name we searched under — worth remembering before
+# reading the remaining eight as proof that those operators buy no paid search at all.
 NO_ACCOUNT = ["AMANAH", "AUTOX", "CAR4CASH", "GSB_MEETEE", "HENG", "MICRO", "SAK",
-              "SOMWANG", "TTB_CYC", "TURBO"]
+              "SOMWANG", "TTB_CYC"]
 
 # A suggestion is only a company if the name carries a corporate marker. Filters out the
 # private individuals that Thai name collisions surface.
@@ -424,6 +473,15 @@ def main():
         return write(store, brands, today)
 
     store, brands = dict(prev), {}
+    if a.brand:
+        # A single-operator run must not evict the operators it did not visit. The creatives
+        # store is merged into `prev` already, but `brands` carries each operator's name, tier
+        # and account list — rebuilt from scratch it would leave the layer with ONE brand and
+        # every other operator's rows nameless and tierless downstream. Seed from the previous
+        # file and let this run overwrite only its own key. A FULL run still rebuilds the map
+        # from ADVERTISERS, so removing an operator there still removes it from the output.
+        brands = dict((json.load(io.open(OUT, encoding="utf-8")) or {}).get("brands") or {}
+                      if os.path.exists(OUT) else {})
     for key, accts in ADVERTISERS.items():
         if a.brand and key.lower() != a.brand.lower():
             continue
