@@ -1,0 +1,314 @@
+Management Discussion and Analysis Q2 2026
+Executive Summary
+Business Overview and Economic and Industry Factors Impacting Operations
+In the second quarter of 2026 (“2Q26”), Tidlor Holdings Public Company Limited (the “Group”) continued to deliver
+strong operating performance amid ongoing economic uncertainty. The Group reported net profit of Baht 1,533.2
+million, increasing by 18.3% (YoY), driven by revenue growth from its two core businesses—lending and insurance
+brokerage—together with an improvement in net interest margin and effective cost and asset quality management.
+The Group’s total revenue for the quarter amounted to Baht 6,143.0 million, increasing by 6.7% (YoY), mainly driven
+by higher interest income in line with loan portfolio growth and higher fee and service income from the insurance
+brokerage business. Meanwhile, finance costs continued to decline, resulting in an improvement in Net Interest
+Margin (NIM) to 16.2%. The Group also continued to manage operating expenses efficiently, with the Cost-to-Income
+Ratio at 55.1%, reflecting continued cost discipline alongside ongoing investments to support long-term growth.
+As of the end of June 2026, the Group’s outstanding loan portfolio totaled Baht 112,537.9 million, increasing by
+6.3% (YoY) and 2.4% (QoQ), with growth continuing to be primarily driven by vehicle title loans. The number of
+lending customers increased by 9.0% (YoY), reflecting continued quality customer base expansion. Growth was
+supported by a network of 1,918 branches, together with the continued increase in the use of digital channels,
+particularly the Tidlor Card, Tid Jai application, and E-Withdrawal service, which enhance customer convenience
+and access to financial services.
+Asset quality remained well managed. The Non-Performing Loan (NPL) Ratio stood at 1.54%, improving from 1.78% in
+the same quarter last year, supported by prudent underwriting and effective debt collection. Credit Cost was 2.06%,
+declining from 2.63% in the same quarter last year, mainly due to lower provisioning and write-offs. Moreover, the
+NPL Coverage Ratio remained strong at 322%, reflecting an adequate reserve buffer and prudent risk management.
+The insurance brokerage business continued to grow, with total non-life insurance premiums in 2Q26 amounting
+to Baht 2,756 million, increasing by 7.4% (YoY). Growth was supported by a comprehensive range of products,
+sales and service channels, and continued development of digital technology to enhance service capabilities
+across the Group’s three core brands—Shield Insurance, Areegator, and heygoody—which help broaden customer
+reach across diverse target segments and support business growth.
+For the first six months of 2026 (“6M26”), the Group reported net profit of Baht 3,147.0 million, increasing by
+26.2% (YoY), driven by revenue growth across both the lending and insurance brokerage businesses, together
+with effective cost and asset quality management. The Group remains focused on quality growth by balancing
+business expansion with appropriate risk-adjusted returns, supported by a strong financial position and ample
+liquidity to sustain long-term growth.
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited
+2nd Quarter 2026 | 1
+Financial Highlights
+Key Financial Ratio
+Economic Overview
+Thailand’s economy slowed in 2Q26 from the previous quarter, affected by higher energy prices and the conflict
+in the Middle East, which weighed on tourism, private consumption, and domestic economic activity. International
+tourist arrivals and tourism-related service activities declined, while household purchasing power remained under
+pressure from the cost of living and household debt, despite some support from government stimulus measures
+toward the end of the quarter. Nevertheless, the economy continued to benefit from the upcycle in the global
+electronics industry, increased investment in artificial intelligence (AI), and the expansion of data centers, which
+support growth in technology exports and investment in machinery and equipment. Additionally, used vehicle
+prices remained broadly stable compared with the previous quarter.
+On monetary policy, the Monetary Policy Committee (MPC) resolved to maintain the policy interest rate at 1.00% at its
+April and June 2026 meetings. The MPC assessed that the Thai economy would continue to expand at a low and uneven
+pace, albeit better than previously expected, while the current policy rate remained supportive of the economic recovery.
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited
+2nd Quarter 2026 | 2
+(U n it: T H B m illio n )
+In te re s t in c o m e o n h ire -p u rc h a s e re c e iv a b le s
+In te re s t in c o m e o n lo a n s
+F e e a n d s e rv ic e in c o m e
+O th e r in c o m e
+T o t a l r e v e n u e s
+S e rv ic e a n d a d m in is tra tiv e e x p e n s e s
+F in a n c e c o s ts
+P r o f it b e f o r e c r e d it lo s s
+C re d it lo s s
+L o s s a ris in g fro m d e re c o g n itio n o f fin a n c ia l a
+m e a s u re d a t a m o rtiz e d c o s t
+L o s s d e te rm in e d in a c c o rd a n c e w ith T F R S 9
+S h a re o f p ro fit fro m jo in t v e n tu re
+P r o f it b e f o r e in c o m e t a x e x p e n s e
+In c o m e ta x e x p e n s e s
+N e t p r o f it (a t t r ib u t a b le t o o w n e r s o f t h e c
+N P L R a t io (% )
+N P L C o v e r a g e R a t io (% )
+C r e d it C o s t (% )
+D e b t t o E q u it y (D / E ) R a t io (t im e s )
+C o s t t o In c o m e (C / I) R a t io (% )
+% Y o Y
+2 Q 2 5 2 Q 2 6 In c re a s e / 6 M 2 5 6 M 2 6
+(D e c re a s e )
+2 8 3 .0 2 8 2 .7 (0 .1 % ) 5 8 7 .7 5 4 9 .7
+4 ,4 7 8 .8 4 ,8 1 4 .7 7 .5 % 8 ,8 3 2 .2 9 ,5 1 6 .8
+9 6 2 .8 9 8 4 .4 2 .2 % 1 ,9 3 4 .5 2 ,0 3 5 .4
+3 0 .8 6 1 .2 9 8 .7 % 4 1 .4 1 1 0 .6
+5 ,7 5 5 .4 6 ,1 4 3 .0 6 .7 % 1 1 ,3 9 5 .8 1 2 ,2 1 2 .5
+(2 ,7 8 9 .1 ) (3 ,0 6 4 .2 ) 9 .9 % (5 ,5 1 9 .1 ) (6 ,0 4 5 .1 )
+(6 4 3 .7 ) (5 8 5 .9 ) (9 .0 % ) (1 ,2 7 4 .5 ) (1 ,1 7 9 .0 )
+2 ,3 2 2 .6 2 ,4 9 2 .9 7 .3 % 4 ,6 0 2 .2 4 ,9 8 8 .4
+(6 9 1 .8 ) (5 7 1 .7 ) (1 7 .4 % ) (1 ,4 6 3 .4 ) (1 ,0 3 9 .6 )
+s s e ts
+(5 5 4 .6 ) (5 3 2 .6 ) (4 .0 % ) (1 ,1 5 5 .0 ) (1 ,0 3 5 .6 )
+(1 3 7 .2 ) (3 9 .1 ) (7 1 .5 % ) (3 0 8 .4 ) (4 .0 )
+- 2 .2 - 4 .6
+1 ,6 3 0 .8 1 ,9 2 3 .4 1 7 .9 % 3 ,1 3 8 .8 3 ,9 5 3 .4
+(3 2 6 .4 ) (3 8 0 .9 ) 1 6 .7 % (6 2 9 .3 ) (7 8 7 .4 )
+o m p a n y ) 1 ,2 9 6 .5 1 ,5 3 3 .2 1 8 .3 % 2 ,4 9 4 .3 3 ,1 4 7 .0
+2 0 2 3 2 0 2 4 2 0 2 5 2 Q 2 5 1 Q 2 6
+1 .4 5 1 .8 1 1 .5 4 1 .7 8 1 .4 7
+2 8 2 .1 2 4 2 .7 3 2 5 .0 2 6 2 .4 3 4 0 .5
+3 .3 3 .4 2 .8 2 .6 1 .7
+2 .5 2 .5 2 .3 2 .5 2 .1
+5 4 .9 5 5 .9 5 5 .4 5 4 .6 5 4 .4
+% Y o Y
+In c re a s e /
+(D e c re a s e )
+(6 .5 % )
+7 .8 %
+5 .2 %
+1 6 6 .9 %
+7 .2 %
+9 .5 %
+(7 .5 % )
+8 .4 %
+(2 9 .0 % )
+(1 0 .3 % )
+(9 8 .7 % )
+2 6 .0 %
+2 5 .1 %
+2 6 .2 %
+2 Q 2 6
+1 .5 4
+3 2 1 .9
+2 .1
+2 .3
+5 5 .1
+Summary of Key Events and Developments
+• On May 20, 2026, the Board of Directors approved an interim cash dividend payment based on the operating
+results for 1Q26 at Baht 0.69 per share, totaling approximately Baht 1,998.2 million. The dividend was paid
+on June 19, 2026. The Board also approved a share repurchase program for capital management purposes
+(Treasury Stock), with a maximum amount of Baht 2,400 million and up to 122.8 million shares, representing
+no more than 4.24% of the total issued shares.
+• In August 2026, the Group completed its inaugural Euro-Yen bond issuance, following the assignment of a
+long-term issuer rating of “A-” with a “Stable” outlook by Japan Credit Rating Agency (JCR), which is an
+Investment Grade rating. The issuance marked another important milestone in expanding the Group’s access
+to international capital markets, further diversifying its funding sources and enhancing funding management
+flexibility to support long-term business growth
+Operating Results for Q2 2026
+Summary of Operating Results
+Revenue: In 2Q26, the Group reported total revenue of Baht 6,143.0 million, increasing by 6.7% (YoY). The Group’s
+principal revenue sources continued to be interest income and fee and service income.
+• Interest income amounted to Baht 5,097.4 million, increasing by 7.0% (YoY) and accounting for 83.0% of
+total revenue. Growth was mainly driven by interest income on loans of Baht 4,814.7 million, increasing by
+7.5% (YoY), in line overall loan portfolio expansion.
+In terms of interest income and funding cost efficiency, yield on loans stood at 18.3%, increasing from 18.1%
+in the same quarter last year, mainly due to changes in loan mix and the application of risk-based pricing.
+Cost of funds declined to 2.1% from 2.4% in the same quarter last year, in line with recent market interest
+rate trend. As a result, Net Interest Margin (NIM) improved to 16.2%.
+For 6M26, the Group reported total revenue of Baht 12,212.5 million, increasing by 7.2% (YoY). Interest income
+amounted to Baht 10,066.5 million, increasing by 6.9% (YoY), mainly driven by the expansion of the vehicle
+title loan portfolio and an improvement in NIM compared with the same period last year.
+% YoY % QoQ
+(Unit: %) 2Q25 1Q26 2Q26 Increase/ Increase/
+(Decrease) (Decrease)
+Interest income ratio (Yield on loans) 18.1 18.1 18.3 1.4% 1.3%
+Interest expense ratio (Cost of funds) 2.4 2.2 2.1 (13.8%) (4.2%)
+Net interest margin (NIM) 15.6 15.9 16.2 3.7% 2.0%
+• Fee and service income amounted to Baht 984.4 million, increasing by 2.2% (YoY) and accounting for 16.0%
+of total revenue. Growth was mainly driven by the insurance brokerage business, which continued to expand,
+supported by product diversity, comprehensive sales and service channels, and the continued development
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited
+2nd Quarter 2026 | 3
+and application of digital technology to enhance systems and service capabilities across the Group’s three
+core brands:
+1) Shield Insurance Broker, supported by Call Center 1501, a face-to-face insurance brokerage business
+operated through branch employees licensed for both non-life and life insurance
+2) Areegator, an online insurance platform for affiliated member brokers
+3) heygoody, a fully digital insurance brokerage platform
+For 6M26, fee and service income amounted to Baht 2,035.4 million, increasing by 5.2% (YoY), and remained
+an important source of income that enhanced the diversity and resilience of the Group’s revenue structure.
+The insurance brokerage business continued to grow and broaden customer access through a diverse range
+of products and service channels.
+Expenses: In 2Q26, the Group’s total expenses amounted to Baht 4,226.3 million, decreasing by 2.5% (YoY),
+comprising the following:
+• Service and administrative expenses amounted to Baht 3,064.2 million, increasing by 9.9% (YoY), in line with
+the expansion of the Group’s businesses and customer base. At the same time, the Group continued to
+emphasize efficient expense management alongside investment to support long-term growth. The Cost-to-
+Income Ratio stood at 55.1%, remaining at a manageable level.
+For 6M26, service and administrative expenses amounted to Baht 6,045.1 million, increasing by 9.5% (YoY),
+in line with business expansion, while the Group continued to maintain cost discipline and manage expenses
+at an appropriate level.
+• Finance costs amounted to Baht 585.9 million, decreasing by 9.0% (YoY), in line with the downward trend in
+the policy rate and bond yields, which lowered funding costs for new borrowings and debenture issuances.
+The Group continued to apply a matched-funding policy and maintain all borrowings on a fixed-rate basis to
+manage interest rate volatility and preserve funding cost stability.
+For 6M26, finance costs amounted to Baht 1,179.0 million, decreasing by 7.5% (YoY), in line with money market
+interest rate trends and the gradual decline in new funding costs.
+• Credit loss amounted to Baht 571.7 million, decreasing by 17.4% (YoY), mainly due to lower provisioning and write-
+off, consistent with the sound quality of the overall loan portfolio. Credit Cost stood at 2.06%, down from 2.63%
+in the same quarter last year. The NPL Coverage Ratio remained strong at 322%, reflecting the maintenance of
+a robust reserve buffer to accommodate external uncertainties and future loan portfolio growth.
+For 6M26, credit loss amounted to Baht 1,039.6 million, decreasing by 29.0% (YoY), while Credit Cost declined
+to 1.87% from 2.79% in the same period last year, consistent with overall portfolio quality. The Group
+continues to prioritize asset quality management and maintain an appropriate reserve level under its risk
+management framework.
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited
+2nd Quarter 2026 | 4
+Net profit: In 2Q26, the Group reported net profit of Baht 1,533.2 million, increasing by 18.3% (YoY), mainly driven
+by revenue growth from both the lending and insurance brokerage businesses, an improvement in NIM, and
+effective cost and asset quality management.
+For 6M26, the Group reported net profit of Baht 3,147.0 million, increasing by 26.2% (YoY), supported by revenue
+growth from both core businesses and effective cost management, reflecting the Group’s continued ability to
+generate earnings from its core operations.
+Summary of Financial Position
+Assets: As of 30 June 2026, the Group’s total assets amounted to Baht 114,749.9 million, increasing by 1.7% from
+the end of 2025, primarily driven by higher loans and hire purchase receivables in line with loan portfolio expansion.
+As of the end of 2Q26, the Group’s outstanding loan portfolio totaled Baht 112,537.9 million, growing by 6.3%
+(YoY) and 2.4% (QoQ). This comprised loans and accrued interest receivables of Baht 104,444.7 million, increasing
+by 2.5% (QoQ), and hire purchase receivables of Baht 8,093.2 million, increasing by 0.5% (QoQ). Loan portfolio
+expansion remained consistent with the Group’s quality growth strategy, with lending decision calibrated to
+customers’ risk profiles and repayment capacity. In addition, loan approval criteria in areas affected by flooding
+in late 2025 have returned to normal lending practices.
+Loan portfolio growth was driven by continued customer base expansion, with the number of lending customers
+increasing by 9.0% (YoY). This growth was supported by a network of 1,918 branches, complemented by non-
+branch and digital channels that help enhance convenience and broaden customers’ access to financial services.
+The Group had issued more than 809,000 Tidlor Cards, while approximately 77% of total loan drawdowns were
+completed through E-Withdrawal, reflecting the growing role of digital channels in customer service. The Group
+continues to develop products, systems, and services through the application of technology and innovation to
+enhance customer experience, improve operating efficiency, and support long-term business growth.
+Asset quality remained well managed. The NPL Ratio stood at 1.54%, improving from 1.78% in the same quarter
+last year, supported by prudent underwriting, healthy quality of newly originated loans, and effective debt
+collection. The Group’s total expected credit loss allowance amounted to Baht 5,559.9 million, representing an
+NPL Coverage Ratio of 322%, which remained strong and provided a buffer against potential future uncertainties
+alongside loan portfolio growth.
+Liabilities: As of 30 June 2026, the Group’s total liabilities amounted to Baht 79,468.8 million, increasing by 1.4%
+from the end of 2025, mainly due to higher long-term borrowings to support loan portfolio growth and provide
+working capital for the Group’s businesses.
+As of the end of 2Q26, the Group’s total borrowings and debentures amounted to Baht 75,051.9 million, increasing
+by 2.2% from the end of 2025. The Group continued to maintain a diversified and appropriate funding structure
+to enhance liquidity management flexibility and reduce funding concentration risk, with a funding mix between
+borrowings and debentures of 56:44. Liquidity remained sufficient, with available credit facilities of over Baht
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited
+2nd Quarter 2026 | 5
+23,000 million to support ongoing operations and future business growth. The Group’s Debt-to-Equity (D/E)
+Ratio stood at 2.3 times as of the end of June 2026.
+Shareholders’ Equity: As of 30 June 2026, the Group’s total shareholders’ equity amounted to Baht 35,281.1 million,
+increasing by 2.4% from the end of 2025, mainly driven by profits generated from the Group’s operations during
+the first six months of 2026.
+Sustainability Development
+In 2Q26, Ngern Tid Lor Public Company Limited (“Ngern Tid Lor”), a subsidiary of the Group, organized an activity
+under the “Financial Knowledge to Communities for Life Rolls Forward” project to promote basic financial literacy
+and appropriate debt management within communities through an Activity-Based Learning approach. The initiative
+focused on strengthening financial planning skills and financial discipline, with the aim of improving quality of life
+and reducing inequality in a sustainable manner. In addition, Ngern Tid Lor continued its “Financial Mentor Program”
+for the sixth consecutive time to enhance employees’ financial planning knowledge and strengthen their financial
+resilience, while enabling them to share financial knowledge and guidance with their colleagues. The program has
+been implemented continuously since 2022 under the Stock Exchange of Thailand’s “Happy Money Financial Mentor”
+initiative. To date, a total of 79 employees have completed batches 1–5 of the program.
+Further details are available on the Company’s sustainability website:
+https://sustainability.tidlorinvestor.com/en/home
+Management Discussion and Analysis of Tidlor Holdings Public Company Limited
+2nd Quarter 2026 | 6
+(U n it : m illio n B a h t )
+C a s h a n d c a s h e q u iv a le n t s
+L o a n s a n d h ir e p u r c h a s e r e c e iv a
+A llo w a n c e f o r e x p e c t e d c r e d it lo
+O t h e r c u r r e n t a s s e t s
+O t h e r n o n - c u r r e n t a s s e t s
+T o t a l a s s e t s
+L o a n s
+D e b e n t u r e s
+T o t a l L o a n s a n d D e b e n t u r e s
+N o n - c u r r e n t lia b ilit ie s
+T o t a l lia b ilit ie s
+T o t a l s h a r e h o ld e r s ’ e q u it y
+T o t a l lia b ilit ie s a n d s h a r e h o
+b le
+s s
+ld
+s
+e r s ’ e q u it y
+3 1 D e c e m b e r
+2 0 2 5
+3 ,0 6 0 .3
+1 0 9 ,5 8 5 .6
+(5 ,4 9 9 .8 )
+1 ,5 8 6 .4
+4 ,0 6 4 .3
+1 1 2 ,7 9 6 .8
+4 1 ,1 2 4 .0
+3 2 ,2 8 6 .1
+7 3 ,4 1 0 .1
+4 ,9 2 3 .9
+7 8 ,3 3 4 .0
+3 4 ,4 6 2 .8
+1 1 2 ,7 9 6 .8
+3 0 J u n e
+2 0 2 6
+2 ,1 1 3 .8
+1 1 2 ,5 3 7 .9
+(5 ,5 5 9 .9 )
+1 ,4 2 2 .8
+4 ,2 3 5 .3
+1 1 4 ,7 4 9 .9
+4 2 ,2 8 7 .1
+3 2 ,7 6 4 .8
+7 5 ,0 5 1 .9
+4 ,4 1 6 .9
+7 9 ,4 6 8 .8
+3 5 ,2 8 1 .1
+1 1 4 ,7 4 9 .9
+% Y T D
+In c r e a s e /
+( D e c r e a s e )
+(3 0 .9 %
+2 .7 %
+1 .1 %
+(1 0 .3 %
+4 .2 %
+1 .7 %
+2 .8 %
+1 .5 %
+2 .2 %
+(1 0 .3 %
+1 .4 %
+2 .4 %
+1 .7 %
+)
+)
+)

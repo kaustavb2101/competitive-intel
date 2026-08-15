@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 252,
+  "n_points": 259,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -262,7 +262,7 @@
     165.0,
     155.0,
     126.0,
-    133.0
+    125.0
    ]
   },
   "fuel_diesel": {
@@ -290,11 +290,12 @@
     "2026-08-09",
     "2026-08-10",
     "2026-08-11",
-    "2026-08-14"
+    "2026-08-14",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-05",
    "label": "Diesel · retail pump",
-   "n": 23,
+   "n": 24,
    "path": "source-data/fuel_prices.json",
    "source": "Bangchak retail oil-price API",
    "unit": "฿/L",
@@ -321,6 +322,7 @@
     36.69,
     36.69,
     36.69,
+    37.54,
     37.54
    ]
   },
@@ -349,11 +351,12 @@
     "2026-08-09",
     "2026-08-10",
     "2026-08-11",
-    "2026-08-14"
+    "2026-08-14",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-05",
    "label": "Gasohol 95 · retail pump",
-   "n": 23,
+   "n": 24,
    "path": "source-data/fuel_prices.json",
    "source": "Bangchak retail oil-price API",
    "unit": "฿/L",
@@ -380,6 +383,7 @@
     35.99,
     35.99,
     35.99,
+    36.84,
     36.84
    ]
   },
@@ -424,11 +428,12 @@
     "2026-08-09",
     "2026-08-10",
     "2026-08-11",
-    "2026-08-14"
+    "2026-08-14",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-05",
    "label": "Rice (Hom Mali) - NABC farm-gate",
-   "n": 22,
+   "n": 23,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/tonne",
@@ -454,6 +459,7 @@
     17721.67,
     17805.0,
     17805.0,
+    17888.33,
     17888.33
    ]
   },
@@ -481,11 +487,12 @@
     "2026-08-09",
     "2026-08-10",
     "2026-08-11",
-    "2026-08-14"
+    "2026-08-14",
+    "2026-08-15"
    ],
    "first_seen": "2026-07-05",
    "label": "Rubber (raw sheet) - NABC farm-gate",
-   "n": 22,
+   "n": 23,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/kg",
@@ -511,6 +518,7 @@
     81.71,
     82.11,
     81.32,
+    80.88,
     80.88
    ]
   },
@@ -566,7 +574,7 @@
     25.0,
     14.0,
     17.0,
-    26.0
+    20.0
    ]
   },
   "rain_max_mm": {
@@ -621,7 +629,7 @@
     120.0,
     137.4,
     96.0,
-    103.4
+    124.0
    ]
   },
   "rival_ads_live": {
@@ -649,17 +657,19 @@
     "2026-07-19",
     "2026-08-08",
     "2026-08-11",
-    "2026-08-13"
+    "2026-08-13",
+    "2026-08-14"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC · live promo/news items",
-   "n": 4,
+   "n": 5,
    "path": "source-data/rival_promos.json",
    "source": "muangthaicap.com (own-site pull)",
    "unit": "items",
    "values": [
     11.0,
     11.0,
+    13.0,
     13.0,
     13.0
    ]
@@ -670,15 +680,17 @@
     "2026-07-19",
     "2026-08-08",
     "2026-08-11",
-    "2026-08-13"
+    "2026-08-13",
+    "2026-08-14"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD · live promo/news items",
-   "n": 4,
+   "n": 5,
    "path": "source-data/rival_promos.json",
    "source": "sawad.co.th (own-site pull)",
    "unit": "items",
    "values": [
+    5.0,
     5.0,
     5.0,
     5.0,
@@ -691,15 +703,17 @@
     "2026-07-19",
     "2026-08-08",
     "2026-08-11",
-    "2026-08-13"
+    "2026-08-13",
+    "2026-08-14"
    ],
    "first_seen": "2026-07-19",
    "label": "TIDLOR · live promo/news items",
-   "n": 4,
+   "n": 5,
    "path": "source-data/rival_promos.json",
    "source": "tidlor.com (own-site pull)",
    "unit": "items",
    "values": [
+    6.0,
     6.0,
     6.0,
     6.0,
@@ -888,7 +902,7 @@
     11137.0,
     11146.0,
     11154.0,
-    12064.0
+    12143.0
    ]
   }
  }

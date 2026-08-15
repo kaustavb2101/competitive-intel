@@ -1,0 +1,388 @@
+
+[SHEET: 2-4]
+Srisawad Corporation Public Company Limited									
+Statement of Financial Position									
+As at 30 June 2026									
+			Consolidated				Separate		
+			financial information				financial information		
+			Unaudited		Audited		Unaudited		Audited
+			30 June		31 December		30 June		31 December
+			2026		2025		2026		2025
+	Notes		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Assets									
+Current assets									
+Cash and cash equivalents			4328941		6045546		911675		2411014
+Financial assets measured at fair value through									
+profit or loss	10.1		1852005		1056731		0		0
+Other financial assets measured at amortised cost			537		536		0		0
+Current portion of derivative assets	13		22669		0		22669		0
+Current portion of loans to customers and									
+accrued interest receivables, net	8		61224228		60288869		0		0
+Other current receivables	9		1616756		1447256		12946		32519
+Short-term loans to related parties and									
+accrued interest receivables	21 f)		0		0		25347508		49219039
+Properties foreclosed, net			1854953		1782264		0		0
+Other current assets			283632		478377		17686		8253
+Total current assets			71183721		71099579		26312484		51670825
+Non-current assets									
+Financial assets measured at fair value through									
+profit or loss	10.1		17754		20473		6191		6164
+Financial assets measured at fair value through									
+other comprehensive income	10.2		54968		41854		0		0
+Investments in subsidiaries, net	11		0		0		14602081		14582081
+Loans to customers and accrued interest receivables, net	8		32466714		32561418		0		0
+Other non-current receivables			0		0		0		0
+Long-term loans to related parties and									
+accrued interest receivables	21 f)		0		0		22913785		0
+Property, plant and equipment, net			560432		687089		16453		17280
+Right-of-use assets, net	12		2450362		1477107		17399		18233
+Intangible assets, net			1280721		1234729		530		710
+Deferred tax assets			321845		311581		0		0
+Other non-current assets			238498		240350		1311		3286
+Total non-current assets			37391294		36574601		37557750		14627754
+Total assets			108575015		107674180		63870234		66298579
+Director_________________________________________    Director __________________________________________									
+The accompanying notes form part of this interim financial information.									
+Srisawad Corporation Public Company Limited									
+Statement of Financial Position (Cont’d)									
+As at 30 June 2026									
+			Consolidated				Separate		
+			financial information				financial information		
+			Unaudited		Audited		Unaudited		Audited
+			30 June		31 December		30 June		31 December
+			2026		2025		2026		2025
+	Notes		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Liabilities and equity									
+Current liabilities									
+Short-term borrowings from financial institutions	14		7416532		6926301		6843105		6176433
+Other current payables	15		1725250		1503103		287895		288718
+Short-term borrowings from related party	21 g)		45000		45000		0		0
+Current portion of long-term borrowings									
+from financial institutions	14		4349768		4932466		4158101		4557466
+Current portion of long-term borrowings									
+from third parties			0		500000		0		0
+Current portion of senior debentures	16		14789448		16342371		11130089		13108869
+Current portion of derivative liabilities	13		54563		112490		54563		112490
+Current portion of lease liabilities	17		717034		646343		1573		1534
+Income tax payables			767683		738735		0		0
+Other current liabilities			81082		63664		15438		22900
+Total current liabilities			29946360		31810473		22490764		24268410
+Non-current liabilities									
+Long-term borrowings from financial institutions	14		1699805		2533506		1566471		2533506
+Senior debentures	16		31611904		31123500		26636974		27001476
+Derivative liabilities	13		0		193978		0		193978
+Lease liabilities	17		1717637		829578		19282		20082
+Deferred tax liabilities			291302		275033		106028		102636
+Employee benefit obligations			114591		113261		15535		19101
+Provision for decommissioning costs			50291		35890		508		494
+Total non-current liabilities			35485530		35104746		28344798		29871273
+Total liabilities			65431890		66915219		50835562		54139683
+Director_________________________________________    Director __________________________________________									
+The accompanying notes form part of this interim financial information.									
+Srisawad Corporation Public Company Limited									
+Statement of Financial Position (Cont’d)									
+As at 30 June 2026									
+			Consolidated				Separate		
+			financial information				financial information		
+			Unaudited		Audited		Unaudited		Audited
+			30 June		31 December		30 June		31 December
+			2026		2025		2026		2025
+	Note		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Liabilities and equity (Cont’d)									
+Equity									
+Share capital									
+Authorised share capital									
+1,730,769,248 ordinary shares									
+at par value of Baht 1 each	18		1730769		1730769		1730769		1730769
+Issued and paid-up share capital									
+1,661,506,929 ordinary shares									
+at par value of Baht 1 each	18		1661507		1661507		1661507		1661507
+Share premium	18		6207185		6207185		6207185		6207185
+Share premium from share-based payment	18		36190		36190		36190		36190
+Retained earnings									
+Appropriated - Legal reserve			173077		173077		173077		173077
+Unappropriated			33089349		30928974		4987011		4125779
+Discount from changes in the ownership									
+interests in a subsidiaries			-1348716		-1348716		0		0
+Other components of equity			-138874		-204060		-30298		-44842
+Equity attributable to owners of the Company			39679718		37454157		13034672		12158896
+Non-controlling interests			3463407		3304804		0		0
+Total equity			43143125		40758961		13034672		12158896
+Total liabilities and equity			108575015		107674180		63870234		66298579
+Director_________________________________________    Director __________________________________________									
+The accompanying notes form part of this interim financial information.									
+
+[SHEET: 5-6 (3M)]
+Srisawad Corporation Public Company Limited									
+Statement of Comprehensive Income (Unaudited)									
+For the three-month period ended 30 June 2026									
+			Consolidated				Separate		
+			financial information				financial information		
+			30 June		30 June		30 June		30 June
+			2026		2025		2026		2025
+			Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Revenues									
+Interest income			4142561		4138913		576740		632521
+Dividend income			2198		643		1413890		1160984
+Other income			664217		658764		15		39
+Total revenues			4808976		4798320		1990645		1793544
+Expenses									
+Service and administrative expenses			1758351		1878052		25357		30982
+Expected credit losses			476139		535469		0		0
+Total expenses			2234490		2413521		25357		30982
+Profit from operating activities			2574486		2384799		1965288		1762562
+Finance costs			-654724		-715216		-533825		-574421
+Profit before income tax			1919762		1669583		1431463		1188141
+Income tax expense			-371431		-353043		-3471		-5472
+Profit for the period			1548331		1316540		1427992		1182669
+Other comprehensive income									
+Items that will not be reclassified subsequently to profit or loss									
+Remeasurements of post-employment benefit obligations			0		-4		0		0
+Income tax on item that will not be reclassified									
+subsequently to profit or loss			0		0		0		0
+Total items that will not be reclassified subsequently to profit or loss			0		-4		0		0
+Items that will be reclassified subsequently to profit or loss									
+Cash flow hedges			-11770		-41871		-11770		-41871
+Currency translation differences			21975		-39134		0		0
+Changes in fair value of debt instruments measured at fair value									
+through other comprehensive income			745		0		0		0
+Translation differences from net investment									
+in a foreign operation			8097		-13572		0		0
+Income tax on items that will be reclassified									
+subsequently to profit or loss			586		11088		2355		8374
+Total items that will be reclassified subsequently to profit or loss			19633		-83489		-9415		-33497
+Total comprehensive income for the period			1567964		1233047		1418577		1149172
+Director_________________________________________    Director __________________________________________									
+The accompanying notes form part of this interim financial information.									
+Srisawad Corporation Public Company Limited									
+Statement of Comprehensive Income (Unaudited) (Cont'd)									
+For the three-month period ended 30 June 2026									
+			Consolidated				Separate		
+			financial information				financial information		
+			30 June		30 June		30 June		30 June
+			2026		2025		2026		2025
+			Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Profit attributable to:									
+Owners of the parent			1400758		1270040		1427992		1182669
+Non-controlling interests			147573		46500		0		0
+			1548331		1316540		1427992		1182669
+Total comprehensive income attributable to:									
+Owners of the parent			1410470		1204810		1418577		1149172
+Non-controlling interests			157494		28237		0		0
+			1567964		1233047		1418577		1149172
+Earnings per share									
+Basic earnings per share (Baht per share)			0.84		0.76		0.86		0.71
+Director_________________________________________    Director __________________________________________									
+The accompanying notes form part of this interim financial information.									
+
+[SHEET: 7-8 (6M)]
+Srisawad Corporation Public Company Limited									
+Statement of Comprehensive Income (Unaudited)									
+For the six-month period ended 30 June 2026									
+			Consolidated				Separate		
+			financial information				financial information		
+			30 June		30 June		30 June		30 June
+			2026		2025		2026		2025
+			Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Revenues									
+Interest income			8347299		8193070		1158350		1263090
+Dividend income			2198		643		1413890		1160984
+Other income			1360832		1379436		27		892
+Total revenues			9710329		9573149		2572267		2424966
+Expenses									
+Service and administrative expenses			3605891		4052703		51956		59970
+Expected credit losses			989279		956527		0		0
+Total expenses			4595170		5009230		51956		59970
+Profit from operating activities			5115159		4563919		2520311		2364996
+Finance costs			-1311526		-1443233		-1070373		-1148057
+Profit before income tax			3803633		3120686		1449938		1216939
+Income tax expense			-798196		-666150		-7186		-11571
+Profit for the period			3005437		2454536		1442752		1205368
+Other comprehensive income									
+Items that will not be reclassified subsequently to profit or loss									
+Remeasurements of post-employment benefit obligations			0		51		0		0
+Income tax on item that will not be reclassified									
+subsequently to profit or loss			0		747		0		0
+Total items that will not be reclassified subsequently to profit or loss			0		798		0		0
+Items that will be reclassified subsequently to profit or loss									
+Cash flow hedges			18179		-18855		18179		-18855
+Currency translation differences			48255		-42609		0		0
+Changes in fair value of debt instruments measured at fair value									
+through other comprehensive income			13206		0		0		0
+Translation differences from net investment									
+in a foreign operation			24158		442		0		0
+Income tax on items that will be reclassified									
+subsequently to profit or loss			-11108		17248		-3635		3771
+Total items that will be reclassified subsequently to profit or loss			92690		-43774		14544		-15084
+Total comprehensive income for the period			3098127		2411560		1457296		1190284
+Director_________________________________________    Director __________________________________________									
+The accompanying notes form part of this interim financial information.									
+Srisawad Corporation Public Company Limited									
+Statement of Comprehensive Income (Unaudited) (Cont'd)									
+For the six-month period ended 30 June 2026									
+			Consolidated				Separate		
+			financial information				financial information		
+			30 June		30 June		30 June		30 June
+			2026		2025		2026		2025
+			Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Profit attributable to:									
+Owners of the parent			2742835		2370119		1442752		1205368
+Non-controlling interests			262602		84417		0		0
+			3005437		2454536		1442752		1205368
+Total comprehensive income attributable to:									
+Owners of the parent			2807081		2334923		1457296		1190284
+Non-controlling interests			291046		76637		0		0
+			3098127		2411560		1457296		1190284
+Earnings per share									
+Basic earnings per share (Baht per share)			1.65		1.43		0.87		0.73
+Director_________________________________________    Director __________________________________________									
+The accompanying notes form part of this interim financial information.									
+
+[SHEET: 9]
+Srisawad Corporation Public Company Limited																													
+Statement of Changes in Equity (Unaudited)																													
+For the six-month period ended 30 June 2026																													
+			Consolidated financial information																										
+			Attributable to owners of the parent																										
+															Other components of equity														
+			Capital contributed												Other comprehensive income														
+									Retained				Discount		Measurement of														
+							Share		earnings				from changes in		investment in debt														
+			Issued and				premium from		Appropriated		Retained		the ownership		instruments at		Translation differences		Currency				Total other						
+			paid-up		Share		share-based		- Legal		earnings		interests		fair value through other		from net investment		translation		Cash flow		components		Total owners		Non-controlling		
+			share capital		premium		payment		reserve		Unappropriated		in subsidiaries		comprehensive income		in a foreign operation		differences		hedges		of equity		of the parent		interests		Total equity
+	Notes		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Opening balance as at 1 January 2025			1510464		6207179		36190		157341		26713212		-1348755		-940		0		-105195		-32679		-138814		33136817		3165660		36302477
+Reclassification			0		0		0		0		0		0		0		-51570		51570		0		0		0		0		0
+Issuance of ordinary shares from subsidiaries			0		0		0		0		0		0		0		0		0		0		0		0		8441		8441
+Issuance of ordinary shares	18		151043		0		0		0		-151043		0		0		0		0		0		0		0		0		0
+Dividends paid	20		0		0		0		0		-60419		0		0		0		0		0		0		-60419		-4277		-64696
+Change in proportion of investment in subsidiaries			0		0		0		0		0		39		0		0		0		0		0		39		-89103		-89064
+Total comprehensive income for the period			0		0		0		0		2370831		0		0		7522		-28346		-15084		-35908		2334923		76637		2411560
+Closing balance as at 30 June 2025			1661507		6207179		36190		157341		28872581		-1348716		-940		-44048		-81971		-47763		-174722		35411360		3157358		38568718
+Opening balance as at 1 January 2026			1661507		6207185		36190		173077		30928974		-1348716		-1597		-49661		-107960		-44842		-204060		37454157		3304804		40758961
+Reclassification			0		0		0		0		-940		0		940		0		0		0		940		0		0		0
+Dividends paid	20		0		0		0		0		-581520		0		0		0		0		0		0		-581520		-132443		-713963
+Total comprehensive income for the period			0		0		0		0		2742835		0		7612		10444		31647		14543		64246		2807081		291046		3098127
+Closing balance as at 30 June 2026			1661507		6207185		36190		173077		33089349		-1348716		6955		-39217		-76313		-30299		-138874		39679718		3463407		43143125
+Director_________________________________________________      Director __________________________________________________																													
+The accompanying notes form part of this interim financial information.																													
+
+[SHEET: 10]
+Srisawad Corporation Public Company Limited																		
+Statement of Changes in Equity (Unaudited) (Cont’d)																		
+For the six-month period ended 30 June 2026																		
+				Separate financial information														
+														Other components of equity				
+														Other				
+														comprehensive				
+				Capital contributed										income				
+				Issued and				Share premium		Retained earnings						Total other		
+				paid-up		Share		from share-based		Appropriated		Retained earnings		Cash flow		components		
+				share capital		premium		payment		- Legal reserve		Unappropriated		hedges		of equity		Total equity
+		Notes		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Opening balance as at 1 January 2025				1510464		6207179		36190		157341		3711247		-32679		-32679		11589742
+Issuance of ordinary shares		18		151043		0		0		0		-151043		0		0		0
+Dividends paid		20		0		0		0		0		-60419		0		0		-60419
+Total comprehensive income for the period				0		0		0		0		1205368		-15084		-15084		1190284
+Closing balance as at 30 June 2025				1661507		6207179		36190		157341		4705153		-47763		-47763		12719607
+Opening balance as at 1 January 2026				1661507		6207185		36190		173077		4125779		-44842		-44842		12158896
+Dividends paid		20		0		0		0		0		-581520		0		0		-581520
+Total comprehensive income for the period				0		0		0		0		1442752		14544		14544		1457296
+Closing balance as at 30 June 2026				1661507		6207185		36190		173077		4987011		-30298		-30298		13034672
+Director_________________________________________________      Director __________________________________________________																		
+The accompanying notes form part of this interim financial information.																		
+
+[SHEET: 11-12]
+Srisawad Corporation Public Company Limited										
+Statement of Cash Flows (Unaudited)										
+For the six-month period ended 30 June 2026										
+				Consolidated				Separate		
+				financial information				financial information		
+				30 June		30 June		30 June		30 June
+				2026		2025		2026		2025
+				Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Cash flows from operating activities										
+Profit before income tax				3803633		3120686		1449938		1216939
+Adjustments:										
+	Loss (gain) from changes in fair value of financial assets			2392		-11424		-27		-56
+	Depreciation and amortisation			519850		506398		1841		1848
+	Amortisation of borrowing and debt issuance costs			65183		134985		57950		118816
+	Loss on write-off of equipment			1569		1675		0		0
+	(Gain) loss on disposal of equipment			-1414		11925		0		0
+	Gain on termination of lease			-55		-1330		0		0
+	Reversal from impairment of properties foreclosed			-86420		-150060		0		0
+	Loss on disposal of properties foreclosed			144188		489529		0		0
+	Expected credit losses			989279		956527		0		0
+	Employee benefit expenses			15792		14314		1012		1169
+	Decommissioning costs			1034		835		14		12
+	Dividend income			-2198		-643		-1413890		-1160984
+	Interest income			-8356708		-8206810		-1158350		-1263090
+	Interest expense			1245309		1307413		1012409		1029229
+Changes in working capital										
+	Loans to customers and accrued interest receivables, net			-2394687		923783		0		0
+	Other current receivables			-169633		164214		19573		953
+	Properties foreclosed, net			394483		935068		0		0
+	Other current assets			224857		-120874		0		1701
+	Other non-current assets			1852		7576		1975		0
+	Other current payables			228487		33369		4892		448
+	Other current liabilities			17418		-22031		-7462		62
+	Employee benefit obligations			-14462		-6171		-4578		0
+Cash (used in) generated from operating activities				-3370251		88954		-34703		-52953
+	Interest received			8386872		8145533		1686296		2124841
+	Interest paid			-1164152		-1274384		-976081		-1024563
+	Income tax paid			-804465		-670533		-16863		-23707
+Net cash generated from operating activities				3048004		6289570		658649		1023618
+Director_________________________________________    Director __________________________________________										
+The accompanying notes form part of this interim financial information.										
+Srisawad Corporation Public Company Limited										
+Statement of Cash Flows (Unaudited) (Cont’d)										
+For the six-month period ended 30 June 2026										
+				Consolidated				Separate		
+				financial information				financial information		
+				30 June		30 June		30 June		30 June
+				2026		2025		2026		2025
+				Thousand Baht		Thousand Baht		Thousand Baht		Thousand Baht
+Cash flows from investing activities										
+Cash received from disposal of financial assets measured at										
+	fair value through profit or loss			1705053		302009		0		0
+Cash paid for acquisition of financial assets measured at										
+	fair value through profit or loss			-2500000		-300000		0		0
+Cash received from loans to related parties				0		0		8152200		6863000
+Cash paid for loans to related parties				0		0		-7722400		-5290000
+Cash received from disposal of equipment				75849		22162		0		0
+Cash paid for purchase of property, plant and equipment				-34012		-91870		0		0
+Cash paid for purchase of intangible assets				-57175		-42988		0		0
+Cash paid for investment in subsidiaries				0		0		-20000		-89064
+Cash received from dividend income				2198		643		1413890		1160984
+Increase in financial assets measured at amortised cost				-1		-1		0		0
+Net cash (used in) generated from investing activities				-808088		-110045		1823690		2644920
+Cash flows from financing activities										
+Cash received from short-term borrowings from related party				0		40000		0		0
+Cash paid for short-term borrowings from related party				0		-80000		0		0
+Cash received from short-term borrowings from financial institutions				3677099		13111760		3454506		13033280
+Cash paid for short-term borrowings from financial institutions				-3230000		-12537000		-2830000		-12517000
+Cash paid for borrowings from third parties				-500000		0		0		0
+Cash received from long-term borrowings from financial institutions				1100000		3966783		900000		3966783
+Cash paid for long-term borrowings from financial institutions				-2787931		-5829769		-2537932		-1648574
+Cash received from issuance of senior debentures				8748687		5564690		5966257		3974321
+Cash paid for redemption of senior debentures				-9862900		-11481800		-8352000		-9810000
+Dividends paid to non-controlling interest				-132443		-4277		0		0
+Cash paid to non-controlling interest				0		-89064		0		0
+Cash received from additional investment in subsidiary										
+	for non-controlling interests			0		8441		0		0
+Dividends paid to the Group shareholders				-581214		-60391		-581214		-60391
+Cash paid for principal of lease liabilities				-457579		-459010		-1295		-1296
+Net cash used in financing activities				-4026281		-7849637		-3981678		-3062877
+Net (decrease) increase in cash and cash equivalents				-1786365		-1670112		-1499339		605661
+Cash and cash equivalents at the beginning of the period				6045546		5813692		2411014		863886
+Translation differences from net investment in a foreign operation				24159		442		0		0
+Gain (loss) on exchange on cash and cash equivalents				45601		-24121		0		0
+Cash and cash equivalents at the end of the period				4328941		4119901		911675		1469547
+Non-cash items										
+Acquisition of right-of-use assets				1387066		361415		0		0
+Change in classification of asset				9931		5998		0		0
+Accounts payable from purchase of assets				1418		444		0		0
+Shares dividend paid				0		151043		0		151043
+Director_________________________________________    Director __________________________________________										
+The accompanying notes form part of this interim financial information.										

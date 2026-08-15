@@ -25,13 +25,20 @@
 #   python3 pipeline/check_site_health.py --local platform --json /tmp/h.json
 #   SITE_PASSWORD=... python3 pipeline/check_site_health.py --base-url ...      # auth-gated site
 #
-# ACCESS-PROTECTED DEPLOYMENTS: the production alias runs middleware.js HTTP
-# Basic Auth (any username, password = SITE_PASSWORD). Supply the same password
-# via --site-password or the SITE_PASSWORD env var and the probe authenticates
-# and runs the full deep checks. WITHOUT a password, a 401 from the live site is
-# treated as HEALTHY ("up and correctly access-protected") rather than a
-# breakage — the deep page/data checks are reported as SKIPPED, not FAILED, so
-# the nightly probe never fires a false alarm just because it lacks the secret.
+# ACCESS-PROTECTED DEPLOYMENTS: two mechanisms, both handled as HEALTHY.
+#   (1) middleware.js HTTP Basic Auth (any username, password = SITE_PASSWORD):
+#       supply the same password via --site-password or the SITE_PASSWORD env var
+#       and the probe authenticates and runs the full deep checks. WITHOUT it, a
+#       401 is treated as "up and correctly access-protected" and the deep checks
+#       are SKIPPED, not FAILED.
+#   (2) Vercel Authentication (SSO Deployment Protection): the alias 30x-redirects
+#       an unauthenticated request to vercel.com/login. urllib follows it to a 200
+#       login page, so a naive check sees 200 + non-site content and would fire a
+#       FALSE outage. The probe detects the off-host redirect to Vercel's auth
+#       endpoint and reports "up + access-protected (SSO)", deep checks SKIPPED. An
+#       SSO gate needs a Vercel session cookie, so SITE_PASSWORD cannot unlock it
+#       from CI — deep-probing requires an SSO-exempt custom domain.
+# Either way the nightly probe never fires a false alarm just because it is gated.
 
 import argparse
 import base64
@@ -41,6 +48,7 @@ import os
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 # Sanity cap: no single served asset should exceed this. The largest committed
@@ -62,11 +70,43 @@ WORDMARK = "AutoX"
 
 # ---------------------------------------------------------------------------
 class AuthGated(RuntimeError):
-    """The live deployment returned 401 (middleware.js Basic Auth). The site is UP
-    and correctly access-protected — a healthy state, not a breakage — whether the
-    probe supplied no credential OR supplied one the deployment rejected. Either
-    way the deep checks are skipped, not failed; unlocking them just needs the CI
-    SITE_PASSWORD secret to match the deployment's own SITE_PASSWORD."""
+    """The live deployment answered an access-protection challenge, NOT an outage.
+    Two shapes, both HEALTHY ("site up + correctly access-protected"):
+      - 401 (middleware.js HTTP Basic Auth), or
+      - a 30x redirect off our host onto Vercel's own Authentication (SSO) login
+        (Vercel "Deployment Protection" -> vercel.com/login?next=/sso-api/...).
+    In both cases the deep checks are skipped, not failed. The 401/basic-auth gate
+    can be unlocked from CI by matching the SITE_PASSWORD secret; the SSO gate
+    CANNOT (it needs a Vercel session cookie, not a password), so a password does
+    not help there — the probe just reports up-and-gated."""
+
+
+def _vercel_sso_gate(base_url, final_url):
+    """Return the Vercel-auth URL if the request was redirected OFF the deployment
+    onto Vercel's Authentication (SSO) login, else "".
+
+    Vercel "Deployment Protection" (Vercel Authentication / SSO) does NOT answer
+    with a 401 — it 307/302-redirects an unauthenticated request to
+    https://vercel.com/login?next=/sso-api?url=<deployment>&nonce=... . urllib
+    follows that silently, so the final response is a 200 *login page*, not our
+    site — every downstream wordmark / JSON check would then fail and the nightly
+    probe would fire a FALSE outage alarm. Detect the tell-tale off-host redirect
+    to the Vercel auth endpoint so fetch() can raise AuthGated (healthy-but-gated)
+    instead. A normal deployment 200 (and Vercel's same-host cleanUrls 30x) keeps
+    the final host on our own deployment, so this never trips on a healthy site."""
+    try:
+        base_host = urllib.parse.urlsplit(base_url).netloc.lower()
+        f = urllib.parse.urlsplit(final_url)
+    except Exception:
+        return ""
+    fhost = f.netloc.lower()
+    if not fhost or fhost == base_host:
+        return ""  # stayed on our own deployment -> not an SSO redirect
+    # Redirected onto a different host: only treat Vercel's auth endpoint as a gate.
+    if fhost == "vercel.com" or fhost.endswith(".vercel.com"):
+        if "/sso" in f.path or "/login" in f.path or "sso-api" in (f.query or ""):
+            return final_url
+    return ""
 
 
 # Fetchers — one code path for validation, two transports.
@@ -92,6 +132,7 @@ class HttpFetcher:
         try:
             with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as resp:
                 status = resp.getcode()
+                final_url = resp.geturl()
                 body = resp.read(MAX_BYTES + 1)
         except urllib.error.HTTPError as e:
             if e.code == 401:
@@ -116,6 +157,21 @@ class HttpFetcher:
             raise RuntimeError("unreachable: %s" % e.reason)
         except Exception as e:  # timeout, TLS, protocol
             raise RuntimeError("fetch error: %r" % e)
+        # Vercel Authentication (SSO Deployment Protection) does NOT 401 — it 30x-
+        # redirects an unauthenticated request onto vercel.com/login. urllib follows
+        # it, so `status` is 200 but `final_url`/`body` are Vercel's login page, not
+        # our site. Detect that off-host redirect and treat it exactly like the 401
+        # basic-auth gate: UP + access-protected (healthy), never a false outage.
+        gate = _vercel_sso_gate(self.base, final_url)
+        if gate:
+            raise AuthGated(
+                "HTTP %d -> %s — live site is up and protected by Vercel "
+                "Authentication (SSO Deployment Protection); the probe was redirected "
+                "to Vercel's login. An SSO gate needs a Vercel session cookie, not a "
+                "password, so SITE_PASSWORD cannot unlock the deep checks from CI%s"
+                % (status, gate,
+                   " (SITE_PASSWORD was supplied but does not apply to an SSO gate)"
+                   if self.password else ""))
         # urllib follows redirects (Vercel cleanUrls 308s *.html -> clean route),
         # so a 200 here means the final response was OK.
         if status != 200:
@@ -571,6 +627,45 @@ def _shape_vehicle_registry(d):
     return None
 
 
+def _shape_brand_trends(d):
+    # The MEASURED new-vehicle first-registration TREND on Overview (#overview),
+    # obj #1 collateral — `loadBrandTrends().then(renderBrandTrends)`, eager on the
+    # default nav route. This is the leading indicator for the FUTURE used-title
+    # collateral pool: a shrinking new-pickup stream means a shrinking pool AutoX
+    # will lend against and recover on years out. renderBrandTrends HIDES the whole
+    # block (`wrap.style.display='none'`) unless `new_regis_trend` yields >=2 year
+    # rows carrying a non-null `pickup`; the verdict then reads `pickup` and `total`
+    # off the first and last of those rows (the "far faster than the whole
+    # new-vehicle market" line) — `ytd.ev_only_share_pct` is the only optional read
+    # (the EV line degrades). Its fetch (app.js loadBrandTrends) has the WEAKEST
+    # guard of the Overview set — a bare `.then(r=>r.json())` with no `r.ok` check —
+    # so a truncated/404 CDN deploy that served an HTML error page throws into the
+    # loader's catch, nulls BTREND, and SILENTLY blanks the collateral-trend block
+    # with no phone alert. It is neither shape- nor freshness-probed until now.
+    # Asserts the render contract (shape, not counts) so a future DLT registration
+    # vintage bump still passes.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    trend = d.get("new_regis_trend")
+    if not isinstance(trend, dict) or not trend:
+        return "missing/empty 'new_regis_trend' object (loader gate: !j.new_regis_trend => BTREND null => block hidden)"
+    # the render hide-gate: >=2 year rows whose value is a dict carrying a numeric
+    # pickup (renderBrandTrends: yrs = keys where t[y].pickup != null; hide if <2).
+    good = []
+    for yr, row in trend.items():
+        if isinstance(row, dict) and isinstance(row.get("pickup"), (int, float)) \
+                and isinstance(row.get("total"), (int, float)):
+            good.append(yr)
+    if len(good) < 2:
+        return ("new_regis_trend has %d year row(s) with numeric pickup+total; "
+                "renderBrandTrends hides the block below 2 (the pickup verdict + "
+                "whole-market comparison read)" % len(good))
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    return None
+
+
 def _shape_drought_district(d):
     # The MODELLED district-grain drought read on Overview (#overview), obj #1 —
     # eager `loadDroughtDistrict().then(renderDroughtDistrict)` on the default nav
@@ -633,6 +728,72 @@ def _shape_amphoe_crops(d):
     meta = d.get("meta")
     if not isinstance(meta, dict):
         return "missing 'meta' object"
+    return None
+
+
+def _shape_thaiwater_flood(d):
+    # The LIVE flood pulse on Overview (#overview), obj #1 — the eager
+    # loadThaiwater().then(renderThaiwater) "water on the ground" card on the
+    # DEFAULT nav route. MEASURED per-province ThaiWater station telemetry
+    # (river/reservoir situation_level 1→5), refreshed by data-thaiwater.yml (so
+    # it self-heals — a probe here is actionable). renderThaiwater HIDES the whole
+    # block on `!TWFLOOD` (set only when `.provinces` is an object), then per
+    # province reads v.max_level (the ≥4 high-water gate + worst-province headline)
+    # and v.n_high / v.n_stations (the "N/M stations high" read). This file was
+    # already in FRESHNESS_LAYERS (its vintage is probed live) but had NO shape
+    # probe — so the freshness block's own premise ("the fetch + shape probes
+    # already own 'does the file serve and parse'") was UNMET for it: a truncated/
+    # 404 CDN deploy silently blanks the acute collections+collateral card on the
+    # exec Overview with NO phone alert, the same "broken demo" blind spot the
+    # sibling collateral_flow / drought_district obj-#1 probes closed. Asserts the
+    # render contract (a non-empty .provinces dict whose rows carry numeric
+    # max_level + n_stations, plus a meta block) as SHAPE not values — robust to a
+    # calm-weather vintage where every province sits at level ≤3 (no flooding).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    provs = d.get("provinces")
+    if not isinstance(provs, dict) or not provs:
+        return "missing/empty 'provinces' dict (renderThaiwater hide-gate: !TWFLOOD)"
+    v0 = next(iter(provs.values()))
+    if not isinstance(v0, dict):
+        return "first province value is not an object"
+    if not isinstance(v0.get("max_level"), (int, float)) or isinstance(v0.get("max_level"), bool):
+        return "first province missing numeric 'max_level' (≥4 high-water gate + worst-province headline)"
+    if not isinstance(v0.get("n_stations"), (int, float)) or isinstance(v0.get("n_stations"), bool):
+        return "first province missing numeric 'n_stations' (the 'N/M stations high' read)"
+    if not isinstance(d.get("meta"), dict):
+        return "missing 'meta' object (observed_to vintage read)"
+    return None
+
+
+def _shape_thaiwater_rain(d):
+    # The LIVE 24h-rain pulse on Overview (#overview), obj #1 — the second half of
+    # the same eager loadThaiwater().then(renderThaiwater) card on the DEFAULT nav
+    # route (renderThaiwater gates the whole block on `!TWRAIN` too). MEASURED
+    # per-province ThaiWater rain-gauge telemetry (24h mm; heavy ≥35.1 / very-heavy
+    # ≥90.1 per Thai Met convention), refreshed by data-thaiwater.yml (self-heals).
+    # Per province the render reads v.pct_heavy (the "most widespread rain" sort key
+    # + headline) and v.max_mm (the peak-gauge column + the suspect-reading guard).
+    # Like its flood sibling this file was freshness-probed but had NO shape probe,
+    # leaving the freshness block's "shape is owned elsewhere" premise unmet: a
+    # truncated/404 CDN deploy silently blanks the rain half of the acute obj-#1
+    # card with NO phone alert. Asserts the render contract (a non-empty .provinces
+    # dict whose rows carry numeric max_mm + pct_heavy, plus a meta block) as SHAPE
+    # not values — robust to a dry-spell vintage where pct_heavy is 0 everywhere.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    provs = d.get("provinces")
+    if not isinstance(provs, dict) or not provs:
+        return "missing/empty 'provinces' dict (renderThaiwater hide-gate: !TWRAIN)"
+    v0 = next(iter(provs.values()))
+    if not isinstance(v0, dict):
+        return "first province value is not an object"
+    if not isinstance(v0.get("max_mm"), (int, float)) or isinstance(v0.get("max_mm"), bool):
+        return "first province missing numeric 'max_mm' (peak-gauge column + suspect-reading guard)"
+    if not isinstance(v0.get("pct_heavy"), (int, float)) or isinstance(v0.get("pct_heavy"), bool):
+        return "first province missing numeric 'pct_heavy' (widespread-rain sort key + headline)"
+    if not isinstance(d.get("meta"), dict):
+        return "missing 'meta' object (observed_to vintage read)"
     return None
 
 
@@ -1546,6 +1707,98 @@ def _shape_farm_book(d):
     for k in ("os_share_pct", "pp_of_book", "farm_os_alloc", "yoy"):
         if not isinstance(c0.get(k), (int, float)):
             return "first crop row %s missing/non-numeric (crop-mix commentary render read)" % k
+    return None
+
+
+def _shape_farm_income_impact(d):
+    # The Overview farm-book section's crop -> farm-INCOME margin-shock verdict (obj
+    # #1), merged onto renderFarmBook via `tmliFetch('farm_income_impact')`. This is
+    # the MEASURED crop-gate-price × margin engine (build_farm_income_impact.py): its
+    # `.fb-inc` verdict sentence renders ONLY if `FIN = FI.national` is truthy, then
+    # reads FIN.price_impact_pct / FIN.margin_impact_pct and FI.meta's
+    # crop_income_share.nonfarm_share_of_income_pct / crop_income_share_pct_used /
+    # crop_constants / dropped_crops; the province/region figures join by row (each
+    # province row keyed by `.th`, each region row by `.region`). Its loader is a bare
+    # `.catch(()=>null)` — so a truncated/404 CDN deploy SILENTLY drops the whole
+    # margin-shock read while the farm book itself keeps rendering, with NO phone alert
+    # (the exact "broken demo" blind spot the farm_book / macro_book / collateral_book
+    # obj-#1 probes closed for their siblings, and the read the last two audits flagged
+    # as the next probe target). Asserts the render CONTRACT as SHAPE not values —
+    # robust to a future crop/price/tape vintage moving every number.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'national' object (FIN margin-shock verdict gate)"
+    for k in ("price_impact_pct", "margin_impact_pct"):
+        if not isinstance(nat.get(k), (int, float)):
+            return "national.%s missing/non-numeric (margin-shock verdict render read)" % k
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        return "missing/empty 'provinces' list (province-row join render read)"
+    p0 = provs[0]
+    if not isinstance(p0, dict):
+        return "first province row is not an object"
+    if not (isinstance(p0.get("th"), str) and p0["th"].strip()):
+        return "first province row missing 'th' key (province-row join key)"
+    for k in ("price_impact_pct", "margin_impact_pct", "crop_income_thb",
+              "d_income_price_thb", "d_income_margin_thb"):
+        if not isinstance(p0.get(k), (int, float)):
+            return "first province row %s missing/non-numeric (put() join render read)" % k
+    regs = d.get("regions")
+    if not isinstance(regs, list) or not regs:
+        return "missing/empty 'regions' list (region-row join render read)"
+    if not (isinstance(regs[0], dict) and isinstance(regs[0].get("region"), str) and regs[0]["region"].strip()):
+        return "first region row missing 'region' join key"
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    if not isinstance(meta.get("crop_income_share_pct_used"), (int, float)):
+        return "meta.crop_income_share_pct_used missing/non-numeric (household-cash render read)"
+    cis = meta.get("crop_income_share")
+    if not isinstance(cis, dict) or not isinstance(cis.get("nonfarm_share_of_income_pct"), (int, float)):
+        return "meta.crop_income_share.nonfarm_share_of_income_pct missing/non-numeric (verdict render read)"
+    if not isinstance(meta.get("crop_constants"), dict) or not meta["crop_constants"]:
+        return "meta.crop_constants missing/empty (covered-crops count render read)"
+    return None
+
+
+def _shape_vintage_digest(d):
+    # The "Since last vintage" exec card at the TOP of the Risk-trend tab (#trend,
+    # obj #1) — renderVintageDigest draws VDIGEST.headline + a worst-first findings
+    # list (each {tone, text, metric}) off vintage_digest.json (build_vintage_digest.py,
+    # a plain-language digest of deltas.json). `if(!VDIGEST){box.style.display='none'}`
+    # HIDES the whole card when the file is absent/404 (the loader is `r.ok?r.json():null`),
+    # so a truncated/404 CDN deploy silently blanks the #trend lead exec headline with
+    # NO phone alert — the same blind spot the deltas / farm_book obj-#1 probes closed.
+    # Asserts the render shape both states read (headline + findings rows when populated,
+    # from/to vintage labels), NOT values, and stays green in a legitimate single-vintage
+    # baseline (baseline===true, findings genuinely absent) so it won't false-alarm if the
+    # snapshot history is ever reset to one vintage.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    if not isinstance(d.get("baseline"), bool):
+        return "missing/non-bool 'baseline' flag (renderVintageDigest state gate)"
+    if not (isinstance(d.get("headline"), str) and d["headline"].strip()):
+        return "missing/blank 'headline' (#trend lead exec headline render read)"
+    if d.get("baseline"):
+        return None  # legitimate single-vintage baseline — findings absent by design, healthy
+    # Populated diff: the vintage-label header + at least one finding row must render.
+    for k in ("from", "to"):
+        if not (isinstance(d.get(k), str) and d[k].strip()):
+            return "non-baseline digest missing/blank '%s' vintage label (header render read)" % k
+    finds = d.get("findings")
+    if not isinstance(finds, list) or not finds:
+        return "non-baseline digest with missing/empty 'findings' list (#trend findings render)"
+    f0 = finds[0]
+    if not isinstance(f0, dict):
+        return "first finding row is not an object"
+    if not (isinstance(f0.get("tone"), str) and f0["tone"].strip()):
+        return "first finding missing 'tone' (better/worse/neutral chip render read)"
+    if not (isinstance(f0.get("text"), str) and f0["text"].strip()):
+        return "first finding missing 'text' (finding sentence render read)"
+    if "metric" not in f0:
+        return "first finding missing 'metric' (underlying-metric tag render read)"
     return None
 
 
@@ -2780,8 +3033,26 @@ DATA_FILES = [
     # sweep, but the committed files must still serve intact for the next
     # build_macro_book rebuild.)
     ("data/vehicle_registry.json", _shape_vehicle_registry, "latest.groups (4 classes) + latest.title_base/all_vehicles (Overview collateral base, obj #1)"),
+    # The new-vehicle first-registration TREND (renderBrandTrends, eager on the
+    # default #overview route) — the leading indicator for the FUTURE used-title
+    # collateral pool, obj #1. Whole-block silent-hide when new_regis_trend lacks
+    # >=2 pickup-bearing year rows, and its loader has the weakest fetch guard of
+    # the Overview set (bare r.json(), no r.ok), so a truncated/404 deploy blanks
+    # it with no phone alert. Neither shape- nor freshness-probed before this.
+    ("data/brand_trends.json", _shape_brand_trends, "new_regis_trend >=2 year rows w/ numeric pickup+total (Overview new-registration collateral trend, obj #1)"),
     ("data/drought_district.json", _shape_drought_district, ".districts (~928) with spei/cls + meta.counts (Overview district drought, obj #1)"),
     ("data/amphoe_crops.json", _shape_amphoe_crops, ".hotspots (crop x drought exposure w/ planted_rai+spei) (Overview agri-PD exposure, obj #1)"),
+    # The LIVE flood + 24h-rain pulse (renderThaiwater, eager on the default
+    # #overview route) — MEASURED per-province ThaiWater station telemetry, the
+    # acute obj-#1 collections+collateral read. Both files were ALREADY in
+    # FRESHNESS_LAYERS (their vintage is checked live) but had NO shape probe, so
+    # the freshness block's stated premise — "the fetch + shape probes already own
+    # 'does the file serve and parse'" — was unmet for them. renderThaiwater hides
+    # the whole block when either layer is absent/malformed, so a truncated/404 CDN
+    # deploy silently blanks the pulse with no phone alert. These two entries close
+    # that gap and complete the shape+freshness coverage contract for the pulse.
+    ("data/thaiwater_flood.json", _shape_thaiwater_flood, ".provinces dict (~76) with numeric max_level/n_stations (Overview flood pulse, obj #1)"),
+    ("data/thaiwater_rain.json", _shape_thaiwater_rain, ".provinces dict (~77) with numeric max_mm/pct_heavy (Overview rain pulse, obj #1)"),
     # The four surfaced-but-unprobed AGRI CROP reads (obj #1 farm-income risk) that the
     # crop_stress / branch_cropland / amphoe_crops probes above left uncovered — one on
     # the default #overview route, three on the province deep-dive (province.html). Each
@@ -2949,6 +3220,15 @@ DATA_FILES = [
     # verdict/commentary render shape (national KPIs + province dict + crops rows),
     # not values.
     ("data/farm_book.json", _shape_farm_book, ".national KPI block + province drill + .crops commentary (Overview farm-book section)"),
+    # The MEASURED crop -> farm-INCOME margin-shock engine merged into the same
+    # Overview farm-book section (obj #1), and the read the last two audits flagged as
+    # the next probe target. Its `.fb-inc` verdict renders only if `.national` is truthy
+    # and joins by province `.th` / region `.region`, and its loader is a bare
+    # `.catch(()=>null)` — so a truncated/404 CDN deploy SILENTLY drops the whole
+    # margin-shock read while the farm book keeps rendering, with no phone alert. Asserts
+    # the national gate + the province/region join rows + the meta household-cash keys,
+    # shape not values.
+    ("data/farm_income_impact.json", _shape_farm_income_impact, ".national price/margin gate + province(.th)/region join rows + meta crop_income_share (Overview farm-income margin-shock verdict, obj #1)"),
     # The Overview collateral board's national recovery-value read + the command-
     # center collateral clause (obj #1), and one of the two reads the last audit's
     # "next probe targets" note flagged. renderCollatOutlook + the command-center
@@ -3029,6 +3309,14 @@ DATA_FILES = [
     # render shape (baseline gate + branch/region mover fields + the #trend board list),
     # shape not values, and stays green in a legitimate baseline vintage.
     ("data/deltas.json", _shape_deltas, ".baseline gate + .branches/.region movers + .board YoY (#home Movers card + #trend tab)"),
+    # The "Since last vintage" exec card at the TOP of the Risk-trend tab (obj #1) — the
+    # #trend lead headline + worst-first findings list, and the second read the last two
+    # audits flagged. renderVintageDigest HIDES the whole card on a missing/404 file
+    # (`if(!VDIGEST){display=none}`), so a truncated CDN deploy silently blanks the #trend
+    # lead exec headline with no phone alert — the same blind spot the deltas probe closed.
+    # Asserts the headline gate + populated-vintage findings shape, stays green in a
+    # legitimate single-vintage baseline (baseline===true, findings absent by design).
+    ("data/vintage_digest.json", _shape_vintage_digest, ".baseline gate + .headline + populated findings (tone/text/metric) rows (#trend lead 'Since last vintage' card, obj #1)"),
     # The Macro tab's nameplate wave (vehicle_models.json, #275/#276, obj #1) — the
     # newest surfaced layer and the last from that wave with no deploy probe. It is
     # load-bearing on two MEASURED render paths: the "which models, and which are
@@ -3281,16 +3569,29 @@ def run_checks(fetcher):
     def record(name, ok, detail=""):
         results.append({"name": name, "ok": bool(ok), "detail": detail})
 
-    # Pre-flight: distinguish "site up + correctly access-protected (401)" from a
-    # real breakage. A protected production alias returning 401 to a
-    # credential-less probe is HEALTHY — report it and skip the deep checks
-    # rather than firing a false alarm. (LocalFetcher never raises AuthGated;
-    # supplying SITE_PASSWORD authenticates past this and runs the full suite.)
+    # Pre-flight: distinguish "site up + correctly access-protected" from a real
+    # breakage. A protected alias that answers a credential-less probe with a 401
+    # (basic auth) OR a redirect to Vercel's SSO login is HEALTHY — report it and
+    # skip the deep checks rather than firing a false alarm. (LocalFetcher never
+    # raises AuthGated; for the basic-auth gate, supplying SITE_PASSWORD
+    # authenticates past this and runs the full suite — an SSO gate cannot be
+    # passed from CI at all.)
     try:
         fetcher.fetch(PAGES[0])
     except AuthGated as e:
-        record("live site is up and access-protected (401)", True, str(e))
-        if getattr(fetcher, "password", ""):
+        detail = str(e)
+        record("live site is up and access-protected (auth-gated)", True, detail)
+        if "SSO" in detail:
+            # Vercel Authentication (SSO): no CI-supplyable credential satisfies it
+            # (it needs a Vercel session cookie). Deep checks are correctly SKIPPED,
+            # not failed — this is the healthy up-and-protected state, and the only
+            # way to deep-probe is to exempt the alias (custom domain) or disable SSO.
+            record("deep page/data checks", True,
+                   "SKIPPED — deployment is behind Vercel Authentication (SSO); the "
+                   "probe cannot authenticate past an SSO gate from CI. Site is up + "
+                   "protected. To deep-probe, expose it via an SSO-exempt custom "
+                   "domain or turn off Vercel Authentication for this alias.")
+        elif getattr(fetcher, "password", ""):
             # A credential was supplied but the deployment rejected it. The site is
             # healthy; the probe simply cannot see past the gate. Skip (not fail) the
             # deep checks and say exactly how to unlock them — align the CI

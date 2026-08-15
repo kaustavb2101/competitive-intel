@@ -3,6 +3,180 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-15 — Integration loop (service/deploy-health, obj #1): the **two remaining default-route silent-hide reads** — `farm_income_impact.json` (Overview crop→farm-income MARGIN-SHOCK verdict) and `vintage_digest.json` (#trend lead "Since last vintage" exec card) — now have SHAPE probes; both were the flagged next targets after the ThaiWater/brand_trends probes and were the last default-route cards a truncated/404 CDN deploy could silently blank with no phone alert
+
+- **Why this, this run.** The high-value INTEGRATION backlog is exhausted or blocked (re-verified on
+  disk): #1 (FPO PICO → `pico_census`/`pico_district`/`branch_pico`), #2 (per-branch `branch_cropland`),
+  #3 (data.go.th DIW/MOT/DBD distillation) are SHIPPED + wired; #4 (GISTDA 40m `check-crop`) is **blocked**
+  — `GISTDA_SPHERE_KEY` is unset in this CI env (confirmed `printenv`), so skipped not faked; BAAC/SME-bank
+  distillation stays blocked (data.go.th aggregator 403 from cloud IPs). That left item #5 — the concrete
+  unblocked next step. The last **two** progress entries both explicitly named these two layers as "the
+  natural next two probe runs"; neither had a probe yet (grep-confirmed). This run closes both together —
+  they are the identical task shape (deploy shape-probe of a default-route silent-hide read) and leaving
+  one dangling would just re-surface it next run.
+- **The gap fixed (`farm-income-impact-and-vintage-digest-unprobed-silent-hide`).**
+  - `platform/data/farm_income_impact.json` is the MEASURED crop→farm-**income** margin-shock engine
+    (`build_farm_income_impact.py`) merged into the Overview farm-book section. Its `.fb-inc` verdict
+    renders **only if `FI.national` is truthy**, joins province rows by `.th` / region rows by `.region`,
+    and reads `meta.crop_income_share` / `crop_income_share_pct_used` / `crop_constants`. Its loader is a
+    bare `tmliFetch('farm_income_impact').catch(()=>null)` — so a truncated/404 CDN deploy **silently drops
+    the whole margin-shock read** while the farm book itself keeps rendering, with no phone alert.
+  - `platform/data/vintage_digest.json` (`build_vintage_digest.py`) is the "Since last vintage" exec card
+    at the TOP of the Risk-trend tab — one headline + a worst-first findings list. `renderVintageDigest`
+    does `if(!VDIGEST){box.style.display='none'}`, so a missing/404 file **silently blanks the #trend lead
+    exec headline** with no phone alert.
+  - Both were fetch/shape-**unprobed**; each is the classic "broken demo" blind spot the sibling
+    `deltas` / `farm_book` / `collateral_book` obj-#1 probes already closed.
+- **The fix.** Added `_shape_farm_income_impact` and `_shape_vintage_digest` to
+  `pipeline/check_site_health.py` and registered `data/farm_income_impact.json` (beside `farm_book`) and
+  `data/vintage_digest.json` (beside `deltas`) in `DATA_FILES`. Both assert the render CONTRACT as **shape
+  not values** (robust to a future crop/price/tape/snapshot vintage moving every number):
+  farm-income-impact → national price/margin numeric gate + non-empty province(`.th`)/region(`.region`)
+  join rows carrying the `put()` keys + `meta` household-cash keys; vintage-digest → `baseline` bool gate +
+  non-blank `headline` + (when non-baseline) `from`/`to` labels and ≥1 finding row with `tone`/`text`/
+  `metric`. The vintage-digest probe deliberately stays GREEN in a legitimate single-vintage baseline
+  (`baseline===true`, findings absent by design) — same no-false-alarm design as the `deltas` probe.
+- **Verified.** Unit-tested: both committed payloads ACCEPTED; 15 broken shapes across the two validators
+  (no/empty/wrong-type national·provinces·regions·meta; non-numeric join fields; no/blank/empty
+  headline·findings·labels; finding missing tone/metric) all correctly REJECTED; a synthetic single-vintage
+  baseline digest ACCEPTED (no false alarm). `check_site_health.py --local platform` → **HEALTHY 278/278,
+  exit 0** (was 272; +6 = fetch/parse/shape × 2 files). No `platform/data` file, builder or provenance
+  changed (probe-only) → no rebuild / `build_provenance` needed. `bash tests/run.sh check` → **0 failed**
+  (the deploy-probe self-test now also accepts both new payloads). Test-infra only, no app behaviour/visual
+  change → safeguard-gated direct commit, no PR / headless render needed.
+- **Next recommended.** Every default-route silent-hide read now has a deploy shape probe. The genuinely-open
+  DATA items still need an owner-side/Thai-IP window (GISTDA 40m `check-crop` per-branch pull to supersede
+  the SPAM baseline in `build_branch_cropland.py`; committing the BAAC/SME-bank raw CSVs for the
+  formal-credit penetration layer). A separate lower-value thread: several collateral-vintage-bearing layers
+  (`brand_trends`/`vehicle_fleet`/`vehicle_models`) are shape- but not freshness-probed — worth a freshness
+  entry once a self-refresh workflow starts landing them.
+
+## 2026-08-15 — Intelligence loop (DEPLOYMENT HEALTH): the nightly site-health probe now reads a **Vercel Authentication (SSO) redirect** as "up + access-protected", not an outage — it was silently following the SSO 30x to `vercel.com/login` (a 200 login page) and FAILING every content check, so a genuinely-healthy protected deployment would file a FALSE "site down" GitHub issue + phone alert
+
+- **Why this, this run.** The autonomy backlog is at 98% (49/50 done; the 1 OPEN item is owner-side —
+  Vercel access protection). Opened with the mandated deploy-health probe of the master production alias
+  and found a live, self-consistent DEPLOYMENT-HEALTH bug in the monitor itself. Ground truth from the
+  Vercel API: the project now has **`ssoProtection.enabled = true` (`all_except_custom_domains`)**,
+  `passwordProtection = false`, and **no custom domain** (all three aliases are `*.vercel.app`) — so
+  every URL of the deployment, including the alias `site-health.yml` monitors, is behind Vercel
+  Authentication. (This is a valid state for the sensitive branch-level PD; whether it's the owner's
+  intent is an owner call — flagged, not changed.)
+- **The bug (`site-health-false-outage-on-vercel-sso-redirect`).** Vercel Authentication does NOT answer
+  with a 401 (the case `check_site_health.py` already treats as healthy-but-gated) — it **307/302-redirects**
+  an unauthenticated request to `vercel.com/login?next=/sso-api?url=<deployment>&nonce=…`. `urllib`
+  silently follows that to a **200 login page**, so `fetch()` saw `status == 200` (passed the status
+  guard) but `body` = Vercel's login HTML — no `AutoX` wordmark, not JSON. Downstream, every page-wordmark
+  and every data-file parse/shape check would FAIL → the nightly `site-health.yml` files a "Site health
+  check **FAILED**" issue (owner's phone) for a site that is actually UP and correctly protected. Verified
+  live: `curl` and a `urllib` probe both land on `vercel.com/login` (200). This is the classic false-alarm
+  a monitor must never raise.
+- **The fix.** Added `_vercel_sso_gate(base_url, final_url)` — a pure detector that trips only when
+  `resp.geturl()` shows the request was redirected OFF our deployment host onto Vercel's auth endpoint
+  (`vercel.com` / `*.vercel.com` with a `/sso`|`/login`|`sso-api` path/query); a healthy same-host 200 or
+  same-host `cleanUrls` 30x never trips it. `fetch()` captures `final_url` and raises `AuthGated` on a
+  gate — the SAME healthy-but-gated path the 401 uses. The pre-flight now labels the state
+  "access-protected (auth-gated)" and, for SSO, records deep checks SKIPPED with the honest reason (an SSO
+  gate needs a Vercel session cookie, so `SITE_PASSWORD` cannot unlock it from CI; deep-probing needs an
+  SSO-exempt custom domain). Module header + `AuthGated` docstring updated to document both gate shapes.
+- **Verified.** Live: the full checker against the SSO-gated alias now prints **HEALTHY 2/2, exit 0**
+  (was: would fail every content check). Offline unit test (added to `tests/run.sh`, pure/no-network):
+  the detector trips on the two real SSO-redirect shapes and stays quiet on same-host 200 / `cleanUrls`
+  30x / same-host data URL / an unrelated third-party host. `check_site_health.py --local platform` still
+  **HEALTHY 272/272, exit 0** (validators untouched). `bash tests/run.sh check` → **137 passed · 0 failed**
+  (was 136; +1 = the new SSO-gate self-test), data integrity 455/455. No `platform/data` file, builder or
+  provenance changed (monitor + gate-test only) → no rebuild / `build_provenance` needed, no app
+  behaviour/visual change → safeguard-gated direct commit, no PR/headless render.
+- **Owner note (flagged, not acted on).** The deployment is currently reachable only through a Vercel
+  login — fine if the owner logs in via Vercel, but a board/demo audience without team access is blocked.
+  To make it publicly viewable, attach an SSO-exempt custom domain or disable Vercel Authentication for
+  the alias (an owner-side Vercel setting; not changed autonomously).
+- **Next recommended.** Two default-route silent-hide reads remain deploy-unprobed: `farm_income_impact.json`
+  (`#overview`, obj #1 — crop→farm-income margin-shock engine) and `vintage_digest.json` (`#trend` lead
+  card) — both deterministic/`--check`-gated and CI-doable, the natural next two probe runs.
+
+## 2026-08-15 — Integration loop (service/deploy-health, obj #1): the new-vehicle first-registration TREND (`brand_trends.json`) — the leading indicator for tomorrow's used-title collateral pool — now has a deploy shape probe; it was the highest-value remaining silent-deploy blind spot AND had the weakest fetch guard on the default Overview route
+
+- **Why this, this run.** The high-value INTEGRATION backlog is exhausted or blocked: #1 (FPO PICO →
+  `pico_census`/`pico_district`/`branch_pico`), #2 (per-branch `branch_cropland`), #3 (data.go.th
+  DIW/MOT/DBD distillation) are all SHIPPED and wired (re-verified on disk this run); #4 (GISTDA 40m
+  `check-crop`) is **blocked** — `GISTDA_SPHERE_KEY` is unset in this CI env, so it was skipped not faked;
+  BAAC/SME-bank distillation stays blocked (data.go.th aggregator 403 from cloud IPs). That left item #5 —
+  the concrete unblocked next step. A negative-space sweep ranked the remaining fetched-but-unprobed
+  `platform/data` layers: of the ~40, most fail loudly or only drop a supplementary line, but **three**
+  silently hide a whole default-route card, and `brand_trends.json` was the clear #1.
+- **The gap fixed (`brand-trends-unprobed-weak-guard-deploy-blind-spot`).** `platform/data/brand_trends.json`
+  is the MEASURED DLT new-vehicle first-registration TREND — obj #1 collateral, the leading indicator for
+  the FUTURE used-title collateral pool (a shrinking new-pickup stream = a shrinking pool AutoX lends
+  against and recovers on). It is eager-loaded on the DEFAULT `#overview` route (`loadBrandTrends().then(
+  renderBrandTrends)`), and `renderBrandTrends` HIDES the whole block (`wrap.style.display='none'`) unless
+  `new_regis_trend` yields ≥2 pickup-bearing year rows. Critically, its loader (`app.js` `loadBrandTrends`)
+  has the **weakest fetch guard of the whole Overview set** — a bare `.then(r=>r.json())` with NO `r.ok`
+  check — so a truncated/404 CDN deploy that served an HTML error page throws into the loader's `catch`,
+  nulls `BTREND`, and SILENTLY blanks the collateral-trend block with no phone alert. It was neither
+  shape- nor freshness-probed. (The `try/catch` means the bad guard degrades gracefully rather than
+  breaking neighbouring Overview render — so no app code change is warranted; the deploy probe is the fix.)
+- **The fix.** Added `_shape_brand_trends` to `pipeline/check_site_health.py` and registered
+  `data/brand_trends.json` in `DATA_FILES` (Overview-collateral group, beside `vehicle_registry`). The
+  validator asserts the render CONTRACT (shape not values, robust to a future DLT vintage bump): top-level
+  dict → non-empty `new_regis_trend` object → ≥2 year rows each carrying numeric `pickup`+`total` (the
+  exact hide-gate `renderBrandTrends` applies, plus the whole-market-comparison read) → `meta` present.
+  `ytd.ev_only_share_pct` is deliberately NOT asserted (the EV line degrades independently). One file,
+  +46 lines, zero deletions.
+- **Verified.** Unit-tested (1 real committed payload ACCEPTED; 8 broken shapes — non-dict, missing/empty/
+  non-dict `new_regis_trend`, only-1-pickup-row, non-numeric pickup, missing `total`, missing `meta` — all
+  correctly REJECTED). `check_site_health.py --local platform` → **HEALTHY 272/272** (was 269, +3 =
+  fetch/parse/shape), exit 0. No `platform/data` file, builder or provenance changed (probe-only) → no
+  rebuild / `build_provenance` needed. `bash tests/run.sh check` → **136 passed · 0 failed** (data
+  integrity 455/455; the deploy-probe self-test now also accepts this payload). Test-infra only, no app
+  behaviour/visual change → safeguard-gated direct commit, no PR/headless render needed.
+- **Next recommended.** Two default-route silent-hide reads remain unprobed after this: `farm_income_impact.json`
+  (`#overview`, obj #1 — the crop→farm-income margin-shock engine; `.catch(()=>null)` drops the impact
+  columns) and `vintage_digest.json` (`#trend` lead "Since last vintage" exec card; `if(!VDIGEST){hide}`).
+  Both are deterministic/`--check`-gated and CI-doable — the natural next two probe runs. The genuinely-open
+  DATA items still need an owner-side/Thai-IP window (GISTDA 40m `check-crop` per-branch pull; committing
+  the BAAC/SME-bank raw CSVs). A separate lower-value thread: `brand_trends`/`vehicle_fleet` are
+  collateral-vintage-bearing but not freshness-probed — worth a freshness entry if a self-refresh workflow
+  starts landing them.
+
+## 2026-08-15 — Intelligence loop (service/deploy-health, obj #1): the LIVE ThaiWater flood + rain pulse now has SHAPE probes — the two layers were freshness-probed but shape-unprobed, leaving the Overview's acute collections+collateral card a silent-deploy blind spot — SHIPPED to master + deploy-verified
+
+- **Why this, this run.** The autonomy backlog is at 98% (49/50 done; the 1 OPEN item is owner-side —
+  Vercel `SITE_PASSWORD`), so no OPEN autonomous item exists to pull. Fell to the continuous
+  service/deploy-health audit. Verified healthy up front: production alias **HTTP 200** on `/`, `/app.js`,
+  `/data/branches.json`, `/data/meta.json`; `build_provenance.py --check` **byte-exact**; **0 broken data
+  refs** (all live `data/*.json` reads resolve — the only "missing" hits were `source-data/` paths inside
+  code comments); `site-health.yml` targets the correct master alias; the peer/competitor boards
+  (`peer_province.json` per-province ×brand incl. Heng) are complete and current. One genuine, self-consistent
+  gap surfaced.
+- **The gap.** `check_site_health.py` already had `thaiwater_flood.json` + `thaiwater_rain.json` in
+  **FRESHNESS_LAYERS** (their live vintage IS checked, TTL 14d), but NEITHER had a **shape** probe in
+  `DATA_FILES` — so the freshness block's own stated premise, *"the fetch + shape probes already own 'does
+  the file serve and parse'"*, was **unmet for these two layers**. They are MEASURED per-province ThaiWater
+  station telemetry (flood `situation_level` 1→5 / 24h rain mm), eager-loaded on the DEFAULT `#overview`
+  route via `loadThaiwater().then(renderThaiwater)`, and `renderThaiwater` **hides the whole block** on
+  `!TWFLOOD || !TWRAIN` — so a truncated/404 CDN deploy would silently blank the acute obj-#1
+  collections+collateral card with NO phone alert, the exact "broken demo" blind spot the sibling
+  `collateral_flow` / `drought_district` probes closed. Self-healing (`data-thaiwater.yml` re-pulls every
+  few hours), so a probe here is actionable.
+- **What shipped.** Two shape validators — `_shape_thaiwater_flood` (asserts a non-empty `.provinces`
+  dict whose rows carry numeric `max_level` + `n_stations`, plus `meta`) and `_shape_thaiwater_rain`
+  (numeric `max_mm` + `pct_heavy`, plus `meta`) — asserting the **render contract as SHAPE not values**, so
+  they stay green through a calm-weather / dry-spell vintage (every province at level ≤3, `pct_heavy` 0).
+  Both files registered in `DATA_FILES` alongside the other Overview obj-#1 entries. Negative-tested: each
+  validator rejects empty-provinces / missing-numeric-field / no-meta / wrong-type payloads and accepts the
+  committed files. CI-only change (a pipeline probe, not deployed to Vercel) — no `platform/` file, no data,
+  and no `provenance.json` touched, so nothing user-facing changes.
+- **Safeguard gate (all passed).** `bash tests/run.sh check` = **134 passed / 0 failed** (exit 0), which
+  RUNS `check_site_health.py --local platform` — the two new probes evaluate and PASS (local run:
+  269/269). No secrets in the diff; scope = `pipeline/check_site_health.py` (+77) + this log entry, no stray
+  files; no-fabrication intact (probes read real committed data, assert structure only).
+- **Recommend next.** The freshness-vs-shape coverage contract is now closed for the daily/self-healing
+  CI-refreshed layers I can see. A future service run could sweep the remaining app-fetched layers with a
+  render-and-hide degrade path that are neither shape- nor freshness-probed (e.g. `macro_indicators` is
+  freshness-probed; check whether `snapshots_index` — the Risk-trend tab — and the flood/rain STRUCTURAL
+  siblings warrant shape probes), keeping the rule "any silently-degrading default-route MEASURED read gets a
+  deploy probe" fully applied.
+
 ## 2026-08-15 — UX loop (print, honesty-of-provenance): the MEASURED provenance dot survives the board PDF — SHIPPED + auto-merged (#416) + deploy-verified
 
 - **What shipped (`ux-print-color-adjust-provenance-dot`).** Follow-up to yesterday's
@@ -7449,3 +7623,10 @@ Kaustav deploys).
 - **Safeguards (all pass):** (a) `bash tests/run.sh check` → **133 passed, 0 failed** (incl. 455/455 data-integrity + `check_site_health.py --local` + `node --check` on app.js and every page's inline JS); JS-only change touching no `--check`-gated data file, so gate was already 0-failed on `origin/master` — no provenance/commodities drift to restore. (b) render self-review: happy-path `render.sh index.html` before AND after → **byte-identical** PNG (157010 bytes both; the change is on the error path only, so the normal page is provably unchanged), AND the error path was actively exercised — rendered an **isolated copy** of `platform/` with `data/branches.json` removed to force the `catch`, read the PNG, and confirmed the new banner renders correctly and themed (bold plain-language answer, a working `↻ Reload` house-chip button, red `var(--agri)` left rail, the raw `SyntaxError` demoted to the muted "Technical detail:" line). (c) no secrets in the JS-only diff. (d) diff = the single boot-catch edit + one `docs/UXUI_AUDIT.md` fix-log line, no stray files (scratch renders kept out of the commit).
 - **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and on the changed file `/app.js`; the **deployed** `/app.js` then served the new markup (`grep "Couldn't load the dashboard data"` = 1), confirming the fix is live in production, not just merged. The old user-facing string is gone — the single residual "sit next to this page" hit in the deployed app.js is my own explanatory **code comment** at L1732, not a rendered string. Session auto-unsubscribed from PR #396 on merge; branch auto-deleted on merge.
 - **Next recommended:** the surgical + headless-verifiable queue is drained again — the standing backlog remains all bigger-than-surgical or device-tested and NOT auto-mergeable unattended: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" expansion language in `build_regional_outlook.py` + app.js as competitive-RISK, ripples across national/regional/province + app.js); the three deck.gl-page items best batched into one real-device run (`ux-viewport-user-scalable-3dpages` drop `maximum-scale=1`+add `touch-action:none`; `ux-navmore-3dpages-absolute-overflow` right-edge Explore-menu spill; `ux-navmore-keyboard-3dpages` port index's full menu-button keyboard pattern); `ux-live-chart-mobile-viewbox-responsive` (narrower viewBox on phones so `live.html`'s SVG geometry+labels scale together). Two **test-infra** wins remain the highest-leverage: `qa-visual-overflow-not-in-ci` (wire `tests/visual_overflow.js` into `tests/run.sh check`) and `qa-live-not-in-overflow-audit-routes` (add `live.html` + the 3 deck.gl pages to the audit ROUTES). Also standing: `qa-visual-baseline-stale` (deliberate `tests/run.sh baseline` refresh) and the recurring pipeline-hygiene ask (fold a `build_provenance.py`/`build_commodities.py` regen into the data-bot commit path). NOTE: `bash tests/run.sh check` took ~10–15 min in this environment (heavy `build_provenance.py`/`validate_data.py` CPU) — budget for it.
+
+## 2026-08-15 — UX loop: ux-print-color-adjust-h2-accent (segment-accent section bars survive the board PDF) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260815-0820`, squash-merged PR #419 → `a48f725` on master): a **print / exec-board-brief** fix closing the print-colour-strip series (data-viz fills #207 + provenance dot #210 were the earlier two slices). The section-heading accent bar — `h2::before`, a 3px gradient rail with **no border** — was still stripped from the default Chrome/Safari "Save as PDF" (Background graphics off by default). Its SEMANTIC variants carry the segment lens: `h2.risk` (agri red), `h2.demand` (merchant teal), `h2.collat` (collateral purple), `h2.opp` (gold), used pervasively across `app.js` + `index.html` — so the printed board brief lost the segment colour-coding that organises the whole document into blank section markers. (The prior fix mislabelled these "cosmetic", conflating the base blue bar with the semantic segment bars.) Added one selector — `h2::before` — to the existing `@media print` `print-color-adjust:exact` rule in `platform/styles.css` (+8 lines, covers base + all four variants). Negligible ink (3px per heading); card fills stay deliberately whitened.
+- **How it was found:** the seven named backlog priorities are long-closed and the remaining open backlog is all bigger-than-surgical / device-tested-3D-page / test-infra (not auto-mergeable unattended), so this run reviewed the print surface directly. The last background-encoded mark the two prior print fixes explicitly left as a follow-up was the `h2::before` accent bar; verifying the semantic (`.risk/.demand/.collat/.opp`) variants are used in markup (grep: pervasive in app.js/index.html) established it carries the segment lens, not decoration.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **137 passed, 0 failed** (CSS-only change, no `--check`-gated data file touched, so no provenance/commodities drift to restore). (b) render self-review: the change is inside `@media print{}` only → happy-path `render.sh index.html` PNG **byte-identical** before/after (116,576 B, `cmp`-equal), AND the fix was proven EMPIRICALLY the way the two prior print fixes were — rasterised `page.pdf({printBackground:false})` (Chrome's real default) of `#home` with pymupdf: left-margin colored pixels **3051 → 3212 (+161**, the full-page delta identical so nothing else moved), i.e. the accent bars now render instead of dropping to white. (c) no secrets in the CSS-only diff. (d) diff = one `styles.css` print rule + one `docs/UXUI_AUDIT.md` fix-log line, no stray files (scratch renders/PDFs kept in the out-of-repo scratchpad).
+- **Deploy-verify (PASS, no rollback):** Vercel production deployment `dpl_4EJ2Lr…` = **state READY, target production**, commit `a48f725` (PR #419) on the `git-master` alias — build succeeded, live in production. Anonymous `curl` of the alias returns **302 → Vercel SSO** (`vercel.com/sso-api`), i.e. the project now has **Deployment Protection (Vercel Authentication)** on the branch alias — a project-level auth wall, NOT a regression (a print-only CSS change cannot introduce an SSO redirect; a rollback would neither remove the 302 nor be correct). Confirmed at content level via the **authenticated** Vercel MCP fetch (bypasses SSO): the deployed `styles.css` **contains the new `h2::before` print-colour-adjust rule + its comment**, with the two prior print rules intact — so the fix is genuinely live, not just merged. Session auto-unsubscribed from PR #419 on merge.
+- **Next recommended:** the surgical + headless-verifiable auto-mergeable queue is drained — the print-colour-strip series is now CLOSED. The standing open backlog remains all bigger-than-surgical or device-tested (NOT auto-mergeable unattended): `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" expansion language in `build_regional_outlook.py` + app.js as competitive-RISK, ripples across national/regional/province + app.js); the three deck.gl-page items best batched into ONE real-device run (`ux-viewport-user-scalable-3dpages`, `ux-navmore-3dpages-absolute-overflow`, `ux-navmore-keyboard-3dpages`); `ux-live-chart-mobile-viewbox-responsive` (narrower viewBox on phones). Two **test-infra** wins are the highest-leverage and worth prioritising with the owner: `qa-visual-overflow-not-in-ci` (wire `tests/visual_overflow.js` into the gate via the global Playwright at `/opt/node22/lib/node_modules`) and `qa-live-not-in-overflow-audit-routes` (add `live.html` + the 3 deck.gl pages to the audit ROUTES); also `qa-visual-baseline-stale` (deliberate `tests/run.sh baseline` refresh). NOTE: a NEW project-level change to flag — **Deployment Protection (SSO) is now ON for the `git-master` branch alias**, so anonymous `curl` deploy-probes return 302 (prior runs got 200); future deploy-verifies should confirm via the authenticated Vercel MCP (deployment state READY + content fetch) rather than an anonymous HTTP-200 curl.
