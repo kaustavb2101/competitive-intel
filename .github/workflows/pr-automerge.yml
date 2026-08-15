@@ -49,11 +49,19 @@ on:
   workflow_run:
     workflows: ["QA"]
     types: [completed]
-  # Safety net only — the workflow_run trigger above already fires ~30x/day, so this exists purely
-  # to recover a PR whose gate was cancelled or never dispatched. Every 6h, not hourly: on a repo
-  # this size a cron that adds nothing still costs a billed minute every time it wakes up.
+  # Safety net, and it had to get much tighter. The trigger above does NOT fire for the gates that
+  # matter most: GitHub suppresses `workflow_run` for any run that was itself triggered by
+  # GITHUB_TOKEN, and every bot PR's gate is a token-made dispatch. qa.yml now wakes this workflow
+  # explicitly on success to close that hole, but a gate that is CANCELLED or never dispatched still
+  # sends nothing at all, and this cron is the only thing that recovers it.
+  #
+  # It was every 6h, justified by each tick costing a billed minute. That justification expired when
+  # this job moved to the self-hosted `thai` runner (#412) — ticks are now free, and the box is idle
+  # between data pulls. Six hours of latency on a free check is a bad trade: on 2026-08-15 the gap
+  # between #407 going green (03:29) and its next scheduled tick was long enough for the head to be
+  # rewritten and the result discarded.
   schedule:
-    - cron: "25 */6 * * *"
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -306,6 +314,18 @@ jobs:
 
           if gh pr merge "$NUM" --squash --delete-branch; then
             echo "merged #$NUM" >> "$GITHUB_STEP_SUMMARY"
+
+            # The branch is gone but its gate is not. Deleting a branch does NOT cancel the qa.yml
+            # runs already queued against it, and on a single serial self-hosted runner those keep
+            # their place in line and execute in full for a PR that no longer exists. Observed
+            # 2026-08-15: a 40-minute gate for an already-merged branch was holding the executor
+            # while three live PRs waited behind it. Free the box.
+            for R in $(gh run list --workflow qa.yml --branch "$BRANCH" --limit 20 \
+                         --json databaseId,status \
+                         --jq '.[]|select(.status!="completed")|.databaseId'); do
+              gh run cancel "$R" >/dev/null 2>&1 \
+                && echo "cancelled qa run $R (branch $BRANCH is merged and deleted)"
+            done
           else
             echo "::error::#$NUM — merge call failed (branch moved, or a check turned required mid-run)."
             exit 0

@@ -636,6 +636,72 @@ def _shape_amphoe_crops(d):
     return None
 
 
+def _shape_thaiwater_flood(d):
+    # The LIVE flood pulse on Overview (#overview), obj #1 — the eager
+    # loadThaiwater().then(renderThaiwater) "water on the ground" card on the
+    # DEFAULT nav route. MEASURED per-province ThaiWater station telemetry
+    # (river/reservoir situation_level 1→5), refreshed by data-thaiwater.yml (so
+    # it self-heals — a probe here is actionable). renderThaiwater HIDES the whole
+    # block on `!TWFLOOD` (set only when `.provinces` is an object), then per
+    # province reads v.max_level (the ≥4 high-water gate + worst-province headline)
+    # and v.n_high / v.n_stations (the "N/M stations high" read). This file was
+    # already in FRESHNESS_LAYERS (its vintage is probed live) but had NO shape
+    # probe — so the freshness block's own premise ("the fetch + shape probes
+    # already own 'does the file serve and parse'") was UNMET for it: a truncated/
+    # 404 CDN deploy silently blanks the acute collections+collateral card on the
+    # exec Overview with NO phone alert, the same "broken demo" blind spot the
+    # sibling collateral_flow / drought_district obj-#1 probes closed. Asserts the
+    # render contract (a non-empty .provinces dict whose rows carry numeric
+    # max_level + n_stations, plus a meta block) as SHAPE not values — robust to a
+    # calm-weather vintage where every province sits at level ≤3 (no flooding).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    provs = d.get("provinces")
+    if not isinstance(provs, dict) or not provs:
+        return "missing/empty 'provinces' dict (renderThaiwater hide-gate: !TWFLOOD)"
+    v0 = next(iter(provs.values()))
+    if not isinstance(v0, dict):
+        return "first province value is not an object"
+    if not isinstance(v0.get("max_level"), (int, float)) or isinstance(v0.get("max_level"), bool):
+        return "first province missing numeric 'max_level' (≥4 high-water gate + worst-province headline)"
+    if not isinstance(v0.get("n_stations"), (int, float)) or isinstance(v0.get("n_stations"), bool):
+        return "first province missing numeric 'n_stations' (the 'N/M stations high' read)"
+    if not isinstance(d.get("meta"), dict):
+        return "missing 'meta' object (observed_to vintage read)"
+    return None
+
+
+def _shape_thaiwater_rain(d):
+    # The LIVE 24h-rain pulse on Overview (#overview), obj #1 — the second half of
+    # the same eager loadThaiwater().then(renderThaiwater) card on the DEFAULT nav
+    # route (renderThaiwater gates the whole block on `!TWRAIN` too). MEASURED
+    # per-province ThaiWater rain-gauge telemetry (24h mm; heavy ≥35.1 / very-heavy
+    # ≥90.1 per Thai Met convention), refreshed by data-thaiwater.yml (self-heals).
+    # Per province the render reads v.pct_heavy (the "most widespread rain" sort key
+    # + headline) and v.max_mm (the peak-gauge column + the suspect-reading guard).
+    # Like its flood sibling this file was freshness-probed but had NO shape probe,
+    # leaving the freshness block's "shape is owned elsewhere" premise unmet: a
+    # truncated/404 CDN deploy silently blanks the rain half of the acute obj-#1
+    # card with NO phone alert. Asserts the render contract (a non-empty .provinces
+    # dict whose rows carry numeric max_mm + pct_heavy, plus a meta block) as SHAPE
+    # not values — robust to a dry-spell vintage where pct_heavy is 0 everywhere.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    provs = d.get("provinces")
+    if not isinstance(provs, dict) or not provs:
+        return "missing/empty 'provinces' dict (renderThaiwater hide-gate: !TWRAIN)"
+    v0 = next(iter(provs.values()))
+    if not isinstance(v0, dict):
+        return "first province value is not an object"
+    if not isinstance(v0.get("max_mm"), (int, float)) or isinstance(v0.get("max_mm"), bool):
+        return "first province missing numeric 'max_mm' (peak-gauge column + suspect-reading guard)"
+    if not isinstance(v0.get("pct_heavy"), (int, float)) or isinstance(v0.get("pct_heavy"), bool):
+        return "first province missing numeric 'pct_heavy' (widespread-rain sort key + headline)"
+    if not isinstance(d.get("meta"), dict):
+        return "missing 'meta' object (observed_to vintage read)"
+    return None
+
+
 def _shape_peer_province(d):
     # The MEASURED per-province PEER board (obj #2 competitive risk) — the
     # Competition surface's flagship read (drawPeerProvince reads .provinces and,
@@ -2782,6 +2848,17 @@ DATA_FILES = [
     ("data/vehicle_registry.json", _shape_vehicle_registry, "latest.groups (4 classes) + latest.title_base/all_vehicles (Overview collateral base, obj #1)"),
     ("data/drought_district.json", _shape_drought_district, ".districts (~928) with spei/cls + meta.counts (Overview district drought, obj #1)"),
     ("data/amphoe_crops.json", _shape_amphoe_crops, ".hotspots (crop x drought exposure w/ planted_rai+spei) (Overview agri-PD exposure, obj #1)"),
+    # The LIVE flood + 24h-rain pulse (renderThaiwater, eager on the default
+    # #overview route) — MEASURED per-province ThaiWater station telemetry, the
+    # acute obj-#1 collections+collateral read. Both files were ALREADY in
+    # FRESHNESS_LAYERS (their vintage is checked live) but had NO shape probe, so
+    # the freshness block's stated premise — "the fetch + shape probes already own
+    # 'does the file serve and parse'" — was unmet for them. renderThaiwater hides
+    # the whole block when either layer is absent/malformed, so a truncated/404 CDN
+    # deploy silently blanks the pulse with no phone alert. These two entries close
+    # that gap and complete the shape+freshness coverage contract for the pulse.
+    ("data/thaiwater_flood.json", _shape_thaiwater_flood, ".provinces dict (~76) with numeric max_level/n_stations (Overview flood pulse, obj #1)"),
+    ("data/thaiwater_rain.json", _shape_thaiwater_rain, ".provinces dict (~77) with numeric max_mm/pct_heavy (Overview rain pulse, obj #1)"),
     # The four surfaced-but-unprobed AGRI CROP reads (obj #1 farm-income risk) that the
     # crop_stress / branch_cropland / amphoe_crops probes above left uncovered — one on
     # the default #overview route, three on the province deep-dive (province.html). Each

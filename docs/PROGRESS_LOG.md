@@ -3,6 +3,45 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-15 — Intelligence loop (service/deploy-health, obj #1): the LIVE ThaiWater flood + rain pulse now has SHAPE probes — the two layers were freshness-probed but shape-unprobed, leaving the Overview's acute collections+collateral card a silent-deploy blind spot — SHIPPED to master + deploy-verified
+
+- **Why this, this run.** The autonomy backlog is at 98% (49/50 done; the 1 OPEN item is owner-side —
+  Vercel `SITE_PASSWORD`), so no OPEN autonomous item exists to pull. Fell to the continuous
+  service/deploy-health audit. Verified healthy up front: production alias **HTTP 200** on `/`, `/app.js`,
+  `/data/branches.json`, `/data/meta.json`; `build_provenance.py --check` **byte-exact**; **0 broken data
+  refs** (all live `data/*.json` reads resolve — the only "missing" hits were `source-data/` paths inside
+  code comments); `site-health.yml` targets the correct master alias; the peer/competitor boards
+  (`peer_province.json` per-province ×brand incl. Heng) are complete and current. One genuine, self-consistent
+  gap surfaced.
+- **The gap.** `check_site_health.py` already had `thaiwater_flood.json` + `thaiwater_rain.json` in
+  **FRESHNESS_LAYERS** (their live vintage IS checked, TTL 14d), but NEITHER had a **shape** probe in
+  `DATA_FILES` — so the freshness block's own stated premise, *"the fetch + shape probes already own 'does
+  the file serve and parse'"*, was **unmet for these two layers**. They are MEASURED per-province ThaiWater
+  station telemetry (flood `situation_level` 1→5 / 24h rain mm), eager-loaded on the DEFAULT `#overview`
+  route via `loadThaiwater().then(renderThaiwater)`, and `renderThaiwater` **hides the whole block** on
+  `!TWFLOOD || !TWRAIN` — so a truncated/404 CDN deploy would silently blank the acute obj-#1
+  collections+collateral card with NO phone alert, the exact "broken demo" blind spot the sibling
+  `collateral_flow` / `drought_district` probes closed. Self-healing (`data-thaiwater.yml` re-pulls every
+  few hours), so a probe here is actionable.
+- **What shipped.** Two shape validators — `_shape_thaiwater_flood` (asserts a non-empty `.provinces`
+  dict whose rows carry numeric `max_level` + `n_stations`, plus `meta`) and `_shape_thaiwater_rain`
+  (numeric `max_mm` + `pct_heavy`, plus `meta`) — asserting the **render contract as SHAPE not values**, so
+  they stay green through a calm-weather / dry-spell vintage (every province at level ≤3, `pct_heavy` 0).
+  Both files registered in `DATA_FILES` alongside the other Overview obj-#1 entries. Negative-tested: each
+  validator rejects empty-provinces / missing-numeric-field / no-meta / wrong-type payloads and accepts the
+  committed files. CI-only change (a pipeline probe, not deployed to Vercel) — no `platform/` file, no data,
+  and no `provenance.json` touched, so nothing user-facing changes.
+- **Safeguard gate (all passed).** `bash tests/run.sh check` = **134 passed / 0 failed** (exit 0), which
+  RUNS `check_site_health.py --local platform` — the two new probes evaluate and PASS (local run:
+  269/269). No secrets in the diff; scope = `pipeline/check_site_health.py` (+77) + this log entry, no stray
+  files; no-fabrication intact (probes read real committed data, assert structure only).
+- **Recommend next.** The freshness-vs-shape coverage contract is now closed for the daily/self-healing
+  CI-refreshed layers I can see. A future service run could sweep the remaining app-fetched layers with a
+  render-and-hide degrade path that are neither shape- nor freshness-probed (e.g. `macro_indicators` is
+  freshness-probed; check whether `snapshots_index` — the Risk-trend tab — and the flood/rain STRUCTURAL
+  siblings warrant shape probes), keeping the rule "any silently-degrading default-route MEASURED read gets a
+  deploy probe" fully applied.
+
 ## 2026-08-15 — UX loop (print, honesty-of-provenance): the MEASURED provenance dot survives the board PDF — SHIPPED + auto-merged (#416) + deploy-verified
 
 - **What shipped (`ux-print-color-adjust-provenance-dot`).** Follow-up to yesterday's
