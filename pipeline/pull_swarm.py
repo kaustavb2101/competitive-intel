@@ -137,20 +137,32 @@ FEEDS = [
          label="Google Trends demand + brand share-of-search (ESTIMATED)", cadence="monthly",
          ip="any", group="competitive", out="source-data/google_trends.json", timeout=1200),
 
+    # SOCIAL LISTENING IS DAILY (owner request, 2026-08-15). These four were "weekly", which the
+    # cadence gate enforces literally: data-swarm.yml fires 4x/day but apply_cadence() dropped them
+    # on ~27 of every 28 runs, so a rival price move or a review spike could sit unseen for six days.
+    # None of them is expensive enough to justify that lag:
+    #   * app_reviews / apple_reviews — store listing pages, no key, no metered quota.
+    #   * rival_youtube — the scheduled path costs 1 quota unit per channels/playlistItems/videos
+    #     call. The 100-unit `search` is only in the separate `do_discover` subcommand, which a cron
+    #     never runs, so daily is nowhere near the 10,000/day budget.
+    #   * google_ads — paced over ~17 advertisers; the 2400s timeout already assumes a slow run.
+    # The accumulating stores all dedup on re-pull (reviewId, video id, ad id), so a daily cadence
+    # adds rows only when something is genuinely new — most days it is a cheap no-op that still
+    # refreshes the liveness stamp.
     dict(key="app_reviews", script="pull_app_reviews.py", args=[],
-         label="Google Play ratings + newest reviews, 10 lender apps incl. our own", cadence="weekly",
+         label="Google Play ratings + newest reviews, 10 lender apps incl. our own", cadence="daily",
          ip="any", group="social", out="source-data/app_reviews.json"),
 
     dict(key="apple_reviews", script="pull_apple_reviews.py", args=[],
-         label="Apple TH storefront ratings + reviews, title + digital cohort", cadence="weekly",
+         label="Apple TH storefront ratings + reviews, title + digital cohort", cadence="daily",
          ip="any", group="social", out="source-data/apple_reviews.json", timeout=1200),
 
     dict(key="rival_youtube", script="pull_rival_youtube.py", args=[],
          label="Rival + own YouTube channel stats and video metadata (needs YOUTUBE_API_KEY)",
-         cadence="weekly", ip="any", group="competitive", out="source-data/rival_youtube_raw.json"),
+         cadence="daily", ip="any", group="competitive", out="source-data/rival_youtube_raw.json"),
 
     dict(key="google_ads", script="pull_google_ads.py", args=[],
-         label="Rival Google Ads Transparency Center creatives + copy", cadence="weekly", ip="any",
+         label="Rival Google Ads Transparency Center creatives + copy", cadence="daily", ip="any",
          group="competitive", out="source-data/google_ads_raw.json", timeout=2400),  # ~17 advertisers, paced
 
     # Google rating + review count for the 755 rival branches the scout already captured a
@@ -202,9 +214,12 @@ FEEDS = [
          label="Rival promo/campaign listings from their own sites (Tidlor/MTC/Sawad)",
          cadence="daily", ip="thai", group="competitive", out="source-data/rival_promos.json"),
 
+    # Daily with the rest of social listening. data-thai-swarm.yml already runs every day and names
+    # pantip in its default feed set, so this only removes the cadence gate that was skipping it on
+    # six days out of seven — no new schedule, no new billed minutes (that workflow is self-hosted).
     dict(key="pantip", script="pull_pantip.py", args=[],
          label="Pantip forum threads mentioning each lender (unprompted voice-of-customer)",
-         cadence="weekly", ip="thai", group="social", out="source-data/pantip_threads.json",
+         cadence="daily", ip="thai", group="social", out="source-data/pantip_threads.json",
          timeout=1200),
 
     dict(key="datagoth", script="pull_datagoth.py", args=[],
