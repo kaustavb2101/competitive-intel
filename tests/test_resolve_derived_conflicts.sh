@@ -16,7 +16,12 @@ set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SRC="${1:-$HERE/../pipeline/resolve_derived_conflicts.sh}"
 R="$(mktemp -d)/resolver-fixture"
-trap 'rm -rf "$(dirname "$R")"' EXIT
+# Somewhere to capture a run's output that is NOT inside the fixture repo — the resolver refuses to
+# start on a dirty tree, so a log file written next to the sources would fail the case it is meant
+# to observe. Do not reach for $TMP here: Windows sets it in the environment and Linux does not, so
+# under `set -u` it passes locally in Git Bash and dies in CI with "TMP: unbound variable".
+LOGDIR="$(dirname "$R")"
+trap 'rm -rf "$LOGDIR"' EXIT
 PASS=0; FAIL=0
 ok(){ echo "  [PASS] $1"; PASS=$((PASS+1)); }
 no(){ echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
@@ -223,11 +228,11 @@ GIT_AUTHOR_DATE="2026-08-15T10:00:00Z" GIT_COMMITTER_DATE="2026-08-15T10:00:00Z"
 git checkout -q -B laptop master; fh 2026-08-04 132 2026-08-05 999
 python3 pipeline/rederive_drift.py >/dev/null
 GIT_AUTHOR_DATE="2026-08-15T10:10:00Z" GIT_COMMITTER_DATE="2026-08-15T10:10:00Z" git commit -qam laptop
-bash pipeline/resolve_derived_conflicts.sh mobile > "$TMP/out11.txt" 2>&1; rc=$?
+bash pipeline/resolve_derived_conflicts.sh mobile > "$LOGDIR/out11.txt" 2>&1; rc=$?
 [ "$rc" -eq 0 ] && ok "exit 0 (resolved by recency, not escalated)" || no "exit $rc, expected 0"
 GOT11=$(python3 -c "import json;d=json.load(open('source-data/feed_history.json'));s=d['series']['flood'];print(dict(zip(s['dates'],s['values'])).get('2026-08-05'))")
 [ "$GOT11" = "999.0" ] && ok "kept the later pull's reading (999.0)" || no "kept $GOT11, expected 999.0"
-grep -q "resolved by recency" "$TMP/out11.txt" \
+grep -q "resolved by recency" "$LOGDIR/out11.txt" \
   && ok "reported the dropped reading instead of silently discarding it" \
   || no "no override was reported (a dropped reading must never be silent)"
 
