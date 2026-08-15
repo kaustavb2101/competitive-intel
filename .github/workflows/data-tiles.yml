@@ -62,6 +62,13 @@ jobs:
       - name: Install Overture CLI
         run: pip install overturemaps
 
+      - name: Put the CLI shim first on PATH (Overture deleted its release catalog)
+        # Same upstream breakage that stopped data-overture.yml: overturemaps 1.0.1 resolves its
+        # release from https://stac.overturemaps.org/catalog.json, which now 404s, so the bare
+        # `overturemaps download` on the tile step below would abort before fetching a footprint.
+        # pipeline/bin/overturemaps answers that from Overture's S3 bucket and delegates the rest.
+        run: echo "$GITHUB_WORKSPACE/pipeline/bin" >> "$GITHUB_PATH"
+
       - name: Cache tippecanoe build
         id: tippecanoe-cache
         uses: actions/cache@v4
