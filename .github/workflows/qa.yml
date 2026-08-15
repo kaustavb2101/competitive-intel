@@ -53,10 +53,29 @@ on:
 # so the flag almost never applies. Keying the group on the commit SHA is what actually fixes it:
 # each master state is alone in its group and has nothing to be superseded by.
 #
-# Branch work keeps the old superseding behaviour, because there a newer commit really does make the
-# older run pointless: `pull_request` groups per PR, and dispatches group per ref.
+# THAT REASONING NOW APPLIES TO BRANCHES TOO. The rule above was written for master only, and
+# branch work was left grouping per PR / per ref on the argument that a newer commit makes the older
+# run pointless. It does — but the group is what decides WHICH run gets killed, and per-ref was too
+# coarse to tell "newer commit on this branch" from "another gate for this branch". On the night of
+# 2026-08-15 that distinction was the whole ballgame: pr-autoresolve rewrote #407 and #408 five
+# times each between 22:43 and 02:23, and every rewrite dispatched a gate that joined the same
+# per-ref group and cancelled the one still executing for the previous head. Nine of ten gates died
+# mid-run; the one that survived was green on a SHA that had already been superseded. Two loops
+# running at incompatible speeds (a 19-40 min gate, a ~20 min refresh cycle) meant nothing was ever
+# mergeable, and the executor spent the night on results that were discarded.
+#
+# So: ONE GROUP PER (event, gated commit). A run can only ever be cancelled by another run asking
+# the identical question — same event, same SHA — which is a true duplicate and the only case where
+# superseding is free. A newer commit no longer reaches back and kills the older commit's gate;
+# pr-autoresolve cancels the superseded SHA by name after it pushes, so the executor is still freed,
+# but deliberately and without collateral.
+#
+# `github.event_name` stays in the key for a specific reason: a bot-pushed head creates BOTH an
+# `action_required` pull_request run and (about two seconds later) the compensating
+# workflow_dispatch run, on the same SHA. Keyed on SHA alone they would share a group, and the
+# pull_request run — which by definition never executes — would cancel the dispatch that does.
 concurrency:
-  group: qa-${{ github.event_name == 'push' && github.sha || github.event.pull_request.number || github.ref }}
+  group: qa-${{ github.event_name }}-${{ github.event.pull_request.head.sha || github.sha }}
   cancel-in-progress: true
 
 jobs:

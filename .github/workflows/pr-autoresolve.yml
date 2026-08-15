@@ -147,6 +147,44 @@ jobs:
               SKIPPED=$((SKIPPED+1)); echo "::endgroup::"; continue
             fi
 
+            # NEVER REWRITE A HEAD THAT IS CURRENTLY BEING GATED. The guard above is necessary but
+            # NOT sufficient, and the difference is the whole bug: it only skips when master moved
+            # somewhere harmless, and on a data-heavy night EVERY master push touches platform/data,
+            # so it passes through and the rewrite happens anyway.
+            #
+            # The rewrite is then strictly destructive, because the two loops run at incompatible
+            # speeds. A gate takes 19-40 min on one serial self-hosted executor; master moves about
+            # every 20. So the head is invalidated before its own gate can finish, the next tick
+            # dispatches a fresh one, and that dispatch CANCELS the run still executing for the old
+            # head. Measured on the night of 2026-08-15: PRs #407 and #408 each had their head
+            # rewritten five times between 22:43 and 02:23, and of the ten gates dispatched across
+            # them, nine were cancelled mid-run and the single one that finished green belonged to a
+            # SHA that had already been superseded. Nothing was mergeable at any point, and the box
+            # spent the entire night computing results that were thrown away.
+            #
+            # A running gate is therefore the scarcest thing in the system, and being a few commits
+            # behind master is not a reason to destroy one: these PRs are UNSTABLE, not BEHIND, so
+            # nothing blocks their merge on being up to date. Let the gate land, let pr-automerge
+            # merge it, and refresh whatever is left on the next tick. That turns the livelock into
+            # a serial drain.
+            #
+            # DIRTY still overrides — a conflicted PR cannot merge whatever its gate says, so
+            # resolving it is worth more than the run in flight, and the stale run is cancelled
+            # after the push below rather than left to occupy the executor.
+            #
+            # Bounded at 90 min (twice qa.yml's own 45-min timeout) so a genuinely wedged run can
+            # slow this down at most once, instead of freezing the PR forever.
+            HEADSHA=$(git rev-parse HEAD)
+            INFLIGHT=$(gh run list --workflow qa.yml --limit 60 --json headSha,status,createdAt \
+                         --jq "[.[] | select(.headSha==\"$HEADSHA\")
+                                    | select(.status != \"completed\")
+                                    | select((now - (.createdAt|fromdateiso8601)) < 5400)] | length" \
+                       2>/dev/null || echo 0)
+            if [ "${INFLIGHT:-0}" -gt 0 ] && [ "${MSS:-UNKNOWN}" != "DIRTY" ] && [ "${MSS:-UNKNOWN}" != "UNKNOWN" ]; then
+              echo "$INFLIGHT gate run(s) already in flight on this head ($HEADSHA) — leaving it alone so one can actually finish."
+              SKIPPED=$((SKIPPED+1)); echo "::endgroup::"; continue
+            fi
+
             # `|| rc=$?` is load-bearing: Actions runs this block as `bash -e`, and `set -uo
             # pipefail` above does NOT clear -e. Calling the resolver bare would abort the whole
             # step the first time it returned 2 — its correct "this one needs a human" signal —
@@ -184,6 +222,25 @@ jobs:
                 # against the branch we just pushed. Best-effort: a dispatch failure must not fail
                 # this job (that would block every other PR still waiting in the loop), but it must
                 # be LOUD — a silent failure here would recreate the exact bug this step exists to close.
+                # The head we just replaced may still have a gate executing. It is now gating a
+                # commit that is no longer anyone's head, so its result can never be used — but on
+                # one serial executor it will happily run to completion and hold the box while the
+                # gate for the NEW head waits behind it. Cancel it explicitly.
+                #
+                # This used to happen implicitly, as a side effect of qa.yml's per-ref concurrency
+                # group: the dispatch below would cancel it. That is being removed in the same
+                # change, because grouping per ref also let a dispatch cancel a run for a DIFFERENT
+                # commit — which is how nine of ten gates died last night. Doing it here instead
+                # keeps the cleanup and drops the collateral: we cancel the old SHA by name,
+                # never whatever else happens to share the branch.
+                for R in $(gh run list --workflow qa.yml --limit 60 \
+                             --json headSha,status,databaseId \
+                             --jq ".[] | select(.headSha==\"$HEADSHA\")
+                                       | select(.status != \"completed\") | .databaseId" 2>/dev/null); do
+                  gh run cancel "$R" >/dev/null 2>&1 \
+                    && echo "  cancelled superseded gate $R (was gating the old head $HEADSHA)"
+                done
+
                 if gh workflow run qa.yml --ref "$BRANCH"; then
                   echo "  dispatched qa.yml on $BRANCH @ $(git rev-parse HEAD)"
                 else
