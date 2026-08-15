@@ -1710,6 +1710,98 @@ def _shape_farm_book(d):
     return None
 
 
+def _shape_farm_income_impact(d):
+    # The Overview farm-book section's crop -> farm-INCOME margin-shock verdict (obj
+    # #1), merged onto renderFarmBook via `tmliFetch('farm_income_impact')`. This is
+    # the MEASURED crop-gate-price × margin engine (build_farm_income_impact.py): its
+    # `.fb-inc` verdict sentence renders ONLY if `FIN = FI.national` is truthy, then
+    # reads FIN.price_impact_pct / FIN.margin_impact_pct and FI.meta's
+    # crop_income_share.nonfarm_share_of_income_pct / crop_income_share_pct_used /
+    # crop_constants / dropped_crops; the province/region figures join by row (each
+    # province row keyed by `.th`, each region row by `.region`). Its loader is a bare
+    # `.catch(()=>null)` — so a truncated/404 CDN deploy SILENTLY drops the whole
+    # margin-shock read while the farm book itself keeps rendering, with NO phone alert
+    # (the exact "broken demo" blind spot the farm_book / macro_book / collateral_book
+    # obj-#1 probes closed for their siblings, and the read the last two audits flagged
+    # as the next probe target). Asserts the render CONTRACT as SHAPE not values —
+    # robust to a future crop/price/tape vintage moving every number.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'national' object (FIN margin-shock verdict gate)"
+    for k in ("price_impact_pct", "margin_impact_pct"):
+        if not isinstance(nat.get(k), (int, float)):
+            return "national.%s missing/non-numeric (margin-shock verdict render read)" % k
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        return "missing/empty 'provinces' list (province-row join render read)"
+    p0 = provs[0]
+    if not isinstance(p0, dict):
+        return "first province row is not an object"
+    if not (isinstance(p0.get("th"), str) and p0["th"].strip()):
+        return "first province row missing 'th' key (province-row join key)"
+    for k in ("price_impact_pct", "margin_impact_pct", "crop_income_thb",
+              "d_income_price_thb", "d_income_margin_thb"):
+        if not isinstance(p0.get(k), (int, float)):
+            return "first province row %s missing/non-numeric (put() join render read)" % k
+    regs = d.get("regions")
+    if not isinstance(regs, list) or not regs:
+        return "missing/empty 'regions' list (region-row join render read)"
+    if not (isinstance(regs[0], dict) and isinstance(regs[0].get("region"), str) and regs[0]["region"].strip()):
+        return "first region row missing 'region' join key"
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    if not isinstance(meta.get("crop_income_share_pct_used"), (int, float)):
+        return "meta.crop_income_share_pct_used missing/non-numeric (household-cash render read)"
+    cis = meta.get("crop_income_share")
+    if not isinstance(cis, dict) or not isinstance(cis.get("nonfarm_share_of_income_pct"), (int, float)):
+        return "meta.crop_income_share.nonfarm_share_of_income_pct missing/non-numeric (verdict render read)"
+    if not isinstance(meta.get("crop_constants"), dict) or not meta["crop_constants"]:
+        return "meta.crop_constants missing/empty (covered-crops count render read)"
+    return None
+
+
+def _shape_vintage_digest(d):
+    # The "Since last vintage" exec card at the TOP of the Risk-trend tab (#trend,
+    # obj #1) — renderVintageDigest draws VDIGEST.headline + a worst-first findings
+    # list (each {tone, text, metric}) off vintage_digest.json (build_vintage_digest.py,
+    # a plain-language digest of deltas.json). `if(!VDIGEST){box.style.display='none'}`
+    # HIDES the whole card when the file is absent/404 (the loader is `r.ok?r.json():null`),
+    # so a truncated/404 CDN deploy silently blanks the #trend lead exec headline with
+    # NO phone alert — the same blind spot the deltas / farm_book obj-#1 probes closed.
+    # Asserts the render shape both states read (headline + findings rows when populated,
+    # from/to vintage labels), NOT values, and stays green in a legitimate single-vintage
+    # baseline (baseline===true, findings genuinely absent) so it won't false-alarm if the
+    # snapshot history is ever reset to one vintage.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    if not isinstance(d.get("baseline"), bool):
+        return "missing/non-bool 'baseline' flag (renderVintageDigest state gate)"
+    if not (isinstance(d.get("headline"), str) and d["headline"].strip()):
+        return "missing/blank 'headline' (#trend lead exec headline render read)"
+    if d.get("baseline"):
+        return None  # legitimate single-vintage baseline — findings absent by design, healthy
+    # Populated diff: the vintage-label header + at least one finding row must render.
+    for k in ("from", "to"):
+        if not (isinstance(d.get(k), str) and d[k].strip()):
+            return "non-baseline digest missing/blank '%s' vintage label (header render read)" % k
+    finds = d.get("findings")
+    if not isinstance(finds, list) or not finds:
+        return "non-baseline digest with missing/empty 'findings' list (#trend findings render)"
+    f0 = finds[0]
+    if not isinstance(f0, dict):
+        return "first finding row is not an object"
+    if not (isinstance(f0.get("tone"), str) and f0["tone"].strip()):
+        return "first finding missing 'tone' (better/worse/neutral chip render read)"
+    if not (isinstance(f0.get("text"), str) and f0["text"].strip()):
+        return "first finding missing 'text' (finding sentence render read)"
+    if "metric" not in f0:
+        return "first finding missing 'metric' (underlying-metric tag render read)"
+    return None
+
+
 def _shape_collateral_outlook(d):
     # The Overview (#overview) collateral board's national recovery-value read
     # AND the command-center collateral clause (obj #1). renderCollatOutlook +
@@ -3128,6 +3220,15 @@ DATA_FILES = [
     # verdict/commentary render shape (national KPIs + province dict + crops rows),
     # not values.
     ("data/farm_book.json", _shape_farm_book, ".national KPI block + province drill + .crops commentary (Overview farm-book section)"),
+    # The MEASURED crop -> farm-INCOME margin-shock engine merged into the same
+    # Overview farm-book section (obj #1), and the read the last two audits flagged as
+    # the next probe target. Its `.fb-inc` verdict renders only if `.national` is truthy
+    # and joins by province `.th` / region `.region`, and its loader is a bare
+    # `.catch(()=>null)` — so a truncated/404 CDN deploy SILENTLY drops the whole
+    # margin-shock read while the farm book keeps rendering, with no phone alert. Asserts
+    # the national gate + the province/region join rows + the meta household-cash keys,
+    # shape not values.
+    ("data/farm_income_impact.json", _shape_farm_income_impact, ".national price/margin gate + province(.th)/region join rows + meta crop_income_share (Overview farm-income margin-shock verdict, obj #1)"),
     # The Overview collateral board's national recovery-value read + the command-
     # center collateral clause (obj #1), and one of the two reads the last audit's
     # "next probe targets" note flagged. renderCollatOutlook + the command-center
@@ -3208,6 +3309,14 @@ DATA_FILES = [
     # render shape (baseline gate + branch/region mover fields + the #trend board list),
     # shape not values, and stays green in a legitimate baseline vintage.
     ("data/deltas.json", _shape_deltas, ".baseline gate + .branches/.region movers + .board YoY (#home Movers card + #trend tab)"),
+    # The "Since last vintage" exec card at the TOP of the Risk-trend tab (obj #1) — the
+    # #trend lead headline + worst-first findings list, and the second read the last two
+    # audits flagged. renderVintageDigest HIDES the whole card on a missing/404 file
+    # (`if(!VDIGEST){display=none}`), so a truncated CDN deploy silently blanks the #trend
+    # lead exec headline with no phone alert — the same blind spot the deltas probe closed.
+    # Asserts the headline gate + populated-vintage findings shape, stays green in a
+    # legitimate single-vintage baseline (baseline===true, findings absent by design).
+    ("data/vintage_digest.json", _shape_vintage_digest, ".baseline gate + .headline + populated findings (tone/text/metric) rows (#trend lead 'Since last vintage' card, obj #1)"),
     # The Macro tab's nameplate wave (vehicle_models.json, #275/#276, obj #1) — the
     # newest surfaced layer and the last from that wave with no deploy probe. It is
     # load-bearing on two MEASURED render paths: the "which models, and which are

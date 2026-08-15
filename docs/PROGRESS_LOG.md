@@ -3,6 +3,54 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-15 — Integration loop (service/deploy-health, obj #1): the **two remaining default-route silent-hide reads** — `farm_income_impact.json` (Overview crop→farm-income MARGIN-SHOCK verdict) and `vintage_digest.json` (#trend lead "Since last vintage" exec card) — now have SHAPE probes; both were the flagged next targets after the ThaiWater/brand_trends probes and were the last default-route cards a truncated/404 CDN deploy could silently blank with no phone alert
+
+- **Why this, this run.** The high-value INTEGRATION backlog is exhausted or blocked (re-verified on
+  disk): #1 (FPO PICO → `pico_census`/`pico_district`/`branch_pico`), #2 (per-branch `branch_cropland`),
+  #3 (data.go.th DIW/MOT/DBD distillation) are SHIPPED + wired; #4 (GISTDA 40m `check-crop`) is **blocked**
+  — `GISTDA_SPHERE_KEY` is unset in this CI env (confirmed `printenv`), so skipped not faked; BAAC/SME-bank
+  distillation stays blocked (data.go.th aggregator 403 from cloud IPs). That left item #5 — the concrete
+  unblocked next step. The last **two** progress entries both explicitly named these two layers as "the
+  natural next two probe runs"; neither had a probe yet (grep-confirmed). This run closes both together —
+  they are the identical task shape (deploy shape-probe of a default-route silent-hide read) and leaving
+  one dangling would just re-surface it next run.
+- **The gap fixed (`farm-income-impact-and-vintage-digest-unprobed-silent-hide`).**
+  - `platform/data/farm_income_impact.json` is the MEASURED crop→farm-**income** margin-shock engine
+    (`build_farm_income_impact.py`) merged into the Overview farm-book section. Its `.fb-inc` verdict
+    renders **only if `FI.national` is truthy**, joins province rows by `.th` / region rows by `.region`,
+    and reads `meta.crop_income_share` / `crop_income_share_pct_used` / `crop_constants`. Its loader is a
+    bare `tmliFetch('farm_income_impact').catch(()=>null)` — so a truncated/404 CDN deploy **silently drops
+    the whole margin-shock read** while the farm book itself keeps rendering, with no phone alert.
+  - `platform/data/vintage_digest.json` (`build_vintage_digest.py`) is the "Since last vintage" exec card
+    at the TOP of the Risk-trend tab — one headline + a worst-first findings list. `renderVintageDigest`
+    does `if(!VDIGEST){box.style.display='none'}`, so a missing/404 file **silently blanks the #trend lead
+    exec headline** with no phone alert.
+  - Both were fetch/shape-**unprobed**; each is the classic "broken demo" blind spot the sibling
+    `deltas` / `farm_book` / `collateral_book` obj-#1 probes already closed.
+- **The fix.** Added `_shape_farm_income_impact` and `_shape_vintage_digest` to
+  `pipeline/check_site_health.py` and registered `data/farm_income_impact.json` (beside `farm_book`) and
+  `data/vintage_digest.json` (beside `deltas`) in `DATA_FILES`. Both assert the render CONTRACT as **shape
+  not values** (robust to a future crop/price/tape/snapshot vintage moving every number):
+  farm-income-impact → national price/margin numeric gate + non-empty province(`.th`)/region(`.region`)
+  join rows carrying the `put()` keys + `meta` household-cash keys; vintage-digest → `baseline` bool gate +
+  non-blank `headline` + (when non-baseline) `from`/`to` labels and ≥1 finding row with `tone`/`text`/
+  `metric`. The vintage-digest probe deliberately stays GREEN in a legitimate single-vintage baseline
+  (`baseline===true`, findings absent by design) — same no-false-alarm design as the `deltas` probe.
+- **Verified.** Unit-tested: both committed payloads ACCEPTED; 15 broken shapes across the two validators
+  (no/empty/wrong-type national·provinces·regions·meta; non-numeric join fields; no/blank/empty
+  headline·findings·labels; finding missing tone/metric) all correctly REJECTED; a synthetic single-vintage
+  baseline digest ACCEPTED (no false alarm). `check_site_health.py --local platform` → **HEALTHY 278/278,
+  exit 0** (was 272; +6 = fetch/parse/shape × 2 files). No `platform/data` file, builder or provenance
+  changed (probe-only) → no rebuild / `build_provenance` needed. `bash tests/run.sh check` → **0 failed**
+  (the deploy-probe self-test now also accepts both new payloads). Test-infra only, no app behaviour/visual
+  change → safeguard-gated direct commit, no PR / headless render needed.
+- **Next recommended.** Every default-route silent-hide read now has a deploy shape probe. The genuinely-open
+  DATA items still need an owner-side/Thai-IP window (GISTDA 40m `check-crop` per-branch pull to supersede
+  the SPAM baseline in `build_branch_cropland.py`; committing the BAAC/SME-bank raw CSVs for the
+  formal-credit penetration layer). A separate lower-value thread: several collateral-vintage-bearing layers
+  (`brand_trends`/`vehicle_fleet`/`vehicle_models`) are shape- but not freshness-probed — worth a freshness
+  entry once a self-refresh workflow starts landing them.
+
 ## 2026-08-15 — Intelligence loop (DEPLOYMENT HEALTH): the nightly site-health probe now reads a **Vercel Authentication (SSO) redirect** as "up + access-protected", not an outage — it was silently following the SSO 30x to `vercel.com/login` (a 200 login page) and FAILING every content check, so a genuinely-healthy protected deployment would file a FALSE "site down" GitHub issue + phone alert
 
 - **Why this, this run.** The autonomy backlog is at 98% (49/50 done; the 1 OPEN item is owner-side —
