@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-08-11",
+  "pulled_at": "2026-08-15",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -29,10 +29,10 @@
    "cohort": "title",
    "own": true,
    "stats": {
-    "score": 3.2488,
-    "ratings": 209,
-    "score_current_version": 3.2488,
-    "ratings_current_version": 209,
+    "score": 3.25714,
+    "ratings": 210,
+    "score_current_version": 3.25714,
+    "ratings_current_version": 210,
     "version": "1.6.7",
     "app_updated": "2026-07-17",
     "released": "2022-10-10",
@@ -428,12 +428,12 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.70573,
-    "ratings": 1536,
-    "score_current_version": 3.70573,
-    "ratings_current_version": 1536,
-    "version": "3.1.0",
-    "app_updated": "2026-07-20",
+    "score": 3.71502,
+    "ratings": 1558,
+    "score_current_version": 3.71502,
+    "ratings_current_version": 1558,
+    "version": "3.2.0",
+    "app_updated": "2026-08-13",
     "released": "2020-04-30",
     "genre": "Finance"
    },
@@ -1330,6 +1330,24 @@
      "votes": 0
     },
     {
+     "id": "14425003983",
+     "at": null,
+     "score": 1,
+     "title": "เข้าแอปไม่ได้",
+     "content": "เข้าใช้งานไม่ได้เลย ถอนการติดตั้งก็แล้ว อัปเดตก็แล้ว แย่มาก",
+     "version": "3.2.0",
+     "votes": 0
+    },
+    {
+     "id": "14413696473",
+     "at": null,
+     "score": 1,
+     "title": "ช้า",
+     "content": "ให้อัพเดตตลอดเข้าแอพยากมากไม่สะดวกเลย",
+     "version": "3.1.0",
+     "votes": 0
+    },
+    {
      "id": "14382062061",
      "at": null,
      "score": 2,
@@ -2204,10 +2222,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.45783,
-    "ratings": 415,
-    "score_current_version": 3.45783,
-    "ratings_current_version": 415,
+    "score": 3.44976,
+    "ratings": 418,
+    "score_current_version": 3.44976,
+    "ratings_current_version": 418,
     "version": "2.7.4",
     "app_updated": "2026-05-19",
     "released": "2017-12-09",
@@ -3260,10 +3278,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.2695,
-    "ratings": 423,
-    "score_current_version": 3.2695,
-    "ratings_current_version": 423,
+    "score": 3.28337,
+    "ratings": 427,
+    "score_current_version": 3.28337,
+    "ratings_current_version": 427,
     "version": "1.0.60",
     "app_updated": "2026-07-02",
     "released": "2024-01-16",
@@ -5291,12 +5309,12 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 1.71429,
-    "ratings": 7,
-    "score_current_version": 1.71429,
-    "ratings_current_version": 7,
-    "version": "1.11.0",
-    "app_updated": "2026-05-11",
+    "score": 1.5,
+    "ratings": 2,
+    "score_current_version": 1.5,
+    "ratings_current_version": 2,
+    "version": "1.12.0",
+    "app_updated": "2026-08-10",
     "released": "2025-01-09",
     "genre": "Finance"
    },
@@ -5585,16 +5603,25 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.45421,
-    "ratings": 546,
-    "score_current_version": 3.45421,
-    "ratings_current_version": 546,
+    "score": 3.4529,
+    "ratings": 552,
+    "score_current_version": 3.4529,
+    "ratings_current_version": 552,
     "version": "1.0.44",
     "app_updated": "2026-07-31",
     "released": "2024-07-09",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14406437683",
+     "at": null,
+     "score": 1,
+     "title": "กดสมัครไม่ได้",
+     "content": "ยืนยันตัวตนไปเป็น10รอบ กดสมัครก็กดไม่ได้ ลบแอพโหลดใหม่ก็ค้างหน้าข้อมูลเดิม สมัครไม่ได้สักที",
+     "version": "1.0.44",
+     "votes": 0
+    },
     {
      "id": "14395528056",
      "at": null,
@@ -6808,7 +6835,7 @@
      "title": "ค",
      "content": "ขายฝันไปวันๆ",
      "version": "1.0.16",
-     "votes": 1
+     "votes": 2
     },
     {
      "id": "12460731220",
@@ -7150,7 +7177,7 @@
      "title": "ขอบคุณค่ะ",
      "content": "ได้เงินจริงมาทันเวลาขาดเงินหมุนพอดี แนะนำค่ะ \n\nถ้าใครรอนานเกือบอาทิตย์ ลองแคปหน้ารอที่มีหมายเลขประจำตัวอยู่ส่งให้แชทเฟสดูนะคะ ทาง จนท แจ้งว่าเนื่องจากระบบยัง Soft launch ยังมีเวอร์ชั่นใหม่ปล่อยมาบ้างเลยทำให้ตกหล่นไปบ้าง \nทักไปวันเดียวถ้าไม่ติดอะไร เอกสารครบ เครดิตโอเค ปล่อยมาเลยค่ะ",
      "version": "1.0.4",
-     "votes": 1
+     "votes": 2
     },
     {
      "id": "11596426057",
@@ -7248,8 +7275,8 @@
     "ratings": 9,
     "score_current_version": 4.66667,
     "ratings_current_version": 9,
-    "version": "1.7.4",
-    "app_updated": "2026-02-05",
+    "version": "1.7.5",
+    "app_updated": "2026-08-13",
     "released": "2025-09-28",
     "genre": "Finance"
    },
@@ -7274,10 +7301,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.38496,
-    "ratings": 1569,
-    "score_current_version": 3.38496,
-    "ratings_current_version": 1569,
+    "score": 3.38501,
+    "ratings": 1574,
+    "score_current_version": 3.38501,
+    "ratings_current_version": 1574,
     "version": "8.5.0",
     "app_updated": "2026-07-17",
     "released": "2020-03-03",
@@ -9112,6 +9139,15 @@
      "votes": 0
     },
     {
+     "id": "14413714161",
+     "at": null,
+     "score": 1,
+     "title": "เข้าหน้าแรกยังไม่ได้",
+     "content": "เข้าใช้งานหน้าแรกยังเข้าไม่ได้ หัด update app หน่อย",
+     "version": "8.5.0",
+     "votes": 0
+    },
+    {
      "id": "14395015261",
      "at": null,
      "score": 1,
@@ -10346,16 +10382,124 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.82437,
-    "ratings": 172300,
-    "score_current_version": 4.82437,
-    "ratings_current_version": 172300,
+    "score": 4.82429,
+    "ratings": 172627,
+    "score_current_version": 4.82429,
+    "ratings_current_version": 172627,
     "version": "3.0.6",
     "app_updated": "2026-08-06",
     "released": "2021-04-20",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14424739025",
+     "at": null,
+     "score": 5,
+     "title": "สมัครผ่านอนุมัติวงเงินแล้วแต่ถอนไม่ได้",
+     "content": "เพราะอะไรทำไมถึงถอนไม่ได้หรอคะ อนุมัติวงเงินแล้วแต่ถอนไม่ได้เลยค่ะ",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14418123902",
+     "at": null,
+     "score": 5,
+     "title": "Good Quickly",
+     "content": "I’m won borrow them give me 37,000฿ in seconds oh amazing big thx",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14417881474",
+     "at": null,
+     "score": 2,
+     "title": "ห้ามนำข้อมูล",
+     "content": "เลขบัตรลงท้าย 7991 ไม่อนุญาตให้นำข้อมูลมาเผยแพร่ ทุกช่องทาง ไม่ว่าจะทางไหนก็ตามนะคะ",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14417769177",
+     "at": null,
+     "score": 5,
+     "title": "ของจริงไม่โม้งเหมือนแอปอื่น",
+     "content": "ดีมากๆๆ  รายเดือน   จริง  ได้จริง   ไม่โกหกเหมือนแอปอื่น",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14415032584",
+     "at": null,
+     "score": 5,
+     "title": "โชคดี",
+     "content": "ขอบคุณที่เข้าใจยามวิกฤตคับ",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14414023745",
+     "at": null,
+     "score": 5,
+     "title": "การจัดการดี",
+     "content": "จัดการขั้นตอนดี ไว",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14413521182",
+     "at": null,
+     "score": 1,
+     "title": "ขอยกเลิกทำสัญญา",
+     "content": "ข้าพเจ้านางสาว ศรัณย์รัตน์ สันทาลุนัย ได้ทำการสมัคร สินเชื่อไป แต่ไม่ได้รับการอนุมัติ ข้าพเจ้าขอยกเลิก สัญญาข้อมูลทั้งหมด ถ้าทางแอบนำข้อมูลข้าพเจ้าไปใช้ในทางที่ผิด ข้าพเจ้าจะไม่รับผิดชอบแต่อย่างใดจะดำเนินคดีให้ถึงที่สุด",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14412940370",
+     "at": null,
+     "score": 1,
+     "title": "ยกเลิกสิ้นเชื่อ",
+     "content": "เลขบัตรปชช ลงท้าย503 ยกเลิกทั้งหมดห้ามนำชื่อไปใช้ใดๆโดยเด็ดขาด",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14412848872",
+     "at": null,
+     "score": 5,
+     "title": "ดีเยี่ยม",
+     "content": "อนุมัติไว",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14410400103",
+     "at": null,
+     "score": 5,
+     "title": "เงินด่วน",
+     "content": "ง่ายและรู้ผลไวค่ะ",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14410164575",
+     "at": null,
+     "score": 5,
+     "title": "ความชอบ",
+     "content": "อนุมัติไวไม่ยุ่งยาก",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14409002066",
+     "at": null,
+     "score": 3,
+     "title": "ความปลอดภัยของข้าพเจ้า",
+     "content": "ข้าพเจ้านางสาวสุทัตตา มานุ่ม\nได้ทำการสมัครวงเงินกับแอพ ‘ฟินนิกซ์’ แต่ไม่ได้รับการอนุมัติวงเงิน และได้ลงข้อมูลส่วนตัวลงไปในแอพด้วย หมายเลขบัตรประชาชนหน้าและหลัง และเบอร์โทรศัพท์ทั้งบุคคลที่อ้างอิง2ท่าน ทั้งนี้ถ้าแอพฟินนิกซ์ ได้นำข้อมูลไปปลอมแปลงในรูปใดๆก็ตามที่ผิดกฎหมายและคุกคามหรือละเมิดสิทธิ์ส่วนบุคคล ข้าพเจ้านางสาวสุทัตต มานุ่มและบุคลลลอ้างอิงอีก2ท่าน จะไม่รับผิดชอบใดๆทั้งสิ้น (โปรดลบข้อมูลส่วนต",
+     "version": "3.0.6",
+     "votes": 0
+    },
     {
      "id": "14407326796",
      "at": null,
@@ -15101,10 +15245,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.70346,
-    "ratings": 63179,
-    "score_current_version": 4.70346,
-    "ratings_current_version": 63179,
+    "score": 4.70368,
+    "ratings": 63458,
+    "score_current_version": 4.70368,
+    "ratings_current_version": 63458,
     "version": "7.5.0",
     "app_updated": "2026-07-20",
     "released": "2021-10-10",
@@ -19622,16 +19766,79 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84424,
-    "ratings": 42772,
-    "score_current_version": 4.84424,
-    "ratings_current_version": 42772,
+    "score": 4.84389,
+    "ratings": 43306,
+    "score_current_version": 4.84389,
+    "ratings_current_version": 43306,
     "version": "3.1.1",
     "app_updated": "2026-05-25",
     "released": "2023-03-06",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14425798081",
+     "at": null,
+     "score": 5,
+     "title": "ขอบคุณนะคะในยามที่เดือดร้อนก็ยังเป็นที่พึ่งพาได้ขอขอบคุณมากๆค่ะ",
+     "content": "ขอบคุณนะคะในยามที่เดือดร้อนก็ยังเป็นที่พึ่งพาได้ขอขอบคุณมากๆค่ะ",
+     "version": "3.1.1",
+     "votes": 0
+    },
+    {
+     "id": "14425302885",
+     "at": null,
+     "score": 5,
+     "title": "ขอบคุณ/thank u",
+     "content": "Thank you so much, You saved my life",
+     "version": "3.1.1",
+     "votes": 0
+    },
+    {
+     "id": "14418311473",
+     "at": null,
+     "score": 5,
+     "title": "บริการดีอนุมัติง่าย",
+     "content": "ขอบคุณที่ช่วยชีวิตนะคะ ไม่คิดว่าจะอนุมัติไวและง่ายแบบนี้เกินคาดจริงๆค่ะแนะนำเลย",
+     "version": "3.1.1",
+     "votes": 0
+    },
+    {
+     "id": "14418308713",
+     "at": null,
+     "score": 1,
+     "title": "ลบข้อมูล",
+     "content": "ข้าพเจ้า ได้ทำการสมัครสินเชื่อและไม่ได้รับการอนุมัติ และได้กรอรข้อมูลส่วนตัว ในแอปPROMISE (THAILAND ) โดยมีชื่อ นามสกุล เลขบัตรประชาชน ด้านหน้าบัตร  หลังบัตรที่อยู่ ปัจจุบันและที่ทำงาน ทั้งนี้หากแอป PROMISE (THAILAND )ได้นำข้อมูลไปปลอมแปลงในรูปแบบที่ผิดกฎหมายคุกคามหรือ สิทธิส่วนบุคคล ข้าพเจ้า นางสาวพัลลภา  สุดเนตรจะไม่ขอรับผิดชอบใดๆทั้งสิ้น และ จะดำเนินคดีให้ถึงที่สุด (โปรดลบข้อมูลส่วนตัวให้ด้วย)",
+     "version": "3.1.1",
+     "votes": 0
+    },
+    {
+     "id": "14416921867",
+     "at": null,
+     "score": 5,
+     "title": "บริการรวดเร็ว",
+     "content": "บริการรวดเร็วดีมากกกค่ะ",
+     "version": "3.1.1",
+     "votes": 0
+    },
+    {
+     "id": "14413618725",
+     "at": null,
+     "score": 5,
+     "title": "โก้ วัชระ",
+     "content": "ดีงามครับ มนุษย์เงินเดือน ผ่านง่ายอนุมัติไวเอกสารครบ จบเลย ผมแนะนำ ยังไงก็เอาเท่าที่ไหวนะครับ ลองมาเป็นสิบแอพ จบที่พรอมิสจริงๆ แนะนำมนุษย์เงินเดือน หมุนไม่ทันรึอยากรวมหนี้ก้อนเล็กๆ เอาไป5 ดาวครับ",
+     "version": "3.1.1",
+     "votes": 0
+    },
+    {
+     "id": "14405244085",
+     "at": null,
+     "score": 5,
+     "title": "ชื่นชม",
+     "content": "รวดเร็วทันใจ ใส่ใจผู้ขอใช้ดีเยี่ยม",
+     "version": "3.1.1",
+     "votes": 0
+    },
     {
      "id": "14398707686",
      "at": null,
@@ -23059,7 +23266,7 @@
      "title": "ขอยกเลิกการสมัครและลบข้อมูลส่วนตัว",
      "content": "เรียน เจ้าหน้าที่ ข้าพเจ้า เลขบัตรประจำตัวประชาชนลงท้ายด้วย 18591ได้ทำการสมัคร และกรอกข้อมูลส่วนตัว ใน PROMISE (THAILAND) \nเมื่อวันที่ 22 พฤษภาคม 2568\nและไม่ได้รับการอนุมัติโดยมีชื่อ - นามสกุล เบอร์โทรศัพท์และ เลข บัตรประชาชน (หน้า บัตร และ หลังบัตร) ที่อยู่และที่ทำงาน ทั้งนี้ ถ้าแอป PROMISE (THAILAND) ได้ข้อมูลไปปลอมแปลงในรูปแบบใดๆที่ผิดกฎหมายคุกคามหรือสิทธิส่วนบุคคล \nข้าพเจ้า จะไม่ขอรับผิดชอบใดๆ",
      "version": "3.0.7",
-     "votes": 4
+     "votes": 5
     },
     {
      "id": "12671976334",
@@ -24269,10 +24476,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.76996,
-    "ratings": 26661,
-    "score_current_version": 4.76996,
-    "ratings_current_version": 26661,
+    "score": 4.76987,
+    "ratings": 26725,
+    "score_current_version": 4.76987,
+    "ratings_current_version": 26725,
     "version": "1.8.7",
     "app_updated": "2026-08-07",
     "released": "2020-08-05",
@@ -25691,6 +25898,24 @@
      "content": "Superb!!!",
      "version": "1.0.5",
      "votes": 11
+    },
+    {
+     "id": "14422665505",
+     "at": null,
+     "score": 5,
+     "title": "ไม่ผ่านการพิจารณา Amoney",
+     "content": "ข้าพเจ้า นายวีระยุทธ มีสัตย์ บัตรประชาชนลงท้ายเลขที่ 6594 ได้ทำการสมัครบัตรกดเงินสด A money แต่ไม่ผ่านการอนุมัติ ข้าพเจ้าจึงขอให้ทางแอปA money ลบข้อมูลทุกอย่างของข้าพเจ้าและบุคคลอ้างอิงด้วย ข้าพเจ้าไม่อนุญาติให้ทางแอฟA money นำข้อมูลของข้าพเจ้าและบุคคลอ้างอิง นำไปใช้ประโยชน์ในทางที่ผิดกฏหมาย\nข้าพเจ้าจะดำเนินคดีทางกฏหมายให้ถึงที่สุด\nลงวันที่13สิงหาคม2569",
+     "version": "1.8.7",
+     "votes": 0
+    },
+    {
+     "id": "14409159165",
+     "at": null,
+     "score": 5,
+     "title": "ยกเลิกสัญญาและข้อมูลส่วนบุคคลไม่ผ่านการอนุมัติ",
+     "content": "ข้าพเจ้า น.ส่วนธิดารัตน์ ตุนอก ได้ทำการสมัครกรอกข้อมูลส่วนบุคคลกับทาง Amuney จึงอยากให้ลบข้อมูลที่สมัครมีเลขที่บัตรประชาชนทั้งหน้าและหลังบัตร เบอร์โทรศัพท์และบุคคลอ้างอิงทั้ง 2 คนด้วย หากทางแอปนำข้อมูลไปใช้โดยไม่ได้รับอนุญาตและไปใช้ในทางที่ผิดกฎหมายข้าพเจ้าจะไม่รับผิดชอบใดใดทั้งสิ้นและจะดำเนินคดีทางกฎหมายถึงที่สุด",
+     "version": "1.8.7",
+     "votes": 0
     },
     {
      "id": "14406767018",
@@ -28421,12 +28646,12 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.60825,
-    "ratings": 2060,
-    "score_current_version": 2.60825,
-    "ratings_current_version": 2060,
-    "version": "3.2.3",
-    "app_updated": "2026-07-23",
+    "score": 2.61245,
+    "ratings": 2072,
+    "score_current_version": 2.61245,
+    "ratings_current_version": 2072,
+    "version": "3.3.0",
+    "app_updated": "2026-08-13",
     "released": "2022-05-11",
     "genre": "Finance"
    },
@@ -33023,16 +33248,34 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.5527,
-    "ratings": 2931,
-    "score_current_version": 2.5527,
-    "ratings_current_version": 2931,
+    "score": 2.55397,
+    "ratings": 2937,
+    "score_current_version": 2.55397,
+    "ratings_current_version": 2937,
     "version": "5.65",
     "app_updated": "2026-02-13",
     "released": "2021-08-03",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14412269456",
+     "at": null,
+     "score": 4,
+     "title": "ยกเลิกข้อมูล",
+     "content": "ข้าพเจ้านายเฉลิมพล แสนปลื้ม ได้สมัครสินเชื่อมันนี่ฮับเมื่อวันที่ 10 สิงหาคม 2569 ข้อมูลส่วนตัวที่สมัคร ไม่ได้รับการอนมัติ ข้าพเจ้าไม่อนุญาตให้นำข้อมูลไปใช้ในทางผิดกฎหมาย และในด้านอื่น",
+     "version": "5.65",
+     "votes": 0
+    },
+    {
+     "id": "14409128268",
+     "at": null,
+     "score": 5,
+     "title": "ไม่ได้รับอนุมัติสินเชื่อขอให้ลบข้อมูลที่สมัคร",
+     "content": "ข้าพเจ้าน.ส ธิดารัตน์ ตุนอก ได้กรอกข้อมูลสมัครสินเชื่อกับทางมันนี่ฮับแล้วไม่ผ่านขอให้ทางแอปลบข้อมูลที่สมัคร หมายเลขบัตรประชาชนทั้งหน้าและหลังบัตร เบอร์โทรและบุคคลอ้างอิงทั้ง 2 คนด้วย ถ้าหากทางแอปนำข้อมูลของข้าพเจ้าไปใช้ได้ในทางที่ผิดกฎหมายโดยไม่ได้รับอนุญาต ข้าพเจ้าจะไม่รับผิดชอบใดๆทั้งสิ้นและจะดำเนินคดีทางกฎหมาย",
+     "version": "5.65",
+     "votes": 0
+    },
     {
      "id": "14406727676",
      "at": null,
