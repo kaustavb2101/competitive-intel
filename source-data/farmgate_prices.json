@@ -6,7 +6,7 @@
     "source": "NABC Agricultural Data Service (agriapi.nabc.go.th) — daily market prices, national average across quoting markets, pulled by pipeline/pull_nabc_prices.py (REACHABLE from a Thai IP and from cloud runners; verified live 2026-07-12). Sugarcane only: OCSB announced cane price via pipeline/ingest_ocsb_cane.py — Thailand sets one national cane price per season, so cane is quoted by no market and cannot come from NABC.",
     "farmgate_note": "OAE's ราคาที่เกษตรกรขายได้ (price-farmers-received) series is not exposed as a machine-readable price resource on catalog.oae.go.th (only value-of-production datasets remain; the price series moved to the geo-blocked data.go.th aggregator). NABC's quoted products ARE the raw farm commodities farmers sell, so this stands in for farm-gate as the reachable measured Thai price layer — replacing the World Bank Pink Sheet GLOBAL proxy for price_stress. It is a national daily average, not a per-province farm-gate census.",
     "vintage": "2026-08-13",
-    "pulled": "2026-08-15",
+    "pulled": "2026-08-16",
     "upstream": "source-data/nabc_prices.json",
     "crops_covered": [
       "cassava",
