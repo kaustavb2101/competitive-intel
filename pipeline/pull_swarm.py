@@ -152,6 +152,31 @@ FEEDS = [
          label="ILOSTAT Thai labour battery: sector employment / informality / unemployment / earnings",
          cadence="quarterly", ip="any", group="macro", out="source-data/ilostat_labour.json"),
 
+    # The other two Thai-official series build_macro_indicators.py reads (beside tpso_cpi above):
+    # source-data/bot_current_account.json (macro-board current-account chip) and
+    # bot_tourist_arrivals.json (tourism chip). Both were in NO scheduler — last hand-pulled
+    # 2026-08-02, 13 days stale while the layer itself re-derived off the fresher CPI, so its
+    # trade/tourism panels were silently frozen. Same silent-stale failure mode as tpso_cpi/
+    # ilostat_labour above. VERIFIED reachable + deterministic from THIS cloud runner 2026-08-16:
+    # both hit app.bot.or.th BOTWEBSTAT (reportID 953 / 875, keyless, HTTP 200) and passed their
+    # own anchor-month acceptance tests (3/3 and 4/4) on a clean EXIT=0 — no bot challenge, no
+    # datacenter-IP block. build_macro_indicators.py is --check-gated (tests/run.sh L434), so
+    # rederive_drift.py rebuilds the macro board automatically on the next fresh pull.
+    #   DELIBERATELY NOT wired: pull_nesdc_gdp.py (source-data/nesdc_gdp.json, the macro-board
+    #   gdp_growth). Re-probed live 4x from CI 2026-08-16: NESDC's bot-mitigation redirect is
+    #   INTERMITTENT — 2 of 4 attempts died with `HTTP 302: infinite loop` (the cookiejar did not
+    #   clear the challenge); the 2 that passed then need pdfplumber. An ~50%-failing feed goes RED
+    #   on the runs it loses, which is exactly the permanently-red-feed anti-pattern the prior
+    #   NEXT_STEPS/PROGRESS notes said to guard against ("wire ONLY after a live CI pull proves it
+    #   passes the challenge"). It does NOT reliably pass, so it stays hand-pulled from a Thai IP.
+    dict(key="bot_current_account", script="pull_bot_current_account.py", args=["--stamp", STAMP],
+         label="BoT monthly current-account balance (macro-board current-account chip)",
+         cadence="monthly", ip="any", group="macro", out="source-data/bot_current_account.json"),
+
+    dict(key="bot_tourist_arrivals", script="pull_bot_tourist_arrivals.py", args=["--stamp", STAMP],
+         label="BoT monthly foreign tourist arrivals (macro-board tourism chip)",
+         cadence="monthly", ip="any", group="macro", out="source-data/bot_tourist_arrivals.json"),
+
     dict(key="google_trends", script="pull_google_trends.py", args=[],
          label="Google Trends demand + brand share-of-search (ESTIMATED)", cadence="monthly",
          ip="any", group="competitive", out="source-data/google_trends.json", timeout=1200),
