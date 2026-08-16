@@ -1,24 +1,32 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
-  "//git": "SKIPPING A BUILD IS NOT THE SAME AS NOT DEPLOYING, and that distinction cost us the live site on 2026-08-15. `ignoreCommand` below has skipped every non-master BUILD since 2026-08-12, but Vercel still CREATES a deployment first and only then runs the ignore step — so each skipped preview still consumed one of the free tier's 100 deployments/day. That day the auto-resolve loop (every master merge pushes a fresh merge commit onto every open PR, and each push is a deployment) burned all 100, `vercel[bot]` answered `api-deployments-free-per-day` on PRs #432/#433, and PRODUCTION froze for three consecutive master pushes. Production never retries itself, so the dashboard silently served an hour-old build. `git.deploymentEnabled` is the lever that stops the deployment being created at all, so it never counts. The note this replaces claimed there is no wildcard: there is — Vercel matches these keys with minimatch, and where a branch matches several rules a deployment happens if ANY matching rule is true. Hence `**` false with `master` true: everything is off, master is explicitly back on. Keep BOTH keys — deploymentEnabled saves the quota, ignoreCommand still guards anything that slips through (a branch whose own vercel.json predates this rule).",
   "git": {
     "deploymentEnabled": {
       "**": false,
       "master": true
     }
   },
-  "//ignoreCommand": "Build ONLY master; skip every other branch. Belt and braces behind git.deploymentEnabled above. Nothing is lost by skipping preview builds: the generated branches only ever change JSON under platform/data/, and this repo verifies a PR with the QA workflow's headless render + visual + overflow audit, not by eye on a preview URL. NOTE THE INVERTED EXIT CODES, they are Vercel's and they are easy to get backwards: exit 1 CONTINUES the build, exit 0 SKIPS it. `github.enabled:false` was rejected: deprecated AND it disables the whole project including production. To preview a branch, temporarily add it to this test AND give it a `true` rule above.",
   "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" = \"master\" ]; then exit 1; else exit 0; fi",
   "redirects": [
-    { "source": "/rayong-province", "destination": "/rayong-catchment", "permanent": true }
+    {
+      "source": "/rayong-province",
+      "destination": "/rayong-catchment",
+      "permanent": true
+    }
   ],
   "headers": [
     {
       "source": "/data/(.*\\.json)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800" },
-        { "key": "Content-Type", "value": "application/json; charset=utf-8" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+        }
       ]
     }
   ]
