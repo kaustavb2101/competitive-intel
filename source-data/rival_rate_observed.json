@@ -7,9 +7,9 @@
   "not_wired_up": "Deliberately absent from tests/run.sh (network puller, not a deterministic --check build) and has no GitHub workflow here — scheduling is the owner's to add separately.",
   "pulled_at": "2026-08-16",
   "n_operators_in_plan": 23,
-  "n_read": 23,
-  "n_error": 0,
-  "n_no_rate_found": 1,
+  "n_read": 22,
+  "n_error": 1,
+  "n_no_rate_found": 3,
   "n_with_drift_vs_card": 7,
   "rate_url_missing": [],
   "requested_keys_not_found": [],
@@ -27,7 +27,7 @@
    "fetched_at": "2026-08-16",
    "status": "ok",
    "error": null,
-   "n_chars": 2479,
+   "n_chars": 2117,
    "quotes": [
     {
      "value": 14.99,
@@ -311,41 +311,13 @@
    "rate_url": "https://www.turbo.co.th/loans/car",
    "fetched_via": "browser",
    "fetched_at": "2026-08-16",
-   "status": "ok",
+   "status": "no_rate_found",
    "error": null,
-   "n_chars": 5270,
-   "quotes": [
-    {
-     "value": 0.68,
-     "unit": "pct_per_month",
-     "quote_th": "ดอกเบี้ยเริ่มต้น 0.68% ต่อเดือน",
-     "basis": null,
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 0.68,
-     "unit": "pct_per_month",
-     "quote_th": "0.68% ต่อเดือนโดยประมาณ",
-     "basis": null,
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 24.0,
-     "unit": "pct_per_year",
-     "quote_th": "*กู้เท่าที่จำเป็นและชำระคืนไหว อัตราดอกเบี้ย 15% - 24% ต่อปี เงื่อนไขและการพิจารณาสินเชื่อเป็นไปตามที่บริษัทฯ กำหนด",
-     "basis": null,
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    }
-   ],
+   "n_chars": 13,
+   "quotes": [],
    "quotes_truncated": false,
    "drift": {
-    "in_card": false,
+    "in_card": true,
     "lines": []
    }
   },
@@ -355,56 +327,13 @@
    "rate_url": "https://www.hengleasing.com/heng_hirepurchase/",
    "fetched_via": "http",
    "fetched_at": "2026-08-16",
-   "status": "ok",
-   "error": null,
-   "n_chars": 4443,
-   "quotes": [
-    {
-     "value": 14.45,
-     "unit": "pct_per_year",
-     "quote_th": "อัตราดอกเบี้ย (EIR) รถยนต์ใช้แล้ว ไม่เกิน 14.45% ต่อปี / รถจักรยานยนต์ ไม่เกิน 22.32% ต่อปี",
-     "basis": "effective",
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": 14.45
-    },
-    {
-     "value": 22.32,
-     "unit": "pct_per_year",
-     "quote_th": "อัตราดอกเบี้ย (EIR) รถยนต์ใช้แล้ว ไม่เกิน 14.45% ต่อปี / รถจักรยานยนต์ ไม่เกิน 22.32% ต่อปี",
-     "basis": "effective",
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": 22.32
-    }
-   ],
-   "quotes_truncated": false,
+   "status": "error",
+   "error": "HTTP Error 403: Forbidden",
+   "n_chars": null,
+   "quotes": [],
    "drift": {
-    "in_card": true,
-    "lines": [
-     {
-      "observed": 14.45,
-      "unit": "pct_per_year",
-      "card_range": [
-       14.45,
-       14.45
-      ],
-      "card_field": "สินเชื่อเฮงรถมือสอง (เช่าซื้อ).quoted",
-      "delta": 0.0,
-      "drift": false
-     },
-     {
-      "observed": 22.32,
-      "unit": "pct_per_year",
-      "card_range": [
-       20.75,
-       24.0
-      ],
-      "card_field": "เฮงเปลี่ยนรถเป็นเงิน.quoted",
-      "delta": 0.0,
-      "drift": false
-     }
-    ]
+    "in_card": false,
+    "lines": []
    }
   },
   {
@@ -845,7 +774,7 @@
    "fetched_at": "2026-08-16",
    "status": "no_rate_found",
    "error": null,
-   "n_chars": 2939,
+   "n_chars": 2247,
    "quotes": [],
    "quotes_truncated": false,
    "drift": {
@@ -1037,7 +966,7 @@
    "fetched_at": "2026-08-16",
    "status": "ok",
    "error": null,
-   "n_chars": 20175,
+   "n_chars": 20452,
    "quotes": [
     {
      "value": 6.75,
@@ -1215,7 +1144,7 @@
    "fetched_at": "2026-08-16",
    "status": "ok",
    "error": null,
-   "n_chars": 18394,
+   "n_chars": 18125,
    "quotes": [
     {
      "value": 0.27,
@@ -1499,156 +1428,14 @@
    "rate_url": "https://kkpauto.com/th/carquickcash",
    "fetched_via": "browser",
    "fetched_at": "2026-08-16",
-   "status": "ok",
+   "status": "no_rate_found",
    "error": null,
-   "n_chars": 3637,
-   "quotes": [
-    {
-     "value": 0.25,
-     "unit": "pct_per_month",
-     "quote_th": "เริ่มต้น 0.25% ต่อเดือน",
-     "basis": null,
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 0.25,
-     "unit": "pct_per_month",
-     "quote_th": "ดอกเบี้ยเริ่มต้น\t0.25% ต่อเดือน",
-     "basis": null,
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 0.25,
-     "unit": "pct_per_month",
-     "quote_th": "**อัตราดอกเบี้ยเริ่มต้น 0.25% ต่อเดือน หรือ 2.99% ต่อปี สำหรับลูกค้าที่ซื้อประกันภัยคุ้มครองสินเชื่อและเลือกระยะเวลาผ่อนไม่เกิน 60 งวด",
-     "basis": null,
-     "tenor_months": 60,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 2.99,
-     "unit": "pct_per_year",
-     "quote_th": "หรือ 2.99% ต่อปี**",
-     "basis": null,
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 2.99,
-     "unit": "pct_per_year",
-     "quote_th": "**อัตราดอกเบี้ยเริ่มต้น 0.25% ต่อเดือน หรือ 2.99% ต่อปี สำหรับลูกค้าที่ซื้อประกันภัยคุ้มครองสินเชื่อและเลือกระยะเวลาผ่อนไม่เกิน 60 งวด",
-     "basis": null,
-     "tenor_months": 60,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 2.99,
-     "unit": "pct_per_year",
-     "quote_th": "ตัวอย่าง เงินต้นที่ 150,000 บาท ระยะเวลาในการผ่อนชำระ 60 งวด กับอัตราดอกเบี้ยแบบคงที่ 2.99% ต่อปี คิดเป็นจำนวนเงินที่ต้องชำระทั้งสิ้น 172,425 บาท และหารเฉลี่ย 60 งวดเท่าๆ กัน เท่ากับงวดละ 3,075 บาท (รวม VAT) ทุกเดือนจนครบสัญญา",
-     "basis": "flat",
-     "tenor_months": 60,
-     "ltv_pct": null,
-     "effective_pct_year": 5.62
-    },
-    {
-     "value": 15.0,
-     "unit": "pct_per_year",
-     "quote_th": "อัตราดอกเบี้ยที่แท้จริง 5.65%-15.00% ต่อปี",
-     "basis": "effective",
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": 15.0
-    }
-   ],
+   "n_chars": 0,
+   "quotes": [],
    "quotes_truncated": false,
    "drift": {
     "in_card": true,
-    "lines": [
-     {
-      "observed": 0.25,
-      "unit": "pct_per_month",
-      "card_range": [
-       0.25,
-       0.25
-      ],
-      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).quoted_monthly",
-      "delta": 0.0,
-      "drift": false
-     },
-     {
-      "observed": 0.25,
-      "unit": "pct_per_month",
-      "card_range": [
-       0.25,
-       0.25
-      ],
-      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).quoted_monthly",
-      "delta": 0.0,
-      "drift": false
-     },
-     {
-      "observed": 0.25,
-      "unit": "pct_per_month",
-      "card_range": [
-       0.25,
-       0.25
-      ],
-      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).quoted_monthly",
-      "delta": 0.0,
-      "drift": false
-     },
-     {
-      "observed": 2.99,
-      "unit": "pct_per_year",
-      "card_range": [
-       2.99,
-       2.99
-      ],
-      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).quoted",
-      "delta": 0.0,
-      "drift": false
-     },
-     {
-      "observed": 2.99,
-      "unit": "pct_per_year",
-      "card_range": [
-       2.99,
-       2.99
-      ],
-      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).quoted",
-      "delta": 0.0,
-      "drift": false
-     },
-     {
-      "observed": 2.99,
-      "unit": "pct_per_year",
-      "card_range": [
-       2.99,
-       2.99
-      ],
-      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).quoted",
-      "delta": 0.0,
-      "drift": false
-     },
-     {
-      "observed": 15.0,
-      "unit": "pct_per_year",
-      "card_range": [
-       5.65,
-       15.0
-      ],
-      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).lender_effective",
-      "delta": 0.0,
-      "drift": false
-     }
-    ]
+    "lines": []
    }
   },
   {
@@ -1891,7 +1678,7 @@
    "fetched_at": "2026-08-16",
    "status": "ok",
    "error": null,
-   "n_chars": 9472,
+   "n_chars": 9464,
    "quotes": [
     {
      "value": 0.5,
