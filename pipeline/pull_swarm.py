@@ -193,19 +193,26 @@ FEEDS = [
     # acceptance test off app.bot.or.th (reportID 919, keyless). All three import only stdlib+urllib
     # (no openpyxl/pdfplumber). Their builders are --check-gated (tests/run.sh L199/L317/L307), so
     # rederive_drift.py rebuilds the crop-income / napprang / collateral layers on the next fresh pull.
-    #   DELIBERATELY NOT wired this pass (both need a clean end-to-end CI proof first, which this
-    #   sandbox could not give — do NOT blind-wire either):
-    #   * pull_bot_credit.py (source-data/bot_credit.json -> build_credit_anchor.py -> credit_anchor.json,
-    #     the MEASURED NPL/household-debt anchor). It parses the BoT Financial Stability Report PDF, so it
-    #     needs pdfplumber — which data-swarm.yml DOES install (L100, for investor_docs) — but its network
-    #     legs (app.bot.or.th report 984 + the FSR PDF download) could NOT be verified here: this sandbox's
-    #     pdfplumber -> pdfminer -> cryptography rust binding panics (a broken local install, not a puller
-    #     fault). RECHECK TRIGGER: a CI run where `python3 pull_bot_credit.py --stamp <today>` reaches
-    #     EXIT=0 with its acceptance test passing; then wire cadence="monthly".
-    #   * pull_bot_policy_rate.py (source-data/bot_policy_rate.json, macro-board gdp/rate-cap). It hits
-    #     www.bot.or.th (a DIFFERENT host than the cloud-verified app.bot.or.th) and parses an .xlsx, and
-    #     was not probed from CI this run. Next MPC meeting 2026-08-26 will move the rate, so it is worth
-    #     verifying — but only after a live CI pull proves www.bot.or.th is reachable from a datacenter IP.
+    #   DELIBERATELY NOT wired: pull_bot_credit.py (source-data/bot_credit.json ->
+    #   build_credit_anchor.py -> credit_anchor.json, the MEASURED NPL/household-debt anchor). It parses
+    #   the BoT Financial Stability Report PDF, so it needs pdfplumber — which data-swarm.yml DOES install
+    #   (L100, for investor_docs) — but its network legs (app.bot.or.th report 984 + the FSR PDF download)
+    #   could NOT be verified from this sandbox: pdfplumber -> pdfminer -> cryptography's rust binding
+    #   panics here (a broken local install, not a puller fault; re-confirmed 2026-08-16). RECHECK
+    #   TRIGGER: a CI run where `python3 pull_bot_credit.py --stamp <today>` reaches EXIT=0 with its
+    #   acceptance test passing; then wire cadence="monthly".
+    #   NOW WIRED (2026-08-16): pull_bot_policy_rate.py -> the bot_policy_rate entry below. The prior note
+    #   held it back "only after a live CI pull proves www.bot.or.th is reachable from a datacenter IP" —
+    #   that proof was obtained THIS run: www.bot.or.th served the MPC page + the dam .xlsx (HTTP 200,
+    #   NOT the app.bot.or.th host), the puller ran EXIT=0, passed its 4/4 anchor-meeting acceptance test,
+    #   and `--check` reproduced byte-exact offline. The next MPC meeting (2026-08-26) is the first rate
+    #   move it will now carry into the macro board automatically. openpyxl is installed by data-swarm.yml
+    #   (L100). build_macro_indicators.py folds bot_policy_rate.json (SRC_POLICY) and is --check-gated
+    #   (tests/run.sh L461), so rederive_drift.py rebuilds macro_indicators.json on the next fresh pull.
+    dict(key="bot_policy_rate", script="pull_bot_policy_rate.py", args=["--stamp", STAMP],
+         label="BoT policy interest rate — MPC decision history (macro-board policy-rate/rate-cap anchor)",
+         cadence="monthly", ip="any", group="macro", out="source-data/bot_policy_rate.json"),
+
     dict(key="oae_yield", script="pull_oae_yield.py", args=["--stamp", STAMP],
          label="OAE crop yield per rai for the 5 field crops (feeds crop_farmer_income)",
          cadence="weekly", ip="any", group="macro", out="source-data/oae_yield.json"),
