@@ -44,9 +44,18 @@ D = os.path.join(ROOT, "platform", "data")
 # where it is read on a big screen; in an inbox at 08:30 on a phone it is just hard to read.
 # Accent/gold/merch are the app's hues DARKENED to hold contrast on white (the dashboard values
 # are tuned against #0F1216 and go illegible on a light ground).
+#
+# INK is the one dark surface, and it is a MASTHEAD BAND, not a reading ground. The instruction
+# that produced this palette was that black body text on black is unreadable in a mail client,
+# which is true and is not an argument against a header carrying six words in 34px type. Every
+# line of actual content stays on white or on the near-white wash.
 BG, CARD, FG, DIM = "#F4F5F7", "#FFFFFF", "#1B1F27", "#5C6572"
-LINE = "#E3E6EB"
+WASH, LINE, INK = "#F4F5F7", "#E3E6EB", "#0B0E14"
 ACC, GOLD, MERCH, PD = "#3B5BD9", "#8A6206", "#12695C", "#A6332C"
+# Two tints that only ever appear ON the dark masthead (ACCLT, MUTED) or as a card ground
+# behind the undercut rows (PDWASH). Kept separate so nothing reaches for a lightened accent
+# on a white ground, where it would fail contrast.
+ACCLT, MUTED, PDWASH = "#8FA6FF", "#8B93A1", "#FDF4F3"
 
 
 def load(name):
@@ -284,22 +293,119 @@ def rows_html(items, render):
 
 
 def html(c):
-    def sec(title, body, note=""):
-        return ('<tr><td style="padding:18px 22px 4px">'
-                '<div style="font:600 13px/1.3 -apple-system,Segoe UI,Roboto,sans-serif;'
-                'color:%s;letter-spacing:.3px;text-transform:uppercase">%s</div>'
-                '%s</td></tr><tr><td style="padding:0 22px 6px">'
-                '<table width="100%%" cellpadding="0" cellspacing="0" style="font:14px/1.5 '
-                '-apple-system,Segoe UI,Roboto,sans-serif;color:%s">%s</table></td></tr>'
-                % (ACC, esc(title),
-                   ('<div style="font:12px/1.45 -apple-system,sans-serif;color:%s;margin-top:3px">%s</div>'
-                    % (DIM, note)) if note else "", FG, body))
+    """The email, built as a list of parts rather than one %-formatted page.
 
+    The previous version formatted the whole document through a single `%` operation, which
+    meant every literal `%` in CSS or in a lender's rate had to be doubled — and one missed
+    escape took the whole render down with an unrelated-looking ValueError. Joining a list has
+    no such failure mode, so a rate can be written as a rate.
+
+    EMAIL, NOT A WEB PAGE. Everything here is deliberately old-fashioned: tables for layout,
+    inline styles only, `bgcolor` alongside every CSS background, no flexbox, no grid, no web
+    font, no external asset. Outlook renders through Word's HTML engine and silently drops the
+    modern half of CSS; a design that needs any of it looks broken to the one reader who matters.
+    The bar charts are nested table cells with a background colour for exactly this reason —
+    they survive everywhere, including a client with images disabled.
+    """
     N = c["names"]
-    BD = "border-bottom:1px solid " + LINE
+    P = []                                          # the page, appended in order
+    FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif"
 
+    def sec(kicker, title, note=""):
+        """A section head: heavy title over a full-bleed accent rule."""
+        P.append(
+            '<tr><td style="padding:30px 26px 0">'
+            '<div style="font-family:%s;font-size:10px;font-weight:700;letter-spacing:1.6px;'
+            'text-transform:uppercase;color:%s">%s</div>'
+            '<div style="font-family:%s;font-size:21px;line-height:1.25;font-weight:800;'
+            'letter-spacing:-.3px;color:%s;padding-top:5px">%s</div>'
+            '</td></tr>'
+            '<tr><td style="padding:11px 26px 0"><table width="100%%" cellpadding="0" '
+            'cellspacing="0" border="0"><tr><td bgcolor="%s" height="3" style="height:3px;'
+            'line-height:3px;font-size:1px;background:%s">&nbsp;</td></tr></table></td></tr>'
+            % (FONT, ACC, esc(kicker), FONT, INK, esc(title), ACC, ACC))
+        if note:
+            P.append('<tr><td style="padding:11px 26px 0;font-family:%s;font-size:12px;'
+                     'line-height:1.55;color:%s">%s</td></tr>' % (FONT, DIM, note))
+
+    def block(body):
+        P.append('<tr><td style="padding:6px 26px 0"><table width="100%%" cellpadding="0" '
+                 'cellspacing="0" border="0" style="font-family:%s;font-size:14px;'
+                 'line-height:1.5;color:%s">%s</table></td></tr>' % (FONT, FG, body))
+
+    def empty(msg="Nothing new."):
+        return ('<tr><td style="padding:14px 0;font-family:%s;font-size:13px;color:%s">%s'
+                '</td></tr>' % (FONT, DIM, msg))
+
+    def chip(txt, fg, bg):
+        """A small pill. Rendered as an inline-block span with padding — the one modern-ish
+        thing Outlook does honour, and it degrades to plain coloured text if it does not."""
+        return ('<span style="display:inline-block;background:%s;color:%s;font-size:10px;'
+                'font-weight:700;letter-spacing:.7px;text-transform:uppercase;padding:2px 7px;'
+                'border-radius:3px;white-space:nowrap">%s</span>' % (bg, fg, esc(txt)))
+
+    def bar(pct, color):
+        """A horizontal bar made of two table cells. Works in every mail client there is."""
+        pct = max(2, min(100, int(round(pct))))
+        return ('<table width="100%%" cellpadding="0" cellspacing="0" border="0"><tr>'
+                '<td width="%d%%" bgcolor="%s" style="width:%d%%;height:9px;line-height:9px;'
+                'font-size:1px;background:%s;border-radius:2px">&nbsp;</td>'
+                '<td bgcolor="%s" style="height:9px;line-height:9px;font-size:1px;background:%s">'
+                '&nbsp;</td></tr></table>' % (pct, color, pct, color, WASH, WASH))
+
+    # ---------------------------------------------------------------- MASTHEAD
+    # The one dark surface in the email, and it is a header band rather than a reading ground:
+    # the owner's instruction was that black BODY text on black is unreadable in an inbox, which
+    # is right, and it is not an argument against a masthead carrying six words in 30px type.
+    P.append(
+        '<tr><td bgcolor="%s" style="background:%s;padding:26px 26px 24px">'
+        '<div style="font-family:%s;font-size:10px;font-weight:700;letter-spacing:2.4px;'
+        'text-transform:uppercase;color:%s">AutoX · เงินไชโย · Competitive intelligence</div>'
+        '<div style="font-family:%s;font-size:34px;line-height:1.05;font-weight:800;'
+        'letter-spacing:-1.1px;color:#FFFFFF;padding-top:10px">Rival pulse</div>'
+        '<div style="font-family:%s;font-size:14px;font-weight:600;color:%s;padding-top:7px">'
+        '%s</div>'
+        '<div style="font-family:%s;font-size:11px;line-height:1.5;color:%s;padding-top:12px">'
+        'Every date below is stamped by the source data, never by when this was sent.</div>'
+        '</td></tr>'
+        % (INK, INK, FONT, ACCLT, FONT, FONT, ACCLT, esc(c["asof"]), FONT, MUTED))
+
+    # ---------------------------------------------------------------- THE NUMBERS
+    # Four figures that answer "do I need to read this" before the reader scrolls at all.
+    ours = next((o for o in c["operators"]
+                 if o.get("key") == "AUTOX" or (o.get("name_th") or "").startswith("เงินไชโย")), None)
+    # "both" belongs on this ladder and excluding it flatters us badly. A lender marked `both`
+    # runs a ไม่โอนเล่ม product AND a โอนเล่ม one — CIMB, KKP, กรุงศรี, ttb, เงินให้ใจ, เงินติดล้อ
+    # and เฮงลิสซิ่ง are all in that group, and every one of them competes for the same borrower
+    # who wants to keep the book. Filtering to `title_loan` alone dropped seven rivals, six of
+    # them CHEAPER than us, and moved AutoX from 13th of 18 to 6th of 11. Only `hp_refinance`
+    # (โอนเล่ม-only) and `land` are genuinely a different product and stay out.
+    ladder = [o for o in c["operators"]
+              if o.get("loan_type") in ("title_loan", "both") and o.get("effective_lo") is not None]
+    ladder.sort(key=lambda o: o["effective_lo"])
+    rank = next((i + 1 for i, o in enumerate(ladder) if o is ours), None)
+
+    stats = [
+        ("%d" % (c["gap_meta"].get("n_checked") or 0), "operators<br>rate-checked", ACC),
+        ("%d" % len(c["gap_hits"]), "selling BELOW<br>their own card", PD),
+        ("%d" % (c["n_fresh_pricing"] or 0), "new pricing<br>ads", MERCH),
+        (("#%d" % rank) if rank else "—", "our price rank<br>of %d rivals" % len(ladder), GOLD),
+    ]
+    cells = "".join(
+        '<td width="25%%" align="center" valign="top" style="padding:0 4px">'
+        '<div style="font-family:%s;font-size:32px;line-height:1;font-weight:800;'
+        'letter-spacing:-1.2px;color:%s">%s</div>'
+        '<div style="font-family:%s;font-size:10px;line-height:1.35;font-weight:700;'
+        'letter-spacing:.8px;text-transform:uppercase;color:%s;padding-top:8px">%s</div></td>'
+        % (FONT, col, big, FONT, DIM, lab) for big, lab, col in stats)
+    P.append('<tr><td bgcolor="%s" style="background:%s;padding:22px 22px 20px;'
+             'border-bottom:1px solid %s">'
+             '<table width="100%%" cellpadding="0" cellspacing="0" border="0"><tr>%s</tr></table>'
+             '</td></tr>' % (WASH, WASH, LINE, cells))
+
+    # ---------------------------------------------------------------- FACEBOOK PROMOS
     def _fbrate(r):
-        """A promo rate, printed the way it was written plus every reading it could bear.
+        """A promo rate, printed as written plus every reading it could bear.
 
         Never one converted number: a post saying "0.60% ต่อเดือน" almost never says whether
         that is flat or reducing, and the two readings are ~2x apart. Publishing a single
@@ -309,188 +415,243 @@ def html(c):
                         "/เดือน" if r.get("quoted_unit") == "pct_per_month" else "/ปี")
         lo, hi = r.get("effective_if_reducing"), r.get("effective_if_flat")
         if r.get("basis"):
-            return "%s %s = %s%%/ปี effective" % (
-                q, esc(r["basis"]), fmt(hi if r["basis"] == "flat" else lo))
+            return chip("%s %s = %s%%/ปี eff" % (q, r["basis"],
+                                                 fmt(hi if r["basis"] == "flat" else lo)),
+                        "#FFFFFF", MERCH)
         if lo is None and hi is None:
-            return q
-        return ("%s <span style=\"color:%s\">· ไม่ระบุฐาน basis unstated → %s–%s%%/ปี effective"
-                "</span>" % (q, DIM, fmt(lo), fmt(hi)))
+            return chip(q, "#FFFFFF", MERCH)
+        return (chip(q, "#FFFFFF", MERCH) + ' <span style="font-family:%s;font-size:11px;'
+                'color:%s">ไม่ระบุฐาน basis unstated → %s–%s%%/ปี effective</span>'
+                % (FONT, DIM, fmt(lo), fmt(hi)))
 
-    fbpromo = rows_html(c["fb_promos"], lambda p: (
-        '<tr><td style="padding:9px 0;%s">'
-        '<b>%s</b> <span style="color:%s;font-size:11px">%s ที่แล้ว</span>%s<br>'
-        '<span style="color:%s;font-size:13px;line-height:1.55">%s</span>%s</td></tr>'
-        % (BD, esc(th(N, p.get("key"), p.get("name_th"))), DIM, esc(p.get("posted_ago") or "?"),
-           (' <span style="color:%s;font-size:11px">· ใหม่</span>' % GOLD)
-           if p.get("changed_since_last_run") else "",
-           FG, esc(" ".join((p.get("post") or "").split()))
-           # WE never truncate — the owner asked for full copy. But Facebook itself cuts every
-           # post at "ดูเพิ่มเติม" before the login wall, and an unexplained "..." reads as our
-           # doing. Say whose cut it is.
-           + ('<span style="color:%s;font-size:11px;white-space:nowrap"> '
-              '[Facebook cut it here]</span>' % DIM if p.get("post_truncated") else ""),
-           ('<div style="margin-top:4px;font-size:12px;color:%s">%s</div>'
-            % (MERCH, " · ".join(_fbrate(r) for r in p["rates"]))) if p.get("rates") else "")))
+    fb = "".join(
+        '<tr><td style="padding:15px 0;border-bottom:1px solid %s">'
+        '<div style="font-family:%s;font-size:16px;font-weight:800;color:%s;'
+        'letter-spacing:-.2px">%s <span style="font-size:11px;font-weight:600;color:%s;'
+        'letter-spacing:0">%s ที่แล้ว</span> %s</div>'
+        '%s'
+        '<div style="font-family:%s;font-size:13px;line-height:1.6;color:%s;padding-top:8px">'
+        '%s%s</div></td></tr>'
+        % (LINE, FONT, INK, esc(th(N, p.get("key"), p.get("name_th"))), DIM,
+           esc(p.get("posted_ago") or "?"),
+           chip("ใหม่", "#FFFFFF", GOLD) if p.get("changed_since_last_run") else "",
+           ('<div style="padding-top:9px">%s</div>'
+            % " ".join(_fbrate(r) for r in p["rates"])) if p.get("rates") else "",
+           FONT, FG, esc(" ".join((p.get("post") or "").split())),
+           # WE never truncate — the owner asked for full copy. Facebook itself cuts every post
+           # at "ดูเพิ่มเติม" before its login wall, and an unexplained "..." reads as our doing.
+           (' <span style="font-size:10px;color:%s;white-space:nowrap">[Facebook cut it here]'
+            '</span>' % DIM) if p.get("post_truncated") else "")
+        for p in c["fb_promos"])
+    sec("What they are selling today", "โปรโมชันล่าสุดบนเฟซบุ๊ก · Live promos on Facebook",
+        "%d of %d rival pages read, newest post first. This is what they are SELLING; the rate "
+        "board below is what they are PERMITTED to charge — KTC posted 0.60%%/month while its "
+        "own card said 12.99–24%%/yr. The two are never averaged. A monthly rate quoted with no "
+        "basis gets both readings, not a guess."
+        % ((c["fb_meta"].get("n_pages") or 0) - (c["fb_meta"].get("n_silent") or 0),
+           (c["fb_meta"].get("n_pages") or 0)))
+    block(fb or empty("No rival posted today."))
 
-    promo = rows_html(c["promos_new"], lambda p: (
-        '<tr><td style="padding:7px 0;%s">'
-        '<b>%s</b> <span style="color:%s">%s</span><br>'
-        '<span style="color:%s;font-size:13px">%s</span></td></tr>'
-        % (BD, esc(th(N, p.get("key"), p.get("brand"))), DIM, esc(p.get("kind") or ""),
-           FG, esc(p.get("title") or ""))))          # full title, no truncation
+    # ---------------------------------------------------------------- UNDERCUT CARDS
+    def _how(q):
+        """The channel and the conversion, in words a reader has not had to learn.
 
-    gone = rows_html(c["promos_gone"], lambda p: (
-        '<tr><td style="padding:7px 0;%s;color:%s">'
-        '<b style="color:%s">%s</b> — %s <span style="font-size:11px">(last seen %s)</span>'
-        '</td></tr>' % (BD, DIM, FG, esc(th(N, p.get("key"), p.get("brand"))),
-                        esc(p.get("title") or ""), esc(p.get("last_seen")))))
+        These fields are machine keys — `google_ads`, `as_quoted_per_year`, `flat_at_60m` — and
+        printing them raw makes a careful method look like a debug dump. The conversion actually
+        applied is the single most challengeable step on this card, so it is the last thing that
+        should read as jargon.
+        """
+        chan = {"google_ads": "Google Ads", "facebook": "Facebook"}.get(
+            q.get("channel"), (q.get("channel") or "—").replace("_", " "))
+        how = q.get("read_as") or ""
+        if how == "as_quoted_per_year":
+            how = "quoted per year, converted by nobody"
+        elif how.startswith("flat_at_"):
+            how = "read as flat over %s months" % how[8:].rstrip("m")
+        return "%s · %s" % (chan, how or "—")
 
-    # FULL ad copy, on the owner's instruction. A pricing creative truncated at 190 characters
-    # loses exactly the tail that matters — the tenor, the LTV cap and the fine print saying
-    # whether the rate is flat or reducing balance.
-    pricing = rows_html(c["fresh_pricing"], lambda a: (
-        '<tr><td style="padding:9px 0;%s">'
-        '<b>%s</b> <span style="color:%s;font-size:11px">first shown %s</span>%s<br>'
-        '<span style="color:%s;font-size:13px;line-height:1.55">%s</span></td></tr>'
-        % (BD, esc(th(N, a.get("key"), a.get("brand"))), DIM, esc(a.get("first")),
-           (' <span style="color:%s;font-size:11px">· %s</span>'
-            % (GOLD, esc(a["basis_kind"]))) if a.get("basis_kind") else "",
-           FG, esc(" ".join((a.get("copy") or "").split())))))
+    # The sharpest finding in the email, so it gets the loudest treatment: a red rail, a tinted
+    # card and the gap set larger than anything else on the page.
+    gaps = "".join(
+        '<tr><td style="padding-bottom:10px">'
+        '<table width="100%%" cellpadding="0" cellspacing="0" border="0" bgcolor="%s" '
+        'style="background:%s;border-radius:5px"><tr>'
+        '<td width="5" bgcolor="%s" style="width:5px;background:%s;border-radius:5px 0 0 5px">'
+        '&nbsp;</td>'
+        '<td style="padding:14px 16px">'
+        '<div style="font-family:%s;font-size:16px;font-weight:800;color:%s">%s</div>'
+        '<div style="font-family:%s;padding-top:9px">'
+        '<span style="font-size:30px;font-weight:800;letter-spacing:-1px;color:%s">%s</span>'
+        '<span style="font-size:12px;font-weight:700;color:%s"> จุดถูกกว่าการ์ดตัวเอง · '
+        'points below their own card</span></div>'
+        '<div style="font-family:%s;font-size:12px;color:%s;padding-top:7px">'
+        'การ์ด <b style="color:%s">%s%%/ปี</b> &nbsp;→&nbsp; ขายจริง '
+        '<b style="color:%s">%s%%/ปี</b></div>'
+        '<div style="font-family:%s;font-size:12px;line-height:1.55;color:%s;padding-top:9px;'
+        'font-style:italic">“%s”</div>'
+        '<div style="font-family:%s;font-size:10px;color:%s;padding-top:6px;'
+        'letter-spacing:.5px;text-transform:uppercase">Seen on %s</div>'
+        '</td></tr></table></td></tr>'
+        % (PDWASH, PDWASH, PD, PD, FONT, INK,
+           esc(th(N, r.get("key"), r.get("name_th"))),
+           FONT, PD, fmt(r.get("gap_pp")), DIM,
+           FONT, DIM, FG, fmt(r.get("card_floor")), PD, fmt(r.get("cheapest_promo_effective")),
+           FONT, FG, esc(" ".join(((r.get("quotes") or [{}])[0].get("context_th") or "").split())),
+           FONT, DIM, esc(_how((r.get("quotes") or [{}])[0])))
+        for r in c["gap_hits"])
+    sec("The card is not the price", "ขายถูกกว่าการ์ดตัวเอง · Selling below their own card",
+        "A published rate card is a CEILING, not a price. Deliberately conservative: a monthly "
+        "rate quoted with no basis is read as FLAT — the dearer reading — at the lender's own "
+        "maximum tenor, and only counts if even that lands %s points or more below the card. "
+        "Only %d of %d operators advertise with a rate at all, so an absent name means we hold "
+        "no promo QUOTE for them — never that their card was verified as their price."
+        % (fmt(c["gap_meta"].get("material_threshold_pp")),
+           c["gap_meta"].get("n_checked") or 0, c["n_universe"]))
+    block(gaps or empty("Nobody is currently advertising below their own published card."))
 
-    # The undercut rows carry BOTH numbers and the quote that proves the cheaper one, because
-    # the claim being made — "their card is not their price" — is only credible if the reader
-    # can see the rival's own words next to it.
-    gaps = rows_html(c["gap_hits"], lambda r: (
-        '<tr><td style="padding:9px 0;%s">'
-        '<b>%s</b> <span style="color:%s;font-size:11px">การ์ด %s%%/ปี → ขายจริง</span> '
-        '<b style="color:%s">%s%%/ปี</b> '
-        '<span style="color:%s;font-size:11px">ถูกกว่า %s จุด</span><br>'
-        '<span style="color:%s;font-size:12px;line-height:1.5">%s</span>'
-        '<span style="color:%s;font-size:11px"> · %s · อ่านแบบ %s</span></td></tr>'
-        % (BD, esc(th(N, r.get("key"), r.get("name_th"))), DIM, fmt(r.get("card_floor")),
-           PD, fmt(r.get("cheapest_promo_effective")), PD, fmt(r.get("gap_pp")),
-           FG, esc(" ".join(((r.get("quotes") or [{}])[0].get("context_th") or "").split())),
-           DIM, esc((r.get("quotes") or [{}])[0].get("channel") or "—"),
-           esc((r.get("quotes") or [{}])[0].get("read_as") or "—"))))
+    # ---------------------------------------------------------------- RATE LADDER
+    # Bars, because a 16-row column of numbers is a table nobody reads on a phone. Scaled to the
+    # dearest lender on the board so the bar lengths mean something rather than filling the row.
+    top = max([o["effective_lo"] for o in ladder] or [1])
+    rows = []
+    for o in ladder:
+        us = o is ours
+        rows.append(
+            '<tr><td style="padding:9px 0 0"><table width="100%%" cellpadding="0" '
+            'cellspacing="0" border="0"><tr>'
+            '<td style="font-family:%s;font-size:13px;font-weight:%s;color:%s;'
+            'padding-bottom:5px">%s%s</td>'
+            '<td align="right" style="font-family:%s;font-size:15px;font-weight:800;'
+            'color:%s;padding-bottom:5px;white-space:nowrap">%s%%%s</td>'
+            '</tr><tr><td colspan="2">%s</td></tr></table></td></tr>'
+            % (FONT, "800" if us else "600", INK if us else FG,
+               esc(o.get("name_th") or th(N, o.get("key"), o.get("operator"))),
+               (" " + chip("เรา", "#FFFFFF", GOLD)) if us else "",
+               FONT, GOLD if us else INK, fmt(o["effective_lo"]),
+               (' <span style="font-size:10px;font-weight:600;color:%s">LTV %s%%</span>'
+                % (DIM, o["ltv_pct"])) if o.get("ltv_pct") is not None else "",
+               bar(100.0 * o["effective_lo"] / top, GOLD if us else (
+                   MERCH if o.get("effective_source") in ("lender", "as_quoted") else ACC))))
+    sec("Where we sit", "ตารางอัตราดอกเบี้ย · The ไม่โอนเล่ม ladder",
+        "Effective %/yr on a reducing balance — the only basis on which these are comparable. "
+        "Borrower keeps the book (ไม่โอนเล่ม), cheapest first. Green = the lender's own "
+        "published effective figure; blue = converted by us from their flat quote; gold = us. "
+        "Includes every lender that runs a ไม่โอนเล่ม product, whether or not it also does "
+        "โอนเล่ม — a bank that offers both still competes for the same borrower. Pure "
+        "hire-purchase refinance and land-title lending are genuinely different products and "
+        "are left off.")
+    block("".join(rows) or empty("No comparable rate on the board."))
 
-    priced = [o for o in c["operators"] if o.get("effective_lo") is not None]
-    board = rows_html(priced, lambda o: (
-        '<tr><td style="padding:5px 0;%s">%s'
-        '<div style="color:%s;font-size:11px">%s</div></td>'
-        '<td align="right" style="padding:5px 0;%s;white-space:nowrap">'
-        '<b style="color:%s">%s</b></td>'
-        '<td align="right" style="padding:5px 0 5px 14px;%s;color:%s;white-space:nowrap">%s</td>'
-        '</tr>'
-        % (BD, esc(o.get("name_th") or th(N, o.get("key"), o.get("operator"))), DIM,
-           esc({"title_loan": "ไม่โอนเล่ม", "hp_refinance": "โอนเล่ม",
-                "both": "ทั้งสองแบบ"}.get(o.get("loan_type"), "")),
-           BD, MERCH if o.get("effective_source") in ("lender", "as_quoted") else GOLD,
-           ("%s%%" % o["effective_lo"]) if o.get("effective_lo") is not None else "—",
-           BD, DIM, ("LTV %s%%" % o["ltv_pct"]) if o.get("ltv_pct") is not None else "")))
+    # ---------------------------------------------------------------- NEW PRICING ADS
+    pricing = "".join(
+        '<tr><td style="padding:14px 0;border-bottom:1px solid %s">'
+        '<div style="font-family:%s;font-size:15px;font-weight:800;color:%s">%s '
+        '<span style="font-size:11px;font-weight:600;color:%s">first shown %s</span> %s</div>'
+        '<div style="font-family:%s;font-size:13px;line-height:1.6;color:%s;padding-top:7px">'
+        '%s</div></td></tr>'
+        % (LINE, FONT, INK, esc(th(N, a.get("key"), a.get("brand"))), DIM, esc(a.get("first")),
+           chip(a["basis_kind"], "#FFFFFF", MERCH) if a.get("basis_kind") else "",
+           FONT, FG, esc(" ".join((a.get("copy") or "").split())))
+        for a in c["fresh_pricing"])
+    sec("New creatives that compete on cost", "โฆษณาราคาใหม่ · New pricing ads",
+        "%d this cycle. Copy is shown IN FULL — the tail is where the tenor, the LTV cap and the "
+        "flat-or-reducing fine print live, which is exactly what a truncation removes."
+        % c["n_fresh_pricing"])
+    block(pricing or empty())
 
+    # ---------------------------------------------------------------- PROMO MOVEMENT
+    promo = "".join(
+        '<tr><td style="padding:10px 0;border-bottom:1px solid %s">'
+        '<b style="font-family:%s;font-size:14px;color:%s">%s</b> %s'
+        '<div style="font-family:%s;font-size:13px;color:%s;padding-top:4px">%s</div></td></tr>'
+        % (LINE, FONT, INK, esc(th(N, p.get("key"), p.get("brand"))),
+           chip(p.get("kind") or "promo", DIM, WASH), FONT, FG, esc(p.get("title") or ""))
+        for p in c["promos_new"])
+    sec("Straight from their own sites", "โปรโมชันใหม่ของคู่แข่ง · New rival promotions",
+        "Only listed once a dated first_seen proves it is genuinely new.")
+    block(promo or empty())
+
+    gone = "".join(
+        '<tr><td style="padding:10px 0;border-bottom:1px solid %s;font-family:%s;font-size:13px;'
+        'color:%s"><b style="color:%s">%s</b> — %s '
+        '<span style="font-size:11px">(last seen %s)</span></td></tr>'
+        % (LINE, FONT, DIM, FG, esc(th(N, p.get("key"), p.get("brand"))),
+           esc(p.get("title") or ""), esc(p.get("last_seen")))
+        for p in c["promos_gone"])
+    sec("Pulled", "โปรโมชันที่ถูกถอด · No longer listed",
+        "Never inferred — each carries the last date it was MEASURABLY still up.")
+    block(gone or empty())
+
+    # ---------------------------------------------------------------- SENTIMENT
     def num(v, suffix=""):
-        return ('<b>%s%s</b>' % (esc(v), suffix)) if v is not None else (
+        return ('<b style="color:%s">%s%s</b>' % (INK, esc(v), suffix)) if v is not None else (
             '<span style="color:#B6BCC6">—</span>')
 
     def subs(r):
         if r["subs"] is None:
             return '<span style="color:#B6BCC6">—</span>'
-        s = _subs_str(r["subs"])
         # A parent corporate channel is not the product's own audience — say so rather than
         # letting KrungsriAutoTV's 521k read as Car4Cash's following.
-        return '<b>%s</b>%s' % (esc(s), '<span style="color:%s;font-size:10px"> กลุ่ม</span>'
-                                % DIM if r["subs_parent"] else "")
+        return '<b style="color:%s">%s</b>%s' % (
+            INK, esc(_subs_str(r["subs"])),
+            '<span style="font-size:10px;color:%s"> กลุ่ม</span>' % DIM if r["subs_parent"] else "")
 
-    sentiment = rows_html(c["sentiment_board"], lambda r: (
-        '<tr><td style="padding:6px 0;%s">%s%s</td>'
-        '<td align="right" style="padding:6px 0;%s">%s</td>'
-        '<td align="right" style="padding:6px 0 6px 12px;%s">%s</td>'
-        '<td align="right" style="padding:6px 0 6px 12px;%s">%s</td>'
-        '<td align="right" style="padding:6px 0 6px 12px;%s">%s</td></tr>'
-        % (BD, esc(r["name"]),
-           ' <span style="color:%s;font-size:11px">เรา</span>' % GOLD if r["is_us"] else "",
-           BD, num(r["play"], "★"), BD, num(r["apple"], "★"),
-           BD, num("{:,}".format(r["pantip"]) if r["pantip"] is not None else None),
-           BD, subs(r))))
+    head = ('<tr>%s</tr>' % "".join(
+        '<td%s style="font-family:%s;font-size:9px;font-weight:700;letter-spacing:.9px;'
+        'text-transform:uppercase;color:%s;padding:0 0 7px%s">%s</td>'
+        % (al, FONT, DIM, pad, lab)
+        for al, pad, lab in ((""," ","แบรนด์"), (' align="right"'," ","Play"),
+                             (' align="right"'," 0 7px 12px","App&nbsp;Store"),
+                             (' align="right"'," 0 7px 12px","Pantip"),
+                             (' align="right"'," 0 7px 12px","YouTube"))))
+    sent = head + "".join(
+        '<tr><td style="font-family:%s;font-size:13px;font-weight:%s;color:%s;padding:7px 0;'
+        'border-bottom:1px solid %s">%s%s</td>'
+        '<td align="right" style="font-family:%s;font-size:13px;padding:7px 0;'
+        'border-bottom:1px solid %s">%s</td>'
+        '<td align="right" style="font-family:%s;font-size:13px;padding:7px 0 7px 12px;'
+        'border-bottom:1px solid %s">%s</td>'
+        '<td align="right" style="font-family:%s;font-size:13px;padding:7px 0 7px 12px;'
+        'border-bottom:1px solid %s">%s</td>'
+        '<td align="right" style="font-family:%s;font-size:13px;padding:7px 0 7px 12px;'
+        'border-bottom:1px solid %s">%s</td></tr>'
+        % (FONT, "800" if r["is_us"] else "600", INK if r["is_us"] else FG, LINE,
+           esc(r["name"]), (" " + chip("เรา", "#FFFFFF", GOLD)) if r["is_us"] else "",
+           FONT, LINE, num(r["play"], "★"), FONT, LINE, num(r["apple"], "★"),
+           FONT, LINE, num("{:,}".format(r["pantip"]) if r["pantip"] is not None else None),
+           FONT, LINE, subs(r))
+        for r in c["sentiment_board"])
+    sec("Who the market is talking about", "เสียงจากตลาด · Sentiment and share of voice",
+        "Play and App Store are MEASURED star averages; YouTube is a MEASURED subscriber count "
+        "(กลุ่ม = a parent corporate channel, not the product's own audience); Pantip is an "
+        "ESTIMATED thread count and leans high for every brand — the RANKING is the finding, "
+        "not the multiple. Ordered by Pantip volume. A dash means the brand is ABSENT from that "
+        "source, not silent on it — เงินให้ใจ ships no app, so it cannot appear in the two star "
+        "columns at all.")
+    block(sent)
 
-    sent_head = ('<tr><td style="padding:0 0 5px;color:%s;font-size:11px">แบรนด์</td>'
-                 '<td align="right" style="padding:0 0 5px;color:%s;font-size:11px">Play</td>'
-                 '<td align="right" style="padding:0 0 5px 12px;color:%s;font-size:11px">'
-                 'App&nbsp;Store</td>'
-                 '<td align="right" style="padding:0 0 5px 12px;color:%s;font-size:11px">'
-                 'Pantip</td>'
-                 '<td align="right" style="padding:0 0 5px 12px;color:%s;font-size:11px">'
-                 'YouTube</td></tr>' % (DIM, DIM, DIM, DIM, DIM))
-    sentiment = sent_head + sentiment
+    # ---------------------------------------------------------------- FOOTER
+    P.append(
+        '<tr><td bgcolor="%s" style="background:%s;padding:20px 26px;border-top:1px solid %s">'
+        '<div style="font-family:%s;font-size:11px;line-height:1.6;color:%s">'
+        '<b style="color:%s">%s of %s</b> tracked creatives state whether their rate is flat or '
+        'reducing balance. That is why an advertised headline is not comparable as printed, and '
+        'it is what the effective column fixes.</div></td></tr>'
+        % (WASH, WASH, LINE, FONT, DIM, INK, c["basis_stated"], c["basis_scanned"]))
 
-    # NO STANDING SUMMARY PARAGRAPH, on the owner's instruction (2026-08-16). It restated the
-    # field-wide band and the cheapest flat headline every single morning — figures that move
-    # perhaps twice a quarter — so it pushed the day's actual movement below the fold while
-    # saying nothing new. The rate board already carries both numbers for anyone who wants them.
-    lead = ""
-
-    return """<!doctype html><html><body style="margin:0;background:%s">
-<table width="100%%" cellpadding="0" cellspacing="0" style="background:%s;padding:20px 0">
-<tr><td align="center">
-<table width="640" cellpadding="0" cellspacing="0" style="max-width:640px;background:%s;
- border:1px solid %s;border-radius:10px;overflow:hidden">
-<tr><td style="padding:20px 22px 6px">
-  <div style="font:700 19px/1.25 -apple-system,Segoe UI,Roboto,sans-serif;color:%s">
-    Rival pulse — %s</div>
-  <div style="font:12px/1.5 -apple-system,sans-serif;color:%s;margin-top:5px">
-    AutoX / เงินไชโย competitive intelligence · every date below is stamped by the source data,
-    never by when this email was sent.</div>
-  %s
-</td></tr>
-%s%s%s%s%s%s%s
-<tr><td style="padding:14px 22px 20px;border-top:1px solid %s">
-  <div style="font:11px/1.55 -apple-system,sans-serif;color:%s">
-   %s of %s tracked creatives state whether their rate is flat or reducing balance, so an
-   advertised headline is not comparable as printed — that is what the effective column fixes.</div>
-</td></tr>
-</table></td></tr></table></body></html>""" % (
-        BG, BG, CARD, LINE, FG, esc(c["asof"]), DIM,
-        ('<div style="font:14px/1.55 -apple-system,sans-serif;color:%s;margin-top:12px;'
-         'padding:11px 13px;background:#F0F4FF;border-left:3px solid %s;border-radius:4px">%s</div>'
-         % (FG, MERCH, lead)) if lead else "",
-        sec("โปรโมชันล่าสุดบนเฟซบุ๊ก · Live promos on Facebook", fbpromo,
-            "%d of %d rival pages read today, newest post first. This is what they are "
-            "SELLING; the rate board below is what they are permitted to charge — KTC posted "
-            "0.60%%/month while its own card says 12.99–24%%/yr. The two are never averaged. "
-            "A monthly rate quoted with no basis gets both readings, not a guess."
-            # Pages are counted by SECTION, not by a "has a post" flag: a page that posted
-            # nothing is the `silent` section, so pages read = universe minus silent.
-            % ((c["fb_meta"].get("n_pages") or 0) - (c["fb_meta"].get("n_silent") or 0),
-               (c["fb_meta"].get("n_pages") or 0))),
-        sec("โปรโมชันใหม่ของคู่แข่ง · New rival promotions", promo,
-            "From the rivals' own sites. Only listed once a dated first_seen proves it is new."),
-        sec("โฆษณาราคาใหม่ · New pricing ads", pricing,
-            "Creatives that compete on cost, newest first — %d in total this cycle. Copy is "
-            "shown in full: the tail carries the tenor, the LTV cap and the flat-or-reducing "
-            "fine print." % c["n_fresh_pricing"]),
-        sec("ขายถูกกว่าการ์ดตัวเอง · Selling below their own published card", gaps,
-            "The rate board below is what each lender may lawfully charge. This is where the "
-            "promo they are running is materially cheaper than that — the card understates how "
-            "hard they are competing. Deliberately conservative: a monthly rate quoted with no "
-            "basis is read as FLAT (the dearer reading) at the lender's own maximum tenor, and "
-            "only counts if even that lands %s points or more below the card. %d of %d "
-            "operators advertise with a rate at all, so an absent name means we hold no promo "
-            "QUOTE for them — never that their card was verified as their price."
-            % (fmt(c["gap_meta"].get("material_threshold_pp")),
-               c["gap_meta"].get("n_checked") or 0, c["n_universe"])),
-        sec("ตารางอัตราดอกเบี้ย · Rate board", board,
-            "Effective %/yr, reducing balance. Green = the lender's own published figure, "
-            "gold = converted by us from their flat quote."),
-        sec("โปรโมชันที่ถูกถอด · Promotions no longer listed", gone,
-            "Never inferred — each carries the last date it was measurably still up."),
-        sec("เสียงจากตลาด · Sentiment and share of voice", sentiment,
-            "Play and App Store are MEASURED star averages; YouTube is a MEASURED subscriber "
-            "count (กลุ่ม = a parent corporate channel, not the product's own audience); Pantip "
-            "is an ESTIMATED thread count and leans high for every brand — the RANKING is the "
-            "finding, not the multiple. Ordered by Pantip volume: who the market is talking "
-            "about. A dash means the brand is absent from that source, not silent on it — "
-            "เงินให้ใจ ships no app, so it cannot appear in the two star columns at all."),
-        LINE, DIM, c["basis_stated"], c["basis_scanned"])
+    return ('<!doctype html><html><head><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<meta name="color-scheme" content="light only">'
+            '<meta name="supported-color-schemes" content="light only">'
+            '<title>Rival pulse</title></head>'
+            '<body style="margin:0;padding:0;background:%s;-webkit-text-size-adjust:100%%">'
+            '<table width="100%%" cellpadding="0" cellspacing="0" border="0" bgcolor="%s" '
+            'style="background:%s;padding:22px 0"><tr><td align="center">'
+            '<table width="660" cellpadding="0" cellspacing="0" border="0" bgcolor="%s" '
+            'style="max-width:660px;width:100%%;background:%s;border:1px solid %s;'
+            'border-radius:10px;overflow:hidden">%s</table>'
+            '</td></tr></table></body></html>'
+            % (WASH, WASH, WASH, CARD, CARD, LINE, "".join(P)))
 
 
 def text(c):
