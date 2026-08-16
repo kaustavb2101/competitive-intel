@@ -177,7 +177,12 @@ function newestPost(bodyText, pageName) {
         '"ดูเพิ่มเติม", plus follower and engagement counts. This is a movement signal, not a ' +
         'promo archive — do not read it as the operator\'s full promotions.',
     session: !!PROFILE,
-    n_pages: ops.length, n_with_post: ok, n_login_wall: walled,
+    // Counted over the STORE, not over this run's selection. --only SAK must not leave the
+    // file claiming the universe is one page wide; the store still holds all the others.
+    n_pages: Object.keys(store.pages).length,
+    n_with_post: Object.values(store.pages).filter(p => p.post).length,
+    n_login_wall: Object.values(store.pages).filter(p => p.login_wall).length,
+    n_read_this_run: ops.length, partial_run: !!ONLY,
     note: 'posted_ago is Facebook\'s own relative stamp, carried verbatim and NOT converted ' +
           'to a date: that conversion needs the wall clock, and every other date in this repo ' +
           'is copied from a field the source stamped.',

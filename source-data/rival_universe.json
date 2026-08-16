@@ -17,19 +17,15 @@
   "tier_note": "tier values: 'us' = AutoX; 'nonbank' and 'bank' = operators running a PHYSICAL branch network and therefore countable in per-branch rival density; 'broker' = online origination with no branches, tracked for narrative completeness ONLY and never counted as local competitive pressure. The bank-tier hire-purchase refinancers added in the 2026-08-16 widening run NO branch network of their own and so, like brokers, add nothing to per-branch rival density — they compete on price and channel, not on proximity.",
   "scope_note": "WIDENED 2026-08-16 from จำนำทะเบียน-only to EVERY operator that refinances a vehicle, on the owner's instruction ('basically everyone in the space of refinance of vehicles either through hire purchase OR title loan'). `loan_type` carries the distinction and it is not cosmetic: 'hp_refinance' operators take the registration book (โอนเล่ม) and advertise a FLAT rate, 'title_loan' operators leave it with the borrower (ไม่โอนเล่ม) and advertise REDUCING BALANCE. The two conventions are ~4x apart on the poster and about level on the cost of money, so mixing them without conversion is the central trap in reading this market. source-data/rival_rate_card.json holds the published rate cards; pipeline/rate_basis.py does the conversion.",
   "ad_search_note": "`ad_search_terms` is the PARENT LEGAL ENTITY each product-branded operator advertises under, used by pull_google_ads.py --discover. Without it a search for 'Car2Cash' or 'My Car My Cash' returns nothing and the operator is filed as having no Google advertiser account — a false measured absence. This is the same trap that hid เงินเทอร์โบ behind 'NGERNTURBO INSURANCE BROKER COMPANY LIMITED' until 2026-08-15. An empty discover result is only ever recorded as NO_ACCOUNT after the parent entity has been searched too.",
-  "rate_url_note": "MEASURED 2026-08-16 from a Thai residential IP. `rate_url` is the page on which that operator states its own interest rate, confirmed by reading the number off the page. `rate_fetch` is http where a plain fetch suffices and browser where the page is a JS shell or sits behind bot mitigation (KBank and KKP answer a plain fetch 403; a patched headless Chromium with a real user-agent gets 200). Operators with NO rate_url are not yet found and are listed in rate_url_missing rather than being given a guessed URL: SAK, GSB_MEETEE, KKP, WSOL_CARFINN, KBANK_RCD, CIMB_AUTO.",
+  "rate_url_note": "MEASURED 2026-08-16 from a Thai residential IP. `rate_url` is the page on which that operator states its own interest rate, confirmed by reading the number off the page. `rate_fetch` is http where a plain fetch suffices and browser where the page is a JS shell or sits behind bot mitigation (KBank and KKP answer a plain fetch 403; a patched headless Chromium with a real user-agent gets 200). Operators with NO rate_url are not yet found and are listed in rate_url_missing rather than being given a guessed URL: GSB_MEETEE, KKP, WSOL_CARFINN, KBANK_RCD.",
   "rate_url_missing": [
-   "SAK",
    "GSB_MEETEE",
    "KKP",
    "WSOL_CARFINN",
-   "KBANK_RCD",
-   "CIMB_AUTO"
+   "KBANK_RCD"
   ],
-  "fb_page_note": "MEASURED 2026-08-16. `fb_page` is the operator's Facebook slug, read off a link on their OWN website rather than guessed from the brand name — a guessed slug returns Facebook's 'content isn't available' page instead of failing, which is how the first pass silently got nothing for เงินติดล้อ (real slug ngerntidlor, not tidlor). `fb_page_is_product` is false where the page covers the whole company rather than the vehicle-loan product, so its posts and follower count must NOT be read as that product's share of voice. Without a logged-in session Facebook serves the page identity, follower and 'talking about' counts, and the single newest post truncated at 'ดูเพิ่มเติม' — enough for a daily movement signal, not enough for a promo archive. No page found for: SAK, TISCO_AC, CIMB_AUTO.",
+  "fb_page_note": "MEASURED 2026-08-16. `fb_page` is the operator's Facebook slug, read off a link on their OWN website rather than guessed from the brand name — a guessed slug returns Facebook's 'content isn't available' page instead of failing, which is how the first pass silently got nothing for เงินติดล้อ (real slug ngerntidlor, not tidlor). `fb_page_is_product` is false where the page covers the whole company rather than the vehicle-loan product, so its posts and follower count must NOT be read as that product's share of voice. Without a logged-in session Facebook serves the page identity, follower and 'talking about' counts, and the single newest post truncated at 'ดูเพิ่มเติม' — enough for a daily movement signal, not enough for a promo archive. No page found for: CIMB_AUTO.",
   "fb_page_missing": [
-   "SAK",
-   "TISCO_AC",
    "CIMB_AUTO"
   ]
  },
@@ -152,9 +148,13 @@
    "model": "MC/car title + land, North/Northeast",
    "footprint": "~1,000 branches (company IR)",
    "app_brand": "SAKSIAM",
-   "site": "saksiam.co.th",
+   "site": "saksiam.com",
    "promo_watch": false,
-   "note": "Regional density player; app barely rated (99 ratings)."
+   "note": "Regional density player; app barely rated (99 ratings).",
+   "rate_url": "https://saksiam.com/service/car",
+   "rate_fetch": "browser",
+   "fb_page": "saksiamofficial",
+   "fb_page_is_product": true
   },
   {
    "key": "MICRO",
@@ -438,8 +438,10 @@
    ],
    "promo_watch": false,
    "note": "TISCO attacks this market from BOTH sides and they are counted separately: this bank product, and สมหวัง เงินสั่งได้ (key SOMWANG), its 800-branch non-bank network. Only SOMWANG is countable in per-branch rival density.",
-   "rate_url": "https://www.tiscoautocash.com",
-   "rate_fetch": "browser"
+   "rate_url": "https://www.tisco.co.th/th/personal/loan/auto-loan.html",
+   "rate_fetch": "browser",
+   "fb_page": "TISCOFinancialGroup",
+   "fb_page_is_product": false
   },
   {
    "key": "KBANK_RCD",
@@ -479,7 +481,9 @@
     "CIMB"
    ],
    "promo_watch": false,
-   "note": "The most complete public rate disclosure in the market — it prints the monthly rate, its flat-per-year equivalent AND its reducing-balance-per-year equivalent for the same product. That triple is the evidence that this market's 'effective' is nominal (monthly x 12), not a compounded APR."
+   "note": "The most complete public rate disclosure in the market — it prints the monthly rate, its flat-per-year equivalent AND its reducing-balance-per-year equivalent for the same product. That triple is the evidence that this market's 'effective' is nominal (monthly x 12), not a compounded APR.",
+   "rate_url": "https://www.cimbthaiauto.com/product/autocash",
+   "rate_fetch": "browser"
   }
  ]
 }
