@@ -45,6 +45,8 @@ import os
 import re
 import sys
 
+import rate_basis
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IN = os.path.join(ROOT, "source-data", "google_ads_raw.json")
 # The hand-verified operator census. Read ONLY to name and tier the operators that do NOT
@@ -102,6 +104,10 @@ THEMES = [
 
 # A percentage anywhere in a copy line; the basis is read from the same line.
 PCT_RE = re.compile(r"(\d+(?:\.\d+)?)\s*%")
+# "อัตราดอกเบี้ย 12-24% ต่อปี" is a BAND, and a plain %-scan sees only the 24 — which publishes
+# a ceiling as though it were the offer, and made Tidlor read as the most expensive lender on
+# the board when its advertised floor is half that. Both endpoints are taken.
+PCT_RANGE_RE = re.compile(r"(\d+(?:\.\d+)?)\s*[-–—]\s*(\d+(?:\.\d+)?)\s*%")
 PER_MONTH = ("ต่อเดือน", "/เดือน", "ต่อ เดือน", "per month")
 PER_YEAR = ("ต่อปี", "/ปี", "ต่อ ปี", "per year", "ต่อปี*")
 RATE_CUE = ("ดอกเบี้ย", "interest", "อัตรา")
@@ -151,8 +157,20 @@ def rates_in(line, nxt=""):
             basis = "month"
         elif any(c in nxt for c in PER_YEAR):
             basis = "year"
-    out = []
+    out, spans = [], []
+    for m in PCT_RANGE_RE.finditer(line):
+        spans.append((m.start(), m.end()))
+        for g in (m.group(1), m.group(2)):
+            try:
+                v = float(g)
+            except ValueError:
+                continue
+            if 0 < v <= 60:
+                out.append({"value": v, "basis": basis})
     for m in PCT_RE.finditer(line):
+        # skip the ceiling already taken as the top of a band above
+        if any(s <= m.start() < e for s, e in spans):
+            continue
         try:
             v = float(m.group(1))
         except ValueError:
@@ -409,6 +427,18 @@ def build():
             a["name_th"] = info.get("name_th")
             a["tier"] = info.get("tier")     # bank / nonbank / broker / us — the feed splits on it
             a["is_us"] = key == OWN
+            # THE FINE PRINT. A rate is unreadable without these three: whether it is quoted
+            # flat or reducing-balance (a 4x difference on the same money), over what term, and
+            # against how much of the car's value. Read from the ad's own rate line first, then
+            # the rest of THIS creative — never another ad. `basis_kind` is None when the ad
+            # simply does not say, which is the overwhelmingly common case and is itself the
+            # finding: as advertised, these headline rates are not comparable to each other.
+            rate_line = " ".join(r["line"] for r in uniq)
+            a["basis_kind"] = (rate_basis.basis_kind_in(rate_line)
+                               or rate_basis.basis_kind_in(a["copy"]))
+            a["tenor_months"] = (rate_basis.tenor_in(rate_line)
+                                 or rate_basis.tenor_in(a["copy"]))
+            a["ltv_pct"] = rate_basis.ltv_in(a["copy"])
             ads.append(a)
 
         # advertised rates, kept per basis and never converted across bases

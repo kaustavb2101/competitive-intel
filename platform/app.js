@@ -2984,6 +2984,7 @@ function renderCompetition(){
   // iOS together, so the second call only re-entered the same guarded loader. It read like a separate
   // data path in every review of this file. Removed 2026-07-31.
   renderRivalPulse();
+  renderRateBoard();
   renderRivalAds();
   renderRivalVideo();
   renderPantip();
@@ -3697,6 +3698,203 @@ function drawRivalIos(){
       `<table class="tbl">${head}${rows(digital)}</table>`:'')+
       `<p class="sub" style="font-size:11px;margin-top:6px">${im.caveat||''}</p>`;
   }
+}
+
+/* ---------- RATE BOARD · every vehicle-refinance rival on ONE comparable basis ----------
+   Surfaces data/rate_board.json (build_rate_board.py). The tab already showed what rivals SAY;
+   this shows what they CHARGE, which needs the two Thai rate conventions reconciled first:
+   โอนเล่ม is quoted flat, ไม่โอนเล่ม is quoted reducing-balance, and the two are ~4x apart on
+   the poster for the same money. Everything is restated to nominal reducing-balance %/yr —
+   AutoX's own accrual basis — with the quoted headline kept beside it so nothing is hidden.
+   Provenance is per cell: a rate the lender published and one we derived are marked apart. */
+let RATEBOARD=null, rbLoaded=false;
+const RBF={type:'',tier:''};
+const RB_TYPE={title_loan:'Title loan (ไม่โอนเล่ม)',hp_refinance:'Hire purchase (โอนเล่ม)',
+               both:'Both',land:'Land deed',broker:'Broker'};
+function renderRateBoard(){
+  const el=$('#rbtbl'); if(!el) return;
+  if(rbLoaded){ drawRateBoard(); return; }
+  fetch('data/rate_board.json').then(r=>r.ok?r.json():null).then(j=>{
+    RATEBOARD=j; rbLoaded=true; drawRateBoard();
+  }).catch(()=>{ RATEBOARD=null; rbLoaded=true; drawRateBoard(); });
+}
+// How a restated rate was arrived at. This is the difference between "the lender says 10.99%"
+// and "we worked out 10.99% from their flat quote", and the table must never blur the two.
+const RB_SRC={
+  lender:['lender’s own published figure','var(--merch)','MEASURED'],
+  as_quoted:['already quoted reducing-balance — no conversion needed','var(--merch)','MEASURED'],
+  computed:['ESTIMATED — we converted the lender’s flat quote at the tenor shown','var(--gold)','EST']
+};
+function rbEff(o){
+  if(o.effective_lo==null){
+    // Nothing established. Show BOTH readings of its cheapest advertised quote rather than a
+    // dash — the ad simply never said which basis it meant, and that is the honest answer.
+    if(o.if_reducing==null) return '<span class="sub">—</span>';
+    return `<span style="color:var(--gold)" title="This operator's ads do not state whether the rate is flat or reducing balance, so it cannot be placed on this column. Both readings are shown.">`+
+           `${o.if_reducing}%<span class="sub"> if reducing</span> · ${o.if_flat}%<span class="sub"> if flat</span></span>`;
+  }
+  // Split by collateral, never blended. An operator running both variants prices them 5-10pp
+  // apart, and a single merged range would read as one erratically-priced lender while hiding
+  // the only line that matters: the ไม่โอนเล่ม one, which is the product we compete against.
+  const bc=o.by_collateral||{};
+  const one=(b,lbl,tip)=>{
+    if(!b) return '';
+    const [why,col]=RB_SRC[b.source]||['','var(--mid)'];
+    const band=(b.hi!=null&&b.hi!==b.lo)?`<span class="sub">–${b.hi}</span>`:'';
+    return `<div style="white-space:nowrap"><b style="color:${col}" title="${why}">${b.lo}${band}%</b>`+
+           (lbl?` <span class="sub" style="font-size:10px" title="${tip}">${lbl}</span>`:'')+`</div>`;
+  };
+  const parts=[
+    one(bc.no_transfer,'ไม่โอนเล่ม','Borrower keeps the registration book — the product AutoX competes against'),
+    one(bc.transfer,'โอนเล่ม','Registration book transfers to the lender, so the money is structurally cheaper — NOT our product'),
+    one(bc.unstated,'','The lender does not state which collateral variant this rate belongs to')
+  ].filter(Boolean);
+  return parts.length?parts.join(''):'<span class="sub">—</span>';
+}
+function rbQuoted(o){
+  if(o.quoted_lo==null) return '<span class="sub">—</span>';
+  const flat=o.quoted_basis==='flat';
+  return `<span class="mono">${o.quoted_lo}%</span> <span class="sub" style="color:${flat?'var(--gold)':'var(--dim)'}" `+
+         `title="${flat?'Quoted FLAT — interest charged on the full original principal for the whole term. Not comparable as printed.':'Quoted reducing balance — already comparable.'}">${flat?'flat':'red.bal'}</span>`;
+}
+function drawRateBoard(){
+  const box=$('#rbtbl'), ro=$('#rbreadout'), note=$('#rbnote'), ctl=$('#rbctl');
+  if(!box) return;
+  const all=(RATEBOARD&&Array.isArray(RATEBOARD.operators))?RATEBOARD.operators:[];
+  const m=(RATEBOARD&&RATEBOARD.meta)||{};
+  if(!all.length){
+    box.innerHTML=''; if(note) note.innerHTML=''; if(ctl) ctl.innerHTML='';
+    const d=$('#rbdetail'); if(d) d.innerHTML='';
+    if(ro) ro.innerHTML='<b>Rate board not yet built.</b> <span class="sub">data/rate_board.json is absent — run pipeline/build_rate_board.py.</span>';
+    return;
+  }
+  // ---- the answer, first ----
+  const est=all.filter(o=>o.effective_lo!=null);
+  const cheap=est[0];
+  // Our own comparable band comes from the builder, which takes it from the ไม่โอนเล่ม bucket
+  // ONLY. Deriving it here from loan_type would sweep in โอนเล่ม money from the operators that
+  // run both, and quote a market floor ~5pp below what anyone charges against our collateral.
+  const ours=m.comparable_effective;
+  const ltv=all.filter(o=>o.ltv_pct!=null).sort((a,b)=>b.ltv_pct-a.ltv_pct)[0];
+  const cf=m.cheapest_flat;
+  if(ro){
+    ro.innerHTML=`<b>Against our own collateral — <span title="ไม่โอนเล่ม: the borrower keeps the registration book, which is how AutoX lends">borrower keeps the book</span> — the field charges `+
+      `${ours?`${ours.lo}% to ${ours.hi}% a year effective`:'a band we have not established'}.</b> `+
+      `The cheapest money anywhere in the market is ${cheap?`<b>${cheap.effective_lo}%</b> (${cheap.operator})`:'not established'}, `+
+      `but that is <b>โอนเล่ม</b> money — the lender takes the book — so it is a different product, not an undercut. `+
+      (cf?`The lowest headline in the field is <b>${cf.quoted}% flat</b> (${cf.operator}) — which is <b>${cf.effective}% effective</b>, roughly double what the poster says. `:'')+
+      (ltv?`The most aggressive advance rate is <b>${ltv.operator} at ${ltv.ltv_pct}% of appraised value</b>. `:'')+
+      `<span class="sub">${m.n_operators||all.length} operators · ${m.n_published||0} offers from published rate cards, ${m.n_advertised||0} read off live ads.</span>`;
+  }
+  // ---- filters ----
+  if(ctl&&!ctl.dataset.init){
+    ctl.dataset.init='1';
+    const mk=(k,v,lbl,t)=>`<span class="chip" data-k="${k}" data-v="${v}" title="${t||''}">${lbl}</span>`;
+    ctl.innerHTML=mk('type','','All products')+
+      mk('type','title_loan','Title loan · ไม่โอนเล่ม','Keeps the registration book with the borrower — the AutoX-comparable product')+
+      mk('type','hp_refinance','Hire purchase · โอนเล่ม','Registration book transfers to the lender — advertised flat')+
+      mk('tier','bank','Banks')+mk('tier','nonbank','Non-bank')+
+      `<span class="chip" data-act="csv" title="Download this table as CSV">⬇ CSV</span>`;
+    ctl.addEventListener('click',e=>{
+      const c=e.target.closest('.chip'); if(!c) return;
+      if(c.dataset.act==='csv'){ rbCSV(); return; }
+      const k=c.dataset.k; RBF[k]=(RBF[k]===c.dataset.v)?'':c.dataset.v;
+      drawRateBoard();
+    });
+  }
+  if(ctl) Array.prototype.forEach.call(ctl.querySelectorAll('.chip'),c=>{
+    if(c.dataset.act) return;
+    const on=RBF[c.dataset.k]===c.dataset.v;
+    c.style.borderColor=on?'var(--acc)':''; c.style.color=on?'var(--hi)':'';
+  });
+  const rows=all.filter(o=>
+    (!RBF.type||o.loan_type===RBF.type||(RBF.type&&o.loan_type==='both'))&&
+    (!RBF.tier||o.tier===RBF.tier));
+  // ---- the table ----
+  box.innerHTML=`<table class="tbl"><tr>
+      <th scope="col">Operator</th>
+      <th scope="col" title="What the operator lends: title loan keeps the registration book with the borrower, hire purchase transfers it">Product</th>
+      <th scope="col" title="THE COMPARABLE COLUMN. Every rate restated to nominal reducing-balance %/yr — monthly x12, never compounded, which is how our own book accrues. Green = the lender's own published figure. Gold = we converted it from their flat quote.">Effective %/yr</th>
+      <th scope="col" title="The number the operator actually prints. A flat quote is not comparable to a reducing-balance one as printed — that is what the column to the left fixes.">As quoted</th>
+      <th scope="col" title="Highest loan-to-value the operator claims, as a % of appraised vehicle value. Above 100% means it lends more than the car is worth.">Max LTV</th>
+      <th scope="col" title="Longest repayment term the operator advertises">Max term</th>
+      <th scope="col" title="Where these numbers come from">Source</th></tr>`+
+    rows.map(o=>{
+      const us=o.is_us;
+      const src=o.source==='published'?`<span class="sub" title="Transcribed from the lender's own published rate card${o.citation?' — '+o.citation:''}">rate card</span>`
+        :o.source==='ads'?'<span class="sub" title="Read off the operator’s live ad creatives — it publishes no standing rate card">its ads</span>'
+        :'<span class="sub">card + ads</span>';
+      const conf=o.confidence==='low'?' <span class="tag" style="color:var(--gold);border:1px solid var(--gold)" title="Not directly verified — the lender’s page is unreachable from here. Treat as indicative.">UNVERIFIED</span>':'';
+      return `<tr${us?' style="background:rgba(230,180,80,.06)"':''}>
+        <td><b${us?' style="color:var(--gold)"':''}>${o.operator}</b>${conf}<div class="sub" style="font-size:11px">${o.name_th||''}${o.owner?' · '+o.owner:''}</div></td>
+        <td class="sub">${RB_TYPE[o.loan_type]||'—'}</td>
+        <td>${rbEff(o)}</td>
+        <td>${rbQuoted(o)}</td>
+        <td class="mono">${o.ltv_pct!=null?o.ltv_pct+'%':'<span class="sub">—</span>'}</td>
+        <td class="mono">${o.tenor_max?o.tenor_max+' mo':'<span class="sub">—</span>'}</td>
+        <td>${src}</td></tr>`;
+    }).join('')+`</table>`;
+  if(note){
+    const stated=m.n_creatives_basis_stated||0, scanned=m.n_creatives_scanned||0;
+    note.innerHTML=`<b>Read the basis before the number.</b> Of ${scanned.toLocaleString()} rival creatives tracked in the last 90 days, `+
+      `<b>${stated}</b> state whether the rate they quote is flat or reducing balance. So an advertised headline, as advertised, `+
+      `is not comparable to another advertiser's or to our book — which is why the published bank rate cards are carried `+
+      `separately and why an operator whose ads never say sits in gold above, showing both readings rather than a guess. `+
+      `Conversion: ${m.conversion||''} Card verified ${m.asof_card||'—'}; ads pulled ${m.asof_ads||'—'}.`;
+  }
+  drawRateDetail();
+  wrapTables();
+}
+function drawRateDetail(){
+  const box=$('#rbdetail'); if(!box) return;
+  const rows=(RATEBOARD&&Array.isArray(RATEBOARD.rows))?RATEBOARD.rows:[];
+  if(!rows.length){ box.innerHTML=''; return; }
+  box.innerHTML=`<table class="tbl"><tr><th scope="col">Operator</th><th scope="col">Variant</th>
+      <th scope="col">Collateral</th><th scope="col">Quoted</th><th scope="col">Effective %/yr</th>
+      <th scope="col">Term</th><th scope="col">LTV</th><th scope="col">The lender’s own words</th></tr>`+
+    rows.map(r=>{
+      const q=r.quoted||{}, e=r.effective;
+      const qs=q.lo==null?'—':`${q.lo}%${q.hi!=null?'–'+q.hi+'%':''} <span class="sub">${q.basis==='flat'?'flat':q.basis==='effective'?'red.bal':'basis not stated'}</span>`;
+      let es='<span class="sub">—</span>';
+      if(e&&e.lo!=null){
+        const [why,col]=RB_SRC[e.source]||['','var(--mid)'];
+        es=`<span style="color:${col}" title="${why}">${e.lo}%${e.hi!=null?'–'+e.hi+'%':''}`+
+           (e.source==='computed'?`<span class="sub"> conv. @${e.at_months}mo${r.tenor_assumed?', term assumed':''}</span>`:'')+`</span>`;
+      }else if(r.effective_if_reducing!=null){
+        es=`<span style="color:var(--gold)" title="The ad does not state its basis, so both readings are shown">${r.effective_if_reducing}% <span class="sub">if red.bal</span> · ${r.effective_if_flat}% <span class="sub">if flat</span></span>`;
+      }
+      const col={transfer:'โอนเล่ม — book transfers',no_transfer:'ไม่โอนเล่ม — borrower keeps it',
+                 unstated:'not stated'}[r.collateral]||'—';
+      const cite=r.citation?` <a href="${r.citation}" target="_blank" rel="noopener" class="sub">source</a>`:'';
+      return `<tr><td><b>${r.operator}</b><div class="sub" style="font-size:11px">${r.source==='published'?'rate card':'advertised'+(r.last_seen?' · seen '+r.last_seen:'')}</div></td>
+        <td class="sub">${r.variant||(r.n_ads?r.n_ads+' ad'+(r.n_ads>1?'s':''):'—')}</td>
+        <td class="sub">${col}</td><td>${qs}</td><td>${es}</td>
+        <td class="mono sub">${r.tenor_max?r.tenor_max+' mo':'—'}</td>
+        <td class="mono sub">${r.ltv_pct!=null?r.ltv_pct+'%':'—'}</td>
+        <td class="sub" style="font-size:11px;max-width:340px">${(r.quote_th||'—')}${cite}</td></tr>`;
+    }).join('')+`</table>`;
+}
+function rbCSV(){
+  const rows=(RATEBOARD&&Array.isArray(RATEBOARD.rows))?RATEBOARD.rows:[];
+  if(!rows.length) return;
+  const hdr=['operator','name_th','owner','tier','loan_type','source','variant','collateral',
+             'quoted_lo','quoted_hi','quoted_basis','effective_lo','effective_hi',
+             'effective_source','effective_at_months','tenor_max','ltv_pct','max_baht',
+             'quote_th','citation','confidence','last_seen'];
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const body=rows.map(r=>{
+    const qq=r.quoted||{}, e=r.effective||{};
+    return [r.operator,r.name_th,r.owner,r.tier,r.loan_type,r.source,r.variant,r.collateral,
+            qq.lo,qq.hi,qq.basis,e.lo,e.hi,e.source,e.at_months,r.tenor_max,r.ltv_pct,
+            r.max_baht,r.quote_th,r.citation,r.confidence,r.last_seen].map(q).join(',');
+  });
+  // The BOM is what makes Excel open the Thai verbatim quotes as Thai rather than mojibake.
+  const blob=new Blob(['﻿',hdr.map(q).join(',')+'\n',body.join('\n')],
+                      {type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='autox_rate_board_'+(((RATEBOARD&&RATEBOARD.meta)||{}).asof_card||'latest')+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 
 /* ---------- rival PAID ADS · Google Ads Transparency Center (obj #2, MEASURED) ----------

@@ -148,6 +148,42 @@ EXCLUDED = {
                                                 "rental firms across the whole country."),
 }
 
+# DISCOVERED BUT NOT YET VETTED — deliberately NOT pinned.
+#
+# The 2026-08-16 widening added the bank refinancers (SCB My Car My Cash, UOB Car2Cash, ttb,
+# CIMB, KBank, TISCO). A first --discover found nothing for any of them, because it searched
+# only their PRODUCT names; banks advertise under the bank's legal entity. Re-running with
+# `ad_search_terms` (the parent entity, now carried in rival_universe.json) found a real
+# account for every one of them — so "no account" had been a false negative six times over.
+#
+# They are still not pinned, because a bank's main advertiser account markets deposits, credit
+# cards, mortgages and mutual funds, and only incidentally a car loan. Pinning KBank's
+# 2,533-creative account for the sake of รถช่วยได้ would bury every rival's pricing signal
+# under unrelated bank marketing — the same mistake already made and reverted with MTC_LIFE
+# (Muang Thai LIFE INSURANCE, 700-800 ads).
+#
+# Vetting needs the creative COPY, and the 2026-08-16 attempt read 0 of 13 accounts: Google
+# returned no payload for any creative from this laptop's IP, which has been degraded all week
+# (~13% capture vs 88-90% on 2026-07-30). That is a limit on us, not a finding about them, so
+# the honest state is "found, unjudged". Vet from CI's fresh IP, then move each id into
+# ADVERTISERS with a note or into EXCLUDED with the reason.
+CANDIDATES = {
+    "SCB_MCMC":  [("AR03082259262517280769", "บริษัท ธนาคารไทยพาณิชย์ จำกัด (มหาชน)", "1 ad")],
+    "UOB_C2C":   [("AR16342850031616786433", "บริษัท ธนาคารยูโอบี จำกัด (มหาชน)", "48 ads"),
+                  ("AR04453538759878639617", "ธนาคารยูโอบี จำกัด (มหาชน)", "8 ads")],
+    "TTB_CYC":   [("AR17320724354459238401", "ธนาคารทหารไทยธนชาต จำกัด (มหาชน)", "200-300 ads"),
+                  ("AR18267852466718507009", "ธนาคารทหารไทยธนชาต จำกัด (มหาชน)", "100-200 ads"),
+                  ("AR17118302322460459009", "ธนาคารทหารไทยธนชาต จำกัด (มหาชน)", "66 ads")],
+    "CIMB_AUTO": [("AR09542472438906880001", "CIMB Thai Bank Public Company Limited", "100-200 ads"),
+                  ("AR13611919918546026497", "ธนาคาร ซีไอเอ็มบี ไทย จำกัด (มหาชน)", "98 ads")],
+    "KBANK_RCD": [("AR01825907575258873857", "ธนาคารกสิกรไทย จำกัด (มหาชน)", "2000-3000 ads"),
+                  ("AR13501192380300132353", "ธนาคารกสิกรไทย จำกัด (มหาชน)", "1000-2000 ads"),
+                  ("AR12328894354075680769", "ธนาคารกสิกรไทย จำกัด (มหาชน)", "100-200 ads")],
+    "TISCO_AC":  [("AR00262835230962876417", "TISCO Bank Public Company Limited", "5 ads")],
+    "KKP":       [("AR15900838128093495297", "KKP Dime Securities Company Limited", "200-300 ads — "
+                   "the SECURITIES arm, so this is probably an investing account, not รถเรียกเงิน")],
+}
+
 # Operators checked with --discover and found to have NO advertiser account in Thailand. A
 # lender with no paid Google presence is a real competitive finding, so it is carried into the
 # output and rendered — but ONLY add a key here after a clean, non-throttled --discover run,
@@ -318,6 +354,14 @@ def discover_queries():
         if not key:
             continue
         terms = []
+        # A bank advertises under its BANK name, not its product's. Searching only "Car2Cash"
+        # or "My Car My Cash" returns nothing and the operator is filed as having no advertiser
+        # account — a false measured absence, and the same trap that hid Ngern Turbo behind
+        # "NGERNTURBO INSURANCE BROKER COMPANY LIMITED". `ad_search_terms` in the census carries
+        # the parent entity's name so the product-branded operators are actually findable.
+        for t in (o.get("ad_search_terms") or []):
+            if t and t not in terms:
+                terms.append(t)
         for t in (o.get("name_th"), o.get("name_en"), o.get("app_brand")):
             if t and t not in terms:
                 terms.append(t)
