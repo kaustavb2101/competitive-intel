@@ -2984,6 +2984,8 @@ function renderCompetition(){
   // iOS together, so the second call only re-entered the same guarded loader. It read like a separate
   // data path in every review of this file. Removed 2026-07-31.
   renderRivalPulse();
+  renderRivalFacebook();
+  renderPromoGap();
   renderRateBoard();
   renderRivalAds();
   renderRivalVideo();
@@ -4817,6 +4819,187 @@ function drawRivalPulse(){
   // via innerHTML AFTER boot, so the boot-time wrapTables() never reached them — an unwrapped wide
   // .tbl pushes the whole #acq route sideways on mobile. Re-run the idempotent wrapper here (it
   // skips tables already inside a .tblwrap) so every promo table scrolls inside its own box.
+  wrapTables();
+}
+
+/* ---------- Facebook pulse · what rivals are posting RIGHT NOW (obj #2, MEASURED) ----------
+   Surfaces data/rival_facebook.json (build_rival_facebook.py, from pull_rival_facebook.js — an
+   ANONYMOUS read of each operator's own Facebook page, no login). Kaustav, 2026-08-16:
+   "facebook is always the promo." A published rate card is the BoT-mandated disclosure — the
+   legal CEILING; the newest Facebook post is what the operator is winning customers with this
+   week. THIS SECTION MUST RENDER ABOVE THE RATE BOARD — that ordering is deliberate, not
+   incidental, and the two are never averaged into one figure.
+
+   Three rules this rendering must hold, all owner-stated:
+     1. A promo quoting a bare monthly rate has no stated basis — show BOTH
+        effective_if_reducing and effective_if_flat, labelled "basis unstated". Only collapse to
+        one figure when the row's own `basis` field is non-null (the post said which convention).
+     2. Facebook truncates every post at "ดูเพิ่มเติม" (`post_truncated`) — label that as
+        Facebook's own cut, never render an unexplained "...".
+     3. `followers_are_product_audience:false` marks a corporate/bank page — its follower count
+        is never a vehicle-loan share-of-voice number, and its posts are kept in a separate
+        `corporate` list rather than ranked among on-product promos.
+   Blanks stay visible: `silent` (no post captured this run) is rendered, not hidden — a
+   coverage fact, not something to suppress. Lazy, null-safe, graceful if absent. */
+let RIVFB=null, rivfbLoaded=false;
+function renderRivalFacebook(){
+  const host=$('#fbpromolist'); if(!host) return;
+  if(rivfbLoaded){ drawRivalFacebook(); return; }
+  fetch('data/rival_facebook.json').then(r=>r.ok?r.json():null).then(j=>{
+    RIVFB=j; rivfbLoaded=true; drawRivalFacebook();
+  }).catch(()=>{ RIVFB=null; rivfbLoaded=true; drawRivalFacebook(); });
+}
+// One rate line for a Facebook post's rates[] entry. basis stated -> ONE figure, labelled with
+// the stated convention. basis null -> BOTH readings, labelled "basis unstated" (rule #1 above).
+function fbRateHTML(r){
+  const q=`<span class="sub">(quoted ${r.quoted_pct}% ${r.quoted_unit==='pct_per_month'?'ต่อเดือน':'ต่อปี'})</span>`;
+  if(r.basis){
+    const lbl=r.basis==='flat'?'flat, as stated':'reducing balance, as stated';
+    return `<div class="mono" style="color:var(--gold)"><b>${r.annualised_pct}%</b><span class="sub">/yr — ${lbl}</span> ${q}</div>`;
+  }
+  return `<div class="mono" style="color:var(--gold)">basis unstated: <b>${r.effective_if_reducing}%</b><span class="sub">/yr if reducing</span> · `+
+         `<b>${r.effective_if_flat}%</b><span class="sub">/yr if flat</span> ${q}</div>`;
+}
+function fbPostCard(p){
+  const own=p.key==='AUTOX';
+  const KINDC={pricing:'var(--gold)',offer:'var(--merch)',brand:'var(--dim)',none:'var(--dim)'};
+  const KINDL={pricing:'pricing',offer:'offer',brand:'brand',none:'no post'};
+  const kc=KINDC[p.kind]||'var(--dim)', kl=KINDL[p.kind]||p.kind||'—';
+  const chg=p.changed_since_last_run?' <span class="tag" style="color:var(--gold);border:1px solid var(--gold)" title="This page\'s post changed since the previous pull">NEW POST</span>':'';
+  const naud=(p.followers_are_product_audience===false)
+    ?` <span class="sub" title="This page covers the whole bank, not the vehicle-loan product — its follower count is NOT this product's share of voice">· not product audience</span>`:'';
+  const foll=p.followers_text?`<span class="mono">${escHtml(p.followers_text)}</span> followers${naud}`:'<span class="sub">no follower count</span>';
+  const talk=p.talking_about?` <span class="sub">· ${escHtml(p.talking_about)} talking about this</span>`:'';
+  const trunc=p.post_truncated?` <span class="sub" title="Facebook itself cuts every post here at &quot;ดูเพิ่มเติม&quot; before we ever read it — this is Facebook's truncation, not ours">…(cut by Facebook)</span>`:'';
+  const postHTML=p.post
+    ?`<blockquote class="pq" lang="th">${escHtml(p.post)}${trunc}</blockquote>`
+    :'<p class="sub" style="margin:4px 0 0">No post text captured this run.</p>';
+  const rates=(p.rates||[]).length?`<div style="margin-top:4px">${p.rates.map(fbRateHTML).join('')}</div>`:'';
+  return `<div class="qgrp" style="margin:12px 0 0;padding-bottom:10px;border-bottom:1px solid var(--line2)">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;align-items:baseline">
+      <div><b${own?' style="color:var(--gold)"':''} lang="th">${escHtml(p.name_th)}</b> <span class="sub mono">${p.key}</span>`+
+        (own?' <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">US</span>':'')+
+        ` <span class="tag" style="color:${kc};border:1px solid ${kc}">${kl}</span>${chg}</div>
+      <div class="sub">${p.posted_ago?escHtml(p.posted_ago)+' ago':'—'}${p.url?` · <a href="${p.url}" target="_blank" rel="noopener">page<span class="sr-only"> (opens in a new tab)</span></a>`:''}</div>
+    </div>
+    <div class="sub" style="margin-top:2px;font-size:11px">${foll}${talk}</div>
+    ${postHTML}
+    ${rates}
+  </div>`;
+}
+function fbSilentRow(p){
+  return `<div class="sub" style="padding:5px 0;border-bottom:1px solid var(--line2)"><b lang="th">${escHtml(p.name_th)}</b> `+
+    `<span class="mono">${p.key}</span> — no post captured this run`+
+    `${p.url?` · <a href="${p.url}" target="_blank" rel="noopener">page<span class="sr-only"> (opens in a new tab)</span></a>`:''}</div>`;
+}
+function drawRivalFacebook(){
+  const ro=$('#fbreadout'), plist=$('#fbpromolist'), corpList=$('#fbcorplist'), corpCount=$('#fbcorpcount'),
+        silentList=$('#fbsilentlist'), silentCount=$('#fbsilentcount');
+  if(!plist) return;
+  const promos=(RIVFB&&Array.isArray(RIVFB.promos))?RIVFB.promos:[];
+  const corp=(RIVFB&&Array.isArray(RIVFB.corporate))?RIVFB.corporate:[];
+  const silent=(RIVFB&&Array.isArray(RIVFB.silent))?RIVFB.silent:[];
+  const m=(RIVFB&&RIVFB.meta)||{};
+  if(!promos.length&&!corp.length&&!silent.length){
+    plist.innerHTML=''; if(corpList) corpList.innerHTML=''; if(silentList) silentList.innerHTML='';
+    if(corpCount) corpCount.textContent='0'; if(silentCount) silentCount.textContent='0';
+    if(ro) ro.innerHTML='<b>Facebook pulse not yet pulled.</b> <span class="sub">data/rival_facebook.json is absent — run pipeline/pull_rival_facebook.js then pipeline/build_rival_facebook.py.</span>';
+    return;
+  }
+  const pricing=promos.filter(p=>p.kind==='pricing');
+  if(ro){
+    ro.innerHTML=`<b>${pricing.length?`${pricing.length} of ${promos.length} live product post${promos.length===1?'':'s'} name a rate right now`:`None of the ${promos.length} live product post${promos.length===1?'':'s'} name a rate right now`}</b> — the rest sell on speed, reach or an unpriced offer. `+
+      `<span class="sub">${corp.length} corporate-page post${corp.length===1?'':'s'} not about the product, ${silent.length} operator${silent.length===1?'':'s'} silent this run.</span> ${TAG_M}`+
+      methodBox(m.why_this_leads||'',
+        [m.label||'', m.basis_caveat||'', m.followers_caveat||'', m.corporate_page_caveat||'', m.routing_rule||'']);
+  }
+  plist.innerHTML=promos.length?promos.map(fbPostCard).join(''):'<p class="sub">No operator has a live on-product post this run.</p>';
+  if(corpList) corpList.innerHTML=corp.length?corp.map(fbPostCard).join(''):'<p class="sub">No corporate-page posts this run.</p>';
+  if(corpCount) corpCount.textContent=String(corp.length);
+  if(silentList) silentList.innerHTML=silent.length?silent.map(fbSilentRow).join(''):'<p class="sub">Every tracked operator posted this run.</p>';
+  if(silentCount) silentCount.textContent=String(silent.length);
+  wrapTables();
+}
+
+/* ---------- Promo vs card · where a live promo undercuts its own rate card (obj #2, MEASURED) ----------
+   Surfaces data/promo_gap.json (build_promo_gap.py). Compares each operator's live promo quote
+   (Facebook post OR Google ad) against its OWN published rate-card floor, on the reading LEAST
+   favourable to claiming an undercut (a bare monthly figure is read FLAT — the costliest
+   conversion). Renders ABOVE the rate board for the same reason the Facebook feed does: the
+   card is the ceiling, the promo is the price. Never averaged. Lazy, null-safe, graceful if
+   absent. */
+let PROMOGAP=null, promogapLoaded=false;
+function renderPromoGap(){
+  const el=$('#pgtbl'); if(!el) return;
+  if(promogapLoaded){ drawPromoGap(); return; }
+  fetch('data/promo_gap.json').then(r=>r.ok?r.json():null).then(j=>{
+    PROMOGAP=j; promogapLoaded=true; drawPromoGap();
+  }).catch(()=>{ PROMOGAP=null; promogapLoaded=true; drawPromoGap(); });
+}
+function pgReadAs(r){
+  if(r==='as_quoted_per_year') return 'as quoted, /yr';
+  const mm=/^flat_at_(\d+)m$/.exec(r||'');
+  return mm?`flat, converted @${mm[1]}mo`:(r||'—');
+}
+function pgVerdict(r){
+  if(r.undercuts_own_card) return '<span style="color:var(--gold)"><b>UNDERCUTS</b></span>';
+  if(r.within_noise) return '<span class="sub">within noise</span>';
+  return '<span class="sub">matches card</span>';
+}
+function drawPromoGap(){
+  const tbl=$('#pgtbl'), ro=$('#pgreadout'), qbox=$('#pgquotes'), cobox=$('#pgcardonly'), note=$('#pgnote');
+  if(!tbl) return;
+  const rows=(PROMOGAP&&Array.isArray(PROMOGAP.operators))?PROMOGAP.operators:[];
+  const cardOnly=(PROMOGAP&&Array.isArray(PROMOGAP.card_only))?PROMOGAP.card_only:[];
+  const m=(PROMOGAP&&PROMOGAP.meta)||{};
+  if(!rows.length&&!cardOnly.length){
+    tbl.innerHTML=''; if(qbox) qbox.innerHTML=''; if(cobox) cobox.innerHTML=''; if(note) note.innerHTML='';
+    if(ro) ro.innerHTML='<b>Promo-vs-card check not yet built.</b> <span class="sub">data/promo_gap.json is absent — run pipeline/build_promo_gap.py (needs rival_ads.json and rival_facebook.json first).</span>';
+    return;
+  }
+  const hits=rows.filter(r=>r.undercuts_own_card);
+  if(ro){
+    ro.innerHTML=(hits.length
+      ?`<b>${hits.length} of ${rows.length} checked operator${rows.length===1?'':'s'} undercut${hits.length===1?'s':''} its own published rate card.</b> `+
+        hits.map(h=>`<b style="color:var(--gold)" lang="th">${escHtml(h.name_th)}</b> (card ${h.card_floor}%/yr, live promo as low as ${h.cheapest_promo_effective}%/yr — a ${h.gap_pp}pp gap)`).join('; ')+'. '
+      :`<b>No operator with a checkable live promo undercuts its own card by a material margin.</b> `)+
+      `<span class="sub">${rows.length} operator${rows.length===1?'':'s'} had a live promo quote to check; ${cardOnly.length} more publish a card but no live promo quote exists to compare against it.</span> ${TAG_M}`+
+      methodBox(m.so_what||'',
+        [m.label||'', m.method||'', m.the_false_positive_this_prevents||'', m.coverage_note||'']);
+  }
+  tbl.innerHTML=rows.length?(`<tr><th scope="col">Operator</th><th scope="col">Card floor</th>`+
+    `<th scope="col" title="The cheapest live promo quote, converted on the reading LEAST favourable to calling it an undercut">Cheapest live promo <span class="sub">(worst-case reading)</span></th>`+
+    `<th scope="col">Gap</th><th scope="col">Verdict</th><th scope="col">Quotes</th></tr>`+
+    rows.map(r=>{
+      const own=r.key==='AUTOX';
+      return `<tr${own?' style="background:rgba(230,180,80,.06)"':''}>
+        <td><b${own?' style="color:var(--gold)"':''} lang="th">${escHtml(r.name_th)}</b> <span class="sub mono">${r.key}</span></td>
+        <td class="mono">${r.card_floor!=null?r.card_floor+'%':'<span class="sub">—</span>'}</td>
+        <td class="mono" style="color:var(--gold)">${r.cheapest_promo_effective!=null?r.cheapest_promo_effective+'%':'<span class="sub">—</span>'}</td>
+        <td class="mono">${r.gap_pp!=null?(r.gap_pp>0?'+':'')+r.gap_pp+'pp':'<span class="sub">—</span>'}</td>
+        <td>${pgVerdict(r)}</td>
+        <td class="sub mono">${r.n_quotes||0}</td>
+      </tr>`;
+    }).join('')):'';
+  if(qbox){
+    qbox.innerHTML=rows.filter(r=>(r.quotes||[]).length).map(r=>{
+      const own=r.key==='AUTOX';
+      return `<div class="qgrp" style="margin:10px 0 0"><div class="sub" style="font-weight:600;color:${own?'var(--gold)':'var(--mid)'}" lang="th">${escHtml(r.name_th)} <span class="mono">${r.key}</span></div>`+
+      (r.quotes||[]).map(q=>`<blockquote class="pq" lang="th">${escHtml(q.context_th)}`+
+        `<span class="sub" style="display:block;margin-top:3px" lang="en">${q.quoted}%${q.unit==='pct_per_month'?'/mo':'/yr'} → ${q.effective_worst_case}%/yr (${pgReadAs(q.read_as)}) · ${q.channel}${q.seen?' · '+escHtml(q.seen):''}</span></blockquote>`).join('')+
+      '</div>';
+    }).join('');
+  }
+  if(cobox){
+    cobox.innerHTML=cardOnly.length
+      ?`<h4 class="compsub" style="margin-top:14px;font-size:13px">Publish a card, no live promo quote to check <span class="sub">(${cardOnly.length})</span></h4>`+
+       `<table class="tbl">${cardOnly.map(c=>{
+         const own=c.key==='AUTOX';
+         return `<tr${own?' style="background:rgba(230,180,80,.06)"':''}><td><b${own?' style="color:var(--gold)"':''} lang="th">${escHtml(c.name_th)}</b> <span class="sub mono">${c.key}</span></td><td class="mono">${c.card_floor!=null?c.card_floor+'%/yr card floor':'—'}</td></tr>`;
+       }).join('')}</table>`
+      :'';
+  }
+  if(note) note.innerHTML=m.coverage_note?`<p class="lead sub" style="margin-top:6px">${m.coverage_note}</p>`:'';
   wrapTables();
 }
 
