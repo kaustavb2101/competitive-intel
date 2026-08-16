@@ -304,6 +304,18 @@ FEEDS = [
          cadence="daily", ip="any", group="competitive",
          out="source-data/rival_facebook.json", timeout=1800, needs_browser=True),
 
+    # The other half of the price picture: what each rival PUBLISHES, re-read rather than
+    # remembered. rival_rate_card.json is hand-curated and only ever moved when a human edited
+    # it, so a rival quietly repricing would sit undetected — while both the rate board and
+    # build_promo_gap.py's undercut check measure against that card. WEEKLY, not daily: a
+    # BoT-disclosed rate card changes on the order of quarters, and this is 23 page loads with
+    # a browser for 14 of them. It writes rival_rate_observed.json and a DRIFT report; it never
+    # overwrites the curated card, which carries judgement a scraper cannot reproduce.
+    dict(key="rival_rates", script="pull_rival_rates.py", args=[],
+         label="Rival published rate pages — re-read all 23 pinned rate_urls, report drift",
+         cadence="weekly", ip="any", group="competitive",
+         out="source-data/rival_rate_observed.json", timeout=2400, needs_browser=True),
+
     # ------------------------------------------------------------------- THAI-IP-ONLY (opt-in only)
     dict(key="rival_promos", script="pull_rival_promos.py", args=[],
          label="Rival promo/campaign listings from their own sites (Tidlor/MTC/Sawad)",
