@@ -22,9 +22,9 @@
   "n_advertised": 10,
   "n_creatives_basis_stated": 7,
   "n_creatives_scanned": 779,
-  "n_operators": 22,
-  "n_published": 37,
-  "n_rows": 47,
+  "n_operators": 23,
+  "n_published": 39,
+  "n_rows": 49,
   "refusal_note": "A rate whose basis is not written down is published with basis 'unstated' and NO effective figure. Guessing the basis would manufacture the exact error this board exists to prevent. A flat rate with no term is likewise left unconverted unless the operator publishes a maximum tenor for that product, in which case `at_months` says which term was used.",
   "so_what": "AutoX's rate peers are the ไม่โอนเล่ม / reducing-balance column, NOT the flat headlines. A bank advertising 3.18% is not undercutting a 21% title loan by eighteen points; it is selling a different product, secured differently, to a borrower who is willing to hand over the book.",
   "sources": {
@@ -588,6 +588,44 @@
    "source": "published",
    "tenor_max": 60,
    "tier": "us"
+  },
+  {
+   "by_collateral": {
+    "no_transfer": {
+     "hi": 24.0,
+     "lo": 15.0,
+     "source": "lender"
+    }
+   },
+   "citation": "https://www.turbo.co.th/loans/car",
+   "collateral": [
+    "no_transfer"
+   ],
+   "confidence": "high",
+   "effective_at_months": null,
+   "effective_hi": 15.0,
+   "effective_lo": 15.0,
+   "effective_source": "lender",
+   "has_published": true,
+   "if_flat": null,
+   "if_reducing": null,
+   "is_us": false,
+   "key": "TURBO",
+   "last_seen": null,
+   "loan_type": "title_loan",
+   "ltv_pct": null,
+   "n_ads_basis_stated": 0,
+   "n_ads_priced": 0,
+   "n_creatives": null,
+   "n_offers": 2,
+   "name_th": "เงินเทอร์โบ",
+   "operator": "Ngern Turbo",
+   "owner": "Ngern Turbo PCL",
+   "quoted_basis": "effective",
+   "quoted_lo": 15.0,
+   "source": "published",
+   "tenor_max": 72,
+   "tier": "nonbank"
   },
   {
    "by_collateral": {
@@ -2120,6 +2158,82 @@
    "tenor_min": null,
    "tier": "bank",
    "variant": "ไม่โอนเล่มทะเบียน (registration retained — the AutoX-comparable product)"
+  },
+  {
+   "asof": "2026-08-16",
+   "citation": "https://www.turbo.co.th/loans/car",
+   "collateral": "no_transfer",
+   "confidence": "high",
+   "effective": {
+    "at_months": null,
+    "hi": 24.0,
+    "lo": 15.0,
+    "source": "lender",
+    "tenor_assumed": false
+   },
+   "effective_note": null,
+   "key": "TURBO",
+   "last_seen": null,
+   "loan_type": "title_loan",
+   "ltv_note": null,
+   "ltv_pct": null,
+   "max_baht": 1000000,
+   "n_ads": null,
+   "name_th": "เงินเทอร์โบ",
+   "operator": "Ngern Turbo",
+   "owner": "Ngern Turbo PCL",
+   "quote_th": "อัตราดอกเบี้ย ค่าธรรมเนียมใดๆ 15% - 24% ต่อปี แบบลดต้นลดดอก (Effective Rate) / ดอกเบี้ย ดอกเบี้ยผิดนัดชำระ ค่าบริการ และค่าธรรมเนียมใดๆ รวมกันแล้วไม่เกิน 24% ต่อปี",
+   "quoted": {
+    "basis": "effective",
+    "hi": 24.0,
+    "lo": 15.0,
+    "unit": "pct_per_year"
+   },
+   "quoted_monthly": null,
+   "source": "published",
+   "source_kind": "lender",
+   "tenor_max": 72,
+   "tenor_min": null,
+   "tier": "nonbank",
+   "variant": "สินเชื่อรถยนต์ (ไม่โอนเล่ม — all car types, no เก๋ง/กระบะ split)"
+  },
+  {
+   "asof": "2026-08-16",
+   "citation": "https://www.turbo.co.th/loans/car",
+   "collateral": "no_transfer",
+   "confidence": "high",
+   "effective": {
+    "at_months": null,
+    "hi": 24.0,
+    "lo": 15.0,
+    "source": "lender",
+    "tenor_assumed": false
+   },
+   "effective_note": null,
+   "key": "TURBO",
+   "last_seen": null,
+   "loan_type": "title_loan",
+   "ltv_note": null,
+   "ltv_pct": null,
+   "max_baht": 100000,
+   "n_ads": null,
+   "name_th": "เงินเทอร์โบ",
+   "operator": "Ngern Turbo",
+   "owner": "Ngern Turbo PCL",
+   "quote_th": "อัตราดอกเบี้ย ค่าธรรมเนียมใดๆ 15% - 24% ต่อปี แบบลดต้นลดดอก (Effective Rate) / ดอกเบี้ย ดอกเบี้ยผิดนัดชำระ ค่าบริการ และค่าธรรมเนียมใดๆ รวมกันแล้วไม่เกิน 24% ต่อปี",
+   "quoted": {
+    "basis": "effective",
+    "hi": 24.0,
+    "lo": 15.0,
+    "unit": "pct_per_year"
+   },
+   "quoted_monthly": null,
+   "source": "published",
+   "source_kind": "lender",
+   "tenor_max": 36,
+   "tenor_min": null,
+   "tier": "nonbank",
+   "variant": "สินเชื่อรถจักรยานยนต์ (ไม่โอนเล่ม)"
   },
   {
    "asof": "2026-08-16",
