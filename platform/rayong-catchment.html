@@ -551,21 +551,21 @@ body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!importan
     </select>
   </div>
   <div class="grp">
-    <div class="glab">Basemap</div>
-    <div class="seg">
-      <button data-b="studio" class="on">Studio</button>
-      <button data-b="light">Light</button>
-      <button data-b="voyager">Streets</button>
-      <button data-b="dark">Dark</button>
-      <button data-b="satellite">Satellite</button>
+    <div class="glab" id="baseLbl">Basemap</div>
+    <div class="seg" role="group" aria-labelledby="baseLbl">
+      <button data-b="studio" class="on" aria-pressed="true">Studio</button>
+      <button data-b="light" aria-pressed="false">Light</button>
+      <button data-b="voyager" aria-pressed="false">Streets</button>
+      <button data-b="dark" aria-pressed="false">Dark</button>
+      <button data-b="satellite" aria-pressed="false">Satellite</button>
     </div>
   </div>
   <div class="grp">
     <div class="glab">Layers</div>
     <div class="acts">
-      <button id="ringtog" class="on">10 km reach rings</button>
-      <button id="isotog" class="on" style="display:none">Isochrone</button>
-      <button id="orbittog" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
+      <button id="ringtog" class="on" aria-pressed="true">10 km reach rings</button>
+      <button id="isotog" class="on" style="display:none" aria-pressed="true">Isochrone</button>
+      <button id="orbittog" title="Gentle auto-orbit (pauses when you move the map)" aria-pressed="false">Auto-orbit</button>
       <button id="postertog" title="Poster mode — hide overlays, frame the skyline edge-to-edge, download a shareable PNG">📸 Poster</button>
     </div>
   </div>
@@ -1077,7 +1077,7 @@ const ORBIT_DPS=2.6;                 // degrees / second — gentle, not nauseat
 // userInteract(): called from onViewStateChange when the *user* moves the camera (not our own
 // programmatic setProps). Pauses the orbit and flips the toggle UI off until the user re-enables it.
 function userInteract(){ orbitPausedByUser=true; setOrbitUI(false); }
-function setOrbitUI(on){const t=document.getElementById('orbittog'); if(t)t.classList.toggle('on',on);}
+function setOrbitUI(on){const t=document.getElementById('orbittog'); if(t){t.classList.toggle('on',on);t.setAttribute('aria-pressed',String(on));}}
 let _programmatic=false;             // guards our own setProps from being mistaken for user input
 function pushView(extra){ _programmatic=true;
   deckgl.setProps({viewState:Object.assign({},VIEW,extra||{})});
@@ -2404,11 +2404,11 @@ function buildLegend(){
   refreshPoiTypes();
   host.innerHTML=POI_TYPES.map(t=>{
     const c=POI_COLORS[t], n=poiGet(t).length;
-    return `<button class="lg ${poiOn[t]?'on':''}" data-t="${t}">
+    return `<button class="lg ${poiOn[t]?'on':''}" data-t="${t}" aria-pressed="${poiOn[t]?'true':'false'}">
       <span class="sw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>${POI_LABEL[t]||t}<b>${n}</b></button>`;
   }).join('');
   host.querySelectorAll('.lg').forEach(el=>el.onclick=()=>{
-    const t=el.dataset.t; poiOn[t]=!poiOn[t]; el.classList.toggle('on',poiOn[t]); render();});
+    const t=el.dataset.t; poiOn[t]=!poiOn[t]; el.classList.toggle('on',poiOn[t]); el.setAttribute('aria-pressed',String(poiOn[t])); render();});
 }
 
 /* ---------- building colour/height legend ---------- */
@@ -2494,13 +2494,13 @@ function buildCompLegend(){
     location.href='rayong-catchment.html'+(c==='rayong'?'':'?city='+encodeURIComponent(c));};
 })();
 document.querySelectorAll('#ctl [data-b]').forEach(b=>b.onclick=()=>{
-  basemap=b.dataset.b;document.querySelectorAll('#ctl [data-b]').forEach(x=>x.classList.toggle('on',x===b));render();});
-document.getElementById('ringtog').onclick=function(){showRings=!showRings;this.classList.toggle('on',showRings);render();};
-document.getElementById('isotog').onclick=function(){showIso=!showIso;this.classList.toggle('on',showIso);render();};
+  basemap=b.dataset.b;document.querySelectorAll('#ctl [data-b]').forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-pressed',String(on));});render();});
+document.getElementById('ringtog').onclick=function(){showRings=!showRings;this.classList.toggle('on',showRings);this.setAttribute('aria-pressed',String(showRings));render();};
+document.getElementById('isotog').onclick=function(){showIso=!showIso;this.classList.toggle('on',showIso);this.setAttribute('aria-pressed',String(showIso));render();};
 // Orbit toggle: master on/off. Turning it ON also clears any "paused by user interaction" state so
 // the scene immediately resumes breathing; turning it OFF parks the camera where it sits.
 (function(){var ot=document.getElementById('orbittog');if(!ot)return;
-  ot.onclick=function(){orbitOn=!orbitOn; if(orbitOn)orbitPausedByUser=false; this.classList.toggle('on',orbitOn); lastT=0;};})();
+  ot.onclick=function(){orbitOn=!orbitOn; if(orbitOn)orbitPausedByUser=false; this.classList.toggle('on',orbitOn); this.setAttribute('aria-pressed',String(orbitOn)); lastT=0;};})();
 // Mobile bottom-sheet toggles: Analysis (#left) / Leads (#right) / Layers (#ctl). Opening any one
 // closes the other two so a single overlay is on screen at a time and the map stays usable.
 (function(){
