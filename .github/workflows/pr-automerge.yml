@@ -338,6 +338,30 @@ jobs:
             && echo "dispatched pr-autoresolve to refresh the remaining PRs" \
             || echo "::error::pr-autoresolve dispatch FAILED — remaining PRs may sit stale until the next master push."
 
+          # ...and the same GITHUB_TOKEN silence leaves the MASTER COMMIT WE JUST CREATED ungated.
+          # qa.yml fires on `push: branches: [master]`, but a workflow-authored push raises no push
+          # event, so the merge result gets no gate of its own — while `git.deploymentEnabled` sends
+          # exactly that commit to Vercel production. Measured 2026-08-17: a4250f7e (#470) and
+          # 9daa2373 (#467) had NO qa check run at all, while direct human pushes like fedc07ab did.
+          #
+          # The PR branch was green (the merge above requires a gate whose headSha equals the PR
+          # head), but green-on-branch is not green-on-master: `--squash` replays the PR's changes
+          # onto whatever master is NOW, and that combined tree is one nobody ran the gate against.
+          # pr-autoresolve keeps branches rebased, which narrows the window but does not close it.
+          #
+          # So gate the shipped state, not just the proposed one. `--ref master` resolves to the
+          # commit this merge just created; qa.yml keys its concurrency group on the master SHA
+          # (see its header), so this run gets a group to itself and cannot be superseded by the
+          # next merge — which is the whole reason that keying exists.
+          #
+          # COST, stated plainly because it is the reason this was an owner decision rather than an
+          # obvious fix: one extra ~28-minute run per merge on a two-runner pool (ci-bkk, ci-bkk-2)
+          # that is already the bottleneck. It does NOT slow the merger itself — this workflow runs
+          # on the `thai` runner, which carries no `ci` label and so never competes for that pool.
+          gh workflow run qa.yml --ref master \
+            && echo "dispatched qa.yml on master — gating the merge commit that ships to production" \
+            || echo "::error::qa.yml master dispatch FAILED — the merge commit for #$NUM shipped ungated; dispatch it by hand."
+
       - name: Nothing to do
         if: steps.pick.outputs.found == 'none'
         run: echo "No eligible generated PR is ready to merge." >> "$GITHUB_STEP_SUMMARY"
