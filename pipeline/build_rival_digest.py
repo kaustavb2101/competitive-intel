@@ -311,7 +311,12 @@ def html(c):
         % (BD, esc(th(N, p.get("key"), p.get("name_th"))), DIM, esc(p.get("posted_ago") or "?"),
            (' <span style="color:%s;font-size:11px">· ใหม่</span>' % GOLD)
            if p.get("changed_since_last_run") else "",
-           FG, esc(" ".join((p.get("post") or "").split())),
+           FG, esc(" ".join((p.get("post") or "").split()))
+           # WE never truncate — the owner asked for full copy. But Facebook itself cuts every
+           # post at "ดูเพิ่มเติม" before the login wall, and an unexplained "..." reads as our
+           # doing. Say whose cut it is.
+           + ('<span style="color:%s;font-size:11px;white-space:nowrap"> '
+              '[Facebook cut it here]</span>' % DIM if p.get("post_truncated") else ""),
            ('<div style="margin-top:4px;font-size:12px;color:%s">%s</div>'
             % (MERCH, " · ".join(_fbrate(r) for r in p["rates"]))) if p.get("rates") else "")))
 
@@ -340,7 +345,8 @@ def html(c):
             % (GOLD, esc(a["basis_kind"]))) if a.get("basis_kind") else "",
            FG, esc(" ".join((a.get("copy") or "").split())))))
 
-    board = rows_html(c["operators"][:10], lambda o: (
+    priced = [o for o in c["operators"] if o.get("effective_lo") is not None]
+    board = rows_html(priced, lambda o: (
         '<tr><td style="padding:5px 0;%s">%s'
         '<div style="color:%s;font-size:11px">%s</div></td>'
         '<td align="right" style="padding:5px 0;%s;white-space:nowrap">'
@@ -495,7 +501,7 @@ def text(c):
         lambda p: "%s — %s (last seen %s)" % (th(N, p.get("key"), p.get("brand")),
                                               p.get("title") or "", p.get("last_seen")))
     L.append("RATE BOARD (effective %/yr, reducing balance)")
-    for o in c["operators"][:10]:
+    for o in [o for o in c["operators"] if o.get("effective_lo") is not None]:
         L.append("  %-30s %7s  %s" % (
             (o.get("name_th") or th(N, o.get("key"), o.get("operator")))[:30],
             ("%s%%" % o["effective_lo"]) if o.get("effective_lo") is not None else "-",
