@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-16T11:17:30+07:00",
-    "commit": "15d5407"
+    "generated_at": "2026-08-16T17:41:57+07:00",
+    "commit": "c34ef1f"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,90 @@
   ],
   "activity": [
     {
+      "date": "2026-08-16T17:41:57+07:00",
+      "sha": "c34ef1f",
+      "summary": "intel(#home): front door now states AutoX leads 0 of 77 provinces, not just density (#456)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-16T09:48:18+00:00",
+      "sha": "918b72c",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-16, run 31939801489)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-16T08:48:42+00:00",
+      "sha": "1e40877",
+      "summary": "docs(progress): log ux-deckgl-legend-group-role merge + the persisting Vercel production auto-deploy stall (PR #454)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-16T08:42:53+00:00",
+      "sha": "b81a2d2",
+      "summary": "feat(digest): the six owner edits — white, Thai names, all four sentiment sources, no truncation (#452)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-16T15:42:48+07:00",
+      "sha": "24de261",
+      "summary": "ux: group the deck.gl POI-legend toggle clusters for screen readers (#454)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-16T07:47:45+00:00",
+      "sha": "a48a403",
+      "summary": "fix(probe): \"no hits\" off 1 creative is not a verdict — sample gate + OCR (#451)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-16T07:33:52+00:00",
+      "sha": "506b5d5",
+      "summary": "docs(progress): log the rate-board + daily-digest wave (PRs #438/#440/#442/#446) (#450)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-16T07:07:10+00:00",
+      "sha": "b33a1e7",
+      "summary": "fix(probe): CANDIDATES rows are 3-tuples, and add the --list that would have caught it (#449)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-16T06:47:15+00:00",
+      "sha": "e5d36d6",
+      "summary": "peer(#acq): state Srisawad's material group-locator inflation on the per-province board (#448)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-16T06:06:03+00:00",
+      "sha": "4d86555",
+      "summary": "data: market-pulse swarm refresh (run 31925990776) (#445)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-16T05:34:07+00:00",
+      "sha": "0068169",
+      "summary": "probe(ads): vet the 13 unpinned bank advertiser accounts from a runner, not the laptop (#446)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-16T05:32:11+00:00",
+      "sha": "c641c77",
+      "summary": "data(census): refresh the Union Auction forward book (run 31926275326) (#444)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-16T04:20:51+00:00",
+      "sha": "5780f35",
+      "summary": "fix(notify): a blank optional secret is not an absent one — the first real send crashed (#442)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-16T04:19:50+00:00",
+      "sha": "89dbb61",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer roll-up-gloss ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-16T11:17:30+07:00",
       "sha": "15d5407",
       "summary": "peer(#acq): gloss the >100% census-to-cited roll-up total, not just per-brand (#443)",
@@ -626,90 +710,6 @@
       "date": "2026-08-15T21:44:01+00:00",
       "sha": "a07ae31",
       "summary": "data: ThaiWater flood + rain pulse (2026-08-15, run 31910049466)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T21:23:54+00:00",
-      "sha": "333b24b",
-      "summary": "data: social listening refresh (run 31888335921) (#423)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T20:29:27+00:00",
-      "sha": "fc20d7f",
-      "summary": "docs(progress): log ux-deckgl-toggle-aria-pressed-province (PR #434) + flag Vercel production-deploy stall",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-16T03:19:47+07:00",
-      "sha": "d03167d",
-      "summary": "ux: province.html deck.gl toggles expose aria-pressed (WCAG 4.1.2) (#434)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-15T19:55:40+00:00",
-      "sha": "42b266c",
-      "summary": "feat(acq): Turbo was never silent — widen the roster, and say how much of it we can read (#432)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-15T19:25:57+00:00",
-      "sha": "6f1e5c5",
-      "summary": "data: Thai-IP-only swarm refresh (run 31893415805) (#428)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T18:52:58+00:00",
-      "sha": "9701f7f",
-      "summary": "feat(acq): per-ad pricing feed — every recent rival creative, its rate and its conditions (#431)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-15T18:30:39+00:00",
-      "sha": "57ed249",
-      "summary": "integ(macro): schedule two cloud-reachable macro pullers that were ageing in silence",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T18:12:39+00:00",
-      "sha": "8038b02",
-      "summary": "data: macro indicators (2026-08-15, run 31888337907) (#422)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T17:29:28+00:00",
-      "sha": "6dde173",
-      "summary": "feat(swarm): social listening + rival ads move from weekly to daily (owner request) (#429)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-15T16:59:57+00:00",
-      "sha": "38e2d93",
-      "summary": "data: market-pulse swarm refresh (run 31893811879) (#430)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-15T16:24:49+00:00",
-      "sha": "4d53594",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer-rollup tripwire ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-15T16:24:19+00:00",
-      "sha": "6e7ed47",
-      "summary": "intel(peer): cross-surface peer-rollup tripwire — the two obj-#2 boards must agree per brand",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-15T15:46:21+00:00",
-      "sha": "334e0f5",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-15T15:42:58+00:00",
-      "sha": "31a0ff4",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-15, run 31893262524)",
       "pillar": "data-integration"
     }
   ]
