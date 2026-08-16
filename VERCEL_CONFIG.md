@@ -1,15 +1,42 @@
-# Why `platform/vercel.json` looks the way it does
+# Why `vercel.json` looks the way it does
 
-This file exists because `vercel.json` cannot hold comments. The two settings below look like
-belt-and-braces duplication and are not — each one stops a different failure, and the second
-was added only after the first proved insufficient in production.
+## READ THIS FIRST: there are TWO vercel.json files and only ONE of them is live
 
-**These notes used to live inside `vercel.json` as `//git` and `//ignoreCommand` keys.** That
+    vercel.json            <- THE LIVE CONFIG. Vercel reads this.
+    platform/vercel.json   <- read by NOTHING in the deployed project.
+
+The `competitive-intel` Vercel project's Root Directory is the **repo root** — which is why the
+root file carries `"outputDirectory": "platform"`. Vercel therefore reads the root
+`vercel.json`, and `platform/vercel.json` is inert as far as production is concerned.
+
+**This was not noticed for four days, and it cost production.** Every deploy guard described
+below — `git.deploymentEnabled` and `ignoreCommand`, both added on 2026-08-12 specifically to
+stop preview deployments burning the free-tier quota — was written into `platform/vercel.json`,
+where Vercel never read it. The guards looked present in code review, in git history and in the
+file that documented them. They were doing nothing.
+
+The proof is in the deployment list: with `"**": false` supposedly in force, branch pushes for
+`feat/rival-full-coverage`, `fix/vercel-json-schema` and `feat/rival-facebook-daily` all created
+deployments anyway. And on 2026-08-16 production stopped updating entirely — three master
+merges (#457, #459, #460, #461) produced **no production deployment at all**, leaving the live
+site on an older commit. Production never retries itself.
+
+Moved to the root file on 2026-08-16. If you edit deploy behaviour, edit **`vercel.json` at the
+repo root**. Treat `platform/vercel.json` as legacy: it is what a `vercel` CLI invocation run
+from inside `platform/` would read, which is a different project entirely (running
+`npx vercel --prod` from that directory creates/targets a *separate* Vercel project called
+`platform` — do not deploy from there; deploy from the repo root).
+
+## Why this file exists at all
+
+`vercel.json` cannot hold comments. The two settings below look like belt-and-braces
+duplication and are not — each stops a different failure, and the second was added only after
+the first proved insufficient in production.
+
+These notes used to live inside `vercel.json` as `//git` and `//ignoreCommand` keys. That
 worked with the Git integration, which ignores unknown keys, but the Vercel **CLI** validates
-the file against its published schema and refuses to deploy: *"Invalid vercel.json — should NOT
-have additional property `//git`"*. So `npx vercel --prod` had been broken by the comments while
-Git-integration deploys kept working, and nobody noticed until a CLI deploy was attempted on
-2026-08-16. Moved here rather than deleted; the content is the point.
+against its published schema and refuses to deploy: *"Invalid vercel.json — should NOT have
+additional property `//git`"*. Moved here rather than deleted; the content is the point.
 
 ## `git.deploymentEnabled` — the quota lever
 

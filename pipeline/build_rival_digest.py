@@ -204,11 +204,23 @@ def collect():
     # post goes above the rate board, and the two are never averaged.
     fb_promos = [p for p in (fb.get("promos") or []) if p.get("post")]
 
+    # WHERE THE CARD UNDERSTATES THE RIVAL. build_promo_gap.py compares each operator's live
+    # promo against its own published disclosure and reports only the ones that survive the
+    # conservative reading (unstated monthly rates scored as FLAT, at the operator's own maximum
+    # tenor). This layer existed, was gated and was even listed in the workflow's pre-flight, but
+    # nothing read it — so the finding that started this whole thread (เงินติดล้อ selling at 10%
+    # against a 24% card) reached the site and never reached the person who asked for it.
+    gap = load("promo_gap")
+    gap_hits = [r for r in (gap.get("operators") or []) if r.get("undercuts_own_card")]
+    gap_hits.sort(key=lambda r: -(r.get("gap_pp") or 0))
+
     return {
         "asof": asof,
         "names": names,
         "fb_promos": fb_promos,
         "fb_meta": fb.get("meta") or {},
+        "gap_hits": gap_hits,
+        "gap_meta": gap.get("meta") or {},
         "sentiment_board": board_rows,
         "blind": blind,
         "n_universe": len(board_rows),
@@ -345,6 +357,22 @@ def html(c):
             % (GOLD, esc(a["basis_kind"]))) if a.get("basis_kind") else "",
            FG, esc(" ".join((a.get("copy") or "").split())))))
 
+    # The undercut rows carry BOTH numbers and the quote that proves the cheaper one, because
+    # the claim being made — "their card is not their price" — is only credible if the reader
+    # can see the rival's own words next to it.
+    gaps = rows_html(c["gap_hits"], lambda r: (
+        '<tr><td style="padding:9px 0;%s">'
+        '<b>%s</b> <span style="color:%s;font-size:11px">การ์ด %s%%/ปี → ขายจริง</span> '
+        '<b style="color:%s">%s%%/ปี</b> '
+        '<span style="color:%s;font-size:11px">ถูกกว่า %s จุด</span><br>'
+        '<span style="color:%s;font-size:12px;line-height:1.5">%s</span>'
+        '<span style="color:%s;font-size:11px"> · %s · อ่านแบบ %s</span></td></tr>'
+        % (BD, esc(th(N, r.get("key"), r.get("name_th"))), DIM, fmt(r.get("card_floor")),
+           PD, fmt(r.get("cheapest_promo_effective")), PD, fmt(r.get("gap_pp")),
+           FG, esc(" ".join(((r.get("quotes") or [{}])[0].get("context_th") or "").split())),
+           DIM, esc((r.get("quotes") or [{}])[0].get("channel") or "—"),
+           esc((r.get("quotes") or [{}])[0].get("read_as") or "—"))))
+
     priced = [o for o in c["operators"] if o.get("effective_lo") is not None]
     board = rows_html(priced, lambda o: (
         '<tr><td style="padding:5px 0;%s">%s'
@@ -414,7 +442,7 @@ def html(c):
     never by when this email was sent.</div>
   %s
 </td></tr>
-%s%s%s%s%s%s
+%s%s%s%s%s%s%s
 <tr><td style="padding:14px 22px 20px;border-top:1px solid %s">
   <div style="font:11px/1.55 -apple-system,sans-serif;color:%s">
    %s of %s tracked creatives state whether their rate is flat or reducing balance, so an
@@ -440,6 +468,16 @@ def html(c):
             "Creatives that compete on cost, newest first — %d in total this cycle. Copy is "
             "shown in full: the tail carries the tenor, the LTV cap and the flat-or-reducing "
             "fine print." % c["n_fresh_pricing"]),
+        sec("ขายถูกกว่าการ์ดตัวเอง · Selling below their own published card", gaps,
+            "The rate board below is what each lender may lawfully charge. This is where the "
+            "promo they are running is materially cheaper than that — the card understates how "
+            "hard they are competing. Deliberately conservative: a monthly rate quoted with no "
+            "basis is read as FLAT (the dearer reading) at the lender's own maximum tenor, and "
+            "only counts if even that lands %s points or more below the card. %d of %d "
+            "operators advertise with a rate at all, so an absent name means we hold no promo "
+            "QUOTE for them — never that their card was verified as their price."
+            % (fmt(c["gap_meta"].get("material_threshold_pp")),
+               c["gap_meta"].get("n_checked") or 0, c["n_universe"])),
         sec("ตารางอัตราดอกเบี้ย · Rate board", board,
             "Effective %/yr, reducing balance. Green = the lender's own published figure, "
             "gold = converted by us from their flat quote."),
@@ -486,6 +524,11 @@ def text(c):
                                        p.get("posted_ago") or "?", r,
                                        " ".join((p.get("post") or "").split()))
     blk("Live promos on Facebook — what they are SELLING", c["fb_promos"], _fbline)
+    blk("Selling below their own published card", c["gap_hits"],
+        lambda r: "%s — card %s%%/yr, actually selling %s%%/yr (%s points cheaper): %s"
+                  % (th(N, r.get("key"), r.get("name_th")), fmt(r.get("card_floor")),
+                     fmt(r.get("cheapest_promo_effective")), fmt(r.get("gap_pp")),
+                     " ".join(((r.get("quotes") or [{}])[0].get("context_th") or "").split())))
     blk("New rival promotions", c["promos_new"],
         lambda p: "%s — %s" % (th(N, p.get("key"), p.get("brand")), p.get("title") or ""))
     blk("New pricing ads (%d)" % c["n_fresh_pricing"], c["fresh_pricing"],
