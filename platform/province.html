@@ -338,9 +338,15 @@ html[data-theme="light"] .lg.on{color:#11151F;border-color:#9fb4dd}
 html[data-theme="light"] .lg b{color:#5A6477}
 html[data-theme="light"] .lg.on b{color:#11151F}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.notice .sp{animation:none}}
+/* keyboard bypass link (WCAG 2.4.1 Bypass Blocks) — off-screen until focus, then overlays the z-2000 nav;
+   matches styles.css .skip-link. Uses this page's own font stack + accent token (--blue). */
+.skip-link{position:fixed;top:7px;left:8px;z-index:3000;background:var(--blue,#5B7CFA);color:#fff;font:600 13px 'IBM Plex Sans Thai',system-ui,sans-serif;padding:7px 14px;border-radius:8px;text-decoration:none;box-shadow:0 4px 16px rgba(0,0,0,.45);transform:translateY(-180%)}
+.skip-link:focus{transform:translateY(0);outline:2px solid #fff;outline-offset:2px}
 </style>
 </head>
 <body>
+  <a class="skip-link" href="#strip">Skip to main content</a>
+  <script>(function(){var s=document.querySelector('.skip-link');if(!s)return;s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('strip');if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
   <h1 class="sr-only" id="pageH1">Province deep-dive — AutoX · <span lang="th">เงินไชโย</span></h1>
   <noscript>
     <div style="max-width:640px;margin:72px auto;padding:20px 22px;background:var(--card);border:1px solid var(--cardln);border-left:3px solid #5B7CFA;border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55;position:relative;z-index:9999">
@@ -404,7 +410,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 <div id="atmos"></div>
 <div id="vignette"></div>
 
-<div id="strip"><span class="ttl" id="stripTtl">Province <b>·</b> branches · POIs · 10km reach</span><span id="kpis"></span></div>
+<div id="strip" tabindex="-1"><span class="ttl" id="stripTtl">Province <b>·</b> branches · POIs · 10km reach</span><span id="kpis"></span></div>
 
 <div id="ctl">
   <div class="grp">
