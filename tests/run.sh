@@ -361,6 +361,19 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_google_ads.py --check (source-data/google_ads_raw.json absent — network pull, not data drift)"
   else bad "build_google_ads.py --check (rival_ads.json drifted from source-data/google_ads_raw.json — run: python3 pipeline/build_google_ads.py)"
   fi
+  # The flat<->effective converter is checked against rates the LENDERS published, not against
+  # itself: ttb, CIMB, SCB, UOB and TISCO each print both bases for the same product, so the
+  # selftest is a real external check. It is offline and input-free, so unlike the builders
+  # around it there is no SKIP case — a failure here means the conversion is wrong, and every
+  # rival rate on the Competition tab is wrong with it.
+  ( cd "$PIPE" && python3 rate_basis.py --selftest >/dev/null 2>&1 ) \
+    && ok "rate_basis.py --selftest (flat<->effective reproduces 8 lender-published pairs)" \
+    || bad "rate_basis.py --selftest FAILED — the flat/effective conversion no longer matches the rate pairs ttb/CIMB/SCB/UOB/TISCO publish themselves. Run: python3 pipeline/rate_basis.py --selftest"
+  ( cd "$PIPE" && python3 build_rate_board.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_rate_board.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_rate_board.py --check (rate_board.json not built yet, or rival_rate_card.json absent)"
+  else bad "build_rate_board.py --check (rate_board.json drifted from rival_rate_card.json + rival_ads.json — run: python3 pipeline/build_rate_board.py)"
+  fi
   ( cd "$PIPE" && python3 build_social_themes.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_social_themes.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_social_themes.py --check (youtube_comments/app_reviews/apple_reviews/pantip_threads absent — network pulls, not data drift)"

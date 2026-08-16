@@ -1,8 +1,8 @@
 {
  "meta": {
-  "title": "The จำนำทะเบียน (title-loan) competitive universe — hand-verified operator census",
+  "title": "The vehicle-refinance competitive universe — hand-verified operator census, title loan AND hire purchase",
   "label": "ESTIMATED-from-public-reports — an editorial census of every material operator in the Thai vehicle/land title-loan space, hand-verified 2026-07-20 from company sites, SET filings and press. Footprint figures are the companies' OWN public claims (cited), not our measurement. App scores join live from the measured Play ladder (app_reviews.json) at build time.",
-  "verified": "2026-08-01",
+  "verified": "2026-08-16",
   "market_note": "Thai title-loan market size widely reported at ~฿400bn outstanding when KBank entered (2023); the four SET-listed pure-plays alone hold ~฿380bn gross loans (Q1-2026 filings).",
   "citations": [
    "https://www.prachachat.net/finance/news-1272898 (market ~฿4แสนล้าน, KBank entry)",
@@ -14,7 +14,9 @@
    "https://www.set.or.th (MTC/TIDLOR/SAWAD/TURBO/HENG/SAK/MICRO/AMANAH listings)",
    "company promo/ads observed 2026-07-19 via Meta Ad Library + own sites (rival_promos.json)"
   ],
-  "tier_note": "tier values: 'us' = AutoX; 'nonbank' and 'bank' = operators running a PHYSICAL branch network and therefore countable in per-branch rival density; 'broker' = online origination with no branches, tracked for narrative completeness ONLY and never counted as local competitive pressure."
+  "tier_note": "tier values: 'us' = AutoX; 'nonbank' and 'bank' = operators running a PHYSICAL branch network and therefore countable in per-branch rival density; 'broker' = online origination with no branches, tracked for narrative completeness ONLY and never counted as local competitive pressure. The bank-tier hire-purchase refinancers added in the 2026-08-16 widening run NO branch network of their own and so, like brokers, add nothing to per-branch rival density — they compete on price and channel, not on proximity.",
+  "scope_note": "WIDENED 2026-08-16 from จำนำทะเบียน-only to EVERY operator that refinances a vehicle, on the owner's instruction ('basically everyone in the space of refinance of vehicles either through hire purchase OR title loan'). `loan_type` carries the distinction and it is not cosmetic: 'hp_refinance' operators take the registration book (โอนเล่ม) and advertise a FLAT rate, 'title_loan' operators leave it with the borrower (ไม่โอนเล่ม) and advertise REDUCING BALANCE. The two conventions are ~4x apart on the poster and about level on the cost of money, so mixing them without conversion is the central trap in reading this market. source-data/rival_rate_card.json holds the published rate cards; pipeline/rate_basis.py does the conversion.",
+  "ad_search_note": "`ad_search_terms` is the PARENT LEGAL ENTITY each product-branded operator advertises under, used by pull_google_ads.py --discover. Without it a search for 'Car2Cash' or 'My Car My Cash' returns nothing and the operator is filed as having no Google advertiser account — a false measured absence. This is the same trap that hid เงินเทอร์โบ behind 'NGERNTURBO INSURANCE BROKER COMPANY LIMITED' until 2026-08-15. An empty discover result is only ever recorded as NO_ACCOUNT after the parent entity has been searched too."
  },
  "operators": [
   {
@@ -22,6 +24,7 @@
    "name_th": "เงินไชโย",
    "name_en": "Ngern Chaiyo (AutoX)",
    "tier": "us",
+   "loan_type": "title_loan",
    "owner": "SCBX",
    "model": "Vehicle title + land, branch-led",
    "footprint": "2,015 branches (our master data — MEASURED)",
@@ -35,6 +38,7 @@
    "name_th": "เมืองไทย แคปปิตอล",
    "name_en": "Muangthai Capital",
    "tier": "nonbank",
+   "loan_type": "both",
    "owner": "SET:MTC",
    "model": "MC/car/agri title + land + HP",
    "footprint": "~8,000 branches (company IR) — the largest network",
@@ -48,6 +52,7 @@
    "name_th": "เงินติดล้อ",
    "name_en": "Ngern Tid Lor",
    "tier": "nonbank",
+   "loan_type": "title_loan",
    "owner": "SET:TIDLOR",
    "model": "Car/MC/truck title + insurance brokerage",
    "footprint": "~1,800 branches (company IR)",
@@ -61,6 +66,7 @@
    "name_th": "ศรีสวัสดิ์ เงินสดทันใจ",
    "name_en": "Srisawad",
    "tier": "nonbank",
+   "loan_type": "title_loan",
    "owner": "SET:SAWAD",
    "model": "Car/MC/truck title + land/home flagship",
    "footprint": "~5,500 branches group-wide (company IR)",
@@ -74,6 +80,7 @@
    "name_th": "เงินเทอร์โบ",
    "name_en": "Ngern Turbo",
    "tier": "nonbank",
+   "loan_type": "title_loan",
    "owner": "SET:TURBO (listed 2025)",
    "model": "Car/MC title + land deed",
    "footprint": "1,000+ branches (its own ads)",
@@ -87,6 +94,7 @@
    "name_th": "เฮงลิสซิ่ง",
    "name_en": "Heng Leasing",
    "tier": "nonbank",
+   "loan_type": "both",
    "owner": "SET:HENG",
    "model": "Title + HP, North-anchored",
    "footprint": "~830 branches (company IR)",
@@ -100,6 +108,7 @@
    "name_th": "ศักดิ์สยามลิสซิ่ง",
    "name_en": "Saksiam Leasing",
    "tier": "nonbank",
+   "loan_type": "title_loan",
    "owner": "SET:SAK",
    "model": "MC/car title + land, North/Northeast",
    "footprint": "~1,000 branches (company IR)",
@@ -113,6 +122,7 @@
    "name_th": "ไมโครลิสซิ่ง",
    "name_en": "Micro Leasing",
    "tier": "nonbank",
+   "loan_type": "both",
    "owner": "SET:MICRO",
    "model": "Used-truck HP/title specialist",
    "footprint": "~90 branches (company IR)",
@@ -126,6 +136,7 @@
    "name_th": "อะมานะฮ์ ลิสซิ่ง",
    "name_en": "Amanah Leasing",
    "tier": "nonbank",
+   "loan_type": "title_loan",
    "owner": "SET:AMANAH (Islamic Bank group)",
    "model": "Sharia-compliant car title",
    "footprint": "~30 branches (company IR)",
@@ -139,6 +150,7 @@
    "name_th": "สมหวัง เงินสั่งได้",
    "name_en": "Somwang (Hi-Way Co.)",
    "tier": "bank",
+   "loan_type": "title_loan",
    "owner": "TISCO Group",
    "model": "Vehicle title (MC→truck) + โฉนดแลกเงิน",
    "footprint": "expanding past 800 branches (TISCO/AIS release)",
@@ -152,6 +164,7 @@
    "name_th": "เงินให้ใจ",
    "name_en": "Ngern Hai Jai",
    "tier": "bank",
+   "loan_type": "both",
    "owner": "KBank (100% via กสิกรอินเวสเจอร์)",
    "model": "Car title + HP, sold via KBank branches + online",
    "footprint": "no own branches — rides ~800 K-branches + K PLUS",
@@ -165,11 +178,17 @@
    "name_th": "คาร์ ฟอร์ แคช",
    "name_en": "Car4Cash (Krungsri Auto)",
    "tier": "bank",
+   "loan_type": "both",
    "owner": "Krungsri (BAY/MUFG)",
    "model": "Car title/refinance — the original รถแลกเงิน brand",
    "footprint": "no own branches — Krungsri Auto network + GO app",
    "app_brand": "KRUNGSRI_GO",
    "site": "krungsriauto.com",
+   "ad_search_terms": [
+    "กรุงศรี ออโต้",
+    "อยุธยา",
+    "Krungsri"
+   ],
    "promo_watch": false,
    "note": "GO app score reads on the whole Krungsri Auto super-app, not Car4Cash alone."
   },
@@ -178,11 +197,16 @@
    "name_th": "KTC พี่เบิ้ม รถแลกเงิน",
    "name_en": "KTC P Berm",
    "tier": "bank",
+   "loan_type": "title_loan",
    "owner": "Krungthai Card (KTB group)",
    "model": "Car/MC title via KTC touchpoints",
    "footprint": "no own branches — KTC touchpoints",
    "app_brand": "KTC_PBERM",
    "site": "ktc.co.th/pberm",
+   "ad_search_terms": [
+    "บัตรกรุงไทย",
+    "KTC"
+   ],
    "promo_watch": false,
    "note": "Dedicated app exists and rates worst on the ladder (3.72★, 111 ratings)."
   },
@@ -191,11 +215,16 @@
    "name_th": "เงินดีดี (Good Money by GSB)",
    "name_en": "MoneyDD",
    "tier": "bank",
+   "loan_type": "title_loan",
    "owner": "GSB (social-bank lending subsidiary)",
    "model": "Digital-led title + personal lending",
    "footprint": "digital-first — no branch network",
    "app_brand": "GSB_MONEYDD",
    "site": "moneydd.co.th",
+   "ad_search_terms": [
+    "ธนาคารออมสิน",
+    "ออมสิน"
+   ],
    "promo_watch": false,
    "note": "State-bank rate-pressure vehicle: GSB's mandate is pushing market rates DOWN — margin risk more than share risk."
   },
@@ -204,11 +233,16 @@
    "name_th": "มีที่ มีเงิน",
    "name_en": "Mee Tee Mee Ngern",
    "tier": "bank",
+   "loan_type": "land",
    "owner": "GSB/MOF-backed",
    "model": "Land-deed (โฉนด) loans",
    "footprint": "limited own network — bank-channel",
    "app_brand": null,
    "site": "meeteemeengern.com",
+   "ad_search_terms": [
+    "ธนาคารออมสิน",
+    "ออมสิน"
+   ],
    "promo_watch": false,
    "note": "Land-collateral overlap with our โฉนด segment; state-rate pressure on land pricing."
   },
@@ -217,11 +251,17 @@
    "name_th": "ttb รถแลกเงิน (cash your car)",
    "name_en": "ttb cash your car",
    "tier": "bank",
+   "loan_type": "both",
    "owner": "TMBThanachart",
    "model": "Car title via bank (Thanachart DRIVE heritage)",
    "footprint": "no own branches — ttb network",
    "app_brand": null,
    "site": "ttbbank.com",
+   "ad_search_terms": [
+    "ทีเอ็มบีธนชาต",
+    "ธนชาต",
+    "ttb"
+   ],
    "promo_watch": false,
    "note": "Whole-bank app only (ttb touch) — no isolated title-loan CX signal."
   },
@@ -230,11 +270,17 @@
    "name_th": "KKP รถเรียกเงิน",
    "name_en": "KKP car-for-cash",
    "tier": "bank",
+   "loan_type": "both",
    "owner": "Kiatnakin Phatra",
    "model": "Car title/refinance via bank",
    "footprint": "no own branches — KKP network",
    "app_brand": null,
    "site": "bank.kkpfg.com",
+   "ad_search_terms": [
+    "เกียรตินาคินภัทร",
+    "เกียรตินาคิน",
+    "KKP"
+   ],
    "promo_watch": false,
    "note": "Auto-lending heritage bank; whole-bank app only."
   },
@@ -243,6 +289,7 @@
    "name_th": "คาร์ฟินน์ (CarFinn)",
    "name_en": "CarFinn (WSOL Public Company Limited, formerly SABUY Technology)",
    "tier": "broker",
+   "loan_type": "broker",
    "owner": "WSOL Plc — 20% stake in CarFinn",
    "model": "ONLINE LOAN BROKER — originates vehicle-title enquiries and refers them to lender partners (Krungsri, TISCO). Does NOT lend off its own balance sheet and runs NO branch network.",
    "footprint": "no branches — web/app origination only",
@@ -250,6 +297,100 @@
    "site": "carfinn.co.th",
    "promo_watch": false,
    "note": "Investigated 2026-08-01 after the owner asked whether a 'เงินสบาย' title lender existed. It does not. SABUY Technology renamed to WSOL Plc; its vehicle-lending exposure is a 20% stake in CarFinn, a broker platform. Carried at tier='broker' so the record is explicit rather than absent — an absent operator invites the same question again, and the wrong answer (treating it as a branch rival) would overstate rival density around our footprint. Brokers are excluded from every per-branch and per-province competitor count by construction: those counts come from the geo censuses (competitor_census.json / competitors_national.json), which only contain physical service points."
+  },
+  {
+   "key": "SCB_MCMC",
+   "name_th": "สินเชื่อรถคือเงิน My Car My Cash",
+   "name_en": "SCB My Car My Cash",
+   "tier": "bank",
+   "loan_type": "hp_refinance",
+   "owner": "Siam Commercial Bank",
+   "model": "Vehicle refinance / cash-out, quoted FLAT",
+   "footprint": "no own network — SCB's ~800 branches + SCB EASY",
+   "app_brand": null,
+   "site": "scb.co.th",
+   "ad_search_terms": [
+    "ธนาคารไทยพาณิชย์",
+    "ไทยพาณิชย์",
+    "SCB"
+   ],
+   "promo_watch": false,
+   "note": "SAME GROUP AS US (SCBX), so a sibling rather than a rival — but it prices the collateral we lend against, advertises the loudest flat headline in the market, and publishes the highest LTV in this file: 140% of the bank's own appraised value. Added 2026-08-16 when the universe was widened from title-loan-only to every vehicle-refinance operator."
+  },
+  {
+   "key": "UOB_C2C",
+   "name_th": "สินเชื่อทะเบียนรถยนต์ ยูโอบี Car2Cash",
+   "name_en": "UOB Car2Cash",
+   "tier": "bank",
+   "loan_type": "title_loan",
+   "owner": "United Overseas Bank (Thai)",
+   "model": "Vehicle title, ไม่โอนเล่ม — borrower keeps the book",
+   "footprint": "no own network — UOB branches + online",
+   "app_brand": null,
+   "site": "uob.co.th",
+   "ad_search_terms": [
+    "ธนาคารยูโอบี",
+    "ยูโอบี",
+    "UOB"
+   ],
+   "promo_watch": false,
+   "note": "The product the owner went looking for and could not find, because it is NOT called 'cash your car' — that is ttb's brand. UOB's is Car2Cash, launched Feb 2023. A direct ไม่โอนเล่ม competitor: keep the book, keep driving, which is the AutoX proposition. Publishes 0.50%/mo = 10.99%/yr reducing balance, ≤72 months, ≤฿2m."
+  },
+  {
+   "key": "TISCO_AC",
+   "name_th": "สินเชื่อทะเบียนรถยนต์ ทิสโก้ ออโต้แคช",
+   "name_en": "TISCO Auto Cash",
+   "tier": "bank",
+   "loan_type": "title_loan",
+   "owner": "TISCO Financial Group",
+   "model": "Vehicle title via the bank",
+   "footprint": "no own network — TISCO branches",
+   "app_brand": null,
+   "site": "tiscoautocash.com",
+   "ad_search_terms": [
+    "ทิสโก้",
+    "TISCO"
+   ],
+   "promo_watch": false,
+   "note": "TISCO attacks this market from BOTH sides and they are counted separately: this bank product, and สมหวัง เงินสั่งได้ (key SOMWANG), its 800-branch non-bank network. Only SOMWANG is countable in per-branch rival density."
+  },
+  {
+   "key": "KBANK_RCD",
+   "name_th": "สินเชื่อรถช่วยได้กสิกรไทย (จำนำทะเบียนรถ)",
+   "name_en": "KBank Rot Chuay Dai",
+   "tier": "bank",
+   "loan_type": "title_loan",
+   "owner": "Kasikornbank",
+   "model": "Vehicle title on the bank's own balance sheet",
+   "footprint": "no own network — ~800 K-branches + K PLUS",
+   "app_brand": null,
+   "site": "kasikornbank.com",
+   "ad_search_terms": [
+    "ธนาคารกสิกรไทย",
+    "กสิกรไทย",
+    "KASIKORNBANK"
+   ],
+   "promo_watch": false,
+   "note": "Distinct from เงินให้ใจ (key NGERNHAIJAI), the separately-licensed KBank subsidiary we already track as an advertiser. Both are Kasikorn in this market; they are different entities and are never merged."
+  },
+  {
+   "key": "CIMB_AUTO",
+   "name_th": "สินเชื่อรถปลดล็อก ซีไอเอ็มบี ไทย ออโต้",
+   "name_en": "CIMB Thai Auto (รถปลดล็อก)",
+   "tier": "bank",
+   "loan_type": "both",
+   "owner": "CIMB Thai Bank",
+   "model": "Vehicle refinance, both โอนเล่ม and ไม่โอนเล่ม",
+   "footprint": "no own network — CIMB Thai Auto channel",
+   "app_brand": null,
+   "site": "cimbthaiauto.com",
+   "ad_search_terms": [
+    "ซีไอเอ็มบี ไทย ออโต้",
+    "ซีไอเอ็มบี",
+    "CIMB"
+   ],
+   "promo_watch": false,
+   "note": "The most complete public rate disclosure in the market — it prints the monthly rate, its flat-per-year equivalent AND its reducing-balance-per-year equivalent for the same product. That triple is the evidence that this market's 'effective' is nominal (monthly x 12), not a compounded APR."
   }
  ]
 }
