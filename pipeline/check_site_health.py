@@ -36,8 +36,15 @@
 #       login page, so a naive check sees 200 + non-site content and would fire a
 #       FALSE outage. The probe detects the off-host redirect to Vercel's auth
 #       endpoint and reports "up + access-protected (SSO)", deep checks SKIPPED. An
-#       SSO gate needs a Vercel session cookie, so SITE_PASSWORD cannot unlock it
-#       from CI — deep-probing requires an SSO-exempt custom domain.
+#       SSO gate needs a Vercel session cookie, so SITE_PASSWORD (a middleware Basic
+#       Auth password) CANNOT unlock it from CI. TWO ways to deep-probe past SSO:
+#         (a) Vercel's "Protection Bypass for Automation" — supply the project's
+#             VERCEL_AUTOMATION_BYPASS_SECRET via --bypass-token or the env var; the
+#             probe sends it as the x-vercel-protection-bypass header and Vercel
+#             serves the real content (200) instead of the SSO redirect, so the full
+#             deep checks run. This is the officially-sanctioned CI path and does not
+#             weaken the site's protection for anyone else.
+#         (b) an SSO-exempt custom domain (deploymentType all_except_custom_domains).
 # Either way the nightly probe never fires a false alarm just because it is gated.
 
 import argparse
@@ -76,9 +83,11 @@ class AuthGated(RuntimeError):
       - a 30x redirect off our host onto Vercel's own Authentication (SSO) login
         (Vercel "Deployment Protection" -> vercel.com/login?next=/sso-api/...).
     In both cases the deep checks are skipped, not failed. The 401/basic-auth gate
-    can be unlocked from CI by matching the SITE_PASSWORD secret; the SSO gate
-    CANNOT (it needs a Vercel session cookie, not a password), so a password does
-    not help there — the probe just reports up-and-gated."""
+    can be unlocked from CI by matching the SITE_PASSWORD secret; the SSO gate needs
+    a Vercel session cookie, not a password, so SITE_PASSWORD does not help there —
+    but Vercel's Protection-Bypass-for-Automation secret (x-vercel-protection-bypass
+    header, VERCEL_AUTOMATION_BYPASS_SECRET) DOES open it. Without either, the probe
+    just reports up-and-gated."""
 
 
 def _vercel_sso_gate(base_url, final_url):
@@ -111,10 +120,15 @@ def _vercel_sso_gate(base_url, final_url):
 
 # Fetchers — one code path for validation, two transports.
 class HttpFetcher:
-    def __init__(self, base_url, password=None):
+    def __init__(self, base_url, password=None, bypass=None):
         self.base = base_url.rstrip("/")
         self.target = self.base
         self.password = (password or "").strip()
+        # Vercel "Protection Bypass for Automation" secret. When present, sent as the
+        # x-vercel-protection-bypass header so Vercel serves the real content instead
+        # of the SSO Deployment-Protection redirect — letting the deep checks run past
+        # a Vercel-Authentication wall from CI. Absent -> unchanged (report up-gated).
+        self.bypass = (bypass or "").strip()
 
     def _headers(self):
         h = {"User-Agent": USER_AGENT}
@@ -123,6 +137,11 @@ class HttpFetcher:
             token = base64.b64encode(
                 ("health:" + self.password).encode("utf-8")).decode("ascii")
             h["Authorization"] = "Basic " + token
+        if self.bypass:
+            # Official Vercel automation-bypass header; a valid secret makes Vercel
+            # skip the SSO/password Deployment-Protection wall for THIS request only.
+            h["x-vercel-protection-bypass"] = self.bypass
+            h["x-vercel-set-bypass-cookie"] = "true"
         return h
 
     def fetch(self, rel):
@@ -164,11 +183,22 @@ class HttpFetcher:
         # basic-auth gate: UP + access-protected (healthy), never a false outage.
         gate = _vercel_sso_gate(self.base, final_url)
         if gate:
+            if self.bypass:
+                # A bypass secret was supplied but Vercel still redirected to SSO —
+                # the secret is stale/wrong (rotated, or from another project). The
+                # site is healthy; the probe just cannot see past the gate.
+                raise AuthGated(
+                    "HTTP %d -> %s — live site is up and protected by Vercel "
+                    "Authentication (SSO); the VERCEL_AUTOMATION_BYPASS_SECRET "
+                    "supplied to the probe was rejected (stale/wrong bypass secret, "
+                    "not a site outage) — re-copy the project's current Protection-"
+                    "Bypass-for-Automation secret into the CI secret" % (status, gate))
             raise AuthGated(
                 "HTTP %d -> %s — live site is up and protected by Vercel "
                 "Authentication (SSO Deployment Protection); the probe was redirected "
                 "to Vercel's login. An SSO gate needs a Vercel session cookie, not a "
-                "password, so SITE_PASSWORD cannot unlock the deep checks from CI%s"
+                "password, so SITE_PASSWORD cannot unlock the deep checks from CI. "
+                "Set the VERCEL_AUTOMATION_BYPASS_SECRET to deep-probe past SSO%s"
                 % (status, gate,
                    " (SITE_PASSWORD was supplied but does not apply to an SSO gate)"
                    if self.password else ""))
@@ -3582,15 +3612,17 @@ def run_checks(fetcher):
         detail = str(e)
         record("live site is up and access-protected (auth-gated)", True, detail)
         if "SSO" in detail:
-            # Vercel Authentication (SSO): no CI-supplyable credential satisfies it
-            # (it needs a Vercel session cookie). Deep checks are correctly SKIPPED,
-            # not failed — this is the healthy up-and-protected state, and the only
-            # way to deep-probe is to exempt the alias (custom domain) or disable SSO.
+            # Vercel Authentication (SSO): a Basic-Auth password cannot satisfy it,
+            # but Vercel's Protection-Bypass-for-Automation secret CAN. Deep checks
+            # are correctly SKIPPED (not failed) — the healthy up-and-protected state
+            # — and we name the CI unlock so the owner can restore deep production
+            # coverage without weakening the site's protection.
             record("deep page/data checks", True,
-                   "SKIPPED — deployment is behind Vercel Authentication (SSO); the "
-                   "probe cannot authenticate past an SSO gate from CI. Site is up + "
-                   "protected. To deep-probe, expose it via an SSO-exempt custom "
-                   "domain or turn off Vercel Authentication for this alias.")
+                   "SKIPPED — deployment is behind Vercel Authentication (SSO). Site "
+                   "is up + protected. To restore deep production checks from CI, add "
+                   "the project's VERCEL_AUTOMATION_BYPASS_SECRET as a repo secret "
+                   "(Protection Bypass for Automation) — or expose an SSO-exempt "
+                   "custom domain / turn off Vercel Authentication for this alias.")
         elif getattr(fetcher, "password", ""):
             # A credential was supplied but the deployment rejected it. The site is
             # healthy; the probe simply cannot see past the gate. Skip (not fail) the
@@ -3704,12 +3736,20 @@ def main(argv=None):
                          "(any username; matches middleware.js SITE_PASSWORD). Falls "
                          "back to the SITE_PASSWORD env var. Omit for a public site — a "
                          "401 is then reported as healthy-but-gated, not a failure.")
+    ap.add_argument("--bypass-token",
+                    default=os.environ.get("VERCEL_AUTOMATION_BYPASS_SECRET"),
+                    help="Vercel Protection-Bypass-for-Automation secret. Sent as the "
+                         "x-vercel-protection-bypass header so the probe can deep-check "
+                         "past a Vercel Authentication (SSO) Deployment-Protection wall. "
+                         "Falls back to the VERCEL_AUTOMATION_BYPASS_SECRET env var. "
+                         "Omit and an SSO redirect is reported as healthy-but-gated.")
     ap.add_argument("--json", metavar="OUT",
                     help="also write a machine-readable report to this path")
     args = ap.parse_args(argv)
 
     if args.base_url:
-        fetcher = HttpFetcher(args.base_url, password=args.site_password)
+        fetcher = HttpFetcher(args.base_url, password=args.site_password,
+                              bypass=args.bypass_token)
     else:
         fetcher = LocalFetcher(args.local)
     results = run_checks(fetcher)
