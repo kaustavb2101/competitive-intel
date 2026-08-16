@@ -39,10 +39,14 @@ from email.utils import formataddr
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D = os.path.join(ROOT, "platform", "data")
-SITE = os.environ.get("SITE_URL", "https://competitive-intel.vercel.app")
 
-BG, CARD, FG, DIM, ACC = "#0F1216", "#171B21", "#E8EAED", "#9AA3AE", "#5B7CFA"
-GOLD, MERCH, PD = "#E6B450", "#1C8C7D", "#C8433B"
+# LIGHT palette, on the owner's instruction — the dark console theme belongs to the dashboard,
+# where it is read on a big screen; in an inbox at 08:30 on a phone it is just hard to read.
+# Accent/gold/merch are the app's hues DARKENED to hold contrast on white (the dashboard values
+# are tuned against #0F1216 and go illegible on a light ground).
+BG, CARD, FG, DIM = "#F4F5F7", "#FFFFFF", "#1B1F27", "#5C6572"
+LINE = "#E3E6EB"
+ACC, GOLD, MERCH, PD = "#3B5BD9", "#8A6206", "#12695C", "#A6332C"
 
 
 def load(name):
@@ -59,6 +63,33 @@ def load(name):
 def esc(s):
     return (str(s if s is not None else "").replace("&", "&amp;")
             .replace("<", "&lt;").replace(">", "&gt;"))
+
+
+def thai_names():
+    """key -> Thai brand name, from the operator universe.
+
+    Every layer carries the same operator `key`, but each renders its own label: the watch
+    layer prints the English "Srisawad", the Play ladder prints an app name. The owner reads
+    these brands in Thai, so one canonical map is applied at render time rather than trusting
+    whatever string each layer happened to store.
+    """
+    p = os.path.join(ROOT, "source-data", "rival_universe.json")
+    try:
+        with io.open(p, encoding="utf-8") as f:
+            u = json.load(f)
+    except (ValueError, OSError):
+        return {}
+    ops = u.get("operators") if isinstance(u, dict) else u
+    return {o.get("key"): o.get("name_th") for o in (ops or []) if o.get("key")}
+
+
+def th(names, key, fallback=None):
+    """Thai name for an operator key, falling back to whatever the layer stored.
+
+    Never invents a name: an operator absent from the universe keeps its own label rather
+    than being silently dropped or rendered as a bare key.
+    """
+    return names.get(key) or fallback or key or "—"
 
 
 def collect():
@@ -91,8 +122,81 @@ def collect():
     sent = pulse.get("sentiment") or []
     us = next((s for s in sent if s.get("is_us")), None)
 
+    # SENTIMENT ACROSS ALL FOUR LISTENING POSTS, not just Google Play. Play and Apple only see
+    # brands that ship an app, which is why เงินให้ใจ never appeared in this email despite
+    # LEADING Pantip discussion — the loudest brand in the field was invisible because it has
+    # no app. Union the keys so presence in ANY source puts a brand on the board.
+    names = thai_names()
+    # The app-review pullers key by APP identity, the universe/Pantip/YouTube by OPERATOR.
+    # Unaliased, เงินเทอร์โบ showed "no app presence" on this board while actually rating
+    # 4.08★ on Play — the same brand under two names, silently split. KRUNGSRI_GO is
+    # deliberately NOT folded into CAR4CASH: GO is Krungsri Auto's super-app and Car4Cash is
+    # the loan product, and Pantip tracks them apart too.
+    ALIAS = {"NGERNTURBO": "TURBO", "SAKSIAM": "SAK"}
+    def op(k):
+        return ALIAS.get(k, k)
+
+    # Apple's catalogue reaches well past vehicle refinance; a 4.84★ digital cash-advance app
+    # is not a peer of ours and must not sit in a title-loan board. Keep the title cohort.
+    ios = [r for r in (pulse.get("ios") or [])
+           if (r.get("cohort") or "title") == "title"]
+    pantip = [b for b in (load("pantip_panel").get("brands") or [])
+              if b.get("key") and b.get("key") != "_CATEGORY"]
+    tube = load("rival_youtube").get("channels") or []
+
+    play_by = {op(r["brand"]): r for r in sent if r.get("brand")}
+    ios_by = {op(r["brand"]): r for r in ios if r.get("brand")}
+    pan_by = {op(b["key"]): b for b in pantip}
+    tube_by = {op(c["key"]): c for c in tube if c.get("key")}
+
+    # EVERY OPERATOR IN THE UNIVERSE, on the owner's instruction: "if there are 23 players in
+    # this universe, you need to find information on all of them." A board built only from
+    # brands that happen to HAVE data silently drops the ones we cover worst — อะมานะฮ์
+    # ลิสซิ่ง has nothing in any source and so was invisible, which reads as "no such
+    # competitor" rather than "we are not watching this competitor". Listing all 23 with the
+    # blanks showing turns a hidden coverage gap into a visible one.
+    rate_by = {}
+    for o in ops:
+        if o.get("key"):
+            rate_by[o["key"]] = o
+    universe_keys = [k for k in names] or sorted(
+        set(play_by) | set(ios_by) | set(pan_by) | set(tube_by))
+
+    board_rows = []
+    for key in universe_keys:
+        pl, ap = play_by.get(key) or {}, ios_by.get(key) or {}
+        pa, yt = pan_by.get(key) or {}, tube_by.get(key) or {}
+        rb = rate_by.get(key) or {}
+        row = {
+            "key": key,
+            "name": th(names, key, pa.get("label") or yt.get("name_th") or pl.get("name")),
+            "is_us": bool(pl.get("own") or pa.get("is_us") or yt.get("is_us") or key == "AUTOX"),
+            "eff": rb.get("effective_lo"),
+            "eff_src": rb.get("effective_source"),
+            "play": pl.get("score"),
+            "apple": ap.get("score"),
+            "pantip": pa.get("est_threads"),
+            "subs": yt.get("subscribers"),
+            # Whose channel: a PARENT corporate channel is not the product's own audience.
+            "subs_parent": bool(yt.get("is_parent_channel")),
+        }
+        row["n_sources"] = sum(row[f] is not None
+                               for f in ("eff", "play", "apple", "pantip", "subs"))
+        board_rows.append(row)
+    # Ordered by Pantip volume — who the market is actually talking about. Brands with no
+    # Pantip figure sort last rather than being read as "quiet", and the ones we hold nothing
+    # at all on sort last of those, which puts our own blind spots at the bottom in plain view.
+    board_rows.sort(key=lambda r: (r["pantip"] is None, -(r["pantip"] or 0), -r["n_sources"]))
+    blind = [r["name"] for r in board_rows if r["n_sources"] == 0]
+
     return {
         "asof": asof,
+        "names": names,
+        "sentiment_board": board_rows,
+        "blind": blind,
+        "n_universe": len(board_rows),
+        "pantip_headline": (load("pantip_panel").get("headline") or None),
+        "n_pantip_brands": len(pantip),
         "headline": pulse.get("headline"),
         "ads_appeared": w_ads.get("appeared") or [],
         "ads_disappeared": w_ads.get("disappeared") or [],
@@ -132,6 +236,19 @@ def subject(c):
     return "Rival pulse %s — %s" % (c["asof"], ", ".join(bits) if bits else "no change")
 
 
+def _subs_str(n):
+    """Subscriber count, without rounding a real audience away.
+
+    "%dk" turned 480 subscribers into "0k", which reads as no channel at all rather than a
+    small one — and a small channel is a finding, not a blank.
+    """
+    if n >= 1e6:
+        return "%.1fM" % (n / 1e6)
+    if n >= 1e4:
+        return "%dk" % round(n / 1e3)
+    return "{:,}".format(int(n))
+
+
 def rows_html(items, render):
     return "".join(render(i) for i in items) or (
         '<tr><td style="padding:6px 0;color:%s">Nothing new.</td></tr>' % DIM)
@@ -149,49 +266,82 @@ def html(c):
                    ('<div style="font:12px/1.45 -apple-system,sans-serif;color:%s;margin-top:3px">%s</div>'
                     % (DIM, note)) if note else "", FG, body))
 
+    N = c["names"]
+    BD = "border-bottom:1px solid " + LINE
+
     promo = rows_html(c["promos_new"], lambda p: (
-        '<tr><td style="padding:5px 0;border-bottom:1px solid #222">'
+        '<tr><td style="padding:7px 0;%s">'
         '<b>%s</b> <span style="color:%s">%s</span><br>'
-        '<a href="%s" style="color:%s;font-size:12px;text-decoration:none">%s</a></td></tr>'
-        % (esc(p.get("brand")), DIM, esc(p.get("kind") or ""), esc(p.get("url") or "#"),
-           ACC, esc((p.get("title") or "")[:150]))))
+        '<span style="color:%s;font-size:13px">%s</span></td></tr>'
+        % (BD, esc(th(N, p.get("key"), p.get("brand"))), DIM, esc(p.get("kind") or ""),
+           FG, esc(p.get("title") or ""))))          # full title, no truncation
 
     gone = rows_html(c["promos_gone"], lambda p: (
-        '<tr><td style="padding:5px 0;border-bottom:1px solid #222;color:%s">'
+        '<tr><td style="padding:7px 0;%s;color:%s">'
         '<b style="color:%s">%s</b> — %s <span style="font-size:11px">(last seen %s)</span>'
-        '</td></tr>' % (DIM, FG, esc(p.get("brand")),
-                        esc((p.get("title") or "")[:120]), esc(p.get("last_seen")))))
+        '</td></tr>' % (BD, DIM, FG, esc(th(N, p.get("key"), p.get("brand"))),
+                        esc(p.get("title") or ""), esc(p.get("last_seen")))))
 
+    # FULL ad copy, on the owner's instruction. A pricing creative truncated at 190 characters
+    # loses exactly the tail that matters — the tenor, the LTV cap and the fine print saying
+    # whether the rate is flat or reducing balance.
     pricing = rows_html(c["fresh_pricing"], lambda a: (
-        '<tr><td style="padding:6px 0;border-bottom:1px solid #222">'
+        '<tr><td style="padding:9px 0;%s">'
         '<b>%s</b> <span style="color:%s;font-size:11px">first shown %s</span>%s<br>'
-        '<span style="color:%s;font-size:12px">%s</span></td></tr>'
-        % (esc(a.get("brand")), DIM, esc(a.get("first")),
+        '<span style="color:%s;font-size:13px;line-height:1.55">%s</span></td></tr>'
+        % (BD, esc(th(N, a.get("key"), a.get("brand"))), DIM, esc(a.get("first")),
            (' <span style="color:%s;font-size:11px">· %s</span>'
             % (GOLD, esc(a["basis_kind"]))) if a.get("basis_kind") else "",
-           DIM, esc((a.get("copy") or "")[:190]))))
+           FG, esc(" ".join((a.get("copy") or "").split())))))
 
     board = rows_html(c["operators"][:10], lambda o: (
-        '<tr><td style="padding:4px 0;border-bottom:1px solid #222">%s'
+        '<tr><td style="padding:5px 0;%s">%s'
         '<div style="color:%s;font-size:11px">%s</div></td>'
-        '<td align="right" style="padding:4px 0;border-bottom:1px solid #222;white-space:nowrap">'
+        '<td align="right" style="padding:5px 0;%s;white-space:nowrap">'
         '<b style="color:%s">%s</b></td>'
-        '<td align="right" style="padding:4px 0 4px 14px;border-bottom:1px solid #222;'
-        'color:%s;white-space:nowrap">%s</td></tr>'
-        % (esc(o.get("operator")), DIM,
+        '<td align="right" style="padding:5px 0 5px 14px;%s;color:%s;white-space:nowrap">%s</td>'
+        '</tr>'
+        % (BD, esc(o.get("name_th") or th(N, o.get("key"), o.get("operator"))), DIM,
            esc({"title_loan": "ไม่โอนเล่ม", "hp_refinance": "โอนเล่ม",
-                "both": "both"}.get(o.get("loan_type"), "")),
-           MERCH if o.get("effective_source") in ("lender", "as_quoted") else GOLD,
+                "both": "ทั้งสองแบบ"}.get(o.get("loan_type"), "")),
+           BD, MERCH if o.get("effective_source") in ("lender", "as_quoted") else GOLD,
            ("%s%%" % o["effective_lo"]) if o.get("effective_lo") is not None else "—",
-           DIM, ("LTV %s%%" % o["ltv_pct"]) if o.get("ltv_pct") is not None else "")))
+           BD, DIM, ("LTV %s%%" % o["ltv_pct"]) if o.get("ltv_pct") is not None else "")))
 
-    sentiment = rows_html(c["sentiment"], lambda s: (
-        '<tr><td style="padding:4px 0;border-bottom:1px solid #222">%s%s</td>'
-        '<td align="right" style="padding:4px 0;border-bottom:1px solid #222">'
-        '<b style="color:%s">%s★</b></td></tr>'
-        % (esc(s.get("brand")),
-           ' <span style="color:%s;font-size:11px">us</span>' % GOLD if s.get("is_us") else "",
-           GOLD if s.get("is_us") else FG, esc(s.get("score")))))
+    def num(v, suffix=""):
+        return ('<b>%s%s</b>' % (esc(v), suffix)) if v is not None else (
+            '<span style="color:#B6BCC6">—</span>')
+
+    def subs(r):
+        if r["subs"] is None:
+            return '<span style="color:#B6BCC6">—</span>'
+        s = _subs_str(r["subs"])
+        # A parent corporate channel is not the product's own audience — say so rather than
+        # letting KrungsriAutoTV's 521k read as Car4Cash's following.
+        return '<b>%s</b>%s' % (esc(s), '<span style="color:%s;font-size:10px"> กลุ่ม</span>'
+                                % DIM if r["subs_parent"] else "")
+
+    sentiment = rows_html(c["sentiment_board"], lambda r: (
+        '<tr><td style="padding:6px 0;%s">%s%s</td>'
+        '<td align="right" style="padding:6px 0;%s">%s</td>'
+        '<td align="right" style="padding:6px 0 6px 12px;%s">%s</td>'
+        '<td align="right" style="padding:6px 0 6px 12px;%s">%s</td>'
+        '<td align="right" style="padding:6px 0 6px 12px;%s">%s</td></tr>'
+        % (BD, esc(r["name"]),
+           ' <span style="color:%s;font-size:11px">เรา</span>' % GOLD if r["is_us"] else "",
+           BD, num(r["play"], "★"), BD, num(r["apple"], "★"),
+           BD, num("{:,}".format(r["pantip"]) if r["pantip"] is not None else None),
+           BD, subs(r))))
+
+    sent_head = ('<tr><td style="padding:0 0 5px;color:%s;font-size:11px">แบรนด์</td>'
+                 '<td align="right" style="padding:0 0 5px;color:%s;font-size:11px">Play</td>'
+                 '<td align="right" style="padding:0 0 5px 12px;color:%s;font-size:11px">'
+                 'App&nbsp;Store</td>'
+                 '<td align="right" style="padding:0 0 5px 12px;color:%s;font-size:11px">'
+                 'Pantip</td>'
+                 '<td align="right" style="padding:0 0 5px 12px;color:%s;font-size:11px">'
+                 'YouTube</td></tr>' % (DIM, DIM, DIM, DIM, DIM))
+    sentiment = sent_head + sentiment
 
     lead = ""
     if c["comparable"].get("lo") is not None:
@@ -208,7 +358,7 @@ def html(c):
 <table width="100%%" cellpadding="0" cellspacing="0" style="background:%s;padding:20px 0">
 <tr><td align="center">
 <table width="640" cellpadding="0" cellspacing="0" style="max-width:640px;background:%s;
- border:1px solid #232830;border-radius:10px;overflow:hidden">
+ border:1px solid %s;border-radius:10px;overflow:hidden">
 <tr><td style="padding:20px 22px 6px">
   <div style="font:700 19px/1.25 -apple-system,Segoe UI,Roboto,sans-serif;color:%s">
     Rival pulse — %s</div>
@@ -218,33 +368,35 @@ def html(c):
   %s
 </td></tr>
 %s%s%s%s%s
-<tr><td style="padding:14px 22px 20px;border-top:1px solid #232830">
-  <a href="%s/#acq" style="display:inline-block;background:%s;color:#fff;text-decoration:none;
-   font:600 13px -apple-system,sans-serif;padding:9px 16px;border-radius:6px">
-   Open the Competition tab</a>
-  <div style="font:11px/1.5 -apple-system,sans-serif;color:%s;margin-top:12px">
+<tr><td style="padding:14px 22px 20px;border-top:1px solid %s">
+  <div style="font:11px/1.55 -apple-system,sans-serif;color:%s">
    %s of %s tracked creatives state whether their rate is flat or reducing balance, so an
-   advertised headline is not comparable as printed — that is what the effective column fixes.
-   Generated by pipeline/build_rival_digest.py from rival_watch.json, rate_board.json,
-   rival_ads.json and rival_pulse.json.</div>
+   advertised headline is not comparable as printed — that is what the effective column fixes.</div>
 </td></tr>
 </table></td></tr></table></body></html>""" % (
-        BG, BG, CARD, FG, esc(c["asof"]), DIM,
+        BG, BG, CARD, LINE, FG, esc(c["asof"]), DIM,
         ('<div style="font:14px/1.55 -apple-system,sans-serif;color:%s;margin-top:12px;'
-         'padding:11px 13px;background:#12161C;border-left:3px solid %s;border-radius:4px">%s</div>'
+         'padding:11px 13px;background:#F0F4FF;border-left:3px solid %s;border-radius:4px">%s</div>'
          % (FG, MERCH, lead)) if lead else "",
-        sec("New rival promotions", promo,
+        sec("โปรโมชันใหม่ของคู่แข่ง · New rival promotions", promo,
             "From the rivals' own sites. Only listed once a dated first_seen proves it is new."),
-        sec("New pricing ads", pricing,
-            "Creatives that compete on cost, newest first — %d in total this cycle."
-            % c["n_fresh_pricing"]),
-        sec("Rate board", board,
+        sec("โฆษณาราคาใหม่ · New pricing ads", pricing,
+            "Creatives that compete on cost, newest first — %d in total this cycle. Copy is "
+            "shown in full: the tail carries the tenor, the LTV cap and the flat-or-reducing "
+            "fine print." % c["n_fresh_pricing"]),
+        sec("ตารางอัตราดอกเบี้ย · Rate board", board,
             "Effective %/yr, reducing balance. Green = the lender's own published figure, "
             "gold = converted by us from their flat quote."),
-        sec("Promotions no longer listed", gone,
+        sec("โปรโมชันที่ถูกถอด · Promotions no longer listed", gone,
             "Never inferred — each carries the last date it was measurably still up."),
-        sec("App sentiment", sentiment, "Google Play, last 90 days."),
-        SITE, ACC, DIM, c["basis_stated"], c["basis_scanned"])
+        sec("เสียงจากตลาด · Sentiment and share of voice", sentiment,
+            "Play and App Store are MEASURED star averages; YouTube is a MEASURED subscriber "
+            "count (กลุ่ม = a parent corporate channel, not the product's own audience); Pantip "
+            "is an ESTIMATED thread count and leans high for every brand — the RANKING is the "
+            "finding, not the multiple. Ordered by Pantip volume: who the market is talking "
+            "about. A dash means the brand is absent from that source, not silent on it — "
+            "เงินให้ใจ ships no app, so it cannot appear in the two star columns at all."),
+        LINE, DIM, c["basis_stated"], c["basis_scanned"])
 
 
 def text(c):
@@ -259,27 +411,42 @@ def text(c):
             L.append("Lowest headline anywhere: %s%% flat (%s) = %s%% effective — โอนเล่ม money, "
                      "a different product." % (cf["quoted"], cf["operator"], cf["effective"]))
         L.append("")
+    N = c["names"]
+
     def blk(title, items, fmt):
         L.append(title.upper())
         L.extend(["  " + fmt(i) for i in items] or ["  (nothing new)"])
         L.append("")
     blk("New rival promotions", c["promos_new"],
-        lambda p: "%s — %s  %s" % (p.get("brand"), (p.get("title") or "")[:90], p.get("url") or ""))
+        lambda p: "%s — %s" % (th(N, p.get("key"), p.get("brand")), p.get("title") or ""))
     blk("New pricing ads (%d)" % c["n_fresh_pricing"], c["fresh_pricing"],
-        lambda a: "%s (%s)%s — %s" % (a.get("brand"), a.get("first"),
+        lambda a: "%s (%s)%s — %s" % (th(N, a.get("key"), a.get("brand")), a.get("first"),
                                       " [%s]" % a["basis_kind"] if a.get("basis_kind") else "",
-                                      " ".join((a.get("copy") or "").split())[:110]))
+                                      " ".join((a.get("copy") or "").split())))
     blk("Promotions no longer listed", c["promos_gone"],
-        lambda p: "%s — %s (last seen %s)" % (p.get("brand"), (p.get("title") or "")[:80],
-                                              p.get("last_seen")))
+        lambda p: "%s — %s (last seen %s)" % (th(N, p.get("key"), p.get("brand")),
+                                              p.get("title") or "", p.get("last_seen")))
     L.append("RATE BOARD (effective %/yr, reducing balance)")
     for o in c["operators"][:10]:
-        L.append("  %-26s %7s  %s" % (
-            (o.get("operator") or "")[:26],
+        L.append("  %-30s %7s  %s" % (
+            (o.get("name_th") or th(N, o.get("key"), o.get("operator")))[:30],
             ("%s%%" % o["effective_lo"]) if o.get("effective_lo") is not None else "-",
             ("LTV %s%%" % o["ltv_pct"]) if o.get("ltv_pct") is not None else ""))
-    L += ["", "%s of %s creatives state their rate basis." % (c["basis_stated"], c["basis_scanned"]),
-          "%s/#acq" % SITE]
+    L.append("")
+    L.append("SENTIMENT AND SHARE OF VOICE")
+    L.append("  %-26s %6s %6s %9s %9s" % ("brand", "Play", "Apple", "Pantip", "YouTube"))
+    for r in c["sentiment_board"]:
+        subs = "-" if r["subs"] is None else _subs_str(r["subs"])
+        L.append("  %-26s %6s %6s %9s %9s%s" % (
+            (r["name"] or "")[:26],
+            r["play"] if r["play"] is not None else "-",
+            r["apple"] if r["apple"] is not None else "-",
+            "{:,}".format(r["pantip"]) if r["pantip"] is not None else "-",
+            subs, "  (us)" if r["is_us"] else ""))
+    L.append("  Play/Apple = measured stars; YouTube = measured subscribers; Pantip = ESTIMATED")
+    L.append("  threads, high for everyone — the ranking is the finding, not the multiple.")
+    L.append("  A dash = absent from that source, not silent on it.")
+    L += ["", "%s of %s creatives state their rate basis." % (c["basis_stated"], c["basis_scanned"])]
     return "\n".join(L)
 
 
