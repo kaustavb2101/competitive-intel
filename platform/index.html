@@ -774,6 +774,30 @@
     <div id="pulseiosnote"></div>
     </details>
 
+    <!-- FACEBOOK PULSE (2026-08-16) — "facebook is always the promo" (owner). A lender's rate card
+         below is the BoT-mandated CEILING; this is what it is winning customers with THIS WEEK, read
+         anonymously off each operator's own Facebook page. It renders ABOVE the rate board on
+         purpose and is never averaged with it. Surfaces data/rival_facebook.json
+         (build_rival_facebook.py, from pull_rival_facebook.js). Lazy, null-safe, graceful if absent. -->
+    <h3 class="compsub" style="margin-top:18px">Facebook pulse · what rivals are posting right now <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · rivals' own Facebook pages</span></h3>
+    <p class="lead">A lender's published rate card (below) is the <b>BoT-mandated disclosure — the legal ceiling</b>. Its Facebook post is what it is actually <b>winning customers with this week</b>, read anonymously off each operator's own page — one newest post per page per run, before the login wall. This feed leads the rate board on purpose and is <b>never averaged</b> with it.</p>
+    <div class="insight" id="fbreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <div id="fbpromolist"></div>
+    <details id="fbcorpwrap" style="margin-top:10px"><summary class="sub" style="cursor:pointer">Corporate-page posts — not about the vehicle-loan product (<span id="fbcorpcount">0</span>)</summary><div id="fbcorplist"></div></details>
+    <details id="fbsilentwrap" style="margin-top:10px"><summary class="sub" style="cursor:pointer">No post captured this run (<span id="fbsilentcount">0</span>)</summary><div id="fbsilentlist"></div></details>
+
+    <!-- PROMO VS CARD (2026-08-16) — where a live promo (Facebook or Google ad) undercuts the
+         operator's own published rate-card floor. Surfaces data/promo_gap.json
+         (build_promo_gap.py). Also renders above the rate board — it is the verdict on the two
+         readings the board and the Facebook feed each supply. Lazy, null-safe, graceful if absent. -->
+    <h3 class="compsub" style="margin-top:18px">Promo vs card · where the live offer undercuts the disclosure <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · both sides</span></h3>
+    <p class="lead">Every operator whose <b>live promo quote</b> (Facebook post or Google ad) is checked against its <b>own published rate-card floor</b>, converted on the reading LEAST favourable to calling it an undercut — a bare monthly figure is read FLAT, the costliest interpretation. A gap under 1.5pp is inside the noise of not knowing the promo's exact tenor and is shown as "within noise", not an undercut.</p>
+    <div class="insight" id="pgreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="pgtbl"></table>
+    <details id="pgquoteswrap" style="margin-top:10px"><summary class="sub" style="cursor:pointer">Every quote behind these numbers — verbatim Thai context, channel and date</summary><div id="pgquotes"></div></details>
+    <div id="pgcardonly"></div>
+    <div id="pgnote"></div>
+
     <h3 class="compsub" style="margin-top:18px">Rate board · what every vehicle-refinance rival actually charges <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · lenders' own rate cards</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED conversion</span></h3>
     <p class="lead">Every operator that turns a vehicle into cash — <b>title loan and hire purchase, bank and non-bank</b> — with its rate restated on <b>one</b> basis so the column can be read straight down. That restatement is the whole point: Thai lenders quote two incompatible conventions a few pixels apart. <b>โอนเล่ม</b> (you hand over the registration book) is advertised <b>flat</b>, which is where the eye-catching 3.18% headlines come from. <b>ไม่โอนเล่ม</b> (you keep the book — <b>our</b> product) is advertised <b>reducing balance</b> at 12–24%. Those two look four times apart and cost about the same money. So a bank advertising 3.18% is <b>not</b> undercutting a 21% title loan by eighteen points; it is selling a different product against different collateral.</p>
     <div class="insight" id="rbreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
