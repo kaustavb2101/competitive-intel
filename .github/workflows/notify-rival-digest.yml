@@ -1,0 +1,117 @@
+name: Notify — daily rival pulse digest (email)
+
+# Emails the day's competitive movement: new rival promotions, new pricing ads, the rate board
+# and the app-sentiment ladder.
+#
+# WHY A JOB: every rival feed in this repo already refreshes DAILY through the market-pulse
+# swarm (pull_swarm.py: google_ads, app_reviews, apple_reviews, rival_youtube, rival_promos —
+# all cadence="daily"), lands as an auto-merged PR and renders on the Competition tab. None of
+# it was ever pushed anywhere, so seeing it depended on remembering to go and look. That is the
+# one step a daily cadence cannot rely on, and it is what this job removes.
+#
+# IT DETECTS NOTHING ITSELF. rival_watch.json is already the diff layer and it is careful in
+# ways worth not re-implementing badly: it never calls a promo "gone" without a measured
+# last_seen to prove it stopped, and it never uses the wall clock — every date is copied from a
+# field the source data stamped. This job renders that. If the email and the site ever
+# disagree, the site is right and the digest is broken.
+#
+# READS ONLY. It writes nothing to the repo, opens no PR and needs no contents:write. It runs
+# AFTER the swarm has already merged the day's data, so it reports what is committed on master
+# rather than racing the pull.
+#
+# CREDENTIALS — the one thing that needs a human. Set four repo secrets
+# (Settings > Secrets and variables > Actions):
+#     SMTP_HOST   smtp.gmail.com
+#     SMTP_USER   the sending Gmail address
+#     SMTP_PASS   a Gmail APP PASSWORD, not the account password
+#                 (myaccount.google.com > Security > 2-Step Verification > App passwords)
+#     MAIL_TO     where the digest goes; comma-separated for several people
+# Optional: SMTP_PORT (default 587), MAIL_FROM, MAIL_FROM_NAME, SITE_URL.
+#
+# Until they exist the job still runs, still renders the digest, uploads it as an artifact and
+# exits GREEN with a SKIP line saying which secret is missing — the same pattern the repo uses
+# for YOUTUBE_API_KEY. A missing secret should never read as "the rivals did nothing today".
+#
+# The send path is stdlib smtplib inside pipeline/build_rival_digest.py — no third-party mail
+# action, so the credentials are never handed to code outside this repo.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Render the digest but do not send it"
+        type: boolean
+        default: false
+  schedule:
+    # Daily 01:30 UTC = 08:30 Bangkok. After the swarm's 21:35 UTC run (04:35 Bangkok) has
+    # merged, so the digest describes today's data and not yesterday's.
+    - cron: "30 1 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rival-digest
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Report which layers the digest can see
+        # A digest built from a layer that failed to refresh would be quietly stale, so the run
+        # log states what it actually read before it reads it.
+        run: |
+          for f in rival_watch rival_pulse rate_board rival_ads; do
+            p="platform/data/$f.json"
+            if [ -s "$p" ]; then
+              printf '  %-14s %8s bytes\n' "$f" "$(wc -c < "$p")"
+            else
+              printf '  %-14s MISSING — the digest will omit its section\n' "$f"
+            fi
+          done
+
+      - name: Build the digest
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://competitive-intel.vercel.app' }}
+        run: python pipeline/build_rival_digest.py --out rival-digest.html --stdout
+
+      - name: Send it
+        if: ${{ !inputs.dry_run }}
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_FROM_NAME: ${{ secrets.MAIL_FROM_NAME }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://competitive-intel.vercel.app' }}
+        run: |
+          set +e
+          python pipeline/build_rival_digest.py --out rival-digest.html --send
+          rc=$?
+          # 3 = credentials absent. That is a configuration state, not a failure: the digest was
+          # still built and is attached below. Anything else is a real send error and fails.
+          if [ "$rc" -eq 3 ]; then
+            echo "::notice title=Digest not emailed::Mail secrets are not set yet — see the header of this workflow file for the four needed. The rendered digest is attached as an artifact."
+            exit 0
+          fi
+          exit $rc
+
+      - name: Attach the digest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rival-digest
+          path: rival-digest.html
+          retention-days: 14
+          if-no-files-found: warn
