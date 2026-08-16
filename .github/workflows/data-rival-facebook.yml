@@ -32,10 +32,13 @@ name: Data — rival Facebook promo feed (daily)
 on:
   workflow_dispatch:
   schedule:
-    # 01:20 UTC = 08:20 Bangkok — before the 08:30 digest, so the email carries the morning's
-    # posts rather than yesterday's. Off-minute from every other data-*.yml to avoid colliding
-    # on provenance.json, which every data job regenerates.
-    - cron: "20 1 * * *"
+    # 22:00 UTC = 05:00 Bangkok. NOT 08:20, which was the first attempt and was wrong: this job
+    # opens a PR, it does not push to master, so a pull ten minutes before the 08:30 digest
+    # would still be sitting unmerged when the email is built — the digest reads master and
+    # would have carried YESTERDAY's posts while appearing to carry today's. Three and a half
+    # hours gives the gate and pr-automerge time to land it first. Off-minute from every other
+    # data-*.yml to avoid colliding on provenance.json, which every data job regenerates.
+    - cron: "0 22 * * *"
 
 permissions:
   contents: write
