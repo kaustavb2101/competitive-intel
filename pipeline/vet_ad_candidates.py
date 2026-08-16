@@ -108,22 +108,36 @@ def main():
     ap.add_argument("--json", metavar="PATH", help="also write the machine-readable report here")
     ap.add_argument("--sleep", type=float, default=None,
                     help="seconds between RPC calls (default: pull_google_ads.POLITE)")
+    ap.add_argument("--list", action="store_true",
+                    help="print the candidate table and exit — no network. Exercises the "
+                         "CANDIDATES unpacking offline, which is the one thing py_compile and "
+                         "an import check cannot do (a shape change there shipped a "
+                         "ValueError straight to CI).")
     a = ap.parse_args()
     if a.sleep is not None:
         P.POLITE = a.sleep
 
-    cands = [(k, aid, note) for k, accts in sorted(P.CANDIDATES.items()) for aid, note in accts]
+    # CANDIDATES values are (advertiser_id, advertiser_name, ads_note) — the NAME matters here:
+    # it is the evidence that --discover matched the bank's legal entity rather than a personal
+    # name collision, so it is carried into the report instead of being dropped.
+    cands = [(k, aid, name, note)
+             for k, accts in sorted(P.CANDIDATES.items()) for aid, name, note in accts]
     print("Vetting %d unpinned advertiser accounts across %d operators.\n"
           % (len(cands), len(P.CANDIDATES)))
+    if a.list:
+        for key, aid, name, note in cands:
+            print("%-10s %-24s %-46s %s" % (key, aid, name[:46], note))
+        return 0
     P.warm()
 
     report = []
-    for key, aid, note in cands:
+    for key, aid, name, note in cands:
         r = probe(aid)
-        r.update({"operator": key, "advertiser_id": aid, "discovery_note": note})
+        r.update({"operator": key, "advertiser_id": aid,
+                  "advertiser_name": name, "discovery_note": note})
         report.append(r)
         print("%-10s %s" % (key, aid))
-        print("   %s" % note)
+        print("   %s — %s" % (name, note))
         if r["status"] == "unreadable":
             print("   UNREADABLE — %s" % (r["error"] or "listed creatives but no copy returned"))
         else:
