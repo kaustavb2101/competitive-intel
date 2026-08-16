@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 281,
+  "n_points": 287,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -250,11 +250,12 @@
     "2026-08-11",
     "2026-08-14",
     "2026-08-15",
-    "2026-08-16"
+    "2026-08-16",
+    "2026-08-17"
    ],
    "first_seen": "2026-07-11",
    "label": "River stations above their high mark",
-   "n": 22,
+   "n": 23,
    "path": "platform/data/thaiwater_flood.json",
    "source": "ThaiWater live river/reservoir telemetry",
    "unit": "stations",
@@ -280,7 +281,8 @@
     155.0,
     126.0,
     131.0,
-    123.0
+    123.0,
+    126.0
    ]
   },
   "fuel_diesel": {
@@ -574,11 +576,12 @@
     "2026-08-11",
     "2026-08-14",
     "2026-08-15",
-    "2026-08-16"
+    "2026-08-16",
+    "2026-08-17"
    ],
    "first_seen": "2026-07-10",
    "label": "Provinces with heavy rain somewhere",
-   "n": 22,
+   "n": 23,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "provinces",
@@ -604,7 +607,8 @@
     14.0,
     17.0,
     22.0,
-    13.0
+    13.0,
+    8.0
    ]
   },
   "rain_max_mm": {
@@ -631,11 +635,12 @@
     "2026-08-11",
     "2026-08-14",
     "2026-08-15",
-    "2026-08-16"
+    "2026-08-16",
+    "2026-08-17"
    ],
    "first_seen": "2026-07-10",
    "label": "Heaviest 24h rainfall, any gauge",
-   "n": 22,
+   "n": 23,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "mm",
@@ -661,7 +666,8 @@
     137.4,
     96.0,
     122.0,
-    110.5
+    110.5,
+    79.0
    ]
   },
   "rival_ads_live": {
@@ -693,11 +699,12 @@
     "2026-08-11",
     "2026-08-13",
     "2026-08-14",
-    "2026-08-15"
+    "2026-08-15",
+    "2026-08-16"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC · live promo/news items",
-   "n": 6,
+   "n": 7,
    "path": "source-data/rival_promos.json",
    "source": "muangthaicap.com (own-site pull)",
    "unit": "items",
@@ -707,6 +714,7 @@
     13.0,
     13.0,
     13.0,
+    11.0,
     11.0
    ]
   },
@@ -718,15 +726,17 @@
     "2026-08-11",
     "2026-08-13",
     "2026-08-14",
-    "2026-08-15"
+    "2026-08-15",
+    "2026-08-16"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD · live promo/news items",
-   "n": 6,
+   "n": 7,
    "path": "source-data/rival_promos.json",
    "source": "sawad.co.th (own-site pull)",
    "unit": "items",
    "values": [
+    5.0,
     5.0,
     5.0,
     5.0,
@@ -743,15 +753,17 @@
     "2026-08-11",
     "2026-08-13",
     "2026-08-14",
-    "2026-08-15"
+    "2026-08-15",
+    "2026-08-16"
    ],
    "first_seen": "2026-07-19",
    "label": "TIDLOR · live promo/news items",
-   "n": 6,
+   "n": 7,
    "path": "source-data/rival_promos.json",
    "source": "tidlor.com (own-site pull)",
    "unit": "items",
    "values": [
+    6.0,
     6.0,
     6.0,
     6.0,
@@ -946,7 +958,7 @@
     11146.0,
     11154.0,
     12143.0,
-    12247.0
+    12248.0
    ]
   }
  }
