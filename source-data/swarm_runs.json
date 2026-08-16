@@ -3,7 +3,7 @@
   "generated_by": "pipeline/pull_swarm.py",
   "label": "Each row is one swarm run: which feeds were pulled concurrently, whether each one succeeded / changed its declared output file / failed / timed out / was skipped (exit 3, the repo-wide SKIP convention), plus the rc of the append_history.py and rederive_drift.py steps that followed. This file makes the pulse observable.",
   "max_runs": 60,
-  "n_runs": 18,
+  "n_runs": 19,
   "title": "pull_swarm.py run history -- the swarm's own audit trail"
  },
  "runs": [
@@ -1212,6 +1212,85 @@
    "n_timeout": 0,
    "rederive_drift_rc": null,
    "started": "2026-08-16T19:35:09Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7111,
+     "bytes_before": 7109,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 4.6,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8872,
+     "bytes_before": 8879,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 5.4,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 3989,
+     "bytes_before": 3989,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 134.5,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 42959,
+     "bytes_before": 42959,
+     "key": "bot_policy_rate",
+     "rc": 0,
+     "seconds": 3.7,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 602781,
+     "bytes_before": 601312,
+     "key": "app_reviews",
+     "rc": 0,
+     "seconds": 6.3,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 2498811,
+     "bytes_before": 2498607,
+     "key": "apple_reviews",
+     "rc": 0,
+     "seconds": 71.9,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 498475,
+     "bytes_before": 498466,
+     "key": "rival_youtube",
+     "rc": 0,
+     "seconds": 35.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 1381570,
+     "bytes_before": 1376671,
+     "key": "google_ads",
+     "rc": 0,
+     "seconds": 274.3,
+     "status": "changed"
+    }
+   ],
+   "finished": "2026-08-16T21:53:32Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 7,
+   "n_failed": 0,
+   "n_ok": 8,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-08-16T21:48:53Z"
   }
  ]
 }

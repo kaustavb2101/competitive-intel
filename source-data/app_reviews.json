@@ -3,7 +3,7 @@
   "title": "Title-lender app sentiment — Google Play ratings + newest reviews (incl. our own)",
   "generated_by": "pipeline/pull_app_reviews.py",
   "label": "MEASURED — Google Play store pages (th/th). Star histogram + dated public reviews; review store accumulates across pulls (dedup by reviewId, newest 1500 kept per app).",
-  "pulled_at": "2026-08-15"
+  "pulled_at": "2026-08-16"
  },
  "apps": {
   "AUTOX": {
@@ -11,16 +11,16 @@
    "name": "เงินไชโย (AutoX)",
    "own": true,
    "stats": {
-    "score": 4.069307,
-    "ratings": 1026,
+    "score": 4.0784316,
+    "ratings": 1027,
     "reviews_total": 330,
     "installs": "500,000+",
     "histogram": [
-     141,
+     140,
      50,
      70,
      90,
-     669
+     674
     ],
     "app_updated": null,
     "version": "Varies with device"
@@ -1657,21 +1657,37 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.5954432,
-    "ratings": 16143,
-    "reviews_total": 5101,
+    "score": 4.599025,
+    "ratings": 16160,
+    "reviews_total": 5105,
     "installs": "1,000,000+",
     "histogram": [
-     804,
-     278,
-     565,
-     1341,
-     13150
+     796,
+     275,
+     560,
+     1338,
+     13185
     ],
     "app_updated": "2026-08-06",
     "version": "3.2.0"
    },
    "reviews_store": [
+    {
+     "id": "ed47e0ef-c979-4377-8cbf-2c0ca6cb1b86",
+     "at": "2026-08-15",
+     "score": 5,
+     "content": "ใช้งานง่าย",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "70ea3352-12be-4f78-bc64-c03ec1dfd02f",
+     "at": "2026-08-15",
+     "score": 5,
+     "content": "ดีจริงค่ะเบิกเงินก็ง่าย",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "6400cc38-f2cc-4007-9042-dadab000762e",
      "at": "2026-08-14",
@@ -2317,7 +2333,7 @@
      "at": "2026-08-02",
      "score": 1,
      "content": "ทั้งๆที่อัพเดทไปแล้วเข้าไปในแอปพลิเคชันยังบอกให้อัพเดทอยู่นั่นแหละระบบมีปัญหาหรือเปล่าครับ จ่ายเงินไปแล้วแต่ระบบไม่อัพเดทยอดให้",
-     "thumbs": 2,
+     "thumbs": 3,
      "replied": false
     },
     {
@@ -2445,7 +2461,7 @@
      "at": "2026-08-02",
      "score": 5,
      "content": "เงินสิบล้อช่วยได้เมื่อยามเราต้องการใช้เงินกดในแอปติดใจได้เลยไม่ยุ่งยาก ถ้าเรามีเงินคงเหลือเบิกได้ในแอปจะแสดงยอดที่เราเบิกได้เท่าไหร่ให้ดู",
-     "thumbs": 2,
+     "thumbs": 3,
      "replied": false
     },
     {
@@ -2925,7 +2941,7 @@
      "at": "2026-07-24",
      "score": 2,
      "content": "โหลดเสร็จเข้าก็ไม่ได้​ จะจ่ายก็เลย​ไม่ได้​ โทรตามตลอดจนไม่ได้ทำไร​ จะจ่ายแอฟก็ไม่ได้",
-     "thumbs": 2,
+     "thumbs": 3,
      "replied": false
     },
     {
@@ -4623,15 +4639,15 @@
    "name": "เมืองไทย แคปปิตอล",
    "own": false,
    "stats": {
-    "score": 4.6625,
-    "ratings": 6404,
-    "reviews_total": 2126,
+    "score": 4.664577,
+    "ratings": 6408,
+    "reviews_total": 2128,
     "installs": "1,000,000+",
     "histogram": [
-     269,
+     260,
      79,
-     200,
-     439,
+     210,
+     441,
      5412
     ],
     "app_updated": "2026-05-18",
@@ -8292,7 +8308,7 @@
    "own": false,
    "stats": {
     "score": 4.08,
-    "ratings": 827,
+    "ratings": 828,
     "reviews_total": 261,
     "installs": "500,000+",
     "histogram": [
@@ -8300,7 +8316,7 @@
      8,
      24,
      24,
-     602
+     603
     ],
     "app_updated": "2026-08-07",
     "version": "1.0.61-ngernturbo"
@@ -9929,16 +9945,16 @@
    "name": "สมหวัง เงินสั่งได้ (TISCO)",
    "own": false,
    "stats": {
-    "score": 4.0873785,
-    "ratings": 335,
-    "reviews_total": 130,
+    "score": 4.09,
+    "ratings": 336,
+    "reviews_total": 131,
     "installs": "100,000+",
     "histogram": [
-     52,
-     13,
+     53,
+     10,
      16,
      26,
-     227
+     228
     ],
     "app_updated": "2026-07-20",
     "version": "1.12.0"
@@ -11317,21 +11333,37 @@
    "name": "Good Money เงินดีดี (GSB)",
    "own": false,
    "stats": {
-    "score": 3.8507936,
-    "ratings": 3136,
-    "reviews_total": 1376,
+    "score": 3.8503184,
+    "ratings": 3142,
+    "reviews_total": 1379,
     "installs": "1,000,000+",
     "histogram": [
-     606,
-     218,
+     609,
+     219,
      129,
-     258,
-     1920
+     249,
+     1930
     ],
     "app_updated": "2026-07-09",
     "version": "1.0.44"
    },
    "reviews_store": [
+    {
+     "id": "a0fd396c-061f-4bcb-a89f-1958d6b0cb4f",
+     "at": "2026-08-15",
+     "score": 2,
+     "content": "ควรปรับปรุงแอปให้มีความเสถียรมากกว่านี้ โหลดช้าถึงขั้นบางทีเข้าแอปไม่ได้เลย เน็ตก็ไม่ได้มีปัญหา",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "5b4f89cc-3d33-4e78-8080-94bdb977930f",
+     "at": "2026-08-15",
+     "score": 1,
+     "content": "ห้ามนำข้อมุลไปใช่ทุกกรณี ไม่ได้สินเชื่อเลย พบเจอไม่รับผิดชอบทั้งนี้น พร้อมดำเนินคดี",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "7488c295-d7e6-47df-8b96-35ce9f9ebf1e",
      "at": "2026-08-14",
@@ -11425,7 +11457,7 @@
      "at": "2026-08-07",
      "score": 1,
      "content": "อัพโหลดเอกสารก็ยากจะลงสลิปเงินเดือนใบรับรองเงินเดือนstatement ย้อนหลังอัพโหลดยากมาก",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": true
     },
     {
@@ -11961,7 +11993,7 @@
      "at": "2026-07-24",
      "score": 1,
      "content": "สมัครแล้วไม่ผ่านการอนุมัติ ได้มีการกรอกข้อมูลสแกนหน้าและ บัตรที่ลงท้ายด้วย9349 ไม่อนุญาตให้ เอาไปเผยแพร่ทำการใดๆ มิฉะนั้นจะดำเนินการตามกฎหมาย",
-     "thumbs": 3,
+     "thumbs": 4,
      "replied": true
     },
     {
@@ -13913,21 +13945,29 @@
    "name": "GO by Krungsri Auto",
    "own": false,
    "stats": {
-    "score": 4.3634386,
-    "ratings": 9269,
+    "score": 4.364821,
+    "ratings": 9271,
     "reviews_total": 3802,
     "installs": "1,000,000+",
     "histogram": [
-     776,
-     252,
-     544,
-     947,
-     6747
+     774,
+     251,
+     543,
+     945,
+     6754
     ],
     "app_updated": "2026-07-16",
     "version": "8.5.0"
    },
    "reviews_store": [
+    {
+     "id": "d89803bc-cb98-4d15-bfe8-a07d5ee16f91",
+     "at": "2026-08-15",
+     "score": 5,
+     "content": "ดีมากคะ",
+     "thumbs": 0,
+     "replied": true
+    },
     {
      "id": "4090489c-3c58-4b8b-8463-ee381d9a6424",
      "at": "2026-08-13",
