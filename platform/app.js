@@ -11788,7 +11788,15 @@ function renderHomeThesis(){
   if(pp&&pp.n_provinces_outnumbered!=null&&pp.n_provinces){
     const nOut=pp.n_provinces_outnumbered, nP=pp.n_provinces;
     const scope=(nOut>=nP)?`all <b>${nP}</b> provinces`:`<b>${nOut}</b> of ${nP} provinces`;
-    clauses.push(`the big-4 rivals <b>outnumber AutoX</b> in ${scope} on local density (measured)`);
+    // Fold in the starker, more concrete leadership read from the SAME measured census: AutoX is the
+    // single largest title-loan network in n_provinces_autox_leads of nP (0 today). This is DISTINCT
+    // from aggregate density-outnumbering — a firm can be outnumbered on total branch count yet still
+    // be the biggest SINGLE brand — so it is not redundant with the clause above. The Competition tab
+    // already renders it (drawPeerProvince); the front door did not. Null-safe: dropped if the field
+    // is absent, so a pre-fold layer degrades to the plain density clause.
+    const led=pp.n_provinces_autox_leads;
+    const leadTail=(led!=null)?`, where AutoX is the single largest network in <b>${led===0?'none':led}</b> of them`:'';
+    clauses.push(`the big-4 rivals <b>outnumber AutoX</b> in ${scope} on local density${leadTail} (measured)`);
   }
   // obj#2 — the per-region DEFENSIBILITY discriminator (rival_threat_region.json, the same MEASURED
   // density×service layer the #cc-defend card renders). Density is high in every region (the clause
