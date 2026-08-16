@@ -6,7 +6,7 @@
     "source_url": "https://app.bot.or.th/BTWS_STAT/statistics/BOTWEBSTAT.aspx?reportID=875&language=TH",
     "unit": "thousand persons",
     "frequency": "monthly",
-    "pulled": "2026-08-02",
+    "pulled": "2026-08-16",
     "period_range": {
       "min": "2015-01",
       "max": "2026-06"
@@ -51,7 +51,7 @@
         "2026-05",
         "2026-06"
       ],
-      "sum_thousand": 32163.059999999998
+      "sum_thousand": 32163.06
     },
     "acceptance_test": "4 spot-verified months (2026-03..2026-06, all flagged preliminary at pull time) checked against fixed anchors on every pull; a mismatch hard-fails rather than silently landing changed history — see ANCHORS in pull_bot_tourist_arrivals.py."
   },
