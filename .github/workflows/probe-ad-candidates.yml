@@ -23,6 +23,10 @@ on:
         description: "Seconds between RPC calls (raise if the runner gets throttled too)"
         type: string
         default: "4"
+      ocr:
+        description: "OCR image banners (slow, but bank creatives are mostly images)"
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -34,7 +38,7 @@ concurrency:
 jobs:
   probe:
     runs-on: ubuntu-latest          # NOT the self-hosted Thai runner — that is the throttled IP
-    timeout-minutes: 45
+    timeout-minutes: 120        # OCR over 13 accounts x up to 80 creatives is slow by nature
     steps:
       - uses: actions/checkout@v4
 
@@ -43,10 +47,23 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install the Thai OCR stack
+        # Bank creatives are overwhelmingly IMAGE banners: the text-only first run read 1 of
+        # 1,278 KBank creatives and 1 of 66 ttb ones, which is far too thin to conclude
+        # anything about what an account sells. tesseract is what makes those words readable.
+        if: ${{ inputs.ocr }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-tha
+          python -m pip install --quiet pytesseract pillow
+          tesseract --version | head -1
+          tesseract --list-langs | grep -qx tha && echo "Thai traineddata present"
+
       - name: Vet the candidate accounts
         run: |
           python pipeline/vet_ad_candidates.py \
             --sleep "${{ inputs.sleep }}" \
+            ${{ inputs.ocr && '--ocr' || '' }} \
             --json ad-candidate-verdicts.json
 
       - name: Attach the verdicts

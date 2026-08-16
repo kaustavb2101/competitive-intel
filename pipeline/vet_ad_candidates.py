@@ -47,58 +47,81 @@ LEND = ("สินเชื่อ", "กู้", "ดอกเบี้ย", "�
 NOT_LENDING = ("ประกันภัยรถ", "ประกันชั้น", "พ.ร.บ.", "ประกันชีวิต", "ประกันสุขภาพ",
                "motor insurance", "travel insurance")
 
-PROBE_N = 25          # creatives to read per account — enough to characterise, cheap enough to be polite
+PROBE_N = 80          # creatives to probe per account (was 25 — too thin once most are images)
 MIN_HITS = 2          # one vehicle-lending creative could be a stray; two is a product line
+MIN_READ = 12         # below this, "no hits" means we barely looked — report it as such
 
 
-def copy_of(c):
-    """Ad copy for one creative row, via the same readers the real pull uses (no OCR: image-only
-    banners are left unread here rather than spending OCR budget on a vetting probe)."""
+def copy_of(c, use_ocr=False):
+    """Ad copy for one creative row, via the same readers the real pull uses.
+
+    Text-rendered creatives are read directly. IMAGE banners need OCR, and skipping them is
+    not a neutral economy here: bank creatives are overwhelmingly image banners, so the
+    text-only path read 1 of 1,278 KBank creatives and 1 of 66 ttb ones. A classifier fed
+    that thin a slice cannot distinguish "advertises something else" from "we barely looked".
+    """
     try:
-        _kind, render, _img = P.payload_of(c)
+        _kind, render, img = P.payload_of(c)
     except Exception:
         return ""
-    if not render:
-        return ""
-    try:
-        return " ".join(P.render_text(render) or [])
-    except Exception:
-        return ""
+    if render:
+        try:
+            return " ".join(P.render_text(render) or [])
+        except Exception:
+            return ""
+    if img and use_ocr:
+        try:
+            return " ".join(P.ocr_text(img) or [])      # ESTIMATED: a transcription can misread
+        except Exception:
+            return ""
+    return ""
 
 
-def probe(aid):
+def probe(aid, use_ocr=False):
     """Return a dict describing what this account advertises, or why we could not tell."""
     try:
         rows = P.creatives(aid)
     except Exception as e:
-        return {"status": "unreadable", "error": str(e)[:160],
-                "n_listed": None, "n_read": 0, "n_vehicle_lending": 0, "samples": []}
+        return {"status": "unreadable", "error": str(e)[:160], "n_listed": None,
+                "n_probed": 0, "n_read": 0, "n_vehicle_lending": 0, "samples": [], "seen": []}
 
     out = {"status": None, "error": None, "n_listed": len(rows),
-           "n_read": 0, "n_vehicle_lending": 0, "samples": []}
+           "n_probed": 0, "n_read": 0, "n_vehicle_lending": 0, "samples": [], "seen": []}
     if not rows:
         out["status"] = "listed_zero"      # deliberately NOT "no ads" — see module docstring
         return out
 
     for c in rows[:PROBE_N]:
-        txt = copy_of(c)
+        out["n_probed"] += 1
+        txt = copy_of(c, use_ocr)
         if not txt:
             continue
         out["n_read"] += 1
-        low = txt.lower()
+        flat = " ".join(txt.split())
+        low = flat.lower()
+        # A few reads kept REGARDLESS of verdict. Without them a "no hits" line is unfalsifiable
+        # — you cannot tell a genuinely off-product account from a broken token list.
+        if len(out["seen"]) < 4:
+            out["seen"].append(flat[:160])
         if any(t in low for t in NOT_LENDING):
             continue
         if any(t in low for t in VEHICLE) and any(t in low for t in LEND):
             out["n_vehicle_lending"] += 1
             if len(out["samples"]) < 3:
-                out["samples"].append(" ".join(txt.split())[:180])
+                out["samples"].append(flat[:180])
 
     if out["n_read"] == 0:
         out["status"] = "unreadable"       # listed, but no copy came back — still not a verdict
     elif out["n_vehicle_lending"] >= MIN_HITS:
         out["status"] = "vehicle_refinance"
+    elif out["n_read"] < MIN_READ:
+        # THE FIX. The first CI run called this "other_product" off 1 read of 1,278 listed
+        # creatives. Absence of evidence in a sample that small is not evidence of absence,
+        # and it is the same false negative the account-level capture guard exists to stop —
+        # one layer down, at the creative level.
+        out["status"] = "insufficient_sample"
     else:
-        out["status"] = "other_product"
+        out["status"] = "no_hit_in_sample"  # NOT "this account has no car-loan ads"
     return out
 
 
@@ -113,6 +136,10 @@ def main():
                          "CANDIDATES unpacking offline, which is the one thing py_compile and "
                          "an import check cannot do (a shape change there shipped a "
                          "ValueError straight to CI).")
+    ap.add_argument("--ocr", action="store_true",
+                    help="OCR image banners too (needs tesseract + Thai traineddata). Without "
+                         "it only text-rendered creatives are read, which for bank accounts is "
+                         "a few per thousand — not enough to conclude anything.")
     a = ap.parse_args()
     if a.sleep is not None:
         P.POLITE = a.sleep
@@ -132,7 +159,7 @@ def main():
 
     report = []
     for key, aid, name, note in cands:
-        r = probe(aid)
+        r = probe(aid, a.ocr)
         r.update({"operator": key, "advertiser_id": aid,
                   "advertiser_name": name, "discovery_note": note})
         report.append(r)
@@ -141,10 +168,15 @@ def main():
         if r["status"] == "unreadable":
             print("   UNREADABLE — %s" % (r["error"] or "listed creatives but no copy returned"))
         else:
-            print("   listed %s | copy read %d | vehicle-lending %d -> %s"
-                  % (r["n_listed"], r["n_read"], r["n_vehicle_lending"], r["status"].upper()))
+            # Coverage is printed as read/probed/listed, never as a bare verdict: "0 hits" off
+            # 1 read of 1,278 and "0 hits" off 60 reads of 66 are not the same claim.
+            print("   read %d of %d probed (%s listed) | vehicle-lending %d -> %s"
+                  % (r["n_read"], r["n_probed"], r["n_listed"],
+                     r["n_vehicle_lending"], r["status"].upper()))
         for s in r["samples"]:
-            print("     · %s" % s)
+            print("     HIT · %s" % s)
+        for s in r["seen"]:
+            print("     saw · %s" % s)
         print()
 
     unreadable = sum(1 for r in report if r["status"] == "unreadable")
@@ -160,18 +192,30 @@ def main():
     else:
         verdict = "usable"
         pin = [r for r in report if r["status"] == "vehicle_refinance"]
-        drop = [r for r in report if r["status"] == "other_product"]
+        drop = [r for r in report if r["status"] == "no_hit_in_sample"]
+        thin = [r for r in report if r["status"] == "insufficient_sample"]
         print("\nPIN to ADVERTISERS (markets vehicle refinance):")
         for r in pin or []:
             print("   %-10s %s  (%d/%d creatives on-product)"
                   % (r["operator"], r["advertiser_id"], r["n_vehicle_lending"], r["n_read"]))
         if not pin:
             print("   (none)")
-        print("\nLEAVE OUT (account advertises something else):")
+        print("\nNO VEHICLE-REFINANCE COPY IN THE SAMPLE READ — a defensible leave-out, but say")
+        print("it as what it is: this is the sample, not a census of the account.")
         for r in drop or []:
-            print("   %-10s %s" % (r["operator"], r["advertiser_id"]))
+            print("   %-10s %s  (read %d of %d probed, %s listed)"
+                  % (r["operator"], r["advertiser_id"], r["n_read"], r["n_probed"], r["n_listed"]))
         if not drop:
             print("   (none)")
+        if thin:
+            print("\nINCONCLUSIVE — too few creatives readable to call it either way (<%d):"
+                  % MIN_READ)
+            for r in thin:
+                print("   %-10s %s  (read %d of %d probed, %s listed)"
+                      % (r["operator"], r["advertiser_id"], r["n_read"], r["n_probed"],
+                         r["n_listed"]))
+            print("   Re-run with --ocr: these accounts are mostly image banners, whose words")
+            print("   are only reachable by transcription.")
         if unreadable:
             print("\nSTILL UNREADABLE (%d) — carry forward, do not conclude:" % unreadable)
             for r in report:
