@@ -76,6 +76,11 @@
    "name_th": "ttb รถแลกเงิน (cash your car)"
   },
   {
+   "card_floor": 15.0,
+   "key": "TURBO",
+   "name_th": "เงินเทอร์โบ"
+  },
+  {
    "card_floor": 10.99,
    "key": "UOB_C2C",
    "name_th": "สินเชื่อทะเบียนรถยนต์ ยูโอบี Car2Cash"
@@ -86,7 +91,7 @@
   "label": "MEASURED on both sides. The card floor is the lender's own published effective rate; the promo figure is a rate the lender printed in a creative or a post. The only computed step is the flat-to-effective conversion, and it is done in the direction that makes an undercut HARDER to claim, not easier.",
   "material_threshold_pp": 1.5,
   "method": "A monthly promo rate with no stated basis is read as FLAT and converted at the operator's own published maximum tenor (fallback 60 months) — the reading that produces the HIGHEST effective cost. It is only reported as an undercut if even that reading falls 1.5pp or more below the card floor.",
-  "n_card_only": 16,
+  "n_card_only": 17,
   "n_checked": 2,
   "n_undercutting": 1,
   "so_what": "A published rate card is a ceiling, not a price. Where these two disagree by more than 1.5pp, the promo is what the rival is actually selling and the card understates how hard they are competing.",
