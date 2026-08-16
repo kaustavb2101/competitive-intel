@@ -1,0 +1,59 @@
+name: Probe — vet unpinned advertiser accounts
+
+# Reads the 13 unpinned bank advertiser accounts in pull_google_ads.CANDIDATES and reports
+# which of them actually market vehicle refinance.
+#
+# WHY IT RUNS HERE AND NOT ON THE LAPTOP. Two probes from Kaustav's Thai residential IP read
+# 0 of 13 accounts — every call answered HTTP 429 after five backoffs. The same endpoint
+# serves hundreds of creatives to data-swarm.yml from GitHub's runners, so the clean IP is
+# the whole fix. This is the mirror image of the geoblocked gov feeds, which only work FROM
+# the laptop.
+#
+# READ-ONLY. Writes nothing to the repo, opens no PR, needs no contents:write. The verdict
+# is a decision for a human (or a follow-up PR) to act on: promote an id into ADVERTISERS,
+# or leave it out because the account sells credit cards.
+#
+# MANUAL ONLY, deliberately. There is nothing to re-check on a schedule — CANDIDATES only
+# changes when a --discover run adds to it, and each vetted id then moves out of the list.
+
+on:
+  workflow_dispatch:
+    inputs:
+      sleep:
+        description: "Seconds between RPC calls (raise if the runner gets throttled too)"
+        type: string
+        default: "4"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: probe-ad-candidates
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest          # NOT the self-hosted Thai runner — that is the throttled IP
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Vet the candidate accounts
+        run: |
+          python pipeline/vet_ad_candidates.py \
+            --sleep "${{ inputs.sleep }}" \
+            --json ad-candidate-verdicts.json
+
+      - name: Attach the verdicts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ad-candidate-verdicts
+          path: ad-candidate-verdicts.json
+          retention-days: 30
+          if-no-files-found: warn
