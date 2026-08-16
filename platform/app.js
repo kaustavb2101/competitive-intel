@@ -3138,8 +3138,18 @@ function drawCompCoverage(){
       </tr>`;}).join('');
   if(ro){
     const m=COMPCOV.meta||{}, t=m.totals||{};
+    // The census total (found) can EXCEED the cited-from-public-reports total (expected) — currently
+    // 16,503 vs 12,134 = 136% — because a group rival's official store-locator lists service points
+    // beyond its listed title-loan branches (chiefly Srisawad: 5,203 locator points vs 1,138 cited).
+    // Without a gloss, "we hold N vs an estimated M" (N>M) invites reading the total as a data error or
+    // an undercounted estimate. Mirror the per-brand `census ≥ cited` flag (shipped 2026-08-15) at the
+    // roll-up level, only when the total is >100%. Copy quoted verbatim from the layer's own caveat.
+    const totOver=(t.coverage_pct!=null&&t.coverage_pct>100);
     const ttxt=(t.coverage_pct!=null)
-      ? `We now hold <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> measured rival branches vs an estimated <b style="color:var(--gold)">${(t.expected||0).toLocaleString()}</b> from public reports.`
+      ? `We now hold <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> measured rival branches vs an estimated <b style="color:var(--gold)">${(t.expected||0).toLocaleString()}</b> from public reports`
+        +(totOver
+          ? ` <span class="sub" title="Our census (${(t.found||0).toLocaleString()}) exceeds the ${(t.expected||0).toLocaleString()} cited across public reports because a group rival's official store-locator lists every service point / sub-branch beyond its headline title-loan branch count (chiefly Srisawad: 5,203 locator points vs 1,138 cited). A data-completeness signal, not an overcount error, and NOT market share.">— ${t.coverage_pct.toFixed(0)}% census-to-cited, above 100% because rival group locators list service points beyond listed title-loan branches.</span>`
+          : `.`)
       : `Found <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> competitor locations.`;
     // national peer standing — where AutoX sits among the big-4 by branch-NETWORK size (obj #2).
     // AutoX size = MEASURED own network; peer size = REPORTED (cited IR). A footprint-scale read

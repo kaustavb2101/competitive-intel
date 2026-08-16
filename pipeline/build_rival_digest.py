@@ -283,11 +283,21 @@ def text(c):
     return "\n".join(L)
 
 
+def _env(name, default=None):
+    """An UNSET GitHub Actions secret arrives as the empty string, not as an absent key, so
+    os.environ.get(name, default) hands back "" and the default never fires. Every optional
+    setting here has to treat blank as absent or the job dies on a secret nobody set on
+    purpose — SMTP_PORT="" crashed the first real send with
+    ValueError: invalid literal for int() with base 10: ''."""
+    v = os.environ.get(name)
+    return v.strip() if v and v.strip() else default
+
+
 def send(subj, body_html, body_text):
     """SMTP via stdlib only — no third-party action, no vendor SDK in the send path."""
-    host, port = os.environ.get("SMTP_HOST"), int(os.environ.get("SMTP_PORT", "587"))
-    user, pw = os.environ.get("SMTP_USER"), os.environ.get("SMTP_PASS")
-    to = os.environ.get("MAIL_TO")
+    host, port = _env("SMTP_HOST"), int(_env("SMTP_PORT", "587"))
+    user, pw = _env("SMTP_USER"), _env("SMTP_PASS")
+    to = _env("MAIL_TO")
     if not (host and user and pw and to):
         missing = [n for n, v in (("SMTP_HOST", host), ("SMTP_USER", user),
                                   ("SMTP_PASS", pw), ("MAIL_TO", to)) if not v]
@@ -296,8 +306,8 @@ def send(subj, body_html, body_text):
         return 3
     m = EmailMessage()
     m["Subject"] = subj
-    m["From"] = formataddr((os.environ.get("MAIL_FROM_NAME", "AutoX Rival Pulse"),
-                            os.environ.get("MAIL_FROM", user)))
+    m["From"] = formataddr((_env("MAIL_FROM_NAME", "AutoX Rival Pulse"),
+                            _env("MAIL_FROM", user)))
     m["To"] = to
     m.set_content(body_text)
     m.add_alternative(body_html, subtype="html")
