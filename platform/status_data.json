@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-16T05:37:39+07:00",
-    "commit": "0c65825"
+    "generated_at": "2026-08-16T11:17:30+07:00",
+    "commit": "15d5407"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,78 @@
   ],
   "activity": [
     {
+      "date": "2026-08-16T11:17:30+07:00",
+      "sha": "15d5407",
+      "summary": "peer(#acq): gloss the >100% census-to-cited roll-up total, not just per-brand (#443)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-16T04:07:37+00:00",
+      "sha": "78e89b7",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-16, run 31925708992)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-16T03:37:47+00:00",
+      "sha": "bb62697",
+      "summary": "feat(notify): email the rival pulse daily instead of waiting to be looked at (#440)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-16T03:28:20+00:00",
+      "sha": "c7bddd9",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-16T10:22:17+07:00",
+      "sha": "1f78bb4",
+      "summary": "docs: correct PROGRESS_LOG — PR #439 merged externally + deploy-verified (#441)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-16T03:19:14+00:00",
+      "sha": "7d48f04",
+      "summary": "data: NABC live prices (2026-08-16, run 31923648181)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-16T03:09:55+00:00",
+      "sha": "ee72159",
+      "summary": "ux: rayong-catchment.html toggle controls expose aria-pressed (WCAG 4.1.2) (#439)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-16T03:09:10+00:00",
+      "sha": "bf55081",
+      "summary": "feat(competition): rate board — every vehicle-refinance rival on one comparable basis (#438)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-16T01:38:59+00:00",
+      "sha": "dd63021",
+      "summary": "fix(deploy): stop preview deployments burning the quota that PRODUCTION needs (#437)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-16T00:32:37+00:00",
+      "sha": "dfb2c48",
+      "summary": "integ(macro): schedule the two BoT macro-board feeds ageing in silence; leave NESDC unwired (intermittent bot challenge)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-15T23:30:42+00:00",
+      "sha": "d287466",
+      "summary": "data: market-pulse swarm refresh (run 31910404567) (#435)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-15T22:38:45+00:00",
+      "sha": "ee49d0d",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer coverage-honesty ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-16T05:37:39+07:00",
       "sha": "0c65825",
       "summary": "peer(#acq): flag >100% coverage as census≥cited, not \"share located\" (#436)",
@@ -639,78 +711,6 @@
       "sha": "31a0ff4",
       "summary": "data: ThaiWater flood + rain pulse (2026-08-15, run 31893262524)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T15:38:35+00:00",
-      "sha": "a035a94",
-      "summary": "fix(ci): repair four broken data feeds — TLS chain, Overture catalog, IMF retry budget (#425)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-15T14:33:23+00:00",
-      "sha": "44231eb",
-      "summary": "docs(progress-log): record ux-loop aria-pressed branch-explorer merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-15T21:30:38+07:00",
-      "sha": "338ef61",
-      "summary": "ux: aria-pressed on branch-explorer basemap/layer toggle buttons (#426)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-15T13:56:31+00:00",
-      "sha": "4f4e8ca",
-      "summary": "data: SET peer filings refresh (run 31886903843) (#421)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-15T12:36:54+00:00",
-      "sha": "99772a1",
-      "summary": "intel(deploy-health): shape-probe the two remaining default-route silent-hide reads",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-15T11:18:50+00:00",
-      "sha": "c403824",
-      "summary": "data: market-pulse swarm refresh (run 31878131912) (#420)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-15T10:30:40+00:00",
-      "sha": "adc7827",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the Vercel-SSO false-outage fix",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-15T10:27:48+00:00",
-      "sha": "3525028",
-      "summary": "intel(deploy-health): read a Vercel SSO redirect as up+gated, not a false outage",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-15T09:46:50+00:00",
-      "sha": "5d72ffe",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-15, run 31877654902)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T08:52:04+00:00",
-      "sha": "c7eeef8",
-      "summary": "docs(progress-log): record ux-print-color-adjust-h2-accent merge+deploy+verify (PR #419)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-15T15:47:23+07:00",
-      "sha": "a48f725",
-      "summary": "ux: print — keep h2 segment-accent bars in the board PDF (#419)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-15T08:24:07+00:00",
-      "sha": "3099377",
-      "summary": "data: market-pulse swarm refresh (run 31844200805) (#414)",
-      "pillar": "market"
     }
   ]
 }
