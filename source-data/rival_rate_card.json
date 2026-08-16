@@ -8,10 +8,629 @@
   "so_what": "AutoX's rate peers are the ไม่โอนเล่ม / reducing-balance column, NOT the flat headlines. A bank advertising 3.18% is not undercutting a 21% title loan by eighteen points; it is selling a different product, secured differently, to a borrower who is willing to hand over the book.",
   "basis_convention": "'effective' throughout means NOMINAL reducing-balance — the monthly rate times twelve, NOT compounded. This is AutoX's own accrual convention and it is what these lenders publish: CIMB prints '0.83% ต่อเดือน ... ลดต้นลดดอก 9.95% ต่อปี' and 0.83 x 12 = 9.96.",
   "source_kinds": "'lender' = the operator's own site or factsheet PDF, the strongest provenance. 'aggregator' = checkraka's product table, which reproduces the lender's published table and is used where the lender's own page is JS-rendered or blocked from here. 'search' = a search-result snippet only, NOT directly verified — carried so the operator is visibly present rather than silently missing, and flagged confidence 'low' so the UI can say so.",
-  "coverage_note": "Bank and non-bank hire-purchase refinance is covered from publication here. The pure title lenders (MTC, TIDLOR, SAWAD, TURBO ...) are NOT in this file: their rate cards are campaign-driven rather than published as a standing table, so their pricing is read from what they actually advertise (platform/data/rival_ads.json) instead. The board renders both sources in one table and labels which is which.",
-  "key_note": "`key` joins to source-data/rival_universe.json. Operators already in that census keep ITS key (CAR4CASH, KKP, TTB_CYC) rather than a new one, or the board would split one operator into two rows that never reconcile."
+  "coverage_note": "Covers 20 of the 23 operators in rival_universe.json. Until 2026-08-16 this file held 8 operators and every one was a bank, so the board answered 'how do the banks price' while being read as 'how does the market price'. The twelve non-bank operators added on that date are the field AutoX actually meets on the street. Still absent: TURBO (its vehicle page renders no rate; only the LAND product quoted cleanly, and filing a land rate as a vehicle rate would be invisible downstream), plus GSB_MEETEE, KKP, WSOL_CARFINN and KBANK_RCD, whose rate pages are still unread.",
+  "key_note": "`key` joins to source-data/rival_universe.json. Operators already in that census keep ITS key (CAR4CASH, KKP, TTB_CYC) rather than a new one, or the board would split one operator into two rows that never reconcile.",
+  "n_operators": 20
  },
  "operators": [
+  {
+   "key": "AMANAH",
+   "name_th": "อะมานะฮ์ ลิสซิ่ง",
+   "name_en": "Amanah Leasing",
+   "owner": "Amanah Leasing PCL",
+   "loan_type": "title_loan",
+   "source_kind": "lender",
+   "citation": "https://amanah.co.th/car-loan",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "Shariah-compliant: the site says อัตรากำไร (profit rate), not ดอกเบี้ย. Economically the comparable figure, and it labels it Effective Rate. LTV 130% — it lends 30% above its own appraised value.",
+   "variants": [
+    {
+     "variant": "ไม่โอนเล่มทะเบียนรถยนต์",
+     "collateral": "no_transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 24.0,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "quoted_monthly": {
+      "lo": 1.58,
+      "hi": 1.58
+     },
+     "tenor_months_min": 12,
+     "tenor_months_max": 84,
+     "ltv_pct": 130,
+     "max_baht": null,
+     "quote_th": "ไม่โอนเล่มทะเบียนรถยนต์ 130%* 17 ปี 84 งวด ไม่เกิน 24% ต่อปี 1.58 ต่อเดือน**(Effective Rate)"
+    }
+   ]
+  },
+  {
+   "key": "AUTOX",
+   "name_th": "เงินไชโย",
+   "name_en": "Ngern Chaiyo (AutoX)",
+   "owner": "AutoX / SCBX",
+   "loan_type": "title_loan",
+   "source_kind": "lender",
+   "citation": "https://chaiyo.co.th/product/detail/loan-car",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "US. Carried so the board has a baseline to compare against; it is not a rival. The page states a single annual rate with no basis word, but AutoX's own convention is reducing balance accrued as rate/12, not compounded — confirmed internally, which is why this is the one row whose basis is not taken from the page text alone.",
+   "variants": [
+    {
+     "variant": "บุคคลทั่วไป",
+     "collateral": "no_transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 23.99,
+      "hi": 23.99,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 60,
+     "ltv_pct": null,
+     "max_baht": null,
+     "quote_th": "บุคคลทั่วไป อัตราดอกเบี้ย 23.99% ต่อปี"
+    },
+    {
+     "variant": "นิติบุคคล",
+     "collateral": "no_transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 14.99,
+      "hi": 14.99,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 60,
+     "ltv_pct": null,
+     "max_baht": null,
+     "quote_th": "นิติบุคคล อัตราดอกเบี้ย 14.99% ต่อปี"
+    }
+   ]
+  },
+  {
+   "key": "CAR4CASH",
+   "name_th": "กรุงศรี คาร์ ฟอร์ แคช",
+   "name_en": "Krungsri Car for Cash",
+   "owner": "Krungsri (BAY/MUFG)",
+   "loan_type": "both",
+   "source_kind": "lender",
+   "citation": "https://www.car4cash.com/",
+   "verified": "2026-08-16",
+   "confidence": "medium",
+   "note": "The original รถแลกเงิน brand and the category's reference point. The site advertises a flat floor and a reducing-balance floor without labelling which product each belongs to; on the pattern every other lender in this file follows, the flat floor is the โอนเล่ม product and the reducing floor the ไม่โอนเล่ม one — but that is inference, so the variants below are recorded as the site states them, unattributed.",
+   "variants": [
+    {
+     "variant": "อัตราคงที่ (flat-quoted programme)",
+     "collateral": "unstated",
+     "quoted_basis": "flat",
+     "quoted": {
+      "lo": 3.18,
+      "hi": null,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": null,
+     "tenor_months_max": 84,
+     "tenor_months_min": 12,
+     "ltv_pct": 100,
+     "max_baht": null,
+     "quote_th": "เริ่มต้นที่ร้อยละ 3.18 ต่อปี (คงที่)"
+    },
+    {
+     "variant": "อัตราลดต้นลดดอก (reducing-balance programme)",
+     "collateral": "unstated",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 12.0,
+      "hi": null,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": {
+      "lo": 12.0,
+      "hi": null,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 84,
+     "tenor_months_min": 12,
+     "ltv_pct": 100,
+     "max_baht": null,
+     "quote_th": "เริ่มต้นที่ร้อยละ 12 ต่อปี (ลดต้นลดดอก)"
+    }
+   ]
+  },
+  {
+   "key": "CIMB_AUTO",
+   "name_th": "สินเชื่อรถปลดล็อก ซีไอเอ็มบี ไทย ออโต้",
+   "name_en": "CIMB Thai Auto (รถปลดล็อก)",
+   "owner": "CIMB Thai Bank",
+   "loan_type": "both",
+   "source_kind": "lender",
+   "citation": "https://www.cimbthaiauto.com/product/autocash",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "The most complete public disclosure in the market — it publishes the monthly rate, its flat-per-year equivalent AND its reducing-balance-per-year equivalent for the same product. That triple is what confirms the market's 'effective' is nominal (monthly x 12), not a compounded APR: 0.83 x 12 = 9.96 against its published 9.95.",
+   "variants": [
+    {
+     "variant": "โอนเล่ม (registration transferred)",
+     "collateral": "transfer",
+     "quoted_basis": "flat",
+     "quoted": {
+      "lo": 2.95,
+      "hi": 8.87,
+      "unit": "pct_per_year"
+     },
+     "quoted_monthly": {
+      "lo": 0.25,
+      "hi": 0.74,
+      "unit": "pct_per_month"
+     },
+     "lender_effective": {
+      "lo": 5.4,
+      "hi": 15.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 72,
+     "ltv_pct": 100,
+     "max_baht": 5000000,
+     "quote_th": "0.25% - 0.74% ต่อเดือน หรือ 2.95% - 8.87% ต่อปี เทียบเท่าดอกเบี้ยลดต้นลดดอกระหว่าง 5.40% - 15.00% ต่อปี"
+    },
+    {
+     "variant": "ไม่โอนเล่ม (registration retained — the AutoX-comparable product)",
+     "collateral": "no_transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 9.95,
+      "hi": 18.65,
+      "unit": "pct_per_year"
+     },
+     "quoted_monthly": {
+      "lo": 0.83,
+      "hi": 1.56,
+      "unit": "pct_per_month"
+     },
+     "lender_effective": {
+      "lo": 9.95,
+      "hi": 18.65,
+      "unit": "pct_per_year"
+     },
+     "lender_flat_equivalent": {
+      "lo": 5.41,
+      "hi": 10.66,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 72,
+     "ltv_pct": 100,
+     "max_baht": 5000000,
+     "quote_th": "0.83% - 1.56% ต่อเดือน เทียบเท่าดอกเบี้ยคงที่ระหว่าง 5.41% - 10.66% ต่อปี หรือดอกเบี้ยลดต้นลดดอกระหว่าง 9.95% - 18.65% ต่อปี"
+    }
+   ]
+  },
+  {
+   "key": "GSB_MEETEE",
+   "name_th": "มีที่ มีเงิน",
+   "name_en": "Mee Tee Mee Ngern (GSB)",
+   "owner": "Government Savings Bank (บริษัท มีที่ มีเงิน จำกัด)",
+   "loan_type": "land",
+   "source_kind": "lender",
+   "citation": "https://meetee.co.th/",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "NOT COMPARABLE TO THE VEHICLE ROWS — this operator lends against LAND (จำนอง and ขายฝาก), not against a vehicle registration, and land pricing runs far below title-loan pricing for reasons that have nothing to do with competitive aggression. It is carried because it competes for the same distressed borrower, and both variants are marked collateral 'unstated' so the vehicle summary cannot pick them up. Three domains in our census (meeteemeengern.com/.co.th, mtme.co.th) are dead; the live one is meetee.co.th.",
+   "variants": [
+    {
+     "variant": "จำนอง (mortgage, ~90% of the book)",
+     "collateral": "unstated",
+     "quoted_basis": null,
+     "quoted": {
+      "lo": 6.75,
+      "hi": null,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": null,
+     "ltv_pct": null,
+     "max_baht": null,
+     "quote_th": "ดอกเบี้ยเริ่มต้น 6.75% ต่อปี (ปีแรก)"
+    },
+    {
+     "variant": "ขายฝาก (sale-and-leaseback)",
+     "collateral": "unstated",
+     "quoted_basis": null,
+     "quoted": {
+      "lo": 9.99,
+      "hi": null,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": null,
+     "ltv_pct": null,
+     "max_baht": null,
+     "quote_th": "ดอกเบี้ยเพียง 9.99% ต่อปี"
+    }
+   ]
+  },
+  {
+   "key": "GSB_MONEYDD",
+   "name_th": "เงินดีดี (Good Money by GSB)",
+   "name_en": "Good Money by GSB",
+   "owner": "Government Savings Bank",
+   "loan_type": "title_loan",
+   "source_kind": "lender",
+   "citation": "https://www.moneydd.co.th",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "State-bank-backed. Basis is not stated on the product tile.",
+   "variants": [
+    {
+     "variant": "จำนำทะเบียนเพื่อคนมีฝัน",
+     "collateral": "no_transfer",
+     "quoted_basis": null,
+     "quoted": {
+      "lo": 12.0,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 84,
+     "ltv_pct": null,
+     "max_baht": 2000000,
+     "quote_th": "จำนำเล่มไม่ต้องมีคนค้ำ วงเงินสูงสุด 2,000,000 บาท ดอกเบี้ยเริ่มต้น 12% - 24% ต่อปี ผ่อนสบายสูงสุด 84 เดือน"
+    }
+   ]
+  },
+  {
+   "key": "HENG",
+   "name_th": "เฮงลิสซิ่ง",
+   "name_en": "Heng Leasing and Capital",
+   "owner": "Heng Leasing and Capital PCL",
+   "loan_type": "both",
+   "source_kind": "lender",
+   "citation": "https://www.hengleasing.com/heng_hirepurchase/",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "Labels its rate EIR outright, so no conversion is involved.",
+   "variants": [
+    {
+     "variant": "เฮงเปลี่ยนรถเป็นเงิน",
+     "collateral": "no_transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 20.75,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_min": 12,
+     "tenor_months_max": 60,
+     "ltv_pct": null,
+     "max_baht": null,
+     "quote_th": "อัตราดอกเบี้ย (EIR) 20.75% - 24% ต่อปี ผ่อนชำระเริ่มต้น 12 งวด สูงสุด 60 งวด"
+    },
+    {
+     "variant": "สินเชื่อเฮงรถมือสอง (เช่าซื้อ)",
+     "collateral": "transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 14.45,
+      "hi": 14.45,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_min": 12,
+     "tenor_months_max": 60,
+     "ltv_pct": null,
+     "max_baht": null,
+     "quote_th": "อัตราดอกเบี้ย (EIR) รถยนต์ใช้แล้ว ไม่เกิน 14.45% ต่อปี"
+    }
+   ]
+  },
+  {
+   "key": "KBANK_RCD",
+   "name_th": "สินเชื่อรถช่วยได้กสิกรไทย (จำนำทะเบียนรถ)",
+   "name_en": "KBank Rot Chuay Dai",
+   "owner": "Kasikornbank",
+   "loan_type": "title_loan",
+   "source_kind": "aggregator",
+   "citation": "https://www.checkraka.com/personalloan/kbank/1435746/",
+   "verified": "2026-08-16",
+   "confidence": "medium",
+   "note": "KBank's own-balance-sheet title loan, distinct from เงินให้ใจ (Ngern Hai Jai), the separately-licensed KBank subsidiary we already track as an advertiser. Both are Kasikorn attacking this market; they are not the same entity and are carried separately. A second variant was added 2026-08-16 from KBank's OWN page: the Top Up, which is open only to existing Kasikorn Leasing customers and is priced far below the walk-in product (7.65-15% vs 13.5-24%). It is carried separately, not merged — a borrower who does not already lease from KBank cannot buy it. Collateral is 'transfer' because the leasing company already holds the book under the running hire-purchase contract.",
+   "variants": [
+    {
+     "variant": "จำนำทะเบียนรถ ลูกค้าทั่วไป (registration retained)",
+     "collateral": "no_transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 13.5,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": {
+      "lo": 13.5,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "lender_effective_note": "13.5% is the advertised floor; 24% is the all-in ceiling on interest, service charges, penalties and fees combined.",
+     "tenor_months_max": 72,
+     "ltv_pct": 100,
+     "max_baht": null,
+     "quote_th": "อัตราดอกเบี้ยลดต้นลดดอก เริ่มต้น 13.5% ต่อปี / อัตราดอกเบี้ย ค่าบริการ เบี้ยปรับ และค่าธรรมเนียมสูงสุดไม่เกิน 24% ต่อปี",
+     "eligibility": "walk-in"
+    },
+    {
+     "variant": "รถช่วยได้ (Top Up) — เฉพาะลูกค้าลีสซิ่งกสิกรไทย",
+     "collateral": "transfer",
+     "eligibility": "existing Kasikorn Leasing installment customers only",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 7.65,
+      "hi": 15.0,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": {
+      "lo": 7.65,
+      "hi": 15.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": null,
+     "ltv_pct": null,
+     "max_baht": null,
+     "quote_th": "ผ่อนเท่าเดิม รับเงินเพิ่ม สำหรับลูกค้าลีสซิ่งกสิกรไทย / กู้เท่าที่จำเป็นและชำระคืนไหว อัตราดอกเบี้ยที่แท้จริง 7.65%-15% ต่อปี"
+    }
+   ],
+   "citation_lender": "https://www.kasikornbank.com/th/personal/autoloan/pages/car-to-cash/top-up.aspx"
+  },
+  {
+   "key": "KKP",
+   "name_th": "สินเชื่อรถเรียกเงิน เกียรตินาคินภัทร",
+   "name_en": "KKP car-for-cash (รถเรียกเงิน)",
+   "owner": "Kiatnakin Phatra",
+   "loan_type": "both",
+   "source_kind": "lender",
+   "citation": "https://kkpauto.com/th/carquickcash",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "Now read from KKP's own product page (the earlier band came from a search snippet and is replaced). The page states both bases itself, so nothing here is converted by us. The 0.25%/month floor is conditional — it requires bundling insurance and a term of 60 installments or fewer.",
+   "variants": [
+    {
+     "variant": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด)",
+     "collateral": "unstated",
+     "quoted_basis": "flat",
+     "quoted": {
+      "lo": 2.99,
+      "hi": null,
+      "unit": "pct_per_year"
+     },
+     "quoted_monthly": {
+      "lo": 0.25,
+      "hi": null
+     },
+     "lender_effective": {
+      "lo": 5.65,
+      "hi": 15.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 60,
+     "tenor_months_min": 12,
+     "ltv_pct": 120,
+     "max_baht": null,
+     "quote_th": "ดอกเบี้ยเริ่มต้น 0.25% ต่อเดือน หรือ 2.99% ต่อปี / อัตราดอกเบี้ยที่แท้จริง 5.65%-15.00% ต่อปี"
+    }
+   ]
+  },
+  {
+   "key": "KTC_PBERM",
+   "name_th": "KTC พี่เบิ้ม รถแลกเงิน",
+   "name_en": "KTC P Berm",
+   "owner": "Krungthai Card PCL",
+   "loan_type": "title_loan",
+   "source_kind": "lender",
+   "citation": "https://ktc.co.th/ktc-p-berm",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "THE CARD IS NOT THE OFFER. On the same day this range was read, KTC's Facebook page was advertising 'ลดดอกถูกลง เริ่มต้นเพียง 0.60% ต่อเดือน' — a rate that appears nowhere in this disclosure. Read platform/data/rival_facebook.json beside this row.",
+   "variants": [
+    {
+     "variant": "รถยนต์ รถกระบะ รถเก๋ง รถตู้",
+     "collateral": "no_transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 12.99,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 60,
+     "ltv_pct": null,
+     "max_baht": null,
+     "quote_th": "รถแลกเงิน : กู้เท่าที่จําเป็นและชําระคืนไหว อัตราดอกเบี้ย 12.99%-24% ต่อปี"
+    }
+   ]
+  },
+  {
+   "key": "MICRO",
+   "name_th": "ไมโครลิสซิ่ง",
+   "name_en": "Micro Leasing",
+   "owner": "Micro Leasing PCL",
+   "loan_type": "both",
+   "source_kind": "lender",
+   "citation": "https://microleasingplc.com/th/micro-products/truck-to-cash",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "TRUCK collateral, not passenger cars — a different borrower from the rest of this board and priced accordingly. Basis is not stated on the page.",
+   "variants": [
+    {
+     "variant": "สินเชื่อเพิ่มสภาพคล่อง (จำนำทะเบียนรถบรรทุก)",
+     "collateral": "no_transfer",
+     "quoted_basis": null,
+     "quoted": {
+      "lo": 18.0,
+      "hi": 20.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 60,
+     "ltv_pct": null,
+     "max_baht": 2500000,
+     "quote_th": "วงเงินขั้นต่ำ 200,000 - 2,500,000 บาท อัตราดอกเบี้ย 18 - 20% ต่อปี ระยะเวลาผ่อนสูงสุด 60 งวด"
+    }
+   ]
+  },
+  {
+   "key": "MTC",
+   "name_th": "เมืองไทย แคปปิตอล",
+   "name_en": "Muangthai Capital",
+   "owner": "Muangthai Capital PCL",
+   "loan_type": "title_loan",
+   "source_kind": "lender",
+   "citation": "https://muangthaicap.com/loan/car-pickup/",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "The largest non-bank rival by branch count. Publishes BOTH bases on the same line, so nothing had to be converted.",
+   "variants": [
+    {
+     "variant": "สินเชื่อทะเบียนรถยนต์ทุกประเภท",
+     "collateral": "no_transfer",
+     "quoted_basis": "flat",
+     "quoted": {
+      "lo": 0.75,
+      "hi": 0.75,
+      "unit": "pct_per_month"
+     },
+     "quoted_monthly": {
+      "lo": 0.75,
+      "hi": 0.75
+     },
+     "lender_effective": {
+      "lo": 16.98,
+      "hi": 16.98,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 60,
+     "ltv_pct": null,
+     "max_baht": null,
+     "quote_th": "อัตราดอกเบี้ย 0.75% ต่อเดือน (เทียบเท่าอัตราดอกเบี้ยที่แท้จริง 16.98% ต่อปี)"
+    }
+   ]
+  },
+  {
+   "key": "NGERNHAIJAI",
+   "name_th": "เงินให้ใจ",
+   "name_en": "Ngern Hai Jai",
+   "owner": "Ngern Hai Jai Co.",
+   "loan_type": "both",
+   "source_kind": "lender",
+   "citation": "https://www.ngernhaijai.com/product/car-title-loan",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "The most complete disclosure of any operator on this board: both bases, both collateral variants, and an LTV for each. Also the operator that leads Pantip discussion by volume while shipping no app at all.",
+   "variants": [
+    {
+     "variant": "แบบจำนำเล่มทะเบียน",
+     "collateral": "transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 12.82,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_min": 12,
+     "tenor_months_max": 72,
+     "ltv_pct": 150,
+     "max_baht": null,
+     "quote_th": "แบบจำนำเล่มทะเบียน อัตราดอกเบี้ยที่แท้จริง 12.82% - 24.00% ต่อปี วงเงินกู้ สูงสุด 150%"
+    },
+    {
+     "variant": "แบบไม่โอนเล่มทะเบียน (รถส่วนบุคคล)",
+     "collateral": "no_transfer",
+     "quoted_basis": "flat",
+     "quoted": {
+      "lo": 3.1,
+      "hi": 8.65,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": {
+      "lo": 6.08,
+      "hi": 15.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_min": 12,
+     "tenor_months_max": 72,
+     "ltv_pct": 140,
+     "max_baht": null,
+     "quote_th": "แบบไม่โอนเล่มทะเบียน (รถส่วนบุคคล) อัตราดอกเบี้ยแบบคงที่ 3.10% - 8.65% ต่อปี (อัตราดอกเบี้ยที่แท้จริงต่ำสุด 6.08% ต่อปี สูงสุดไม่เกิน 15.00% ต่อปี)"
+    },
+    {
+     "variant": "แบบไม่โอนเล่มทะเบียน (รถเชิงพาณิชย์)",
+     "collateral": "no_transfer",
+     "quoted_basis": "flat",
+     "quoted": {
+      "lo": 3.1,
+      "hi": 15.0,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": {
+      "lo": 6.08,
+      "hi": 26.62,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_min": 12,
+     "tenor_months_max": 72,
+     "ltv_pct": 140,
+     "max_baht": null,
+     "quote_th": "แบบไม่โอนเล่มทะเบียน (รถเชิงพาณิชย์) อัตราดอกเบี้ยแบบคงที่ 3.10% - 15.00% ต่อปี (อัตราดอกเบี้ยที่แท้จริงต่ำสุด 6.08% ต่อปี สูงสุดไม่เกิน 26.62% ต่อปี)"
+    }
+   ]
+  },
+  {
+   "key": "SAK",
+   "name_th": "ศักดิ์สยามลิสซิ่ง",
+   "name_en": "Saksiam Leasing",
+   "owner": "Saksiam Leasing PCL",
+   "loan_type": "title_loan",
+   "source_kind": "lender",
+   "citation": "https://saksiam.com/service/car",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "The highest FLOOR on the board at 20.88% — where most operators start near 12%, Saksiam's cheapest published rate is already close to the ceiling. Small ticket too: ฿400,000 maximum. Found only after correcting the site from saksiam.co.th, which resolves but serves an 85-character shell.",
+   "variants": [
+    {
+     "variant": "สินเชื่อที่มีทะเบียนรถเป็นประกัน",
+     "collateral": "no_transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 20.88,
+      "hi": 23.76,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 60,
+     "ltv_pct": null,
+     "max_baht": 400000,
+     "quote_th": "ให้วงเงินสูงสุด 400,000 บาท ดอกเบี้ยถูก เริ่มต้นที่ 20.88% - 23.76% ต่อปี คิดดอกเบี้ยแบบลดต้นลดดอก"
+    }
+   ]
+  },
+  {
+   "key": "SAWAD",
+   "name_th": "ศรีสวัสดิ์ เงินสดทันใจ",
+   "name_en": "Srisawad Power",
+   "owner": "Srisawad Corporation PCL",
+   "loan_type": "title_loan",
+   "source_kind": "lender",
+   "citation": "https://www.sawad.co.th/loan_calculator/",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "Quotes only the effective range for the car product; the 0.72%/เดือน headline it advertises alongside is the motorcycle product, not this one.",
+   "variants": [
+    {
+     "variant": "สินเชื่อรถยนต์",
+     "collateral": "no_transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 15.27,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 54,
+     "ltv_pct": null,
+     "max_baht": null,
+     "quote_th": "สินเชื่อรถยนต์ อัตราดอกเบี้ยที่แท้จริง 15.27% – 24% ต่อปี ระยะเวลาผ่อนสูงสุด 54 งวด"
+    }
+   ]
+  },
   {
    "key": "SCB_MCMC",
    "name_th": "สินเชื่อรถคือเงิน My Car My Cash",
@@ -29,8 +648,16 @@
      "variant": "รถจดทะเบียนปี 2026–2021",
      "collateral": "unstated",
      "quoted_basis": "flat",
-     "quoted": {"lo": 2.99, "hi": 6.25, "unit": "pct_per_year"},
-     "lender_effective": {"lo": 5.47, "hi": 10.98, "unit": "pct_per_year"},
+     "quoted": {
+      "lo": 2.99,
+      "hi": 6.25,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": {
+      "lo": 5.47,
+      "hi": 10.98,
+      "unit": "pct_per_year"
+     },
      "tenor_months_max": 84,
      "ltv_pct": 140,
      "max_baht": 5000000,
@@ -40,8 +667,16 @@
      "variant": "รถจดทะเบียนปี 2020–2016",
      "collateral": "unstated",
      "quoted_basis": "flat",
-     "quoted": {"lo": 4.25, "hi": 7.30, "unit": "pct_per_year"},
-     "lender_effective": {"lo": 7.75, "hi": 12.62, "unit": "pct_per_year"},
+     "quoted": {
+      "lo": 4.25,
+      "hi": 7.3,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": {
+      "lo": 7.75,
+      "hi": 12.62,
+      "unit": "pct_per_year"
+     },
      "tenor_months_max": 84,
      "ltv_pct": 140,
      "max_baht": 5000000,
@@ -51,12 +686,140 @@
      "variant": "รถจดทะเบียนปี 2015–2011",
      "collateral": "unstated",
      "quoted_basis": "flat",
-     "quoted": {"lo": 5.50, "hi": 8.65, "unit": "pct_per_year"},
-     "lender_effective": {"lo": 10.00, "hi": 15.00, "unit": "pct_per_year"},
+     "quoted": {
+      "lo": 5.5,
+      "hi": 8.65,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": {
+      "lo": 10.0,
+      "hi": 15.0,
+      "unit": "pct_per_year"
+     },
      "tenor_months_max": 84,
      "ltv_pct": 140,
      "max_baht": 5000000,
      "quote_th": "อัตราดอกเบี้ยคงที่ 5.50% – 8.65% ต่อปี (อัตราดอกเบี้ยที่แท้จริง 10.00% – 15.00% ต่อปี)"
+    }
+   ]
+  },
+  {
+   "key": "SOMWANG",
+   "name_th": "สมหวัง เงินสั่งได้",
+   "name_en": "Somwang Ngern Sang Dai",
+   "owner": "Hi-Way Co. (TISCO group)",
+   "loan_type": "title_loan",
+   "source_kind": "lender",
+   "citation": "https://www.somwang.co.th",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "TISCO's non-bank arm — the same group as ทิสโก้ ออโต้แคช, priced separately.",
+   "variants": [
+    {
+     "variant": "สินเชื่อทะเบียนรถ",
+     "collateral": "no_transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 12.0,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 60,
+     "ltv_pct": null,
+     "max_baht": null,
+     "quote_th": "สินเชื่อทะเบียนรถ อัตราดอกเบี้ยที่แท้จริง 12%-24% ต่อปี"
+    },
+    {
+     "variant": "สินเชื่อทะเบียนรถมอเตอร์ไซค์",
+     "collateral": "no_transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 15.0,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 60,
+     "ltv_pct": null,
+     "max_baht": null,
+     "quote_th": "สินเชื่อทะเบียนรถมอเตอร์ไซค์ อัตราดอกเบี้ยที่แท้จริง 15%-24% ต่อปี"
+    }
+   ]
+  },
+  {
+   "key": "TIDLOR",
+   "name_th": "เงินติดล้อ",
+   "name_en": "Ngern Tid Lor",
+   "owner": "TIDLOR Holdings PCL",
+   "loan_type": "both",
+   "source_kind": "lender",
+   "citation": "https://tidlor.com/th/loan/car",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "Publishes a worked example that states the flat rate AND the reducing-balance rate it corresponds to — the clearest disclosure of the pair in the market.",
+   "variants": [
+    {
+     "variant": "สินเชื่อทะเบียนรถเก๋ง-กระบะ (ตัวอย่างการคำนวณ)",
+     "collateral": "no_transfer",
+     "quoted_basis": "flat",
+     "quoted": {
+      "lo": 1.13,
+      "hi": 1.13,
+      "unit": "pct_per_month"
+     },
+     "quoted_monthly": {
+      "lo": 1.13,
+      "hi": 1.13
+     },
+     "lender_effective": {
+      "lo": 24.0,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 24,
+     "ltv_pct": null,
+     "max_baht": null,
+     "quote_th": "อัตราดอกเบี้ย 1.13% ต่อเดือน เป็นดอกเบี้ยแบบคงที่ ซึ่งเทียบเคียงจากดอกเบี้ยที่แท้จริงแบบลดต้น ลดดอก ในอัตรา 24% ต่อปี"
+    }
+   ]
+  },
+  {
+   "key": "TISCO_AC",
+   "name_th": "สินเชื่อทะเบียนรถยนต์ ทิสโก้ ออโต้แคช",
+   "name_en": "TISCO Auto Cash",
+   "owner": "TISCO Financial Group",
+   "loan_type": "title_loan",
+   "source_kind": "aggregator",
+   "citation": "https://www.checkraka.com/personalloan/tisco/1435861/",
+   "citation_2": "https://www.tiscoautocash.com/th/index.html",
+   "verified": "2026-08-16",
+   "confidence": "medium",
+   "note": "Same group as สมหวัง เงินสั่งได้, which we already track as a branch rival — TISCO attacks this market from both a bank product and an 800-branch non-bank network. The lender's own site is JS-rendered and returned no text from here, so the table is transcribed from checkraka's reproduction of it.",
+   "variants": [
+    {
+     "variant": "รถเก๋ง/กระบะ/ตู้/บรรทุก/บิ๊กไบค์",
+     "collateral": "unstated",
+     "quoted_basis": "flat",
+     "quoted": {
+      "lo": 7.08,
+      "hi": 12.0,
+      "unit": "pct_per_year"
+     },
+     "quoted_monthly": {
+      "lo": 0.59,
+      "hi": 1.0,
+      "unit": "pct_per_month"
+     },
+     "lender_effective": {
+      "lo": 12.64,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "lender_effective_note": "ดอกเบี้ยรวมค่าธรรมเนียม — inclusive of fees, which is why it sits above what the flat rate alone converts to.",
+     "tenor_months_max": 72,
+     "ltv_pct": 85,
+     "ltv_note": "85% of appraised value alone; up to 100% with a co-borrower (ผู้กู้ร่วม).",
+     "max_baht": null,
+     "quote_th": "อัตราดอกเบี้ยคงที่ 0.59% - 1.00% ต่อเดือน / อัตราดอกเบี้ยที่แท้จริง 12.64% - 24% ต่อปีแบบลดต้นลดดอก"
     }
    ]
   },
@@ -78,8 +841,16 @@
      "variant": "โอนเล่มทะเบียน (registration transferred)",
      "collateral": "transfer",
      "quoted_basis": "flat",
-     "quoted": {"lo": 3.18, "hi": 8.70, "unit": "pct_per_year"},
-     "lender_effective": {"lo": 5.93, "hi": 15.00, "unit": "pct_per_year"},
+     "quoted": {
+      "lo": 3.18,
+      "hi": 8.7,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": {
+      "lo": 5.93,
+      "hi": 15.0,
+      "unit": "pct_per_year"
+     },
      "tenor_months_max": 84,
      "ltv_pct": 120,
      "max_baht": null,
@@ -89,51 +860,20 @@
      "variant": "ไม่โอนเล่มทะเบียน (registration retained — the AutoX-comparable product)",
      "collateral": "no_transfer",
      "quoted_basis": "effective",
-     "quoted": {"lo": 12.00, "hi": 23.00, "unit": "pct_per_year"},
-     "lender_effective": {"lo": 12.00, "hi": 23.00, "unit": "pct_per_year"},
+     "quoted": {
+      "lo": 12.0,
+      "hi": 23.0,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": {
+      "lo": 12.0,
+      "hi": 23.0,
+      "unit": "pct_per_year"
+     },
      "tenor_months_max": 84,
      "ltv_pct": 120,
      "max_baht": null,
      "quote_th": "อัตราดอกเบี้ยลดต้นลดดอก 12.00% - 23% ต่อปี"
-    }
-   ]
-  },
-  {
-   "key": "CIMB_AUTO",
-   "name_th": "สินเชื่อรถปลดล็อก ซีไอเอ็มบี ไทย ออโต้",
-   "name_en": "CIMB Thai Auto (รถปลดล็อก)",
-   "owner": "CIMB Thai Bank",
-   "loan_type": "both",
-   "source_kind": "lender",
-   "citation": "https://www.cimbthaiauto.com/product/autocash",
-   "verified": "2026-08-16",
-   "confidence": "high",
-   "note": "The most complete public disclosure in the market — it publishes the monthly rate, its flat-per-year equivalent AND its reducing-balance-per-year equivalent for the same product. That triple is what confirms the market's 'effective' is nominal (monthly x 12), not a compounded APR: 0.83 x 12 = 9.96 against its published 9.95.",
-   "variants": [
-    {
-     "variant": "โอนเล่ม (registration transferred)",
-     "collateral": "transfer",
-     "quoted_basis": "flat",
-     "quoted": {"lo": 2.95, "hi": 8.87, "unit": "pct_per_year"},
-     "quoted_monthly": {"lo": 0.25, "hi": 0.74, "unit": "pct_per_month"},
-     "lender_effective": {"lo": 5.40, "hi": 15.00, "unit": "pct_per_year"},
-     "tenor_months_max": 72,
-     "ltv_pct": 100,
-     "max_baht": 5000000,
-     "quote_th": "0.25% - 0.74% ต่อเดือน หรือ 2.95% - 8.87% ต่อปี เทียบเท่าดอกเบี้ยลดต้นลดดอกระหว่าง 5.40% - 15.00% ต่อปี"
-    },
-    {
-     "variant": "ไม่โอนเล่ม (registration retained — the AutoX-comparable product)",
-     "collateral": "no_transfer",
-     "quoted_basis": "effective",
-     "quoted": {"lo": 9.95, "hi": 18.65, "unit": "pct_per_year"},
-     "quoted_monthly": {"lo": 0.83, "hi": 1.56, "unit": "pct_per_month"},
-     "lender_effective": {"lo": 9.95, "hi": 18.65, "unit": "pct_per_year"},
-     "lender_flat_equivalent": {"lo": 5.41, "hi": 10.66, "unit": "pct_per_year"},
-     "tenor_months_max": 72,
-     "ltv_pct": 100,
-     "max_baht": 5000000,
-     "quote_th": "0.83% - 1.56% ต่อเดือน เทียบเท่าดอกเบี้ยคงที่ระหว่าง 5.41% - 10.66% ต่อปี หรือดอกเบี้ยลดต้นลดดอกระหว่าง 9.95% - 18.65% ต่อปี"
     }
    ]
   },
@@ -154,9 +894,21 @@
      "variant": "โปรโมชันสมัครออนไลน์ (online application promo)",
      "collateral": "no_transfer",
      "quoted_basis": "flat",
-     "quoted": {"lo": 6.00, "hi": 6.00, "unit": "pct_per_year"},
-     "quoted_monthly": {"lo": 0.50, "hi": 0.50, "unit": "pct_per_month"},
-     "lender_effective": {"lo": 10.99, "hi": 10.99, "unit": "pct_per_year"},
+     "quoted": {
+      "lo": 6.0,
+      "hi": 6.0,
+      "unit": "pct_per_year"
+     },
+     "quoted_monthly": {
+      "lo": 0.5,
+      "hi": 0.5,
+      "unit": "pct_per_month"
+     },
+     "lender_effective": {
+      "lo": 10.99,
+      "hi": 10.99,
+      "unit": "pct_per_year"
+     },
      "tenor_months_max": 72,
      "ltv_pct": null,
      "max_baht": 2000000,
@@ -166,8 +918,16 @@
      "variant": "อัตราปกติ รวมค่าธรรมเนียม (standard band, fees included)",
      "collateral": "no_transfer",
      "quoted_basis": "effective",
-     "quoted": {"lo": 12.00, "hi": 24.00, "unit": "pct_per_year"},
-     "lender_effective": {"lo": 12.00, "hi": 24.00, "unit": "pct_per_year"},
+     "quoted": {
+      "lo": 12.0,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": {
+      "lo": 12.0,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
      "tenor_months_max": 72,
      "ltv_pct": null,
      "max_baht": 2000000,
@@ -176,121 +936,48 @@
    ]
   },
   {
-   "key": "TISCO_AC",
-   "name_th": "สินเชื่อทะเบียนรถยนต์ ทิสโก้ ออโต้แคช",
-   "name_en": "TISCO Auto Cash",
-   "owner": "TISCO Financial Group",
-   "loan_type": "title_loan",
-   "source_kind": "aggregator",
-   "citation": "https://www.checkraka.com/personalloan/tisco/1435861/",
-   "citation_2": "https://www.tiscoautocash.com/th/index.html",
-   "verified": "2026-08-16",
-   "confidence": "medium",
-   "note": "Same group as สมหวัง เงินสั่งได้, which we already track as a branch rival — TISCO attacks this market from both a bank product and an 800-branch non-bank network. The lender's own site is JS-rendered and returned no text from here, so the table is transcribed from checkraka's reproduction of it.",
-   "variants": [
-    {
-     "variant": "รถเก๋ง/กระบะ/ตู้/บรรทุก/บิ๊กไบค์",
-     "collateral": "unstated",
-     "quoted_basis": "flat",
-     "quoted": {"lo": 7.08, "hi": 12.00, "unit": "pct_per_year"},
-     "quoted_monthly": {"lo": 0.59, "hi": 1.00, "unit": "pct_per_month"},
-     "lender_effective": {"lo": 12.64, "hi": 24.00, "unit": "pct_per_year"},
-     "lender_effective_note": "ดอกเบี้ยรวมค่าธรรมเนียม — inclusive of fees, which is why it sits above what the flat rate alone converts to.",
-     "tenor_months_max": 72,
-     "ltv_pct": 85,
-     "ltv_note": "85% of appraised value alone; up to 100% with a co-borrower (ผู้กู้ร่วม).",
-     "max_baht": null,
-     "quote_th": "อัตราดอกเบี้ยคงที่ 0.59% - 1.00% ต่อเดือน / อัตราดอกเบี้ยที่แท้จริง 12.64% - 24% ต่อปีแบบลดต้นลดดอก"
-    }
-   ]
-  },
-  {
-   "key": "CAR4CASH",
-   "name_th": "กรุงศรี คาร์ ฟอร์ แคช",
-   "name_en": "Krungsri Car for Cash",
-   "owner": "Krungsri (BAY/MUFG)",
+   "key": "WSOL_CARFINN",
+   "name_th": "คาร์ฟิน (CarFinn)",
+   "name_en": "CarFinn",
+   "owner": "WSOL / Sabuy group",
    "loan_type": "both",
-   "source_kind": "lender",
-   "citation": "https://www.car4cash.com/",
+   "source_kind": "aggregator",
+   "citation": "https://www.carfinn.com/car-loan",
    "verified": "2026-08-16",
    "confidence": "medium",
-   "note": "The original รถแลกเงิน brand and the category's reference point. The site advertises a flat floor and a reducing-balance floor without labelling which product each belongs to; on the pattern every other lender in this file follows, the flat floor is the โอนเล่ม product and the reducing floor the ไม่โอนเล่ม one — but that is inference, so the variants below are recorded as the site states them, unattributed.",
+   "note": "A BROKER, not a lender — CarFinn originates for a panel of finance companies, so the figures below are the cheapest offer on that panel, not a rate CarFinn itself charges or is bound by. Basis is not stated anywhere on the page, so nothing is converted. The rate text is client-rendered and only appears after the FAQ hydrates, which is why a plain fetch of this URL finds no rate at all.",
    "variants": [
     {
-     "variant": "อัตราคงที่ (flat-quoted programme)",
+     "variant": "รถยนต์เก่า (used)",
      "collateral": "unstated",
-     "quoted_basis": "flat",
-     "quoted": {"lo": 3.18, "hi": null, "unit": "pct_per_year"},
-     "lender_effective": null,
-     "tenor_months_max": 84,
-     "tenor_months_min": 12,
-     "ltv_pct": 100,
+     "quoted_basis": null,
+     "quoted": {
+      "lo": 6.0,
+      "hi": null,
+      "unit": "pct_per_year"
+     },
+     "quoted_monthly": {
+      "lo": 0.5,
+      "hi": null
+     },
+     "tenor_months_max": null,
+     "ltv_pct": null,
      "max_baht": null,
-     "quote_th": "เริ่มต้นที่ร้อยละ 3.18 ต่อปี (คงที่)"
+     "quote_th": "รถยนต์เก่าเริ่มต้นที่ 0.5% ต่อเดือน"
     },
     {
-     "variant": "อัตราลดต้นลดดอก (reducing-balance programme)",
+     "variant": "รถยนต์ใหม่ (new)",
      "collateral": "unstated",
-     "quoted_basis": "effective",
-     "quoted": {"lo": 12.00, "hi": null, "unit": "pct_per_year"},
-     "lender_effective": {"lo": 12.00, "hi": null, "unit": "pct_per_year"},
-     "tenor_months_max": 84,
-     "tenor_months_min": 12,
-     "ltv_pct": 100,
+     "quoted_basis": null,
+     "quoted": {
+      "lo": null,
+      "hi": 3.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": null,
+     "ltv_pct": null,
      "max_baht": null,
-     "quote_th": "เริ่มต้นที่ร้อยละ 12 ต่อปี (ลดต้นลดดอก)"
-    }
-   ]
-  },
-  {
-   "key": "KBANK_RCD",
-   "name_th": "สินเชื่อรถช่วยได้กสิกรไทย (จำนำทะเบียนรถ)",
-   "name_en": "KBank Rot Chuay Dai",
-   "owner": "Kasikornbank",
-   "loan_type": "title_loan",
-   "source_kind": "aggregator",
-   "citation": "https://www.checkraka.com/personalloan/kbank/1435746/",
-   "verified": "2026-08-16",
-   "confidence": "medium",
-   "note": "KBank's own-balance-sheet title loan, distinct from เงินให้ใจ (Ngern Hai Jai), the separately-licensed KBank subsidiary we already track as an advertiser. Both are Kasikorn attacking this market; they are not the same entity and are carried separately.",
-   "variants": [
-    {
-     "variant": "จำนำทะเบียนรถ (registration retained)",
-     "collateral": "no_transfer",
-     "quoted_basis": "effective",
-     "quoted": {"lo": 13.50, "hi": 24.00, "unit": "pct_per_year"},
-     "lender_effective": {"lo": 13.50, "hi": 24.00, "unit": "pct_per_year"},
-     "lender_effective_note": "13.5% is the advertised floor; 24% is the all-in ceiling on interest, service charges, penalties and fees combined.",
-     "tenor_months_max": 72,
-     "ltv_pct": 100,
-     "max_baht": null,
-     "quote_th": "อัตราดอกเบี้ยลดต้นลดดอก เริ่มต้น 13.5% ต่อปี / อัตราดอกเบี้ย ค่าบริการ เบี้ยปรับ และค่าธรรมเนียมสูงสุดไม่เกิน 24% ต่อปี"
-    }
-   ]
-  },
-  {
-   "key": "KKP",
-   "name_th": "สินเชื่อรถเรียกเงิน เกียรตินาคินภัทร",
-   "name_en": "KKP car-for-cash (รถเรียกเงิน)",
-   "owner": "Kiatnakin Phatra",
-   "loan_type": "both",
-   "source_kind": "search",
-   "citation": "https://kkpauto.com/th/rrn-26",
-   "verified": "2026-08-16",
-   "confidence": "low",
-   "note": "NOT DIRECTLY VERIFIED. kkpauto.com returns HTTP 403 to us and checkraka's KKP index lists only a bare 'ดอกเบี้ยต่อปี 2.990%' with no basis, tenor or LTV. The band below is from a search-result snippet of the 2569 campaign page and is carried at low confidence so the operator is visibly present with a caveat rather than silently missing. Re-verify from the lender's page when it is reachable.",
-   "variants": [
-    {
-     "variant": "รถเรียกเงิน 2569 (campaign)",
-     "collateral": "unstated",
-     "quoted_basis": "flat",
-     "quoted": {"lo": 3.18, "hi": 12.55, "unit": "pct_per_year"},
-     "lender_effective": {"lo": 12.00, "hi": 17.50, "unit": "pct_per_year"},
-     "tenor_months_max": 72,
-     "tenor_months_min": 12,
-     "ltv_pct": 120,
-     "max_baht": null,
-     "quote_th": "ดอกเบี้ยคงที่ 3.18% - 12.55% ต่อปี และดอกเบี้ยลดต้นลดดอก 12.00% - 17.50% ต่อปี ตั้งแต่ 12 - 72 เดือน วงเงินกู้สูงสุด 120%"
+     "quote_th": "รถยนต์ใหม่ไม่เกิน 3% ต่อปี"
     }
    ]
   }

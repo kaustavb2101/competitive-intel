@@ -18,16 +18,9 @@
   "scope_note": "WIDENED 2026-08-16 from จำนำทะเบียน-only to EVERY operator that refinances a vehicle, on the owner's instruction ('basically everyone in the space of refinance of vehicles either through hire purchase OR title loan'). `loan_type` carries the distinction and it is not cosmetic: 'hp_refinance' operators take the registration book (โอนเล่ม) and advertise a FLAT rate, 'title_loan' operators leave it with the borrower (ไม่โอนเล่ม) and advertise REDUCING BALANCE. The two conventions are ~4x apart on the poster and about level on the cost of money, so mixing them without conversion is the central trap in reading this market. source-data/rival_rate_card.json holds the published rate cards; pipeline/rate_basis.py does the conversion.",
   "ad_search_note": "`ad_search_terms` is the PARENT LEGAL ENTITY each product-branded operator advertises under, used by pull_google_ads.py --discover. Without it a search for 'Car2Cash' or 'My Car My Cash' returns nothing and the operator is filed as having no Google advertiser account — a false measured absence. This is the same trap that hid เงินเทอร์โบ behind 'NGERNTURBO INSURANCE BROKER COMPANY LIMITED' until 2026-08-15. An empty discover result is only ever recorded as NO_ACCOUNT after the parent entity has been searched too.",
   "rate_url_note": "MEASURED 2026-08-16 from a Thai residential IP. `rate_url` is the page on which that operator states its own interest rate, confirmed by reading the number off the page. `rate_fetch` is http where a plain fetch suffices and browser where the page is a JS shell or sits behind bot mitigation (KBank and KKP answer a plain fetch 403; a patched headless Chromium with a real user-agent gets 200). Operators with NO rate_url are not yet found and are listed in rate_url_missing rather than being given a guessed URL: GSB_MEETEE, KKP, WSOL_CARFINN, KBANK_RCD.",
-  "rate_url_missing": [
-   "GSB_MEETEE",
-   "KKP",
-   "WSOL_CARFINN",
-   "KBANK_RCD"
-  ],
+  "rate_url_missing": [],
   "fb_page_note": "MEASURED 2026-08-16. `fb_page` is the operator's Facebook slug, read off a link on their OWN website rather than guessed from the brand name — a guessed slug returns Facebook's 'content isn't available' page instead of failing, which is how the first pass silently got nothing for เงินติดล้อ (real slug ngerntidlor, not tidlor). `fb_page_is_product` is false where the page covers the whole company rather than the vehicle-loan product, so its posts and follower count must NOT be read as that product's share of voice. Without a logged-in session Facebook serves the page identity, follower and 'talking about' counts, and the single newest post truncated at 'ดูเพิ่มเติม' — enough for a daily movement signal, not enough for a promo archive. No page found for: CIMB_AUTO.",
-  "fb_page_missing": [
-   "CIMB_AUTO"
-  ]
+  "fb_page_missing": []
  },
  "operators": [
   {
@@ -305,7 +298,7 @@
    "model": "Land-deed (โฉนด) loans",
    "footprint": "limited own network — bank-channel",
    "app_brand": null,
-   "site": "meeteemeengern.com",
+   "site": "meetee.co.th",
    "ad_search_terms": [
     "ธนาคารออมสิน",
     "ออมสิน"
@@ -313,7 +306,9 @@
    "promo_watch": false,
    "note": "Land-collateral overlap with our โฉนด segment; state-rate pressure on land pricing.",
    "fb_page": "GSBSociety",
-   "fb_page_is_product": false
+   "fb_page_is_product": false,
+   "rate_url": "https://meetee.co.th/mortgage/",
+   "rate_fetch": "http"
   },
   {
    "key": "TTB_CYC",
@@ -357,7 +352,9 @@
    "promo_watch": false,
    "note": "Auto-lending heritage bank; whole-bank app only.",
    "fb_page": "kiatnakinphatra",
-   "fb_page_is_product": false
+   "fb_page_is_product": false,
+   "rate_url": "https://kkpauto.com/th/carquickcash",
+   "rate_fetch": "browser"
   },
   {
    "key": "WSOL_CARFINN",
@@ -373,7 +370,9 @@
    "promo_watch": false,
    "note": "Investigated 2026-08-01 after the owner asked whether a 'เงินสบาย' title lender existed. It does not. SABUY Technology renamed to WSOL Plc; its vehicle-lending exposure is a 20% stake in CarFinn, a broker platform. Carried at tier='broker' so the record is explicit rather than absent — an absent operator invites the same question again, and the wrong answer (treating it as a branch rival) would overstate rival density around our footprint. Brokers are excluded from every per-branch and per-province competitor count by construction: those counts come from the geo censuses (competitor_census.json / competitors_national.json), which only contain physical service points.",
    "fb_page": "carfiinn",
-   "fb_page_is_product": true
+   "fb_page_is_product": true,
+   "rate_url": "https://www.carfinn.com/car-loan",
+   "rate_fetch": "browser"
   },
   {
    "key": "SCB_MCMC",
@@ -462,7 +461,9 @@
    "promo_watch": false,
    "note": "Distinct from เงินให้ใจ (key NGERNHAIJAI), the separately-licensed KBank subsidiary we already track as an advertiser. Both are Kasikorn in this market; they are different entities and are never merged.",
    "fb_page": "KBankLive",
-   "fb_page_is_product": false
+   "fb_page_is_product": false,
+   "rate_url": "https://www.kasikornbank.com/th/personal/autoloan/pages/car-to-cash/top-up.aspx",
+   "rate_fetch": "browser"
   },
   {
    "key": "CIMB_AUTO",
@@ -483,7 +484,9 @@
    "promo_watch": false,
    "note": "The most complete public rate disclosure in the market — it prints the monthly rate, its flat-per-year equivalent AND its reducing-balance-per-year equivalent for the same product. That triple is the evidence that this market's 'effective' is nominal (monthly x 12), not a compounded APR.",
    "rate_url": "https://www.cimbthaiauto.com/product/autocash",
-   "rate_fetch": "browser"
+   "rate_fetch": "browser",
+   "fb_page": "CIMBThai",
+   "fb_page_is_product": false
   }
  ]
 }

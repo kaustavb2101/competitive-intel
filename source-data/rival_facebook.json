@@ -2,15 +2,13 @@
  "meta": {
   "label": "MEASURED anonymously. Facebook serves ONE newest post per page, truncated at \"ดูเพิ่มเติม\", plus follower and engagement counts. This is a movement signal, not a promo archive — do not read it as the operator's full promotions.",
   "session": false,
-  "n_pages": 22,
-  "n_with_post": 21,
-  "n_login_wall": 22,
-  "n_read_this_run": 22,
-  "partial_run": false,
+  "n_pages": 23,
+  "n_with_post": 22,
+  "n_login_wall": 23,
+  "n_read_this_run": 1,
+  "partial_run": true,
   "note": "posted_ago is Facebook's own relative stamp, carried verbatim and NOT converted to a date: that conversion needs the wall clock, and every other date in this repo is copied from a field the source stamped.",
-  "fb_page_missing": [
-   "CIMB_AUTO"
-  ]
+  "fb_page_missing": []
  },
  "pages": {
   "AUTOX": {
@@ -471,6 +469,27 @@
    "reactions": "5",
    "error": null,
    "likes": "112,617",
+   "first_seen": null,
+   "previous_post": null
+  },
+  "CIMB_AUTO": {
+   "key": "CIMB_AUTO",
+   "name_th": "สินเชื่อรถปลดล็อก ซีไอเอ็มบี ไทย ออโต้",
+   "fb_page": "CIMBThai",
+   "is_product_page": false,
+   "url": "https://m.facebook.com/CIMBThai",
+   "status": 200,
+   "session": false,
+   "login_wall": true,
+   "followers": "1.2 ล้าน",
+   "talking_about": "8,854",
+   "bio": "32,080 คนเคยมาที่นี่. MOVING YOU FORWARD",
+   "post": "ธนาคาร ซีไอเอ็มบี ไทย เปิดจองหุ้นกู้ของบริษัท ศรีสวัสดิ์ คอร์ปอเรชั่น จำกัด (มหาชน) ครั้งที่ 2/2569 ชนิดระบุชื่อผู้ถือ ประเภทไม่ด้อยสิทธิ มีประกัน และมีผู้แทนผู้ถือหุ้น...",
+   "posted_ago": "2 วัน",
+   "post_truncated": true,
+   "reactions": "5",
+   "error": null,
+   "likes": "1,217,785",
    "first_seen": null,
    "previous_post": null
   }
