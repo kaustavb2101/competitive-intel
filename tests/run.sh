@@ -374,6 +374,16 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_rate_board.py --check (rate_board.json not built yet, or rival_rate_card.json absent)"
   else bad "build_rate_board.py --check (rate_board.json drifted from rival_rate_card.json + rival_ads.json — run: python3 pipeline/build_rate_board.py)"
   fi
+  # Gated BEFORE promo_gap because it is promo_gap's input: the undercut check reads
+  # rival_facebook.json, so an ungated Facebook projection could drift and the only symptom
+  # would be a promo-gap row that silently stopped matching the post it cites. Every other
+  # deterministic builder in this repo is --check-gated; this one was written alongside
+  # build_promo_gap.py, gated in its own workflow, and then missed here.
+  ( cd "$PIPE" && python3 build_rival_facebook.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_rival_facebook.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_rival_facebook.py --check (source-data/rival_facebook.json absent — a network pull, not data drift)"
+  else bad "build_rival_facebook.py --check (platform/data/rival_facebook.json drifted from source-data/rival_facebook.json — run: python3 pipeline/build_rival_facebook.py)"
+  fi
   ( cd "$PIPE" && python3 build_promo_gap.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_promo_gap.py --check (promo-vs-card undercut test)"
   else bad "build_promo_gap.py --check (promo_gap.json drifted from rival_rate_card/rival_ads/rival_facebook — run: python3 pipeline/build_promo_gap.py)"
