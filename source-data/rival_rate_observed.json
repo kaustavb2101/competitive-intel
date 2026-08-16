@@ -1,0 +1,2239 @@
+{
+ "meta": {
+  "title": "Rival rate OBSERVATION — live re-read of each operator's pinned rate_url",
+  "generated_by": "pipeline/pull_rival_rates.py",
+  "label": "MEASURED — the verbatim rate text found on each operator's own rate_url this run, PLUS what pipeline/rate_basis.py could read off the page about its basis/tenor/LTV. `basis` is null (and `effective_pct_year` is null) wherever the page does not itself state which convention it is quoting — never inferred. This file is NOT the rate board's input and NEVER overwrites source-data/rival_rate_card.json, which stays hand-curated; `drift` on each operator is this script's own comparison against that card, for a human to act on.",
+  "why": "rival_rate_card.json only moved when a human edited it by hand. This script is the scheduled eyes that re-visit every rate_url and say what changed, so the card (and everything measured against it, incl. build_promo_gap.py's undercut check) does not go stale without anyone noticing.",
+  "not_wired_up": "Deliberately absent from tests/run.sh (network puller, not a deterministic --check build) and has no GitHub workflow here — scheduling is the owner's to add separately.",
+  "pulled_at": "2026-08-16",
+  "n_operators_in_plan": 23,
+  "n_read": 23,
+  "n_error": 0,
+  "n_no_rate_found": 1,
+  "n_with_drift_vs_card": 7,
+  "rate_url_missing": [],
+  "requested_keys_not_found": [],
+  "drift_tolerance": {
+   "pct_per_year_pp": 0.5,
+   "pct_per_month_pp": 0.05
+  }
+ },
+ "operators": [
+  {
+   "key": "AUTOX",
+   "name_th": "เงินไชโย",
+   "rate_url": "https://chaiyo.co.th/product/detail/loan-car",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 2479,
+   "quotes": [
+    {
+     "value": 14.99,
+     "unit": "pct_per_year",
+     "quote_th": "เงื่อนไขเป็นไปตามบริษัทฯ กำหนด | บุคคลทั่วไป อัตราดอกเบี้ย 23.99% ต่อปี นิติบุคคล อัตราดอกเบี้ย 14.99% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 23.99,
+     "unit": "pct_per_year",
+     "quote_th": "เงื่อนไขเป็นไปตามบริษัทฯ กำหนด | บุคคลทั่วไป อัตราดอกเบี้ย 23.99% ต่อปี นิติบุคคล อัตราดอกเบี้ย 14.99% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 14.99,
+      "unit": "pct_per_year",
+      "card_range": [
+       14.99,
+       14.99
+      ],
+      "card_field": "นิติบุคคล.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 23.99,
+      "unit": "pct_per_year",
+      "card_range": [
+       23.99,
+       23.99
+      ],
+      "card_field": "บุคคลทั่วไป.quoted",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "MTC",
+   "name_th": "เมืองไทย แคปปิตอล",
+   "rate_url": "https://muangthaicap.com/loan/car-pickup/",
+   "fetched_via": "http",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 10015,
+   "quotes": [
+    {
+     "value": 0.75,
+     "unit": "pct_per_month",
+     "quote_th": "อัตราดอกเบี้ย 0.75% ต่อเดือน (เทียบเท่าอัตราดอกเบี้ยที่แท้จริง 16.98% ต่อปี)",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 9.0
+    },
+    {
+     "value": 16.98,
+     "unit": "pct_per_year",
+     "quote_th": "อัตราดอกเบี้ย 0.75% ต่อเดือน (เทียบเท่าอัตราดอกเบี้ยที่แท้จริง 16.98% ต่อปี)",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 16.98
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 0.75,
+      "unit": "pct_per_month",
+      "card_range": [
+       0.75,
+       0.75
+      ],
+      "card_field": "สินเชื่อทะเบียนรถยนต์ทุกประเภท.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 16.98,
+      "unit": "pct_per_year",
+      "card_range": [
+       16.98,
+       16.98
+      ],
+      "card_field": "สินเชื่อทะเบียนรถยนต์ทุกประเภท.lender_effective",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "TIDLOR",
+   "name_th": "เงินติดล้อ",
+   "rate_url": "https://tidlor.com/th/loan/car",
+   "fetched_via": "http",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 3787,
+   "quotes": [
+    {
+     "value": 10.0,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกถูก เริ่มต้น 10% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 10.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       10.0,
+       10.0
+      ],
+      "card_field": "โปรพิเศษ รีไฟแนนซ์ เก๋ง-กระบะ (live promo).lender_effective",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "SAWAD",
+   "name_th": "ศรีสวัสดิ์ เงินสดทันใจ",
+   "rate_url": "https://www.sawad.co.th/loan_calculator/",
+   "fetched_via": "http",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 7390,
+   "quotes": [
+    {
+     "value": 0.66,
+     "unit": "pct_per_month",
+     "quote_th": "👉 ดอกเบี้ยเริ่มต้น 0.66% ต่อเดือน",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 0.75,
+     "unit": "pct_per_month",
+     "quote_th": "👉 ดอกเบี้ยเริ่มต้น 0.75% ต่อเดือน",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 1.0,
+     "unit": "pct_per_month",
+     "quote_th": "👉 ดอกเบี้ยเริ่มต้นเพียง 1.00% ต่อเดือน",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 15.0,
+     "unit": "pct_per_year",
+     "quote_th": "*อัตราดอกเบี้ยที่แท้จริง 14.61% – 15.00% ต่อปี",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 15.0
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "*อัตราดอกเบี้ยที่แท้จริง 17.04% – 24.00% ต่อปี",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 24.0
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "*อัตราดอกเบี้ยที่แท้จริง 17.85% – 24.00% ต่อปี",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 24.0
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 0.66,
+      "unit": "pct_per_month",
+      "card_range": null,
+      "card_field": null,
+      "delta": null,
+      "drift": true,
+      "note": "card has no figure in this unit for this operator"
+     },
+     {
+      "observed": 0.75,
+      "unit": "pct_per_month",
+      "card_range": null,
+      "card_field": null,
+      "delta": null,
+      "drift": true,
+      "note": "card has no figure in this unit for this operator"
+     },
+     {
+      "observed": 1.0,
+      "unit": "pct_per_month",
+      "card_range": null,
+      "card_field": null,
+      "delta": null,
+      "drift": true,
+      "note": "card has no figure in this unit for this operator"
+     },
+     {
+      "observed": 15.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       15.27,
+       24.0
+      ],
+      "card_field": "สินเชื่อรถยนต์.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       15.27,
+       24.0
+      ],
+      "card_field": "สินเชื่อรถยนต์.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       15.27,
+       24.0
+      ],
+      "card_field": "สินเชื่อรถยนต์.quoted",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "TURBO",
+   "name_th": "เงินเทอร์โบ",
+   "rate_url": "https://www.turbo.co.th/loans/car",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 5270,
+   "quotes": [
+    {
+     "value": 0.68,
+     "unit": "pct_per_month",
+     "quote_th": "ดอกเบี้ยเริ่มต้น 0.68% ต่อเดือน",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 0.68,
+     "unit": "pct_per_month",
+     "quote_th": "0.68% ต่อเดือนโดยประมาณ",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "*กู้เท่าที่จำเป็นและชำระคืนไหว อัตราดอกเบี้ย 15% - 24% ต่อปี เงื่อนไขและการพิจารณาสินเชื่อเป็นไปตามที่บริษัทฯ กำหนด",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": false,
+    "lines": []
+   }
+  },
+  {
+   "key": "HENG",
+   "name_th": "เฮงลิสซิ่ง",
+   "rate_url": "https://www.hengleasing.com/heng_hirepurchase/",
+   "fetched_via": "http",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 4443,
+   "quotes": [
+    {
+     "value": 14.45,
+     "unit": "pct_per_year",
+     "quote_th": "อัตราดอกเบี้ย (EIR) รถยนต์ใช้แล้ว ไม่เกิน 14.45% ต่อปี / รถจักรยานยนต์ ไม่เกิน 22.32% ต่อปี",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 14.45
+    },
+    {
+     "value": 22.32,
+     "unit": "pct_per_year",
+     "quote_th": "อัตราดอกเบี้ย (EIR) รถยนต์ใช้แล้ว ไม่เกิน 14.45% ต่อปี / รถจักรยานยนต์ ไม่เกิน 22.32% ต่อปี",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 22.32
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 14.45,
+      "unit": "pct_per_year",
+      "card_range": [
+       14.45,
+       14.45
+      ],
+      "card_field": "สินเชื่อเฮงรถมือสอง (เช่าซื้อ).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 22.32,
+      "unit": "pct_per_year",
+      "card_range": [
+       20.75,
+       24.0
+      ],
+      "card_field": "เฮงเปลี่ยนรถเป็นเงิน.quoted",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "SAK",
+   "name_th": "ศักดิ์สยามลิสซิ่ง",
+   "rate_url": "https://saksiam.com/service/car",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 3108,
+   "quotes": [
+    {
+     "value": 23.76,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ยถูก เริ่มต้นที่ 20.88% - 23.76% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 23.76,
+      "unit": "pct_per_year",
+      "card_range": [
+       20.88,
+       23.76
+      ],
+      "card_field": "สินเชื่อที่มีทะเบียนรถเป็นประกัน.quoted",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "MICRO",
+   "name_th": "ไมโครลิสซิ่ง",
+   "rate_url": "https://microleasingplc.com/th/micro-products/truck-to-cash",
+   "fetched_via": "http",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 6481,
+   "quotes": [
+    {
+     "value": 20.0,
+     "unit": "pct_per_year",
+     "quote_th": "อัตราดอกเบี้ย 18 - 20% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 22.0,
+     "unit": "pct_per_year",
+     "quote_th": "อัตราดอกเบี้ย 22% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 20.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       18.0,
+       20.0
+      ],
+      "card_field": "สินเชื่อเพิ่มสภาพคล่อง (จำนำทะเบียนรถบรรทุก).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 22.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       18.0,
+       20.0
+      ],
+      "card_field": "สินเชื่อเพิ่มสภาพคล่อง (จำนำทะเบียนรถบรรทุก).quoted",
+      "delta": 2.0,
+      "drift": true
+     }
+    ]
+   }
+  },
+  {
+   "key": "AMANAH",
+   "name_th": "อะมานะฮ์ ลิสซิ่ง",
+   "rate_url": "https://amanah.co.th/car-loan",
+   "fetched_via": "http",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 12467,
+   "quotes": [
+    {
+     "value": 15.0,
+     "unit": "pct_per_year",
+     "quote_th": "เงินต้น 200,000 บาท กำไร 15% ต่อปี จำนวน 24 งวด",
+     "basis": null,
+     "tenor_months": 24,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "ไม่เกิน 24% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "อัตรากำไร ค่าปรับ ค่าชดเชย ค่าบริการ ค่าธรรมเนียมใดๆ ไม่เกิน 24% ต่อปี แบบลดต้นลดกำไร (Effective Rate)",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 24.0
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "รวมกันแล้วไม่เกิน 24% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "อัตรากำไรที่แท้จริงตามสัญญาบวก 3% แต่ไม่เกิน 24% ต่อปี ไม่เกิน 3,500 บาท",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "ค่าปรับ ค่าชดเชย จะแตกต่างกันตามสัญญาของลูกค้าแต่ละราย โดยท่านสามารถดูรายละเอียดค่าปรับ ค่าชดเชยตามที่ระบุในสัญญาต่อท้ายสัญญาสินเชื่ออเนกประสงค์ ทั้งนี้เป็นอัตราที่เมื่อรวมกับกำไร ค่าบริการ และค่าธรรมเนียมต่างๆ ที่แท้จริงตลอดอายุสัญญาแล้วไม่เกินร้อยละ 24 ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 15.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       24.0,
+       24.0
+      ],
+      "card_field": "ไม่โอนเล่มทะเบียนรถยนต์.quoted",
+      "delta": 9.0,
+      "drift": true
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       24.0,
+       24.0
+      ],
+      "card_field": "ไม่โอนเล่มทะเบียนรถยนต์.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       24.0,
+       24.0
+      ],
+      "card_field": "ไม่โอนเล่มทะเบียนรถยนต์.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       24.0,
+       24.0
+      ],
+      "card_field": "ไม่โอนเล่มทะเบียนรถยนต์.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       24.0,
+       24.0
+      ],
+      "card_field": "ไม่โอนเล่มทะเบียนรถยนต์.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       24.0,
+       24.0
+      ],
+      "card_field": "ไม่โอนเล่มทะเบียนรถยนต์.quoted",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "SOMWANG",
+   "name_th": "สมหวัง เงินสั่งได้",
+   "rate_url": "https://www.somwang.co.th",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 3170,
+   "quotes": [
+    {
+     "value": 16.95,
+     "unit": "pct_per_year",
+     "quote_th": "สินเชื่อโฉนดแลกเงิน อัตราดอกเบี้ยที่แท้จริง 11.85%-16.95% ต่อปี",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 16.95
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "สินเชื่อทะเบียนรถ อัตราดอกเบี้ยที่แท้จริง 12%-24% ต่อปี",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 24.0
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "สินเชื่อทะเบียนรถมอเตอร์ไซค์ อัตราดอกเบี้ยที่แท้จริง 15%-24% ต่อปี",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 24.0
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 16.95,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.0,
+       24.0
+      ],
+      "card_field": "สินเชื่อทะเบียนรถ.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.0,
+       24.0
+      ],
+      "card_field": "สินเชื่อทะเบียนรถ.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.0,
+       24.0
+      ],
+      "card_field": "สินเชื่อทะเบียนรถ.quoted",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "NGERNHAIJAI",
+   "name_th": "เงินให้ใจ",
+   "rate_url": "https://www.ngernhaijai.com/product/car-title-loan",
+   "fetched_via": "http",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 5655,
+   "quotes": [
+    {
+     "value": 8.65,
+     "unit": "pct_per_year",
+     "quote_th": "3.10% - 8.65% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 15.0,
+     "unit": "pct_per_year",
+     "quote_th": "6.08% - 15.00% ต่อปี*",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 15.0,
+     "unit": "pct_per_year",
+     "quote_th": "3.10% - 15.00% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "12.82% - 24.00% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 26.62,
+     "unit": "pct_per_year",
+     "quote_th": "6.08% - 26.62% ต่อปี**",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 8.65,
+      "unit": "pct_per_year",
+      "card_range": [
+       3.1,
+       8.65
+      ],
+      "card_field": "แบบไม่โอนเล่มทะเบียน (รถส่วนบุคคล).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 15.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.82,
+       24.0
+      ],
+      "card_field": "แบบจำนำเล่มทะเบียน.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 15.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.82,
+       24.0
+      ],
+      "card_field": "แบบจำนำเล่มทะเบียน.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.82,
+       24.0
+      ],
+      "card_field": "แบบจำนำเล่มทะเบียน.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 26.62,
+      "unit": "pct_per_year",
+      "card_range": [
+       6.08,
+       26.62
+      ],
+      "card_field": "แบบไม่โอนเล่มทะเบียน (รถเชิงพาณิชย์).lender_effective",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "CAR4CASH",
+   "name_th": "คาร์ ฟอร์ แคช",
+   "rate_url": "https://www.car4cash.com/",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "no_rate_found",
+   "error": null,
+   "n_chars": 2939,
+   "quotes": [],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": []
+   }
+  },
+  {
+   "key": "KTC_PBERM",
+   "name_th": "KTC พี่เบิ้ม รถแลกเงิน",
+   "rate_url": "https://ktc.co.th/ktc-p-berm",
+   "fetched_via": "http",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 5968,
+   "quotes": [
+    {
+     "value": 21.0,
+     "unit": "pct_per_year",
+     "quote_th": "ลูกค้าเบิกถอนเงินกู้ 25,000 บาท ในอัตราดอกเบี้ย 21% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 21.5,
+     "unit": "pct_per_year",
+     "quote_th": "ลูกค้าเบิกถอนเงินกู้ 25,000 บาท ในอัตราดอกเบี้ย 21.5% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "KTC พี่เบิ้ม รถแลกเงิน : กู้เท่าที่จําเป็นและชําระคืนไหว อัตราดอกเบี้ย 12.99%-24% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 21.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.99,
+       24.0
+      ],
+      "card_field": "รถยนต์ รถกระบะ รถเก๋ง รถตู้.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 21.5,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.99,
+       24.0
+      ],
+      "card_field": "รถยนต์ รถกระบะ รถเก๋ง รถตู้.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.99,
+       24.0
+      ],
+      "card_field": "รถยนต์ รถกระบะ รถเก๋ง รถตู้.quoted",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "GSB_MONEYDD",
+   "name_th": "เงินดีดี (Good Money by GSB)",
+   "rate_url": "https://www.moneydd.co.th",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 4113,
+   "quotes": [
+    {
+     "value": 15.0,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ย 15% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ยเริ่มต้น 12% - 24% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 25.0,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ย 19–25% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 33.0,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ย 29–33% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 15.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.0,
+       24.0
+      ],
+      "card_field": "จำนำทะเบียนเพื่อคนมีฝัน.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.0,
+       24.0
+      ],
+      "card_field": "จำนำทะเบียนเพื่อคนมีฝัน.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 25.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.0,
+       24.0
+      ],
+      "card_field": "จำนำทะเบียนเพื่อคนมีฝัน.quoted",
+      "delta": 1.0,
+      "drift": true
+     },
+     {
+      "observed": 33.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.0,
+       24.0
+      ],
+      "card_field": "จำนำทะเบียนเพื่อคนมีฝัน.quoted",
+      "delta": 9.0,
+      "drift": true
+     }
+    ]
+   }
+  },
+  {
+   "key": "GSB_MEETEE",
+   "name_th": "มีที่ มีเงิน",
+   "rate_url": "https://meetee.co.th/mortgage/",
+   "fetched_via": "http",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 20175,
+   "quotes": [
+    {
+     "value": 6.75,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ยเริ่มต้น 6.75% ต่อปี (ปีแรก)",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 6.75,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ยกรณีตรวจบูโร เริ่มต้น 6.75% ต่อปี สำหรับปีแรก ปีต่อไป MLR*+Spread",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 6.75,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ย กรณีตรวจบูโร เริ่มต้น 6.75% ต่อปี สำหรับปีแรก ปีต่อไป MLR*+Spread",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 6.75,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ยเริ่มต้น 6.75% ต่อปี ดอกเบี้ยสูงสุด 9.99% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 9.99,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ยกรณีไม่ตรวจบูโร 9.99% ต่อปี สำหรับปีแรก ปีต่อไป MLR*+Spread",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 9.99,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ย กรณีไม่ตรวจบูโร 9.99% ต่อปี สำหรับปีแรก ปีต่อไป MLR*+Spread",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 9.99,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ยเริ่มต้น 6.75% ต่อปี ดอกเบี้ยสูงสุด 9.99% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 9.99,
+     "unit": "pct_per_year",
+     "quote_th": "1. การคำนวณข้างต้นเป็นเพียงการประมาณการจากอัตราดอกเบี้ยตลอดอายุสัญญา 5 ปี โดยอัตราดอกเบี้ยสูงสุดปีแรกอยู่ที่ 9.99% ต่อปี, ปีที่สองเป็นต้นไปใช้อัตราดอกเบี้ย MLR+spread (อัตราดอกเบี้ย MLR ตามประกาศธนาคารออมสิน อาจมีการปรับเปลี่ยน ณ เวลานั้น)",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 6.75,
+      "unit": "pct_per_year",
+      "card_range": [
+       6.75,
+       6.75
+      ],
+      "card_field": "จำนอง (mortgage, ~90% of the book).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 6.75,
+      "unit": "pct_per_year",
+      "card_range": [
+       6.75,
+       6.75
+      ],
+      "card_field": "จำนอง (mortgage, ~90% of the book).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 6.75,
+      "unit": "pct_per_year",
+      "card_range": [
+       6.75,
+       6.75
+      ],
+      "card_field": "จำนอง (mortgage, ~90% of the book).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 6.75,
+      "unit": "pct_per_year",
+      "card_range": [
+       6.75,
+       6.75
+      ],
+      "card_field": "จำนอง (mortgage, ~90% of the book).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 9.99,
+      "unit": "pct_per_year",
+      "card_range": [
+       9.99,
+       9.99
+      ],
+      "card_field": "ขายฝาก (sale-and-leaseback).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 9.99,
+      "unit": "pct_per_year",
+      "card_range": [
+       9.99,
+       9.99
+      ],
+      "card_field": "ขายฝาก (sale-and-leaseback).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 9.99,
+      "unit": "pct_per_year",
+      "card_range": [
+       9.99,
+       9.99
+      ],
+      "card_field": "ขายฝาก (sale-and-leaseback).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 9.99,
+      "unit": "pct_per_year",
+      "card_range": [
+       9.99,
+       9.99
+      ],
+      "card_field": "ขายฝาก (sale-and-leaseback).quoted",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "TTB_CYC",
+   "name_th": "ttb รถแลกเงิน (cash your car)",
+   "rate_url": "https://www.ttbbank.com/th/personal/loans/hire-purchase/cash-your-car",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 18394,
+   "quotes": [
+    {
+     "value": 0.27,
+     "unit": "pct_per_month",
+     "quote_th": "จากราคาประเมิน ดอกเบี้ยต่ำ เริ่มต้น 0.27% ต่อเดือน ผ่อนยาว ตั้งแต่ 12-84 เดือน",
+     "basis": null,
+     "tenor_months": 84,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 0.27,
+     "unit": "pct_per_month",
+     "quote_th": "ดอกเบี้ยคงที่ เริ่มต้น 0.27% ต่อเดือน เทียบเท่า 3.18% ต่อปี",
+     "basis": "flat",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 0.27,
+     "unit": "pct_per_month",
+     "quote_th": "เอารถเข้าไฟแนนซ์ที่ไหนดอกเบี้ยถูก? ttb DRIVE ให้บริการไฟแนนซ์รถยนต์ดอกเบี้ยถูก อนุมัติง่าย ดอกเบี้ยต่ำ วงเงินสูง แถมผ่อนสบายนานสูงสุด 84 เดือน โดยมีอัตราดอกเบี้ยคงที่เริ่มต้น 0.27% ต่อเดือน และยังมีบริการแบบไม่โอนเล่มทะเบียนหรือเรียกว่าจำนำทะเบียน รับเงินไว สามารถโปะ ปิดบัญชีก่อนกำหนดได้ อัตราดอกเบี้ยคิดแบบลดต้นลดดอกเริ่มต้น 0.54% ต่อเดือน",
+     "basis": "flat",
+     "tenor_months": 84,
+     "ltv_pct": null,
+     "effective_pct_year": 5.99
+    },
+    {
+     "value": 0.52,
+     "unit": "pct_per_month",
+     "quote_th": "คนมีวินัยทางการเงิน ต้องได้ข้อเสนอดีกว่าเดิม ​ทีทีบีไดรฟ์ คำนวณดอกเบี้ย จากประวัติการผ่อนของคุณ รถปีไหน ก็ได้ดอกเบี้ยต่ำ จำนำทะเบียนรถ แบบไม่โอนเล่ม เริ่มต้น 0.52% ต่อเดือน (เทียบเท่า 11.11% ต่อปี)​",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 0.54,
+     "unit": "pct_per_month",
+     "quote_th": "*เทียบเท่าดอกเบี้ยคงที เริ่มต้น 0.54% ต่อเดือน",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 0.57,
+     "unit": "pct_per_month",
+     "quote_th": "ดอกเบี้ยคงที่ เริ่มต้น 0.57% ต่อเดือน",
+     "basis": "flat",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 3.18,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ยคงที่ เริ่มต้น 0.27% ต่อเดือน เทียบเท่า 3.18% ต่อปี",
+     "basis": "flat",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 6.79,
+     "unit": "pct_per_year",
+     "quote_th": "(เทียบเท่าดอกเบี้ยคงที่ 6.79% ต่อปี)",
+     "basis": "flat",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 8.7,
+     "unit": "pct_per_year",
+     "quote_th": "และอยู่ระหว่าง 3.18% - 8.70% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 11.11,
+     "unit": "pct_per_year",
+     "quote_th": "คนมีวินัยทางการเงิน ต้องได้ข้อเสนอดีกว่าเดิม ​ทีทีบีไดรฟ์ คำนวณดอกเบี้ย จากประวัติการผ่อนของคุณ รถปีไหน ก็ได้ดอกเบี้ยต่ำ จำนำทะเบียนรถ แบบไม่โอนเล่ม เริ่มต้น 0.52% ต่อเดือน (เทียบเท่า 11.11% ต่อปี)​",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 12.0,
+     "unit": "pct_per_year",
+     "quote_th": "วงเงินกู้ยืมลูกค้าจำนวนเงิน 500,000 บาท อัตราดอกเบี้ยที่แท้จริงต่อปี (Effective rate) ตามที่ระบุในสัญญาเท่ากับ 12% ต่อปี จำนวนงวดที่ผ่อน 60 งวด ในสัญญาระบุเงื่อนไขการผ่อนชำระเดือนละ 11,123 บาท ณ วันที่ 1 มี.ค. 2565 มีเงินต้นคงเหลือ 500,000 บาท ลูกค้าชำระค่างวดตามกำหนดณ วันที่ 1 เม.ย. 2565",
+     "basis": "effective",
+     "tenor_months": 60,
+     "ltv_pct": null,
+     "effective_pct_year": 12.0
+    },
+    {
+     "value": 13.0,
+     "unit": "pct_per_year",
+     "quote_th": "วงเงินสำรองพร้อมใช้ ไว้จัดการเรื่องฉุกเฉิน หรือโอนยอดหนี้บัตรอื่นมาก็ทำได้ ช่วยให้คุณจ่ายดอกเบี้ยต่ำลง เริ่มต้นแค่ 13% ต่อปี สมัครง่าย อนุมัติไวทันใจ",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "กู้เท่าที่จำเป็นและชำระคืนไหว อัตราดอกเบี้ยที่แท้จริง 5.93% - 24% ต่อปี",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 24.0
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "อัตราดอกเบี้ยที่แท้จริง 12% - 24% ต่อปี",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 24.0
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 0.27,
+      "unit": "pct_per_month",
+      "card_range": null,
+      "card_field": null,
+      "delta": null,
+      "drift": true,
+      "note": "card has no figure in this unit for this operator"
+     },
+     {
+      "observed": 0.27,
+      "unit": "pct_per_month",
+      "card_range": null,
+      "card_field": null,
+      "delta": null,
+      "drift": true,
+      "note": "card has no figure in this unit for this operator"
+     },
+     {
+      "observed": 0.27,
+      "unit": "pct_per_month",
+      "card_range": null,
+      "card_field": null,
+      "delta": null,
+      "drift": true,
+      "note": "card has no figure in this unit for this operator"
+     },
+     {
+      "observed": 0.52,
+      "unit": "pct_per_month",
+      "card_range": null,
+      "card_field": null,
+      "delta": null,
+      "drift": true,
+      "note": "card has no figure in this unit for this operator"
+     },
+     {
+      "observed": 0.54,
+      "unit": "pct_per_month",
+      "card_range": null,
+      "card_field": null,
+      "delta": null,
+      "drift": true,
+      "note": "card has no figure in this unit for this operator"
+     },
+     {
+      "observed": 0.57,
+      "unit": "pct_per_month",
+      "card_range": null,
+      "card_field": null,
+      "delta": null,
+      "drift": true,
+      "note": "card has no figure in this unit for this operator"
+     },
+     {
+      "observed": 3.18,
+      "unit": "pct_per_year",
+      "card_range": [
+       3.18,
+       8.7
+      ],
+      "card_field": "โอนเล่มทะเบียน (registration transferred).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 6.79,
+      "unit": "pct_per_year",
+      "card_range": [
+       3.18,
+       8.7
+      ],
+      "card_field": "โอนเล่มทะเบียน (registration transferred).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 8.7,
+      "unit": "pct_per_year",
+      "card_range": [
+       3.18,
+       8.7
+      ],
+      "card_field": "โอนเล่มทะเบียน (registration transferred).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 11.11,
+      "unit": "pct_per_year",
+      "card_range": [
+       5.93,
+       15.0
+      ],
+      "card_field": "โอนเล่มทะเบียน (registration transferred).lender_effective",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 12.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       5.93,
+       15.0
+      ],
+      "card_field": "โอนเล่มทะเบียน (registration transferred).lender_effective",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 13.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       5.93,
+       15.0
+      ],
+      "card_field": "โอนเล่มทะเบียน (registration transferred).lender_effective",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.0,
+       23.0
+      ],
+      "card_field": "ไม่โอนเล่มทะเบียน (registration retained — the AutoX-comparable product).quoted",
+      "delta": 1.0,
+      "drift": true
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.0,
+       23.0
+      ],
+      "card_field": "ไม่โอนเล่มทะเบียน (registration retained — the AutoX-comparable product).quoted",
+      "delta": 1.0,
+      "drift": true
+     }
+    ]
+   }
+  },
+  {
+   "key": "KKP",
+   "name_th": "KKP รถเรียกเงิน",
+   "rate_url": "https://kkpauto.com/th/carquickcash",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 3637,
+   "quotes": [
+    {
+     "value": 0.25,
+     "unit": "pct_per_month",
+     "quote_th": "เริ่มต้น 0.25% ต่อเดือน",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 0.25,
+     "unit": "pct_per_month",
+     "quote_th": "ดอกเบี้ยเริ่มต้น\t0.25% ต่อเดือน",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 0.25,
+     "unit": "pct_per_month",
+     "quote_th": "**อัตราดอกเบี้ยเริ่มต้น 0.25% ต่อเดือน หรือ 2.99% ต่อปี สำหรับลูกค้าที่ซื้อประกันภัยคุ้มครองสินเชื่อและเลือกระยะเวลาผ่อนไม่เกิน 60 งวด",
+     "basis": null,
+     "tenor_months": 60,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 2.99,
+     "unit": "pct_per_year",
+     "quote_th": "หรือ 2.99% ต่อปี**",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 2.99,
+     "unit": "pct_per_year",
+     "quote_th": "**อัตราดอกเบี้ยเริ่มต้น 0.25% ต่อเดือน หรือ 2.99% ต่อปี สำหรับลูกค้าที่ซื้อประกันภัยคุ้มครองสินเชื่อและเลือกระยะเวลาผ่อนไม่เกิน 60 งวด",
+     "basis": null,
+     "tenor_months": 60,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 2.99,
+     "unit": "pct_per_year",
+     "quote_th": "ตัวอย่าง เงินต้นที่ 150,000 บาท ระยะเวลาในการผ่อนชำระ 60 งวด กับอัตราดอกเบี้ยแบบคงที่ 2.99% ต่อปี คิดเป็นจำนวนเงินที่ต้องชำระทั้งสิ้น 172,425 บาท และหารเฉลี่ย 60 งวดเท่าๆ กัน เท่ากับงวดละ 3,075 บาท (รวม VAT) ทุกเดือนจนครบสัญญา",
+     "basis": "flat",
+     "tenor_months": 60,
+     "ltv_pct": null,
+     "effective_pct_year": 5.62
+    },
+    {
+     "value": 15.0,
+     "unit": "pct_per_year",
+     "quote_th": "อัตราดอกเบี้ยที่แท้จริง 5.65%-15.00% ต่อปี",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 15.0
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 0.25,
+      "unit": "pct_per_month",
+      "card_range": [
+       0.25,
+       0.25
+      ],
+      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).quoted_monthly",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 0.25,
+      "unit": "pct_per_month",
+      "card_range": [
+       0.25,
+       0.25
+      ],
+      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).quoted_monthly",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 0.25,
+      "unit": "pct_per_month",
+      "card_range": [
+       0.25,
+       0.25
+      ],
+      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).quoted_monthly",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 2.99,
+      "unit": "pct_per_year",
+      "card_range": [
+       2.99,
+       2.99
+      ],
+      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 2.99,
+      "unit": "pct_per_year",
+      "card_range": [
+       2.99,
+       2.99
+      ],
+      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 2.99,
+      "unit": "pct_per_year",
+      "card_range": [
+       2.99,
+       2.99
+      ],
+      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 15.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       5.65,
+       15.0
+      ],
+      "card_field": "รถเรียกเงิน (โปรโมชันพ่วงประกัน ≤60 งวด).lender_effective",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "WSOL_CARFINN",
+   "name_th": "คาร์ฟินน์ (CarFinn)",
+   "rate_url": "https://www.carfinn.com/car-loan",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 3387,
+   "quotes": [
+    {
+     "value": 0.5,
+     "unit": "pct_per_month",
+     "quote_th": "รถยนต์ใหม่ไม่เกิน 3% ต่อปี รถยนต์เก่าเริ่มต้นที่ 0.5% ต่อเดือน",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 0.5,
+     "unit": "pct_per_month",
+     "quote_th": "เพียงแค่กรอกชื่อ เบอร์โทรศัพท์ รุ่นรถ ปีรถ ไม่ต้องมีคนค้ำประกัน วงเงินสูงสุด 1 ล้านบาท รับรถยนต์ทุกชนิด เก๋ง ปิ๊กอัพ/กระบะ แท็กซี่ รถตู้ (ติด blacklist) อนุมัติเร็วภายใน 3 วัน ดอกเบี้ยเริ่มต้น 0.5% ต่อเดือน",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 3.0,
+     "unit": "pct_per_year",
+     "quote_th": "รถยนต์ใหม่ไม่เกิน 3% ต่อปี รถยนต์เก่าเริ่มต้นที่ 0.5% ต่อเดือน",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 0.5,
+      "unit": "pct_per_month",
+      "card_range": [
+       0.5,
+       0.5
+      ],
+      "card_field": "รถยนต์เก่า (used).quoted_monthly",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 0.5,
+      "unit": "pct_per_month",
+      "card_range": [
+       0.5,
+       0.5
+      ],
+      "card_field": "รถยนต์เก่า (used).quoted_monthly",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 3.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       3.0,
+       3.0
+      ],
+      "card_field": "รถยนต์ใหม่ (new).quoted",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "SCB_MCMC",
+   "name_th": "สินเชื่อรถคือเงิน My Car My Cash",
+   "rate_url": "https://www.scb.co.th/th/personal-banking/loans/car-loans/my-car-my-cash.html",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 7782,
+   "quotes": [
+    {
+     "value": 0.25,
+     "unit": "pct_per_month",
+     "quote_th": "อัตราดอกเบี้ยเริ่มต้น 0.25% ต่อเดือน*",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 0.25,
+     "unit": "pct_per_month",
+     "quote_th": "อัตราดอกเบี้ยเริ่มต้น 0.25% ต่อเดือน คำนวณจากอัตราดอกเบี้ย 2.99% ต่อปี สำหรับรถยนต์ที่จดทะเบียนปี 2026-2024 ระยะเวลาการผ่อนไม่เกิน 60 เดือน (ทั้งนี้ อัตราดอกเบี้ยอาจเปลี่ยนแปลงได้ซึ่งไม่เกินตามที่ธนาคารประกาศกำหนด)",
+     "basis": null,
+     "tenor_months": 60,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 2.99,
+     "unit": "pct_per_year",
+     "quote_th": "อัตราดอกเบี้ยเริ่มต้น 0.25% ต่อเดือน คำนวณจากอัตราดอกเบี้ย 2.99% ต่อปี สำหรับรถยนต์ที่จดทะเบียนปี 2026-2024 ระยะเวลาการผ่อนไม่เกิน 60 เดือน (ทั้งนี้ อัตราดอกเบี้ยอาจเปลี่ยนแปลงได้ซึ่งไม่เกินตามที่ธนาคารประกาศกำหนด)",
+     "basis": null,
+     "tenor_months": 60,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 5.0,
+     "unit": "pct_per_year",
+     "quote_th": "สมมติฐานการคำนวณมาจากการกู้สินเชื่อที่ผ่อนชำระเป็นงวด จากเงินต้น 100,000 บาท ประเภทรถเก๋ง ปีที่จดทะเบียน 2024 อัตราดอกเบี้ยคงที่ 5% ต่อปี (อัตราดอกเบี้ยที่แท้จริง 8.97% ต่อปี) และระยะเวลาผ่อน 84 เดือน (7 ปี) ค่างวด (รวม VAT) 1,720 บาทต่อเดือน จำนวนดอกเบี้ยทั้งสัญญา 35,000 บาท",
+     "basis": "flat",
+     "tenor_months": 84,
+     "ltv_pct": null,
+     "effective_pct_year": 8.97
+    },
+    {
+     "value": 8.65,
+     "unit": "pct_per_year",
+     "quote_th": "อัตราดอกเบี้ยคงที่อยู่ระหว่าง 2.99% - 8.65% ต่อปี (อัตราดอกเบี้ยที่แท้จริงอยู่ระหว่าง 5.47% - 15% ต่อปี ตลอดอายุสัญญา) (อัตราดอกเบี้ยอาจมีการเปลี่ยนแปลงได้ซึ่งไม่เกินตามที่ธนาคารประกาศกำหนด)",
+     "basis": "flat",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 8.97,
+     "unit": "pct_per_year",
+     "quote_th": "สมมติฐานการคำนวณมาจากการกู้สินเชื่อที่ผ่อนชำระเป็นงวด จากเงินต้น 100,000 บาท ประเภทรถเก๋ง ปีที่จดทะเบียน 2024 อัตราดอกเบี้ยคงที่ 5% ต่อปี (อัตราดอกเบี้ยที่แท้จริง 8.97% ต่อปี) และระยะเวลาผ่อน 84 เดือน (7 ปี) ค่างวด (รวม VAT) 1,720 บาทต่อเดือน จำนวนดอกเบี้ยทั้งสัญญา 35,000 บาท",
+     "basis": "effective",
+     "tenor_months": 84,
+     "ltv_pct": null,
+     "effective_pct_year": 8.97
+    },
+    {
+     "value": 15.0,
+     "unit": "pct_per_year",
+     "quote_th": "อัตราดอกเบี้ยคงที่อยู่ระหว่าง 2.99% - 8.65% ต่อปี (อัตราดอกเบี้ยที่แท้จริงอยู่ระหว่าง 5.47% - 15% ต่อปี ตลอดอายุสัญญา) (อัตราดอกเบี้ยอาจมีการเปลี่ยนแปลงได้ซึ่งไม่เกินตามที่ธนาคารประกาศกำหนด)",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 15.0
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 0.25,
+      "unit": "pct_per_month",
+      "card_range": null,
+      "card_field": null,
+      "delta": null,
+      "drift": true,
+      "note": "card has no figure in this unit for this operator"
+     },
+     {
+      "observed": 0.25,
+      "unit": "pct_per_month",
+      "card_range": null,
+      "card_field": null,
+      "delta": null,
+      "drift": true,
+      "note": "card has no figure in this unit for this operator"
+     },
+     {
+      "observed": 2.99,
+      "unit": "pct_per_year",
+      "card_range": [
+       2.99,
+       6.25
+      ],
+      "card_field": "รถจดทะเบียนปี 2026–2021.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 5.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       2.99,
+       6.25
+      ],
+      "card_field": "รถจดทะเบียนปี 2026–2021.quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 8.65,
+      "unit": "pct_per_year",
+      "card_range": [
+       5.47,
+       10.98
+      ],
+      "card_field": "รถจดทะเบียนปี 2026–2021.lender_effective",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 8.97,
+      "unit": "pct_per_year",
+      "card_range": [
+       5.47,
+       10.98
+      ],
+      "card_field": "รถจดทะเบียนปี 2026–2021.lender_effective",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 15.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       10.0,
+       15.0
+      ],
+      "card_field": "รถจดทะเบียนปี 2015–2011.lender_effective",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "UOB_C2C",
+   "name_th": "สินเชื่อทะเบียนรถยนต์ ยูโอบี Car2Cash",
+   "rate_url": "https://www.uob.co.th/personal/loans/car-2-cash.page",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 9472,
+   "quotes": [
+    {
+     "value": 0.5,
+     "unit": "pct_per_month",
+     "quote_th": "ดอกเบี้ยต่ำเริ่มต้น 0.50% ต่อเดือน*",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 0.5,
+     "unit": "pct_per_month",
+     "quote_th": "*ดอกเบี้ย 0.50% ต่อเดือน เทียบเท่ากับ 10.99% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 10.99,
+     "unit": "pct_per_year",
+     "quote_th": "*ดอกเบี้ย 0.50% ต่อเดือน เทียบเท่ากับ 10.99% ต่อปี",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "กู้เท่าที่จำเป็นและชำระคืนไหว อัตราดอกเบี้ย 10.99% - 24% ต่อปี*​",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 0.5,
+      "unit": "pct_per_month",
+      "card_range": [
+       0.5,
+       0.5
+      ],
+      "card_field": "โปรโมชันสมัครออนไลน์ (online application promo).quoted_monthly",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 0.5,
+      "unit": "pct_per_month",
+      "card_range": [
+       0.5,
+       0.5
+      ],
+      "card_field": "โปรโมชันสมัครออนไลน์ (online application promo).quoted_monthly",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 10.99,
+      "unit": "pct_per_year",
+      "card_range": [
+       10.99,
+       10.99
+      ],
+      "card_field": "โปรโมชันสมัครออนไลน์ (online application promo).lender_effective",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.0,
+       24.0
+      ],
+      "card_field": "อัตราปกติ รวมค่าธรรมเนียม (standard band, fees included).quoted",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "TISCO_AC",
+   "name_th": "สินเชื่อทะเบียนรถยนต์ ทิสโก้ ออโต้แคช",
+   "rate_url": "https://www.tisco.co.th/th/personal/loan/auto-loan.html",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 3851,
+   "quotes": [
+    {
+     "value": 0.59,
+     "unit": "pct_per_month",
+     "quote_th": "อัตราดอกเบี้ย เริ่มต้น 0.59% ต่อเดือน",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 1.15,
+     "unit": "pct_per_month",
+     "quote_th": "อัตราดอกเบี้ยคงที่ 0.59% – 1.15% ต่อเดือน",
+     "basis": "flat",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "ดอกเบี้ยที่แท้จริง 12% – 24% ต่อปี แบบลดต้นลดดอก",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 24.0
+    },
+    {
+     "value": 24.0,
+     "unit": "pct_per_year",
+     "quote_th": "อัตราดอกเบี้ยที่แท้จริง 12% - 24% ต่อปี เงื่อนไขและการพิจารณาสินเชื่อเป็นไปตามที่ธนาคารกำหนด",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 24.0
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 0.59,
+      "unit": "pct_per_month",
+      "card_range": [
+       0.59,
+       1.0
+      ],
+      "card_field": "รถเก๋ง/กระบะ/ตู้/บรรทุก/บิ๊กไบค์.quoted_monthly",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 1.15,
+      "unit": "pct_per_month",
+      "card_range": [
+       0.59,
+       1.0
+      ],
+      "card_field": "รถเก๋ง/กระบะ/ตู้/บรรทุก/บิ๊กไบค์.quoted_monthly",
+      "delta": 0.15,
+      "drift": true
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.64,
+       24.0
+      ],
+      "card_field": "รถเก๋ง/กระบะ/ตู้/บรรทุก/บิ๊กไบค์.lender_effective",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 24.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       12.64,
+       24.0
+      ],
+      "card_field": "รถเก๋ง/กระบะ/ตู้/บรรทุก/บิ๊กไบค์.lender_effective",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "KBANK_RCD",
+   "name_th": "สินเชื่อรถช่วยได้กสิกรไทย (จำนำทะเบียนรถ)",
+   "rate_url": "https://www.kasikornbank.com/th/personal/autoloan/pages/car-to-cash/top-up.aspx",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 8522,
+   "quotes": [
+    {
+     "value": 15.0,
+     "unit": "pct_per_year",
+     "quote_th": "กู้เท่าที่จำเป็นและชำระคืนไหว อัตราดอกเบี้ยที่แท้จริง 7.65%-15% ต่อปี",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 15.0
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 15.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       13.5,
+       24.0
+      ],
+      "card_field": "จำนำทะเบียนรถ ลูกค้าทั่วไป (registration retained).quoted",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  },
+  {
+   "key": "CIMB_AUTO",
+   "name_th": "สินเชื่อรถปลดล็อก ซีไอเอ็มบี ไทย ออโต้",
+   "rate_url": "https://www.cimbthaiauto.com/product/autocash",
+   "fetched_via": "browser",
+   "fetched_at": "2026-08-16",
+   "status": "ok",
+   "error": null,
+   "n_chars": 5937,
+   "quotes": [
+    {
+     "value": 0.25,
+     "unit": "pct_per_month",
+     "quote_th": "เพียง 0.25% ต่อเดือน",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 0.74,
+     "unit": "pct_per_month",
+     "quote_th": "0.25% - 0.74% ต่อเดือน",
+     "basis": null,
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 1.56,
+     "unit": "pct_per_month",
+     "quote_th": "เทียบเท่าดอกเบี้ยลดต้นลดดอกระหว่าง 5.40% - 15.00% ต่อปี\t0.83% - 1.56% ต่อเดือน",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 18.72
+    },
+    {
+     "value": 8.87,
+     "unit": "pct_per_year",
+     "quote_th": "หรือดอกเบี้ยคงที่ระหว่าง 2.95% - 8.87% ต่อปี",
+     "basis": "flat",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
+     "value": 10.66,
+     "unit": "pct_per_year",
+     "quote_th": "เทียบเท่าดอกเบี้ยคงที่ระหว่าง 5.41% - 10.66% ต่อปี",
+     "basis": "flat",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    }
+   ],
+   "quotes_truncated": false,
+   "drift": {
+    "in_card": true,
+    "lines": [
+     {
+      "observed": 0.25,
+      "unit": "pct_per_month",
+      "card_range": [
+       0.25,
+       0.74
+      ],
+      "card_field": "โอนเล่ม (registration transferred).quoted_monthly",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 0.74,
+      "unit": "pct_per_month",
+      "card_range": [
+       0.25,
+       0.74
+      ],
+      "card_field": "โอนเล่ม (registration transferred).quoted_monthly",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 1.56,
+      "unit": "pct_per_month",
+      "card_range": [
+       0.83,
+       1.56
+      ],
+      "card_field": "ไม่โอนเล่ม (registration retained — the AutoX-comparable product).quoted_monthly",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 8.87,
+      "unit": "pct_per_year",
+      "card_range": [
+       2.95,
+       8.87
+      ],
+      "card_field": "โอนเล่ม (registration transferred).quoted",
+      "delta": 0.0,
+      "drift": false
+     },
+     {
+      "observed": 10.66,
+      "unit": "pct_per_year",
+      "card_range": [
+       5.4,
+       15.0
+      ],
+      "card_field": "โอนเล่ม (registration transferred).lender_effective",
+      "delta": 0.0,
+      "drift": false
+     }
+    ]
+   }
+  }
+ ]
+}
