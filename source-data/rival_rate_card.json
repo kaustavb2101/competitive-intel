@@ -613,7 +613,7 @@
    "citation": "https://www.sawad.co.th/loan_calculator/",
    "verified": "2026-08-16",
    "confidence": "high",
-   "note": "Quotes only the effective range for the car product; the 0.72%/เดือน headline it advertises alongside is the motorcycle product, not this one.",
+   "note": "Quotes only the effective range for the car product. The 0.72%/เดือน headline it advertises alongside is THE SAME PRODUCT, not the motorcycle one as this note previously claimed: flat 8.64%/yr over their published 54-month maximum converts to 15.27%/yr effective — their card floor exactly, and the reverse conversion returns 0.720%/mo. ศรีสวัสดิ์ is therefore NOT undercutting its own disclosure; it is quoting the same money flat in advertising and reducing-balance on the card. A separate 0.66%/เดือน creative (first shown 2026-03-26) converts to ~14.11% and would be ~1.2pp below the floor, but it states no tenor and that gap is inside the range a 24-to-72-month term spans, so it is carried as an open question rather than a rate. See platform/data/promo_gap.json.",
    "variants": [
     {
      "variant": "สินเชื่อรถยนต์",
