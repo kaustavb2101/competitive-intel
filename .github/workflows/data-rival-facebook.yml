@@ -1,0 +1,140 @@
+name: Data — rival Facebook promo feed (daily)
+
+# The promo channel the owner ranks ABOVE every published rate card: "facebook is always the
+# promo." A lender's website carries the Bank of Thailand disclosure — the legal ceiling — while
+# the Facebook post is what they are winning customers with this week. On 2026-08-16 KTC พี่เบิ้ม
+# posted "0.60% ต่อเดือน" on the same day its published card said 12.99–24%/yr, a rate that
+# appears nowhere in the disclosure. Reading only the card systematically understates how hard
+# the field is competing, which is why this runs every day.
+#
+#   pipeline/pull_rival_facebook.js   -> source-data/rival_facebook.json   (accumulating store)
+#   pipeline/build_rival_facebook.py  -> platform/data/rival_facebook.json (deterministic, --check)
+#   pipeline/build_promo_gap.py       -> platform/data/promo_gap.json      (promo vs card undercut)
+#
+# ANONYMOUS, AND THAT IS A DESIGN DECISION, NOT A LIMITATION. No account, no session, no cookie,
+# no credential anywhere in this job — the puller was proven to read 22 of 23 pages logged out.
+# Facebook's login wall serves page identity, the follower and engagement counts and THE SINGLE
+# NEWEST POST before it blocks, which is exactly what a daily movement watch needs. Two things
+# follow: this can run on a CI runner at all (a personal session could not, and automating one
+# would breach Facebook's terms and risk the account), and a failure here can never cost anyone
+# their login. If this job ever needs a credential to keep working, the correct response is to
+# let it degrade, not to give it one.
+#
+# WHY A BROWSER ON A GITHUB RUNNER: the wall is served by client-side JS, so a plain fetch gets a
+# shell with no post in it. The feed carries `needs_browser=True` in pull_swarm.py's registry, so
+# data-swarm.yml's `--skip-browser` correctly drops it from the 4x/day swarm — and that skip is
+# only safe because THIS workflow owns it, exactly as data-swarm.yml's header requires of any
+# browser feed.
+#
+# PR, never a direct push: rival copy is genuinely different most days, and a promo landing on
+# the Competition tab is something a human should see before it reaches production.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 22:00 UTC = 05:00 Bangkok. NOT 08:20, which was the first attempt and was wrong: this job
+    # opens a PR, it does not push to master, so a pull ten minutes before the 08:30 digest
+    # would still be sitting unmerged when the email is built — the digest reads master and
+    # would have carried YESTERDAY's posts while appearing to carry today's. Three and a half
+    # hours gives the gate and pr-automerge time to land it first. Off-minute from every other
+    # data-*.yml to avoid colliding on provenance.json, which every data job regenerates.
+    - cron: "0 22 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  # One at a time: the store accumulates, and two runs writing rival_facebook.json would race.
+  group: rival-facebook
+  cancel-in-progress: false
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright (Node client) + Chromium
+        run: |
+          # pull_rival_facebook.js requires the NODE playwright package (qa.yml installs the same
+          # one for rendering); build_rival_facebook.py is pure stdlib and needs nothing.
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+
+      - name: Install numpy (so branch_peers rebuilds authoritatively in rederive_drift)
+        # Without numpy, build_branch_peers.py --check exits SKIP and a stale layer slips through
+        # to surface as gate-red on master later. Same pin as data-set-peers.yml.
+        run: pip install numpy==2.4.6
+
+      - name: Read every rival Facebook page (anonymous)
+        run: |
+          # --sleep paces the reads so 23 sequential page loads do not look like a burst.
+          # The puller isolates its own per-page failures and still writes the store, so a
+          # single page going dark never loses the other 22.
+          node pipeline/pull_rival_facebook.js --sleep
+
+      - name: Rebuild the projection, the promo-gap check, then whatever else went stale
+        run: |
+          python pipeline/build_rival_facebook.py
+          python pipeline/build_promo_gap.py
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
+          # The builders' own byte-exact checks must pass against what they just wrote.
+          python pipeline/build_rival_facebook.py --check
+          python pipeline/build_promo_gap.py --check
+
+      - name: Commit to a data branch + open a PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/rival-facebook-${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a hand-kept file list going stale behind it.
+          git add -u source-data platform/data
+          if git diff --cached --quiet; then
+            echo "No rival posted anything new since the last run. No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          READ="$(python -c "import json;m=json.load(open('platform/data/rival_facebook.json'))['meta'];print('%d of %d pages, %d selling the product' % (m['n_pages']-m['n_silent'], m['n_pages'], m['n_promo_pages']))")"
+          UNDER="$(python -c "import json;print(json.load(open('platform/data/promo_gap.json'))['meta']['n_undercutting'])")"
+          git commit -m "data: rival Facebook promo feed refresh (run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-rival-facebook.yml via pipeline/pull_rival_facebook.js (each operator's own page, MEASURED, read ANONYMOUSLY — no account or session). Read ${READ}. ${UNDER} operator(s) currently advertising below their own published rate card."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Daily rival Facebook promo refresh (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "**Read:** ${READ}. **Undercutting their own card:** ${UNDER}."
+            echo
+            echo "Provenance: MEASURED from each operator's own Facebook page, read **anonymously** —"
+            echo "no account, no session, no credential in the job. The login wall serves page identity,"
+            echo "follower/engagement counts and the single newest post before it blocks; posts are"
+            echo "truncated by Facebook at \`ดูเพิ่มเติม\` and the layer records that rather than hiding it."
+            echo
+            echo "A promo quoting a bare monthly rate carries **both** readings — \`effective_if_reducing\`"
+            echo "and \`effective_if_flat\` — never one converted number, because the post almost never"
+            echo "states its basis and the two are ~2x apart."
+            echo
+            echo "After merge \`bash tests/run.sh check\` gates it byte-exact"
+            echo "(\`build_rival_facebook.py --check\`, \`build_promo_gap.py --check\`)."
+            echo
+            echo "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+          } > /tmp/pr_body.md
+          gh pr create --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: rival Facebook promo feed refresh (run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md

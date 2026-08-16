@@ -294,6 +294,16 @@ FEEDS = [
          cadence="quarterly", ip="any", group="competitive",
          out="source-data/investor_docs/index.json", timeout=2400),
 
+    # The promo feed the owner ranks above every rate card: "facebook is always the promo."
+    # ANY-IP and ANONYMOUS — no account, no session, no credential anywhere in the path. The
+    # login wall serves page identity, follower counts and the single newest post before it
+    # blocks, which is exactly what a daily movement watch needs and is why this can run in CI
+    # at all. Node rather than Python because it drives playwright, which this repo already has.
+    dict(key="rival_facebook", script="pull_rival_facebook.js", args=["--sleep"], runner="node",
+         label="Rival Facebook pages — newest promo post per operator (anonymous, 23 pages)",
+         cadence="daily", ip="any", group="competitive",
+         out="source-data/rival_facebook.json", timeout=1800, needs_browser=True),
+
     # ------------------------------------------------------------------- THAI-IP-ONLY (opt-in only)
     dict(key="rival_promos", script="pull_rival_promos.py", args=[],
          label="Rival promo/campaign listings from their own sites (Tidlor/MTC/Sawad)",
@@ -471,8 +481,12 @@ def run_one(feed):
     t0 = time.time()
     rc, tail, timed_out = None, "", False
     try:
+        # Most feeds are Python; the Facebook puller is Node, because reading a page behind a
+        # login wall needs a real browser and playwright already ships in this repo. `runner`
+        # names the interpreter so the registry can hold both without a second scheduler.
+        argv0 = [sys.executable] if feed.get("runner", "python") == "python" else ["node"]
         proc = subprocess.run(
-            [sys.executable, script] + list(feed.get("args") or []),
+            argv0 + [script] + list(feed.get("args") or []),
             cwd=HERE, capture_output=True, timeout=timeout,
             encoding="utf-8", errors="replace",   # never let a Thai-text decode kill the swarm
         )
