@@ -42,16 +42,18 @@ on:
         description: "Render the digest but do not send it"
         type: boolean
         default: false
-  # SCHEDULE PAUSED 2026-08-16 at the owner's request: "can we review the artefact before you
-  # send out next time?" Leaving the cron live would have sent an unreviewed email at 08:30
-  # the next morning, which is the one thing that was asked not to happen. workflow_dispatch
-  # still works, so the digest can be rendered and reviewed on demand meanwhile.
+  # RESUMED 2026-08-16. It was paused the same day on the owner's request ("can we review the
+  # artefact before you send out next time?"), the review copy was rendered and approved
+  # ("i'm good on the email push tmrw"), so the daily send is back on.
   #
-  # TO RESUME: uncomment the two lines below. Daily 01:30 UTC = 08:30 Bangkok, after the
-  # swarm's 21:35 UTC run (04:35 Bangkok) has merged, so the digest describes today's data
-  # and not yesterday's.
-  # schedule:
-  #   - cron: "30 1 * * *"
+  # 01:30 UTC = 08:30 Bangkok, which is downstream of BOTH morning feeds by design:
+  #   21:35 UTC (04:35 Bangkok)  data-swarm.yml         — the any-IP market pulse
+  #   22:00 UTC (05:00 Bangkok)  data-rival-facebook.yml — the rival promo posts
+  # Both open PRs rather than pushing, so the gap is what lets the gate and pr-automerge land
+  # them before this reads master. A tighter gap would send an email whose header claims
+  # today's pages while its body carries yesterday's.
+  schedule:
+    - cron: "30 1 * * *"
 
 permissions:
   contents: read
