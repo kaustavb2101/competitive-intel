@@ -904,6 +904,62 @@
    ]
   },
   {
+   "key": "TURBO",
+   "name_th": "เงินเทอร์โบ",
+   "name_en": "Ngern Turbo",
+   "owner": "Ngern Turbo PCL",
+   "loan_type": "title_loan",
+   "source_kind": "lender",
+   "citation": "https://www.turbo.co.th/loans/car",
+   "citation_disclosure": "https://drive.ntb.co.th/documents/car-registration-loan.pdf",
+   "verified": "2026-08-16",
+   "confidence": "high",
+   "note": "Read from the BoT-mandated product disclosure (ตารางการเปิดเผยข้อมูลผลิตภัณฑ์) linked off each product page, which states the basis in words and glosses it in English as '(Effective Rate)' — nothing here is inferred. Turbo advertises a 0.68%/เดือน teaser which is FLAT; its own worked example cross-walks that to the 15%/yr effective floor over 24 งวด, and rate_basis.py reproduces the pair to 0.04pp. Both products are ไม่โอนเล่ม and each disclosure's §14 states no alternative variant exists, so there is no โอนเล่ม Turbo product to confuse these with. NO LTV is published — Turbo caps the loan in baht, not as a share of appraised value, so the field is left null rather than invented. Disclosure effective 13 พ.ย. 2568 (2025) for car, 21 มิ.ย. 2568 (2025) for motorcycle.",
+   "variants": [
+    {
+     "variant": "สินเชื่อรถยนต์ (ไม่โอนเล่ม — all car types, no เก๋ง/กระบะ split)",
+     "collateral": "no_transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 15.0,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": {
+      "lo": 15.0,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 72,
+     "ltv_pct": null,
+     "max_baht": 1000000,
+     "collateral_age_max_years": 25,
+     "quote_th": "อัตราดอกเบี้ย ค่าธรรมเนียมใดๆ 15% - 24% ต่อปี แบบลดต้นลดดอก (Effective Rate) / ดอกเบี้ย ดอกเบี้ยผิดนัดชำระ ค่าบริการ และค่าธรรมเนียมใดๆ รวมกันแล้วไม่เกิน 24% ต่อปี"
+    },
+    {
+     "variant": "สินเชื่อรถจักรยานยนต์ (ไม่โอนเล่ม)",
+     "collateral": "no_transfer",
+     "quoted_basis": "effective",
+     "quoted": {
+      "lo": 15.0,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "lender_effective": {
+      "lo": 15.0,
+      "hi": 24.0,
+      "unit": "pct_per_year"
+     },
+     "tenor_months_max": 36,
+     "ltv_pct": null,
+     "max_baht": 100000,
+     "collateral_age_max_years": 20,
+     "not_our_cohort": "MOTORCYCLE collateral. AutoX's book is pickup and passenger car, so this row is carried for completeness and is not a like-for-like peer — same headline rate, different borrower and a 100k cap.",
+     "quote_th": "อัตราดอกเบี้ย ค่าธรรมเนียมใดๆ 15% - 24% ต่อปี แบบลดต้นลดดอก (Effective Rate) / ดอกเบี้ย ดอกเบี้ยผิดนัดชำระ ค่าบริการ และค่าธรรมเนียมใดๆ รวมกันแล้วไม่เกิน 24% ต่อปี"
+    }
+   ]
+  },
+  {
    "key": "UOB_C2C",
    "name_th": "สินเชื่อทะเบียนรถยนต์ ยูโอบี Car2Cash",
    "name_en": "UOB Car2Cash",
