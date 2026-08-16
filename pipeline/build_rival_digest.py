@@ -395,16 +395,11 @@ def html(c):
                  'YouTube</td></tr>' % (DIM, DIM, DIM, DIM, DIM))
     sentiment = sent_head + sentiment
 
+    # NO STANDING SUMMARY PARAGRAPH, on the owner's instruction (2026-08-16). It restated the
+    # field-wide band and the cheapest flat headline every single morning — figures that move
+    # perhaps twice a quarter — so it pushed the day's actual movement below the fold while
+    # saying nothing new. The rate board already carries both numbers for anyone who wants them.
     lead = ""
-    if c["comparable"].get("lo") is not None:
-        lead = ("Against our own collateral — borrower keeps the book — the field charges "
-                "<b>%s%% to %s%%</b> a year effective." % (c["comparable"]["lo"],
-                                                           c["comparable"]["hi"]))
-        cf = c["cheapest_flat"]
-        if cf:
-            lead += (" The lowest headline anywhere is <b>%s%% flat</b> (%s), which is "
-                     "<b>%s%% effective</b> — and it is โอนเล่ม money, a different product."
-                     % (cf["quoted"], esc(cf["operator"]), cf["effective"]))
 
     return """<!doctype html><html><body style="margin:0;background:%s">
 <table width="100%%" cellpadding="0" cellspacing="0" style="background:%s;padding:20px 0">

@@ -23,8 +23,8 @@
   "n_creatives_basis_stated": 7,
   "n_creatives_scanned": 779,
   "n_operators": 22,
-  "n_published": 36,
-  "n_rows": 46,
+  "n_published": 37,
+  "n_rows": 47,
   "refusal_note": "A rate whose basis is not written down is published with basis 'unstated' and NO effective figure. Guessing the basis would manufacture the exact error this board exists to prevent. A flat rate with no term is likewise left unconverted unless the operator publishes a maximum tenor for that product, in which case `at_months` says which term was used.",
   "so_what": "AutoX's rate peers are the ไม่โอนเล่ม / reducing-balance column, NOT the flat headlines. A bank advertising 3.18% is not undercutting a 21% title loan by eighteen points; it is selling a different product, secured differently, to a borrower who is willing to hand over the book.",
   "sources": {
@@ -323,6 +323,44 @@
    "by_collateral": {
     "no_transfer": {
      "hi": 24.0,
+     "lo": 10.0,
+     "source": "lender"
+    }
+   },
+   "citation": "https://tidlor.com/th/loan/car",
+   "collateral": [
+    "no_transfer"
+   ],
+   "confidence": "high",
+   "effective_at_months": null,
+   "effective_hi": 24.0,
+   "effective_lo": 10.0,
+   "effective_source": "lender",
+   "has_published": true,
+   "if_flat": 10.04,
+   "if_reducing": 5.52,
+   "is_us": false,
+   "key": "TIDLOR",
+   "last_seen": "2026-08-15",
+   "loan_type": "both",
+   "ltv_pct": 160,
+   "n_ads_basis_stated": 4,
+   "n_ads_priced": 20,
+   "n_creatives": null,
+   "n_offers": 7,
+   "name_th": "เงินติดล้อ",
+   "operator": "Ngern Tid Lor",
+   "owner": "TIDLOR Holdings PCL",
+   "quoted_basis": "flat",
+   "quoted_lo": 5.52,
+   "source": "published+ads",
+   "tenor_max": 60,
+   "tier": "nonbank"
+  },
+  {
+   "by_collateral": {
+    "no_transfer": {
+     "hi": 24.0,
      "lo": 10.99,
      "source": "lender"
     }
@@ -394,44 +432,6 @@
    "source": "published",
    "tenor_max": 60,
    "tier": "bank"
-  },
-  {
-   "by_collateral": {
-    "no_transfer": {
-     "hi": 24.0,
-     "lo": 12.0,
-     "source": "as_quoted"
-    }
-   },
-   "citation": "https://tidlor.com/th/loan/car",
-   "collateral": [
-    "no_transfer"
-   ],
-   "confidence": "high",
-   "effective_at_months": null,
-   "effective_hi": 24.0,
-   "effective_lo": 12.0,
-   "effective_source": "as_quoted",
-   "has_published": true,
-   "if_flat": 10.26,
-   "if_reducing": 5.52,
-   "is_us": false,
-   "key": "TIDLOR",
-   "last_seen": "2026-08-15",
-   "loan_type": "both",
-   "ltv_pct": 160,
-   "n_ads_basis_stated": 4,
-   "n_ads_priced": 20,
-   "n_creatives": null,
-   "n_offers": 6,
-   "name_th": "เงินติดล้อ",
-   "operator": "Ngern Tid Lor",
-   "owner": "TIDLOR Holdings PCL",
-   "quoted_basis": "effective",
-   "quoted_lo": 12.0,
-   "source": "published+ads",
-   "tenor_max": 60,
-   "tier": "nonbank"
   },
   {
    "by_collateral": {
@@ -1929,6 +1929,47 @@
    "confidence": "high",
    "effective": {
     "at_months": null,
+    "hi": null,
+    "lo": 10.0,
+    "source": "lender",
+    "tenor_assumed": false
+   },
+   "effective_note": "The creative prints both figures, so the basis is pinned by the source: 0.46%/month flat over the advertised 60-month maximum converts to 10.04%, against their stated 10%. We reproduce their own pair to 0.04pp.",
+   "key": "TIDLOR",
+   "last_seen": null,
+   "loan_type": "both",
+   "ltv_note": null,
+   "ltv_pct": 160,
+   "max_baht": null,
+   "n_ads": null,
+   "name_th": "เงินติดล้อ",
+   "operator": "Ngern Tid Lor",
+   "owner": "TIDLOR Holdings PCL",
+   "quote_th": "โปรพิเศษ ลดดอกเบี้ยเฉพาะ สินเชื่อทะเบียนรถรีไฟแนนซ์ เก๋ง-กระบะ ดอกเบี้ยเริ่มต้น 10% ต่อปี วงเงินอนุมัติสูงสุด 160% ของราคาประเมิน อัตราดอกเบี้ยพิเศษเริ่มต้น 0.46% ต่อเดือน / ไม่ต้องค้ำ ไม่ต้องโอนเล่ม",
+   "quoted": {
+    "basis": "flat",
+    "hi": null,
+    "lo": 5.52,
+    "unit": "pct_per_year"
+   },
+   "quoted_monthly": {
+    "hi": null,
+    "lo": 0.46
+   },
+   "source": "published",
+   "source_kind": "lender",
+   "tenor_max": 60,
+   "tenor_min": null,
+   "tier": "nonbank",
+   "variant": "โปรพิเศษ รีไฟแนนซ์ เก๋ง-กระบะ (live promo)"
+  },
+  {
+   "asof": "2026-08-16",
+   "citation": "https://tidlor.com/th/loan/car",
+   "collateral": "no_transfer",
+   "confidence": "high",
+   "effective": {
+    "at_months": null,
     "hi": 24.0,
     "lo": 24.0,
     "source": "lender",
@@ -2432,7 +2473,7 @@
    "collateral": null,
    "confidence": "high",
    "effective": null,
-   "effective_if_flat": 10.26,
+   "effective_if_flat": 10.04,
    "effective_if_reducing": 5.52,
    "effective_note": null,
    "key": "TIDLOR",
@@ -2461,7 +2502,7 @@
    "source": "advertised",
    "source_kind": "ad",
    "tenor_assumed": true,
-   "tenor_max": 24,
+   "tenor_max": 60,
    "tenor_min": null,
    "tier": "nonbank",
    "variant": null
@@ -2505,7 +2546,7 @@
    "source": "advertised",
    "source_kind": "ad",
    "tenor_assumed": true,
-   "tenor_max": 24,
+   "tenor_max": 60,
    "tenor_min": null,
    "tier": "nonbank",
    "variant": null
@@ -2549,7 +2590,7 @@
    "source": "advertised",
    "source_kind": "ad",
    "tenor_assumed": true,
-   "tenor_max": 24,
+   "tenor_max": 60,
    "tenor_min": null,
    "tier": "nonbank",
    "variant": null

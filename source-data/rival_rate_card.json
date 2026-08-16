@@ -755,8 +755,34 @@
    "citation": "https://tidlor.com/th/loan/car",
    "verified": "2026-08-16",
    "confidence": "high",
-   "note": "Publishes a worked example that states the flat rate AND the reducing-balance rate it corresponds to — the clearest disclosure of the pair in the market.",
+   "note": "Publishes a worked example stating the flat rate AND the reducing-balance rate it corresponds to — the clearest disclosure of the pair in the market. But the example is the CEILING (1.13%/month flat = 24%/yr): the money they are actually advertising is a 10%/yr refinance promo, carried as the first variant. Do not read the 24% as their price.",
    "variants": [
+    {
+     "variant": "โปรพิเศษ รีไฟแนนซ์ เก๋ง-กระบะ (live promo)",
+     "collateral": "no_transfer",
+     "offer_kind": "advertised_promo",
+     "citation": "Google Ads Transparency creative, first shown 2026-06-24",
+     "quoted_basis": "flat",
+     "quoted": {
+      "lo": 5.52,
+      "hi": null,
+      "unit": "pct_per_year"
+     },
+     "quoted_monthly": {
+      "lo": 0.46,
+      "hi": null
+     },
+     "lender_effective": {
+      "lo": 10.0,
+      "hi": null,
+      "unit": "pct_per_year"
+     },
+     "lender_effective_note": "The creative prints both figures, so the basis is pinned by the source: 0.46%/month flat over the advertised 60-month maximum converts to 10.04%, against their stated 10%. We reproduce their own pair to 0.04pp.",
+     "tenor_months_max": 60,
+     "ltv_pct": 160,
+     "max_baht": null,
+     "quote_th": "โปรพิเศษ ลดดอกเบี้ยเฉพาะ สินเชื่อทะเบียนรถรีไฟแนนซ์ เก๋ง-กระบะ ดอกเบี้ยเริ่มต้น 10% ต่อปี วงเงินอนุมัติสูงสุด 160% ของราคาประเมิน อัตราดอกเบี้ยพิเศษเริ่มต้น 0.46% ต่อเดือน / ไม่ต้องค้ำ ไม่ต้องโอนเล่ม"
+    },
     {
      "variant": "สินเชื่อทะเบียนรถเก๋ง-กระบะ (ตัวอย่างการคำนวณ)",
      "collateral": "no_transfer",
