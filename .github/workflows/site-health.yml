@@ -51,11 +51,20 @@ jobs:
         env:
           # scheduled runs have no inputs -> fall back to the master PRODUCTION alias
           BASE_URL: ${{ inputs.base_url || 'https://competitive-intel-git-master-kaustav-bagchis-projects.vercel.app' }}
-          # Production is access-protected (middleware.js Basic Auth). With the secret
-          # set, the probe authenticates and runs the full deep checks; WITHOUT it, a
-          # 401 is reported as healthy-but-gated (site up + protected), never a false
-          # alarm. Add the SITE_PASSWORD repo secret to unlock the deep page/data checks.
+          # The production alias is access-protected. TWO possible walls, both handled
+          # as healthy-but-gated (never a false alarm) and both unlockable for deep
+          # checks by a repo secret:
+          #   - middleware.js HTTP Basic Auth (401) -> unlock with SITE_PASSWORD.
+          #   - Vercel Authentication / SSO Deployment Protection (30x -> vercel.com
+          #     login) -> a password CANNOT open it; unlock with the project's
+          #     Protection-Bypass-for-Automation secret (VERCEL_AUTOMATION_BYPASS_SECRET),
+          #     which the probe sends as the x-vercel-protection-bypass header.
+          # As of 2026-08-16 the alias is behind Vercel SSO (ssoProtection enabled,
+          # all_except_custom_domains), so VERCEL_AUTOMATION_BYPASS_SECRET is the one
+          # that restores deep production coverage. Both are optional: without them the
+          # probe reports the site as up + protected, deep checks skipped.
           SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
           echo "base_url=$BASE_URL" >> "$GITHUB_OUTPUT"
           set +e
