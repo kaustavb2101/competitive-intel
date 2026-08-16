@@ -1,0 +1,232 @@
+{
+ "card_only": [
+  {
+   "card_floor": 24.0,
+   "key": "AMANAH",
+   "name_th": "อะมานะฮ์ ลิสซิ่ง"
+  },
+  {
+   "card_floor": 14.99,
+   "key": "AUTOX",
+   "name_th": "เงินไชโย"
+  },
+  {
+   "card_floor": 12.0,
+   "key": "CAR4CASH",
+   "name_th": "คาร์ ฟอร์ แคช"
+  },
+  {
+   "card_floor": 5.4,
+   "key": "CIMB_AUTO",
+   "name_th": "สินเชื่อรถปลดล็อก ซีไอเอ็มบี ไทย ออโต้"
+  },
+  {
+   "card_floor": 14.45,
+   "key": "HENG",
+   "name_th": "เฮงลิสซิ่ง"
+  },
+  {
+   "card_floor": 7.65,
+   "key": "KBANK_RCD",
+   "name_th": "สินเชื่อรถช่วยได้กสิกรไทย (จำนำทะเบียนรถ)"
+  },
+  {
+   "card_floor": 5.65,
+   "key": "KKP",
+   "name_th": "KKP รถเรียกเงิน"
+  },
+  {
+   "card_floor": 12.99,
+   "key": "KTC_PBERM",
+   "name_th": "KTC พี่เบิ้ม รถแลกเงิน"
+  },
+  {
+   "card_floor": 16.98,
+   "key": "MTC",
+   "name_th": "เมืองไทย แคปปิตอล"
+  },
+  {
+   "card_floor": 6.08,
+   "key": "NGERNHAIJAI",
+   "name_th": "เงินให้ใจ"
+  },
+  {
+   "card_floor": 20.88,
+   "key": "SAK",
+   "name_th": "ศักดิ์สยามลิสซิ่ง"
+  },
+  {
+   "card_floor": 5.47,
+   "key": "SCB_MCMC",
+   "name_th": "สินเชื่อรถคือเงิน My Car My Cash"
+  },
+  {
+   "card_floor": 12.0,
+   "key": "SOMWANG",
+   "name_th": "สมหวัง เงินสั่งได้"
+  },
+  {
+   "card_floor": 12.64,
+   "key": "TISCO_AC",
+   "name_th": "สินเชื่อทะเบียนรถยนต์ ทิสโก้ ออโต้แคช"
+  },
+  {
+   "card_floor": 5.93,
+   "key": "TTB_CYC",
+   "name_th": "ttb รถแลกเงิน (cash your car)"
+  },
+  {
+   "card_floor": 10.99,
+   "key": "UOB_C2C",
+   "name_th": "สินเชื่อทะเบียนรถยนต์ ยูโอบี Car2Cash"
+  }
+ ],
+ "meta": {
+  "coverage_note": "Only operators that advertise with a rate can be checked at all. Most of this market advertises reach and speed, not price, so an absent row means we hold no promo QUOTE for that operator — never that its card was verified as its price.",
+  "label": "MEASURED on both sides. The card floor is the lender's own published effective rate; the promo figure is a rate the lender printed in a creative or a post. The only computed step is the flat-to-effective conversion, and it is done in the direction that makes an undercut HARDER to claim, not easier.",
+  "material_threshold_pp": 1.5,
+  "method": "A monthly promo rate with no stated basis is read as FLAT and converted at the operator's own published maximum tenor (fallback 60 months) — the reading that produces the HIGHEST effective cost. It is only reported as an undercut if even that reading falls 1.5pp or more below the card floor.",
+  "n_card_only": 16,
+  "n_checked": 2,
+  "n_undercutting": 1,
+  "so_what": "A published rate card is a ceiling, not a price. Where these two disagree by more than 1.5pp, the promo is what the rival is actually selling and the card understates how hard they are competing.",
+  "sources": {
+   "ads": "platform/data/rival_ads.json",
+   "card": "source-data/rival_rate_card.json",
+   "facebook": "platform/data/rival_facebook.json"
+  },
+  "the_false_positive_this_prevents": "ศรีสวัสดิ์ advertises 0.72%/เดือน against a published 15.27%/yr floor, which reads as a 7-point undercut if the monthly figure is naively multiplied by 12. It is not one: flat 8.64%/yr over their published 54-month maximum is 15.27%/yr effective — the card floor exactly, and the reverse conversion returns 0.720%/mo. The ad and the card are the same offer in two conventions.",
+  "title": "Promo vs card — where a rival's live offer undercuts its own disclosure"
+ },
+ "operators": [
+  {
+   "card_floor": 24.0,
+   "card_tenor_months": 60,
+   "card_variant": "สินเชื่อทะเบียนรถเก๋ง-กระบะ (ตัวอย่างการคำนวณ)",
+   "cheapest_promo_effective": 10.0,
+   "gap_pp": 14.0,
+   "key": "TIDLOR",
+   "n_quotes": 5,
+   "name_th": "เงินติดล้อ",
+   "quotes": [
+    {
+     "channel": "google_ads",
+     "context_th": "รถผ่อนอยู่ก็ขอกู้ได้ดอก เริม 10% ต่อปี ย้ายไฟแนน",
+     "effective_worst_case": 10.0,
+     "quoted": 10.0,
+     "read_as": "as_quoted_per_year",
+     "seen": "2026-06-17",
+     "unit": "pct_per_year"
+    },
+    {
+     "channel": "google_ads",
+     "context_th": "ิน อัตราดอกเบี้ยพิเศษเริ่มต้น 0.46% ต่อเดือน · ถนน สระ",
+     "effective_worst_case": 10.04,
+     "quoted": 0.46,
+     "read_as": "flat_at_60m",
+     "seen": "2026-06-24",
+     "unit": "pct_per_month"
+    },
+    {
+     "channel": "google_ads",
+     "context_th": "บัตรติดล้อ · ชนปนนน 24 · ย 12-24% ต่อปี · ณ วันที",
+     "effective_worst_case": 24.0,
+     "quoted": 24.0,
+     "read_as": "as_quoted_per_year",
+     "seen": "2026-07-10",
+     "unit": "pct_per_year"
+    },
+    {
+     "channel": "google_ads",
+     "context_th": "ชําระคืนไหว อัตราดอกทเบี้ย 12-24% ต่อปี · สินเชื่",
+     "effective_worst_case": 24.0,
+     "quoted": 24.0,
+     "read_as": "as_quoted_per_year",
+     "seen": "2025-11-06",
+     "unit": "pct_per_year"
+    },
+    {
+     "channel": "google_ads",
+     "context_th": "นและชําระคืนไหว อัตราดอกเนี้ย 24% ต่อปี · ไม่มีสล",
+     "effective_worst_case": 24.0,
+     "quoted": 24.0,
+     "read_as": "as_quoted_per_year",
+     "seen": "2026-06-18",
+     "unit": "pct_per_year"
+    }
+   ],
+   "tier": "nonbank",
+   "undercuts_own_card": true,
+   "within_noise": false
+  },
+  {
+   "card_floor": 15.27,
+   "card_tenor_months": 54,
+   "card_variant": "สินเชื่อรถยนต์",
+   "cheapest_promo_effective": 14.11,
+   "gap_pp": 1.16,
+   "key": "SAWAD",
+   "n_quotes": 10,
+   "name_th": "ศรีสวัสดิ์ เงินสดทันใจ",
+   "quotes": [
+    {
+     "channel": "google_ads",
+     "context_th": "เงินใช้ทันใจ ดอกเบี้ยเริ่มตัน 0.66% ต่อเดือน ผ่อนนานสู",
+     "effective_worst_case": 14.11,
+     "quoted": 0.66,
+     "read_as": "flat_at_54m",
+     "seen": "2026-03-26",
+     "unit": "pct_per_month"
+    },
+    {
+     "channel": "google_ads",
+     "context_th": "ดิ์อนุมัติไว ดอกเบี้ยเริ่มต้น 0.72% ต่อเดือน ผ่อนชําระ",
+     "effective_worst_case": 15.27,
+     "quoted": 0.72,
+     "read_as": "flat_at_54m",
+     "seen": "2026-06-17",
+     "unit": "pct_per_month"
+    },
+    {
+     "channel": "google_ads",
+     "context_th": "ขอสินเชื่อได้ ดอกเบียเริ่มต้น 1.00% ต่อเดือน ดอกเบียต่",
+     "effective_worst_case": 20.53,
+     "quoted": 1.0,
+     "read_as": "flat_at_54m",
+     "seen": "2024-02-06",
+     "unit": "pct_per_month"
+    },
+    {
+     "channel": "google_ads",
+     "context_th": "ดิ์อนุมัติไว ดอกเบี้ยเริ่มต้น 1.00% ต่อเดือน ผ่อนชําระ",
+     "effective_worst_case": 20.53,
+     "quoted": 1.0,
+     "read_as": "flat_at_54m",
+     "seen": "2026-03-26",
+     "unit": "pct_per_month"
+    },
+    {
+     "channel": "google_ads",
+     "context_th": "่ต้องโอนเล่ม ดอกเบี้ยเริ่มต้น 1.00% ต่อ เดือน...",
+     "effective_worst_case": 20.53,
+     "quoted": 1.0,
+     "read_as": "flat_at_54m",
+     "seen": "2024-02-06",
+     "unit": "pct_per_month"
+    },
+    {
+     "channel": "google_ads",
+     "context_th": "ม่ต้องโอนเล่ม ดอกเบียเริ่มตัน 1.00% ต่อเดือน ผ่อนชําระ",
+     "effective_worst_case": 20.53,
+     "quoted": 1.0,
+     "read_as": "flat_at_54m",
+     "seen": "2026-03-26",
+     "unit": "pct_per_month"
+    }
+   ],
+   "tier": "nonbank",
+   "undercuts_own_card": false,
+   "within_noise": true
+  }
+ ]
+}

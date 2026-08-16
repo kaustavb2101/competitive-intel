@@ -374,6 +374,10 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_rate_board.py --check (rate_board.json not built yet, or rival_rate_card.json absent)"
   else bad "build_rate_board.py --check (rate_board.json drifted from rival_rate_card.json + rival_ads.json — run: python3 pipeline/build_rate_board.py)"
   fi
+  ( cd "$PIPE" && python3 build_promo_gap.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_promo_gap.py --check (promo-vs-card undercut test)"
+  else bad "build_promo_gap.py --check (promo_gap.json drifted from rival_rate_card/rival_ads/rival_facebook — run: python3 pipeline/build_promo_gap.py)"
+  fi
   ( cd "$PIPE" && python3 build_social_themes.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_social_themes.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_social_themes.py --check (youtube_comments/app_reviews/apple_reviews/pantip_threads absent — network pulls, not data drift)"

@@ -65,6 +65,13 @@ def esc(s):
             .replace("<", "&lt;").replace(">", "&gt;"))
 
 
+def fmt(v):
+    """A rate, printed without inventing precision or a decimal point it never had."""
+    if v is None:
+        return "—"
+    return ("%.2f" % v).rstrip("0").rstrip(".")
+
+
 def thai_names():
     """key -> Thai brand name, from the operator universe.
 
@@ -96,6 +103,7 @@ def collect():
     """Everything the digest says, as plain data — so the HTML and text stay in step."""
     watch, pulse = load("rival_watch"), load("rival_pulse")
     board, ads = load("rate_board"), load("rival_ads")
+    fb = load("rival_facebook")
     w_ads = watch.get("ads") or {}
     w_promo = watch.get("promos") or {}
     w_search = watch.get("search_demand") or {}
@@ -189,9 +197,18 @@ def collect():
     board_rows.sort(key=lambda r: (r["pantip"] is None, -(r["pantip"] or 0), -r["n_sources"]))
     blind = [r["name"] for r in board_rows if r["n_sources"] == 0]
 
+    # THE FACEBOOK FEED LEADS THE EMAIL. Kaustav: "facebook is always the promo." The rate card
+    # is the BoT-mandated disclosure — the legal ceiling — while the post is what the rival is
+    # actually winning customers with this week. KTC พี่เบิ้ม posted 0.60%/month the same day its
+    # published card said 12.99–24%/yr; that teaser appears nowhere in the disclosure. So the
+    # post goes above the rate board, and the two are never averaged.
+    fb_promos = [p for p in (fb.get("promos") or []) if p.get("post")]
+
     return {
         "asof": asof,
         "names": names,
+        "fb_promos": fb_promos,
+        "fb_meta": fb.get("meta") or {},
         "sentiment_board": board_rows,
         "blind": blind,
         "n_universe": len(board_rows),
@@ -269,6 +286,40 @@ def html(c):
     N = c["names"]
     BD = "border-bottom:1px solid " + LINE
 
+    def _fbrate(r):
+        """A promo rate, printed the way it was written plus every reading it could bear.
+
+        Never one converted number: a post saying "0.60% ต่อเดือน" almost never says whether
+        that is flat or reducing, and the two readings are ~2x apart. Publishing a single
+        figure would be inventing the basis the lender declined to state.
+        """
+        q = "%s%%%s" % (fmt(r.get("quoted_pct")),
+                        "/เดือน" if r.get("quoted_unit") == "pct_per_month" else "/ปี")
+        lo, hi = r.get("effective_if_reducing"), r.get("effective_if_flat")
+        if r.get("basis"):
+            return "%s %s = %s%%/ปี effective" % (
+                q, esc(r["basis"]), fmt(hi if r["basis"] == "flat" else lo))
+        if lo is None and hi is None:
+            return q
+        return ("%s <span style=\"color:%s\">· ไม่ระบุฐาน basis unstated → %s–%s%%/ปี effective"
+                "</span>" % (q, DIM, fmt(lo), fmt(hi)))
+
+    fbpromo = rows_html(c["fb_promos"], lambda p: (
+        '<tr><td style="padding:9px 0;%s">'
+        '<b>%s</b> <span style="color:%s;font-size:11px">%s ที่แล้ว</span>%s<br>'
+        '<span style="color:%s;font-size:13px;line-height:1.55">%s</span>%s</td></tr>'
+        % (BD, esc(th(N, p.get("key"), p.get("name_th"))), DIM, esc(p.get("posted_ago") or "?"),
+           (' <span style="color:%s;font-size:11px">· ใหม่</span>' % GOLD)
+           if p.get("changed_since_last_run") else "",
+           FG, esc(" ".join((p.get("post") or "").split()))
+           # WE never truncate — the owner asked for full copy. But Facebook itself cuts every
+           # post at "ดูเพิ่มเติม" before the login wall, and an unexplained "..." reads as our
+           # doing. Say whose cut it is.
+           + ('<span style="color:%s;font-size:11px;white-space:nowrap"> '
+              '[Facebook cut it here]</span>' % DIM if p.get("post_truncated") else ""),
+           ('<div style="margin-top:4px;font-size:12px;color:%s">%s</div>'
+            % (MERCH, " · ".join(_fbrate(r) for r in p["rates"]))) if p.get("rates") else "")))
+
     promo = rows_html(c["promos_new"], lambda p: (
         '<tr><td style="padding:7px 0;%s">'
         '<b>%s</b> <span style="color:%s">%s</span><br>'
@@ -294,7 +345,8 @@ def html(c):
             % (GOLD, esc(a["basis_kind"]))) if a.get("basis_kind") else "",
            FG, esc(" ".join((a.get("copy") or "").split())))))
 
-    board = rows_html(c["operators"][:10], lambda o: (
+    priced = [o for o in c["operators"] if o.get("effective_lo") is not None]
+    board = rows_html(priced, lambda o: (
         '<tr><td style="padding:5px 0;%s">%s'
         '<div style="color:%s;font-size:11px">%s</div></td>'
         '<td align="right" style="padding:5px 0;%s;white-space:nowrap">'
@@ -343,16 +395,11 @@ def html(c):
                  'YouTube</td></tr>' % (DIM, DIM, DIM, DIM, DIM))
     sentiment = sent_head + sentiment
 
+    # NO STANDING SUMMARY PARAGRAPH, on the owner's instruction (2026-08-16). It restated the
+    # field-wide band and the cheapest flat headline every single morning — figures that move
+    # perhaps twice a quarter — so it pushed the day's actual movement below the fold while
+    # saying nothing new. The rate board already carries both numbers for anyone who wants them.
     lead = ""
-    if c["comparable"].get("lo") is not None:
-        lead = ("Against our own collateral — borrower keeps the book — the field charges "
-                "<b>%s%% to %s%%</b> a year effective." % (c["comparable"]["lo"],
-                                                           c["comparable"]["hi"]))
-        cf = c["cheapest_flat"]
-        if cf:
-            lead += (" The lowest headline anywhere is <b>%s%% flat</b> (%s), which is "
-                     "<b>%s%% effective</b> — and it is โอนเล่ม money, a different product."
-                     % (cf["quoted"], esc(cf["operator"]), cf["effective"]))
 
     return """<!doctype html><html><body style="margin:0;background:%s">
 <table width="100%%" cellpadding="0" cellspacing="0" style="background:%s;padding:20px 0">
@@ -367,7 +414,7 @@ def html(c):
     never by when this email was sent.</div>
   %s
 </td></tr>
-%s%s%s%s%s
+%s%s%s%s%s%s
 <tr><td style="padding:14px 22px 20px;border-top:1px solid %s">
   <div style="font:11px/1.55 -apple-system,sans-serif;color:%s">
    %s of %s tracked creatives state whether their rate is flat or reducing balance, so an
@@ -378,6 +425,15 @@ def html(c):
         ('<div style="font:14px/1.55 -apple-system,sans-serif;color:%s;margin-top:12px;'
          'padding:11px 13px;background:#F0F4FF;border-left:3px solid %s;border-radius:4px">%s</div>'
          % (FG, MERCH, lead)) if lead else "",
+        sec("โปรโมชันล่าสุดบนเฟซบุ๊ก · Live promos on Facebook", fbpromo,
+            "%d of %d rival pages read today, newest post first. This is what they are "
+            "SELLING; the rate board below is what they are permitted to charge — KTC posted "
+            "0.60%%/month while its own card says 12.99–24%%/yr. The two are never averaged. "
+            "A monthly rate quoted with no basis gets both readings, not a guess."
+            # Pages are counted by SECTION, not by a "has a post" flag: a page that posted
+            # nothing is the `silent` section, so pages read = universe minus silent.
+            % ((c["fb_meta"].get("n_pages") or 0) - (c["fb_meta"].get("n_silent") or 0),
+               (c["fb_meta"].get("n_pages") or 0))),
         sec("โปรโมชันใหม่ของคู่แข่ง · New rival promotions", promo,
             "From the rivals' own sites. Only listed once a dated first_seen proves it is new."),
         sec("โฆษณาราคาใหม่ · New pricing ads", pricing,
@@ -417,6 +473,19 @@ def text(c):
         L.append(title.upper())
         L.extend(["  " + fmt(i) for i in items] or ["  (nothing new)"])
         L.append("")
+    def _fbline(p):
+        r = ""
+        if p.get("rates"):
+            x = p["rates"][0]
+            r = "  [%s%%%s%s]" % (
+                fmt(x.get("quoted_pct")),
+                "/mo" if x.get("quoted_unit") == "pct_per_month" else "/yr",
+                "" if x.get("basis") else " basis unstated → %s-%s%%/yr eff" % (
+                    fmt(x.get("effective_if_reducing")), fmt(x.get("effective_if_flat"))))
+        return "%s (%s ago)%s — %s" % (th(N, p.get("key"), p.get("name_th")),
+                                       p.get("posted_ago") or "?", r,
+                                       " ".join((p.get("post") or "").split()))
+    blk("Live promos on Facebook — what they are SELLING", c["fb_promos"], _fbline)
     blk("New rival promotions", c["promos_new"],
         lambda p: "%s — %s" % (th(N, p.get("key"), p.get("brand")), p.get("title") or ""))
     blk("New pricing ads (%d)" % c["n_fresh_pricing"], c["fresh_pricing"],
@@ -427,7 +496,7 @@ def text(c):
         lambda p: "%s — %s (last seen %s)" % (th(N, p.get("key"), p.get("brand")),
                                               p.get("title") or "", p.get("last_seen")))
     L.append("RATE BOARD (effective %/yr, reducing balance)")
-    for o in c["operators"][:10]:
+    for o in [o for o in c["operators"] if o.get("effective_lo") is not None]:
         L.append("  %-30s %7s  %s" % (
             (o.get("name_th") or th(N, o.get("key"), o.get("operator")))[:30],
             ("%s%%" % o["effective_lo"]) if o.get("effective_lo") is not None else "-",
