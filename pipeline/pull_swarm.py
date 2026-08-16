@@ -177,6 +177,47 @@ FEEDS = [
          label="BoT monthly foreign tourist arrivals (macro-board tourism chip)",
          cadence="monthly", ip="any", group="macro", out="source-data/bot_tourist_arrivals.json"),
 
+    # ----- THREE objective-#1 (portfolio-risk) feeds that fed WIRED, --check-gated builders yet sat
+    # in NO scheduler, ageing in silence (same silent-stale failure mode as nabc_agri / tpso_cpi
+    # above; the exact NEXT_STEPS "widen pull_swarm's registry so no puller is left unscheduled" item):
+    #   * oae_yield        -> build_crop_farmer_income.py -> crop_farmer_income.json (live #exposure/farm)
+    #   * oae_napprang     -> build_napprang.py           -> napprang.json          (live, second-rice cut)
+    #   * bot_uvpi         -> build_used_vehicle_value.py -> used_vehicle_value.json -> collateral_outlook
+    # oae_napprang.json was the stalest at 36 days (last pull 2026-07-11); oae_yield 29 days; bot_uvpi
+    # 14 days — while their --check-gated builders kept reproducing the same frozen vintage.
+    # VERIFIED reachable + deterministic + valid from THIS cloud runner 2026-08-16 (so none becomes the
+    # retired-oae_prices permanently-red-feed anti-pattern): each ran live EXIT=0 — oae_yield landed
+    # rice/77-prov + 4 national crops off catalog.oae.go.th; oae_napprang landed 73 provinces of
+    # dry-season rice (and a genuine fresh 2025/BE-2568 vintage, confirming the staleness gap is real —
+    # the drift was reverted, the SCHEDULE is the improvement); bot_uvpi passed its own 6/6 anchor-month
+    # acceptance test off app.bot.or.th (reportID 919, keyless). All three import only stdlib+urllib
+    # (no openpyxl/pdfplumber). Their builders are --check-gated (tests/run.sh L199/L317/L307), so
+    # rederive_drift.py rebuilds the crop-income / napprang / collateral layers on the next fresh pull.
+    #   DELIBERATELY NOT wired this pass (both need a clean end-to-end CI proof first, which this
+    #   sandbox could not give — do NOT blind-wire either):
+    #   * pull_bot_credit.py (source-data/bot_credit.json -> build_credit_anchor.py -> credit_anchor.json,
+    #     the MEASURED NPL/household-debt anchor). It parses the BoT Financial Stability Report PDF, so it
+    #     needs pdfplumber — which data-swarm.yml DOES install (L100, for investor_docs) — but its network
+    #     legs (app.bot.or.th report 984 + the FSR PDF download) could NOT be verified here: this sandbox's
+    #     pdfplumber -> pdfminer -> cryptography rust binding panics (a broken local install, not a puller
+    #     fault). RECHECK TRIGGER: a CI run where `python3 pull_bot_credit.py --stamp <today>` reaches
+    #     EXIT=0 with its acceptance test passing; then wire cadence="monthly".
+    #   * pull_bot_policy_rate.py (source-data/bot_policy_rate.json, macro-board gdp/rate-cap). It hits
+    #     www.bot.or.th (a DIFFERENT host than the cloud-verified app.bot.or.th) and parses an .xlsx, and
+    #     was not probed from CI this run. Next MPC meeting 2026-08-26 will move the rate, so it is worth
+    #     verifying — but only after a live CI pull proves www.bot.or.th is reachable from a datacenter IP.
+    dict(key="oae_yield", script="pull_oae_yield.py", args=["--stamp", STAMP],
+         label="OAE crop yield per rai for the 5 field crops (feeds crop_farmer_income)",
+         cadence="weekly", ip="any", group="macro", out="source-data/oae_yield.json"),
+
+    dict(key="oae_napprang", script="pull_oae_napprang.py", args=["--stamp", STAMP],
+         label="OAE dry-season (second) rice-crop production per province (feeds napprang)",
+         cadence="weekly", ip="any", group="macro", out="source-data/oae_napprang.json"),
+
+    dict(key="bot_uvpi", script="pull_bot_uvpi.py", args=["--stamp", STAMP],
+         label="BoT Used Vehicle Price Index (collateral-recovery anchor; feeds collateral_outlook)",
+         cadence="monthly", ip="any", group="macro", out="source-data/bot_uvpi.json"),
+
     dict(key="google_trends", script="pull_google_trends.py", args=[],
          label="Google Trends demand + brand share-of-search (ESTIMATED)", cadence="monthly",
          ip="any", group="competitive", out="source-data/google_trends.json", timeout=1200),
