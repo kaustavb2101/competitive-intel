@@ -42,10 +42,16 @@ on:
         description: "Render the digest but do not send it"
         type: boolean
         default: false
-  schedule:
-    # Daily 01:30 UTC = 08:30 Bangkok. After the swarm's 21:35 UTC run (04:35 Bangkok) has
-    # merged, so the digest describes today's data and not yesterday's.
-    - cron: "30 1 * * *"
+  # SCHEDULE PAUSED 2026-08-16 at the owner's request: "can we review the artefact before you
+  # send out next time?" Leaving the cron live would have sent an unreviewed email at 08:30
+  # the next morning, which is the one thing that was asked not to happen. workflow_dispatch
+  # still works, so the digest can be rendered and reviewed on demand meanwhile.
+  #
+  # TO RESUME: uncomment the two lines below. Daily 01:30 UTC = 08:30 Bangkok, after the
+  # swarm's 21:35 UTC run (04:35 Bangkok) has merged, so the digest describes today's data
+  # and not yesterday's.
+  # schedule:
+  #   - cron: "30 1 * * *"
 
 permissions:
   contents: read
