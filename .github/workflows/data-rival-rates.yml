@@ -1,0 +1,136 @@
+name: Data — rival published rate pages (weekly)
+
+# The other half of the price picture. data-rival-facebook.yml watches what the rivals are
+# SELLING; this watches what they PUBLISH — the BoT-mandated disclosure each of them has to
+# carry, which is the ceiling every promo is measured against.
+#
+# WHY IT HAS TO BE RE-READ RATHER THAN REMEMBERED. source-data/rival_rate_card.json is
+# hand-curated, and until now it only ever moved when a human opened it and typed. A rival
+# quietly repricing its card would therefore sit undetected indefinitely — while BOTH
+# build_rate_board.py AND build_promo_gap.py's undercut check measure against that card. A
+# stale card does not fail loudly; it produces a confident, wrong comparison. The first test
+# run already found seven operators whose live page disagrees with what we hold, including
+# TISCO_AC's ceiling having moved to 1.15%/mo against a captured 0.59–1.00%/mo.
+#
+#   pipeline/pull_rival_rates.py -> source-data/rival_rate_observed.json + a DRIFT report
+#
+# IT DOES NOT TOUCH THE CURATED CARD, deliberately. The card encodes judgement a scraper cannot
+# reproduce: which variant is the comparable one, whether a figure is โอนเล่ม or ไม่โอนเล่ม
+# money, whether a quoted basis was stated or inferred. Letting a regex overwrite that would
+# trade a stale-but-considered number for a fresh-but-wrong one. So this reports drift and a
+# human decides — the PR is the notification.
+#
+# WEEKLY, not daily. A BoT-disclosed rate card changes on the order of quarters; running it
+# every morning would be 23 page loads a day, 14 of them through a browser, to re-confirm the
+# same numbers. The Facebook feed is the daily channel because promos genuinely move daily.
+#
+# WHY A BROWSER: 14 of the 23 pages render their rate table client-side, and two hosts (KKP,
+# KBank) 403 a plain fetch outright. The feed carries `needs_browser=True` in pull_swarm.py's
+# registry, so data-swarm.yml's `--skip-browser` correctly drops it from the 4x/day swarm —
+# and that skip is only safe because THIS workflow owns it, exactly as data-swarm.yml's header
+# requires of any browser feed. A `needs_browser` feed with no workflow of its own is a feed
+# that silently never runs, which is the trap set_filings fell into.
+#
+# PR, never a direct push: every row here is an input to a published price comparison.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 23:10 UTC Sunday = 06:10 Bangkok Monday — the start of the week, so a rival's repricing
+    # is on the desk before the week's decisions rather than after them. Off-minute and off-day
+    # from data-rival-facebook.yml (daily 22:00) and data-set-filings.yml (Sat 12:50) so the
+    # three browser jobs never contend, and so no two data jobs regenerate provenance.json at
+    # once — that file is this repo's standing merge-collision point.
+    - cron: "10 23 * * 0"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: rival-rates
+  cancel-in-progress: false
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Install Playwright (Python client) + Chromium
+        run: |
+          # pull_rival_rates.py imports playwright.sync_api — the PYTHON client, not the Node
+          # one data-rival-facebook.yml installs. Same pin as data-set-filings.yml so the two
+          # browser jobs cannot drift to different Chromium builds.
+          pip install playwright==1.49.1
+          python -m playwright install --with-deps chromium
+
+      - name: Install numpy (so branch_peers rebuilds authoritatively in rederive_drift)
+        # Without numpy, build_branch_peers.py --check exits SKIP and a stale layer slips
+        # through to surface as gate-red on master later. Same pin as data-set-peers.yml.
+        run: pip install numpy==2.4.6
+
+      - name: Re-read every pinned rate page
+        run: |
+          # The puller isolates its own per-URL failures and still writes the store, so one
+          # host going dark never costs the other 22. Exit code is reported either way.
+          set +e
+          python -X utf8 pipeline/pull_rival_rates.py | tee /tmp/drift.txt
+          echo "puller exit: $?"
+
+      - name: Rebuild whatever went stale
+        run: |
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
+
+      - name: Commit to a data branch + open a PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/rival-rates-${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it
+          # reached without a hand-kept file list going stale behind it.
+          git add -u source-data platform/data
+          if git diff --cached --quiet; then
+            echo "No rival changed its published rate page since the last run. No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          READ="$(python -c "import json;m=json.load(open('source-data/rival_rate_observed.json'))['meta'];print('%s of %s pages read, %s with a parseable rate' % (m.get('n_ok','?'), m.get('n_operators','?'), m.get('n_with_rate','?')))" 2>/dev/null || echo 'see the drift report')"
+          git commit -m "data: rival published rate pages re-read (run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-rival-rates.yml via pipeline/pull_rival_rates.py — each operator's own pinned rate_url, MEASURED. ${READ}. The curated rival_rate_card.json is deliberately NOT overwritten; this reports drift for a human to act on."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Weekly re-read of every rival's published rate page (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "**${READ}.**"
+            echo
+            echo "This does **not** overwrite \`source-data/rival_rate_card.json\`. The card encodes"
+            echo "judgement a regex cannot reproduce — which variant is comparable, โอนเล่ม vs ไม่โอนเล่ม,"
+            echo "whether a basis was stated or inferred. This job reports where the live page and the"
+            echo "card disagree, and a human decides. **The drift list below is the reason to read this PR.**"
+            echo
+            echo '```'
+            # The drift report is the entire point of the run, so it goes in the PR body rather
+            # than only in a log that expires.
+            sed -n '/DRIFT/,$p' /tmp/drift.txt | head -60
+            echo '```'
+            echo
+            echo "A rate whose page does not state its basis keeps \`basis: null\` and gets **no**"
+            echo "computed effective figure — the same rule the rate board and the promo-gap check follow."
+            echo
+            echo "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+          } > /tmp/pr_body.md
+          gh pr create --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: rival published rate pages re-read (run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md
