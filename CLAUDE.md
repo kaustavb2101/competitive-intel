@@ -3,6 +3,18 @@
 > This file is auto-loaded by Claude Code. Read it first. It tells you what this project is,
 > what's already built, the hard environment constraints, and how to continue.
 
+> **Then read the human-readable companion:**
+> `OneDrive\Desktop\Vault\Projects\CompetitiveIntel\Overview.md` — the Obsidian vault, mounted as an
+> `additionalDirectory` in the global settings so it is reachable from every session in every folder.
+> This file is the *engineering* contract: scripts, constraints, how to run things. The vault note is
+> the *narrative* one, and it is **authoritative** for deploy URLs, the access gate, the autonomy
+> architecture and the state snapshots that record what shipped and why.
+>
+> The pointer existed in only one direction until 2026-08-16 — the vault named this repo, this repo
+> never named the vault — so a session starting here never learned the note existed. That is the half
+> of a two-way link that always breaks silently, because nothing errors: you simply get a session
+> that has never read the project's own history.
+
 ## Who this is for
 **Kaustav**, Corp Strategy Director at **AutoX / บริษัท ออโต้ เอกซ์ จำกัด** (brand **เงินไชโย / Ngern Chaiyo**),
 a Thai non-bank **title-loan lender** (SCBX subsidiary). Targets ~1M customers, ฿70bn loans,
