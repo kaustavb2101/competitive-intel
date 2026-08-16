@@ -77,13 +77,20 @@ jobs:
       - name: Report which layers the digest can see
         # A digest built from a layer that failed to refresh would be quietly stale, so the run
         # log states what it actually read before it reads it.
+        #
+        # KEEP THIS LIST IN STEP WITH collect() IN build_rival_digest.py. It listed four layers
+        # while the digest read six, so rival_facebook — the section that LEADS the email — could
+        # have gone missing and this step would still have printed an all-green pre-flight. The
+        # digest degrades silently by design (a missing layer just omits its section), which is
+        # correct behaviour and exactly why the diagnostic has to be the thing that notices.
         run: |
-          for f in rival_watch rival_pulse rate_board rival_ads; do
+          for f in rival_watch rival_pulse rate_board rival_ads rival_facebook promo_gap \
+                   pantip_panel rival_youtube; do
             p="platform/data/$f.json"
             if [ -s "$p" ]; then
-              printf '  %-14s %8s bytes\n' "$f" "$(wc -c < "$p")"
+              printf '  %-16s %8s bytes\n' "$f" "$(wc -c < "$p")"
             else
-              printf '  %-14s MISSING — the digest will omit its section\n' "$f"
+              printf '  %-16s MISSING — the digest will omit its section\n' "$f"
             fi
           done
 
