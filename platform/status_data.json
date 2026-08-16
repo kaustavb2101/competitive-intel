@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-16T17:41:57+07:00",
-    "commit": "c34ef1f"
+    "generated_at": "2026-08-16T16:30:17+00:00",
+    "commit": "6bc4dbc"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,114 @@
   ],
   "activity": [
     {
+      "date": "2026-08-16T16:30:17+00:00",
+      "sha": "6bc4dbc",
+      "summary": "fix(deploy-health): deep-probe past the Vercel SSO wall via the automation-bypass secret",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-16T16:16:12+00:00",
+      "sha": "8e68e7e",
+      "summary": "docs(progress): ux-skip-link-branchexplorer merged + deployed + verified on the backstop check-in",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-16T23:12:51+07:00",
+      "sha": "3ea6c39",
+      "summary": "ux: add \"Skip to main content\" bypass link to branch-explorer.html (#465)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-16T16:10:15+00:00",
+      "sha": "2e987d1",
+      "summary": "feat(acq): render the Facebook promo feed and promo-vs-card gap on Competition (#468)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-16T15:44:03+00:00",
+      "sha": "f9128f9",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-16, run 31956314454)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-16T22:26:34+07:00",
+      "sha": "a5b0ea0",
+      "summary": "feat(digest): redesign the email — and fix the rank it was quietly flattering (#471)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-16T22:06:38+07:00",
+      "sha": "6297c52",
+      "summary": "feat(digest): the undercut check was built, gated and never read (#466)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-16T21:21:13+07:00",
+      "sha": "9f45351",
+      "summary": "fix(vercel): the deploy guards were in a vercel.json Vercel never reads (#463)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-16T21:21:08+07:00",
+      "sha": "5645670",
+      "summary": "data: เงินเทอร์โบ priced — the last operator with a promo and no rate (#464)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-16T21:21:04+07:00",
+      "sha": "4730568",
+      "summary": "fix(digest): the pre-flight checked 4 layers while the digest reads 8 (#462)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-16T20:51:58+07:00",
+      "sha": "09d2bab",
+      "summary": "feat(digest): resume the daily 08:30 send — reviewed and approved (#461)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-16T20:51:54+07:00",
+      "sha": "b2c26a8",
+      "summary": "feat(rival): schedule the Facebook promo feed daily, in its own browser job (#459)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-16T20:51:50+07:00",
+      "sha": "0979624",
+      "summary": "fix(vercel): CLI deploys were blocked by our own comment keys in vercel.json (#460)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-16T20:15:13+07:00",
+      "sha": "061e64b",
+      "summary": "feat(rival): full coverage — 23 of 23 operators, and the Facebook promo feed leads (#457)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-16T12:48:12+00:00",
+      "sha": "098e954",
+      "summary": "swarm: schedule three obj-#1 pullers that were ageing in silence (oae_yield, oae_napprang, bot_uvpi)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-16T12:01:37+00:00",
+      "sha": "5343ff3",
+      "summary": "rivals: pin each operator's rate page AND Facebook page, and read the Facebook promos (#453)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-16T11:34:26+00:00",
+      "sha": "4fd8db9",
+      "summary": "data: market-pulse swarm refresh (run 31940258914) (#455)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-16T10:44:29+00:00",
+      "sha": "c309887",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the #home leadership-fact ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-16T17:41:57+07:00",
       "sha": "c34ef1f",
       "summary": "intel(#home): front door now states AutoX leads 0 of 77 provinces, not just density (#456)",
@@ -602,114 +710,6 @@
       "date": "2026-08-16T05:32:11+00:00",
       "sha": "c641c77",
       "summary": "data(census): refresh the Union Auction forward book (run 31926275326) (#444)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-16T04:20:51+00:00",
-      "sha": "5780f35",
-      "summary": "fix(notify): a blank optional secret is not an absent one — the first real send crashed (#442)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-16T04:19:50+00:00",
-      "sha": "89dbb61",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer roll-up-gloss ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-16T11:17:30+07:00",
-      "sha": "15d5407",
-      "summary": "peer(#acq): gloss the >100% census-to-cited roll-up total, not just per-brand (#443)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-16T04:07:37+00:00",
-      "sha": "78e89b7",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-16, run 31925708992)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-16T03:37:47+00:00",
-      "sha": "bb62697",
-      "summary": "feat(notify): email the rival pulse daily instead of waiting to be looked at (#440)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-16T03:28:20+00:00",
-      "sha": "c7bddd9",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-16T10:22:17+07:00",
-      "sha": "1f78bb4",
-      "summary": "docs: correct PROGRESS_LOG — PR #439 merged externally + deploy-verified (#441)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-16T03:19:14+00:00",
-      "sha": "7d48f04",
-      "summary": "data: NABC live prices (2026-08-16, run 31923648181)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-16T03:09:55+00:00",
-      "sha": "ee72159",
-      "summary": "ux: rayong-catchment.html toggle controls expose aria-pressed (WCAG 4.1.2) (#439)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-16T03:09:10+00:00",
-      "sha": "bf55081",
-      "summary": "feat(competition): rate board — every vehicle-refinance rival on one comparable basis (#438)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-16T01:38:59+00:00",
-      "sha": "dd63021",
-      "summary": "fix(deploy): stop preview deployments burning the quota that PRODUCTION needs (#437)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-16T00:32:37+00:00",
-      "sha": "dfb2c48",
-      "summary": "integ(macro): schedule the two BoT macro-board feeds ageing in silence; leave NESDC unwired (intermittent bot challenge)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-15T23:30:42+00:00",
-      "sha": "d287466",
-      "summary": "data: market-pulse swarm refresh (run 31910404567) (#435)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-15T22:38:45+00:00",
-      "sha": "ee49d0d",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer coverage-honesty ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-16T05:37:39+07:00",
-      "sha": "0c65825",
-      "summary": "peer(#acq): flag >100% coverage as census≥cited, not \"share located\" (#436)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-15T22:23:59+00:00",
-      "sha": "2128116",
-      "summary": "data(census): refresh the Union Auction forward book (run 31893411869) (#427)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T21:58:54+00:00",
-      "sha": "fb7a092",
-      "summary": "data: Thai-IP-only swarm refresh (run 31904306759) (#433)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-15T21:44:01+00:00",
-      "sha": "a07ae31",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-15, run 31910049466)",
       "pillar": "data-integration"
     }
   ]

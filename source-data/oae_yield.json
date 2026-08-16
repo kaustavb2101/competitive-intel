@@ -26,7 +26,7 @@
       "rubber": "2566 (CE 2023)",
       "oilpalm": "2566 (CE 2023)"
     },
-    "pulled": "2026-07-18",
+    "pulled": "2026-08-16",
     "provenance": "MEASURED. Nothing modelled. Sugarcane EXCLUDED (no OAE yield dataset).",
     "consumer": "pipeline/build_crop_farmer_income.py (yield leg of gross farmer income)."
   },

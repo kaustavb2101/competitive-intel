@@ -10,7 +10,7 @@
     "frequency": "monthly",
     "definition_truck_series": "CONFIRMED PICKUP TRUCKS (รถกระบะ), not heavy/commercial trucks. BoT's own 2019 Stat-Horizon methodology paper (still the live 'ดูรายละเอียดเพิ่มเติม' link from the current metadata PDF) captions its car-vs-truck comparison chart: 'เมื่อจำแนกดัชนีราคารถยนต์มือสองออกเป็นประเภทรถยนต์นั่ง (Car) และรถกระบะ (Truck)' — i.e. BoT itself uses รถกระบะ (pickup) and 'Truck' interchangeably for this series; the regression appendix repeats the same pairing ('ประเภทรถ (รถนั่ง และรถกระบะ)'). The 11 constituent brands (Toyota, Isuzu, Honda, Mitsubishi, Nissan, Mazda, Ford, Chevrolet, BMW, Mercedes-Benz, Volvo) are passenger-car/pickup marques — no heavy-truck-only OEM (Hino, Scania, UD Trucks, Fuso) appears. Caveat: that methodology paper is dated Aug 2019; a silent post-2019 basket change cannot be fully ruled out, but the live metadata page still cites it as the current definitive reference with no note of revision.",
     "pull_method": "No CSV/JSON endpoint exists behind the download button. The report page is an ASP.NET WebForms grid (__VIEWSTATE/__EVENTVALIDATION) that renders its data server-side as a plain HTML table (id=dgExcel); pulled by GET (read postback state + the live valid period range) then a real form POST re-requesting that full range — no Playwright needed.",
-    "pulled": "2026-08-02",
+    "pulled": "2026-08-16",
     "n_months": {
       "overall": 185,
       "car": 185,
