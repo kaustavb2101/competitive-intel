@@ -3742,6 +3742,27 @@ FRESHNESS_LAYERS = [
      "structurally valid (shape-probe-green) but frozen board shipping forever. A >35-day lag "
      "is past both the monthly backstop cadence AND any Google rate-limit cluster (which "
      "resolves in days) — an unambiguous 'the Trends pull is dead' signal, not a slow week"),
+    ("data/rival_ads.json", "pulled", 21,
+     "Rival Google-Ads Transparency-Center creative board (the paid-media pulse on the "
+     "Competition #acq tab — what each big-4 rival is ADVERTISING: MEASURED creatives + an "
+     "ESTIMATED Thai keyword read) — live-fetch()'d by renderRivalAds/drawRivalAds, refreshed by "
+     "the 4x/day any-IP data-swarm.yml google_ads feed (pull_google_ads.py, cadence=daily ip=any). "
+     "build_google_ads.py stamps meta.pulled straight from the pull's own stamp, so it advances on "
+     "every SUCCESSFUL pull (observed daily: 2026-08-15 -> 08-16 -> 08-17) and freezes the moment "
+     "the pull errors — run_one() isolates a google_ads failure so the rest of the swarm stays "
+     "green, leaving a structurally valid (shape-probe-green) but frozen ad board shipping forever "
+     "with no phone alert (the exact blind spot this list closes; rival_ads already has a SHAPE "
+     "probe but SHAPE cannot see a stale-but-valid vintage). It has NO dedicated backstop cron "
+     "(only the swarm) and the Google-Ads endpoint can rate-limit in day-long clusters, so the TTL "
+     "is generous: a >21-day lag is ~21 missed daily swarm days (84 skipped 4x/day attempts), well "
+     "past any Google rate-limit cluster — an unambiguous 'the Google-Ads pull is dead' signal, not "
+     "a quiet-ad week (the .pulled stamp is the PULL date, not an ad-observation date, so an ad-free "
+     "week still advances it). DELIBERATELY EXCLUDED here, by contrast (both were floated as "
+     "freshness candidates but are NOT cron-tied): rate_board.json — its asof_card is the "
+     "HUMAN-curated rival_rate_card.json's date; data-rival-rates.yml only REPORTS drift for a "
+     "human to act on and never overwrites the card, so a lagging card is owner-side judgement, not "
+     "a stuck cron; and contested_mindshare.json — its ground axis rides peer_province -> the "
+     "on-demand/paused Places scout, so a lag is the paused scout, not a break"),
 ]
 
 
