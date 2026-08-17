@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-17T10:57:36+00:00",
-    "commit": "e079bda"
+    "generated_at": "2026-08-17T16:21:48+00:00",
+    "commit": "6cf7e29"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-08-17T16:21:48+00:00",
+      "sha": "6cf7e29",
+      "summary": "health: probe contested_mindshare + rate_board in the live site-health check",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-17T15:47:39+00:00",
+      "sha": "9e37eb0",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-17, run 32043147206)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-17T15:20:57+00:00",
+      "sha": "a57fa61",
+      "summary": "docs(progress): confirm ux-live-theme-toggle-missing deployed live",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-17T14:39:28+00:00",
+      "sha": "f796fdd",
+      "summary": "docs(progress): record ux-live-theme-toggle-missing merge + pending deploy",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-17T21:27:15+07:00",
+      "sha": "5c475b1",
+      "summary": "ux: add missing theme toggle + theme-color sync to live.html (#487)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-17T20:37:26+07:00",
+      "sha": "f237e0f",
+      "summary": "docs(claude): correct the deploy command — prod is git-driven, not `cd platform`",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-17T12:50:30+00:00",
+      "sha": "c275cd3",
+      "summary": "feat(swarm): schedule OAE farm-economics feed (obj #1) + add pymupdf to the swarm",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-17T12:19:58+00:00",
+      "sha": "a650d1d",
+      "summary": "data: SET listed-peer scoreboard refresh (run 32025738341) (#486)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-17T11:48:01+00:00",
+      "sha": "e210e81",
+      "summary": "data: market-pulse swarm refresh (run 32018582197) (#484)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-17T11:00:37+00:00",
+      "sha": "b79a50d",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the contested-mindshare ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-17T10:57:36+00:00",
       "sha": "e079bda",
       "summary": "feat(peer): contested-mindshare board — outnumbered on the ground AND out-searched by the same rival (obj #2) (#485)",
@@ -651,66 +711,6 @@
       "sha": "9a266f4",
       "summary": "fix(rival-rates): the feed's first cron run reported on itself badly",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-16T23:25:17+00:00",
-      "sha": "f4a6582",
-      "summary": "data: rival Facebook promo feed refresh (run 31975941181) (#476)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-17T06:22:08+07:00",
-      "sha": "fb3c2f7",
-      "summary": "fix(automerge): gate the master commit the merge creates, not just the branch",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-16T21:42:27+00:00",
-      "sha": "3784b48",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-16, run 31974084199)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-17T03:25:26+07:00",
-      "sha": "cb0acb3",
-      "summary": "docs(progress): log the rival-pulse wave — 5 PRs, and the ungated-master finding",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-16T20:24:16+00:00",
-      "sha": "be3744d",
-      "summary": "docs(progress): log the ux-skip-link-province merge + deploy-verify (PR #474)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-16T20:23:55+00:00",
-      "sha": "a029e90",
-      "summary": "data: Thai-IP-only swarm refresh (run 31967991065) (#473)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-17T03:21:14+07:00",
-      "sha": "07c3e79",
-      "summary": "ux: add \"Skip to main content\" bypass link to province.html (#474)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-16T19:56:55+00:00",
-      "sha": "77d4ed8",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 31952455765) (#458)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-16T19:48:18+00:00",
-      "sha": "9daa237",
-      "summary": "feat(rival): re-read every rival's published rate page, weekly (#467)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-16T19:12:22+00:00",
-      "sha": "a4250f7",
-      "summary": "docs: point CLAUDE.md at the vault note — the link only ran one way (#470)",
-      "pillar": "feature"
     }
   ]
 }
