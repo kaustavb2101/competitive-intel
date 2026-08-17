@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-17T16:21:48+00:00",
-    "commit": "6cf7e29"
+    "generated_at": "2026-08-17T22:21:51+00:00",
+    "commit": "7dbe837"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-08-17T22:21:51+00:00",
+      "sha": "7dbe837",
+      "summary": "health: freshness-guard rival_ads.json (Google-Ads board could freeze silently)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-17T21:49:12+00:00",
+      "sha": "d1546dc",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-17, run 32072648347)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-17T21:14:32+00:00",
+      "sha": "bd68807",
+      "summary": "data: Thai-IP-only swarm refresh (run 32061879977) (#490)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-17T20:24:02+00:00",
+      "sha": "fd7b380",
+      "summary": "docs(progress): log the ux-loop mtog-disclosure-aria merge + deploy-verify (PR #491)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-18T03:20:03+07:00",
+      "sha": "87f894f",
+      "summary": "ux: mtog mobile panel switcher exposes disclosure state (aria-expanded/controls) on province.html (#491)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-17T19:00:47+00:00",
+      "sha": "b8a72fa",
+      "summary": "data: market-pulse swarm refresh (run 32043654441) (#489)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-17T18:37:30+00:00",
+      "sha": "67214b6",
+      "summary": "health: probe vehicle_fleet + 3 NSO-SES income floors in site-health",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-17T23:49:57+07:00",
+      "sha": "d4c9648",
+      "summary": "docs(progress): log the digest actionable-email wave (PR #488)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-17T16:45:59+00:00",
+      "sha": "8763394",
+      "summary": "feat(digest): actionable email — LTVX beat-heatmap, our levers, crops and water (#488)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-17T16:22:32+00:00",
+      "sha": "f58b93f",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the site-health probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-17T16:21:48+00:00",
       "sha": "6cf7e29",
       "summary": "health: probe contested_mindshare + rate_board in the live site-health check",
@@ -651,66 +711,6 @@
       "sha": "a90e337",
       "summary": "fix(provenance): 9 MEASURED layers showed blank vintage in the Data-room card",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-17T04:11:13+00:00",
-      "sha": "1667b18",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-17, run 31993310549)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-17T03:35:27+00:00",
-      "sha": "6a95f1d",
-      "summary": "docs(progress): record ux-skip-link-rayong merge+deploy+verify outcome",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-17T03:31:14+00:00",
-      "sha": "125b1c0",
-      "summary": "ux: add skip-to-content bypass link to rayong-catchment.html (#479)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-17T03:19:54+00:00",
-      "sha": "3fd6d66",
-      "summary": "data: NABC live prices (2026-08-17, run 31990363442)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-17T09:17:47+07:00",
-      "sha": "3148091",
-      "summary": "docs(progress): log the ⑥ Brand tab wave (PR #478) — merge, deploy, verify",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-17T01:56:18+00:00",
-      "sha": "4a4e0be",
-      "summary": "feat(brand): lift the ten social/sentiment feeds into their own ⑥ Brand tab (#478)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-17T01:27:01+00:00",
-      "sha": "6dffe32",
-      "summary": "data: market-pulse swarm refresh (run 31974538692) (#475)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-17T00:59:37+00:00",
-      "sha": "d6f21c4",
-      "summary": "data: rival published rate pages re-read (run 31979334801) (#477)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-17T00:25:44+00:00",
-      "sha": "5a79933",
-      "summary": "fix(rival-rates): distinguish a card-unit coverage gap from real rate drift",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-17T06:58:38+07:00",
-      "sha": "9a266f4",
-      "summary": "fix(rival-rates): the feed's first cron run reported on itself badly",
-      "pillar": "market"
     }
   ]
 }
