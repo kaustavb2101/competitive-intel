@@ -196,8 +196,11 @@ per cycle, never regressing a metric (see `committee/COMMITTEE.md`). Members:
 # serve the app locally (must be http, not file://, or data fetch fails)
 cd platform && python3 -m http.server 8000      # open http://localhost:8000
 
-# deploy (Kaustav's Vercel; sets root to platform/)
-cd platform && npx vercel --prod                  # prints live URL
+# deploy — PRODUCTION IS GIT-DRIVEN. Pushing to master deploys it; there is nothing to run.
+git push origin master                            # → https://competitive-intel-blue.vercel.app
+# Project `competitive-intel`, root dir `.`, and the repo-root vercel.json sets outputDirectory=platform.
+# So a manual deploy, if ever needed, runs from the REPO ROOT — never from platform/:
+npx vercel --prod                                 # from the repo root only
 
 # refresh data (national features + segment scores) — now writes straight to platform/data/
 cd pipeline && python3 autox_enrich_loop.py       # recompute master + derive platform/data + log iteration
