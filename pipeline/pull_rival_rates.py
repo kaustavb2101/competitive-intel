@@ -430,9 +430,24 @@ def print_report(results, card_by):
         if not d.get("in_card"):
             continue
         name = (card_by.get(r["key"]) or {}).get("name_th") or r["name_th"] or r["key"]
+        # One row per DISTINCT finding, not per quote. A page that says "0.27% ต่อเดือน" in three
+        # places yields three drift lines that all resolve to the same value, the same band and —
+        # because quote_by_val collapses on (key, value, unit) — the same quote, so the report
+        # printed the identical row three times. Observed on the first scheduled run (PR #477):
+        # TTB_CYC's 0.27% appeared 3×, which pads the list a human is meant to read and makes the
+        # feed look noisier than the market actually is. Dedupe on what is actually printed.
+        # The JSON payload still carries every line — this is a display-layer collapse only, so
+        # nothing about the underlying record is lost.
+        seen_rows = set()
         for line in d["lines"]:
             if not line["drift"]:
                 continue
+            row_id = (line["observed"], line["unit"],
+                      tuple(line["card_range"]) if line["card_range"] else None,
+                      line.get("note"), line.get("card_field"))
+            if row_id in seen_rows:
+                continue
+            seen_rows.add(row_id)
             any_drift = True
             u = "ต่อเดือน" if line["unit"] == "pct_per_month" else "ต่อปี"
             q_th = quote_by_val.get((r["key"], line["observed"], line["unit"]), "")[:90]
@@ -565,13 +580,26 @@ def main():
                    "is the scheduled eyes that re-visit every rate_url and say what changed, so "
                    "the card (and everything measured against it, incl. build_promo_gap.py's "
                    "undercut check) does not go stale without anyone noticing.",
-            "not_wired_up": "Deliberately absent from tests/run.sh (network puller, not a "
-                            "deterministic --check build) and has no GitHub workflow here — "
-                            "scheduling is the owner's to add separately.",
+            "scheduling": "Deliberately absent from tests/run.sh — this is a network puller, not "
+                          "a deterministic --check build, so it has nothing byte-exact to gate. "
+                          "It IS scheduled: .github/workflows/data-rival-rates.yml runs it weekly "
+                          "(cron 10 23 * * 0 — 06:10 Bangkok Monday) and opens a PR carrying the "
+                          "drift report below. Registered in pull_swarm.py as `rival_rates` "
+                          "(needs_browser), which is why it needs that dedicated workflow: "
+                          "data-swarm.yml runs --skip-browser and would never pick it up.",
             "pulled_at": today,
             "n_operators_in_plan": len(plan),
             "n_read": n_read, "n_error": n_error, "n_no_rate_found": n_no_rate,
             "n_with_drift_vs_card": n_with_drift,
+            # The one-line headline, written HERE rather than reassembled by the workflow.
+            # data-rival-rates.yml used to build this sentence itself from `n_ok`/`n_operators`/
+            # `n_with_rate` — three key names this file has never emitted — so the first scheduled
+            # run (PR #477) opened with a title reading "? of ? pages read, ? with a parseable
+            # rate". Nothing errored: .get(k, '?') did exactly what it was told. A consumer that
+            # re-derives a summary from key names it does not own will drift from them silently,
+            # so the producer owns the sentence and the workflow prints one field.
+            "summary": "%d of %d pages read, %d with a parseable rate, %d showing drift vs the card"
+                       % (n_read, len(plan), n_read - n_no_rate, n_with_drift),
             "rate_url_missing": missing_url,
             "requested_keys_not_found": skipped,
             "drift_tolerance": {"pct_per_year_pp": YEAR_TOL, "pct_per_month_pp": MONTH_TOL},
