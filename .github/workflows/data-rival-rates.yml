@@ -106,7 +106,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$DATA_BRANCH"
-          READ="$(python -c "import json;m=json.load(open('source-data/rival_rate_observed.json'))['meta'];print('%s of %s pages read, %s with a parseable rate' % (m.get('n_ok','?'), m.get('n_operators','?'), m.get('n_with_rate','?')))" 2>/dev/null || echo 'see the drift report')"
+          # Read the headline the PULLER wrote, rather than reassembling it from key names this
+          # workflow does not own. The previous version built the sentence from `n_ok`,
+          # `n_operators` and `n_with_rate` — none of which pull_rival_rates.py has ever emitted —
+          # so the first scheduled run (PR #477) opened with "? of ? pages read, ? with a parseable
+          # rate" and no error anywhere, because .get(k,'?') did exactly what it was asked.
+          # encoding='utf-8' is explicit: the file is full of Thai and a runner with a C locale
+          # would otherwise fail the read and silently fall through to the generic message.
+          READ="$(python -c "import json,io;print(json.load(io.open('source-data/rival_rate_observed.json',encoding='utf-8'))['meta']['summary'])" 2>/dev/null || echo 'see the drift report')"
           git commit -m "data: rival published rate pages re-read (run ${{ github.run_id }})" \
                      -m "Pulled by .github/workflows/data-rival-rates.yml via pipeline/pull_rival_rates.py — each operator's own pinned rate_url, MEASURED. ${READ}. The curated rival_rate_card.json is deliberately NOT overwritten; this reports drift for a human to act on."
           git push origin "$DATA_BRANCH"
