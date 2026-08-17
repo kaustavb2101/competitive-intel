@@ -466,9 +466,15 @@ body.poster #nav,body.poster #strip,body.poster #left,body.poster #right,
 body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!important}
 #ctl .acts #postertog.on{border-color:var(--gold)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+/* keyboard bypass link (WCAG 2.4.1 Bypass Blocks) — off-screen until focus, then overlays the nav;
+   matches styles.css .skip-link. Uses this page's own font stack + accent token (--blue). */
+.skip-link{position:fixed;top:7px;left:8px;z-index:3000;background:var(--blue,#5B7CFA);color:#fff;font:600 13px 'IBM Plex Sans Thai',system-ui,sans-serif;padding:7px 14px;border-radius:8px;text-decoration:none;box-shadow:0 4px 16px rgba(0,0,0,.45);transform:translateY(-180%)}
+.skip-link:focus{transform:translateY(0);outline:2px solid #fff;outline-offset:2px}
 </style>
 </head>
 <body>
+  <a class="skip-link" href="#strip">Skip to main content</a>
+  <script>(function(){var s=document.querySelector('.skip-link');if(!s)return;s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('strip');if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
   <noscript>
     <div style="max-width:640px;margin:72px auto;padding:20px 22px;background:var(--card);border:1px solid var(--cardln);border-left:3px solid #5B7CFA;border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55;position:relative;z-index:9999">
       <strong style="color:var(--hi);display:block;margin-bottom:6px">This 3D scene needs JavaScript enabled.</strong>
@@ -529,7 +535,7 @@ body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!importan
 <div id="atmos"></div>
 <div id="vignette"></div>
 
-<div id="strip"><span class="ttl" id="cityTitle">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
+<div id="strip" tabindex="-1"><span class="ttl" id="cityTitle">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
 
 <div id="scenesearch">
   <div class="ss-box">
