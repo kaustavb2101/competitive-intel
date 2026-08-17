@@ -339,8 +339,14 @@ def diff_against_card(quotes, card_entry):
         tol = MONTH_TOL if q["unit"] == "pct_per_month" else YEAR_TOL
         same_unit = [r for r in ranges if r[2] == q["unit"]]
         if not same_unit:
+            # The card records NOTHING in this unit for this operator, so there is no card figure
+            # for the quote to have moved away from. That is a coverage GAP in the card's units,
+            # NOT a rate change — kind="gap", drift=False, so it is neither counted nor reported as
+            # drift. (This was previously drift=True, which inflated n_with_drift_vs_card and read
+            # as "the operator changed its rate" when the card was simply silent in that unit — e.g.
+            # SAWAD/ttb pages quote a per-month figure the card only ever states annually.)
             lines.append({"observed": q["value"], "unit": q["unit"], "card_range": None,
-                          "card_field": None, "delta": None, "drift": True,
+                          "card_field": None, "delta": None, "drift": False, "kind": "gap",
                           "note": "card has no figure in this unit for this operator"})
             continue
         # inside ANY published range (with tolerance padding each side) -> not drift, full stop.
@@ -349,16 +355,17 @@ def diff_against_card(quotes, card_entry):
             r = inside[0]
             lines.append({"observed": q["value"], "unit": q["unit"],
                           "card_range": [r[0], r[1]], "card_field": r[3],
-                          "delta": 0.0, "drift": False})
+                          "delta": 0.0, "drift": False, "kind": "in_band"})
             continue
-        # outside every range -> report the NEAREST one, by distance to its closer edge.
+        # outside every range the card DOES publish in this unit -> a genuine move. Report the
+        # NEAREST one, by distance to its closer edge.
         def edge_dist(r):
             return r[0] - q["value"] if q["value"] < r[0] else q["value"] - r[1]
         nearest = min(same_unit, key=edge_dist)
         delta = round(edge_dist(nearest), 2)
         lines.append({"observed": q["value"], "unit": q["unit"],
                       "card_range": [nearest[0], nearest[1]], "card_field": nearest[3],
-                      "delta": delta, "drift": True})
+                      "delta": delta, "drift": True, "kind": "drift"})
     return {"in_card": bool(card_entry.get("variants")), "lines": lines}
 
 
@@ -421,6 +428,7 @@ def print_report(results, card_by):
     print("\nDRIFT vs source-data/rival_rate_card.json (report only — a human decides, this "
           "script never writes that file):")
     any_drift = False
+    gap_rows = []  # card-unit gaps, collected and printed under their own heading below
     quote_by_val = {}
     for r in results:
         for q in r["quotes"]:
@@ -431,39 +439,54 @@ def print_report(results, card_by):
             continue
         name = (card_by.get(r["key"]) or {}).get("name_th") or r["name_th"] or r["key"]
         # One row per DISTINCT finding, not per quote. A page that says "0.27% ต่อเดือน" in three
-        # places yields three drift lines that all resolve to the same value, the same band and —
-        # because quote_by_val collapses on (key, value, unit) — the same quote, so the report
-        # printed the identical row three times. Observed on the first scheduled run (PR #477):
-        # TTB_CYC's 0.27% appeared 3×, which pads the list a human is meant to read and makes the
-        # feed look noisier than the market actually is. Dedupe on what is actually printed.
-        # The JSON payload still carries every line — this is a display-layer collapse only, so
-        # nothing about the underlying record is lost.
+        # places yields three lines that all resolve to the same value, the same band and — because
+        # quote_by_val collapses on (key, value, unit) — the same quote, so the report printed the
+        # identical row three times. Observed on the first scheduled run (PR #477): TTB_CYC's 0.27%
+        # appeared 3×, which pads the list a human is meant to read and makes the feed look noisier
+        # than the market actually is. Dedupe on what is actually printed. The JSON payload still
+        # carries every line — this is a display-layer collapse only, so nothing is lost.
         seen_rows = set()
         for line in d["lines"]:
-            if not line["drift"]:
+            kind = line.get("kind") or ("drift" if line.get("drift") else "in_band")
+            if kind == "in_band":
                 continue
             row_id = (line["observed"], line["unit"],
                       tuple(line["card_range"]) if line["card_range"] else None,
-                      line.get("note"), line.get("card_field"))
+                      line.get("note"), line.get("card_field"), kind)
             if row_id in seen_rows:
                 continue
             seen_rows.add(row_id)
-            any_drift = True
             u = "ต่อเดือน" if line["unit"] == "pct_per_month" else "ต่อปี"
             q_th = quote_by_val.get((r["key"], line["observed"], line["unit"]), "")[:90]
-            if line["card_range"] is None:
-                print("  DRIFT  %s (%s): page now says %g%% %s — %s\n           quote: %s"
-                      % (r["key"], name, line["observed"], u, line["note"], q_th))
-            else:
-                lo, hi = line["card_range"]
-                band = ("%g%%" % lo) if lo == hi else ("%g-%g%%" % (lo, hi))
-                print("  DRIFT  %s (%s): page now says %g%% %s, the card says %s (%s) — "
-                      "%+.2fpp outside that band\n           quote: %s"
-                      % (r["key"], name, line["observed"], u, band, line["card_field"],
-                         line["delta"], q_th))
+            if kind == "gap":
+                # The card is SILENT in this unit for this operator, so there is no card figure for
+                # the quote to have moved away from — a coverage gap in the card's units, NOT a rate
+                # move. Held back and printed under its own heading, never as DRIFT.
+                gap_rows.append((r["key"], name, line["observed"], u, q_th))
+                continue
+            any_drift = True
+            lo, hi = line["card_range"]
+            band = ("%g%%" % lo) if lo == hi else ("%g-%g%%" % (lo, hi))
+            print("  DRIFT  %s (%s): page now says %g%% %s, the card says %s (%s) — "
+                  "%+.2fpp outside that band\n           quote: %s"
+                  % (r["key"], name, line["observed"], u, band, line["card_field"],
+                     line["delta"], q_th))
     if not any_drift:
         print("  none — every rate this run could read lands within tolerance of a band "
               "already on the card (or the operator carries no observable quote this run)")
+
+    # Card-unit gaps are NOT drift: the operator quotes a unit (usually per-month) the curated card
+    # only ever states in the other unit (usually per-year), so there is nothing to compare. Surfaced
+    # separately so a human can decide whether the CARD wants a figure in that unit — the opposite
+    # action from "a rate moved", which is why conflating the two under DRIFT was misleading.
+    print("\nCARD-UNIT GAPS (page quotes a unit the card does not carry for that operator — no card "
+          "figure to compare, so NOT drift):")
+    if gap_rows:
+        for key, name, observed, u, q_th in gap_rows:
+            print("  GAP    %s (%s): page quotes %g%% %s, the card carries no %s figure for it\n"
+                  "           quote: %s" % (key, name, observed, u, u, q_th))
+    else:
+        print("  none — no operator quoted a unit missing from its card entry this run")
 
 
 def main():
@@ -563,6 +586,12 @@ def main():
     n_no_rate = sum(1 for r in results if r["status"] == "no_rate_found")
     n_with_drift = sum(1 for r in results
                         if r["drift"]["in_card"] and any(l["drift"] for l in r["drift"]["lines"]))
+    # Card-unit gaps counted separately from drift: the operator quotes a unit the card does not
+    # carry, so there is no card figure to have drifted from — see diff_against_card. Previously
+    # these landed in n_with_drift and overstated how many operators had actually changed a rate.
+    n_card_gaps = sum(1 for r in results
+                       if r["drift"]["in_card"]
+                       and any(l.get("kind") == "gap" for l in r["drift"]["lines"]))
 
     payload = {
         "meta": {
@@ -575,7 +604,11 @@ def main():
                      "never inferred. This file is NOT the rate board's input and NEVER "
                      "overwrites source-data/rival_rate_card.json, which stays hand-curated; "
                      "`drift` on each operator is this script's own comparison against that "
-                     "card, for a human to act on.",
+                     "card, for a human to act on. Each drift line carries a `kind`: `drift` = the "
+                     "quote moved outside a band the card DOES publish in that unit (a real rate "
+                     "move); `gap` = the card carries no figure in that unit for the operator, so "
+                     "there is nothing to compare (a coverage gap in the card, NOT drift — counted "
+                     "in n_card_unit_gaps, never n_with_drift_vs_card); `in_band` = within tolerance.",
             "why": "rival_rate_card.json only moved when a human edited it by hand. This script "
                    "is the scheduled eyes that re-visit every rate_url and say what changed, so "
                    "the card (and everything measured against it, incl. build_promo_gap.py's "
@@ -591,6 +624,10 @@ def main():
             "n_operators_in_plan": len(plan),
             "n_read": n_read, "n_error": n_error, "n_no_rate_found": n_no_rate,
             "n_with_drift_vs_card": n_with_drift,
+            # Operators quoting a unit (usually per-month) the card only states in the other unit —
+            # a coverage gap in the card, NOT a rate move; kept out of n_with_drift_vs_card so the
+            # drift headline reflects genuine changes only.
+            "n_card_unit_gaps": n_card_gaps,
             # The one-line headline, written HERE rather than reassembled by the workflow.
             # data-rival-rates.yml used to build this sentence itself from `n_ok`/`n_operators`/
             # `n_with_rate` — three key names this file has never emitted — so the first scheduled
@@ -598,8 +635,9 @@ def main():
             # rate". Nothing errored: .get(k, '?') did exactly what it was told. A consumer that
             # re-derives a summary from key names it does not own will drift from them silently,
             # so the producer owns the sentence and the workflow prints one field.
-            "summary": "%d of %d pages read, %d with a parseable rate, %d showing drift vs the card"
-                       % (n_read, len(plan), n_read - n_no_rate, n_with_drift),
+            "summary": "%d of %d pages read, %d with a parseable rate, %d showing drift vs the "
+                       "card, %d quoting a unit the card does not cover"
+                       % (n_read, len(plan), n_read - n_no_rate, n_with_drift, n_card_gaps),
             "rate_url_missing": missing_url,
             "requested_keys_not_found": skipped,
             "drift_tolerance": {"pct_per_year_pp": YEAR_TOL, "pct_per_month_pp": MONTH_TOL},
