@@ -3,7 +3,7 @@
   "generated_by": "pipeline/pull_swarm.py",
   "label": "Each row is one swarm run: which feeds were pulled concurrently, whether each one succeeded / changed its declared output file / failed / timed out / was skipped (exit 3, the repo-wide SKIP convention), plus the rc of the append_history.py and rederive_drift.py steps that followed. This file makes the pulse observable.",
   "max_runs": 60,
-  "n_runs": 23,
+  "n_runs": 24,
   "title": "pull_swarm.py run history -- the swarm's own audit trail"
  },
  "runs": [
@@ -1511,6 +1511,77 @@
    "n_timeout": 0,
    "rederive_drift_rc": null,
    "started": "2026-08-17T19:43:22Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7111,
+     "bytes_before": 7110,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 4.6,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8886,
+     "bytes_before": 8879,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 5.0,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 3989,
+     "bytes_before": 3989,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 141.2,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 605235,
+     "bytes_before": 602781,
+     "key": "app_reviews",
+     "rc": 0,
+     "seconds": 4.0,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 2504425,
+     "bytes_before": 2498811,
+     "key": "apple_reviews",
+     "rc": 0,
+     "seconds": 140.4,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 498453,
+     "bytes_before": 498475,
+     "key": "rival_youtube",
+     "rc": 0,
+     "seconds": 30.1,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 1381570,
+     "bytes_before": 1381570,
+     "key": "google_ads",
+     "rc": 3,
+     "seconds": 374.5,
+     "status": "skipped"
+    }
+   ],
+   "finished": "2026-08-17T21:59:04Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 5,
+   "n_failed": 0,
+   "n_ok": 6,
+   "n_skipped": 1,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-08-17T21:52:46Z"
   }
  ]
 }

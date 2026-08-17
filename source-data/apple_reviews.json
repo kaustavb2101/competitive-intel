@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-08-16",
+  "pulled_at": "2026-08-17",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -1327,6 +1327,15 @@
      "title": "น่าสนใจ",
      "content": "ใช้งานง่าย และสะดวก",
      "version": "1.0.5",
+     "votes": 0
+    },
+    {
+     "id": "14429151054",
+     "at": null,
+     "score": 1,
+     "title": "แอปเด้ง",
+     "content": "แอปกากมากก เน็ตแรงแต่เข้าแอปแม้งไม่ได้หลายรอบล่ะ เด้งก็ไม่จ่ายค่างวดแม้งสะเลย เป็นทุกครั้งที่เข้าจ่าย ห่วยยยแตกก",
+     "version": "3.2.0",
      "votes": 0
     },
     {
@@ -5621,16 +5630,25 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.4557,
-    "ratings": 553,
-    "score_current_version": 3.4557,
-    "ratings_current_version": 553,
-    "version": "1.0.44",
-    "app_updated": "2026-07-31",
+    "score": 3.45126,
+    "ratings": 554,
+    "score_current_version": 3.45126,
+    "ratings_current_version": 554,
+    "version": "1.0.45",
+    "app_updated": "2026-08-17",
     "released": "2024-07-09",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14435711627",
+     "at": null,
+     "score": 1,
+     "title": "ค",
+     "content": "สแกนหน้าไม่ได้อยู่แบบนั้นเอาแต่บอกว่าไม่ตรงกับบัตรประชาชนบัตรถ่ายตั้งแต่ชาติปางก่อนหน้ามันคงจะเหมือนเดิมมั้ง",
+     "version": "1.0.44",
+     "votes": 0
+    },
     {
      "id": "14406437683",
      "at": null,
@@ -10400,16 +10418,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.82422,
-    "ratings": 172694,
-    "score_current_version": 4.82422,
-    "ratings_current_version": 172694,
+    "score": 4.82425,
+    "ratings": 172748,
+    "score_current_version": 4.82425,
+    "ratings_current_version": 172748,
     "version": "3.0.6",
     "app_updated": "2026-08-06",
     "released": "2021-04-20",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14433508048",
+     "at": null,
+     "score": 1,
+     "title": "ห้าม",
+     "content": "ข้าพเจ้า นางสาวกานต์ธีรา กาญจนศรี ได้กรอกข้อมูลกับทางแอปฟินิกซ์ ไม่อนุญาตให้ทางแอปฟินิกซ์นำข้อมูลส่วนตัวไปทำอะไรต่าง ๆ รวมถึงผู้อ้างอิง หากนำข้อมูลส่วนตัวไปใช้หรือเผยแพร่ ข้าพเจ้าจะดำเนินคดีให้ถึงที่สุด",
+     "version": "3.0.6",
+     "votes": 0
+    },
     {
      "id": "14430563044",
      "at": null,
@@ -15290,10 +15317,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.70376,
-    "ratings": 63521,
-    "score_current_version": 4.70376,
-    "ratings_current_version": 63521,
+    "score": 4.70375,
+    "ratings": 63554,
+    "score_current_version": 4.70375,
+    "ratings_current_version": 63554,
     "version": "7.5.0",
     "app_updated": "2026-07-20",
     "released": "2021-10-10",
@@ -19910,10 +19937,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84391,
-    "ratings": 43397,
-    "score_current_version": 4.84391,
-    "ratings_current_version": 43397,
+    "score": 4.84407,
+    "ratings": 43481,
+    "score_current_version": 4.84407,
+    "ratings_current_version": 43481,
     "version": "3.1.1",
     "app_updated": "2026-05-25",
     "released": "2023-03-06",
@@ -24629,10 +24656,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.76986,
-    "ratings": 26745,
-    "score_current_version": 4.76986,
-    "ratings_current_version": 26745,
+    "score": 4.76985,
+    "ratings": 26756,
+    "score_current_version": 4.76985,
+    "ratings_current_version": 26756,
     "version": "1.8.7",
     "app_updated": "2026-08-07",
     "released": "2020-08-05",
@@ -28799,16 +28826,43 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.60905,
-    "ratings": 2077,
-    "score_current_version": 2.60905,
-    "ratings_current_version": 2077,
+    "score": 2.60876,
+    "ratings": 2078,
+    "score_current_version": 2.60876,
+    "ratings_current_version": 2078,
     "version": "3.3.0",
     "app_updated": "2026-08-13",
     "released": "2022-05-11",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14435608480",
+     "at": null,
+     "score": 2,
+     "title": "เลขบัตร ลงท้าย 3239 ไม่อนุญาตให้ เอาข้อมูลไปเผยแพร่ หากตรวจพบ จะดำเนินคดีไห้ถึงที่สุด",
+     "content": "เลขบัตร ลงท้าย 3239 ไม่อนุญาตให้ เอาข้อมูลไปเผยแพร่ หากตรวจพบ จะดำเนินคดีไห้ถึงที่สุด",
+     "version": "3.3.0",
+     "votes": 0
+    },
+    {
+     "id": "14431694463",
+     "at": null,
+     "score": 1,
+     "title": "ยกเลิกการสมัคร",
+     "content": "ห้ามนำข้อมูลของสุดารัตน์ สงค์เจริญไปใช้ในทางที่ไม่ดีขอดำเนินคดีถึงที่สุด",
+     "version": "3.3.0",
+     "votes": 0
+    },
+    {
+     "id": "14429550410",
+     "at": null,
+     "score": 2,
+     "title": "แอพเสียรึเปล่า ทำไรไม่ได้เลย",
+     "content": "รอมา10-20วัน ใครจะโหลดพักก่อนได้เลย แอพห่วยแตก",
+     "version": "3.3.0",
+     "votes": 0
+    },
     {
      "id": "14427310635",
      "at": null,
@@ -33456,6 +33510,24 @@
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14430679714",
+     "at": null,
+     "score": 1,
+     "title": "ไม่อนุญาตให้เปิดเผยข้อมูล",
+     "content": "ข้าพเจ้านส.นาฏยา ได้ยื่นขอสินเชื่อ แต่ไม่ได้รับการอนุมัติ ดังนั้นเอกสารที่ข้าพเจ้าได้แนบไป ข้าพเจ้าไม่อนุญาตให้บริษัทมันนี่ฮับ นำไปใช้ในทางด้านอื่น ข้าพเจ้าไม่ยินยอมให้เปิดเผยข้อมูล หรือนำข้อมูลของข้าพเจ้าไปใช้ในทางที่ผิด ถ้าเกิดเหตุการณ์อะไรขึ้น หรือก่อให้เกิดความเสียหายต่อข้าพเจ้า  ข้าพเจ้าจะดำเนินการตามกฏหมายให้ถึงที่สุด",
+     "version": "5.65",
+     "votes": 0
+    },
+    {
+     "id": "14429485031",
+     "at": null,
+     "score": 2,
+     "title": "ขอสงววน",
+     "content": "ข้าพเจ้า นาย อดิศร จ่อยสาคู\nได้ ทำการกรอกข้อมูลบัตรประจำตัวประชาชน และ ทำการสมัครเข้าแอพลิเคชัน มันนีฮับ เมื่อวันที่ 15/08/69 และได้ยื่นขอสินเชื่อ \nดังนั้นเอกสารที่แนบไปทั้งหมด ข้าพเจ้าไม่ อนุญาตให้บริษัทนำไปใช้ในด้านอื่นๆทั้งสิ้น และถ้า เกิดเหตุการณ์ใดๆขึ้น ข้าพเจ้าจะไม่รับผิดชอบทุกๆ กรณี และถ้าบริษัทมันนี่ฮับนำข้อมูลที่ได้รับไปใช้ใน ทางที่ไม่ถูกต้อง ก่อให้เกิดความเสียหายใดๆ\n\nข้าพเจ้าจะดำเนินการต",
+     "version": "5.65",
+     "votes": 0
+    },
     {
      "id": "14426305515",
      "at": null,
