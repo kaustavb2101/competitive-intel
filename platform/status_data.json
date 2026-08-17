@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-17T04:35:59+00:00",
-    "commit": "a90e337"
+    "generated_at": "2026-08-17T10:57:36+00:00",
+    "commit": "e079bda"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-08-17T10:57:36+00:00",
+      "sha": "e079bda",
+      "summary": "feat(peer): contested-mindshare board — outnumbered on the ground AND out-searched by the same rival (obj #2) (#485)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-17T10:03:00+00:00",
+      "sha": "423356c",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-17, run 32017879096)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-17T08:34:56+00:00",
+      "sha": "46f3cb0",
+      "summary": "docs(progress): record ux-dataroom-truncated-title merge+deploy+verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-17T15:31:50+07:00",
+      "sha": "e75c7f7",
+      "summary": "ux: recover truncated dataroom Layer cells via title (name + provenance label) (#483)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-17T06:51:11+00:00",
+      "sha": "30af668",
+      "summary": "pipeline: schedule nabc_history + diw_scurve pullers (feeds ageing in silence)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-17T06:37:41+00:00",
+      "sha": "f5644f9",
+      "summary": "data(census): refresh the Union Auction forward book (run 31994211127) (#480)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-17T06:10:13+00:00",
+      "sha": "edc3ae6",
+      "summary": "data: market-pulse swarm refresh (run 31994138954) (#481)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-17T05:38:02+00:00",
+      "sha": "1e54bb0",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 31995514769) (#482)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-17T04:47:06+00:00",
+      "sha": "c90be40",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the provenance-vintage ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-17T04:35:59+00:00",
       "sha": "a90e337",
       "summary": "fix(provenance): 9 MEASURED layers showed blank vintage in the Data-room card",
@@ -657,60 +711,6 @@
       "sha": "a4250f7",
       "summary": "docs: point CLAUDE.md at the vault note — the link only ran one way (#470)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-16T18:26:57+00:00",
-      "sha": "fedc07a",
-      "summary": "feat(swarm): schedule the BoT policy-rate puller — proven CI-reachable this run",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-16T17:52:53+00:00",
-      "sha": "fed8a81",
-      "summary": "fix(gate): build_rival_facebook.py --check was never wired into the gate (#469)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-16T17:05:33+00:00",
-      "sha": "e21021c",
-      "summary": "data: market-pulse swarm refresh (run 31956866465) (#472)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-16T16:30:47+00:00",
-      "sha": "91beaf9",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the deploy-health SSO-bypass ship",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-16T16:30:17+00:00",
-      "sha": "6bc4dbc",
-      "summary": "fix(deploy-health): deep-probe past the Vercel SSO wall via the automation-bypass secret",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-16T16:16:12+00:00",
-      "sha": "8e68e7e",
-      "summary": "docs(progress): ux-skip-link-branchexplorer merged + deployed + verified on the backstop check-in",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-16T23:12:51+07:00",
-      "sha": "3ea6c39",
-      "summary": "ux: add \"Skip to main content\" bypass link to branch-explorer.html (#465)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-16T16:10:15+00:00",
-      "sha": "2e987d1",
-      "summary": "feat(acq): render the Facebook promo feed and promo-vs-card gap on Competition (#468)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-16T15:44:03+00:00",
-      "sha": "f9128f9",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-16, run 31956314454)",
-      "pillar": "data-integration"
     }
   ]
 }
