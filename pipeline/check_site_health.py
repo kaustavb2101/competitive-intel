@@ -855,6 +855,67 @@ def _shape_peer_province(d):
     return None
 
 
+def _shape_contested_mindshare(d):
+    # The MEASURED-ground x ESTIMATED-search JOIN (contested_mindshare.json, obj #2)
+    # — the Competition (#acq) "double jeopardy" board (drawContestMind reads
+    # .provinces, filters class=='double-jeopardy', and per row renders
+    # ground_top_rival + ground_top_rival_share + screen_top_rival_share +
+    # autox_share + dj_index) plus its readout (meta.n_double_jeopardy /
+    # n_split_pressure / dj_by_brand). Shipped 2026-08-17 (#485), it was the
+    # newest surfaced obj-#2 peer read with NO deploy probe. Its loader sets
+    # CONTESTMIND=null on any fetch failure and the board gates on a non-empty
+    # .provinces array, so a truncated/404 CDN deploy silently drops it to the
+    # "Contested-mindshare board not yet computed" placeholder with no phone alert
+    # — the same "broken demo" blind spot the peer_province / rival_threat probes
+    # closed for their siblings. Asserts render shape (the provinces gate + the
+    # classification key + the load-bearing share columns), not values — robust to
+    # a future census shifting how many provinces are double jeopardy (including 0).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or len(provs) < 70:
+        return "missing/short 'provinces' list (expected ~77)"
+    p0 = provs[0]
+    if not isinstance(p0, dict):
+        return "first province row is not an object"
+    if "class" not in p0:
+        return "first province missing 'class' (the double-jeopardy filter key)"
+    if "ground_top_rival_share" not in p0 or "dj_index" not in p0:
+        return "first province missing 'ground_top_rival_share'/'dj_index' (board share + index columns)"
+    return None
+
+
+def _shape_rate_board(d):
+    # The MEASURED published-rate board (rate_board.json, obj #2) — the Competition
+    # (#acq) "what rivals CHARGE" table (drawRateBoard gates on a non-empty
+    # .operators array; per operator it renders the effective reducing-balance
+    # band off .effective_lo / .by_collateral and the quoted headline off
+    # .quoted_lo / .quoted_basis, restating flat vs reducing to AutoX's own accrual
+    # basis). Its loader sets RATEBOARD=null on any fetch failure and the whole
+    # board — including the "cheapest effective rate" answer line — gates on the
+    # .operators array, so a truncated/404 CDN deploy silently drops it to the
+    # "Rate board not yet built" placeholder with no phone alert. It carries a live
+    # MEASURED asof_card and CANNOT self-heal (build_rate_board.py has no CI cron —
+    # it folds the Thai-IP rival ad/rate pulls), so the probe is the only deploy
+    # safeguard — the same blind spot the rival_pulse / peer_scoreboard probes
+    # closed for their #acq siblings. Asserts render shape (the operators gate + an
+    # operator name column + at least one numerically-priced row), not values —
+    # robust to a future rate-card refresh.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    ops = d.get("operators")
+    if not isinstance(ops, list) or len(ops) < 5:
+        return "missing/short 'operators' list (expected the rate-card roster)"
+    o0 = ops[0]
+    if not isinstance(o0, dict):
+        return "first operator row is not an object"
+    if not (isinstance(o0.get("name_th"), str) and o0["name_th"].strip()):
+        return "first operator missing/empty 'name_th' (board row label render)"
+    if not any(isinstance(o, dict) and isinstance(o.get("effective_lo"), (int, float)) for o in ops):
+        return "no operator carries a numeric 'effective_lo' (the restated reducing-balance column + cheapest-rate answer)"
+    return None
+
+
 def _shape_rival_threat(d):
     # The brand-level density x service matrix (rival_threat.json, obj #2) — the
     # per-BRAND sibling of rival_threat_region (whose probe comment already named
@@ -3104,6 +3165,24 @@ DATA_FILES = [
     # obj-#1 flow card is now probed; this closes the matching obj-#2 blind spot
     # so a truncated deploy that guts the competitive board triggers a phone alert.
     ("data/peer_province.json", _shape_peer_province, ".provinces (~77) with .by_brand per-rival split + meta.total_autox"),
+    # peer_province's own JOIN child (contested_mindshare.json, obj #2, #485,
+    # 2026-08-17) — the newest surfaced competitive read: the Competition (#acq)
+    # "double jeopardy" board crossing the MEASURED branch field (peer_province)
+    # with the ESTIMATED search field (search_demand) to name the provinces where
+    # ONE rival leads AutoX on BOTH axes. Both parents are already probed above/
+    # below; this closes the matching blind spot for their join. drawContestMind
+    # gates on a non-empty .provinces array and degrades SILENTLY to a "not yet
+    # computed" placeholder with no phone alert when a truncated deploy guts it.
+    ("data/contested_mindshare.json", _shape_contested_mindshare, ".provinces (~77) with class/dj_index/ground_top_rival_share (#acq double-jeopardy board)"),
+    # The MEASURED published-rate board (rate_board.json, obj #2) — the Competition
+    # (#acq) "what rivals CHARGE" table, the pricing counterpart to the already-
+    # probed rival ad/promo pulse. It gates its whole board (incl. the cheapest-
+    # effective-rate answer line) on a non-empty .operators array, carries a live
+    # MEASURED asof_card, and CANNOT self-heal (build_rate_board.py has no CI cron),
+    # so a truncated/404 CDN deploy silently drops it to the "Rate board not yet
+    # built" placeholder with no phone alert. The last unprobed pricing read on the
+    # Competition surface; closes it.
+    ("data/rate_board.json", _shape_rate_board, ".operators (rate-card roster) with name_th + numeric effective_lo (#acq restated rate board)"),
     # The cross-objective SYNTHESIS the exec front door leads with: province_pressure
     # is the deterministic JOIN of portfolio risk (obj #1) x competitive risk (obj
     # #2). Both parents are probed above (peer_province + province_risk/stress); the
