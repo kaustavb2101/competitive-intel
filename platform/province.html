@@ -466,9 +466,9 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 </aside>
 
 <div id="mtog">
-  <button data-s="left">Branch reach</button>
-  <button data-s="right">Province</button>
-  <button data-s="ctl">Layers</button>
+  <button data-s="left" aria-controls="left" aria-expanded="false">Branch reach</button>
+  <button data-s="right" aria-controls="right" aria-expanded="false">Province</button>
+  <button data-s="ctl" aria-controls="ctl" aria-expanded="false">Layers</button>
 </div>
 
 <div id="legendwrap">
@@ -1250,13 +1250,22 @@ function measuredCropSpan(){
 // one closes the other two so a single overlay shows at a time and the map stays usable full-screen.
 (function(){
   const ids=['left','right','ctl'];
-  document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
+  const btns=document.querySelectorAll('#mtog button');
+  // disclosure pattern: keep each switcher's aria-expanded in step with whether its panel is shown
+  function syncMtogAria(){btns.forEach(b=>{const e=document.getElementById(b.dataset.s);b.setAttribute('aria-expanded',String(!!(e&&e.classList.contains('show'))));});}
+  btns.forEach(b=>b.onclick=()=>{
     const s=b.dataset.s, el=document.getElementById(s);
     const willShow=el?!el.classList.contains('show'):false;
     ids.forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('show',id===s?willShow:false);});
+    syncMtogAria();
   });
+  syncMtogAria();
 })();
-document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.x).classList.remove('show'));
+document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>{
+  document.getElementById(b.dataset.x).classList.remove('show');
+  const mt=document.querySelector('#mtog button[data-s="'+b.dataset.x+'"]');
+  if(mt)mt.setAttribute('aria-expanded','false');
+});
 document.querySelectorAll('.stb').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.stb').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-pressed',String(x===b));});
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.v));});
