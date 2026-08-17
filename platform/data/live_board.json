@@ -85,8 +85,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "4 observations from 2026-07-17, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 4,
+    "note": "5 observations from 2026-07-17, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 5,
     "series": "set_mtc_mcap"
    },
    "key": "peer_scoreboard",
@@ -273,7 +273,7 @@
    "stamp_iso": "2026-08-17",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4429,
+   "value": 4427,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -297,7 +297,7 @@
    "stamp_iso": "2026-08-17",
    "stamp_kind": "pulled",
    "unit": "of 796",
-   "value": 119,
+   "value": 122,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -354,8 +354,8 @@
    "label": "Household debt",
    "measured": true,
    "source": "BIS Statistics (stats.bis.org, household debt) + BOT (ธปท./กนง.) MPC decision history (policy rate) + World Bank (api.worldbank.org, CPI + lending rate) + ECB daily reference rates",
-   "stamp": "2026-08-15",
-   "stamp_iso": "2026-08-15",
+   "stamp": "2026-08-17",
+   "stamp_iso": "2026-08-17",
    "stamp_kind": "pulled",
    "unit": "% GDP",
    "value": 87.5,
@@ -489,7 +489,7 @@
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
   "history_note": "A trend line is drawn only where a stored series exists. 10 of 23 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 252,
+  "history_points": 253,
   "missing_files": [],
   "n_feeds": 23,
   "n_with_history": 10,
