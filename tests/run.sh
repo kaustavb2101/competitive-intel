@@ -482,6 +482,7 @@ INGESTS
   ( cd "$PIPE" && python3 build_exit_whitespace.py --check >/dev/null 2>&1 ) && ok "build_exit_whitespace.py --check" || bad "build_exit_whitespace.py --check (exit_whitespace.json drifted from amphoe.json/competitors)"
   ( cd "$PIPE" && python3 build_expansion_plan.py --check >/dev/null 2>&1 ) && ok "build_expansion_plan.py --check" || bad "build_expansion_plan.py --check (expansion_plan.json drifted from amphoe.json/branches.json)"
   ( cd "$PIPE" && python3 build_search_demand.py --check >/dev/null 2>&1 ) && ok "build_search_demand.py --check" || bad "build_search_demand.py --check (search_demand.json drifted from source-data/google_trends.json/provinces index)"
+  ( cd "$PIPE" && python3 build_contested_mindshare.py --check >/dev/null 2>&1 ) && ok "build_contested_mindshare.py --check" || bad "build_contested_mindshare.py --check (contested_mindshare.json drifted from peer_province.json/search_demand.json — run: python3 pipeline/build_contested_mindshare.py)"
   ( cd "$PIPE" && python3 build_branch_peers.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_branch_peers.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_branch_peers.py --check (numpy not installed — dependency missing, not data drift; pip install --break-system-packages numpy)"

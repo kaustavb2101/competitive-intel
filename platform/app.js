@@ -3092,6 +3092,7 @@ function renderCompetition(){
   renderCompCoverage();
   renderRivalDensity();
   renderPeerProvince();
+  renderContestMind();
   renderPeerNpl();
   renderRivThreat();
   renderRivThreatRegion();
@@ -3640,6 +3641,79 @@ function drawPeerProvince(){
          'The <b>PICO</b> column is a separate <b>MEASURED</b> class — licensed พิโกไฟแนนซ์ operators from the FPO registry (small-ticket, not part of the big-4 ratio).',
          'The <b>single-brand-dominated</b> read is <b>MEASURED</b>-derived: over provinces with a substantial big-4 field (≥10 rival branches, so a tiny field can’t score a meaningless 100%), it counts those where one rival brand holds a majority of the rival branches — a lopsided field means a single competitor sets local pricing; a split field spreads the pressure. Computed share, MEASURED counts.',
          'Ratio is the merged big-4 count ÷ AutoX — a competitive-pressure signal on the existing network, not an expansion cue.']);
+  }
+}
+
+/* ---------- contested mindshare · ground × search double-jeopardy (obj #2) ----------
+   Surfaces data/contested_mindshare.json (pipeline/build_contested_mindshare.py): the JOIN of the
+   MEASURED branch field (peer_province.json — which operator leads and the top rival's share of the
+   local title-lender census) with the ESTIMATED search field (search_demand.json — share-of-search).
+   The sharp obj-#2 list: provinces where AutoX is BOTH outnumbered on the ground AND out-searched on
+   the screen by the SAME rival brand (double jeopardy). Ground MEASURED, search ESTIMATED → the
+   combined read is estimated. Lazy, null-safe. A risk read on the existing network; no open/expand. */
+let CONTESTMIND=null, contestmindLoaded=false, contestmindPromise=null;
+function loadContestMind(){
+  if(contestmindPromise) return contestmindPromise;
+  contestmindPromise=fetch('data/contested_mindshare.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ CONTESTMIND=j; contestmindLoaded=true; return CONTESTMIND; })
+    .catch(()=>{ CONTESTMIND=null; contestmindLoaded=true; return null; });
+  return contestmindPromise;
+}
+function renderContestMind(){
+  const tbl=$('#contestmindtbl'); if(!tbl) return;
+  if(contestmindLoaded){ drawContestMind(); return; }
+  loadContestMind().then(drawContestMind);
+}
+function drawContestMind(){
+  const tbl=$('#contestmindtbl'), ro=$('#contestmindreadout'); if(!tbl) return;
+  const recs=(CONTESTMIND&&Array.isArray(CONTESTMIND.provinces))?CONTESTMIND.provinces:[];
+  if(!recs.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Contested-mindshare board not yet computed.</b> <span class="sub">Run pipeline/build_contested_mindshare.py — it joins peer_province.json + search_demand.json.</span>';
+    return;
+  }
+  const m=CONTESTMIND.meta||{};
+  const pct=v=>(v==null)?'·':Math.round(v*100)+'%';
+  // The sharp list: the SAME rival leads BOTH axes. Already sorted double-jeopardy-first by the
+  // builder; fall back to the first rows if a pre-fold layer carries no class field.
+  const dj=recs.filter(r=>r.class==='double-jeopardy');
+  const list=dj.length?dj:recs.slice(0,15);
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th>`+
+    `<th scope="col" title="the rival that leads BOTH the branch field and search demand here">Rival</th>`+
+    `<th scope="col" title="that rival's share of the located title-lender census in the province (MEASURED)">Ground field</th>`+
+    `<th scope="col" title="that rival's share-of-search in the province (ESTIMATED — Thai search-term demand proxy)">Search</th>`+
+    `<th scope="col" title="AutoX's own share-of-search here (ESTIMATED)">AutoX search</th>`+
+    `<th scope="col" title="mean of the rival's ground and search share, 0-100 (ESTIMATED, since search is estimated); higher = harder to defend">Index</th></tr>`+
+    list.map((r,i)=>{
+      const prov=`${r.province_th||'—'}${r.province_en?`<span class="sub" style="font-weight:400"> ${r.province_en}</span>`:''}`;
+      const gcol=(r.ground_top_rival_share!=null&&r.ground_top_rival_share>=0.5)?'var(--agri)':'var(--gold)';
+      const scol=(r.screen_top_rival_share!=null&&r.screen_top_rival_share>=0.5)?'var(--agri)':'var(--gold)';
+      const idx=(r.dj_index!=null)?Math.round(r.dj_index*100):null;
+      return `<tr title="${(r.verdict||'').replace(/"/g,'&quot;')}">`+
+        `<td class="mono">${i+1}</td>`+
+        `<td>${prov}</td>`+
+        `<td><span style="color:var(--agri)">${r.ground_top_rival||'—'}</span></td>`+
+        `<td class="mono" style="color:${gcol}">${pct(r.ground_top_rival_share)}</td>`+
+        `<td class="mono" style="color:${scol}">${pct(r.screen_top_rival_share)}</td>`+
+        `<td class="mono" style="color:var(--dim)">${pct(r.autox_share)}</td>`+
+        `<td class="mono"${idx!=null?' style="font-weight:600"':''}>${idx!=null?idx:'·'}</td></tr>`;
+    }).join('');
+  if(ro){
+    const nDj=(m.n_double_jeopardy!=null)?m.n_double_jeopardy:dj.length;
+    const nProv=(m.n_provinces!=null)?m.n_provinces:recs.length;
+    const nSplit=(m.n_split_pressure!=null)?m.n_split_pressure:0;
+    const byBrand=m.dj_by_brand||{};
+    const driverEntries=Object.entries(byBrand).sort((a,b)=>b[1]-a[1]);
+    const driver=driverEntries.length?driverEntries[0]:null;
+    const top=list[0];
+    let s=`<b>${nDj} of ${nProv}</b> AutoX provinces are <b style="color:var(--agri)">double jeopardy</b> — the <b>same rival</b> leads both the branch field and search demand`;
+    if(driver) s+=`, and <b>${driver[0]}</b> drives <b>${driver[1]}</b> of them`;
+    s+='.';
+    if(top&&top.ground_top_rival_share!=null&&top.screen_top_rival_share!=null){
+      s+=` Hardest to defend: <b style="color:var(--agri)">${top.province_th}</b> — ${top.ground_top_rival} holds <b>${pct(top.ground_top_rival_share)}</b> of the local field and <b>${pct(top.screen_top_rival_share)}</b> of search vs AutoX's ${pct(top.autox_share)}.`;
+    }
+    s+=` A further <b>${nSplit}</b> provinces are out-fielded and out-searched by <b>different</b> rivals (split pressure). <span class="sub">Ground share MEASURED (branch census); search share ESTIMATED (Thai search-term proxy), so the index is estimated. No open / expand call.</span>`;
+    ro.innerHTML=s;
   }
 }
 
