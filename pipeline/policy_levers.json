@@ -1,0 +1,523 @@
+{
+ "campaign": {
+  "ceiling_ends": "2026-10-01",
+  "ceiling_refs": [
+   "097/2569"
+  ],
+  "ltv_max_pct": 100.0,
+  "n_programs": 23,
+  "n_rows": 103,
+  "refs": [
+   "047/2569",
+   "097/2569",
+   "107/2569"
+  ],
+  "top": [
+   {
+    "age_from": 1,
+    "age_to": 20,
+    "collateral": "รถกระบะ",
+    "ltv_basis": "insurance-agnostic",
+    "ltv_pct": 100.0,
+    "model": "ISUZU PU — D-MAX (RHUC)",
+    "ref": "097/2569",
+    "tier": "หลัก"
+   },
+   {
+    "age_from": 1,
+    "age_to": 20,
+    "collateral": "รถกระบะ",
+    "ltv_basis": "insurance-agnostic",
+    "ltv_pct": 100.0,
+    "model": "ISUZU PU — OTHER (RHUC)",
+    "ref": "097/2569",
+    "tier": "หลัก"
+   },
+   {
+    "age_from": 1,
+    "age_to": 20,
+    "collateral": "รถกระบะ",
+    "ltv_basis": "insurance-agnostic",
+    "ltv_pct": 100.0,
+    "model": "TOYOTA PU — HILUX VIGO (RHUC)",
+    "ref": "097/2569",
+    "tier": "หลัก"
+   },
+   {
+    "age_from": 1,
+    "age_to": 20,
+    "collateral": "รถกระบะ",
+    "ltv_basis": "insurance-agnostic",
+    "ltv_pct": 100.0,
+    "model": "TOYOTA PU — OTHER (RHUC)",
+    "ref": "097/2569",
+    "tier": "หลัก"
+   }
+  ],
+  "uplift_pp": 25.0,
+  "windows": {
+   "2026-10-01": 24,
+   "2027-01-14": 15
+  }
+ },
+ "eligibility": [
+  {
+   "collateral": "รถจักรยานยนต์",
+   "max_age_years": 15,
+   "ownership_days": 30,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "หลัก · Honda, Yamaha"
+  },
+  {
+   "collateral": "รถจักรยานยนต์",
+   "max_age_years": 10,
+   "ownership_days": 30,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "รอง · Suzuki, Kawasaki, GPX, Vespa"
+  },
+  {
+   "collateral": "รถจักรยานยนต์",
+   "max_age_years": 5,
+   "ownership_days": 30,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "อื่นๆ · Lifan, Triumph ฯลฯ"
+  },
+  {
+   "collateral": "รถยนต์ (เก๋ง/ตู้)",
+   "max_age_years": 20,
+   "ownership_days": 90,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "หลัก · Toyota, Isuzu, Honda"
+  },
+  {
+   "collateral": "รถยนต์ (เก๋ง/ตู้)",
+   "max_age_years": 20,
+   "ownership_days": 90,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "รอง · Mazda, Mitsubishi, Nissan, Ford, Suzuki, MG, BMW, Benz"
+  },
+  {
+   "collateral": "รถยนต์ (เก๋ง/ตู้)",
+   "max_age_years": 10,
+   "ownership_days": 90,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "อื่นๆ · Chevrolet, KIA, Volvo, Hyundai ฯลฯ"
+  },
+  {
+   "collateral": "รถกระบะยี่ห้อพิเศษ",
+   "max_age_years": 20,
+   "ownership_days": 90,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "หลัก · Toyota PU, Isuzu PU"
+  },
+  {
+   "collateral": "รถกระบะยี่ห้อพิเศษ",
+   "max_age_years": 20,
+   "ownership_days": 90,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "รอง · Mitsubishi PU, Nissan PU, Ford PU"
+  },
+  {
+   "collateral": "รถบรรทุก",
+   "max_age_years": 25,
+   "ownership_days": 30,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "หลัก · Hino, Isuzu"
+  },
+  {
+   "collateral": "รถบรรทุก",
+   "max_age_years": 20,
+   "ownership_days": 30,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "รอง · Mitsubishi, Fuso, Nissan, Nissan UD, Volvo, Scania"
+  },
+  {
+   "collateral": "รถบรรทุก",
+   "max_age_years": 15,
+   "ownership_days": 30,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "อื่นๆ · Benz, Man, Daewoo ฯลฯ"
+  },
+  {
+   "collateral": "รถเพื่อการเกษตร",
+   "max_age_years": 35,
+   "ownership_days": 30,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "หลัก · Ford, New Holland"
+  },
+  {
+   "collateral": "รถเพื่อการเกษตร",
+   "max_age_years": 30,
+   "ownership_days": 30,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "หลัก · Kubota"
+  },
+  {
+   "collateral": "รถเพื่อการเกษตร",
+   "max_age_years": 20,
+   "ownership_days": 30,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "รอง · Yanmar, John Deere"
+  },
+  {
+   "collateral": "รถเพื่อการเกษตร",
+   "max_age_years": 10,
+   "ownership_days": 30,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "อื่นๆ · Champ, Class, Iseki ฯลฯ"
+  },
+  {
+   "collateral": "ที่ดิน (จำนำ/จำนอง)",
+   "max_age_years": null,
+   "ownership_days": null,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "น.ส.4 (ครุฑแดง)"
+  },
+  {
+   "collateral": "ที่ดิน (จำนำ/จำนอง)",
+   "max_age_years": null,
+   "ownership_days": null,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "น.ส.3ก (ครุฑเขียว)"
+  },
+  {
+   "collateral": "ที่ดิน (จำนำ/จำนอง)",
+   "max_age_years": null,
+   "ownership_days": null,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "อ.ช.2 (ห้องชุด)"
+  },
+  {
+   "collateral": "ที่ดิน (จำนำ/จำนอง)",
+   "max_age_years": null,
+   "ownership_days": null,
+   "src": "ระเบียบ ver 9.0",
+   "tier": "โฉนดตราจอง (5 จังหวัด)"
+  }
+ ],
+ "lanes": [
+  {
+   "basis": "ระเบียบ ver 9.0",
+   "collateral": "รถยนต์",
+   "holding_days": 90,
+   "loan_cap_thb": 700000,
+   "model": "รถยนต์ — ยกเว้นกระบะยี่ห้อพิเศษ",
+   "note": "ผู้กู้ <26 ปี: ค่า 65% ลดเหลือ 50%",
+   "program": "B045",
+   "rate_pct_yr": 24.0
+  },
+  {
+   "basis": "ระเบียบ ver 9.0",
+   "collateral": "รถกระบะ",
+   "holding_days": null,
+   "loan_cap_thb": null,
+   "model": "รถกระบะยี่ห้อพิเศษ (PU) — เกณฑ์ปกติ",
+   "note": "ผู้กู้ <26 ปี: LTV สูงสุด 50% (กระบะรอง 16–20 ปี → 30%) · ดูโปรแกรม VIGO สำหรับเงื่อนไขประกัน",
+   "program": "B046",
+   "rate_pct_yr": 24.0
+  },
+  {
+   "basis": "ระเบียบ ver 9.0",
+   "collateral": "รถบรรทุก",
+   "holding_days": 30,
+   "loan_cap_thb": 1000000,
+   "model": "รถบรรทุก — ทุกยี่ห้อ",
+   "note": null,
+   "program": "B047",
+   "rate_pct_yr": 24.0
+  },
+  {
+   "basis": "ระเบียบ ver 9.0",
+   "collateral": "รถเพื่อการเกษตร",
+   "holding_days": 30,
+   "loan_cap_thb": 500000,
+   "model": "รถเพื่อการเกษตร — ทุกยี่ห้อ",
+   "note": null,
+   "program": "B048",
+   "rate_pct_yr": 24.0
+  }
+ ],
+ "ltv_ceilings": [
+  {
+   "age_from": 1,
+   "age_to": 20,
+   "brands": "Toyota, Isuzu, Honda",
+   "collateral": "รถยนต์",
+   "ltv_pct": 65.0,
+   "program": "B045",
+   "tier": "main"
+  },
+  {
+   "age_from": 1,
+   "age_to": 15,
+   "brands": "Mazda, Mitsubishi, Nissan, Ford, Suzuki, MG, BMW, Benz",
+   "collateral": "รถยนต์",
+   "ltv_pct": 65.0,
+   "program": "B045",
+   "tier": "sub"
+  },
+  {
+   "age_from": 16,
+   "age_to": 20,
+   "brands": "Mazda, Mitsubishi, Nissan, Ford, Suzuki, MG, BMW, Benz",
+   "collateral": "รถยนต์",
+   "ltv_pct": 30.0,
+   "program": "B045",
+   "tier": "sub"
+  },
+  {
+   "age_from": 1,
+   "age_to": 10,
+   "brands": "Chevrolet, KIA, Volvo, Hyundai และอื่นๆ",
+   "collateral": "รถยนต์",
+   "ltv_pct": 30.0,
+   "program": "B045",
+   "tier": "other"
+  },
+  {
+   "age_from": 1,
+   "age_to": 10,
+   "brands": "Toyota PU, Isuzu PU",
+   "collateral": "รถกระบะ",
+   "ltv_pct": 75.0,
+   "program": "B046",
+   "tier": "main"
+  },
+  {
+   "age_from": 11,
+   "age_to": 15,
+   "brands": "Toyota PU, Isuzu PU",
+   "collateral": "รถกระบะ",
+   "ltv_pct": 70.0,
+   "program": "B046",
+   "tier": "main"
+  },
+  {
+   "age_from": 16,
+   "age_to": 20,
+   "brands": "Toyota PU, Isuzu PU",
+   "collateral": "รถกระบะ",
+   "ltv_pct": 65.0,
+   "program": "B046",
+   "tier": "main"
+  },
+  {
+   "age_from": 1,
+   "age_to": 15,
+   "brands": "Mitsubishi PU, Nissan PU, Ford PU",
+   "collateral": "รถกระบะ",
+   "ltv_pct": 65.0,
+   "program": "B046",
+   "tier": "sub"
+  },
+  {
+   "age_from": 16,
+   "age_to": 20,
+   "brands": "Mitsubishi PU, Nissan PU, Ford PU",
+   "collateral": "รถกระบะ",
+   "ltv_pct": 50.0,
+   "program": "B046",
+   "tier": "sub"
+  },
+  {
+   "age_from": 1,
+   "age_to": 20,
+   "brands": "Hino, Isuzu",
+   "collateral": "รถบรรทุก",
+   "ltv_pct": 75.0,
+   "program": "B047",
+   "tier": "main"
+  },
+  {
+   "age_from": 21,
+   "age_to": 25,
+   "brands": "Hino, Isuzu",
+   "collateral": "รถบรรทุก",
+   "ltv_pct": 50.0,
+   "program": "B047",
+   "tier": "main"
+  },
+  {
+   "age_from": 1,
+   "age_to": 15,
+   "brands": "Mitsubishi, Mitsubishi Fuso, Nissan, Nissan UD, Volvo, Scania",
+   "collateral": "รถบรรทุก",
+   "ltv_pct": 70.0,
+   "program": "B047",
+   "tier": "sub"
+  },
+  {
+   "age_from": 16,
+   "age_to": 20,
+   "brands": "Mitsubishi, Mitsubishi Fuso, Nissan, Nissan UD, Volvo, Scania",
+   "collateral": "รถบรรทุก",
+   "ltv_pct": 50.0,
+   "program": "B047",
+   "tier": "sub"
+  },
+  {
+   "age_from": 1,
+   "age_to": 15,
+   "brands": "Benz, Man, Daewoo และอื่นๆ",
+   "collateral": "รถบรรทุก",
+   "ltv_pct": 30.0,
+   "program": "B047",
+   "tier": "other"
+  },
+  {
+   "age_from": 1,
+   "age_to": 20,
+   "brands": "Ford, New Holland",
+   "collateral": "รถเพื่อการเกษตร",
+   "ltv_pct": 70.0,
+   "program": "B048",
+   "tier": "main"
+  },
+  {
+   "age_from": 21,
+   "age_to": 35,
+   "brands": "Ford, New Holland",
+   "collateral": "รถเพื่อการเกษตร",
+   "ltv_pct": 50.0,
+   "program": "B048",
+   "tier": "main"
+  },
+  {
+   "age_from": 1,
+   "age_to": 15,
+   "brands": "Kubota",
+   "collateral": "รถเพื่อการเกษตร",
+   "ltv_pct": 70.0,
+   "program": "B048",
+   "tier": "main"
+  },
+  {
+   "age_from": 16,
+   "age_to": 25,
+   "brands": "Kubota",
+   "collateral": "รถเพื่อการเกษตร",
+   "ltv_pct": 50.0,
+   "program": "B048",
+   "tier": "main"
+  },
+  {
+   "age_from": 26,
+   "age_to": 30,
+   "brands": "Kubota",
+   "collateral": "รถเพื่อการเกษตร",
+   "ltv_pct": 30.0,
+   "program": "B048",
+   "tier": "main"
+  },
+  {
+   "age_from": 1,
+   "age_to": 15,
+   "brands": "Yanmar, John Deere",
+   "collateral": "รถเพื่อการเกษตร",
+   "ltv_pct": 65.0,
+   "program": "B048",
+   "tier": "sub"
+  },
+  {
+   "age_from": 16,
+   "age_to": 20,
+   "brands": "Yanmar, John Deere",
+   "collateral": "รถเพื่อการเกษตร",
+   "ltv_pct": 50.0,
+   "program": "B048",
+   "tier": "sub"
+  },
+  {
+   "age_from": 1,
+   "age_to": 10,
+   "brands": "Champ, Class, Iseki, รถไทยแลนด์ และอื่นๆ",
+   "collateral": "รถเพื่อการเกษตร",
+   "ltv_pct": 30.0,
+   "program": "B048",
+   "tier": "other"
+  }
+ ],
+ "ltvx": {
+  "codes": [
+   {
+    "cap_pct": 120,
+    "code": "CLBH",
+    "loan_kind": "hp_bank",
+    "rate_pct": 12.99,
+    "risk": "LR"
+   },
+   {
+    "cap_pct": 120,
+    "code": "CLNT",
+    "loan_kind": "title",
+    "rate_pct": 15.99,
+    "risk": "LR"
+   },
+   {
+    "cap_pct": 120,
+    "code": "CLNH",
+    "loan_kind": "hp_nonbank",
+    "rate_pct": 15.99,
+    "risk": "LR"
+   },
+   {
+    "cap_pct": 100,
+    "code": "CLTN",
+    "loan_kind": "title",
+    "rate_pct": 12.99,
+    "risk": "LR"
+   },
+   {
+    "cap_pct": 100,
+    "code": "CLHN",
+    "loan_kind": "hp_nonbank",
+    "rate_pct": 12.99,
+    "risk": "LR"
+   },
+   {
+    "cap_pct": 100,
+    "code": "CMNT",
+    "loan_kind": "title",
+    "rate_pct": 15.99,
+    "risk": "MR"
+   },
+   {
+    "cap_pct": 100,
+    "code": "CMNH",
+    "loan_kind": "hp_nonbank",
+    "rate_pct": 15.99,
+    "risk": "MR"
+   }
+  ],
+  "eligible_vehicle_types": [
+   "PA",
+   "PU",
+   "VAN"
+  ],
+  "low_risk_gate": "gAA&&gVeh&&occ&&age&&h12",
+  "low_risk_gate_readable": "NCB grade AA + an eligible vehicle type (PA/PU/VAN) + salaried occupation + borrower aged 31–60 + at least 12 months of credit history",
+  "source": "AutoX_Product_Selector_Wizard_46.html",
+  "source_note": "Parsed from the Product Selector's JavaScript. This table is NOT in the workbook, so it sits outside the Excel-is-the-record-of-truth contract that governs every other policy number here.",
+  "standard_cap_pct": 100,
+  "title_best_rate_pct": 12.99,
+  "title_cap_pct": 120,
+  "title_rate_at_cap": 15.99,
+  "v46_change": "v46 (Aug 2026) moved the low-risk collateral test from BRAND TIER to VEHICLE TYPE. Low-risk previously needed a MAJOR-tier brand (4 brands in the ratebook); now every PA / PU / VAN qualifies regardless of tier. This is the change that widened who can be booked LTVX.",
+  "what": "A booking mode, not a rate promotion. Every Redbook brand has a duplicate item prefixed LTVX; choosing the twin is what lets Mobius write LTV above 100%. The plain item locks at 100%. The twin is legal only when the case resolves to a C-code, so booking mode and credit programme are one decision."
+ },
+ "meta": {
+  "basis_note": "LTV here is AutoX's own basis (a percentage of the appraised collateral value under ระเบียบ ver 9.0). A rival's advertised LTV may be quoted on a different base entirely, so the two are NOT comparable until that rival's basis is confirmed. Never net one against the other without it.",
+  "campaign_note": "`campaign` is the LIVE uplift over the base grid. Use its ceiling, not the base one, for any competitor comparison — a rival's headline LTV is its campaign too.",
+  "generated_by": "pipeline/build_policy_levers.py",
+  "ltv_max_pct": 75.0,
+  "ltv_min_pct": 30.0,
+  "n_eligibility_rows": 19,
+  "n_ltv_rows": 22,
+  "not_served": "Lives in pipeline/, never platform/ — platform/ is the deployed folder.",
+  "provenance": "MEASURED — read directly from the policy workbook, not inferred.",
+  "scope_note": "Collateral ceilings + eligibility ONLY. The approval ladder, fraud thresholds, income margins, NCB rules and the income-doc checklist are deliberately not extracted.",
+  "source": "AutoX_LTV_Database_COMPLETE.xlsx (owner-side; the record of truth per production/EXCEL-ARCHITECTURE.md)",
+  "source_basename": "AutoX_LTV_Database_COMPLETE.xlsx",
+  "title": "AutoX underwriting levers — the collateral-side ceilings only"
+ }
+}

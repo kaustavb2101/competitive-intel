@@ -85,7 +85,7 @@ jobs:
         # correct behaviour and exactly why the diagnostic has to be the thing that notices.
         run: |
           for f in rival_watch rival_pulse rate_board rival_ads rival_facebook promo_gap \
-                   pantip_panel rival_youtube; do
+                   pantip_panel rival_youtube branches crop_stress thaiwater_rain; do
             p="platform/data/$f.json"
             if [ -s "$p" ]; then
               printf '  %-16s %8s bytes\n' "$f" "$(wc -c < "$p")"
@@ -93,6 +93,16 @@ jobs:
               printf '  %-16s MISSING — the digest will omit its section\n' "$f"
             fi
           done
+          # OUR OWN LEVERS, and the one input that is NOT under platform/data. Without it the
+          # email loses both the "What to do" lever lines and the whole LTVX standing section —
+          # i.e. exactly the actionable half — so its absence has to be loud here. It is generated
+          # owner-side by build_policy_levers.py from the underwriting workbook + Product Selector,
+          # which is why CI cannot regenerate it and must rely on the committed copy.
+          if [ -s pipeline/policy_levers.json ]; then
+            printf '  %-16s %8s bytes\n' "policy_levers" "$(wc -c < pipeline/policy_levers.json)"
+          else
+            printf '  %-16s MISSING — no LTVX section and no lever lines in the actions\n' "policy_levers"
+          fi
 
       - name: Build the digest
         env:
