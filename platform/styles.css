@@ -1724,6 +1724,20 @@ g:hover .cbars-l{fill:var(--hi)}
 g:hover .cbars-b,g:hover .cdot{filter:brightness(1.25)}
 .cdot-s{stroke-width:1.4;opacity:.45}
 
+/* Brand tab (2026-08-17): dumbbell + diverging-pair additions.
+   .cbars-lg is the in-viewBox legend — kept inside the SVG rather than as sibling HTML so it scales
+   with the chart instead of drifting away from it at the .chartwrap max-width cap. */
+.cbars-lg{font-family:var(--sans);font-size:9.5px;fill:var(--mid);dominant-baseline:middle;
+  letter-spacing:.3px;text-transform:uppercase}
+/* Our own row, in a field of rivals. A brand ladder is unreadable if the reader has to hunt for
+   which line is us, and colour alone would fail the same test a colour-blind reader applies to the
+   segment palette — so the row gets a tinted band AND the label goes bright + semibold. */
+.cbars-usbg{fill:var(--accent);opacity:.10}
+.cbars-us{fill:var(--hi);font-weight:600}
+/* Same job in the HTML tables the charts sit above. Left rule + tint, matching .cbars-usbg. */
+.tbl tr.rowus>td{background:var(--accent-soft)}
+.tbl tr.rowus>td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
+
 /* sparkline: sits inline beside a number in a table cell or card */
 .csp{width:108px;height:26px;vertical-align:-7px;overflow:visible}
 .csp-l{fill:none;stroke-width:1.5;vector-effect:non-scaling-stroke}
