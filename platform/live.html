@@ -130,6 +130,8 @@ html[data-theme="light"] .lb-aging{color:#8A6210}
       <a class="on" href="live.html" role="menuitem" aria-current="page">Live board</a>
     </div>
   </div>
+  <button id="themeToggle" title="Toggle light / dark" aria-label="Toggle light or dark theme" aria-pressed="false"
+    style="margin-left:auto;flex:none;background:none;border:1px solid var(--line);color:var(--mid);border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px">☾</button>
 </nav>
 
 <main id="main-content" tabindex="-1">
@@ -192,6 +194,12 @@ html[data-theme="light"] .lb-aging{color:#8A6210}
    else if(e.key==='Escape'){e.preventDefault();open(false);btn.focus();}
    else if(e.key==='Tab'){open(false);}});
  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&wrap.classList.contains('open')){open(false);btn.focus();}});})();
+</script>
+<script>/* theme toggle (copied from index.html/data.html) — also keeps the theme-color meta tracking data-theme */
+(function(){var b=document.getElementById('themeToggle');if(!b)return;
+ function sync(){var l=document.documentElement.dataset.theme==='light';b.textContent=l?'☀':'☾';b.setAttribute('aria-pressed',String(l));var mtc=document.querySelector('meta[name="theme-color"]');if(mtc)mtc.setAttribute('content',l?'#F4F6FA':'#0a0e17');}
+ sync();
+ b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});})();
 </script>
 <script>
 /* ============================================================================================
