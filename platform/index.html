@@ -58,6 +58,7 @@
   <a data-v="assist" href="#assist" title="③ Assistance — which segments are hit most & need pre-emptive help">Assistance</a>
   <a data-v="exposure" href="#exposure" title="④ Risk — where the book sits in stress: live book vs the 180+ legacy stock">Risk</a>
   <a data-v="acq" href="#acq" title="⑤ Competitor — rival pressure on the network we already run">Competition</a>
+  <a data-v="brand" href="#brand" title="⑥ Brand — share of voice, reputation and message–market fit across every public channel">Brand</a>
   <span class="nav-sep" aria-hidden="true"></span>
   <div class="nav-more" id="navMore">
     <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">Explore ▾</button>
@@ -685,9 +686,8 @@
          untouched: the click handler only routes <details> targets through the switcher. -->
     <nav class="jumpnav no-print" id="compjump" data-exclusive="1" data-switch="compswitch" aria-label="Jump to section within Competition">
       <a class="chip" href="#acq" data-jump="sec-cost">Does it cost us?</a>
-      <a class="chip" href="#acq" data-jump="sec-search">Brand &amp; search</a>
       <a class="chip" href="#acq" data-jump="sec-presence">Market presence</a>
-      <a class="chip" href="#acq" data-jump="sec-pulse">Rival pulse</a>
+      <a class="chip" href="#acq" data-jump="sec-pulse">Rival pricing</a>
       <a class="chip" href="#acq" data-jump="sec-comp">Rival density</a>
       <a class="chip" href="#acq" data-jump="sec-segments">Segment exposure</a>
     </nav>
@@ -709,17 +709,7 @@
          markup (WAVE 2, 2026-08-09: moved off sec-search — the owner opens this tab FOR the rival
          pulse, the one section that refreshes every day) — and showOvPanel() on tab entry (see
          showTab in app.js) confirms exactly one panel is open even on a hard reload to #acq. -->
-    <div class="compswitch" id="compswitch">
-    <!-- 2 · BRAND SHARE-OF-SEARCH — how AutoX's brand demand compares to rivals, province by province. -->
-    <details class="compsec" id="sec-search">
-    <summary><h2 class="opp">Brand share-of-search vs rivals · title-loan search interest by province <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2><span class="ovsec-what">Google Trends search interest by province, AutoX share-of-search vs 4 rival brands</span></summary>
-    <p class="lead">Google Trends relative search-interest (0–100) for title-loan intent terms
-      (<span class="mono" lang="th">จำนำทะเบียนรถ</span> · <span class="mono" lang="th">สินเชื่อรถแลกเงิน</span>), plus <b>share-of-search</b> —
-      how AutoX's brand searches compare to the big rivals in each province (five brands on one shared Trends axis).
-      A competitive read of <b>where our brand wins or loses demand attention to rivals</b>, <b>not</b> query volume or market share.</p>
-    <div class="insight" id="searchreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
-    <table class="tbl" id="searchtbl"></table>
-    </details>
+    <div class="compswitch" id="compswitch" data-nav="compjump">
 
     <!-- 1.5 · MARKET & DIGITAL PRESENCE — listed-peer SET scoreboard + share-of-mind framing. -->
     <details class="compsec" id="sec-presence">
@@ -745,46 +735,21 @@
     <div class="tbl-wrap"><div id="acq-debtsource"></div></div>
     </details>
 
-    <!-- 1.6 · RIVAL PULSE — what rivals are running right now + measured customer sentiment (incl. our own app). -->
+    <!-- 1.6 · RIVAL PRICING — what every rival CHARGES, and who is in the field.
+         SPLIT 2026-08-17: this panel used to also carry the whole voice-of-customer stack (Play +
+         Apple ladders, Pantip, YouTube, Google ads, Facebook, the say/hear gap, share-of-search and
+         the rival-watch diff) — thirteen surfaces in one accordion, filed under a tab whose job is
+         rival PRESSURE ON THE NETWORK. Brand voice is not network pressure, so those moved to the
+         #brand tab. What stays here is pricing (rate card + promo-vs-card) and the field census:
+         both are competitive STRUCTURE, and promo-vs-card is meaningless away from the rate board
+         it is measured against. -->
     <details class="compsec" id="sec-pulse" open>
-    <summary><h2 class="opp">Rival pulse · live promotions &amp; voice of customer <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2><span class="ovsec-what">Live promos, paid ads, YouTube and Pantip pulse, Play/Apple sentiment ladders, the full field census</span></summary>
-    <p class="lead">The always-on watch: <b>what the rivals are promoting right now</b> (pulled from their own websites, new items flagged on every refresh) and <b>what customers say</b> — Google Play star ratings and dated reviews for the rivals' apps <b>and our own เงินไชโย app</b>, side by side. Stars, histograms and promo dates are <b>measured</b>; the detractor theme buckets are an <b>estimated</b> keyword read over 1–2★ reviews.</p>
+    <summary><h2 class="opp">Rival pricing · the rate card, the live offer, and the field <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2><span class="ovsec-what">Every rival's published rate card on one basis, where a live promo undercuts it, and the full operator census</span></summary>
+    <p class="lead">What every vehicle-refinance rival <b>actually charges</b> — the BoT-mandated published disclosure restated onto one basis so the column reads straight down, then the check on whether each operator's <b>live promo undercuts its own card</b>. Rates and promo quotes are <b>measured</b> from the lenders' own pages; the single-basis restatement is an <b>estimated</b> conversion, spelled out per row. <span class="sub">Voice of customer, share-of-search, paid ads, Pantip and the say/hear gap moved to <a href="#brand">⑥ Brand</a>.</span></p>
 
-    <!-- WHAT CHANGED, before what's live. Everything else in this section is a snapshot of the
-         rival field right now; this is the only place that says what MOVED since the previous
-         pull. Driven by rival_watch.json, a pure diff layer — it re-counts nothing and emits a
-         movement only where a dated first_seen/last_seen/last_shown field proves it. Rendered by
-         renderRivalWatch(); silent when only one pull vintage exists. -->
-    <h3 class="compsub">What changed since the last pull <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED diff</span></h3>
-    <div id="rivalwatch"></div>
 
-    <h3 class="compsub" style="margin-top:18px">Voice of customer · app sentiment ladder <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Google Play</span></h3>
-    <div class="insight" id="pulsesentreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
-    <table class="tbl" id="pulsesenttbl"></table>
 
-    <!-- FOLD (Wave 2, 2026-08-09): kept, not cut — real Apple App Store data, incl. our own app — but
-         nested under a closed <details>. It is the smaller, secondary VOC read by design (Apple gives
-         no dates/histogram/dev-replies, so it can't carry a trend the way the Play ladder above does),
-         and sec-pulse is now the tab's default-open panel, so its always-visible weight matters most. -->
-    <details style="margin-top:18px">
-    <summary style="cursor:pointer"><h3 class="compsub" style="display:inline;border-bottom:none;padding-bottom:0;margin:0">The same customers on iPhone <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Apple App Store (TH)</span></h3></summary>
-    <p class="lead sub" style="margin-top:10px">iOS skews to the higher-income borrower — the one whose collateral is a car rather than a motorcycle — so it is read as that slice, not as the market. Apple publishes <b>no review dates, no star histogram and no developer replies</b>, so there is deliberately no 90-day trend or reply rate here; those live in the Google Play ladder above. The <b>star rating</b> is the whole rating population; the <b>1–2★ of written sample</b> column is only the people who wrote something, who skew heavily negative — use it to rank operators against each other, never as the share of customers who are unhappy.</p>
-    <div class="insight" id="pulseiosreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span></div></div>
-    <table class="tbl" id="pulseiostbl"></table>
-    <div id="pulseiosnote"></div>
-    </details>
 
-    <!-- FACEBOOK PULSE (2026-08-16) — "facebook is always the promo" (owner). A lender's rate card
-         below is the BoT-mandated CEILING; this is what it is winning customers with THIS WEEK, read
-         anonymously off each operator's own Facebook page. It renders ABOVE the rate board on
-         purpose and is never averaged with it. Surfaces data/rival_facebook.json
-         (build_rival_facebook.py, from pull_rival_facebook.js). Lazy, null-safe, graceful if absent. -->
-    <h3 class="compsub" style="margin-top:18px">Facebook pulse · what rivals are posting right now <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · rivals' own Facebook pages</span></h3>
-    <p class="lead">A lender's published rate card (below) is the <b>BoT-mandated disclosure — the legal ceiling</b>. Its Facebook post is what it is actually <b>winning customers with this week</b>, read anonymously off each operator's own page — one newest post per page per run, before the login wall. This feed leads the rate board on purpose and is <b>never averaged</b> with it.</p>
-    <div class="insight" id="fbreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
-    <div id="fbpromolist"></div>
-    <details id="fbcorpwrap" style="margin-top:10px"><summary class="sub" style="cursor:pointer">Corporate-page posts — not about the vehicle-loan product (<span id="fbcorpcount">0</span>)</summary><div id="fbcorplist"></div></details>
-    <details id="fbsilentwrap" style="margin-top:10px"><summary class="sub" style="cursor:pointer">No post captured this run (<span id="fbsilentcount">0</span>)</summary><div id="fbsilentlist"></div></details>
 
     <!-- PROMO VS CARD (2026-08-16) — where a live promo (Facebook or Google ad) undercuts the
          operator's own published rate-card floor. Surfaces data/promo_gap.json
@@ -806,60 +771,10 @@
     <p class="lead sub" id="rbnote" style="margin-top:6px"></p>
     <details id="rbdetailwrap" style="margin-top:10px"><summary class="sub" style="cursor:pointer">Every offer behind these numbers — each variant, its verbatim Thai quote and its source</summary><div id="rbdetail"></div></details>
 
-    <h3 class="compsub" style="margin-top:18px">Live rival promotions &amp; campaigns <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · rivals' own sites</span></h3>
-    <div class="insight" id="pulsepromoreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span></div></div>
-    <div id="pulsepromolandscape"></div>
-    <details id="pulsepromorawwrap" style="margin-top:10px"><summary class="sub" style="cursor:pointer">Raw promo feed (line items, by brand)</summary><div id="pulsepromolist"></div></details>
 
-    <h3 class="compsub" style="margin-top:18px">Paid online ads · what the rivals are running on Google <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Google Ads Transparency</span></h3>
-    <p class="lead">Every ad creative Google lists for each lender in Thailand, with the dates it ran — so this is <b>how hard each rival is pushing paid acquisition right now</b>, who is still live today, and how fast they cycle creative. Counts, run-lengths and formats are <b>measured</b>. Google publishes spend and impressions only for election ads, so these are <b>share-of-volume</b> figures — <b>never</b> a spend ranking: a rival running fewer but longer creatives is not necessarily spending less. Meta's ad library is <b>not</b> an option here — its credit-ad slice excludes Thailand.</p>
-    <div class="insight" id="pulseadsreadout" style="border-left-color:var(--collat)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
-    <table class="tbl" id="pulseadstbl"></table>
-    <h4 class="compsub" style="margin-top:14px;font-size:13px">Advertised rates · what the field is quoting in its own ads</h4>
-    <div id="pulseadsrates"></div>
-    <h4 class="compsub" style="margin-top:14px;font-size:13px">What each operator is actually saying · ad copy, newest first</h4>
-    <div id="pulseadsmsgs"></div>
 
-    <h4 class="compsub" style="margin-top:18px;font-size:13px">Every recent ad · the rate and the conditions it attaches <span class="tag" id="pulseadsfeedcount" style="color:var(--collat);border:1px solid var(--collat)"></span></h4>
-    <p class="lead">One row per individual creative still running in the last 90 days — <b>what the ad says, the rate it advertises, and the conditions attached to it</b>. Filter by operator, by condition, or search the Thai copy. A rate is shown only when it survives the transcription check; where an ad clearly quoted a rate we could not read reliably, the row says so rather than printing a number that might be wrong.</p>
-    <div id="pulseadscov"></div>
-    <input class="search" id="pulseadsq" type="search" aria-label="Search the rival ad copy" placeholder="Search the ad copy (Thai or English)…" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" style="max-width:420px">
-    <div class="chips" id="pulseadsfeedctl" style="margin:6px 0;align-items:center;gap:6px;flex-wrap:wrap"></div>
-    <div id="pulseadsfeed"></div>
 
-    <p class="lead sub" id="pulseadsnote" style="margin-top:6px"></p>
 
-    <h3 class="compsub" style="margin-top:18px">Video pulse · what the field is publishing on YouTube <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · YouTube Data API</span></h3>
-    <p class="lead">The organic half of rival marketing, <b>including our own เงินไชโย channel</b> as the control: audience size, how often each operator publishes, how its recent videos actually perform, and what its titles push. Subscriber counts are <b>rounded by YouTube itself</b> at scale, so read them as bands. A channel with <b>few subscribers but very high median views</b> is buying paid video placement rather than earning reach — that gap is called out. Title themes use the <b>same</b> keyword lexicon as the ad copy above, so paid and organic messaging are comparable (<b>estimated</b>).</p>
-    <div class="insight" id="pulsevidreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
-    <table class="tbl" id="pulsevidtbl"></table>
-    <p class="lead sub" id="pulsevidnote" style="margin-top:6px"></p>
-
-    <h3 class="compsub" style="margin-top:18px">Pantip · what borrowers say about each lender, unprompted <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED text</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED volume</span></h3>
-    <p class="lead">Pantip is where Thai borrowers discuss lenders <b>at length and unprompted</b> — no review form asking them to rate anything. The say/hear gap below blends this into one axis; here it stays split by brand, in the borrowers' own words.
-      <b>Read the ranking, not the multiple.</b> Volume is Pantip's own reported total per search term, because search itself is <b>capped at 10 threads per term</b> — so the threads we retrieved are a ceiling we hit, never a measure of how much a brand is discussed. Several rival names are also ordinary Thai (<span class="mono" lang="th">สมหวัง</span> means "wish fulfilled"; <span class="mono" lang="th">ศรีสวัสดิ์</span> is also a district of Kanchanaburi), so those totals count far more than the lender — <b>match rate</b> measures how loose each one is, and it runs from 6% to 100%. It is itself measured on the friendliest slice, so every estimate here leans <b>high</b>.
-      <b>PDPA:</b> no author name, member id, handle or profile link is read at any stage, identifiers are scrubbed from the text too, and quotes are short and unattributed.</p>
-    <div class="insight" id="pantipreadout" style="border-left-color:var(--collat)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
-    <table class="tbl" id="pantiptbl"></table>
-    <!-- FOLD (Wave 2, 2026-08-09): the measured table above (match rate, themes, reply rate) carries
-         the analytical content; these 35 verbatim quotes across 14 brands are illustrative colour, so
-         they sit one click away rather than adding a long scroll to the tab's now-default-open panel.
-         pantipnote (the cap/name-collision/PDPA caveats) stays OUTSIDE the fold — it must not hide. -->
-    <details style="margin-top:14px">
-    <summary class="sub" style="cursor:pointer;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--mid)">In borrowers' own words — including about us</summary>
-    <p class="lead sub" style="margin-top:8px">Verbatim, unattributed, and chosen only for carrying a theme and naming the brand. Nothing is filtered for being unflattering.</p>
-    <div id="pantipquotes"></div>
-    </details>
-    <p class="lead sub" id="pantipnote" style="margin-top:6px"></p>
-
-    <h3 class="compsub" style="margin-top:18px">Say / hear gap · what the field advertises vs what customers raise <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED counts</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED themes</span></h3>
-    <p class="lead">Every channel above read on <b>one axis</b>. Everything customers wrote (forum posts, app reviews, comments under the rivals' videos) and everything lenders published (ad creatives, promo pages) counted against the <b>same</b> Thai phrase list — so "what the industry keeps saying" and "what customers actually raise" can be compared directly. Document <b>counts are measured</b> and re-derivable by hand; the phrase list ships inside <code>social_themes.json</code>. The <b>theme buckets are estimated</b> editorial judgement — a theme absent from the list reads as zero, so absence is not evidence of absence. Read the <b>ordering</b>, not the size of each gap: an ad exists to make a claim while a comment is an unprompted reaction, so the two denominators differ in kind.</p>
-    <div class="insight" id="themesreadout" style="border-left-color:var(--collat)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
-    <table class="tbl" id="themestbl"></table>
-    <h4 class="compsub" style="margin-top:14px;font-size:13px">What the ads ask people to do — paid mechanic vs what they actually do by hand</h4>
-    <p class="lead sub">Counted over <b>paid</b> supply only (ad creatives + promo pages), because a call to action is a campaign mechanic. The <b>organic</b> column is the same phrase counted in the lenders' own unpaid forum replies — customer <b>service</b>, not a campaign. Read the two together: the field answers people conversationally by hand, and never buys it.</p>
-    <table class="tbl" id="themectatbl"></table>
-    <p class="lead sub" id="themesnote" style="margin-top:6px"></p>
 
     <!-- FOLD (Wave 2, 2026-08-09): unlike the rest of sec-pulse (promos/ads/video/pantip/reviews all
          refresh daily), this is a static public-report census — the least "dynamic" content in the
@@ -913,13 +828,6 @@
     <div class="insight" id="peernplreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="peernpltbl"></table>
 
-    <h3 class="compsub" style="margin-top:18px">Rival service reputation · measured Google ratings by brand <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · sample</span></h3>
-    <p class="lead">A <b>quality</b> read the density map can't give: the <b>Google rating and review count</b> customers leave on the
-      rival branches we've located (a sample of the census, review-count-weighted so a 5★ with three reviews can't outweigh a
-      4.2★ with hundreds). Where a rival is <b>both dense and well-liked</b>, share is hardest to take; a weak rating in a
-      saturated district is a service opening. <b>Not an AutoX figure</b> — our own branches carry no Google ratings.</p>
-    <div class="insight" id="rivrepreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
-    <table class="tbl" id="rivreptbl"></table>
 
     <!-- FOLD (Wave 2, 2026-08-09): these two were both literal joins of data already on the tab
          (footprint from the coverage/density boards above + service from the reputation board below)
@@ -1042,6 +950,231 @@
       <span class="story-next-lab">Last stop — explore</span>
       <a data-v="map" href="#map">See it on the map — all 2,015 branches →</a>
     </div>
+  </section>
+
+  <!-- BRAND (⑥) — SHARE OF VOICE. Created 2026-08-17.
+       WHY THIS TAB EXISTS. Ten social/sentiment files (Play, Apple, Pantip, YouTube, Google Ads
+       Transparency, Facebook, Google Trends, Google Places, the theme lexicon and the pull diff)
+       were all rendered into ONE accordion panel on #acq — thirteen surfaces stacked with no
+       hierarchy, under a tab whose stated job is rival pressure on the branch network. Brand voice
+       is not network pressure, and the stacking hid the joins: our Google Play reply rate is 0.0%
+       while our Pantip reply rate is 76%, two numbers that lived ~400px apart in differently-ordered
+       tables and were therefore never read together.
+
+       THE CUT is the one a marketing agency uses — EARNED (what customers say unprompted), PAID
+       (what the field buys), OWNED (what each brand publishes on ground it controls) — led by a
+       share-of-voice scoreboard that states our rank per channel, and closed by the say/hear gap.
+
+       WHAT DID NOT MOVE: pricing. The rate board and promo-vs-card stay on #acq because a promo is
+       only meaningful against the card it undercuts, and the operator census stays because it is
+       competitive structure. See the split note on #sec-pulse.
+
+       LAZY BY DESIGN: renderBrand() is called from showTab('brand'), NOT from boot(). The old
+       renderCompetition() fired all ten renderers at page load into a hidden section — ~950KB of
+       JSON parsed on every first paint, including the 658KB ads file, whether or not anyone opened
+       the tab. -->
+  <section class="view" id="v-brand">
+    <h2 class="opp" style="margin-bottom:4px">⑥ Brand — what the market says, and how our voice stands against it</h2>
+    <p class="lead">Every public channel where AutoX and its rivals are talked about, bought on, or rated —
+      read as one position rather than ten feeds. <b>Earned</b> is what customers say when nobody asked;
+      <b>paid</b> is what the field is buying; <b>owned</b> is what each brand publishes itself. Star ratings,
+      review counts, reply rates, ad counts and thread volumes are <b>measured</b>; theme buckets and the
+      Pantip volume estimate are <b>estimated</b> and labelled at the point of use. This tab makes no pricing
+      claim — the rate card lives on <a href="#acq">⑤ Competition</a>.</p>
+
+    <!-- Five positions, not five counts. Rendered by renderBrandAnswer(); each tile is null-safe and
+         simply not emitted when its layer is absent, so this can never invent a headline. -->
+    <div class="answerband" id="brand-answer" aria-label="Brand headline positions"></div>
+    <p class="lead sub" id="brand-answer-note" style="margin:2px 0 10px"></p>
+
+    <!-- THE FINDING THE OLD LAYOUT HID. renderBrandGapFinding() joins the Play reply-rate column to
+         the Pantip reply-rate column — same company, same customers, two channels, and until this
+         tab existed no view put them on one line. -->
+    <div id="brand-replygap"></div>
+
+    <nav class="jumpnav no-print" id="brandjump" data-exclusive="1" data-switch="brandswitch" aria-label="Jump to section within Brand">
+      <a class="chip" href="#brand" data-jump="sec-sov">Share of voice</a>
+      <a class="chip" href="#brand" data-jump="sec-earned">Earned</a>
+      <a class="chip" href="#brand" data-jump="sec-paid">Paid</a>
+      <a class="chip" href="#brand" data-jump="sec-owned">Owned</a>
+      <a class="chip" href="#brand" data-jump="sec-fit">Message–market fit</a>
+    </nav>
+
+    <div class="compswitch" id="brandswitch" data-nav="brandjump">
+
+    <!-- ① SHARE OF VOICE — the scoreboard. This did not exist before: the ten feeds each knew their
+         own channel and none of them stated a rank. -->
+    <details class="compsec" id="sec-sov" open>
+    <summary><h2 class="opp">① Share of voice · where we rank, channel by channel <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2><span class="ovsec-what">Our standing in every public channel, against the named leader in each</span></summary>
+    <p class="lead">One row per channel, one question: <b>where do we rank, and against whom</b>. Assembled from the
+      same files the sections below render in full — nothing new is pulled. Where a cell is a zero or a dash,
+      that <b>absence is the finding</b>, not a gap in the data: we run no Google ads and carry no Google Places
+      rating across 2,015 branches, and both are stated in words rather than left blank.</p>
+    <div class="insight" id="sovreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <div class="chartwrap" id="sovchart"></div>
+    <table class="tbl" id="sovtbl"></table>
+
+
+        <h3 class="compsub" style="margin-top:18px">Brand share-of-search vs rivals · by province <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h3>
+    <p class="lead">Google Trends relative search-interest (0–100) for title-loan intent terms
+      (<span class="mono" lang="th">จำนำทะเบียนรถ</span> · <span class="mono" lang="th">สินเชื่อรถแลกเงิน</span>), plus <b>share-of-search</b> —
+      how AutoX's brand searches compare to the big rivals in each province (five brands on one shared Trends axis).
+      A competitive read of <b>where our brand wins or loses demand attention to rivals</b>, <b>not</b> query volume or market share.</p>
+    <div class="insight" id="searchreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="searchtbl"></table>
+    
+    </details>
+
+    <!-- ② EARNED — unprompted customer voice. Play + Apple + Pantip + Google Places, joined on brand
+         so the ladders can be read across instead of down four separate tables. -->
+    <details class="compsec" id="sec-earned">
+    <summary><h2 class="opp">② Earned · what customers say when nobody asked <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED themes</span></h2><span class="ovsec-what">Play and Apple sentiment ladders, Pantip thread volume and reply rate, measured Google service ratings</span></summary>
+    <p class="lead">Nobody paid for any of this. Four independent reads of the same question — <b>what do borrowers
+      actually think of each lender</b> — from the two app stores, the forum where Thai borrowers discuss lenders at
+      length, and the Google reviews left on rival branches. Stars, counts and reply rates are <b>measured</b>;
+      the detractor theme buckets are an <b>estimated</b> keyword read, and the Pantip volume is an
+      <b>estimated</b> scaling of Pantip's own reported totals — both caveated in full at the point of use.</p>
+
+    <h3 class="compsub" style="margin-top:18px">The ladder, joined · every brand on one line <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
+    <p class="lead">Play stars, Play reply rate, iOS stars and Google service rating for the same brand, in the same
+      row, ordered once. Split across four tables — as they were until this tab existed — the comparisons that
+      matter most are the ones a reader never makes.</p>
+    <div class="chartwrap" id="earnedchart"></div>
+    <table class="tbl" id="earnedjoin"></table>
+    <p class="lead sub" id="earnedjoinnote" style="margin-top:6px"></p>
+
+    <h3 class="compsub" style="margin-top:18px">Voice of customer · app sentiment ladder <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Google Play</span></h3>
+    <div class="insight" id="pulsesentreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="pulsesenttbl"></table>
+    <!-- FOLD (Wave 2, 2026-08-09): kept, not cut — real Apple App Store data, incl. our own app — but
+         nested under a closed <details>. It is the smaller, secondary VOC read by design (Apple gives
+         no dates/histogram/dev-replies, so it can't carry a trend the way the Play ladder above does),
+         and sec-pulse is now the tab's default-open panel, so its always-visible weight matters most. -->
+    <details style="margin-top:18px">
+    <summary style="cursor:pointer"><h3 class="compsub" style="display:inline;border-bottom:none;padding-bottom:0;margin:0">The same customers on iPhone <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Apple App Store (TH)</span></h3></summary>
+    <p class="lead sub" style="margin-top:10px">iOS skews to the higher-income borrower — the one whose collateral is a car rather than a motorcycle — so it is read as that slice, not as the market. Apple publishes <b>no review dates, no star histogram and no developer replies</b>, so there is deliberately no 90-day trend or reply rate here; those live in the Google Play ladder above. The <b>star rating</b> is the whole rating population; the <b>1–2★ of written sample</b> column is only the people who wrote something, who skew heavily negative — use it to rank operators against each other, never as the share of customers who are unhappy.</p>
+    <div class="insight" id="pulseiosreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span></div></div>
+    <table class="tbl" id="pulseiostbl"></table>
+    <div id="pulseiosnote"></div>
+    </details>
+    <h3 class="compsub" style="margin-top:18px">Pantip · what borrowers say about each lender, unprompted <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED text</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED volume</span></h3>
+    <p class="lead">Pantip is where Thai borrowers discuss lenders <b>at length and unprompted</b> — no review form asking them to rate anything. The say/hear gap below blends this into one axis; here it stays split by brand, in the borrowers' own words.
+      <b>Read the ranking, not the multiple.</b> Volume is Pantip's own reported total per search term, because search itself is <b>capped at 10 threads per term</b> — so the threads we retrieved are a ceiling we hit, never a measure of how much a brand is discussed. Several rival names are also ordinary Thai (<span class="mono" lang="th">สมหวัง</span> means "wish fulfilled"; <span class="mono" lang="th">ศรีสวัสดิ์</span> is also a district of Kanchanaburi), so those totals count far more than the lender — <b>match rate</b> measures how loose each one is, and it runs from 6% to 100%. It is itself measured on the friendliest slice, so every estimate here leans <b>high</b>.
+      <b>PDPA:</b> no author name, member id, handle or profile link is read at any stage, identifiers are scrubbed from the text too, and quotes are short and unattributed.</p>
+    <div class="insight" id="pantipreadout" style="border-left-color:var(--collat)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="pantiptbl"></table>
+    <!-- FOLD (Wave 2, 2026-08-09): the measured table above (match rate, themes, reply rate) carries
+         the analytical content; these 35 verbatim quotes across 14 brands are illustrative colour, so
+         they sit one click away rather than adding a long scroll to the tab's now-default-open panel.
+         pantipnote (the cap/name-collision/PDPA caveats) stays OUTSIDE the fold — it must not hide. -->
+    <details style="margin-top:14px">
+    <summary class="sub" style="cursor:pointer;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--mid)">In borrowers' own words — including about us</summary>
+    <p class="lead sub" style="margin-top:8px">Verbatim, unattributed, and chosen only for carrying a theme and naming the brand. Nothing is filtered for being unflattering.</p>
+    <div id="pantipquotes"></div>
+    </details>
+    <p class="lead sub" id="pantipnote" style="margin-top:6px"></p>
+    <h3 class="compsub" style="margin-top:18px">Rival service reputation · measured Google ratings by brand <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · sample</span></h3>
+    <p class="lead">A <b>quality</b> read the density map can't give: the <b>Google rating and review count</b> customers leave on the
+      rival branches we've located (a sample of the census, review-count-weighted so a 5★ with three reviews can't outweigh a
+      4.2★ with hundreds). Where a rival is <b>both dense and well-liked</b>, share is hardest to take; a weak rating in a
+      saturated district is a service opening. <b>Not an AutoX figure</b> — our own branches carry no Google ratings.</p>
+    <div class="insight" id="rivrepreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="rivreptbl"></table>
+    </details>
+
+    <!-- ③ PAID — what the field is buying. Google Ads Transparency + the Facebook feed. -->
+    <details class="compsec" id="sec-paid">
+    <summary><h2 class="opp">③ Paid · what the field is buying <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Google Ads Transparency</span></h2><span class="ovsec-what">Every ad creative Google lists per lender, the rates they advertise, and each rival's newest Facebook post</span></summary>
+    <p class="lead">Paid acquisition, as the platforms themselves publish it. <b>Share of volume, never a spend
+      ranking</b> — Google discloses spend and impressions for election ads only, so a rival running fewer but
+      longer creatives is not necessarily spending less. AutoX runs <b>no</b> Google ads, which is a position,
+      not a missing row.</p>
+
+    <h3 class="compsub" style="margin-top:18px">Paid online ads · what the rivals are running on Google <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · Google Ads Transparency</span></h3>
+    <p class="lead">Every ad creative Google lists for each lender in Thailand, with the dates it ran — so this is <b>how hard each rival is pushing paid acquisition right now</b>, who is still live today, and how fast they cycle creative. Counts, run-lengths and formats are <b>measured</b>. Google publishes spend and impressions only for election ads, so these are <b>share-of-volume</b> figures — <b>never</b> a spend ranking: a rival running fewer but longer creatives is not necessarily spending less. Meta's ad library is <b>not</b> an option here — its credit-ad slice excludes Thailand.</p>
+    <div class="insight" id="pulseadsreadout" style="border-left-color:var(--collat)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="pulseadstbl"></table>
+    <h4 class="compsub" style="margin-top:14px;font-size:13px">Advertised rates · what the field is quoting in its own ads</h4>
+    <div id="pulseadsrates"></div>
+    <h4 class="compsub" style="margin-top:14px;font-size:13px">What each operator is actually saying · ad copy, newest first</h4>
+    <div id="pulseadsmsgs"></div>
+
+    <h4 class="compsub" style="margin-top:18px;font-size:13px">Every recent ad · the rate and the conditions it attaches <span class="tag" id="pulseadsfeedcount" style="color:var(--collat);border:1px solid var(--collat)"></span></h4>
+    <p class="lead">One row per individual creative still running in the last 90 days — <b>what the ad says, the rate it advertises, and the conditions attached to it</b>. Filter by operator, by condition, or search the Thai copy. A rate is shown only when it survives the transcription check; where an ad clearly quoted a rate we could not read reliably, the row says so rather than printing a number that might be wrong.</p>
+    <div id="pulseadscov"></div>
+    <input class="search" id="pulseadsq" type="search" aria-label="Search the rival ad copy" placeholder="Search the ad copy (Thai or English)…" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" style="max-width:420px">
+    <div class="chips" id="pulseadsfeedctl" style="margin:6px 0;align-items:center;gap:6px;flex-wrap:wrap"></div>
+    <div id="pulseadsfeed"></div>
+
+    <p class="lead sub" id="pulseadsnote" style="margin-top:6px"></p>
+    <!-- FACEBOOK PULSE (2026-08-16) — "facebook is always the promo" (owner). A lender's rate card
+         below is the BoT-mandated CEILING; this is what it is winning customers with THIS WEEK, read
+         anonymously off each operator's own Facebook page. It renders ABOVE the rate board on
+         purpose and is never averaged with it. Surfaces data/rival_facebook.json
+         (build_rival_facebook.py, from pull_rival_facebook.js). Lazy, null-safe, graceful if absent. -->
+    <h3 class="compsub" style="margin-top:18px">Facebook pulse · what rivals are posting right now <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · rivals' own Facebook pages</span></h3>
+    <p class="lead">A lender's published rate card (below) is the <b>BoT-mandated disclosure — the legal ceiling</b>. Its Facebook post is what it is actually <b>winning customers with this week</b>, read anonymously off each operator's own page — one newest post per page per run, before the login wall. This feed leads the rate board on purpose and is <b>never averaged</b> with it.</p>
+    <div class="insight" id="fbreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <div id="fbpromolist"></div>
+    <details id="fbcorpwrap" style="margin-top:10px"><summary class="sub" style="cursor:pointer">Corporate-page posts — not about the vehicle-loan product (<span id="fbcorpcount">0</span>)</summary><div id="fbcorplist"></div></details>
+    <details id="fbsilentwrap" style="margin-top:10px"><summary class="sub" style="cursor:pointer">No post captured this run (<span id="fbsilentcount">0</span>)</summary><div id="fbsilentlist"></div></details>
+    </details>
+
+    <!-- ④ OWNED — ground each brand controls: its YouTube channel and its own site's promo feed. -->
+    <details class="compsec" id="sec-owned">
+    <summary><h2 class="opp">④ Owned · what each brand publishes on its own ground <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2><span class="ovsec-what">YouTube channels and cadence, plus the promo feed pulled from each rival's own website</span></summary>
+    <p class="lead">The unpaid half. A brand's YouTube channel and its own promo page cost nothing per impression,
+      so cadence here is a read on <b>commitment</b> rather than budget — and the field is markedly quieter on
+      ground it owns than on ground it rents. Our own <b lang="th">เงินไชโย</b> channel is included as the control.</p>
+
+    <h3 class="compsub" style="margin-top:18px">Video pulse · what the field is publishing on YouTube <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · YouTube Data API</span></h3>
+    <p class="lead">The organic half of rival marketing, <b>including our own เงินไชโย channel</b> as the control: audience size, how often each operator publishes, how its recent videos actually perform, and what its titles push. Subscriber counts are <b>rounded by YouTube itself</b> at scale, so read them as bands. A channel with <b>few subscribers but very high median views</b> is buying paid video placement rather than earning reach — that gap is called out. Title themes use the <b>same</b> keyword lexicon as the ad copy above, so paid and organic messaging are comparable (<b>estimated</b>).</p>
+    <div class="insight" id="pulsevidreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="pulsevidtbl"></table>
+    <p class="lead sub" id="pulsevidnote" style="margin-top:6px"></p>
+    <h3 class="compsub" style="margin-top:18px">Live rival promotions &amp; campaigns <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · rivals' own sites</span></h3>
+    <div class="insight" id="pulsepromoreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span></div></div>
+    <div id="pulsepromolandscape"></div>
+    <details id="pulsepromorawwrap" style="margin-top:10px"><summary class="sub" style="cursor:pointer">Raw promo feed (line items, by brand)</summary><div id="pulsepromolist"></div></details>
+    </details>
+
+    <!-- ⑤ MESSAGE–MARKET FIT — the say/hear gap, the one section that compares the other four. -->
+    <details class="compsec" id="sec-fit">
+    <summary><h2 class="opp">⑤ Message–market fit · what the field says vs what customers raise <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED counts</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED themes</span></h2><span class="ovsec-what">Every customer document and every lender document scored on one shared Thai phrase list</span></summary>
+    <p class="lead">The section that reads the other four against each other. Everything customers wrote and
+      everything lenders published, counted on the <b>same</b> Thai phrase list — so "what the industry keeps
+      saying" and "what customers actually raise" sit on one axis.</p>
+
+    <!-- CHART-KIT RULE CHECK (see the header comment on svgBars in app.js: "never chart an
+         ESTIMATE"). The two SHARES plotted here are measured document counts — re-derivable by hand
+         from the file — and the chart is ordinal: it is read for WHICH themes diverge and in which
+         direction. What is estimated is the theme BUCKETING (a keyword lexicon), so the chart
+         carries the ESTIMATED tag in its own heading and the panel keeps the "read the ordering,
+         not the size of each gap" instruction that governed the table. It is not a composite or a
+         score, which is what that rule exists to keep out of charts. -->
+    <div class="chartwrap" id="gapchart"></div>
+
+    <h3 class="compsub" style="margin-top:18px">Say / hear gap · what the field advertises vs what customers raise <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED counts</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED themes</span></h3>
+    <p class="lead">Every channel above read on <b>one axis</b>. Everything customers wrote (forum posts, app reviews, comments under the rivals' videos) and everything lenders published (ad creatives, promo pages) counted against the <b>same</b> Thai phrase list — so "what the industry keeps saying" and "what customers actually raise" can be compared directly. Document <b>counts are measured</b> and re-derivable by hand; the phrase list ships inside <code>social_themes.json</code>. The <b>theme buckets are estimated</b> editorial judgement — a theme absent from the list reads as zero, so absence is not evidence of absence. Read the <b>ordering</b>, not the size of each gap: an ad exists to make a claim while a comment is an unprompted reaction, so the two denominators differ in kind.</p>
+    <div class="insight" id="themesreadout" style="border-left-color:var(--collat)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="themestbl"></table>
+    <h4 class="compsub" style="margin-top:14px;font-size:13px">What the ads ask people to do — paid mechanic vs what they actually do by hand</h4>
+    <p class="lead sub">Counted over <b>paid</b> supply only (ad creatives + promo pages), because a call to action is a campaign mechanic. The <b>organic</b> column is the same phrase counted in the lenders' own unpaid forum replies — customer <b>service</b>, not a campaign. Read the two together: the field answers people conversationally by hand, and never buys it.</p>
+    <table class="tbl" id="themectatbl"></table>
+    <p class="lead sub" id="themesnote" style="margin-top:6px"></p>
+    </details>
+
+    </div><!-- /brandswitch -->
+
+    <!-- The pull diff closes the tab rather than opening it: it is only legible once a reader knows
+         what the channels are. Silent when only one pull vintage exists. -->
+    <!-- WHAT CHANGED, before what's live. Everything else in this section is a snapshot of the
+         rival field right now; this is the only place that says what MOVED since the previous
+         pull. Driven by rival_watch.json, a pure diff layer — it re-counts nothing and emits a
+         movement only where a dated first_seen/last_seen/last_shown field proves it. Rendered by
+         renderRivalWatch(); silent when only one pull vintage exists. -->
+    <h3 class="compsub">What changed since the last pull <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED diff</span></h3>
+    <div id="rivalwatch"></div>
   </section>
 
   <!-- EXPOSURE / CONCENTRATION -->

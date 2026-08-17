@@ -1202,6 +1202,17 @@ function barHTML(v,color,max=100){return `<span class="bar"><i style="width:${Ma
    ============================================================================ */
 function svgEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
+/* SVG <text> does not wrap and does not clip to a box — a row label longer than its gutter simply
+   runs off the LEFT of the viewBox and is cut by it, which silently turns "How do I apply / who do
+   I contact" into "w do I apply / who do I contact". A truncated label is honest; a beheaded one
+   invents a word. Callers keep the FULL string in the row's <title>, so nothing is lost on hover.
+   The divisor is an em-width estimate for the 10.5px sans these charts label in. */
+function svgClip(s,labW){
+  s=String(s==null?'':s);
+  const n=Math.max(6,Math.floor((labW-14)/5.6));
+  return s.length>n?s.slice(0,n-1).trimEnd()+'…':s;
+}
+
 /* Diverging horizontal bars around a zero axis — the right shape for YoY moves, because the
    direction of a set of numbers has to be visible at a glance rather than read row by row.
    rows: [{label, value, color?, note?}]. Returns '' if no finite value.
@@ -1228,7 +1239,10 @@ function svgBars(rows,opt){
     const y=padT+i*rowH, w=Math.abs(r.value)*scale;
     const x=r.value<0?zero-w:zero;
     const col=r.color||(r.value>0?'var(--up)':r.value<0?'var(--agri)':'var(--dim)');
-    const txt=(r.value>0?'+':'')+r.value+unit;
+    // opt.plus:false for magnitudes that are never signed — a share of 9.8% printed as "+9.8%"
+    // reads as a CHANGE of 9.8 points, which is a different claim entirely. Default keeps the
+    // signed behaviour every existing caller relies on.
+    const txt=(opt.plus!==false&&r.value>0?'+':'')+r.value+unit;
     parts.push(`<g><title>${svgEsc(r.label)}: ${svgEsc(txt)}${r.note?' — '+svgEsc(r.note):''}</title>`
       +`<text class="cbars-l" x="${labW-8}" y="${y+rowH/2}">${svgEsc(r.label)}</text>`
       +`<rect class="cbars-b" x="${x.toFixed(1)}" y="${y+3}" width="${Math.max(w,0.8).toFixed(1)}" height="${rowH-8}" fill="${col}" rx="1.5"/>`
@@ -1305,6 +1319,77 @@ function svgDots(rows,opt){
   parts.push('</svg>');
   return parts.join('');
 }
+/* Dumbbell — ONE row, TWO measures of the same thing, joined by a connector.
+   Added 2026-08-17 for the Brand tab: every title lender rates roughly a star lower on the Apple
+   App Store than on Google Play, and that is a fact about the two rating populations, not about any
+   one brand. Two separate tables cannot show it; a dumbbell shows it in one glance, because the
+   connectors all lean the same way.
+
+   rows: [{label, a, b, us?}] — `a` and `b` are the two values, `us` highlights our own row.
+   opt: {aName, bName, unit, min, max, aria}. Returns '' if no row has both values. */
+function svgDumbbell(rows,opt){
+  opt=opt||{};
+  const R=(rows||[]).filter(r=>r&&typeof r.a==='number'&&isFinite(r.a)&&typeof r.b==='number'&&isFinite(r.b));
+  if(!R.length) return '';
+  const unit=opt.unit==null?'':opt.unit;
+  const rowH=opt.rowH||18, padT=16, labW=opt.labW||124, W=560, H=padT+8+R.length*rowH;
+  const vals=R.reduce((a,r)=>a.concat([r.a,r.b]),[]);
+  const lo=opt.min!=null?opt.min:Math.min(...vals), hi=opt.max!=null?opt.max:Math.max(...vals);
+  const span=(hi-lo)||1, plotL=labW, plotR=W-52;
+  const x=v=>plotL+(plotR-plotL)*(v-lo)/span;
+  const cA=opt.aColor||'var(--merch)', cB=opt.bColor||'var(--collat)';
+  const p=[`<svg class="cbars" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${svgEsc(opt.aria||'Paired comparison')}">`];
+  // Legend sits INSIDE the viewBox so it scales with the chart rather than drifting from it.
+  p.push(`<g><circle cx="${plotL}" cy="7" r="3.1" fill="${cA}"/><text class="cbars-lg" x="${plotL+8}" y="7">${svgEsc(opt.aName||'A')}</text>`
+    +`<circle cx="${plotL+92}" cy="7" r="3.1" fill="${cB}"/><text class="cbars-lg" x="${plotL+100}" y="7">${svgEsc(opt.bName||'B')}</text></g>`);
+  R.forEach((r,i)=>{
+    const y=padT+8+i*rowH-rowH/2+rowH/2, xa=x(r.a), xb=x(r.b);
+    const sh=svgEsc(svgClip(r.label,labW));
+    const lab=r.us?`<tspan class="cbars-us">${sh}</tspan>`:sh;
+    p.push(`<g><title>${svgEsc(r.label)} — ${svgEsc(opt.aName||'A')}: ${r.a}${unit} · ${svgEsc(opt.bName||'B')}: ${r.b}${unit}</title>`
+      +(r.us?`<rect class="cbars-usbg" x="0" y="${y-rowH/2+1}" width="${W}" height="${rowH-2}"/>`:'')
+      +`<text class="cbars-l" x="${labW-8}" y="${y}">${lab}</text>`
+      +`<line class="cdot-s" x1="${xa.toFixed(1)}" y1="${y}" x2="${xb.toFixed(1)}" y2="${y}" stroke="var(--mid)"/>`
+      +`<circle class="cdot" cx="${xa.toFixed(1)}" cy="${y}" r="3.2" fill="${cA}"/>`
+      +`<circle class="cdot" cx="${xb.toFixed(1)}" cy="${y}" r="3.2" fill="${cB}"/>`
+      +`<text class="cbars-v" x="${W-6}" y="${y}" fill="${r.b<r.a?'var(--agri)':'var(--up)'}">${(r.b-r.a>0?'+':'')+(r.b-r.a).toFixed(2)}</text></g>`);
+  });
+  p.push('</svg>');
+  return p.join('');
+}
+
+/* Diverging PAIR bars — supply left of the axis, demand right of it, on a shared scale.
+   Added 2026-08-17 for the say/hear gap. Unlike svgBars (one signed value per row) this plots two
+   independent positives that face away from each other, which is the only shape that makes "the
+   field shouts about this, customers never mention it" legible without arithmetic.
+
+   rows: [{label, left, right, note?}] as PERCENTAGE SHARES of their own side's document total. */
+function svgGapBars(rows,opt){
+  opt=opt||{};
+  const R=(rows||[]).filter(r=>r&&(isFinite(r.left)||isFinite(r.right)));
+  if(!R.length) return '';
+  const rowH=opt.rowH||21, padT=18, labW=opt.labW||150, numW=54, W=560, H=padT+6+R.length*rowH;
+  const mx=Math.max(...R.map(r=>Math.max(r.left||0,r.right||0)))||1;
+  const plotL=labW, plotR=W-numW, mid=(plotL+plotR)/2, half=(plotR-plotL)/2;
+  const cL=opt.leftColor||'var(--gold)', cR=opt.rightColor||'var(--merch)';
+  const p=[`<svg class="cbars" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${svgEsc(opt.aria||'Supply versus demand by theme')}">`];
+  p.push(`<text class="cbars-lg" style="text-anchor:end" x="${mid-6}" y="7" fill="${cL}">◀ ${svgEsc(opt.leftName||'field says')}</text>`
+    +`<text class="cbars-lg" x="${mid+6}" y="7" fill="${cR}">${svgEsc(opt.rightName||'customers say')} ▶</text>`);
+  p.push(`<line class="cbars-ax" x1="${mid}" y1="${padT-6}" x2="${mid}" y2="${H-4}"/>`);
+  R.forEach((r,i)=>{
+    const y=padT+i*rowH, cy=y+rowH/2;
+    const wl=(r.left||0)/mx*half, wr=(r.right||0)/mx*half;
+    const gap=(r.right||0)-(r.left||0);
+    p.push(`<g><title>${svgEsc(r.label)} — ${svgEsc(opt.leftName||'field')} ${(r.left||0).toFixed(1)}% of its documents · ${svgEsc(opt.rightName||'customers')} ${(r.right||0).toFixed(1)}%${r.note?' — '+svgEsc(r.note):''}</title>`
+      +`<text class="cbars-l" x="${labW-10}" y="${cy}">${svgEsc(svgClip(r.label,labW))}</text>`
+      +(wl>0?`<rect class="cbars-b" x="${(mid-wl).toFixed(1)}" y="${y+4}" width="${Math.max(wl,0.8).toFixed(1)}" height="${rowH-9}" fill="${cL}" rx="1.5"/>`:'')
+      +(wr>0?`<rect class="cbars-b" x="${mid}" y="${y+4}" width="${Math.max(wr,0.8).toFixed(1)}" height="${rowH-9}" fill="${cR}" rx="1.5"/>`:'')
+      +`<text class="cbars-v" x="${W-6}" y="${cy}" fill="${gap<0?'var(--agri)':'var(--up)'}">${(gap>0?'+':'')+gap.toFixed(1)}</text></g>`);
+  });
+  p.push('</svg>');
+  return p.join('');
+}
+
 // honest n/a renderer for null measured fields (Batch 1 nulled some workforce releases)
 function naNum(v){return v==null?'<span class="sub" title="Not in the NSO release we have">n/a</span>':v.toLocaleString();}
 // honest renderer for NSO province fields NOT published for a province (e.g. กรุงเทพมหานคร/Bangkok has
@@ -1476,7 +1561,7 @@ function wrapTables(){
 // Per-route browser-tab titles: without these all hash routes share one <title>, so history
 // entries, bookmarks and open tabs are indistinguishable (and SPA route changes are silent to
 // screen readers). Keeps the brand suffix so the tab is still recognisable at a glance.
-const TAB_TITLES={home:'Command center',overview:'Macro',map:'Map view',assist:'Assistance',exposure:'Risk',acq:'Competition',trend:'Risk trend',provinces:'Provinces',market:'Market',branches:'Branches',sim:'Simulator'};
+const TAB_TITLES={home:'Command center',overview:'Macro',map:'Map view',assist:'Assistance',exposure:'Risk',acq:'Competition',brand:'Brand',trend:'Risk trend',provinces:'Provinces',market:'Market',branches:'Branches',sim:'Simulator'};
 function showTab(v){
   if(!v||!document.getElementById('v-'+v)) v='home';
   document.title=(TAB_TITLES[v]?TAB_TITLES[v]+' · ':'')+'AutoX · เงินไชโย';
@@ -1501,7 +1586,10 @@ function showTab(v){
   if(v==='exposure'){ renderExposure(); renderProducts(); }
   if(v==='sim'){ renderSim(); renderScenarios(); }
   if(v==='trend') renderTrend();
-  if(v==='acq'){ loadAmphoe(); renderAcqAnswerBand(); renderRivalBookImpact(); renderRivalWatch(); showOvPanel(PANEL_MEM.compswitch,{wrap:'compswitch',nav:'compjump'}); }
+  if(v==='acq'){ loadAmphoe(); renderAcqAnswerBand(); renderRivalBookImpact(); showOvPanel(PANEL_MEM.compswitch,{wrap:'compswitch',nav:'compjump'}); }
+  // Brand is LAZY on purpose — see the header comment on renderBrand(). renderRivalWatch() moved off
+  // the #acq line above with the #rivalwatch mount it draws into.
+  if(v==='brand'){ renderBrand(); showOvPanel(PANEL_MEM.brandswitch,{wrap:'brandswitch',nav:'brandjump'}); }
   renderImpactMounts(v);    // Region→Province→Branch drill on Home + the pillar front doors
   closeBranchSheet();   // the mobile branch sheet belongs to the map — never let it cover another tab
   window.scrollTo(0,0);
@@ -1571,9 +1659,13 @@ document.addEventListener('click',e=>{
 // click — resolves to the same target the static HTML already shows.
 // WAVE 2 (2026-08-09): compswitch's default moved from sec-search to sec-pulse — the owner is "very
 // keen on the social pulse … it's very dynamic and gets refreshed every day," it's the reason he
-// opens this tab. sec-search stays the FIRST chip in #compjump (unchanged tab order/scan path); only
-// which panel is open by default changed.
-const PANEL_MEM={ovswitch:'sec-ov-macro', compswitch:'sec-pulse'};
+// opens this tab. Only which panel opened by default changed.
+// SUPERSEDED IN PART 2026-08-17: sec-search no longer exists on #acq at all — share-of-search moved
+// to the Brand tab with the rest of the voice stack, and sec-pulse now holds pricing. The owner's
+// daily-refresh interest followed the pulse to #brand, where sec-sov is that switcher's default.
+// 2026-08-17: brandswitch joins them, defaulting to the share-of-voice scoreboard — the only panel
+// on that tab that states a position rather than listing a channel, so it is the one worth landing on.
+const PANEL_MEM={ovswitch:'sec-ov-macro', compswitch:'sec-pulse', brandswitch:'sec-sov'};
 function showOvPanel(id,opt){
   opt=opt||{};
   const wrapId=opt.wrap||'ovswitch', navId=opt.nav||'ovjump';
@@ -1603,12 +1695,16 @@ function showOvPanel(id,opt){
    switcher so the "one open at a time" rule holds however the reader gets there. Closing the only
    open panel is refused — an all-closed tab looks broken (secs.forEach above always sets exactly
    one `open`, by construction, so there is no code path that closes every panel). */
+// GENERALISED AGAIN 2026-08-17: the selector named #compswitch by id, so #brandswitch — the third
+// switcher, same .compswitch markup — got summaries that toggled natively and bypassed the
+// one-open-at-a-time rule entirely. Matching on the CLASS and reading the nav id off the wrapper's
+// own data-nav means a fourth switcher needs no edit here, only the two attributes in the markup.
 document.addEventListener('click',e=>{
-  const sm=e.target.closest&&e.target.closest('#ovswitch details.ovsec > summary, #compswitch details.compsec > summary');
+  const sm=e.target.closest&&e.target.closest('#ovswitch details.ovsec > summary, .compswitch details.compsec > summary');
   if(!sm) return;
   e.preventDefault();
-  const inComp=!!sm.closest('#compswitch');
-  showOvPanel(sm.parentElement.id, inComp?{wrap:'compswitch',nav:'compjump'}:undefined);
+  const wrap=sm.closest('.compswitch');
+  showOvPanel(sm.parentElement.id, wrap?{wrap:wrap.id,nav:wrap.dataset.nav||'compjump'}:undefined);
 });
 
 /* ---------- SECOND level: a sub-switcher INSIDE the long topics (2026-08-02) ----------
@@ -2976,27 +3072,27 @@ function renderCompetition(){
   $('#cws').innerHTML = `<tr><th scope="col">Collat</th><th scope="col">Vehicle</th><th scope="col">Gold</th><th scope="col">AutoX</th><th scope="col">Province</th><th scope="col">Branch</th></tr>`+
     META.cws.map(c=>`<tr><td class="mono" style="color:var(--collat)">${c.c}</td><td class="mono">${c.veh}</td><td class="mono">${c.gold}</td><td class="mono">${c.own}</td><td>${c.v}</td><td class="sub">${c.n}</td></tr>`).join('');
   renderGapBoard();
-  renderSearchDemand();
   renderPeerScore();
   renderDebtSource();
-  // ONE call paints both sentiment ladders. renderRivalIos() used to sit here as a second line, but it
-  // was a bare alias for renderRivalPulse() — the fetch resolves once and paintPulse() draws Play and
-  // iOS together, so the second call only re-entered the same guarded loader. It read like a separate
-  // data path in every review of this file. Removed 2026-07-31.
-  renderRivalPulse();
-  renderRivalFacebook();
+  // SPLIT 2026-08-17 — eight renderers left this function for renderBrand(): renderSearchDemand,
+  // renderRivalPulse (Play + iOS in one call), renderRivalFacebook, renderRivalAds, renderRivalVideo,
+  // renderPantip, renderSocialThemes and renderRivRep. Their mounts now live in #v-brand, so calling
+  // them here would find no host and return early — but more to the point, this function runs at
+  // boot() for every visitor, and those eight fetch ~950KB of JSON (rival_ads.json alone is 658KB)
+  // to paint a section nobody has opened. Brand pays for its own data on first open instead.
+  //
+  // WHAT STAYED, and why it is not an oversight: renderPromoGap and renderRateBoard are PRICING —
+  // an undercut is only meaningful against the card it undercuts, so splitting the pair would have
+  // left a verdict with no evidence. renderRivalUniverse is the operator census, i.e. competitive
+  // structure; its app-score column is baked in by build_rival_universe.py at build time, NOT read
+  // from RIVPULSE at render time, so it is unaffected by the pulse loader moving tabs.
   renderPromoGap();
   renderRateBoard();
-  renderRivalAds();
-  renderRivalVideo();
-  renderPantip();
-  renderSocialThemes();
   renderRivalUniverse();
   renderCompCoverage();
   renderRivalDensity();
   renderPeerProvince();
   renderPeerNpl();
-  renderRivRep();
   renderRivThreat();
   renderRivThreatRegion();
   renderPicoCompetitors();
@@ -4527,6 +4623,331 @@ function renderRivalBookImpact(){
   });
 }
 
+/* ============================================================================
+   BRAND TAB (⑥) — share of voice, reputation, message–market fit.
+   Created 2026-08-17. See the header comment on #v-brand in index.html for why the tab exists.
+
+   THIS FUNCTION IS THE LAZY BOUNDARY. renderCompetition() used to call eight of these renderers at
+   boot(), painting ~950KB of parsed JSON (rival_ads.json is 658KB on its own) into a section behind
+   a hash route nobody had visited. showTab('brand') calls this instead, on first open. Every
+   renderer below already carries its own `xLoaded` promise guard, so re-entry on each tab visit is
+   free — no extra once-flag is needed here, and adding one would break the redraw a resize wants.
+
+   The three functions written FOR this tab (answer band, reply-gap card, share-of-voice scoreboard,
+   earned join) read the SAME files the sections render in full. Nothing new is pulled. Their whole
+   job is to state a position the per-channel panels each individually could not. */
+function renderBrand(){
+  renderBrandAnswer();
+  renderReplyGap();
+  renderShareOfVoice();
+  renderEarnedJoin();
+  renderSearchDemand();
+  renderRivalPulse();      // one call paints BOTH the Play ladder and the iOS table
+  renderPantip();
+  renderRivRep();
+  renderRivalAds();
+  renderRivalFacebook();
+  renderRivalVideo();
+  renderSocialThemes();
+  renderRivalWatch();
+}
+
+/* The comparable Apple cohort. rival_pulse.ios mixes `title` lenders with `digital` ones (Finnix,
+   Promise, MoneyThunder rate 4.7–4.8★ and dwarf every title lender on mobile), so ranking ourselves
+   across the whole array would report us far worse than the truth against a set we do not compete
+   with. `thin` rows are excluded too — SAKSIAM's 4.67★ rests on nine ratings. */
+function brandIosCohort(pulse){
+  return ((pulse&&pulse.ios)||[]).filter(r=>r&&r.cohort==='title'&&!r.thin&&r.score!=null);
+}
+function brandRank(list,val,key){
+  const v=list.map(r=>r[key||'score']).filter(x=>x!=null).sort((a,b)=>b-a);
+  return {rank:v.indexOf(val)+1, n:v.length};
+}
+/* Never print an internal key at a reader. `GSB_MONEYDD answers 96.6%` is an analyst code in a
+   sentence meant for the owner — the standing instruction is that outsiders read plain names, not
+   codes. Falls back through the three shapes the social files use for a display name. */
+const brandLabel=s=>svgEsc((s&&(s.name||s.label||s.name_th||s.brand))||'');
+/* pantip_panel.json carries a 15th row, "The category itself (no brand named)" (tier:'category'),
+   for threads that discuss จำนำทะเบียน without naming a lender. It is not a competitor, and the
+   file's OWN headline excludes it — meta.n_brands is 14, not 15. Ranking against it reported us
+   7th of 15 directly above a headline saying 6th of 14. Exclude it everywhere it would be ranked
+   or summed, exactly as the builder does. */
+const pantipLenders=pan=>((pan&&pan.brands)||[]).filter(b=>b&&b.tier!=='category'&&b.est_threads!=null);
+const BRAND_ORD=n=>n+(['th','st','nd','rd'][(n%100-n%10!=10)*(n%10<4)*n%10]||'th');
+
+/* ---------- ① answer band — five POSITIONS, not five counts ----------
+   Same abTile contract as #overview and #acq. Every tile is skipped rather than defaulted when its
+   layer is absent, so a failed pull shortens the band and can never print a wrong number. */
+function renderBrandAnswer(){
+  const host=$('#brand-answer'); if(!host) return;
+  Promise.all(['rival_pulse','pantip_panel','social_themes'].map(n=>tmliFetch(n)))
+    .then(([pulse,pan,th])=>{
+    const T=[];
+    const sent=(pulse&&pulse.sentiment)||[];
+    const us=sent.find(s=>s.own);
+    const rivals=sent.filter(s=>!s.own&&s.score!=null).sort((a,b)=>b.score-a.score);
+
+    // 1. Google Play — the rating a customer sees before installing anything.
+    if(us&&us.score!=null&&rivals.length){
+      const r=brandRank(sent.filter(s=>s.score!=null),us.score);
+      const d=us.score-rivals[0].score;
+      T.push(abTile({k:'Google Play · เงินไชโย',cad:'Play Store',cadCls:'d',
+        v:us.score.toFixed(2),unit:'★',
+        move:`${d.toFixed(2)}★ vs ${brandLabel(rivals[0])} · ${BRAND_ORD(r.rank)} of ${r.n}`,
+        moveColor:d<0?'var(--agri)':'var(--merch)',
+        why:'no stored rating history yet',sub:'MEASURED · Google Play'}));
+    }
+    // 2. Apple, against the comparable cohort only (see brandIosCohort).
+    const coh=brandIosCohort(pulse), iosUs=coh.find(r=>r.own);
+    if(iosUs){
+      const r=brandRank(coh,iosUs.score);
+      T.push(abTile({k:'Apple App Store · เงินไชโย',cad:'App Store',cadCls:'d',
+        v:iosUs.score.toFixed(2),unit:'★',
+        move:`${BRAND_ORD(r.rank)} of ${r.n} title lenders on iOS`,
+        moveColor:r.rank>=r.n?'var(--agri)':'var(--mid)',
+        why:'Apple publishes no review dates',sub:'MEASURED · title-lender cohort only'}));
+    }
+    // 3. THE FREE LEVER. Answering a reviewer costs nothing and we do none of it.
+    if(us&&us.reply_rate_pct!=null){
+      const best=sent.filter(s=>!s.own&&s.reply_rate_pct!=null).sort((a,b)=>b.reply_rate_pct-a.reply_rate_pct)[0];
+      T.push(abTile({k:'We answer Play reviewers',cad:'Play Store',cadCls:'d',
+        v:us.reply_rate_pct.toFixed(1),unit:'%',
+        move:best?`${brandLabel(best)} answers ${best.reply_rate_pct.toFixed(1)}%`:'',
+        moveColor:us.reply_rate_pct<5?'var(--agri)':'var(--merch)',
+        why:'per-pull rate · no history retained',sub:'MEASURED · developer replies'}));
+    }
+    // 4. Share of conversation. Rank, never the multiple — the volume basis is an estimate.
+    const pb=pantipLenders(pan);
+    const pu=pb.find(b=>b.is_us);
+    if(pu&&pb.length){
+      const srt=pb.slice().sort((a,b)=>b.est_threads-a.est_threads);
+      const rank=srt.findIndex(b=>b.is_us)+1;
+      T.push(abTile({k:'Share of conversation · Pantip',cad:'Pantip',cadCls:'q',
+        v:BRAND_ORD(rank),unit:` of ${srt.length}`,
+        move:srt[0]&&!srt[0].is_us?`${srt[0].label} leads`:'',
+        moveColor:'var(--gold)',why:'one pull vintage · no history yet',
+        sub:'ESTIMATED volume · MEASURED text'}));
+    }
+    // 5. The widest divergence between what the field publishes and what customers raise.
+    const gaps=((th&&th.gap)||[]).filter(g=>!g.thin&&g.gap_pts!=null).sort((a,b)=>a.gap_pts-b.gap_pts);
+    if(gaps.length){
+      T.push(abTile({k:'Widest message–market gap',cad:'theme lexicon',cadCls:'q',
+        v:gaps[0].gap_pts.toFixed(1),unit:'pts',
+        move:`“${gaps[0].label}” — the field's loudest theme`,
+        moveColor:'var(--agri)',why:'one lexicon vintage',
+        sub:'MEASURED counts · ESTIMATED themes'}));
+    }
+    host.innerHTML=T.join('');
+    const note=$('#brand-answer-note');
+    if(note) note.innerHTML=T.length
+      ? 'Every tile is a <b>position against a named rival</b>, not a count of what we hold. Read the ordering; the underlying counts and their caveats are in the sections below.'
+      : '';
+  });
+}
+
+/* ---------- the finding the old layout structurally hid ----------
+   Two reply rates, same company, same customers, two channels. Until this tab existed they lived in
+   differently-ordered tables ~400px apart inside one accordion, so nobody ever put them on a line.
+   Rendered as a card rather than a chart: it is two numbers and a sentence, and a chart of two
+   numbers is decoration. Silent unless BOTH sides are present. */
+function renderReplyGap(){
+  const host=$('#brand-replygap'); if(!host) return;
+  Promise.all(['rival_pulse','pantip_panel'].map(n=>tmliFetch(n))).then(([pulse,pan])=>{
+    const sent=(pulse&&pulse.sentiment)||[];
+    const us=sent.find(s=>s.own);
+    const pu=pantipLenders(pan).find(b=>b.is_us);
+    if(!us||us.reply_rate_pct==null||!pu||pu.reply_rate==null){ host.innerHTML=''; return; }
+    const best=sent.filter(s=>!s.own&&s.reply_rate_pct!=null).sort((a,b)=>b.reply_rate_pct-a.reply_rate_pct).slice(0,3);
+    const theme=(us.themes||[])[0];
+    host.innerHTML=`<div class="insight risk" style="border-left-color:var(--agri)">
+      <b>We answer ${pu.reply_rate.toFixed(0)}% of Pantip threads and ${us.reply_rate_pct.toFixed(1)}% of Google Play reviews.</b>
+      Same customers, two channels — and the channel we ignore is the one where our rating is lowest
+      ${theme?`and the top complaint is <b lang="th">${svgEsc(theme.label)}</b> (${theme.n} of the 1–2★ sample)`:''}.
+      ${best.length?`The field's most responsive: ${best.map(b=>`${brandLabel(b)} <span class="mono">${b.reply_rate_pct.toFixed(1)}%</span>`).join(' · ')}.`:''}
+      <span class="sub">Both figures are MEASURED and already in the data — Pantip reply rate off ${pu.n_threads_sampled} sampled threads, Play reply rate off the developer-response field. Neither is new; only the join is.</span></div>`;
+  });
+}
+
+/* ---------- ① share of voice · AutoX's share of each tracked field ----------
+   The scoreboard that did not exist: each feed knew its own channel and none of them stated a rank.
+
+   WHY SHARE AND NOT RANK for the chart: the channels measure different things in different units
+   (stars, threads, creatives, subscribers), so a rank chart would put 3rd-of-10 next to 6th-of-14
+   and imply they are comparable. A SHARE of the tracked field is one unit — percent — and is
+   directly derivable from measured counts on every row. The equal-share line (1/n of the brands
+   tracked in that channel) is what turns a bare percentage into a position, so it colours each bar. */
+function renderShareOfVoice(){
+  const tbl=$('#sovtbl'); if(!tbl) return;
+  Promise.all(['rival_pulse','pantip_panel','rival_youtube','rival_ads','search_demand','rival_reputation']
+    .map(n=>tmliFetch(n))).then(([pulse,pan,yt,ads,sd,rep])=>{
+    const R=[], sum=(a,f)=>a.reduce((t,x)=>t+(Number(f(x))||0),0);
+
+    const sent=(pulse&&pulse.sentiment)||[], us=sent.find(s=>s.own);
+    if(us&&us.ratings!=null){
+      const tot=sum(sent,s=>s.ratings);
+      R.push({ch:'Google Play',what:'rating volume',ours:us.ratings,tot:tot,n:sent.length,
+        stand:us.score!=null?us.score.toFixed(2)+'★':'—',
+        lead:(()=>{const b=sent.filter(s=>!s.own&&s.score!=null).sort((a,b)=>b.score-a.score)[0];return b?`${brandLabel(b)} ${b.score.toFixed(2)}★`:'—';})(),
+        read:us.reply_rate_pct!=null&&us.reply_rate_pct<5?'we reply to almost none of them':'',us:true});
+    }
+    const coh=brandIosCohort(pulse), iu=coh.find(r=>r.own);
+    if(iu&&iu.ratings!=null){
+      R.push({ch:'Apple App Store',what:'rating volume',ours:iu.ratings,tot:sum(coh,r=>r.ratings),n:coh.length,
+        stand:iu.score.toFixed(2)+'★',
+        lead:(()=>{const b=coh.filter(r=>!r.own).sort((a,b)=>b.score-a.score)[0];return b?`${brandLabel(b)} ${b.score.toFixed(2)}★`:'—';})(),
+        read:'the whole category rates lower on iOS than on Play',us:true});
+    }
+    const pb=pantipLenders(pan), pu=pb.find(b=>b.is_us);
+    if(pu){
+      const srt=pb.slice().sort((a,b)=>b.est_threads-a.est_threads);
+      R.push({ch:'Pantip',what:'thread volume',ours:pu.est_threads,tot:sum(pb,b=>b.est_threads),n:pb.length,
+        stand:pu.est_threads.toLocaleString()+' threads',
+        lead:srt[0]&&!srt[0].is_us?`${brandLabel(srt[0])} ${srt[0].est_threads.toLocaleString()}`:'—',
+        read:pu.reply_rate!=null?`we do reply here — ${pu.reply_rate.toFixed(0)}%`:'',est:true,us:true});
+    }
+    // PARENT channels are NOT peers. Krungsri's คาร์ ฟอร์ แคช is the bank's whole auto-finance
+    // channel (521k subs), so build_rival_youtube.py fences it out of share_of_subs_pct and the
+    // video table tags it "excluded from share-of-voice". Counting it in the denominator here
+    // understated every title lender ~4x (ours read 0.2% against the file's own 0.7%) and named it
+    // the field leader. Same shape as the Pantip `tier:'category'` row and the iOS `thin` rows:
+    // the builder marks a row as not-a-peer and the front end must honour that, not re-rank past it.
+    const ch=((yt&&yt.channels)||[]).filter(c=>!c.is_parent_channel), yu=ch.find(c=>c.is_us);
+    if(yu&&yu.subscribers!=null){
+      const srt=ch.filter(c=>c.subscribers!=null).sort((a,b)=>b.subscribers-a.subscribers);
+      R.push({ch:'YouTube',what:'subscribers',ours:yu.subscribers,tot:sum(ch,c=>c.subscribers),n:srt.length,
+        pct:yu.share_of_subs_pct!=null?yu.share_of_subs_pct:null,   // the builder's own figure wins
+        stand:yu.subscribers.toLocaleString()+' subs',
+        lead:srt[0]&&!srt[0].is_us?`${brandLabel(srt[0])} ${srt[0].subscribers.toLocaleString()}`:'—',
+        read:yu.uploads_90d!=null?`${yu.uploads_90d} uploads in 90 days`:'',us:true});
+    }
+    // Google ads: a real, measured ZERO. It must render as a row saying so, never be filtered out —
+    // a dropped row reads as "not measured" when the finding is that we do not advertise at all.
+    const am=(ads&&ads.meta)||{}, ab=(ads&&ads.brands)||[];
+    if(am.n_ads!=null){
+      const oursAds=ab.filter(b=>b.is_us).length;
+      R.push({ch:'Google Ads',what:'ads running',ours:0,tot:am.n_ads,n:(am.coverage_n||(ads&&ads.coverage&&ads.coverage.length)||ab.length),
+        stand:oursAds?'advertising':'not advertising',
+        lead:`${ab.length} of ${(ads&&ads.coverage&&ads.coverage.length)||ab.length} operators do`,
+        read:'zero paid presence is a position, not a missing row',us:true,zero:true});
+    }
+    const provs=(sd&&sd.provinces)||[];
+    const withShare=provs.filter(p=>p.autox_share!=null);
+    if(withShare.length){
+      const mean=sum(withShare,p=>p.autox_share)/withShare.length;
+      const lead=withShare.filter(p=>p.best_rival&&p.autox_share>=p.best_rival.share).length;
+      R.push({ch:'Google Search',what:'share of search',ours:mean*100,tot:100,n:5,pct:mean*100,
+        stand:(mean*100).toFixed(1)+'% mean share',
+        lead:`we lead in ${lead} of ${provs.length} provinces`,
+        read:'the only channel measured province by province',est:true,us:true});
+    }
+    // Google Places: we hold NO rating across 2,015 branches. Same rule as the ads row — stated.
+    const rb=(rep&&rep.by_brand)||[];
+    if(rb.length){
+      const best=rb.slice().sort((a,b)=>b.rating_wavg-a.rating_wavg)[0];
+      R.push({ch:'Google Places',what:'service rating',ours:null,tot:null,n:rb.length,
+        stand:'no rating captured',
+        lead:`${best.brand} ${best.rating_wavg.toFixed(2)}★ (${best.reviews.toLocaleString()} reviews)`,
+        read:'2,015 branches and no Google reviews we can read — a blind spot',us:true,absent:true});
+    }
+
+    if(!R.length){
+      tbl.innerHTML='<tr><td class="sub">Share-of-voice needs at least one channel layer built — none resolved.</td></tr>';
+      return;
+    }
+    R.forEach(r=>{ if(r.pct==null) r.pct=(r.tot&&r.ours!=null)?r.ours/r.tot*100:(r.absent?null:0); });
+
+    // Chart: measured share of the tracked field, against that channel's own equal share.
+    const bars=R.filter(r=>r.pct!=null&&!r.absent).map(r=>{
+      const fair=r.n?100/r.n:0;
+      return {label:r.ch,value:Number(r.pct.toFixed(1)),
+        color:r.pct>=fair?'var(--merch)':r.pct===0?'var(--agri)':'var(--gold)',
+        note:`equal share of ${r.n} tracked brands would be ${fair.toFixed(1)}%`};
+    }).sort((a,b)=>b.value-a.value);
+    const cw=$('#sovchart');
+    if(cw) cw.innerHTML=svgBars(bars,{signed:false,plus:false,unit:'%',labW:104,
+      aria:'AutoX share of the tracked field, by channel'})
+      +`<p class="lead sub" style="margin:6px 0 0">Our <b>measured share of the tracked field</b> in each channel.
+         <b style="color:var(--merch)">Teal</b> = at or above an equal share of the brands tracked there,
+         <b style="color:var(--gold)">gold</b> = below it, <b style="color:var(--agri)">red</b> = zero presence.
+         Hover any bar for that channel's equal-share line. Google Places is charted nowhere because we hold no rating at all.</p>`;
+
+    tbl.innerHTML='<tr><th scope="col">Channel</th><th scope="col">Our standing</th><th scope="col">Share of field</th>'
+      +'<th scope="col">Field leader</th><th scope="col">Read</th></tr>'
+      +R.map(r=>{
+        const share=r.absent?'<span class="sub">n/a</span>'
+          :`<span class="mono">${r.pct.toFixed(1)}%</span> <span class="sub">of ${r.n}</span>`;
+        const tag=r.est?' <span class="tag opp">EST</span>':'';
+        return `<tr><td><b>${r.ch}</b><div class="sub">${r.what}${tag}</div></td>`
+          +`<td class="mono"${r.zero||r.absent?' style="color:var(--agri)"':''}>${r.stand}</td>`
+          +`<td>${share}</td><td class="sub">${r.lead}</td><td class="sub">${r.read||''}</td></tr>`;
+      }).join('');
+
+    const ro=$('#sovreadout');
+    if(ro){
+      const weak=R.filter(r=>r.zero||r.absent).length;
+      ro.innerHTML=`We are measurable in <b>${R.length-weak} of ${R.length}</b> public channels`
+        +(weak?` — and in <b>${weak}</b> our presence is a measured zero rather than a gap in the pull.`:'.')
+        +` ${TAG_M} <span class="sub">Assembled from the files rendered in full below; nothing extra is pulled for this table.</span>`;
+    }
+    wrapTables();
+  });
+}
+
+/* ---------- ② the earned ladder, JOINED ----------
+   Play stars, Play reply rate, iOS stars and Google service rating for the same brand on one row.
+   Four tables ordered four different ways is why the reply-rate gap above went unread for months. */
+function renderEarnedJoin(){
+  const tbl=$('#earnedjoin'); if(!tbl) return;
+  Promise.all(['rival_pulse','pantip_panel','rival_reputation'].map(n=>tmliFetch(n)))
+    .then(([pulse,pan,rep])=>{
+    const sent=((pulse&&pulse.sentiment)||[]).filter(s=>s.score!=null);
+    if(!sent.length){ tbl.innerHTML=''; return; }
+    const coh=brandIosCohort(pulse);
+    const ios=k=>coh.find(r=>r.key===k||r.brand===k);
+    // rival_reputation keys on a display brand name, the pulse on a code. Match loosely on the
+    // leading word rather than inventing a mapping table that would rot the next time a brand
+    // renames — an unmatched row simply renders '—', which is the honest outcome.
+    const repOf=b=>((rep&&rep.by_brand)||[]).find(x=>{
+      const a=String(x.brand||'').toLowerCase(), c=String(b.brand||'').toLowerCase(), d=String(b.name||'').toLowerCase();
+      return a&&(c.indexOf(a)===0||a.indexOf(c)===0||d.indexOf(a)>=0);
+    });
+    const pantipOf=b=>((pan&&pan.brands)||[]).find(x=>x.key===b.brand)||(b.own?((pan&&pan.brands)||[]).find(x=>x.is_us):null);
+    const rows=sent.slice().sort((a,b)=>b.score-a.score);
+
+    const dumb=rows.map(r=>{const i=ios(r.brand);return i?{label:r.name||r.brand,a:r.score,b:i.score,us:!!r.own}:null;}).filter(Boolean);
+    const cw=$('#earnedchart');
+    if(cw) cw.innerHTML=(dumb.length?svgDumbbell(dumb,{aName:'Google Play',bName:'Apple App Store',unit:'★',
+        min:2.5,max:5,labW:150,aria:'Google Play versus Apple App Store rating, by brand'}):'')
+      +`<p class="lead sub" style="margin:6px 0 0">The connectors all lean the same way: <b>every</b> title lender
+         rates lower on iOS than on Play. That is a fact about the two rating populations — iOS skews to the
+         higher-income borrower, and Apple's written sample skews negative — <b>not</b> a fact about any one brand.
+         Read our own position <i>within</i> the cohort, never the absolute drop. Right-hand figure is iOS minus Play.</p>`;
+
+    tbl.innerHTML='<tr><th scope="col">Brand</th><th scope="col">Play ★</th><th scope="col">Ratings</th>'
+      +'<th scope="col" title="share of Google Play reviews the developer has replied to — MEASURED">Play replies</th>'
+      +'<th scope="col">iOS ★</th><th scope="col" title="ESTIMATED thread volume — Pantip’s own reported total scaled by brand-name match rate">Pantip</th>'
+      +'<th scope="col">Places ★</th></tr>'
+      +rows.map(r=>{
+        const i=ios(r.brand), rp=repOf(r), pp=pantipOf(r);
+        const rr=r.reply_rate_pct;
+        const rrCol=rr==null?'':rr<5?'var(--agri)':rr>=50?'var(--merch)':'var(--gold)';
+        return `<tr${r.own?' class="rowus"':''}><td><b>${svgEsc(r.name||r.brand)}</b>${r.own?' <span class="tag demand">ours</span>':''}</td>`
+          +`<td class="mono">${r.score.toFixed(2)}</td>`
+          +`<td class="mono sub">${r.ratings!=null?r.ratings.toLocaleString():'—'}</td>`
+          +`<td class="mono"${rrCol?` style="color:${rrCol}"`:''}>${rr!=null?rr.toFixed(1)+'%':'—'}</td>`
+          +`<td class="mono">${i?i.score.toFixed(2):'<span class="sub">—</span>'}</td>`
+          +`<td class="mono sub">${pp&&pp.est_threads!=null?pp.est_threads.toLocaleString():'—'}</td>`
+          +`<td class="mono">${rp?rp.rating_wavg.toFixed(2):'<span class="sub">—</span>'}</td></tr>`;
+      }).join('');
+    const note=$('#earnedjoinnote');
+    if(note) note.innerHTML='A dash is <b>not</b> a zero — it means that brand has no row in that source '
+      +'(no iOS app in the title cohort, no Pantip term, or no rival branches sampled for Google reviews). '
+      +'iOS shows the <b>title-lender cohort only</b>: the digital lenders in the same file rate 4.7–4.8★ and '
+      +'are not a comparable set. Pantip volume is <b>ESTIMATED</b> — read the ordering, never the multiple.';
+    wrapTables();
+  });
+}
+
 /* ---------- rival pulse · live promotions + voice of customer (obj #2, MEASURED) ----------
    Surfaces data/rival_pulse.json (build_rival_pulse.py, from pull_rival_promos.py [Thai-IP pull of
    the rivals' own sites] + pull_app_reviews.py [Google Play, 5 apps incl. our own เงินไชโย]).
@@ -4654,6 +5075,32 @@ function drawSocialThemes(){
       (q?` <span class="sub">Biggest thing customers raise that nothing answers: <b>${q.label}</b> `+
       `(${pct(q.demand_share_pct)}, ${(q.demand_docs||0).toLocaleString()} documents`+
       `${q.no_counterpart?', no counterpart message at all':''}).</span>`:'');
+  }
+  /* DIVERGING CHART (2026-08-17, Brand tab) — the same rows the table below carries, drawn so the
+     divergence is visible without arithmetic. It sits ABOVE the table, never instead of it.
+
+     Against the chart-kit rule "never chart an ESTIMATE": what is plotted here are two MEASURED
+     document shares — re-derivable by hand from social_themes.json — and the chart is read
+     ORDINALLY, for which themes diverge and in which direction. The estimate is the theme
+     BUCKETING (a keyword lexicon), so the heading carries ESTIMATED and the caption below repeats
+     the panel's standing instruction to read the ordering rather than the size of any one gap.
+     No composite and no score is charted, which is what that rule exists to prevent. */
+  const gc=$('#gapchart');
+  if(gc){
+    const gr=ans.filter(a=>!a.thin&&(a.supply_share_pct!=null||a.demand_share_pct!=null))
+      .map(a=>({label:a.label,left:a.supply_share_pct||0,right:a.demand_share_pct||0,
+                note:a.no_counterpart?'no counterpart message at all':''}))
+      .sort((a,b)=>(a.right-a.left)-(b.right-b.left));
+    gc.innerHTML=(gr.length?svgGapBars(gr,{leftName:'the field advertises',rightName:'customers raise',
+        labW:158,aria:'Share of lender documents versus share of customer documents, by theme'}):'')
+      +`<p class="lead sub" style="margin:6px 0 0"><b>Left</b> is each theme's share of the
+        ${(m.supply_docs||0).toLocaleString()} lender documents; <b>right</b> is its share of the
+        ${(m.demand_docs||0).toLocaleString()} customer documents. Both shares are <b>measured counts</b>;
+        the right-hand figure is customers minus field, in points.
+        <b>Read the ordering, not the size of any one gap</b> — an ad exists to make a claim while a
+        comment is an unprompted reaction, so the two denominators differ in kind. The theme buckets
+        themselves are an <b>estimated</b> keyword read: a theme absent from the lexicon reads as zero,
+        so absence here is not evidence of absence.</p>`;
   }
   tbl.innerHTML=`<tr><th scope="col">Theme</th><th scope="col">Lenders say</th><th scope="col">Customers raise</th><th scope="col">Imbalance</th><th scope="col">Read</th></tr>`+
     over.concat(under).map(a=>{
