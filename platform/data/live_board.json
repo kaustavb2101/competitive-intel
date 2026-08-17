@@ -190,16 +190,16 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "25 observations from 2026-07-05, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 25,
+    "note": "26 observations from 2026-07-05, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 26,
     "series": "fuel_diesel"
    },
    "key": "fuel_prices",
    "label": "Diesel · retail pump",
    "measured": true,
    "source": "Bangchak retail oil-price API (www.bangchak.co.th/api/oilprice) — daily Bangkok reference prices; free, no key, cloud-reachable (EPPO/PTT/data.go.th are geoblocked).",
-   "stamp": "2026-08-16",
-   "stamp_iso": "2026-08-16",
+   "stamp": "2026-08-17",
+   "stamp_iso": "2026-08-17",
    "stamp_kind": "pulled",
    "unit": "฿/L",
    "value": 37.54,
@@ -214,8 +214,8 @@
    "history": {
     "file": "thai_price_history.json",
     "kind": "thai_farmgate",
-    "note": "19 months, 2025-01 → 2026-07, 14 commodities — NABC Thai farm-gate, 6 provinces quoting",
-    "points": 19,
+    "note": "20 months, 2025-01 → 2026-08, 14 commodities — NABC Thai farm-gate, 6 provinces quoting",
+    "points": 20,
     "series": "Rice"
    },
    "key": "farmgate_prices",
@@ -273,7 +273,7 @@
    "stamp_iso": "2026-08-17",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4016,
+   "value": 4429,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -296,8 +296,8 @@
    "stamp": "2026-08-17",
    "stamp_iso": "2026-08-17",
    "stamp_kind": "pulled",
-   "unit": "of 797",
-   "value": 120,
+   "unit": "of 796",
+   "value": 119,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -489,7 +489,7 @@
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
   "history_note": "A trend line is drawn only where a stored series exists. 10 of 23 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 250,
+  "history_points": 252,
   "missing_files": [],
   "n_feeds": 23,
   "n_with_history": 10,
