@@ -12791,13 +12791,14 @@ function renderHomeDataRoom(){
   PROVEN.layers.forEach(L=>{
     const fam=L.family;
     const name=dqEsc(L.file)+(fam?` <span class="sub">×${L.n_files}</span>`:'');
+    const nameTitle=(dqEsc(L.file)+(fam?` (×${L.n_files} files)`:'')).replace(/"/g,'&quot;');
     const shame=(L.n_unlabelled>0&&L.cls!=='unlabelled')?` <span class="dr-shame" title="${L.n_unlabelled} member file(s) have no meta stamp">△ ${L.n_unlabelled} unstamped</span>`:'';
     const src=L.source?dqEsc(L.source):(L.cls==='unlabelled'?'<span class="dr-shame">— no meta.source / meta.provenance</span>':'—');
     const cnt=L.count?`${L.count.toLocaleString()} ${dqEsc(L.count_of||'')}`:'';
     const vint=L.vintage?dqEsc(L.vintage)+' · ':'';
     const age=(L.age_days!=null)?`<span class="dr-age${L.age_days>staleThresh?' dr-age-stale':''}" title="${L.age_days} days behind the freshest committed layer">${L.age_days}d</span> · `:'';
     html+=`<tr class="dr-${L.cls}">`+
-      `<td><span class="dr-name">${name}</span>${shame}`+(L.label?`<span class="dr-desc">${dqEsc(L.label)}</span>`:'')+`</td>`+
+      `<td><span class="dr-name" title="${nameTitle}">${name}</span>${shame}`+(L.label?`<span class="dr-desc" title="${dqEsc(L.label).replace(/"/g,'&quot;')}">${dqEsc(L.label)}</span>`:'')+`</td>`+
       `<td>${prChip(L.cls)}</td>`+
       `<td class="dr-src"><span title="${L.source?dqEsc(L.source):''}">${src}</span></td>`+
       `<td class="num mono dr-size">${vint}${age}${prBytes(L.bytes)}${cnt?`<span class="dr-cnt">${cnt}</span>`:''}</td>`+
