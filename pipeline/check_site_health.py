@@ -3049,6 +3049,104 @@ def _shape_social_themes(d):
     return None
 
 
+def _shape_vehicle_fleet(d):
+    # The MEASURED national title-collateral FLEET trend on Overview (#overview),
+    # obj #1 — the eager loadFleetData() -> renderCollatOutlook() card on the DEFAULT
+    # nav route (index.html #collat-outlook). It adds the TIME dimension the single-
+    # vintage province vehicle stock lacks: whether the collateral BASE (the pool AutoX
+    # lends against and recovers on) is growing or shrinking. renderCollatOutlook gates
+    # the fleet cards on `Array.isArray(FLEET.classes)`, keys the classes by `c.key`, and
+    # for 'pickup' and 'moto' pushes a card only when `c.yoy_pct != null`, reading
+    # `c.yoy_pct` (.toFixed(2)) + `c.latest` (.toLocaleString()); the year label reads
+    # `latest_year_ce || meta.latest_year_ce`. The fetch is `r.ok ? r.json() : null` +
+    # `.catch(()=>null)`-guarded and the cards simply don't push when FLEET is null, so a
+    # truncated/404 CDN deploy SILENTLY drops the measured collateral-base-direction cards
+    # from the exec Overview with NO phone alert — the same "broken demo" blind spot the
+    # sibling collateral_flow / vehicle_registry obj-#1 probes closed. Asserts the render
+    # contract (a non-empty .classes list carrying pickup/moto with numeric yoy_pct +
+    # latest, plus a resolvable latest year) as SHAPE not values — robust to a future
+    # DLT/MOT registry vintage bump.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    classes = d.get("classes")
+    if not isinstance(classes, list) or not classes:
+        return "missing/empty 'classes' list (renderCollatOutlook gate: Array.isArray(FLEET.classes))"
+    byk = {c.get("key"): c for c in classes if isinstance(c, dict)}
+    hit = None
+    for k in ("pickup", "moto"):
+        c = byk.get(k)
+        if (isinstance(c, dict)
+                and isinstance(c.get("yoy_pct"), (int, float)) and not isinstance(c.get("yoy_pct"), bool)
+                and isinstance(c.get("latest"), (int, float)) and not isinstance(c.get("latest"), bool)):
+            hit = k
+            break
+    if hit is None:
+        return ("no 'pickup'/'moto' class with numeric yoy_pct + latest "
+                "(the two collateral-base-direction cards renderCollatOutlook reads)")
+    yr = d.get("latest_year_ce")
+    if yr is None and isinstance(d.get("meta"), dict):
+        yr = d["meta"].get("latest_year_ce")
+    if yr is None:
+        return "no 'latest_year_ce' (top-level or meta) — the YoY card year-label read"
+    return None
+
+
+def _shape_income_floor(d, income_key, has_data_fn):
+    # Shared shape for the three MEASURED NSO-SES-2566 occupation income-FLOOR layers
+    # (factory_income_by_province / agri_income_by_province / sme_income_by_province) —
+    # obj #1 borrower-repayment-capacity context, keyed by province Thai name. Each
+    # province row carries a numeric `<occ>_income` (THB/mo) + `ratio_to_national` (the
+    # `<1` = below-the-national-floor comparison every renderer gates on). All three
+    # renderers degrade FULLY SILENTLY when the layer is missing (factincHasData /
+    # agrincHasData / smeincHasData go false -> the context card/note is simply not
+    # emitted, NO placeholder, NO phone alert), so a truncated/404 CDN deploy drops the
+    # measured income-floor context unnoticed. IMPORTANT: the builders are deterministic +
+    # network-free and emit a {meta:{absent:true}} sentinel when the NSO source is
+    # unavailable, which the app treats as "no data" BY DESIGN — so meta.absent==true is
+    # HEALTHY (not an outage), exactly as the client branches on `meta.absent`; only a
+    # NON-absent file must carry the populated shape. Asserts SHAPE not values — robust to
+    # a future SES vintage.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    if meta.get("absent") is True:
+        return None  # legitimately absent by design -> healthy; the app degrades gracefully
+    provs = d.get("provinces")
+    if not isinstance(provs, dict) or not provs:
+        return "missing/empty 'provinces' map (client %s() render gate)" % has_data_fn
+    v0 = next(iter(provs.values()))
+    if not isinstance(v0, dict):
+        return "first province value is not an object"
+    if not isinstance(v0.get("ratio_to_national"), (int, float)) or isinstance(v0.get("ratio_to_national"), bool):
+        return "first province missing numeric 'ratio_to_national' (the <1 below-floor render gate)"
+    if not isinstance(v0.get(income_key), (int, float)) or isinstance(v0.get(income_key), bool):
+        return "first province missing numeric '%s' (income-floor render read)" % income_key
+    return None
+
+
+def _shape_factory_income(d):
+    # The Simulator (#sim) factory-slowdown lever (renderSimFactory reads
+    # FACTINC[branch.v].ratio_to_national to name manufacturing-base branches whose NSO-SES
+    # factory-worker income already runs below the national floor).
+    return _shape_income_floor(d, "factory_income", "factincHasData")
+
+
+def _shape_agri_income(d):
+    # The Simulator (#sim) crop-price/rainfall what-if (computeSim reads
+    # AGRIINC[prov.th].ratio_to_national for the measured agri-worker income-floor context
+    # beside the ESTIMATED agri-stress scenario).
+    return _shape_income_floor(d, "agri_income", "agrincHasData")
+
+
+def _shape_sme_income(d):
+    # The Exposure (#exposure) merchant-segment risk readout (renderRiskReadouts reads the
+    # worst-first SMEINC_LIST[0] .province / .sme_income / .ratio_to_national — the
+    # SME-owner income-floor proxy for the merchant-lending segment).
+    return _shape_income_floor(d, "sme_income", "smeincHasData")
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -3124,6 +3222,13 @@ DATA_FILES = [
     # sweep, but the committed files must still serve intact for the next
     # build_macro_book rebuild.)
     ("data/vehicle_registry.json", _shape_vehicle_registry, "latest.groups (4 classes) + latest.title_base/all_vehicles (Overview collateral base, obj #1)"),
+    # The MEASURED national title-collateral FLEET TREND (renderCollatOutlook, eager on
+    # the default #overview route) — the DLT/MOT registry companion to vehicle_registry
+    # above: it puts a real YoY number on whether the pickup/motorcycle collateral BASE
+    # is growing or shrinking. Its fetch is r.ok?json():null + .catch-guarded and the
+    # cards silently vanish when null, so a truncated/404 deploy blanks the measured
+    # collateral-direction cards with no phone alert. Was surfaced-but-unprobed.
+    ("data/vehicle_fleet.json", _shape_vehicle_fleet, ".classes pickup/moto with numeric yoy_pct+latest + latest year (Overview collateral-base trend, obj #1)"),
     # The new-vehicle first-registration TREND (renderBrandTrends, eager on the
     # default #overview route) — the leading indicator for the FUTURE used-title
     # collateral pool, obj #1. Whole-block silent-hide when new_regis_trend lacks
@@ -3159,6 +3264,20 @@ DATA_FILES = [
     ("data/crop_landuse.json", _shape_crop_landuse, ".amphoe (~928, name_en/province_th/dominant_crop) + meta.crops (province Crops lens)"),
     ("data/crop_farmer_income.json", _shape_crop_farmer_income, ".crops (price_thb_per_kg + per-province rows) (province farmer-income drill, obj #1)"),
     ("data/province_cropland.json", _shape_province_cropland, "slug-keyed .provinces w/ total_ha + meta.crops (province measured-area line, obj #1)"),
+    # The three MEASURED NSO-SES-2566 occupation income-FLOOR layers (obj #1 borrower-
+    # repayment-capacity context), all surfaced-but-unprobed. Each degrades FULLY SILENTLY
+    # when absent (factincHasData/agrincHasData/smeincHasData go false -> the context
+    # card/note is simply not emitted, no placeholder, no phone alert), so a truncated/404
+    # deploy drops the measured income-floor read unnoticed. All three carry a legitimate
+    # {meta:{absent:true}} sentinel their builders emit when the NSO source is unavailable,
+    # which the validator treats as HEALTHY (not an outage), exactly as the app does:
+    #  - factory_income (#sim factory-slowdown lever: which manufacturing-base branches sit
+    #    below the national factory-worker income floor);
+    #  - agri_income (#sim crop-price/rainfall what-if income-floor context);
+    #  - sme_income (#exposure merchant-segment income floor, SME-owner occupation).
+    ("data/factory_income_by_province.json", _shape_factory_income, "province-keyed .provinces w/ factory_income+ratio_to_national (#sim factory income floor, obj #1; meta.absent ok)"),
+    ("data/agri_income_by_province.json", _shape_agri_income, "province-keyed .provinces w/ agri_income+ratio_to_national (#sim agri income floor, obj #1; meta.absent ok)"),
+    ("data/sme_income_by_province.json", _shape_sme_income, "province-keyed .provinces w/ sme_income+ratio_to_national (#exposure merchant income floor, obj #1; meta.absent ok)"),
     # The competition pillar's flagship exec layer (obj #2) — the per-province
     # peer board (AutoX next to each big-4 rival, per province) that powers the
     # Competition surface + the command-center thesis clause. Every default-route
