@@ -248,6 +248,26 @@ FEEDS = [
          label="OAE dry-season (second) rice-crop production per province (feeds napprang)",
          cadence="weekly", ip="any", group="macro", out="source-data/oae_napprang.json"),
 
+    # A FOURTH OAE feed in the same silent-stale class as oae_yield/oae_napprang above: it fed a
+    # WIRED, --check-gated builder yet sat in NO scheduler, ageing in silence — last pull 2026-07-20
+    # (28 days). Chain: pull_oae_farm_economics.py -> source-data/oae_farm_economics.json ->
+    # build_crop_farmer_income.py (real per-crop FARMING-HOUSEHOLD denominator + net return, tests/run.sh
+    # L199, rc=3 SKIP when the source is absent) -> crop_farmer_income.json (live in platform/province.html).
+    # This is the obj-#1 signal that rice/cassava/rubber run a NEGATIVE net return per household (a real
+    # loss) — a portfolio-risk read for agri borrowers. Its own pull_oae_farm_economics.py --check is also
+    # gated (tests/run.sh L174). rederive_drift.py rebuilds crop_farmer_income on the next fresh pull.
+    # UNLIKE the two stdlib-only OAE feeds above, this one parses the OAE Cai-up compendium PDF via
+    # ingest_pdf.extract_pdf, which needs pdfplumber (already installed) AND pymupdf/fitz — pymupdf was
+    # ADDED to data-swarm.yml's pip line the same run (it is the first swarm feed on the fitz path).
+    # VERIFIED reachable + deterministic + valid from THIS cloud runner 2026-08-17 (so it does not become
+    # the retired-oae_prices permanently-red-feed anti-pattern): ran live EXIT=0, all 6 crop spot-anchors
+    # + the national household net-cash-income anchor passed (rice net -1,433, cassava -320, rubber -2,460,
+    # oilpalm +3,080 THB/ton), and --check reproduced byte-exact from the cached PDF — only the --stamp
+    # moved vs the committed vintage (the drift was reverted; the SCHEDULE is the improvement).
+    dict(key="oae_farm_economics", script="pull_oae_farm_economics.py", args=["--stamp", STAMP],
+         label="OAE per-household crop economics + farm-household income/debt (feeds crop_farmer_income)",
+         cadence="weekly", ip="any", group="macro", out="source-data/oae_farm_economics.json", timeout=600),
+
     dict(key="bot_uvpi", script="pull_bot_uvpi.py", args=["--stamp", STAMP],
          label="BoT Used Vehicle Price Index (collateral-recovery anchor; feeds collateral_outlook)",
          cadence="monthly", ip="any", group="macro", out="source-data/bot_uvpi.json"),
