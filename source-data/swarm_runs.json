@@ -3,7 +3,7 @@
   "generated_by": "pipeline/pull_swarm.py",
   "label": "Each row is one swarm run: which feeds were pulled concurrently, whether each one succeeded / changed its declared output file / failed / timed out / was skipped (exit 3, the repo-wide SKIP convention), plus the rc of the append_history.py and rederive_drift.py steps that followed. This file makes the pulse observable.",
   "max_runs": 60,
-  "n_runs": 21,
+  "n_runs": 22,
   "title": "pull_swarm.py run history -- the swarm's own audit trail"
  },
  "runs": [
@@ -1393,6 +1393,77 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-08-17T10:08:07Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7110,
+     "bytes_before": 7111,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 3.6,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8879,
+     "bytes_before": 8861,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 4.1,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 3989,
+     "bytes_before": 3989,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 117.7,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 24189,
+     "bytes_before": 24189,
+     "key": "nabc_agri",
+     "rc": 0,
+     "seconds": 13.1,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 1797,
+     "bytes_before": 3236,
+     "key": "macro",
+     "rc": 0,
+     "seconds": 4.4,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 7903,
+     "bytes_before": 7903,
+     "key": "oae_farm_economics",
+     "rc": 0,
+     "seconds": 21.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 79625,
+     "bytes_before": 168977,
+     "key": "place_ratings",
+     "rc": 0,
+     "seconds": 57.8,
+     "status": "changed"
+    }
+   ],
+   "finished": "2026-08-17T15:55:41Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 6,
+   "n_failed": 0,
+   "n_ok": 7,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-08-17T15:53:44Z"
   }
  ]
 }

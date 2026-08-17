@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_place_ratings.py",
   "label": "MEASURED — Google Places (New) Place Details rating + userRatingCount, joined onto the scout's rival place_ids. A SAMPLE (the located subset), not the full census. AutoX-branch reputation is NOT obtainable (our branches have no captured place_ids and are not findable by text search) — stated, not inferred.",
   "source": "Google Places API (New) · Place Details",
-  "n_rated": 1171,
+  "n_rated": 547,
   "n_scout": 1740
  },
  "ratings": [
@@ -41,7 +41,7 @@
    "brand": "Krungsri",
    "prov": "นครศรีธรรมราช",
    "rating": 5,
-   "n": 4
+   "n": 3
   },
   {
    "place_id": "ChIJbzq62zh1szERi1K_1pUFn6c",
@@ -51,60 +51,18 @@
    "n": 1
   },
   {
-   "place_id": "ChIJg4leZk6nIjER1HOlIvSGjYE",
-   "brand": "Krungsri",
-   "prov": "มหาสารคาม",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ0zQmIPOmIjERNWc7nZFOAJU",
-   "brand": "Krungsri",
-   "prov": "มหาสารคาม",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ1daBhzFQVjAR01nGte5soPw",
-   "brand": "Krungsri",
-   "prov": "ระนอง",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJCzh6Djvx4TAR0qj9JudnTMo",
-   "brand": "Krungsri",
-   "prov": "สิงห์บุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJizdW7yA54jARqdMPy8EY1QM",
-   "brand": "Krungsri",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 2
-  },
-  {
    "place_id": "ChIJHxqx6BxjHTERj0IWdez9Um8",
    "brand": "Krungsri",
    "prov": "กรุงเทพมหานคร",
    "rating": 4.7,
-   "n": 55
+   "n": 54
   },
   {
    "place_id": "ChIJk_Zj7J2D4jARLnUIa7wSD0Y",
    "brand": "Krungsri",
    "prov": "กรุงเทพมหานคร",
    "rating": 4.6,
-   "n": 39
-  },
-  {
-   "place_id": "ChIJGQ0npukiFjERX4pF7AnLe9o",
-   "brand": "Krungsri",
-   "prov": "อำนาจเจริญ",
-   "rating": 4.6,
-   "n": 5
+   "n": 38
   },
   {
    "place_id": "ChIJJ3IhqTEqHDERX0e_7a8gnOM",
@@ -114,88 +72,18 @@
    "n": 2
   },
   {
-   "place_id": "ChIJf-sHLdKHUjARTyE7tc6F-CY",
-   "brand": "Krungsri",
-   "prov": "พัทลุง",
-   "rating": 4.5,
-   "n": 2
-  },
-  {
    "place_id": "ChIJOSgsQwqq-DARj60dGitMLiU",
    "brand": "Krungsri",
    "prov": "ชุมพร",
-   "rating": 4.4,
-   "n": 7
-  },
-  {
-   "place_id": "ChIJKcUQMC3T2TARBGBn8bC9Mjk",
-   "brand": "Krungsri",
-   "prov": "พะเยา",
-   "rating": 4.4,
-   "n": 8
-  },
-  {
-   "place_id": "ChIJAQAAACR0szERkiCzOZhfF4c",
-   "brand": "Krungsri",
-   "prov": "ยะลา",
-   "rating": 4.4,
-   "n": 10
-  },
-  {
-   "place_id": "ChIJUUc-VRYw3zARF_owNvQIBoc",
-   "brand": "Krungsri",
-   "prov": "อุตรดิตถ์",
-   "rating": 4.4,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJQS71lm2v4TARv3KUoNRm-gA",
-   "brand": "Krungsri",
-   "prov": "อุทัยธานี",
-   "rating": 4.4,
-   "n": 5
+   "rating": 4.3,
+   "n": 6
   },
   {
    "place_id": "ChIJ7VCaDLpP4DARf0C3zQrJ5Bo",
    "brand": "Krungsri",
    "prov": "นครสวรรค์",
    "rating": 4.3,
-   "n": 12
-  },
-  {
-   "place_id": "ChIJy4CVChEAHjERde5lYQaN9hY",
-   "brand": "Krungsri",
-   "prov": "ลพบุรี",
-   "rating": 4.3,
-   "n": 8
-  },
-  {
-   "place_id": "ChIJnx3o1E254jARVs9CHM-SvTE",
-   "brand": "Krungsri",
-   "prov": "สมุทรสาคร",
-   "rating": 4.3,
-   "n": 8
-  },
-  {
-   "place_id": "ChIJZ8D6vukP4jARcjLm8lJ0kAA",
-   "brand": "Krungsri",
-   "prov": "อ่างทอง",
-   "rating": 4.3,
-   "n": 7
-  },
-  {
-   "place_id": "ChIJqcU_k72THTERk_VKrqU7yAE",
-   "brand": "Krungsri",
-   "prov": "นครนายก",
-   "rating": 4.2,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJsax2e3WOJzER6yGGsfEgEsM",
-   "brand": "Krungsri",
-   "prov": "น่าน",
-   "rating": 4.1,
-   "n": 7
+   "n": 11
   },
   {
    "place_id": "ChIJyThJgerZ3TARTgPzQu4WmoI",
@@ -205,32 +93,25 @@
    "n": 5
   },
   {
+   "place_id": "ChIJqcU_k72THTERk_VKrqU7yAE",
+   "brand": "Krungsri",
+   "prov": "นครนายก",
+   "rating": 4,
+   "n": 4
+  },
+  {
+   "place_id": "ChIJsax2e3WOJzER6yGGsfEgEsM",
+   "brand": "Krungsri",
+   "prov": "น่าน",
+   "rating": 4,
+   "n": 6
+  },
+  {
    "place_id": "ChIJJQt7xbBjJDERQwSHiVtAqn4",
    "brand": "Krungsri",
    "prov": "บึงกาฬ",
    "rating": 4,
    "n": 6
-  },
-  {
-   "place_id": "ChIJDTL4RyzT2TAR9XdCdGf9YFo",
-   "brand": "Krungsri",
-   "prov": "พะเยา",
-   "rating": 4,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJJ8pwehLm3zARPlN3q29pHTQ",
-   "brand": "Krungsri",
-   "prov": "พิจิตร",
-   "rating": 4,
-   "n": 7
-  },
-  {
-   "place_id": "ChIJk4adXCjPFzERHsynyvOK8as",
-   "brand": "Krungsri",
-   "prov": "ยโสธร",
-   "rating": 4,
-   "n": 2
   },
   {
    "place_id": "ChIJiU4E_MLxszERz9OaHzhqgkw",
@@ -247,20 +128,6 @@
    "n": 13
   },
   {
-   "place_id": "ChIJuTro0HMGVDARDjUCnbcAvFU",
-   "brand": "Krungsri",
-   "prov": "สงขลา",
-   "rating": 3.8,
-   "n": 18
-  },
-  {
-   "place_id": "ChIJZdbKqm-NTDARWqNrdtZPnkc",
-   "brand": "Krungsri",
-   "prov": "สตูล",
-   "rating": 3.8,
-   "n": 4
-  },
-  {
    "place_id": "ChIJ-xDhofONTTARUCqZRBJ-qlc",
    "brand": "Krungsri",
    "prov": "ตรัง",
@@ -272,54 +139,12 @@
    "brand": "Krungsri",
    "prov": "นครราชสีมา",
    "rating": 3.7,
-   "n": 40
+   "n": 39
   },
   {
-   "place_id": "ChIJx3mE35eVGTERiCNfkd-rb28",
+   "place_id": "ChIJCy3wBieZ4jARP2Uc-hFuEHI",
    "brand": "Krungsri",
-   "prov": "บุรีรัมย์",
-   "rating": 3.7,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJAYFiTNJ8TTARNVkfyTFFoSo",
-   "brand": "Krungsri",
-   "prov": "พัทลุง",
-   "rating": 3.7,
-   "n": 7
-  },
-  {
-   "place_id": "ChIJw3RwOUH8AjER1bMOMbd_6TY",
-   "brand": "Krungsri",
-   "prov": "ระยอง",
-   "rating": 3.7,
-   "n": 35
-  },
-  {
-   "place_id": "ChIJ1xv2t4_T4jARdRBjlPORK3w",
-   "brand": "Krungsri",
-   "prov": "สมุทรสงคราม",
-   "rating": 3.7,
-   "n": 7
-  },
-  {
-   "place_id": "ChIJwSLmUXIWHTERKeEo5ZbJB6M",
-   "brand": "Krungsri",
-   "prov": "ฉะเชิงเทรา",
-   "rating": 3.6,
-   "n": 11
-  },
-  {
-   "place_id": "ChIJr7os_1rN2zARuC_jD_GyY0M",
-   "brand": "Krungsri",
-   "prov": "ลำพูน",
-   "rating": 3.6,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJ2z6eDGW44jARtoEV6CGAKxE",
-   "brand": "Krungsri",
-   "prov": "สมุทรสาคร",
+   "prov": "กรุงเทพมหานคร",
    "rating": 3.6,
    "n": 9
   },
@@ -331,6 +156,13 @@
    "n": 21
   },
   {
+   "place_id": "ChIJwSLmUXIWHTERKeEo5ZbJB6M",
+   "brand": "Krungsri",
+   "prov": "ฉะเชิงเทรา",
+   "rating": 3.5,
+   "n": 10
+  },
+  {
    "place_id": "ChIJh1plMYSy_TARnHR3nIo0Bfs",
    "brand": "Krungsri",
    "prov": "ประจวบคีรีขันธ์",
@@ -338,46 +170,25 @@
    "n": 11
   },
   {
-   "place_id": "ChIJFY0kwWnGPTERZlrO8Iz2eSM",
+   "place_id": "ChIJ-30dHozWOjERkQGutkddAco",
    "brand": "Krungsri",
-   "prov": "มุกดาหาร",
-   "rating": 3.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJiZIxjmhDHjER93s0fyI0BXo",
-   "brand": "Krungsri",
-   "prov": "ลพบุรี",
-   "rating": 3.5,
-   "n": 11
-  },
-  {
-   "place_id": "ChIJCy3wBieZ4jARP2Uc-hFuEHI",
-   "brand": "Krungsri",
-   "prov": "กรุงเทพมหานคร",
+   "prov": "บึงกาฬ",
    "rating": 3.4,
-   "n": 8
+   "n": 10
   },
   {
-   "place_id": "ChIJGWHt-YFr2TARgCFiDKcK5t0",
+   "place_id": "ChIJx3mE35eVGTERiCNfkd-rb28",
    "brand": "Krungsri",
-   "prov": "ลำปาง",
+   "prov": "บุรีรัมย์",
    "rating": 3.4,
-   "n": 8
-  },
-  {
-   "place_id": "ChIJ4dkvf72E4jARCJ_FTYe4GA8",
-   "brand": "Krungsri",
-   "prov": "กรุงเทพมหานคร",
-   "rating": 3.3,
-   "n": 23
+   "n": 5
   },
   {
    "place_id": "ChIJgy563RWf4jARl8hp_wNNd-M",
    "brand": "Krungsri",
    "prov": "กรุงเทพมหานคร",
-   "rating": 3.2,
-   "n": 53
+   "rating": 3.3,
+   "n": 54
   },
   {
    "place_id": "ChIJE1CDd7VfHTERxvVf93vgFes",
@@ -387,11 +198,11 @@
    "n": 30
   },
   {
-   "place_id": "ChIJ-30dHozWOjERkQGutkddAco",
+   "place_id": "ChIJ4dkvf72E4jARCJ_FTYe4GA8",
    "brand": "Krungsri",
-   "prov": "บึงกาฬ",
-   "rating": 3.2,
-   "n": 11
+   "prov": "กรุงเทพมหานคร",
+   "rating": 3.1,
+   "n": 21
   },
   {
    "place_id": "ChIJXU5eO4O94TARX5cRaKI5IxQ",
@@ -429,25 +240,11 @@
    "n": 2
   },
   {
-   "place_id": "ChIJV_MRCpd14jARVXPN_GG7DE0",
-   "brand": "Krungsri",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 3,
-   "n": 19
-  },
-  {
-   "place_id": "ChIJT871WRcG1zARCW7_zaHuQiI",
-   "brand": "Krungsri",
-   "prov": "น่าน",
-   "rating": 2.9,
-   "n": 21
-  },
-  {
    "place_id": "ChIJPeEp3AljHTEROt2cLDiS7h8",
    "brand": "Krungsri",
    "prov": "กรุงเทพมหานคร",
-   "rating": 2.8,
-   "n": 26
+   "rating": 2.9,
+   "n": 25
   },
   {
    "place_id": "ChIJQYu9upTv4jARWqtKLPmvvRM",
@@ -457,11 +254,11 @@
    "n": 19
   },
   {
-   "place_id": "ChIJ2-E1ewEm4zARPE3Yh6n_iyI",
+   "place_id": "ChIJT871WRcG1zARCW7_zaHuQiI",
    "brand": "Krungsri",
-   "prov": "ราชบุรี",
+   "prov": "น่าน",
    "rating": 2.8,
-   "n": 8
+   "n": 20
   },
   {
    "place_id": "ChIJC0e8PO-TUTARl6pPYgQKxKU",
@@ -478,6 +275,13 @@
    "n": 18
   },
   {
+   "place_id": "ChIJOwWxMnEY3jARxcgZoOJXzJE",
+   "brand": "Krungsri",
+   "prov": "กำแพงเพชร",
+   "rating": 2.6,
+   "n": 9
+  },
+  {
    "place_id": "ChIJhyRjntSVAjER5khQPKO2GvA",
    "brand": "Krungsri",
    "prov": "ชลบุรี",
@@ -485,18 +289,11 @@
    "n": 48
   },
   {
-   "place_id": "ChIJ5wNmCoAwUDAREXj-jkQNsWA",
+   "place_id": "ChIJkzSLFc_jGTERaN-qVkbSDP0",
    "brand": "Krungsri",
-   "prov": "พังงา",
+   "prov": "บุรีรัมย์",
    "rating": 2.6,
-   "n": 48
-  },
-  {
-   "place_id": "ChIJ-aArk9eJFjERlUEqmOkwS9w",
-   "brand": "Krungsri",
-   "prov": "อุบลราชธานี",
-   "rating": 2.6,
-   "n": 14
+   "n": 5
   },
   {
    "place_id": "ChIJ-YVKqATpHTER2-flu2-004Q",
@@ -513,46 +310,11 @@
    "n": 25
   },
   {
-   "place_id": "ChIJf1HWFVg44jAR7jySBvI792c",
-   "brand": "Krungsri",
-   "prov": "สุพรรณบุรี",
-   "rating": 2.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJuQ2HbM4yTTARDAhJX8U9st8",
-   "brand": "Krungsri",
-   "prov": "สงขลา",
-   "rating": 2.4,
-   "n": 11
-  },
-  {
-   "place_id": "ChIJkzSLFc_jGTERaN-qVkbSDP0",
-   "brand": "Krungsri",
-   "prov": "บุรีรัมย์",
-   "rating": 2.3,
-   "n": 6
-  },
-  {
    "place_id": "ChIJq6rWVyyH4jARIGBJ0xk5pAo",
    "brand": "Krungsri",
    "prov": "ปทุมธานี",
-   "rating": 2.2,
-   "n": 16
-  },
-  {
-   "place_id": "ChIJvZ_MjuqX3zAR3_kDolQEmWE",
-   "brand": "Krungsri",
-   "prov": "พิจิตร",
-   "rating": 2.2,
-   "n": 61
-  },
-  {
-   "place_id": "ChIJOwWxMnEY3jARxcgZoOJXzJE",
-   "brand": "Krungsri",
-   "prov": "กำแพงเพชร",
-   "rating": 2.1,
-   "n": 9
+   "rating": 2.4,
+   "n": 14
   },
   {
    "place_id": "ChIJM1f5PnOJIjERl2a9suYeG7s",
@@ -566,35 +328,7 @@
    "brand": "Krungsri",
    "prov": "ชลบุรี",
    "rating": 2.1,
-   "n": 121
-  },
-  {
-   "place_id": "ChIJN-bm7tf9FzERSdg0JhO5H5E",
-   "brand": "Krungsri",
-   "prov": "มหาสารคาม",
-   "rating": 2.1,
-   "n": 13
-  },
-  {
-   "place_id": "ChIJx-SRO6GCHDERcsniTFmWIhY",
-   "brand": "Krungsri",
-   "prov": "สระแก้ว",
-   "rating": 2.1,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJRXdyETzjFjER_Ah0NGIyBSU",
-   "brand": "Krungsri",
-   "prov": "ศรีสะเกษ",
-   "rating": 2,
-   "n": 8
-  },
-  {
-   "place_id": "ChIJNXXoTF244jARz8PJ0kO74g8",
-   "brand": "Krungsri",
-   "prov": "สมุทรสาคร",
-   "rating": 2,
-   "n": 6
+   "n": 118
   },
   {
    "place_id": "ChIJq1G59qxVHDEReFgzodSBk_I",
@@ -604,13 +338,6 @@
    "n": 9
   },
   {
-   "place_id": "ChIJd8Muqa2mIjERBNPGo88jQfQ",
-   "brand": "Krungsri",
-   "prov": "มหาสารคาม",
-   "rating": 1.9,
-   "n": 7
-  },
-  {
    "place_id": "ChIJ7WXkjwRVHDERPVbEy5NAIC4",
    "brand": "Krungsri",
    "prov": "นครนายก",
@@ -618,25 +345,11 @@
    "n": 19
   },
   {
-   "place_id": "ChIJYRhDQlcoTTARyHrY2hcYLLQ",
-   "brand": "Krungsri",
-   "prov": "พัทลุง",
-   "rating": 1.8,
-   "n": 49
-  },
-  {
    "place_id": "ChIJm0JXCh93IzERlnP01W5vta0",
    "brand": "Krungsri",
    "prov": "ขอนแก่น",
-   "rating": 1.4,
-   "n": 27
-  },
-  {
-   "place_id": "ChIJu7nN7DB9GzEREazkxsY0uRk",
-   "brand": "Krungsri",
-   "prov": "สระแก้ว",
-   "rating": 1,
-   "n": 1
+   "rating": 1.3,
+   "n": 24
   },
   {
    "place_id": "ChIJ9WTf9Na_UTARgccT3qndz3E",
@@ -716,13 +429,6 @@
    "n": 1
   },
   {
-   "place_id": "ChIJBVpSKQC1IjER2tqA2iE_5PQ",
-   "brand": "Muangthai",
-   "prov": "กาฬสินธุ์",
-   "rating": 5,
-   "n": 1
-  },
-  {
    "place_id": "ChIJV8kSnR-1IjERAu0WT-Rlt38",
    "brand": "Muangthai",
    "prov": "กาฬสินธุ์",
@@ -783,7 +489,7 @@
    "brand": "Muangthai",
    "prov": "จันทบุรี",
    "rating": 5,
-   "n": 2
+   "n": 1
   },
   {
    "place_id": "ChIJO5TgdZbHBDER-bq_hbml3Yo",
@@ -923,7 +629,7 @@
    "brand": "Muangthai",
    "prov": "นครนายก",
    "rating": 5,
-   "n": 3
+   "n": 2
   },
   {
    "place_id": "ChIJheCdCjDv4jARyb48toU0KEA",
@@ -1042,7 +748,7 @@
    "brand": "Muangthai",
    "prov": "นนทบุรี",
    "rating": 5,
-   "n": 4
+   "n": 3
   },
   {
    "place_id": "ChIJUVC-VUGR4jARTbXtvlCmvmw",
@@ -1091,7 +797,7 @@
    "brand": "Muangthai",
    "prov": "ปทุมธานี",
    "rating": 5,
-   "n": 2
+   "n": 1
   },
   {
    "place_id": "ChIJZWL67mZ_4jARk8U8DTuxfDI",
@@ -1133,7 +839,7 @@
    "brand": "Muangthai",
    "prov": "ปทุมธานี",
    "rating": 5,
-   "n": 7
+   "n": 8
   },
   {
    "place_id": "ChIJCVEP_guE_jAR-X_ziYH5hbk",
@@ -1178,816 +884,11 @@
    "n": 1
   },
   {
-   "place_id": "ChIJwSvCUbN14jAReJnI4JAknTg",
-   "brand": "Muangthai",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJUeTyeXcL4jARQKB9yG0sPUo",
-   "brand": "Muangthai",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ-dcw6f534jAR9k81nmRTpwE",
-   "brand": "Muangthai",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJb_1lq8Dt1zARQQjBwACojgA",
-   "brand": "Muangthai",
-   "prov": "พะเยา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJTcl47LAy2DAR7wWfdV3LXfs",
-   "brand": "Muangthai",
-   "prov": "พะเยา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJcQMOsZEY2DARjDa-UyFqDjw",
-   "brand": "Muangthai",
-   "prov": "พะเยา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJI2nyJeZtTTARPVld5n5aiuw",
-   "brand": "Muangthai",
-   "prov": "พัทลุง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ97hEKMJ4TTAR8dt8yTbrJ7Y",
-   "brand": "Muangthai",
-   "prov": "พัทลุง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJs-vojwD_3zARWrluCV2TBy8",
-   "brand": "Muangthai",
-   "prov": "พิจิตร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ47N-jl9z4DARA3JVihd-6UA",
-   "brand": "Muangthai",
-   "prov": "พิจิตร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJBcyoc9mX3zAR0V-RZOal4i8",
-   "brand": "Muangthai",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJzcaXhV83UDARBhDydmD36IE",
-   "brand": "Muangthai",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJfXPNbYQ3UDARUUDUETBgqfw",
-   "brand": "Muangthai",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJbWBMZ90xUDARsWlnx__cAx4",
-   "brand": "Muangthai",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJOb1JmhwxUDARG4pC9n3x8P8",
-   "brand": "Muangthai",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJ_zohoyAxUDARkJRnoJKhrx8",
-   "brand": "Muangthai",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJE_BzEBAvUDAR0b6m16bj92I",
-   "brand": "Muangthai",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJtzRNyMKlIjERo-s63UbSb_s",
-   "brand": "Muangthai",
-   "prov": "มหาสารคาม",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJdTUjdBinIjER9LQq0yRhuEE",
-   "brand": "Muangthai",
-   "prov": "มหาสารคาม",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJLxs_B0zGPTERTW6md3xDtTE",
-   "brand": "Muangthai",
-   "prov": "มุกดาหาร",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJV2eiTQB3szERixm57v-nupE",
-   "brand": "Muangthai",
-   "prov": "ยะลา",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJS_PQ4LXOFzER-8-lwtV6ed8",
-   "brand": "Muangthai",
-   "prov": "ยโสธร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJj-kYeZIxFjERodVBJedk1iI",
-   "brand": "Muangthai",
-   "prov": "ยโสธร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJi8jPJyFQVjARBGIh4hLVKcM",
-   "brand": "Muangthai",
-   "prov": "ระนอง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJoxqrqW38AjER8YmDyJ8vhiQ",
-   "brand": "Muangthai",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJ4XXJB6b7AjERdKE6Td0AB1M",
-   "brand": "Muangthai",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJr7BmEYb6AjERQ64m5bxsUgE",
-   "brand": "Muangthai",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJxyf3AZX7AjER5wVN9oCmxMc",
-   "brand": "Muangthai",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJvbpfcEjpAjERz18iGx-pyxA",
-   "brand": "Muangthai",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJS_OoqmX7AjERKVrl7iZLe-8",
-   "brand": "Muangthai",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJh4_zYJcv4zARLoWYSEI8Cbw",
-   "brand": "Muangthai",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJRcFcgaMl4zARYzt-qRZNIAo",
-   "brand": "Muangthai",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJY8Uwu6wn4zARMfrnJEjCJDQ",
-   "brand": "Muangthai",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJv5e-Fako4zARYTMYESitqlw",
-   "brand": "Muangthai",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJP4k7cTVFPTERjAdVPiIlVxk",
-   "brand": "Muangthai",
-   "prov": "ร้อยเอ็ด",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ6WVTWer_4TARWf7o9d39kuA",
-   "brand": "Muangthai",
-   "prov": "ลพบุรี",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJraXdVBAAHjERkvtaIHSj3vA",
-   "brand": "Muangthai",
-   "prov": "ลพบุรี",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJZ3Uy1bwHHjERuS0ngS76sYM",
-   "brand": "Muangthai",
-   "prov": "ลพบุรี",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJeZ9OhwUAHjERDeCuEoL0vwg",
-   "brand": "Muangthai",
-   "prov": "ลพบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJm1Fl3XkKHjERkFbtR1A7HiU",
-   "brand": "Muangthai",
-   "prov": "ลพบุรี",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJt6XAvOD64TAR4jKo9ViGrns",
-   "brand": "Muangthai",
-   "prov": "ลพบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ2zFSyPZr2TARiOERIicSqP4",
-   "brand": "Muangthai",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJCS7l-49l2TARelwNLXApsrc",
-   "brand": "Muangthai",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJNbbp8qFr2TARKakEcgNZ2lU",
-   "brand": "Muangthai",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ07_qNe1s2TAR0S6xr8u2kDY",
-   "brand": "Muangthai",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJjcvgZHxr2TAReudn6HkRuV0",
-   "brand": "Muangthai",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ9bkbK3ts2TARdA7CE3u8R3g",
-   "brand": "Muangthai",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJBRRWRtTS2zARo8R08VRBzJo",
-   "brand": "Muangthai",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJuy6FNjgt2jARCI5RVUxDkk4",
-   "brand": "Muangthai",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJt0k4HjbN2zARlFVL4Wrs2uQ",
-   "brand": "Muangthai",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ5W2ttWPS2zARvQYrXMzoNHA",
-   "brand": "Muangthai",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJlV7IKVAt2jAR3Q97nb2g6Zg",
-   "brand": "Muangthai",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJzR5ryVYt2jAR-Ulog9ODO9I",
-   "brand": "Muangthai",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJw8SWBtUy2jAR7KlBY-jncbc",
-   "brand": "Muangthai",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJ-TFUWCDjFjERKn9tuXtgbQA",
-   "brand": "Muangthai",
-   "prov": "ศรีสะเกษ",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ_1_cI9fyPDERWmXF72s2e88",
-   "brand": "Muangthai",
-   "prov": "สกลนคร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJB_E_2fDzPDERwTomAfkJ734",
-   "brand": "Muangthai",
-   "prov": "สกลนคร",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJsRLKF4UyTTAR0VZJvBSt54E",
-   "brand": "Muangthai",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJGdm96KQpTTARRBjnMjiSpVA",
-   "brand": "Muangthai",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJjzDQUBIzTTARNpmXjQ4OQWQ",
-   "brand": "Muangthai",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ3Sx_-kQoTTARTjIjDrmqJys",
-   "brand": "Muangthai",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJQUQFUwBZHTERnosMNnFdb2s",
-   "brand": "Muangthai",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 14
-  },
-  {
-   "place_id": "ChIJ3a2UYABbHTER1cgeLFxaGsA",
-   "brand": "Muangthai",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 10
-  },
-  {
-   "place_id": "ChIJ6VX0amig4jAR9M1JpyuSTYg",
-   "brand": "Muangthai",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJFfek6IFYHTERg_mcZxvyGUw",
-   "brand": "Muangthai",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJa8ZJZABdHTER-LjBPavUG5U",
-   "brand": "Muangthai",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJVQtyeQBdHTERXMBcba-Qz1g",
-   "brand": "Muangthai",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ2XTclchfHTERLq9nm-j9Z9w",
-   "brand": "Muangthai",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJTexJJwnU4jARn2VuwvW6N80",
-   "brand": "Muangthai",
-   "prov": "สมุทรสงคราม",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJTx09f6i74jARSC51oktUSWs",
-   "brand": "Muangthai",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ_9YZqP644jARFUpZ1o_OKy4",
-   "brand": "Muangthai",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJuV682_XH4jARnWGW_P8hfm4",
-   "brand": "Muangthai",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJMQ6enqe-4jARuOszkjlkzMc",
-   "brand": "Muangthai",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJP-8_5wvpHTERhxkBXM9OxEA",
-   "brand": "Muangthai",
-   "prov": "สระบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJe5kPRjnpHTERjFfWgcpU76A",
-   "brand": "Muangthai",
-   "prov": "สระบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJs_3EraOCHDER_g7MTi2zGIU",
-   "brand": "Muangthai",
-   "prov": "สระแก้ว",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJU17MX5iCHDERz5dQoecKXOg",
-   "brand": "Muangthai",
-   "prov": "สระแก้ว",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ95pJl3QUGzEROO86qBL7wYU",
-   "brand": "Muangthai",
-   "prov": "สระแก้ว",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJy8NoMqcd4jAR2L84ewsRQQk",
-   "brand": "Muangthai",
-   "prov": "สิงห์บุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ2ZbCXJTt4TARRdbxLXPsxTA",
-   "brand": "Muangthai",
-   "prov": "สิงห์บุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJgXs4O2Hu4TARaKwMPyLZs0c",
-   "brand": "Muangthai",
-   "prov": "สิงห์บุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJdR1ETP844jARmx9fijYrXwI",
-   "brand": "Muangthai",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJ0dPm3kc44jARkbggZp8nmpI",
-   "brand": "Muangthai",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJt6hnTP844jARvJ8qsonNk_Q",
-   "brand": "Muangthai",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJQZXgItxa4jARcJkHZSJojVk",
-   "brand": "Muangthai",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJn80giBLY4zARabNSYOE4IbU",
-   "brand": "Muangthai",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJL15RO6604zARFN0xWfoqsFM",
-   "brand": "Muangthai",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJRT6TTugHVDARJUynPMCp_Cs",
-   "brand": "Muangthai",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJdexXsssHVDARU3uxVozYVIk",
-   "brand": "Muangthai",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJJxyWD1AGVDARvi1E45hZe_o",
-   "brand": "Muangthai",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJoWXPhQqdVjAR2b20fB7ty3E",
-   "brand": "Muangthai",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ_2E48NsFVDARKCMA1LCpUKA",
-   "brand": "Muangthai",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJx9vTj87jGTERzmdfD6_feso",
-   "brand": "Muangthai",
-   "prov": "สุรินทร์",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJba81KjbiGTERKafYz3umQjA",
-   "brand": "Muangthai",
-   "prov": "สุรินทร์",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJJWobOnxW3jARgqqpwEeQIP8",
-   "brand": "Muangthai",
-   "prov": "สุโขทัย",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJBQPSUxj_3jARk7tU6yDvJ3c",
-   "brand": "Muangthai",
-   "prov": "สุโขทัย",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJzzRvOnxW3jARW73OHXRCXpI",
-   "brand": "Muangthai",
-   "prov": "สุโขทัย",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJ2e6DGpRjJDERcItEvKvPu7M",
-   "brand": "Muangthai",
-   "prov": "หนองคาย",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJj_s8fc97JDERaGw4t1qhc0M",
-   "brand": "Muangthai",
-   "prov": "หนองคาย",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJz0xa8pBrJDERxLUH2dumXi8",
-   "brand": "Muangthai",
-   "prov": "หนองคาย",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJmQDJYJJ7JDERVt64Qm4wfBw",
-   "brand": "Muangthai",
-   "prov": "หนองคาย",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJa_MaSvciFjERlaFKvNTdP0w",
-   "brand": "Muangthai",
-   "prov": "อำนาจเจริญ",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJk49KLzWdIzERNQxsqSEXuAg",
-   "brand": "Muangthai",
-   "prov": "อุดรธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ5ZbxTjKeIzERaokb0A6TEjI",
-   "brand": "Muangthai",
-   "prov": "อุดรธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ3Ymu5BOdIzERy_FF9RnP0p8",
-   "brand": "Muangthai",
-   "prov": "อุดรธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJYyNLwUgw3zARL33fU0IUNDI",
-   "brand": "Muangthai",
-   "prov": "อุตรดิตถ์",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJwYRYu22v4TARG6_q12ec35M",
-   "brand": "Muangthai",
-   "prov": "อุทัยธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJQcZq7qliFjER07GqUjvZU7I",
-   "brand": "Muangthai",
-   "prov": "อุบลราชธานี",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJ7XayXQyGFjERvC-L73yZ0jw",
-   "brand": "Muangthai",
-   "prov": "อุบลราชธานี",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJoZs9UB2IFjERKAv4i_dRLJc",
-   "brand": "Muangthai",
-   "prov": "อุบลราชธานี",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJ42iE3UR9FjER-qgYjdT-H-0",
-   "brand": "Muangthai",
-   "prov": "อุบลราชธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJlbLoF0kX4jARuLY1tLblfyw",
-   "brand": "Muangthai",
-   "prov": "อ่างทอง",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJo4_U784P4jARmoTRnogyGtM",
-   "brand": "Muangthai",
-   "prov": "อ่างทอง",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJ__jhTWgg4zARRl19n8nyX_M",
-   "brand": "Muangthai",
-   "prov": "ราชบุรี",
-   "rating": 4.9,
-   "n": 10
-  },
-  {
    "place_id": "ChIJI9re9vRjHTERPOMi-ETQ7sI",
    "brand": "Muangthai",
    "prov": "กรุงเทพมหานคร",
    "rating": 4.8,
    "n": 5
-  },
-  {
-   "place_id": "ChIJtZbdxxWKIjERQhSaclv0Ed4",
-   "brand": "Muangthai",
-   "prov": "ขอนแก่น",
-   "rating": 4.8,
-   "n": 4
   },
   {
    "place_id": "ChIJ3-goW2S_AjERBcMgkYTWUj0",
@@ -2018,48 +919,6 @@
    "n": 5
   },
   {
-   "place_id": "ChIJMRbUj2hu4jARVLr_GUGbG3Y",
-   "brand": "Muangthai",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 4.8,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJUcOdW879FzERX8-6glRisI4",
-   "brand": "Muangthai",
-   "prov": "ร้อยเอ็ด",
-   "rating": 4.8,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJn7GSZxsHFzERW5e9M9cY084",
-   "brand": "Muangthai",
-   "prov": "ศรีสะเกษ",
-   "rating": 4.8,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJX0I2kFqn4jARcMKBGlHB2Uo",
-   "brand": "Muangthai",
-   "prov": "สมุทรปราการ",
-   "rating": 4.8,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJX-6-D0K44jARPmOt9ZVdqeE",
-   "brand": "Muangthai",
-   "prov": "สมุทรสาคร",
-   "rating": 4.8,
-   "n": 8
-  },
-  {
-   "place_id": "ChIJLTiipz1LFzERT4b0VT50kG4",
-   "brand": "Muangthai",
-   "prov": "สุรินทร์",
-   "rating": 4.8,
-   "n": 8
-  },
-  {
    "place_id": "ChIJe9oDLOWY4jARwZq0TXPG2y4",
    "brand": "Muangthai",
    "prov": "กรุงเทพมหานคร",
@@ -2067,18 +926,11 @@
    "n": 6
   },
   {
-   "place_id": "ChIJV_w23nm93zARIvAiu-okr1c",
+   "place_id": "ChIJtZbdxxWKIjERQhSaclv0Ed4",
    "brand": "Muangthai",
-   "prov": "พิษณุโลก",
+   "prov": "ขอนแก่น",
    "rating": 4.7,
    "n": 3
-  },
-  {
-   "place_id": "ChIJXcDLJpDT4jAR89C9T3m8N8E",
-   "brand": "Muangthai",
-   "prov": "สมุทรสงคราม",
-   "rating": 4.7,
-   "n": 7
   },
   {
    "place_id": "ChIJOaa8R32R4jARe0QCHh2ok4c",
@@ -2088,18 +940,11 @@
    "n": 22
   },
   {
-   "place_id": "ChIJ9RWEqrQQ4jARnjY5gy61Cbc",
-   "brand": "Muangthai",
-   "prov": "อ่างทอง",
-   "rating": 4.6,
-   "n": 5
-  },
-  {
    "place_id": "ChIJy9oWuxqW4jARMQc6PV2eYjo",
    "brand": "Muangthai",
    "prov": "กรุงเทพมหานคร",
    "rating": 4.5,
-   "n": 18
+   "n": 17
   },
   {
    "place_id": "ChIJeXOsLBH54jARjO0LVhbiZZM",
@@ -2123,83 +968,6 @@
    "n": 2
   },
   {
-   "place_id": "ChIJ_ZzM_5LT2TARVJ800JEkR1s",
-   "brand": "Muangthai",
-   "prov": "พะเยา",
-   "rating": 4.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJXQUrTTTcFzERRXDfgdKcOqU",
-   "brand": "Muangthai",
-   "prov": "ร้อยเอ็ด",
-   "rating": 4.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJA_K0n-DiFjERj3PyNSFJZVM",
-   "brand": "Muangthai",
-   "prov": "ศรีสะเกษ",
-   "rating": 4.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJc9fyjCfjFjERWa0wzt_TWVw",
-   "brand": "Muangthai",
-   "prov": "ศรีสะเกษ",
-   "rating": 4.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJQc735SIzTTARfoIJDvrk9Ng",
-   "brand": "Muangthai",
-   "prov": "สงขลา",
-   "rating": 4.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJl-_v0WcpTTAR73Xz39Xs9u4",
-   "brand": "Muangthai",
-   "prov": "สงขลา",
-   "rating": 4.5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJi40USRnpHTERqKpvEyKvilE",
-   "brand": "Muangthai",
-   "prov": "สระบุรี",
-   "rating": 4.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJq6FVs9Xw4TARHmWMxkLULY4",
-   "brand": "Muangthai",
-   "prov": "สิงห์บุรี",
-   "rating": 4.5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJazl8Ry9k4TARDPtlcxcyz5g",
-   "brand": "Muangthai",
-   "prov": "สุพรรณบุรี",
-   "rating": 4.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJwYmrDAAD4jARy_ZeFqcc8PM",
-   "brand": "Muangthai",
-   "prov": "อ่างทอง",
-   "rating": 4.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ08xCzIuBBDERV7QWsOR51Ik",
-   "brand": "Muangthai",
-   "prov": "จันทบุรี",
-   "rating": 4.4,
-   "n": 5
-  },
-  {
    "place_id": "ChIJb8WtFbRLGTERYr6IXyWPuQM",
    "brand": "Muangthai",
    "prov": "นครราชสีมา",
@@ -2207,39 +975,18 @@
    "n": 9
   },
   {
+   "place_id": "ChIJ08xCzIuBBDERV7QWsOR51Ik",
+   "brand": "Muangthai",
+   "prov": "จันทบุรี",
+   "rating": 4.3,
+   "n": 4
+  },
+  {
    "place_id": "ChIJeScEIMA3HTER_qQUIp4qOdM",
    "brand": "Muangthai",
    "prov": "ชลบุรี",
    "rating": 4.3,
    "n": 7
-  },
-  {
-   "place_id": "ChIJpW1sksh14jAR3l3BELXq318",
-   "brand": "Muangthai",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 4.3,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJ6V3gvIkxUDARPeiT1msYZiU",
-   "brand": "Muangthai",
-   "prov": "ภูเก็ต",
-   "rating": 4.3,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJq6f2dm2v4TARfk8EAUhPhDY",
-   "brand": "Muangthai",
-   "prov": "อุทัยธานี",
-   "rating": 4.3,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJ31Ve-OwN4jARReHkaBbx_5A",
-   "brand": "Muangthai",
-   "prov": "อ่างทอง",
-   "rating": 4.3,
-   "n": 4
   },
   {
    "place_id": "ChIJcaDgYbxMGTER-QJnX1faZeU",
@@ -2252,13 +999,6 @@
    "place_id": "ChIJLQQTDi3xHDERWUR-WNMCIxc",
    "brand": "Muangthai",
    "prov": "ปราจีนบุรี",
-   "rating": 4.2,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJ-2AHR9TS2zAR07GovnSlQEA",
-   "brand": "Muangthai",
-   "prov": "ลำพูน",
    "rating": 4.2,
    "n": 6
   },
@@ -2361,86 +1101,9 @@
    "n": 3
   },
   {
-   "place_id": "ChIJf8yJBoN74jARZF5UJJn-zZU",
-   "brand": "Muangthai",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 4,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ4YXPV-GX3zARomHNU0XYg8U",
-   "brand": "Muangthai",
-   "prov": "พิษณุโลก",
-   "rating": 4,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJqxgtcjTJFzERuGrFzjNk600",
-   "brand": "Muangthai",
-   "prov": "ยโสธร",
-   "rating": 4,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJvbrwtyPwAjERxOLAg6fYaJY",
-   "brand": "Muangthai",
-   "prov": "ระยอง",
-   "rating": 4,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJnVK8WLb9FzERjwK8MxV9I7Y",
-   "brand": "Muangthai",
-   "prov": "ร้อยเอ็ด",
-   "rating": 4,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJb7UEFk0ZHjERYsWsdcpZLMA",
-   "brand": "Muangthai",
-   "prov": "ลพบุรี",
-   "rating": 4,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJazVmROfjGTERRpV8zY3absg",
-   "brand": "Muangthai",
-   "prov": "สุรินทร์",
-   "rating": 4,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJv_HnbSB1JDERFXViaddST7Q",
-   "brand": "Muangthai",
-   "prov": "อุดรธานี",
-   "rating": 4,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJEaIT_Row3zARRmnqfgfK28k",
-   "brand": "Muangthai",
-   "prov": "อุตรดิตถ์",
-   "rating": 4,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJzdZ_wotL3zARtOD79lnrExI",
-   "brand": "Muangthai",
-   "prov": "อุตรดิตถ์",
-   "rating": 4,
-   "n": 5
-  },
-  {
    "place_id": "ChIJQ8r94ZQBUzARxH5RM71x95g",
    "brand": "Muangthai",
    "prov": "นครศรีธรรมราช",
-   "rating": 3.8,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJk2s0u22v4TAR2c36R5vFF9w",
-   "brand": "Muangthai",
-   "prov": "อุทัยธานี",
    "rating": 3.8,
    "n": 4
   },
@@ -2466,60 +1129,11 @@
    "n": 3
   },
   {
-   "place_id": "ChIJA3bpcuRoPTERNE0rZNw8L4k",
-   "brand": "Muangthai",
-   "prov": "ร้อยเอ็ด",
-   "rating": 3.7,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJQ8ERAXqNHTERvDQXo0ero4w",
-   "brand": "Muangthai",
-   "prov": "สระบุรี",
-   "rating": 3.7,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJ15npka7jGTERVrLac6hbTnc",
-   "brand": "Muangthai",
-   "prov": "สุรินทร์",
-   "rating": 3.7,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJF_r-myiKHTERMGqnICpVdMA",
-   "brand": "Muangthai",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 3.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJhbsJ1RYw3zAR5IzjgSvS4X4",
-   "brand": "Muangthai",
-   "prov": "อุตรดิตถ์",
-   "rating": 3.5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJ3QVXsxpJUDARP0F44v-kWpM",
-   "brand": "Muangthai",
-   "prov": "ภูเก็ต",
-   "rating": 3.3,
-   "n": 6
-  },
-  {
    "place_id": "ChIJfQfQ4eqb4jARhGP77nxCy7w",
    "brand": "Muangthai",
    "prov": "กรุงเทพมหานคร",
    "rating": 3.2,
-   "n": 130
-  },
-  {
-   "place_id": "ChIJ-d7_s9CHFjERLAIV_mCeOqU",
-   "brand": "Muangthai",
-   "prov": "อุบลราชธานี",
-   "rating": 3.2,
-   "n": 6
+   "n": 126
   },
   {
    "place_id": "ChIJmWHtrpuBBDER0FR5C57Cxh4",
@@ -2543,144 +1157,11 @@
    "n": 2
   },
   {
-   "place_id": "ChIJ62rFb4uX3zARKzIfMzfWhgI",
-   "brand": "Muangthai",
-   "prov": "พิษณุโลก",
-   "rating": 3,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJJ6pzVVQ7UDARutmjP6FRZ20",
-   "brand": "Muangthai",
-   "prov": "ภูเก็ต",
-   "rating": 3,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ-WrowJahIjERQCWXJvtGbyc",
-   "brand": "Muangthai",
-   "prov": "มหาสารคาม",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ9c7XQmanIjER40sMax6wXOs",
-   "brand": "Muangthai",
-   "prov": "มหาสารคาม",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJDdNeP_Il4zARZ9ybit3SjmI",
-   "brand": "Muangthai",
-   "prov": "ราชบุรี",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJk9ikIsb9FzERpj58l8cYsbQ",
-   "brand": "Muangthai",
-   "prov": "ร้อยเอ็ด",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJkxU8Jrn9FzERmNhzHHWGIHY",
-   "brand": "Muangthai",
-   "prov": "ร้อยเอ็ด",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJEQ1i_2wAHjER2UHwIYyWfG0",
-   "brand": "Muangthai",
-   "prov": "ลพบุรี",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJNSgCNF4AHjERfP5PY3XoEcI",
-   "brand": "Muangthai",
-   "prov": "ลพบุรี",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ4WHSWTTM2zARzwpNxG-IAaw",
-   "brand": "Muangthai",
-   "prov": "ลำพูน",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJlbLNDWCn4jARRtautp3e8ac",
-   "brand": "Muangthai",
-   "prov": "สมุทรปราการ",
-   "rating": 3,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJE8btJ1_CHTERMWbz_BPz3bk",
-   "brand": "Muangthai",
-   "prov": "สระบุรี",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJtUNgOwABVDARILTT1ipk1sE",
-   "brand": "Muangthai",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJoRn12I4GVDARMqCO0UztE4w",
-   "brand": "Muangthai",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJzesEjbbjGTERJPYOEEsULqo",
-   "brand": "Muangthai",
-   "prov": "สุรินทร์",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJX2Ypiw0wFjER3TJVa0Zm-ac",
-   "brand": "Muangthai",
-   "prov": "อำนาจเจริญ",
-   "rating": 3,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJDYdzPit2IzER79CDFhVfax4",
-   "brand": "Muangthai",
-   "prov": "อุดรธานี",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJoS6LVACFFjER9ifaRQTV6hQ",
-   "brand": "Muangthai",
-   "prov": "อุบลราชธานี",
-   "rating": 3,
-   "n": 1
-  },
-  {
    "place_id": "ChIJh5UOLDCb4jAR0UrP6XpLmM4",
    "brand": "Muangthai",
    "prov": "นนทบุรี",
    "rating": 2.7,
    "n": 3
-  },
-  {
-   "place_id": "ChIJF-C_p0f8AjERsFfWC4Qlbso",
-   "brand": "Muangthai",
-   "prov": "ระยอง",
-   "rating": 2.6,
-   "n": 5
   },
   {
    "place_id": "ChIJZ1nUqW914zARmxfY-zO-jIg",
@@ -2695,34 +1176,6 @@
    "prov": "นครราชสีมา",
    "rating": 2.3,
    "n": 3
-  },
-  {
-   "place_id": "ChIJg41gpRHm3zARRKMCMeB0gWk",
-   "brand": "Muangthai",
-   "prov": "พิจิตร",
-   "rating": 2,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJGY1kYgB1szER4GUHMXLWUtk",
-   "brand": "Muangthai",
-   "prov": "ยะลา",
-   "rating": 2,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJN1sIf73kFjERPP6YEjziXWk",
-   "brand": "Muangthai",
-   "prov": "ศรีสะเกษ",
-   "rating": 2,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ76vEZiXvHTERllsc2SOc004",
-   "brand": "Muangthai",
-   "prov": "สระบุรี",
-   "rating": 2,
-   "n": 1
   },
   {
    "place_id": "ChIJcfgmZK-f4jAR5e_m3rOPbpA",
@@ -2791,62 +1244,6 @@
    "place_id": "ChIJXY0OHgAFszERVZ19LOyMi2I",
    "brand": "Muangthai",
    "prov": "ปัตตานี",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJxWzgEc58TTARpNU68VFcf7U",
-   "brand": "Muangthai",
-   "prov": "พัทลุง",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJzcrPzeimIjERPHfegxWaLmA",
-   "brand": "Muangthai",
-   "prov": "มหาสารคาม",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJh_iNE310GDERMfOIJjmM2Jg",
-   "brand": "Muangthai",
-   "prov": "มหาสารคาม",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJObSCuBQpszERou0Rj1TCV9U",
-   "brand": "Muangthai",
-   "prov": "ยะลา",
-   "rating": 1,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ33AXoRds2TAR7JmyrJzAWy8",
-   "brand": "Muangthai",
-   "prov": "ลำปาง",
-   "rating": 1,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJXcraru5B2TAReVOtiMt14K0",
-   "brand": "Muangthai",
-   "prov": "ลำปาง",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJVwpqbFgfFzERQ8Sd5LvSwJQ",
-   "brand": "Muangthai",
-   "prov": "ศรีสะเกษ",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJP-uM4DLiGTERN05jfdqFtlc",
-   "brand": "Muangthai",
-   "prov": "สุรินทร์",
    "rating": 1,
    "n": 1
   },
@@ -2925,7 +1322,7 @@
    "brand": "Srisawad",
    "prov": "กรุงเทพมหานคร",
    "rating": 5,
-   "n": 7
+   "n": 8
   },
   {
    "place_id": "ChIJ6ZBDzop14zARtYSN_dsWpkk",
@@ -2960,7 +1357,7 @@
    "brand": "Srisawad",
    "prov": "กาญจนบุรี",
    "rating": 5,
-   "n": 2
+   "n": 1
   },
   {
    "place_id": "ChIJK2EEuHsO4zARx_JK6OiO6Go",
@@ -2995,7 +1392,7 @@
    "brand": "Srisawad",
    "prov": "กาฬสินธุ์",
    "rating": 5,
-   "n": 1
+   "n": 2
   },
   {
    "place_id": "ChIJ4SthOU2xIjER3U0XFbgAxso",
@@ -3051,7 +1448,14 @@
    "brand": "Srisawad",
    "prov": "ขอนแก่น",
    "rating": 5,
-   "n": 3
+   "n": 4
+  },
+  {
+   "place_id": "ChIJjSPjWtGLIjERLqr98U85jEU",
+   "brand": "Srisawad",
+   "prov": "ขอนแก่น",
+   "rating": 5,
+   "n": 1
   },
   {
    "place_id": "ChIJJ87_1spnIjER3XdBwimLAlA",
@@ -3072,7 +1476,7 @@
    "brand": "Srisawad",
    "prov": "จันทบุรี",
    "rating": 5,
-   "n": 6
+   "n": 7
   },
   {
    "place_id": "ChIJ0TAgWe6FBDER5H2AQBWjzyw",
@@ -3090,6 +1494,13 @@
   },
   {
    "place_id": "ChIJYaoQRfadBDERrkiqb1zFa0k",
+   "brand": "Srisawad",
+   "prov": "จันทบุรี",
+   "rating": 5,
+   "n": 2
+  },
+  {
+   "place_id": "ChIJ65poKOiDBDER79Wm1K9jQ0Q",
    "brand": "Srisawad",
    "prov": "จันทบุรี",
    "rating": 5,
@@ -3170,7 +1581,7 @@
    "brand": "Srisawad",
    "prov": "ชลบุรี",
    "rating": 5,
-   "n": 1
+   "n": 2
   },
   {
    "place_id": "ChIJU1PxEp5KHTERqX1JGTd0luo",
@@ -3184,7 +1595,14 @@
    "brand": "Srisawad",
    "prov": "ชลบุรี",
    "rating": 5,
-   "n": 2
+   "n": 3
+  },
+  {
+   "place_id": "ChIJt9DQKjFLHTER8JP0OJMMOWY",
+   "brand": "Srisawad",
+   "prov": "ชลบุรี",
+   "rating": 5,
+   "n": 1
   },
   {
    "place_id": "ChIJJ4q0y4LHAjER5XiilSMHQ2g",
@@ -3226,7 +1644,14 @@
    "brand": "Srisawad",
    "prov": "ชัยนาท",
    "rating": 5,
-   "n": 2
+   "n": 3
+  },
+  {
+   "place_id": "ChIJe4faAri94TARSvrZG0X0lkQ",
+   "brand": "Srisawad",
+   "prov": "ชัยนาท",
+   "rating": 5,
+   "n": 1
   },
   {
    "place_id": "ChIJ5QVEBaC94TAR9PHfdtu6Ppg",
@@ -3240,7 +1665,7 @@
    "brand": "Srisawad",
    "prov": "ชัยนาท",
    "rating": 5,
-   "n": 1
+   "n": 2
   },
   {
    "place_id": "ChIJWTpT9i2R4TARy0EGMiHvl7k",
@@ -3338,10 +1763,24 @@
    "brand": "Srisawad",
    "prov": "ตราด",
    "rating": 5,
-   "n": 1
+   "n": 2
   },
   {
    "place_id": "ChIJBSzOw0dFBDERFuibrRaBFWM",
+   "brand": "Srisawad",
+   "prov": "ตราด",
+   "rating": 5,
+   "n": 1
+  },
+  {
+   "place_id": "ChIJMxZdqNSbBjERK4yGrXq7Ojw",
+   "brand": "Srisawad",
+   "prov": "ตราด",
+   "rating": 5,
+   "n": 1
+  },
+  {
+   "place_id": "ChIJGa8ht51BBDERtIIfASXfAvA",
    "brand": "Srisawad",
    "prov": "ตราด",
    "rating": 5,
@@ -3352,14 +1791,14 @@
    "brand": "Srisawad",
    "prov": "ตราด",
    "rating": 5,
-   "n": 2
+   "n": 3
   },
   {
    "place_id": "ChIJseijL6PZ3TARW_QkRcmZ2Xk",
    "brand": "Srisawad",
    "prov": "ตาก",
    "rating": 5,
-   "n": 2
+   "n": 3
   },
   {
    "place_id": "ChIJk6qiz52Z3TARaC8jroHHtYc",
@@ -3373,7 +1812,7 @@
    "brand": "Srisawad",
    "prov": "ตาก",
    "rating": 5,
-   "n": 1
+   "n": 2
   },
   {
    "place_id": "ChIJ-6mFJPbg3TARIGznkksFXR4",
@@ -3453,6 +1892,13 @@
    "n": 1
   },
   {
+   "place_id": "ChIJk5W-X0rn4jARGH-3B1tAJ3g",
+   "brand": "Srisawad",
+   "prov": "นครปฐม",
+   "rating": 5,
+   "n": 1
+  },
+  {
    "place_id": "ChIJM_BUcI7l4jARkK7GPLhW9V0",
    "brand": "Srisawad",
    "prov": "นครปฐม",
@@ -3502,6 +1948,13 @@
    "n": 1
   },
   {
+   "place_id": "ChIJIV5R5YuLOzERC9YljaCnd2s",
+   "brand": "Srisawad",
+   "prov": "นครพนม",
+   "rating": 5,
+   "n": 1
+  },
+  {
    "place_id": "ChIJ9Xx8TltMGTERBY9QaAsl0EA",
    "brand": "Srisawad",
    "prov": "นครราชสีมา",
@@ -3510,6 +1963,13 @@
   },
   {
    "place_id": "ChIJnxt3xXJNGTER0hBHF5aOaYY",
+   "brand": "Srisawad",
+   "prov": "นครราชสีมา",
+   "rating": 5,
+   "n": 1
+  },
+  {
+   "place_id": "ChIJkVn-8aayHjERdBJXZHJU1mU",
    "brand": "Srisawad",
    "prov": "นครราชสีมา",
    "rating": 5,
@@ -3579,7 +2039,7 @@
    "n": 1
   },
   {
-   "place_id": "ChIJ0RbPNMhP4DARqj0fWk-QiiY",
+   "place_id": "ChIJGyq7q6FP4DAR3bMreBzUNk4",
    "brand": "Srisawad",
    "prov": "นครสวรรค์",
    "rating": 5,
@@ -3601,6 +2061,13 @@
   },
   {
    "place_id": "ChIJHSM9YgBP4DARs9NFc6UGaIY",
+   "brand": "Srisawad",
+   "prov": "นครสวรรค์",
+   "rating": 5,
+   "n": 1
+  },
+  {
+   "place_id": "ChIJ37s3Uu9P4DARS4wopZeuP4U",
    "brand": "Srisawad",
    "prov": "นครสวรรค์",
    "rating": 5,
@@ -3744,7 +2211,7 @@
    "brand": "Srisawad",
    "prov": "บึงกาฬ",
    "rating": 5,
-   "n": 1
+   "n": 2
   },
   {
    "place_id": "ChIJC0723b7PJDERJpCRiEcLH6o",
@@ -3765,14 +2232,14 @@
    "brand": "Srisawad",
    "prov": "บุรีรัมย์",
    "rating": 5,
-   "n": 10
+   "n": 11
   },
   {
    "place_id": "ChIJffYHcL6XGTER8_Jfbvuwy0U",
    "brand": "Srisawad",
    "prov": "บุรีรัมย์",
    "rating": 5,
-   "n": 5
+   "n": 6
   },
   {
    "place_id": "ChIJlQTf-gCVGTERsBAEoSxlLD8",
@@ -3786,14 +2253,21 @@
    "brand": "Srisawad",
    "prov": "บุรีรัมย์",
    "rating": 5,
-   "n": 2
+   "n": 3
+  },
+  {
+   "place_id": "ChIJm06xLNuFGTER7XKrq15Riko",
+   "brand": "Srisawad",
+   "prov": "บุรีรัมย์",
+   "rating": 5,
+   "n": 1
   },
   {
    "place_id": "ChIJqy1VtHeTGTERAe1mSm9CmBw",
    "brand": "Srisawad",
    "prov": "บุรีรัมย์",
    "rating": 5,
-   "n": 1
+   "n": 2
   },
   {
    "place_id": "ChIJfVJtKTuH4jAR_ajja5CRzY0",
@@ -3835,14 +2309,14 @@
    "brand": "Srisawad",
    "prov": "ปทุมธานี",
    "rating": 5,
-   "n": 3
+   "n": 4
   },
   {
    "place_id": "ChIJQ3u4spd_HTERdXUrMigquso",
    "brand": "Srisawad",
    "prov": "ปทุมธานี",
    "rating": 5,
-   "n": 3
+   "n": 4
   },
   {
    "place_id": "ChIJDzomKJZ_HTER2cGUjonsA24",
@@ -3852,7 +2326,21 @@
    "n": 1
   },
   {
+   "place_id": "ChIJOxXXAR6R_jARwObgg0hg5c4",
+   "brand": "Srisawad",
+   "prov": "ประจวบคีรีขันธ์",
+   "rating": 5,
+   "n": 1
+  },
+  {
    "place_id": "ChIJaysEU2ut_TARAiNEuPlmcL8",
+   "brand": "Srisawad",
+   "prov": "ประจวบคีรีขันธ์",
+   "rating": 5,
+   "n": 1
+  },
+  {
+   "place_id": "ChIJ78XcVFFV_DARVOai76Dlovc",
    "brand": "Srisawad",
    "prov": "ประจวบคีรีขันธ์",
    "rating": 5,
@@ -3874,13 +2362,6 @@
   },
   {
    "place_id": "ChIJS3qKTBNTHDERUYSNNmaFhIQ",
-   "brand": "Srisawad",
-   "prov": "ปราจีนบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJD-1S5AhVHDERZoWp14Pf6UQ",
    "brand": "Srisawad",
    "prov": "ปราจีนบุรี",
    "rating": 5,
@@ -3922,1075 +2403,18 @@
    "n": 1
   },
   {
-   "place_id": "ChIJwapuKgKKHTERpuXBlKv_ttg",
-   "brand": "Srisawad",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJR8xTlfFx4jARMgPZtsk_Wmw",
-   "brand": "Srisawad",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJj_QiptuLHTERTKGnfgGYp1U",
-   "brand": "Srisawad",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJR8M2EN2LHTERNwB_8wufEA4",
-   "brand": "Srisawad",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ7wptDVEN4jARq3nenBKmHVc",
-   "brand": "Srisawad",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJGX5kwVyKHTER6p2JGK3OKc4",
-   "brand": "Srisawad",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJVdcCHpgL4jARpSh0beKqdAA",
-   "brand": "Srisawad",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJzyOroXDT2TARtiUM2US2puM",
-   "brand": "Srisawad",
-   "prov": "พะเยา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJHY_oOJTS2TARBDMJg-acwys",
-   "brand": "Srisawad",
-   "prov": "พะเยา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ_9agQ1Tt1zAREPIZP_t0GjM",
-   "brand": "Srisawad",
-   "prov": "พะเยา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ1QDes8EDUTAR06T6IVLW9TQ",
-   "brand": "Srisawad",
-   "prov": "พังงา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJEYuIeAdRUDAR8sIEanEKTgk",
-   "brand": "Srisawad",
-   "prov": "พังงา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJZy-jk-xbUDARnDcAypVIs6s",
-   "brand": "Srisawad",
-   "prov": "พังงา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJw8OCZ2Z9TTAR4qdFoAX7qn8",
-   "brand": "Srisawad",
-   "prov": "พัทลุง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ-xRq2ydjTTARrt7yi6qEuNE",
-   "brand": "Srisawad",
-   "prov": "พัทลุง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJI0S0sNt5TTARtEhnLMlQ3io",
-   "brand": "Srisawad",
-   "prov": "พัทลุง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJqYUKKwmX3zARfJUFN49KEM8",
-   "brand": "Srisawad",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJb3UeOTWX3zARelHce7QGUi4",
-   "brand": "Srisawad",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJjeu2PcW93zAR_lpzKH3BCZ8",
-   "brand": "Srisawad",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJg1FxnDa93zARw0679lvX_-0",
-   "brand": "Srisawad",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJh1UPVoG93zARJeA0LaIdasA",
-   "brand": "Srisawad",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJaQevgmK93zARUuE-TvFNCuE",
-   "brand": "Srisawad",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJCyYBEtCX3zARsytm3MCQLQk",
-   "brand": "Srisawad",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJEQ-cu2eX3zAR2gU_e_7JGKA",
-   "brand": "Srisawad",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJt6hugLQzUDARfjFi4naing4",
-   "brand": "Srisawad",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJmUuU5W0yUDAR_kCz9HjMxa8",
-   "brand": "Srisawad",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJA1GccYYxUDARKe3j_3XwnQc",
-   "brand": "Srisawad",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJmWosIb0xUDARbnQdw2AeQ1s",
-   "brand": "Srisawad",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 18
-  },
-  {
-   "place_id": "ChIJ4d70s-IxUDARamRo_Y7xQt4",
-   "brand": "Srisawad",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ4QRcZ-YpUDAR5eghk2LVCmA",
-   "brand": "Srisawad",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 19
-  },
-  {
-   "place_id": "ChIJjxJ3LdkxUDAR1bF6x904fCM",
-   "brand": "Srisawad",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJJwxinpovUDARkr01v6mH3K4",
-   "brand": "Srisawad",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ50Qv-eKnIjERG9HgMFxREXM",
-   "brand": "Srisawad",
-   "prov": "มหาสารคาม",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ5dJ1f_NnGDERGM_xYO6W5_k",
-   "brand": "Srisawad",
-   "prov": "มหาสารคาม",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ7bGjddmlPTERcLPSkE7o89o",
-   "brand": "Srisawad",
-   "prov": "มุกดาหาร",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJb1HA6m7JFzER3osY0n8X8Js",
-   "brand": "Srisawad",
-   "prov": "ยโสธร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJzVCzuEaHPTERdYs6PQDL-Do",
-   "brand": "Srisawad",
-   "prov": "ยโสธร",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJEcX6WXqbPTERQmWGbwtHI5k",
-   "brand": "Srisawad",
-   "prov": "ยโสธร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJdT28wcmPPTERZNJ87EVkUlU",
-   "brand": "Srisawad",
-   "prov": "ยโสธร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJMfYAR7DjAjERhmaEgIXPNHY",
-   "brand": "Srisawad",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJaf5-O0f7AjERz9G9VQv0m1o",
-   "brand": "Srisawad",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJi19TFVf7AjERINg--RwEuxg",
-   "brand": "Srisawad",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJWy58tDH7AjERIpik21XcPfw",
-   "brand": "Srisawad",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJOWd3gvL7AjERDVsMr6vQvfc",
-   "brand": "Srisawad",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 34
-  },
-  {
-   "place_id": "ChIJFUFLlyL7AjERC9L0pk0yoLI",
-   "brand": "Srisawad",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJxfVaNoj7AjERHlVgHLMDZwM",
-   "brand": "Srisawad",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJPajTN3L7AjERTN016BZXCkE",
-   "brand": "Srisawad",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ0cjMWD0BAzERFpAhFnre1Cc",
-   "brand": "Srisawad",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJjeZXFeEl4zARCgNkVnNwFhQ",
-   "brand": "Srisawad",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 15
-  },
-  {
-   "place_id": "ChIJw8algLcv4zARN7486CXk09g",
-   "brand": "Srisawad",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJM6eHVW0l4zARTdEr_sRt_2A",
-   "brand": "Srisawad",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJiR0IWbIo4zAR5pYTvM6cZDQ",
-   "brand": "Srisawad",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJ8_49-4Al4zARoTXeRh35jAU",
-   "brand": "Srisawad",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJPVd2snwo4zARRR3u6uYhJZE",
-   "brand": "Srisawad",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJf2Jn5L9R4zARJQq0IVBBIfM",
-   "brand": "Srisawad",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ3emVelDh4jARxveTvSFIlPE",
-   "brand": "Srisawad",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 10
-  },
-  {
-   "place_id": "ChIJIwJeNW0m4zAR4Q7IST1Pf6s",
-   "brand": "Srisawad",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJg4sM4rP9FzERKJlW-w87Aaw",
-   "brand": "Srisawad",
-   "prov": "ร้อยเอ็ด",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJW1befC39FzERcWgz6pxj-p4",
-   "brand": "Srisawad",
-   "prov": "ร้อยเอ็ด",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJaS_mdTn9FzERLgQZxhbKWvM",
-   "brand": "Srisawad",
-   "prov": "ร้อยเอ็ด",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJQ1tcGbXfFzERXz7vDuiGntM",
-   "brand": "Srisawad",
-   "prov": "ร้อยเอ็ด",
-   "rating": 5,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJDccTMvVpHjERTcng1gcj0Jk",
-   "brand": "Srisawad",
-   "prov": "ลพบุรี",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJvwIJkMpZHjERE6rPPI0hQYs",
-   "brand": "Srisawad",
-   "prov": "ลพบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJudawnuknHjERqFQBIlV0TbA",
-   "brand": "Srisawad",
-   "prov": "ลพบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ7epcsIZpHjERSxvufkUfPY8",
-   "brand": "Srisawad",
-   "prov": "ลพบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJu48SqP5r2TARLKmBQJTCofg",
-   "brand": "Srisawad",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJ-Y2t_lJr2TARs9xwW2qQJys",
-   "brand": "Srisawad",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJeVRTI4Fr2TARuCH4lsUmjnk",
-   "brand": "Srisawad",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJvcmbuDtt2TARKrix-HhRctA",
-   "brand": "Srisawad",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJZYBSj6Fr2TARh5Oomrxg7jY",
-   "brand": "Srisawad",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJI5RrJYlr2TAR57Dm8qn-K6c",
-   "brand": "Srisawad",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ59dVtYlr2TAREy6wnGUFwl4",
-   "brand": "Srisawad",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJufxIoYpp2TARg5US2YRaTk4",
-   "brand": "Srisawad",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJ67rsDQDT2zARMuYhqcejtZ0",
-   "brand": "Srisawad",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJN-CpcCDT2zARjM6brYOdBmY",
-   "brand": "Srisawad",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJ70JNZ_zN2zARksPEF3wbLME",
-   "brand": "Srisawad",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJTzpld10t2jARSwWsWm0Qpao",
-   "brand": "Srisawad",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJaae9wFot2jAR1DzOVeNdmU4",
-   "brand": "Srisawad",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ4YMltF3N2zAR3A9YZr0BgWE",
-   "brand": "Srisawad",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJlf27H5At2jAR3-Gkc2PZObM",
-   "brand": "Srisawad",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 7
-  },
-  {
-   "place_id": "ChIJs6J0xXAt2jARuR_dLtVZzMk",
-   "brand": "Srisawad",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJPad7kZbUEDER6aRx-H1CDHM",
-   "brand": "Srisawad",
-   "prov": "ศรีสะเกษ",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJUf8tI_jSFjER7ZTNVb2WpvM",
-   "brand": "Srisawad",
-   "prov": "ศรีสะเกษ",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ675t6IjTFjERcv8DMY-NQiI",
-   "brand": "Srisawad",
-   "prov": "ศรีสะเกษ",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ6QT4D7gpFzERQbm5dsZvMbQ",
-   "brand": "Srisawad",
-   "prov": "ศรีสะเกษ",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJVwHeYCfTFjERacaiMxkQyYo",
-   "brand": "Srisawad",
-   "prov": "ศรีสะเกษ",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJzwz9hMPyPDERoJyuUHRkZaA",
-   "brand": "Srisawad",
-   "prov": "สกลนคร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJXX9HfrXyPDERYwXuyWG_D1c",
-   "brand": "Srisawad",
-   "prov": "สกลนคร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJbdlRf6WWPDERso23mXZVCV4",
-   "brand": "Srisawad",
-   "prov": "สกลนคร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJx-6rkZJZOzERf9nS8--S2Ek",
-   "brand": "Srisawad",
-   "prov": "สกลนคร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJiViSaTRZOzERbCHLTiJzyBE",
-   "brand": "Srisawad",
-   "prov": "สกลนคร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJg6XSQTdZOzERpOSs9D4qBuA",
-   "brand": "Srisawad",
-   "prov": "สกลนคร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJQ0wQleYzTTARyxI4Oywu954",
-   "brand": "Srisawad",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJI2ed9aItTTARN8iRv3gjkM4",
-   "brand": "Srisawad",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJFaEGErUpTTAR8TdPZmuZrnM",
-   "brand": "Srisawad",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJlam_894pTTARy8vKx_04Qho",
-   "brand": "Srisawad",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJA5bnXnSNTDARATRDBV8NPxE",
-   "brand": "Srisawad",
-   "prov": "สตูล",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJUSvQNF73TDARQts3bgcsRvY",
-   "brand": "Srisawad",
-   "prov": "สตูล",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJmY-KcytRTDAR9_hSUBvk0jI",
-   "brand": "Srisawad",
-   "prov": "สตูล",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJR_OudF_zTDARIsowFBhl0l4",
-   "brand": "Srisawad",
-   "prov": "สตูล",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJWzyLWa5ZHTERkRsJZinNqe8",
-   "brand": "Srisawad",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJe4UYCOpdHTER5EQKoFfG8go",
-   "brand": "Srisawad",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJdaRmeQ1FHTERGKJCguMTOIM",
-   "brand": "Srisawad",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJRZOpMn1ZHTERp2VYEILkXgI",
-   "brand": "Srisawad",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJsRgukonT4jARvkzQR8t0XgA",
-   "brand": "Srisawad",
-   "prov": "สมุทรสงคราม",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJsTL4B1PT4jAREZ74mnELogs",
-   "brand": "Srisawad",
-   "prov": "สมุทรสงคราม",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJoXHhu7fX4jARR3Cde7vxO50",
-   "brand": "Srisawad",
-   "prov": "สมุทรสงคราม",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJoSqIu8S54jARpGBSnE--CCE",
-   "brand": "Srisawad",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ5y6UuyS_4jARxDkewxjy3sQ",
-   "brand": "Srisawad",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJww39ZkDH4jARXe4YZLy4zYE",
-   "brand": "Srisawad",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJpWOOm-zH4jARDme9Eba5g3g",
-   "brand": "Srisawad",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJoUb3tt_pHTERmtyYvFeEKm4",
-   "brand": "Srisawad",
-   "prov": "สระบุรี",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJZWLEI93pHTERImxK88KwVzo",
-   "brand": "Srisawad",
-   "prov": "สระบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ2yMOAP39HTERO9gwiFeij9o",
-   "brand": "Srisawad",
-   "prov": "สระบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJKS4puzq-HTERgOewTN0pJtA",
-   "brand": "Srisawad",
-   "prov": "สระบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJkbqla57cHTER2z8p-3HeBIM",
-   "brand": "Srisawad",
-   "prov": "สระบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJh8MlPBILGzERcb6mVjWqq-4",
-   "brand": "Srisawad",
-   "prov": "สระแก้ว",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJPYFCWfJvGzERZONZVV5ieG8",
-   "brand": "Srisawad",
-   "prov": "สระแก้ว",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJyWo0ygITGzERbHhITAVb0aA",
-   "brand": "Srisawad",
-   "prov": "สระแก้ว",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJYQCJ3TlgGzERb6dEA0fcTNA",
-   "brand": "Srisawad",
-   "prov": "สระแก้ว",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJnwMEM6cd4jARWkJvExGl7cw",
-   "brand": "Srisawad",
-   "prov": "สิงห์บุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ5UuBOQH14TARq7q2myUtjbE",
-   "brand": "Srisawad",
-   "prov": "สิงห์บุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJz2PFXgAD4jARz9rc9Zkn1mQ",
-   "brand": "Srisawad",
-   "prov": "สิงห์บุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJc4f1Xjfv4TARHj4wO1Eezgo",
-   "brand": "Srisawad",
-   "prov": "สิงห์บุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ6yIOrvU54jARR5Acx_GH_S8",
-   "brand": "Srisawad",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJQRWCnEZR4jARATnzBFOeLEw",
-   "brand": "Srisawad",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJBeq7uxkHVDAR2jP9M9hQlR0",
-   "brand": "Srisawad",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ4011l4sHVDARwTFZtgKTQ3I",
-   "brand": "Srisawad",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJKd0PrGcHVDARpGMnMhQuot8",
-   "brand": "Srisawad",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJt7ZsKtlPUTAREY5byxH4roQ",
-   "brand": "Srisawad",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJbb0_27fjGTERj61e2taW2ds",
-   "brand": "Srisawad",
-   "prov": "สุรินทร์",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJcTwUCt3jGTER9q9r8aWBLSw",
-   "brand": "Srisawad",
-   "prov": "สุรินทร์",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJC95FVuFbFzER8hAn1-GlZ2w",
-   "brand": "Srisawad",
-   "prov": "สุรินทร์",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJv286w6HjGTERqVJ1vgghUh8",
-   "brand": "Srisawad",
-   "prov": "สุรินทร์",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJM5IOiQtjJDERCtnMMyF2Emw",
-   "brand": "Srisawad",
-   "prov": "หนองคาย",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJfwUs5b7tIzERD2HM7edlmYI",
-   "brand": "Srisawad",
-   "prov": "หนองบัวลำภู",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJgxj2FLdLIjERLylwm9bqX_g",
-   "brand": "Srisawad",
-   "prov": "หนองบัวลำภู",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJs4CyaFe_IzEREpvYNBiP6KA",
-   "brand": "Srisawad",
-   "prov": "หนองบัวลำภู",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJCRSnVSMjFjERbazCZun4PU8",
-   "brand": "Srisawad",
-   "prov": "อำนาจเจริญ",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ8W-ynIQjFjER7AVwWUUDxtY",
-   "brand": "Srisawad",
-   "prov": "อำนาจเจริญ",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJbRro3CKdIzERdJbk7NnAKCw",
-   "brand": "Srisawad",
-   "prov": "อุดรธานี",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ2UxLOIl5IzERNOaA6PCRkaA",
-   "brand": "Srisawad",
-   "prov": "อุดรธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJUYCTc3d3IzERKWbI4xLYxqw",
-   "brand": "Srisawad",
-   "prov": "อุดรธานี",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJTeY-_PycIzERU-__8Zlf5kw",
-   "brand": "Srisawad",
-   "prov": "อุดรธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJxTz5JfAx3zARl0ov4W1wrnI",
-   "brand": "Srisawad",
-   "prov": "อุตรดิตถ์",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ1R7gLYMx3zAROKGy7xJ_E08",
-   "brand": "Srisawad",
-   "prov": "อุตรดิตถ์",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJB9Ne2sA93zARkCv6BPCYo_A",
-   "brand": "Srisawad",
-   "prov": "อุตรดิตถ์",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJU9ziNUuv4TARx1-fxgxpbzQ",
-   "brand": "Srisawad",
-   "prov": "อุทัยธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ61gXk9QZ4TARduEkqDum5t0",
-   "brand": "Srisawad",
-   "prov": "อุทัยธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJcVCuYK99FjERUUHYgGM113o",
-   "brand": "Srisawad",
-   "prov": "อุบลราชธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJM34f9SIT4jAReVenba--LsY",
-   "brand": "Srisawad",
-   "prov": "อ่างทอง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJhziAYNIv4zAROrPItt_BM-s",
-   "brand": "Srisawad",
-   "prov": "ราชบุรี",
-   "rating": 4.9,
-   "n": 7
-  },
-  {
    "place_id": "ChIJ7z-aIIwrHDERAlbECHvnpRE",
    "brand": "Srisawad",
    "prov": "นครราชสีมา",
    "rating": 4.8,
    "n": 18
+  },
+  {
+   "place_id": "ChIJj-hBgtNHHTERxw_Q3z981jg",
+   "brand": "Srisawad",
+   "prov": "ฉะเชิงเทรา",
+   "rating": 4.7,
+   "n": 3
   },
   {
    "place_id": "ChIJ-9y-uZdMGTERnH1J-3yUUec",
@@ -5000,46 +2424,11 @@
    "n": 3
   },
   {
-   "place_id": "ChIJLdR8CN8zUDARYNiw36liiEc",
-   "brand": "Srisawad",
-   "prov": "ภูเก็ต",
-   "rating": 4.7,
-   "n": 3
-  },
-  {
    "place_id": "ChIJL1cOLD2Z4jARmtVGM_7iX6A",
    "brand": "Srisawad",
    "prov": "กรุงเทพมหานคร",
    "rating": 4.6,
    "n": 9
-  },
-  {
-   "place_id": "ChIJj-hBgtNHHTERxw_Q3z981jg",
-   "brand": "Srisawad",
-   "prov": "ฉะเชิงเทรา",
-   "rating": 4.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ0Zuv6arT2zARilHRzbDri2I",
-   "brand": "Srisawad",
-   "prov": "ลำพูน",
-   "rating": 4.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJXRJtV9LT4jARWM1OgW4rhAc",
-   "brand": "Srisawad",
-   "prov": "สมุทรสงคราม",
-   "rating": 4.5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJUyeBKfbdHTERCuxwC0yUQSc",
-   "brand": "Srisawad",
-   "prov": "สระบุรี",
-   "rating": 4.4,
-   "n": 7
   },
   {
    "place_id": "ChIJSdS0kGuT26sRi43ydz2x85g",
@@ -5070,6 +2459,13 @@
    "n": 1
   },
   {
+   "place_id": "ChIJ0RbPNMhP4DARqj0fWk-QiiY",
+   "brand": "Srisawad",
+   "prov": "นครสวรรค์",
+   "rating": 4,
+   "n": 2
+  },
+  {
    "place_id": "ChIJ4ViyEpJP4DAR9Vd6PbG52Sg",
    "brand": "Srisawad",
    "prov": "นครสวรรค์",
@@ -5082,48 +2478,6 @@
    "prov": "น่าน",
    "rating": 4,
    "n": 4
-  },
-  {
-   "place_id": "ChIJUZ-1pxHm3zARvq0FtDXX3OM",
-   "brand": "Srisawad",
-   "prov": "พิจิตร",
-   "rating": 4,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJTbWSMr92szER3A0aWMYykBw",
-   "brand": "Srisawad",
-   "prov": "ยะลา",
-   "rating": 4,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJPV0oiZXPFzERmNuAMgwSfZs",
-   "brand": "Srisawad",
-   "prov": "ยโสธร",
-   "rating": 4,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJsxb9Ftmn4jARNdLSWLDdLg8",
-   "brand": "Srisawad",
-   "prov": "สมุทรปราการ",
-   "rating": 4,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJr-DFE3LpHTERlndV7BZPDDQ",
-   "brand": "Srisawad",
-   "prov": "สระบุรี",
-   "rating": 4,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJT86U4dl7JDERUYqesyDBzZQ",
-   "brand": "Srisawad",
-   "prov": "หนองคาย",
-   "rating": 4,
-   "n": 1
   },
   {
    "place_id": "ChIJeQtFTyNnBDERsXEpJlBVujw",
@@ -5140,32 +2494,11 @@
    "n": 3
   },
   {
-   "place_id": "ChIJN_6Eanxr2TARxiGSlzagZpY",
-   "brand": "Srisawad",
-   "prov": "ลำปาง",
-   "rating": 3.7,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJH0-_Z3fjGTERDBjvnCX-BU0",
-   "brand": "Srisawad",
-   "prov": "สุรินทร์",
-   "rating": 3.7,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJvfuoyXGNTDARPewuCbp4Gvw",
-   "brand": "Srisawad",
-   "prov": "สตูล",
-   "rating": 3.5,
-   "n": 2
-  },
-  {
    "place_id": "ChIJ0YCxbt-C4jARul-nAE4uvkQ",
    "brand": "Srisawad",
    "prov": "กรุงเทพมหานคร",
    "rating": 3,
-   "n": 164
+   "n": 169
   },
   {
    "place_id": "ChIJ8b-XtKFjIjERYJWFPjatnDQ",
@@ -5189,46 +2522,11 @@
    "n": 1
   },
   {
-   "place_id": "ChIJkVn-8aayHjERdBJXZHJU1mU",
-   "brand": "Srisawad",
-   "prov": "นครราชสีมา",
-   "rating": 3,
-   "n": 2
-  },
-  {
    "place_id": "ChIJAUQ7Ewe5szER0NEyngCt0uk",
    "brand": "Srisawad",
    "prov": "ปัตตานี",
    "rating": 3,
    "n": 2
-  },
-  {
-   "place_id": "ChIJL0YnL4-nIjERRVT-KUwm0V0",
-   "brand": "Srisawad",
-   "prov": "มหาสารคาม",
-   "rating": 3,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ-deuZ5IxFjERd_umLq3H_B4",
-   "brand": "Srisawad",
-   "prov": "ยโสธร",
-   "rating": 3,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ5aBBLNy34jAR0aXl0VmfVoY",
-   "brand": "Srisawad",
-   "prov": "สมุทรสาคร",
-   "rating": 3,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ9-zj3Uc54jARDi4hzqnnux0",
-   "brand": "Srisawad",
-   "prov": "สิงห์บุรี",
-   "rating": 3,
-   "n": 4
   },
   {
    "place_id": "ChIJgyKsr7waszER_vd6l9U_XCo",
@@ -5248,83 +2546,6 @@
    "place_id": "ChIJD7Y7DU2LHDERHnG64FH8U8A",
    "brand": "Srisawad",
    "prov": "ปราจีนบุรี",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJZ3dzMKXbUDARMS3NoemQc1A",
-   "brand": "Srisawad",
-   "prov": "พังงา",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJvfJpQe293zARblfyiVsSkWM",
-   "brand": "Srisawad",
-   "prov": "พิษณุโลก",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ-Yx7Ed1zszERB9sNZ2xQAII",
-   "brand": "Srisawad",
-   "prov": "ยะลา",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJbzEQB4srFjER6qrpCEuz6Yc",
-   "brand": "Srisawad",
-   "prov": "ยโสธร",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJB7Kpf7T_FzERC9T0jy3IHSM",
-   "brand": "Srisawad",
-   "prov": "ร้อยเอ็ด",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ70O2-USn4jARFxOLqgh2fkU",
-   "brand": "Srisawad",
-   "prov": "สมุทรปราการ",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJK6WhFCm54jAR_jlpDFm-mm0",
-   "brand": "Srisawad",
-   "prov": "สมุทรสาคร",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJkcd9W3G54jARZQJugv4uTcc",
-   "brand": "Srisawad",
-   "prov": "สมุทรสาคร",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJq-puLgzpHTERCGAE6rad184",
-   "brand": "Srisawad",
-   "prov": "สระบุรี",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ7z0iAg-dIzERo41sgBtR4t4",
-   "brand": "Srisawad",
-   "prov": "อุดรธานี",
-   "rating": 1,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ1U7HA7-l4TAR-J2s6fQBefg",
-   "brand": "Srisawad",
-   "prov": "อุทัยธานี",
    "rating": 1,
    "n": 1
   },
@@ -5403,7 +2624,7 @@
    "brand": "Tidlor",
    "prov": "กรุงเทพมหานคร",
    "rating": 5,
-   "n": 14
+   "n": 13
   },
   {
    "place_id": "ChIJPcR1BY2f4jARjha_CjKhoUs",
@@ -5431,7 +2652,7 @@
    "brand": "Tidlor",
    "prov": "กรุงเทพมหานคร",
    "rating": 5,
-   "n": 20
+   "n": 3
   },
   {
    "place_id": "ChIJGW7nfMSd4jARzFd27ywnF8A",
@@ -5564,7 +2785,7 @@
    "brand": "Tidlor",
    "prov": "จันทบุรี",
    "rating": 5,
-   "n": 2
+   "n": 3
   },
   {
    "place_id": "ChIJebMhpiuDBDERzHnC-WjEeE4",
@@ -5854,6 +3075,13 @@
    "n": 15
   },
   {
+   "place_id": "ChIJ137inRfn4jARE-yrLcTphn8",
+   "brand": "Tidlor",
+   "prov": "นครปฐม",
+   "rating": 5,
+   "n": 3
+  },
+  {
    "place_id": "ChIJq7uwzF3l4jARlZE2tXaM6-Q",
    "brand": "Tidlor",
    "prov": "นครปฐม",
@@ -5872,7 +3100,7 @@
    "brand": "Tidlor",
    "prov": "นครปฐม",
    "rating": 5,
-   "n": 25
+   "n": 23
   },
   {
    "place_id": "ChIJSQhI-iHl4jARhGSgI4MLhyA",
@@ -5914,7 +3142,7 @@
    "brand": "Tidlor",
    "prov": "นครพนม",
    "rating": 5,
-   "n": 25
+   "n": 26
   },
   {
    "place_id": "ChIJw3w3QF15PDERZii0eQ_9LlA",
@@ -5928,14 +3156,14 @@
    "brand": "Tidlor",
    "prov": "นครพนม",
    "rating": 5,
-   "n": 30
+   "n": 31
   },
   {
    "place_id": "ChIJwQFeV71MGTER6oaUZ2MLYKY",
    "brand": "Tidlor",
    "prov": "นครราชสีมา",
    "rating": 5,
-   "n": 83
+   "n": 82
   },
   {
    "place_id": "ChIJh1KI-YCzHjERMQ9PDQ2bBQc",
@@ -6131,7 +3359,7 @@
    "brand": "Tidlor",
    "prov": "นนทบุรี",
    "rating": 5,
-   "n": 54
+   "n": 49
   },
   {
    "place_id": "ChIJfRMJU_qP4jARfH4gpGZJ1DU",
@@ -6281,1273 +3509,6 @@
    "n": 22
   },
   {
-   "place_id": "ChIJh5cnY9h14jARVoi9g-plAz8",
-   "brand": "Tidlor",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ3b5Qmrtv4jARuaapztHUh3k",
-   "brand": "Tidlor",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 19
-  },
-  {
-   "place_id": "ChIJ8-Qaj4YL4jARTZzpW99C2dk",
-   "brand": "Tidlor",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJ8zvoqN5v4jARfE6ynfoTU3o",
-   "brand": "Tidlor",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 21
-  },
-  {
-   "place_id": "ChIJ62GKoMmJHTERr5fhGR9d9V0",
-   "brand": "Tidlor",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ5d-jh63T2TARcMiCk842xic",
-   "brand": "Tidlor",
-   "prov": "พะเยา",
-   "rating": 5,
-   "n": 8
-  },
-  {
-   "place_id": "ChIJm1iHapgt2DARuUVGlv81vug",
-   "brand": "Tidlor",
-   "prov": "พะเยา",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJA6sMc0PT2TARJH-cndwU1i8",
-   "brand": "Tidlor",
-   "prov": "พะเยา",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJBcBucbQt2DARGtkXkBIcQ5k",
-   "brand": "Tidlor",
-   "prov": "พะเยา",
-   "rating": 5,
-   "n": 8
-  },
-  {
-   "place_id": "ChIJVfqe7c0v2DAR4NMU1RELcPg",
-   "brand": "Tidlor",
-   "prov": "พะเยา",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJLwZONjHt1zARjLKzvueRQ0k",
-   "brand": "Tidlor",
-   "prov": "พะเยา",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJo-sU3GwBUTARv0AHMa5yit8",
-   "brand": "Tidlor",
-   "prov": "พังงา",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJZx1Ka-tbUDAR7e-QgI8T_SI",
-   "brand": "Tidlor",
-   "prov": "พังงา",
-   "rating": 5,
-   "n": 12
-  },
-  {
-   "place_id": "ChIJOWSQr69bUDAR5Fgfdw3xaz0",
-   "brand": "Tidlor",
-   "prov": "พังงา",
-   "rating": 5,
-   "n": 7
-  },
-  {
-   "place_id": "ChIJubAa1EV9TTAR1vqiIsKcraw",
-   "brand": "Tidlor",
-   "prov": "พัทลุง",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJkVX5B1l9TTARJaWI5Ki9T1E",
-   "brand": "Tidlor",
-   "prov": "พัทลุง",
-   "rating": 5,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJjVcovYJjTTAR7EYzpyQ0VJg",
-   "brand": "Tidlor",
-   "prov": "พัทลุง",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJ7YPG94aDUjARnLMHvRTMtyQ",
-   "brand": "Tidlor",
-   "prov": "พัทลุง",
-   "rating": 5,
-   "n": 14
-  },
-  {
-   "place_id": "ChIJVyoSK79jTTARwEDvpvyaY_c",
-   "brand": "Tidlor",
-   "prov": "พัทลุง",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJ1w1OZxl5TTARq0jXh9W3sUU",
-   "brand": "Tidlor",
-   "prov": "พัทลุง",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJF_BMCFd1TTARntKPYIRZNgs",
-   "brand": "Tidlor",
-   "prov": "พัทลุง",
-   "rating": 5,
-   "n": 12
-  },
-  {
-   "place_id": "ChIJSxS-WuRBTTARCX01brPkd5E",
-   "brand": "Tidlor",
-   "prov": "พัทลุง",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJzdOwFXPn3zAR4Z-siP-ILl4",
-   "brand": "Tidlor",
-   "prov": "พิจิตร",
-   "rating": 5,
-   "n": 18
-  },
-  {
-   "place_id": "ChIJx71A5dLF3zARqKIJ9HVUs_I",
-   "brand": "Tidlor",
-   "prov": "พิจิตร",
-   "rating": 5,
-   "n": 22
-  },
-  {
-   "place_id": "ChIJU6fXG7kD4DARiZydkgHGdr4",
-   "brand": "Tidlor",
-   "prov": "พิจิตร",
-   "rating": 5,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJYy3zFZAI4DARdBNvtQk_Aak",
-   "brand": "Tidlor",
-   "prov": "พิจิตร",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJdairvh7D3zAREczWPPyxUBs",
-   "brand": "Tidlor",
-   "prov": "พิจิตร",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJtUT-fTsR4DAR7kl599DUuEQ",
-   "brand": "Tidlor",
-   "prov": "พิจิตร",
-   "rating": 5,
-   "n": 18
-  },
-  {
-   "place_id": "ChIJx5wphEOX3zARLMHVZR9c5yw",
-   "brand": "Tidlor",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 7
-  },
-  {
-   "place_id": "ChIJX0gYomeX3zARNX571b2hVUU",
-   "brand": "Tidlor",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 16
-  },
-  {
-   "place_id": "ChIJQYFj7G693zARPMo0wQ4f9eY",
-   "brand": "Tidlor",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ-VXADT-93zARc84p-MgyaSI",
-   "brand": "Tidlor",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJjVAzHRqj3zARwePQR9JJMG4",
-   "brand": "Tidlor",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJ9Vhq_SeX3zAR3vLrpDsbUhg",
-   "brand": "Tidlor",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJa0W4IJqR3zARdPW8s-APu5Q",
-   "brand": "Tidlor",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJB57xLmWX3zARxgmIW-sz1K0",
-   "brand": "Tidlor",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJsTwg0FS93zARRc_SKM3-YnU",
-   "brand": "Tidlor",
-   "prov": "พิษณุโลก",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ2SpsfJwxUDAR-5-xuWCmC7A",
-   "brand": "Tidlor",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 12
-  },
-  {
-   "place_id": "ChIJ0W9QDC8xUDARlbgX6_AX55w",
-   "brand": "Tidlor",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJ9XLqMgwxUDAR13vUQUs1ND8",
-   "brand": "Tidlor",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJSdprR4o3UDARvXQ0bHgziIQ",
-   "brand": "Tidlor",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJnb3IHjUxUDAR2rYe-MTIk8Q",
-   "brand": "Tidlor",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJvSnNlvoxUDARZSpHY1avD-Y",
-   "brand": "Tidlor",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJ5ROUg1IzUDARJzhcyBlf6Ks",
-   "brand": "Tidlor",
-   "prov": "ภูเก็ต",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJMSXcOvKjIjERAD1vi9mPc0c",
-   "brand": "Tidlor",
-   "prov": "มหาสารคาม",
-   "rating": 5,
-   "n": 12
-  },
-  {
-   "place_id": "ChIJhVBGDTKnIjERjuoeDSBlJWM",
-   "brand": "Tidlor",
-   "prov": "มหาสารคาม",
-   "rating": 5,
-   "n": 16
-  },
-  {
-   "place_id": "ChIJcR8eZg27IjERr2bl63VzgDY",
-   "brand": "Tidlor",
-   "prov": "มหาสารคาม",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJEQXRg8s3GDERkX8nO8lwTHE",
-   "brand": "Tidlor",
-   "prov": "มหาสารคาม",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJIxcRzx51GDERrH1rRcdtCec",
-   "brand": "Tidlor",
-   "prov": "มหาสารคาม",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJWyL_yPqbIjER3U9ywQ2LuhI",
-   "brand": "Tidlor",
-   "prov": "มหาสารคาม",
-   "rating": 5,
-   "n": 27
-  },
-  {
-   "place_id": "ChIJv0rRXSl3GDERR47IRtSaUS0",
-   "brand": "Tidlor",
-   "prov": "มหาสารคาม",
-   "rating": 5,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJtfluNB3PFzERYGtm2Rqxohs",
-   "brand": "Tidlor",
-   "prov": "ยโสธร",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJL-uUxdxRVjARbzYLIZtIsbw",
-   "brand": "Tidlor",
-   "prov": "ระนอง",
-   "rating": 5,
-   "n": 14
-  },
-  {
-   "place_id": "ChIJGWUwOXdPVjARgZ9nQpDbGok",
-   "brand": "Tidlor",
-   "prov": "ระนอง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJN1S5qK4jVjAR2qcphVYq-NE",
-   "brand": "Tidlor",
-   "prov": "ระนอง",
-   "rating": 5,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJAdi9HUr9AjER--LP4X33M_0",
-   "brand": "Tidlor",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 19
-  },
-  {
-   "place_id": "ChIJjx-kRs77AjERWUFahyxfB_A",
-   "brand": "Tidlor",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJi40vaJn7AjER6w9KOZHxAio",
-   "brand": "Tidlor",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 31
-  },
-  {
-   "place_id": "ChIJZWnwgCT7AjERn1LZLFJGY5g",
-   "brand": "Tidlor",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJe9zH4cltAzERy4osZ9yOJzw",
-   "brand": "Tidlor",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 18
-  },
-  {
-   "place_id": "ChIJEZbiyTv9AjERKXojsB98s08",
-   "brand": "Tidlor",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJf4oNczL7AjERgdToQGy4Ze8",
-   "brand": "Tidlor",
-   "prov": "ระยอง",
-   "rating": 5,
-   "n": 15
-  },
-  {
-   "place_id": "ChIJLeNiyy8l4zARtMHUTXNx5g0",
-   "brand": "Tidlor",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 12
-  },
-  {
-   "place_id": "ChIJs7nvIKol4zAREm8pW_6x23g",
-   "brand": "Tidlor",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 20
-  },
-  {
-   "place_id": "ChIJwcZWASIn4zARAbQfeplG3uc",
-   "brand": "Tidlor",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 18
-  },
-  {
-   "place_id": "ChIJWXIJooEp4zARo5WmV3EnyoI",
-   "brand": "Tidlor",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 16
-  },
-  {
-   "place_id": "ChIJbY5Vo2Ih4zAR5w0F9tp73hc",
-   "brand": "Tidlor",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 32
-  },
-  {
-   "place_id": "ChIJDQVqreop4zARP3T8WHNeWz0",
-   "brand": "Tidlor",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 19
-  },
-  {
-   "place_id": "ChIJi1uH01cp4zARiHV2GAFHWgQ",
-   "brand": "Tidlor",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 12
-  },
-  {
-   "place_id": "ChIJZ6eFFo0h4zARkeLmgdp8RwI",
-   "brand": "Tidlor",
-   "prov": "ราชบุรี",
-   "rating": 5,
-   "n": 141
-  },
-  {
-   "place_id": "ChIJmy3kmLP9FzERZFdWp-CYLO4",
-   "brand": "Tidlor",
-   "prov": "ร้อยเอ็ด",
-   "rating": 5,
-   "n": 11
-  },
-  {
-   "place_id": "ChIJodh2WJT9FzERvr15ZHLdHq8",
-   "brand": "Tidlor",
-   "prov": "ร้อยเอ็ด",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJk1S79g_9FzER1wiS7o6BQNA",
-   "brand": "Tidlor",
-   "prov": "ร้อยเอ็ด",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJJW7c-DH9FzERtWIW9XRTZjg",
-   "brand": "Tidlor",
-   "prov": "ร้อยเอ็ด",
-   "rating": 5,
-   "n": 13
-  },
-  {
-   "place_id": "ChIJEU35rKFVPTERc68NTxLEhfE",
-   "brand": "Tidlor",
-   "prov": "ร้อยเอ็ด",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJl7RheIr9FzERsuZuOglLNQw",
-   "brand": "Tidlor",
-   "prov": "ร้อยเอ็ด",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ2wsYs20AHjERQlh35D2oaXE",
-   "brand": "Tidlor",
-   "prov": "ลพบุรี",
-   "rating": 5,
-   "n": 34
-  },
-  {
-   "place_id": "ChIJ1XqVFSpt2TARlxBOZVMdj5s",
-   "brand": "Tidlor",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 10
-  },
-  {
-   "place_id": "ChIJv9D3nZBr2TARSsLE-21AygM",
-   "brand": "Tidlor",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJ10st1JJr2TARcAajSKRkq8Q",
-   "brand": "Tidlor",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 27
-  },
-  {
-   "place_id": "ChIJj0PXaIVr2TARrZjpOkANK_I",
-   "brand": "Tidlor",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJWwHwBwVB2TARxjj3RBYfezg",
-   "brand": "Tidlor",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJaeVWv2Nt2TARAeF9UnZUByE",
-   "brand": "Tidlor",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJFZlDQhJp2TARWEX_MB2rgj0",
-   "brand": "Tidlor",
-   "prov": "ลำปาง",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJv8zbL_ct2jARo_Gi8Hzh4RE",
-   "brand": "Tidlor",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 14
-  },
-  {
-   "place_id": "ChIJ20I5Mc_T2zARYhF20nLCuX8",
-   "brand": "Tidlor",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 25
-  },
-  {
-   "place_id": "ChIJy-TxC7st2jARIjgnFAA_RVA",
-   "brand": "Tidlor",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJrQdC_53T2zARb_uX6ggcpO0",
-   "brand": "Tidlor",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 15
-  },
-  {
-   "place_id": "ChIJKxz27iXT2zARAtmnzZHCUj0",
-   "brand": "Tidlor",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 15
-  },
-  {
-   "place_id": "ChIJhXb4RdfN2zAR0f1vSxWaFts",
-   "brand": "Tidlor",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJhza1VYLP2zAREzd9ffcjNHM",
-   "brand": "Tidlor",
-   "prov": "ลำพูน",
-   "rating": 5,
-   "n": 13
-  },
-  {
-   "place_id": "ChIJFQl2WKnjFjER9cfD4g3nyDs",
-   "brand": "Tidlor",
-   "prov": "ศรีสะเกษ",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJyUoyhB_jFjERykEvyIjG3Ps",
-   "brand": "Tidlor",
-   "prov": "ศรีสะเกษ",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJM6qUxGjjFjER7-pKYQI8DOQ",
-   "brand": "Tidlor",
-   "prov": "ศรีสะเกษ",
-   "rating": 5,
-   "n": 12
-  },
-  {
-   "place_id": "ChIJxxNw1NHjFjERLEu21k1gQGw",
-   "brand": "Tidlor",
-   "prov": "ศรีสะเกษ",
-   "rating": 5,
-   "n": 13
-  },
-  {
-   "place_id": "ChIJyxA-dNPjFjERTDRElbSyThY",
-   "brand": "Tidlor",
-   "prov": "ศรีสะเกษ",
-   "rating": 5,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJ1dKtah4PFzERYvaHl3LSRkk",
-   "brand": "Tidlor",
-   "prov": "ศรีสะเกษ",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJLRoRJNfyPDERcVpW1Xhvgso",
-   "brand": "Tidlor",
-   "prov": "สกลนคร",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ6XBgE94zTTARjrHtY31l068",
-   "brand": "Tidlor",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJayrSAIczTTARonNKgGxdezI",
-   "brand": "Tidlor",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJ4VjLsP7NsjERrXKUi1DWETI",
-   "brand": "Tidlor",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 23
-  },
-  {
-   "place_id": "ChIJ7QUd1ectTTAR6ldww2_biCQ",
-   "brand": "Tidlor",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJex8ZWG4pTTARheNQFhaMmzs",
-   "brand": "Tidlor",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJ34WGNCvZTDARtd3WPT2-9bg",
-   "brand": "Tidlor",
-   "prov": "สงขลา",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJFbL6PTaNTDARmwQ_4LiO3oI",
-   "brand": "Tidlor",
-   "prov": "สตูล",
-   "rating": 5,
-   "n": 11
-  },
-  {
-   "place_id": "ChIJj4YF9A1RTDARzcSZO6RfvIw",
-   "brand": "Tidlor",
-   "prov": "สตูล",
-   "rating": 5,
-   "n": 16
-  },
-  {
-   "place_id": "ChIJaQoRxHONTDARIcR2UpcqORg",
-   "brand": "Tidlor",
-   "prov": "สตูล",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJJQ9ANZmn4jARZtUhfDDhZpA",
-   "brand": "Tidlor",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 27
-  },
-  {
-   "place_id": "ChIJe4Afo0yn4jARwZWBXaAbM9c",
-   "brand": "Tidlor",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 29
-  },
-  {
-   "place_id": "ChIJt4r0pK5ZHTER-3DloSFvbXs",
-   "brand": "Tidlor",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 36
-  },
-  {
-   "place_id": "ChIJZyVJjEBfHTERnXcHf--Jo84",
-   "brand": "Tidlor",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJ79quoLRZHTERS2BgDYvCYZo",
-   "brand": "Tidlor",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJGfFRIH9dHTERA6_3Wkaq_Rg",
-   "brand": "Tidlor",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 10
-  },
-  {
-   "place_id": "ChIJvYJEQEFbHTERWEvncbpj-JY",
-   "brand": "Tidlor",
-   "prov": "สมุทรปราการ",
-   "rating": 5,
-   "n": 11
-  },
-  {
-   "place_id": "ChIJf0hpkq3T4jARu1WZB1upIq0",
-   "brand": "Tidlor",
-   "prov": "สมุทรสงคราม",
-   "rating": 5,
-   "n": 19
-  },
-  {
-   "place_id": "ChIJSTdajte54jARBTf6BNAgV_c",
-   "brand": "Tidlor",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 98
-  },
-  {
-   "place_id": "ChIJDa4114TH4jARteAVYkEPVSI",
-   "brand": "Tidlor",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 23
-  },
-  {
-   "place_id": "ChIJ0YNkc4C54jARoVCW2800Ydo",
-   "brand": "Tidlor",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 10
-  },
-  {
-   "place_id": "ChIJ3eRr7FK54jARejHM-MOJjQg",
-   "brand": "Tidlor",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 28
-  },
-  {
-   "place_id": "ChIJCaN61WW54jARyAU6EqHHQPI",
-   "brand": "Tidlor",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJY9nYwGC54jARiAtViOdlvaE",
-   "brand": "Tidlor",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 33
-  },
-  {
-   "place_id": "ChIJx5YxCL3F4jAR0Dmgxb7YMio",
-   "brand": "Tidlor",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 23
-  },
-  {
-   "place_id": "ChIJ38PeEBbH4jARkUMRADzuGu8",
-   "brand": "Tidlor",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 15
-  },
-  {
-   "place_id": "ChIJ3TYLoSa54jARMxJMpTwkJiA",
-   "brand": "Tidlor",
-   "prov": "สมุทรสาคร",
-   "rating": 5,
-   "n": 42
-  },
-  {
-   "place_id": "ChIJSXh2phbpHTERIc1QVFEycIo",
-   "brand": "Tidlor",
-   "prov": "สระบุรี",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJ994_DT3pHTERR0PenzPL_DQ",
-   "brand": "Tidlor",
-   "prov": "สระบุรี",
-   "rating": 5,
-   "n": 13
-  },
-  {
-   "place_id": "ChIJuabNOcXpHTERcMX3-00K5Vg",
-   "brand": "Tidlor",
-   "prov": "สระบุรี",
-   "rating": 5,
-   "n": 8
-  },
-  {
-   "place_id": "ChIJwZLemaV9GzERHp80f2eIibE",
-   "brand": "Tidlor",
-   "prov": "สระแก้ว",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJs0vmsOWDHDERUO0hn1YVBVY",
-   "brand": "Tidlor",
-   "prov": "สระแก้ว",
-   "rating": 5,
-   "n": 19
-  },
-  {
-   "place_id": "ChIJ4eREzG7x4TARJUu5ELDAjN4",
-   "brand": "Tidlor",
-   "prov": "สิงห์บุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJKZjc1G3x4TARg5Bjrfu4lZ0",
-   "brand": "Tidlor",
-   "prov": "สิงห์บุรี",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJb-INGUQ54jARtowerCZGz6s",
-   "brand": "Tidlor",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJyx7FRmo54jAR26l85SAt-_U",
-   "brand": "Tidlor",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJv2SVono54jARC2CytCfsks4",
-   "brand": "Tidlor",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 11
-  },
-  {
-   "place_id": "ChIJdd4B2R454jARUHn8x1IUewE",
-   "brand": "Tidlor",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 14
-  },
-  {
-   "place_id": "ChIJnWmRxLU54jARfw4PTWvFYz0",
-   "brand": "Tidlor",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJj990v1Al4jARABJMctgMwiU",
-   "brand": "Tidlor",
-   "prov": "สุพรรณบุรี",
-   "rating": 5,
-   "n": 14
-  },
-  {
-   "place_id": "ChIJyRwKHAwHVDAR4Lcl9GTJAiI",
-   "brand": "Tidlor",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 22
-  },
-  {
-   "place_id": "ChIJ8Ueyu8sHVDAR2go0ISBHhYg",
-   "brand": "Tidlor",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 15
-  },
-  {
-   "place_id": "ChIJnU40RJEHVDARMu1zbsbFGlg",
-   "brand": "Tidlor",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 10
-  },
-  {
-   "place_id": "ChIJE98PkOMGVDAR8PnWaGJMw7g",
-   "brand": "Tidlor",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJweUgj-IHVDARSSse29eoe3Y",
-   "brand": "Tidlor",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 22
-  },
-  {
-   "place_id": "ChIJ36-jCZ93VDARXdc572csiD0",
-   "brand": "Tidlor",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 20
-  },
-  {
-   "place_id": "ChIJiV6cn6AHVDARhHgDHn0BUpw",
-   "brand": "Tidlor",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 12
-  },
-  {
-   "place_id": "ChIJo2wQ0NwHVDARXFNSvfZwMDk",
-   "brand": "Tidlor",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJcXc_v5wHVDARDceltieVmFk",
-   "brand": "Tidlor",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 5,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJFfaa4D7jGTERIvVLj38_jbQ",
-   "brand": "Tidlor",
-   "prov": "สุรินทร์",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJOxGiwOrjGTERtYWKkNM5teM",
-   "brand": "Tidlor",
-   "prov": "สุรินทร์",
-   "rating": 5,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJB-Nm0jzjGTERx9AyEqRaANI",
-   "brand": "Tidlor",
-   "prov": "สุรินทร์",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJlzMd4ZbjGTERhBAbb9-NUl4",
-   "brand": "Tidlor",
-   "prov": "สุรินทร์",
-   "rating": 5,
-   "n": 13
-  },
-  {
-   "place_id": "ChIJAzRHhIvjGTER_5tc9PcytZY",
-   "brand": "Tidlor",
-   "prov": "สุรินทร์",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJD58BtbcDGjER5m-d7jZrRSE",
-   "brand": "Tidlor",
-   "prov": "สุรินทร์",
-   "rating": 5,
-   "n": 20
-  },
-  {
-   "place_id": "ChIJcaMi4QoDGjER1AA2eWwprUo",
-   "brand": "Tidlor",
-   "prov": "สุรินทร์",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJQbHM1JBX3jARhq8SAjRm2XI",
-   "brand": "Tidlor",
-   "prov": "สุโขทัย",
-   "rating": 5,
-   "n": 38
-  },
-  {
-   "place_id": "ChIJraIRnZNV3jARS87dzMfIjGQ",
-   "brand": "Tidlor",
-   "prov": "สุโขทัย",
-   "rating": 5,
-   "n": 48
-  },
-  {
-   "place_id": "ChIJaXPYAX9X3jARqTjzjThxwTU",
-   "brand": "Tidlor",
-   "prov": "สุโขทัย",
-   "rating": 5,
-   "n": 12
-  },
-  {
-   "place_id": "ChIJFQjA6I9V3jAR9UizaTNHIx4",
-   "brand": "Tidlor",
-   "prov": "สุโขทัย",
-   "rating": 5,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJ-TqVmQBjJDERC-sxQFbTgfI",
-   "brand": "Tidlor",
-   "prov": "หนองคาย",
-   "rating": 5,
-   "n": 8
-  },
-  {
-   "place_id": "ChIJic_NOoNjJDERSvF3S6mr7fQ",
-   "brand": "Tidlor",
-   "prov": "หนองคาย",
-   "rating": 5,
-   "n": 14
-  },
-  {
-   "place_id": "ChIJu97aYB59JDERYDum4MT5O3k",
-   "brand": "Tidlor",
-   "prov": "หนองคาย",
-   "rating": 5,
-   "n": 10
-  },
-  {
-   "place_id": "ChIJP8mzzb6_IzERIguf-EcxJ4o",
-   "brand": "Tidlor",
-   "prov": "หนองบัวลำภู",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJhwLerpPhIzERLE8neR1QxXg",
-   "brand": "Tidlor",
-   "prov": "หนองบัวลำภู",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJ9fUjQ-7NIzER0U_XBprWaFc",
-   "brand": "Tidlor",
-   "prov": "หนองบัวลำภู",
-   "rating": 5,
-   "n": 24
-  },
-  {
-   "place_id": "ChIJ2VxS2XjnIzERxIYqFQbCDyY",
-   "brand": "Tidlor",
-   "prov": "หนองบัวลำภู",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ9UWeTZdNIjERSpw8esLm-sU",
-   "brand": "Tidlor",
-   "prov": "หนองบัวลำภู",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJVZGgFo8jFjERF8vc187EG5E",
-   "brand": "Tidlor",
-   "prov": "อำนาจเจริญ",
-   "rating": 5,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJv-SZAsF3IzER--2oIeFV_fw",
-   "brand": "Tidlor",
-   "prov": "อุดรธานี",
-   "rating": 5,
-   "n": 7
-  },
-  {
-   "place_id": "ChIJbcdHw153IzERH296V1PBYSs",
-   "brand": "Tidlor",
-   "prov": "อุดรธานี",
-   "rating": 5,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJi4o70x6dIzEREocB-cEcvLs",
-   "brand": "Tidlor",
-   "prov": "อุดรธานี",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJN2jPbcGDIzERqiUan7iiKXQ",
-   "brand": "Tidlor",
-   "prov": "อุดรธานี",
-   "rating": 5,
-   "n": 12
-  },
-  {
-   "place_id": "ChIJkR82Gd2dIzERsy2fzdZBVoM",
-   "brand": "Tidlor",
-   "prov": "อุดรธานี",
-   "rating": 5,
-   "n": 21
-  },
-  {
-   "place_id": "ChIJ4VdSZgqdIzERI_RUnL_IrlQ",
-   "brand": "Tidlor",
-   "prov": "อุดรธานี",
-   "rating": 5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJxdI8ZTAx3zARhQ6q-A1zxvc",
-   "brand": "Tidlor",
-   "prov": "อุตรดิตถ์",
-   "rating": 5,
-   "n": 30
-  },
-  {
-   "place_id": "ChIJLfLyUWUx3zARuEf8VZ0bNk8",
-   "brand": "Tidlor",
-   "prov": "อุตรดิตถ์",
-   "rating": 5,
-   "n": 33
-  },
-  {
-   "place_id": "ChIJj3P0oJIv3zARTN7Po1Xdhoc",
-   "brand": "Tidlor",
-   "prov": "อุตรดิตถ์",
-   "rating": 5,
-   "n": 15
-  },
-  {
-   "place_id": "ChIJf3ug7xhB3zAROuVzGAsTuUg",
-   "brand": "Tidlor",
-   "prov": "อุตรดิตถ์",
-   "rating": 5,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJAdkGF7Kv4TAReavJ1A7myHM",
-   "brand": "Tidlor",
-   "prov": "อุทัยธานี",
-   "rating": 5,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ3XrjVKCv4TARM4HqZnah6wI",
-   "brand": "Tidlor",
-   "prov": "อุทัยธานี",
-   "rating": 5,
-   "n": 20
-  },
-  {
-   "place_id": "ChIJV_qbr0uv4TAR1SXQEc2i3Gw",
-   "brand": "Tidlor",
-   "prov": "อุทัยธานี",
-   "rating": 5,
-   "n": 19
-  },
-  {
-   "place_id": "ChIJedsbgFAR4TARnvW-wAqBZ2Q",
-   "brand": "Tidlor",
-   "prov": "อุทัยธานี",
-   "rating": 5,
-   "n": 19
-  },
-  {
-   "place_id": "ChIJ341Q_d6HFjER0NPPAaP7cO0",
-   "brand": "Tidlor",
-   "prov": "อุบลราชธานี",
-   "rating": 5,
-   "n": 20
-  },
-  {
    "place_id": "ChIJnbCoAw-b4jAR00Ku0I1GnFU",
    "brand": "Tidlor",
    "prov": "กรุงเทพมหานคร",
@@ -7560,6 +3521,13 @@
    "prov": "ชลบุรี",
    "rating": 4.9,
    "n": 30
+  },
+  {
+   "place_id": "ChIJhyqX5MczHTERKVaKklGsp54",
+   "brand": "Tidlor",
+   "prov": "ชลบุรี",
+   "rating": 4.9,
+   "n": 20
   },
   {
    "place_id": "ChIJp3THelmr-DARFpRaPwIxhjA",
@@ -7623,104 +3591,6 @@
    "prov": "ปทุมธานี",
    "rating": 4.9,
    "n": 14
-  },
-  {
-   "place_id": "ChIJuyDYvHV_1zARTTTi-w2YgMw",
-   "brand": "Tidlor",
-   "prov": "พะเยา",
-   "rating": 4.9,
-   "n": 13
-  },
-  {
-   "place_id": "ChIJjVn5nkrn3zAR5NZ825aXT0g",
-   "brand": "Tidlor",
-   "prov": "พิจิตร",
-   "rating": 4.9,
-   "n": 16
-  },
-  {
-   "place_id": "ChIJ23tvBmAzUDAR3onWW2gncLE",
-   "brand": "Tidlor",
-   "prov": "ภูเก็ต",
-   "rating": 4.9,
-   "n": 19
-  },
-  {
-   "place_id": "ChIJS_3aksenIjERaZLwTiOVUrY",
-   "brand": "Tidlor",
-   "prov": "มหาสารคาม",
-   "rating": 4.9,
-   "n": 15
-  },
-  {
-   "place_id": "ChIJy5XvLGBfVjARZHUwDlV6nGQ",
-   "brand": "Tidlor",
-   "prov": "ระนอง",
-   "rating": 4.9,
-   "n": 15
-  },
-  {
-   "place_id": "ChIJlR8h_237AjERGCBJlKw4SNI",
-   "brand": "Tidlor",
-   "prov": "ระยอง",
-   "rating": 4.9,
-   "n": 31
-  },
-  {
-   "place_id": "ChIJIWmluZMv4zARfs3YunbRZSw",
-   "brand": "Tidlor",
-   "prov": "ราชบุรี",
-   "rating": 4.9,
-   "n": 20
-  },
-  {
-   "place_id": "ChIJVVDFrOcn4zARyLfxKQ9BxSI",
-   "brand": "Tidlor",
-   "prov": "ราชบุรี",
-   "rating": 4.9,
-   "n": 17
-  },
-  {
-   "place_id": "ChIJx3hJbZKRFzERzOsFXgyxepw",
-   "brand": "Tidlor",
-   "prov": "ร้อยเอ็ด",
-   "rating": 4.9,
-   "n": 8
-  },
-  {
-   "place_id": "ChIJTRsQU9an4jARU0iFv4_SuqU",
-   "brand": "Tidlor",
-   "prov": "สมุทรปราการ",
-   "rating": 4.9,
-   "n": 33
-  },
-  {
-   "place_id": "ChIJIeTJfqO54jARki1YnQ5qSTI",
-   "brand": "Tidlor",
-   "prov": "สมุทรสาคร",
-   "rating": 4.9,
-   "n": 28
-  },
-  {
-   "place_id": "ChIJOTPwo5YR3zARQX4qWNlOaEc",
-   "brand": "Tidlor",
-   "prov": "อุตรดิตถ์",
-   "rating": 4.9,
-   "n": 16
-  },
-  {
-   "place_id": "ChIJTajJNFBL3zARclKzFcUbyCc",
-   "brand": "Tidlor",
-   "prov": "อุตรดิตถ์",
-   "rating": 4.9,
-   "n": 16
-  },
-  {
-   "place_id": "ChIJMTZ1fgoP4jARsx_rESyYDm8",
-   "brand": "Tidlor",
-   "prov": "อ่างทอง",
-   "rating": 4.9,
-   "n": 32
   },
   {
    "place_id": "ChIJN4oWbqlpHTERX_Z6yhDdrdQ",
@@ -7790,7 +3660,7 @@
    "brand": "Tidlor",
    "prov": "ปทุมธานี",
    "rating": 4.8,
-   "n": 21
+   "n": 20
   },
   {
    "place_id": "ChIJZT7rLg2F_jAR4f3yPusU7a8",
@@ -7807,76 +3677,6 @@
    "n": 19
   },
   {
-   "place_id": "ChIJlZXIK20BUTAR9WIvW0HqNK0",
-   "brand": "Tidlor",
-   "prov": "พังงา",
-   "rating": 4.8,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJJ2xnoduX3zAR3StjTSFQJu8",
-   "brand": "Tidlor",
-   "prov": "พิษณุโลก",
-   "rating": 4.8,
-   "n": 21
-  },
-  {
-   "place_id": "ChIJUVEtrGMzUDAR_wkoUFdbp_8",
-   "brand": "Tidlor",
-   "prov": "ภูเก็ต",
-   "rating": 4.8,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJraTKxKv7AjER4vIPQ9T4uco",
-   "brand": "Tidlor",
-   "prov": "ระยอง",
-   "rating": 4.8,
-   "n": 6
-  },
-  {
-   "place_id": "ChIJHUtb3Qf9FzERFAf6yRJBqso",
-   "brand": "Tidlor",
-   "prov": "ร้อยเอ็ด",
-   "rating": 4.8,
-   "n": 27
-  },
-  {
-   "place_id": "ChIJH3_-4iMbFzERZa8lvJHq_Xo",
-   "brand": "Tidlor",
-   "prov": "ศรีสะเกษ",
-   "rating": 4.8,
-   "n": 9
-  },
-  {
-   "place_id": "ChIJZa6GtwozTTARzsl7J-QwwYQ",
-   "brand": "Tidlor",
-   "prov": "สงขลา",
-   "rating": 4.8,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJsUB68_5ZHTER7f79mN6JMok",
-   "brand": "Tidlor",
-   "prov": "สมุทรปราการ",
-   "rating": 4.8,
-   "n": 34
-  },
-  {
-   "place_id": "ChIJpf8rqmc54jARpOwAQTOBZtA",
-   "brand": "Tidlor",
-   "prov": "สุพรรณบุรี",
-   "rating": 4.8,
-   "n": 16
-  },
-  {
-   "place_id": "ChIJwykyVHCdIzERzw81XN8stwY",
-   "brand": "Tidlor",
-   "prov": "อุดรธานี",
-   "rating": 4.8,
-   "n": 5
-  },
-  {
    "place_id": "ChIJI8JTWe6BBDERMEg5RKBlnz8",
    "brand": "Tidlor",
    "prov": "จันทบุรี",
@@ -7889,13 +3689,6 @@
    "prov": "ชลบุรี",
    "rating": 4.7,
    "n": 9
-  },
-  {
-   "place_id": "ChIJhyqX5MczHTERKVaKklGsp54",
-   "brand": "Tidlor",
-   "prov": "ชลบุรี",
-   "rating": 4.7,
-   "n": 21
   },
   {
    "place_id": "ChIJg4DdTA-r-DARCFLL20XBBJw",
@@ -7926,55 +3719,6 @@
    "n": 12
   },
   {
-   "place_id": "ChIJxx61_IUL4jAR26BERFl-Cjs",
-   "brand": "Tidlor",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 4.7,
-   "n": 13
-  },
-  {
-   "place_id": "ChIJSwFQ9oIxUDARd87aELMayOk",
-   "brand": "Tidlor",
-   "prov": "ภูเก็ต",
-   "rating": 4.7,
-   "n": 15
-  },
-  {
-   "place_id": "ChIJVWvKGyJZHTERGwquPayWCd0",
-   "brand": "Tidlor",
-   "prov": "สมุทรปราการ",
-   "rating": 4.7,
-   "n": 7
-  },
-  {
-   "place_id": "ChIJ1cE99VsHVDARqF14fgMrY4k",
-   "brand": "Tidlor",
-   "prov": "สุราษฎร์ธานี",
-   "rating": 4.7,
-   "n": 7
-  },
-  {
-   "place_id": "ChIJz187wythFzERJEF9m3T6YIg",
-   "brand": "Tidlor",
-   "prov": "สุรินทร์",
-   "rating": 4.7,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJfS4DxL1jJDERmW8gMiJTdP4",
-   "brand": "Tidlor",
-   "prov": "หนองคาย",
-   "rating": 4.7,
-   "n": 12
-  },
-  {
-   "place_id": "ChIJhdV6mrUx3zARJmOgXWTaCG8",
-   "brand": "Tidlor",
-   "prov": "อุตรดิตถ์",
-   "rating": 4.7,
-   "n": 12
-  },
-  {
    "place_id": "ChIJC01YIJlLGTEROSlpddyCLKo",
    "brand": "Tidlor",
    "prov": "นครราชสีมา",
@@ -7996,13 +3740,6 @@
    "n": 25
   },
   {
-   "place_id": "ChIJw1IkGGxRVjARv5Qdgwb_3nA",
-   "brand": "Tidlor",
-   "prov": "ระนอง",
-   "rating": 4.6,
-   "n": 11
-  },
-  {
    "place_id": "ChIJq06hO7clHzERPJShIN0IThk",
    "brand": "Tidlor",
    "prov": "ชัยภูมิ",
@@ -8017,39 +3754,11 @@
    "n": 8
   },
   {
-   "place_id": "ChIJcd4AXlf7AjER1s5uzr3i5qY",
-   "brand": "Tidlor",
-   "prov": "ระยอง",
-   "rating": 4.5,
-   "n": 4
-  },
-  {
-   "place_id": "ChIJZ05iVKP34TAR0fa5oealqJI",
-   "brand": "Tidlor",
-   "prov": "สิงห์บุรี",
-   "rating": 4.5,
-   "n": 8
-  },
-  {
    "place_id": "ChIJXwMI9xaKIjERltZ8NisyeKg",
    "brand": "Tidlor",
    "prov": "ขอนแก่น",
    "rating": 4.4,
    "n": 5
-  },
-  {
-   "place_id": "ChIJ7U1uB_PtFjERtJ8xqnMsnJQ",
-   "brand": "Tidlor",
-   "prov": "ศรีสะเกษ",
-   "rating": 4.4,
-   "n": 7
-  },
-  {
-   "place_id": "ChIJk2Foyd53IzERA9PjAWbTeE8",
-   "brand": "Tidlor",
-   "prov": "อุดรธานี",
-   "rating": 4.4,
-   "n": 7
   },
   {
    "place_id": "ChIJUY1hK7K1IjERv-O8pXV49Ms",
@@ -8066,25 +3775,11 @@
    "n": 13
   },
   {
-   "place_id": "ChIJeZCYOvRr2TARGWTkiKH-034",
-   "brand": "Tidlor",
-   "prov": "ลำปาง",
-   "rating": 4.3,
-   "n": 6
-  },
-  {
    "place_id": "ChIJBYuCpbQ9HTERmVwm41JNh04",
    "brand": "Tidlor",
    "prov": "ฉะเชิงเทรา",
    "rating": 4.1,
    "n": 12
-  },
-  {
-   "place_id": "ChIJ137inRfn4jARE-yrLcTphn8",
-   "brand": "Tidlor",
-   "prov": "นครปฐม",
-   "rating": 4,
-   "n": 4
   },
   {
    "place_id": "ChIJc_6aMfqVGTERz9Bv24TzWXs",
@@ -8094,52 +3789,10 @@
    "n": 1
   },
   {
-   "place_id": "ChIJG40VWVN14jARl5ShVRzYwCo",
-   "brand": "Tidlor",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 4,
-   "n": 5
-  },
-  {
-   "place_id": "ChIJsXK-pPhtTTARRIypxW5Z-6o",
-   "brand": "Tidlor",
-   "prov": "พัทลุง",
-   "rating": 4,
-   "n": 1
-  },
-  {
-   "place_id": "ChIJ_w_R9wxt2TARjE9PPhwTMcY",
-   "brand": "Tidlor",
-   "prov": "ลำปาง",
-   "rating": 4,
-   "n": 4
-  },
-  {
    "place_id": "ChIJP1L1oJO94TARjfDKISE7Clg",
    "brand": "Tidlor",
    "prov": "ชัยนาท",
    "rating": 3.7,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJ-dx-UZV14jAR-3bNUwQxioM",
-   "brand": "Tidlor",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 3.7,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJxSUps1tJ4jAR4EsesMf3RIg",
-   "brand": "Tidlor",
-   "prov": "สุพรรณบุรี",
-   "rating": 3.7,
-   "n": 3
-  },
-  {
-   "place_id": "ChIJt2mliJeJHTER37ib2GMjGrE",
-   "brand": "Tidlor",
-   "prov": "พระนครศรีอยุธยา",
-   "rating": 3.3,
    "n": 3
   },
   {
@@ -8162,27 +3815,6 @@
    "prov": "บุรีรัมย์",
    "rating": 3,
    "n": 1
-  },
-  {
-   "place_id": "ChIJYynaxRZLFzERw7_ehcxRfQc",
-   "brand": "Tidlor",
-   "prov": "สุรินทร์",
-   "rating": 3,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJr0Flq1bnIzERv55a9hYKA64",
-   "brand": "Tidlor",
-   "prov": "หนองบัวลำภู",
-   "rating": 3,
-   "n": 2
-  },
-  {
-   "place_id": "ChIJk-0w-MedIzERBW5akjPdQJE",
-   "brand": "Tidlor",
-   "prov": "อุดรธานี",
-   "rating": 3,
-   "n": 2
   },
   {
    "place_id": "ChIJremHeyZLHTERfQ-s1kUBTws",
