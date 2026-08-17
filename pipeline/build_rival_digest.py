@@ -261,6 +261,12 @@ def collect():
     # Derived LAST, because each of these reads the observations above.
     lv = levers()
     out["levers_meta"] = lv.get("meta") or {}
+    # THE RATE WE GO TO MARKET AT. Owner's instruction: the LTVX C-code floor is "what we are vying
+    # to win in the market for", so it — not the published card floor — is what every part of this
+    # email uses to say where we sit on price. Falls back to the board figure if the projection is
+    # absent, so an unavailable levers file degrades the framing rather than blanking the rank.
+    out["gtm_rate"] = ((lv.get("ltvx") or {}).get("title_best_rate_pct")
+                       or ((next((o for o in ops if o.get("is_us")), None) or {}).get("effective_lo")))
     out["ltv_standing"] = ltv_standing(ops, lv)
     out["beat_matrix"] = beat_matrix(ops, board.get("rows") or [], lv)
     out["agri"] = agri()
@@ -668,6 +674,20 @@ def actions(c, lv):
               if o.get("loan_type") == "title_loan" and o.get("effective_lo") is not None]
     N = c["names"]
 
+    # OUR PRICE IS THE LTVX C-CODE FLOOR, NOT THE PUBLISHED CARD. The owner's instruction, verbatim:
+    # "our new promo rate of 12.99% is what we are vying to win in the market for". So every place
+    # this email states where we sit on price uses the go-to-market rate. The card figure the rate
+    # board carries for us (its floor across ALL published operators) is not a second opinion about
+    # our pricing — it is a different question — and quoting both put two different "our rate"
+    # numbers in one email. Where the programme rate is unavailable the board figure is still the
+    # honest fallback, so the email degrades to it rather than to silence.
+    gtm = ((lv or {}).get("ltvx") or {}).get("title_best_rate_pct")
+    our_rate = gtm if gtm is not None else (us or {}).get("effective_lo")
+
+    def rate_of(o):
+        """A cohort member's comparable floor — ours restated to what we actually go to market at."""
+        return our_rate if o.get("is_us") else o.get("effective_lo")
+
     def nm(key, fallback=""):
         return th(N, key, fallback) or key
 
@@ -677,51 +697,61 @@ def actions(c, lv):
     # a rival undercutting itself but still dearer than us is their problem, not ours.
     for g in c["gap_hits"]:
         promo, card = g.get("cheapest_promo_effective"), g.get("card_floor")
-        if promo is None or not us or us.get("effective_lo") is None:
+        if promo is None or our_rate is None:
             continue
-        if promo >= us["effective_lo"]:
+        if promo >= our_rate:
             continue
         A.append({
             "tag": "PRICE",
             "sev": 100 + (g.get("gap_pp") or 0),
-            "head": "%s is selling at %s%% while its own card says %s%% — and we are at %s%%"
-                    % (nm(g["key"], g.get("name_th")), fmt(promo), fmt(card),
-                       fmt(us["effective_lo"])),
+            "head": "%s is selling at %s%% while its own card says %s%% — under our %s%%"
+                    % (nm(g["key"], g.get("name_th")), fmt(promo), fmt(card), fmt(our_rate)),
             "evidence": "%d live quote%s in the pull; %s pp below its own published floor at its "
                         "own %s-month tenor. Read at the conservative reading — an unstated "
                         "monthly rate is scored as flat."
                         % (g.get("n_quotes") or 0, "" if (g.get("n_quotes") or 0) == 1 else "s",
                            fmt(g.get("gap_pp")), g.get("card_tenor_months")),
-            "lever": "Our published floor is %s%% (card %s–%s%%). The ระเบียบ lanes all carry "
-                     "24%%/ปี as the regulated ceiling, so there is headroom between the card and "
-                     "the ceiling to price a lane without a policy change."
-                     % (fmt(us["effective_lo"]), fmt(us["effective_lo"]),
-                        fmt(us.get("effective_hi"))),
+            "lever": "We go to market at %s%% on a low-risk C-code case. The ระเบียบ lanes all "
+                     "carry 24%%/ปี as the regulated ceiling, so there is headroom below it to "
+                     "price a named lane without a policy change."
+                     % fmt(our_rate),
             "decision": "Match on a named lane, or hold price and compete on approval speed. "
                         "Either way it is a pricing call, not a monitoring one.",
         })
 
     # -- 2. WHERE OUR PRICE SITS IN THE COHORT WE ACTUALLY COMPETE WITH ------------------------
-    if us and us.get("effective_lo") is not None and len(cohort) >= 4:
-        srt = sorted(cohort, key=lambda o: o["effective_lo"])
+    if us and our_rate is not None and len(cohort) >= 4:
+        # Ranked at the rate we SELL at, so the position moves when the programme moves. Ranking
+        # our card against their promos would have compared two different things and put us
+        # further down the field than we actually sit.
+        srt = sorted(cohort, key=rate_of)
         rank = next((i + 1 for i, o in enumerate(srt) if o.get("is_us")), None)
-        cheaper = [o for o in srt if not o.get("is_us") and o["effective_lo"] < us["effective_lo"]]
+        cheaper = [o for o in srt if not o.get("is_us") and o["effective_lo"] < our_rate]
+        # LENDERS SITTING EXACTLY ON OUR RATE ARE COUNTED SEPARATELY. Without this the item read
+        # "4 of 11 publish a floor below our 12.99%" and then "we are 6th of 11" — both true, and
+        # together they look like an arithmetic error. The missing rung is KTC, level with us at
+        # 12.99%, which is a competitively interesting fact in its own right rather than a rounding
+        # artefact to paper over.
+        level = [o for o in srt if not o.get("is_us") and abs(o["effective_lo"] - our_rate) < 0.005]
         if rank and cheaper:
             A.append({
                 "tag": "PRICE",
                 "sev": 60 + len(cheaper),
-                "head": "%d of %d title lenders publish a floor below ours"
-                        % (len(cheaper), len(srt)),
-                "evidence": "We are %s of %d at %s%%. Below us: %s. Ranked inside the title-loan "
+                "head": "%d of %d title lenders publish a floor below our %s%%"
+                        % (len(cheaper), len(srt), fmt(our_rate)),
+                "evidence": "We are %s of %d at %s%%%s. Below us: %s. Ranked inside the title-loan "
                             "cohort — the strip at the top of this email ranks us against every "
                             "operator including the banks, which is why that number is different."
-                            % (_ord(rank), len(srt), fmt(us["effective_lo"]),
+                            % (_ord(rank), len(srt), fmt(our_rate),
+                               (", level with %s" % ", ".join(nm(o["key"], o.get("name_th"))
+                                                              for o in level)) if level else "",
                                ", ".join("%s %s%%" % (nm(o["key"], o.get("name_th")),
                                                      fmt(o["effective_lo"])) for o in cheaper[:5])),
-                "lever": "Published card, not policy — the ระเบียบ ceiling is 24%/ปี and our card "
-                         "floor sits well under it.",
-                "decision": "Is mid-field the intended position? If yes this is settled and should "
-                            "stop being raised. If not, it is a card change, not a rate-cap one.",
+                "lever": "The ระเบียบ ceiling is 24%%/ปี, so %s%% sits far below the regulated "
+                         "limit — moving it is a programme decision, not a rate-cap one."
+                         % fmt(our_rate),
+                "decision": "Is mid-field the intended position at our go-to-market rate? If yes "
+                            "this is settled and should stop being raised.",
             })
 
     # -- 3. TENOR — the lever that cuts the monthly payment without cutting the rate -----------
@@ -756,8 +786,8 @@ def actions(c, lv):
         A.append({
             "tag": "LTV",
             "sev": 75,
-            "head": "LTVX puts us level with %d rivals and ahead of %d, but our card advertises "
-                    "none of it" % (len(st["on_par"]), len(st["better"])),
+            "head": "%s%% and %s%% LTV are what we are taking to market, and nothing we publish "
+                    "says so" % (fmt(st["best_rate"]), fmt(st["ours"])),
             "evidence": "The LTVX booking mode reaches %s%% on a title case (vs %s%% on the plain "
                         "Redbook item), at %s%%. We are level with %s and ahead of %s. Still "
                         "ahead of us: %s."
@@ -767,10 +797,10 @@ def actions(c, lv):
                            ", ".join("%s %s%%" % (nm(o["key"], o.get("name_th")), fmt(o["ltv_pct"]))
                                      for o in st["behind"]) or "none"),
             "lever": "Not a policy change — the cap already exists. v46 widened who qualifies by "
-                     "moving the low-risk test from brand tier to vehicle type (%s), and the C-code "
-                     "rate floor of %s%% is below our published card floor of %s%%."
+                     "moving the low-risk test from brand tier to vehicle type (%s), so %s%% at "
+                     "up to %s%% is bookable on every PA/PU/VAN in the ratebook today."
                      % ("/".join(st["vtypes"]) or "PA/PU/VAN", fmt(st["best_rate"]),
-                        fmt(st["card_rate"])),
+                        fmt(st["standard"])),
             "decision": "Two calls. (1) Should the card say anything about LTV at all, given four "
                         "rivals headline 130–160%? (2) Confirm one rival's LTV basis in writing — "
                         "if theirs is not appraised value, this whole ranking changes.",
@@ -958,7 +988,16 @@ def html(c):
     # (โอนเล่ม-only) and `land` are genuinely a different product and stay out.
     ladder = [o for o in c["operators"]
               if o.get("loan_type") in ("title_loan", "both") and o.get("effective_lo") is not None]
-    ladder.sort(key=lambda o: o["effective_lo"])
+
+    # OUR RUNG IS THE GO-TO-MARKET RATE. Every rival's `effective_lo` is the CHEAPEST rate that
+    # lender publishes — its best offer, promos included. Our equivalent best offer is the LTVX
+    # C-code floor, not the card floor, so plotting the card here compared their promo against our
+    # ceiling and put us several rungs below where we actually compete. Substituted once, at the
+    # source, so the sort, the KPI rank, the bar lengths and the printed figure all agree.
+    def lad_rate(o):
+        return c["gtm_rate"] if (o is ours and c.get("gtm_rate")) else o["effective_lo"]
+
+    ladder.sort(key=lad_rate)
     rank = next((i + 1 for i, o in enumerate(ladder) if o is ours), None)
 
     stats = [
@@ -1061,11 +1100,11 @@ def html(c):
             % (fmt(st["standard"]), fmt(st["ours"]), fmt(st["band_pp"]), fmt(st["band_pp"])))
         verdict = ('<tr><td style="padding:14px 0 0;font-family:%s;font-size:15px;'
                    'line-height:1.45;color:%s"><b>On par with %d, ahead of %d, behind %d.</b> '
-                   'Our title ceiling is %s%% at %s%%, and the C-code rate floor of %s%% sits '
-                   'below our own published card floor of %s%%.</td></tr>'
+                   'We go to market at <b>%s%%</b> up to a %s%% ceiling, and %s%% where the case '
+                   'runs to the %s%% cap.</td></tr>'
                    % (FONT, INK, len(st["on_par"]), len(st["better"]), len(st["behind"]),
-                      fmt(st["ours"]), fmt(st["rate_at_cap"]), fmt(st["best_rate"]),
-                      fmt(st["card_rate"])))
+                      fmt(st["best_rate"]), fmt(st["standard"]), fmt(st["rate_at_cap"]),
+                      fmt(st["ours"])))
         def grp(label, items, color):
             if not items:
                 return ('<tr><td style="padding:9px 0 0;font-family:%s;font-size:13px;color:%s">'
@@ -1184,9 +1223,9 @@ def html(c):
 
         legend = ('<tr><td colspan="5" style="padding:12px 0 0;font-family:%s;font-size:11.5px;'
                   'line-height:1.6;color:%s">%s &nbsp;%s &nbsp;%s &nbsp;%s<br><br>'
-                  '<b style="color:%s">Read the gate before you use this.</b> The %s%% floor is a '
-                  'C-code rate on a LOW-RISK case &mdash; %s &mdash; not the walk-in rate; our '
-                  'published card still opens at %s%%, and at the %s%% ceiling the code is %s%%. '
+                  '<b style="color:%s">Who qualifies for %s%%.</b> It is the C-code rate on a '
+                  'LOW-RISK case &mdash; %s &mdash; and it holds to a %s%% ceiling; a case running '
+                  'to the %s%% cap books at %s%%. '
                   'Rate is each lender&rsquo;s own ไม่โอนเล่ม floor restated to nominal '
                   'reducing-balance; LTV and tenor come from that lender&rsquo;s ไม่โอนเล่ม '
                   'variant, never the headline. Bands: &plusmn;%s pp LTV, &plusmn;%s pp rate, '
@@ -1196,7 +1235,7 @@ def html(c):
                      chip("we win", "#0C4A41", "#DCEEEA"), chip("level", "#6B4E05", "#FBF0D8"),
                      chip("they win", "#8A2B25", "#FBE1DF"), chip("not published", DIM, WASH),
                      INK, fmt(o["rate"]), esc(bm.get("gated") or "the low-risk gate"),
-                     fmt(o["card_rate"]), fmt(o["ltv"]), fmt(o["rate_at_cap"]),
+                     fmt(o["standard_ltv"]), fmt(o["ltv"]), fmt(o["rate_at_cap"]),
                      fmt(bm["bands"]["ltv"]), fmt(bm["bands"]["rate"]),
                      fmt(bm["bands"]["tenor"]),
                      esc(", ".join(bm["dropped_land"]) or "Nothing")))
@@ -1324,7 +1363,7 @@ def html(c):
     # ---------------------------------------------------------------- RATE LADDER
     # Bars, because a 16-row column of numbers is a table nobody reads on a phone. Scaled to the
     # dearest lender on the board so the bar lengths mean something rather than filling the row.
-    top = max([o["effective_lo"] for o in ladder] or [1])
+    top = max([lad_rate(o) for o in ladder] or [1])
     rows = []
     for o in ladder:
         us = o is ours
@@ -1338,16 +1377,18 @@ def html(c):
             '</tr><tr><td colspan="2">%s</td></tr></table></td></tr>'
             % (FONT, "800" if us else "600", INK if us else FG,
                esc(o.get("name_th") or th(N, o.get("key"), o.get("operator"))),
-               (" " + chip("เรา", "#FFFFFF", GOLD)) if us else "",
-               FONT, GOLD if us else INK, fmt(o["effective_lo"]),
+               (" " + chip("เรา · LTVX", "#FFFFFF", GOLD)) if us else "",
+               FONT, GOLD if us else INK, fmt(lad_rate(o)),
                (' <span style="font-size:10px;font-weight:600;color:%s">LTV %s%%</span>'
                 % (DIM, o["ltv_pct"])) if o.get("ltv_pct") is not None else "",
-               bar(100.0 * o["effective_lo"] / top, GOLD if us else (
+               bar(100.0 * lad_rate(o) / top, GOLD if us else (
                    MERCH if o.get("effective_source") in ("lender", "as_quoted") else ACC))))
     sec("Where we sit", "ตารางอัตราดอกเบี้ย · The ไม่โอนเล่ม ladder",
         "Effective %/yr on a reducing balance — the only basis on which these are comparable. "
-        "Borrower keeps the book (ไม่โอนเล่ม), cheapest first. Green = the lender's own "
-        "published effective figure; blue = converted by us from their flat quote; gold = us. "
+        "Borrower keeps the book (ไม่โอนเล่ม), cheapest first. Every rung is that lender's "
+        "CHEAPEST published rate, so ours is the LTVX C-code floor — best offer against best "
+        "offer. Green = the lender's own published effective figure; blue = converted by us from "
+        "their flat quote; gold = us. "
         "Includes every lender that runs a ไม่โอนเล่ม product, whether or not it also does "
         "โอนเล่ม — a bank that offers both still competes for the same borrower. Pure "
         "hire-purchase refinance and land-title lending are genuinely different products and "
@@ -1489,10 +1530,10 @@ def text(c):
         L += ["WHERE LTVX PUTS US", "-" * 52,
               "LTVX is a booking mode: the plain Redbook item locks Mobius at %s%%, the LTVX twin "
               "(C-code only) opens it to %s%%." % (fmt(st["standard"]), fmt(st["ours"])),
-              "On par with %d, ahead of %d, behind %d. Title ceiling %s%% at %s%%; C-code rate "
-              "floor %s%% vs our card floor %s%%."
-              % (len(st["on_par"]), len(st["better"]), len(st["behind"]), fmt(st["ours"]),
-                 fmt(st["rate_at_cap"]), fmt(st["best_rate"]), fmt(st["card_rate"])),
+              "On par with %d, ahead of %d, behind %d. We go to market at %s%% up to a %s%% "
+              "ceiling, and %s%% where the case runs to the %s%% cap."
+              % (len(st["on_par"]), len(st["better"]), len(st["behind"]), fmt(st["best_rate"]),
+                 fmt(st["standard"]), fmt(st["rate_at_cap"]), fmt(st["ours"])),
               "  ahead of us : %s" % (", ".join(_n(o) for o in st["behind"]) or "none"),
               "  on par      : %s" % (", ".join(_n(o) for o in st["on_par"]) or "none"),
               "  we lead     : %s" % (", ".join(_n(o) for o in st["better"]) or "none"),
@@ -1534,9 +1575,9 @@ def text(c):
                      cell("rate", r["their_rate"], "%"),
                      cell("tenor", r["their_tenor"], "mo"), WORD[r["verdict"]])]
         L += ["  * decided by less than 1.5x the band — treat as level in practice.",
-              "GATE: %s%% is a C-code rate on a low-risk case (%s), NOT the walk-in rate. Our card "
-              "still opens at %s%%, and at the %s%% ceiling the code is %s%%."
-              % (fmt(o["rate"]), bm.get("gated") or "the low-risk gate", fmt(o["card_rate"]),
+              "WHO QUALIFIES for %s%%: the C-code rate on a low-risk case (%s), holding to a %s%% "
+              "ceiling. A case running to the %s%% cap books at %s%%."
+              % (fmt(o["rate"]), bm.get("gated") or "the low-risk gate", fmt(o["standard_ltv"]),
                  fmt(o["ltv"]), fmt(o["rate_at_cap"])),
               "Bands: ±%s pp LTV, ±%s pp rate, ±%s months. Excluded: %s (land collateral). "
               "Rival LTV basis is unconfirmed in writing."
@@ -1610,12 +1651,24 @@ def text(c):
     blk("Promotions no longer listed", c["promos_gone"],
         lambda p: "%s — %s (last seen %s)" % (th(N, p.get("key"), p.get("brand")),
                                               p.get("title") or "", p.get("last_seen")))
-    L.append("RATE BOARD (effective %/yr, reducing balance)")
-    for o in [o for o in c["operators"] if o.get("effective_lo") is not None]:
-        L.append("  %-30s %7s  %s" % (
+    L.append("RATE BOARD (effective %/yr, reducing balance — each lender's CHEAPEST published rate)")
+
+    # Ours is the LTVX go-to-market floor, exactly as on the HTML ladder. Left as the card figure
+    # here, the plain-text half would have quietly contradicted the HTML half of the same email —
+    # and the text half is what a phone client with images off actually shows.
+    def _brate(o):
+        return c["gtm_rate"] if (o.get("is_us") and c.get("gtm_rate")) else o["effective_lo"]
+
+    # SORTED BY THE FIGURE SHOWN. This list was ordered by the raw card rate, so once ours moved to
+    # 12.99% we printed 12.99% two rows BELOW 14.45% — a board that contradicts its own sort order.
+    board = sorted([o for o in c["operators"] if o.get("effective_lo") is not None], key=_brate)
+    for o in board:
+        rate = _brate(o)
+        L.append("  %-30s %7s  %s%s" % (
             (o.get("name_th") or th(N, o.get("key"), o.get("operator")))[:30],
-            ("%s%%" % o["effective_lo"]) if o.get("effective_lo") is not None else "-",
-            ("LTV %s%%" % o["ltv_pct"]) if o.get("ltv_pct") is not None else ""))
+            "%s%%" % fmt(rate),
+            ("LTV %s%%" % o["ltv_pct"]) if o.get("ltv_pct") is not None else "",
+            "  (us, LTVX)" if o.get("is_us") else ""))
     L.append("")
     L.append("SENTIMENT AND SHARE OF VOICE")
     L.append("  %-26s %6s %6s %9s %9s" % ("brand", "Play", "Apple", "Pantip", "YouTube"))
