@@ -3,7 +3,7 @@
   "generated_by": "pipeline/pull_swarm.py",
   "label": "Each row is one swarm run: which feeds were pulled concurrently, whether each one succeeded / changed its declared output file / failed / timed out / was skipped (exit 3, the repo-wide SKIP convention), plus the rc of the append_history.py and rederive_drift.py steps that followed. This file makes the pulse observable.",
   "max_runs": 60,
-  "n_runs": 20,
+  "n_runs": 21,
   "title": "pull_swarm.py run history -- the swarm's own audit trail"
  },
  "runs": [
@@ -1330,6 +1330,69 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-08-17T04:21:45Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 1443,
+     "bytes_before": 1443,
+     "key": "fuel_prices",
+     "rc": 0,
+     "seconds": 1.6,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 7111,
+     "bytes_before": 7110,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 4.6,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8861,
+     "bytes_before": 8869,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 5.2,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 3989,
+     "bytes_before": 3989,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 124.5,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 27439,
+     "bytes_before": 26726,
+     "key": "nabc_history",
+     "rc": 0,
+     "seconds": 128.4,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 56492,
+     "bytes_before": 56487,
+     "key": "diw_scurve",
+     "rc": 0,
+     "seconds": 7.7,
+     "status": "changed"
+    }
+   ],
+   "finished": "2026-08-17T10:10:15Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 5,
+   "n_failed": 0,
+   "n_ok": 6,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-08-17T10:08:07Z"
   }
  ]
 }
