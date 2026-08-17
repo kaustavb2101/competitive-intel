@@ -117,6 +117,33 @@ FEEDS = [
          label="NABC per-province agri production (feeds branch_agri + crop_farmer_income)",
          cadence="weekly", ip="any", group="macro", out="source-data/nabc_agri.json"),
 
+    # NABC also serves the price TIME SERIES + per-province spread off the SAME agriapi.nabc.go.th
+    # /api/daily-prices family (13 categories) that pull_nabc_prices.py reads live — pull_nabc_history.py
+    # keeps the two dimensions the price puller drops (TIME + PLACE) as monthly national means plus a
+    # per-province recent mean -> source-data/nabc_history.json -> build_thai_price_history.py ->
+    # platform/data/thai_price_history.json (the ONLY Thai farm-gate price history the app draws; every
+    # other sparkline is a World Bank WORLD price). It was in NO scheduler — last pull 2026-08-02, ageing
+    # in silence while its --check-gated builder (tests/run.sh build_thai_price_history) kept reproducing
+    # the same frozen trailing window. Same silent-stale failure mode as nabc_agri / tpso_cpi above.
+    # VERIFIED reachable + EXIT=0 from THIS cloud runner 2026-08-17 (13 categories, months through
+    # 2026-08); stdlib+urllib only, and "recent" is anchored on the newest date IN the data (no wall
+    # clock) so a re-pull on unchanged upstream reproduces byte-for-byte.
+    dict(key="nabc_history", script="pull_nabc_history.py", args=["--stamp", STAMP],
+         label="NABC Thai farm-gate price history + per-province spread (feeds thai_price_history)",
+         cadence="weekly", ip="any", group="macro", out="source-data/nabc_history.json", timeout=1200),
+
+    #   DELIBERATELY NOT wired: pull_nabc_monthly.py (source-data/nabc_monthly.json ->
+    #   build_commodities.py, the board's Thai durian/rambutan/longan/beef rows — the ONLY Thai price for
+    #   those four anywhere in the repo). It is any-IP and reachable, but its assert_acceptance() is a
+    #   DELIBERATE hard regression pin against the verified 2026-08-02 facts, and its own docstring is
+    #   explicit: "If NABC revises its own published history this will need a fresh verification pass, NOT
+    #   a code tweak to make it pass." A new durian harvest month has since landed (n_months 31 -> 32), so
+    #   the pull now EXITs 1 at that pin (verified live from CI 2026-08-17). Auto-scheduling it would
+    #   either go permanently red or force the mechanically-bumped pin the author forbids — the exact
+    #   permanently-red-feed anti-pattern the retired-oae_prices note guards against. RECHECK TRIGGER: a
+    #   human/analyst re-verification pass that re-confirms the durian/rambutan/longan/beef facts and
+    #   re-pins ACCEPTANCE, THEN wire cadence="monthly". This is an owner-side step, not an autonomous one.
+
     # RETIRED 2026-08-11: `oae_prices` (OAE weekly farm-gate prices) used to sit here and had
     # failed on EVERY swarm run since the registry was created — source-data/oae_farmgate_prices.json
     # was never once produced. Three earlier cycles diagnosed it as "the upstream series is gone".
@@ -224,6 +251,20 @@ FEEDS = [
     dict(key="bot_uvpi", script="pull_bot_uvpi.py", args=["--stamp", STAMP],
          label="BoT Used Vehicle Price Index (collateral-recovery anchor; feeds collateral_outlook)",
          cadence="monthly", ip="any", group="macro", out="source-data/bot_uvpi.json"),
+
+    # MEASURED DIW S-curve (target-industry) factory footprint per province -> source-data/
+    # scurve_by_province.json -> build_ev_exposure.py -> ev_exposure.json (objective #1: the AUTOMOTIVE
+    # group, ~1.6k ICE-parts factories / 173k workers, is the measured workforce most exposed to the EV
+    # transition the brand-trends board shows arriving — a portfolio-risk read for factory-worker
+    # borrowers). Reachable from any cloud IP (the diw-dataset.diw.go.th dept-CKAN bypass, same host as
+    # diw_factories). It was in NO scheduler — last pull 2026-07-09, the STALEST of this batch at 39 days,
+    # while its --check-gated builder (tests/run.sh L278, rc=3 SKIP when the source is absent) kept
+    # reproducing the same frozen vintage. Same silent-stale failure mode as nabc_history above. VERIFIED
+    # reachable + EXIT=0 from THIS cloud runner 2026-08-17 (18,128 factories, 77 provinces, automotive
+    # 1,630 / 173,380 workers); stdlib+urllib only (one CSV download + aggregate, no openpyxl/pdfplumber).
+    dict(key="diw_scurve", script="pull_diw_scurve.py", args=["--stamp", STAMP],
+         label="DIW S-curve target-industry factory footprint per province (feeds ev_exposure)",
+         cadence="monthly", ip="any", group="gov", out="source-data/scurve_by_province.json", timeout=600),
 
     dict(key="google_trends", script="pull_google_trends.py", args=[],
          label="Google Trends demand + brand share-of-search (ESTIMATED)", cadence="monthly",
