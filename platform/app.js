@@ -4805,10 +4805,17 @@ function renderShareOfVoice(){
         lead:srt[0]&&!srt[0].is_us?`${brandLabel(srt[0])} ${srt[0].est_threads.toLocaleString()}`:'—',
         read:pu.reply_rate!=null?`we do reply here — ${pu.reply_rate.toFixed(0)}%`:'',est:true,us:true});
     }
-    const ch=(yt&&yt.channels)||[], yu=ch.find(c=>c.is_us);
+    // PARENT channels are NOT peers. Krungsri's คาร์ ฟอร์ แคช is the bank's whole auto-finance
+    // channel (521k subs), so build_rival_youtube.py fences it out of share_of_subs_pct and the
+    // video table tags it "excluded from share-of-voice". Counting it in the denominator here
+    // understated every title lender ~4x (ours read 0.2% against the file's own 0.7%) and named it
+    // the field leader. Same shape as the Pantip `tier:'category'` row and the iOS `thin` rows:
+    // the builder marks a row as not-a-peer and the front end must honour that, not re-rank past it.
+    const ch=((yt&&yt.channels)||[]).filter(c=>!c.is_parent_channel), yu=ch.find(c=>c.is_us);
     if(yu&&yu.subscribers!=null){
       const srt=ch.filter(c=>c.subscribers!=null).sort((a,b)=>b.subscribers-a.subscribers);
       R.push({ch:'YouTube',what:'subscribers',ours:yu.subscribers,tot:sum(ch,c=>c.subscribers),n:srt.length,
+        pct:yu.share_of_subs_pct!=null?yu.share_of_subs_pct:null,   // the builder's own figure wins
         stand:yu.subscribers.toLocaleString()+' subs',
         lead:srt[0]&&!srt[0].is_us?`${brandLabel(srt[0])} ${srt[0].subscribers.toLocaleString()}`:'—',
         read:yu.uploads_90d!=null?`${yu.uploads_90d} uploads in 90 days`:'',us:true});
