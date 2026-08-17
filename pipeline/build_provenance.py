@@ -266,14 +266,31 @@ def _vintage_of(m):
     # Data-room card despite carrying a real measured vintage. They sit LAST (coarse, non-ISO labels):
     # a proper ISO/observation key always wins, and _parse_vintage leaves each age-blank (a bare year
     # or BE label is never coerced into a false age), matching the vintage_individual precedent.
+    # asof_card (rate_board — the MEASURED published rate-card observation date; preferred over the
+    # layer's advertised-half asof_ads), anchor_date (collateral_census — the newest auction date the
+    # vehicle-age read is measured against), stock_asof (vehicle_mix — the DLT registered-stock snapshot
+    # date), latest_month (vehicle_models — the newest DLT first-registration month IN the series),
+    # mob_anchor (tape_real / tape_geo_occ / collateral_book — the months-on-book anchor = newest
+    # disbursement month IN the real loan tape), and newest_observation_date (rival_watch — the newest
+    # promo/ad observation date) are all MEASURED data-observation dates each layer stamps ONLY under
+    # its own key, so every one showed BLANK in the Data-room card despite a real fresh vintage. They
+    # are strict ISO/month strings, so they sit with the other data-observation keys (AHEAD of any pull
+    # timestamp) and _parse_vintage gives each an honest freshness age. vintage_ce (oae_agstats — the
+    # OAE crop-year, a bare CE calendar year like 2024) is the latest_year_ce precedent under a second
+    # key name; it sits LAST with the other coarse int-year labels (int→str coerced, age-blank, never a
+    # false age) and — verified — leaves nso_wage_anchor / vehicle_registry unchanged, since each of
+    # those already resolves via an earlier scanned key. Purely additive: no populated layer carries any
+    # of these keys under an earlier priority, so only the previously-blank layers gain a vintage.
     for k in ("updated", "vintage", "as_of", "updated_to",
               "observed_to", "price_vintage", "price_asof", "farmgate_vintage", "board_vintage",
+              "asof_card", "anchor_date", "stock_asof", "latest_month", "mob_anchor",
+              "newest_observation_date",
               "sentiment_anchor", "snapshot", "pico_vintage", "vintage_individual", "pulled_at_utc",
-              "pulled", "promos_pulled_at", "latest_year_ce", "span"):
+              "pulled", "promos_pulled_at", "latest_year_ce", "vintage_ce", "span"):
         v = m.get(k)
         if isinstance(v, str) and v.strip():
             return _trunc(v, 24)
-        if isinstance(v, int) and k == "latest_year_ce":
+        if isinstance(v, int) and k in ("latest_year_ce", "vintage_ce"):
             return str(v)
     return ""
 

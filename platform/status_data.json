@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-16T16:30:17+00:00",
-    "commit": "6bc4dbc"
+    "generated_at": "2026-08-17T04:35:59+00:00",
+    "commit": "a90e337"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-16",
+    "eta_date": "2026-08-17",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,156 @@
   ],
   "activity": [
     {
+      "date": "2026-08-17T04:35:59+00:00",
+      "sha": "a90e337",
+      "summary": "fix(provenance): 9 MEASURED layers showed blank vintage in the Data-room card",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-17T04:11:13+00:00",
+      "sha": "1667b18",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-17, run 31993310549)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-17T03:35:27+00:00",
+      "sha": "6a95f1d",
+      "summary": "docs(progress): record ux-skip-link-rayong merge+deploy+verify outcome",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-17T03:31:14+00:00",
+      "sha": "125b1c0",
+      "summary": "ux: add skip-to-content bypass link to rayong-catchment.html (#479)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-17T03:19:54+00:00",
+      "sha": "3fd6d66",
+      "summary": "data: NABC live prices (2026-08-17, run 31990363442)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-17T09:17:47+07:00",
+      "sha": "3148091",
+      "summary": "docs(progress): log the ⑥ Brand tab wave (PR #478) — merge, deploy, verify",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-17T01:56:18+00:00",
+      "sha": "4a4e0be",
+      "summary": "feat(brand): lift the ten social/sentiment feeds into their own ⑥ Brand tab (#478)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-17T01:27:01+00:00",
+      "sha": "6dffe32",
+      "summary": "data: market-pulse swarm refresh (run 31974538692) (#475)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-17T00:59:37+00:00",
+      "sha": "d6f21c4",
+      "summary": "data: rival published rate pages re-read (run 31979334801) (#477)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-17T00:25:44+00:00",
+      "sha": "5a79933",
+      "summary": "fix(rival-rates): distinguish a card-unit coverage gap from real rate drift",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-17T06:58:38+07:00",
+      "sha": "9a266f4",
+      "summary": "fix(rival-rates): the feed's first cron run reported on itself badly",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-16T23:25:17+00:00",
+      "sha": "f4a6582",
+      "summary": "data: rival Facebook promo feed refresh (run 31975941181) (#476)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-17T06:22:08+07:00",
+      "sha": "fb3c2f7",
+      "summary": "fix(automerge): gate the master commit the merge creates, not just the branch",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-16T21:42:27+00:00",
+      "sha": "3784b48",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-16, run 31974084199)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-17T03:25:26+07:00",
+      "sha": "cb0acb3",
+      "summary": "docs(progress): log the rival-pulse wave — 5 PRs, and the ungated-master finding",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-16T20:24:16+00:00",
+      "sha": "be3744d",
+      "summary": "docs(progress): log the ux-skip-link-province merge + deploy-verify (PR #474)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-16T20:23:55+00:00",
+      "sha": "a029e90",
+      "summary": "data: Thai-IP-only swarm refresh (run 31967991065) (#473)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-17T03:21:14+07:00",
+      "sha": "07c3e79",
+      "summary": "ux: add \"Skip to main content\" bypass link to province.html (#474)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-16T19:56:55+00:00",
+      "sha": "77d4ed8",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 31952455765) (#458)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-16T19:48:18+00:00",
+      "sha": "9daa237",
+      "summary": "feat(rival): re-read every rival's published rate page, weekly (#467)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-16T19:12:22+00:00",
+      "sha": "a4250f7",
+      "summary": "docs: point CLAUDE.md at the vault note — the link only ran one way (#470)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-16T18:26:57+00:00",
+      "sha": "fedc07a",
+      "summary": "feat(swarm): schedule the BoT policy-rate puller — proven CI-reachable this run",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-16T17:52:53+00:00",
+      "sha": "fed8a81",
+      "summary": "fix(gate): build_rival_facebook.py --check was never wired into the gate (#469)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-16T17:05:33+00:00",
+      "sha": "e21021c",
+      "summary": "data: market-pulse swarm refresh (run 31956866465) (#472)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-16T16:30:47+00:00",
+      "sha": "91beaf9",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the deploy-health SSO-bypass ship",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-08-16T16:30:17+00:00",
       "sha": "6bc4dbc",
       "summary": "fix(deploy-health): deep-probe past the Vercel SSO wall via the automation-bypass secret",
@@ -560,156 +710,6 @@
       "date": "2026-08-16T15:44:03+00:00",
       "sha": "f9128f9",
       "summary": "data: ThaiWater flood + rain pulse (2026-08-16, run 31956314454)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-16T22:26:34+07:00",
-      "sha": "a5b0ea0",
-      "summary": "feat(digest): redesign the email — and fix the rank it was quietly flattering (#471)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-16T22:06:38+07:00",
-      "sha": "6297c52",
-      "summary": "feat(digest): the undercut check was built, gated and never read (#466)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-16T21:21:13+07:00",
-      "sha": "9f45351",
-      "summary": "fix(vercel): the deploy guards were in a vercel.json Vercel never reads (#463)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-16T21:21:08+07:00",
-      "sha": "5645670",
-      "summary": "data: เงินเทอร์โบ priced — the last operator with a promo and no rate (#464)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-16T21:21:04+07:00",
-      "sha": "4730568",
-      "summary": "fix(digest): the pre-flight checked 4 layers while the digest reads 8 (#462)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-16T20:51:58+07:00",
-      "sha": "09d2bab",
-      "summary": "feat(digest): resume the daily 08:30 send — reviewed and approved (#461)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-16T20:51:54+07:00",
-      "sha": "b2c26a8",
-      "summary": "feat(rival): schedule the Facebook promo feed daily, in its own browser job (#459)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-16T20:51:50+07:00",
-      "sha": "0979624",
-      "summary": "fix(vercel): CLI deploys were blocked by our own comment keys in vercel.json (#460)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-16T20:15:13+07:00",
-      "sha": "061e64b",
-      "summary": "feat(rival): full coverage — 23 of 23 operators, and the Facebook promo feed leads (#457)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-16T12:48:12+00:00",
-      "sha": "098e954",
-      "summary": "swarm: schedule three obj-#1 pullers that were ageing in silence (oae_yield, oae_napprang, bot_uvpi)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-16T12:01:37+00:00",
-      "sha": "5343ff3",
-      "summary": "rivals: pin each operator's rate page AND Facebook page, and read the Facebook promos (#453)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-16T11:34:26+00:00",
-      "sha": "4fd8db9",
-      "summary": "data: market-pulse swarm refresh (run 31940258914) (#455)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-16T10:44:29+00:00",
-      "sha": "c309887",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the #home leadership-fact ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-16T17:41:57+07:00",
-      "sha": "c34ef1f",
-      "summary": "intel(#home): front door now states AutoX leads 0 of 77 provinces, not just density (#456)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-16T09:48:18+00:00",
-      "sha": "918b72c",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-16, run 31939801489)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-16T08:48:42+00:00",
-      "sha": "1e40877",
-      "summary": "docs(progress): log ux-deckgl-legend-group-role merge + the persisting Vercel production auto-deploy stall (PR #454)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-16T08:42:53+00:00",
-      "sha": "b81a2d2",
-      "summary": "feat(digest): the six owner edits — white, Thai names, all four sentiment sources, no truncation (#452)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-16T15:42:48+07:00",
-      "sha": "24de261",
-      "summary": "ux: group the deck.gl POI-legend toggle clusters for screen readers (#454)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-16T07:47:45+00:00",
-      "sha": "a48a403",
-      "summary": "fix(probe): \"no hits\" off 1 creative is not a verdict — sample gate + OCR (#451)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-16T07:33:52+00:00",
-      "sha": "506b5d5",
-      "summary": "docs(progress): log the rate-board + daily-digest wave (PRs #438/#440/#442/#446) (#450)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-16T07:07:10+00:00",
-      "sha": "b33a1e7",
-      "summary": "fix(probe): CANDIDATES rows are 3-tuples, and add the --list that would have caught it (#449)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-16T06:47:15+00:00",
-      "sha": "e5d36d6",
-      "summary": "peer(#acq): state Srisawad's material group-locator inflation on the per-province board (#448)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-16T06:06:03+00:00",
-      "sha": "4d86555",
-      "summary": "data: market-pulse swarm refresh (run 31925990776) (#445)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-16T05:34:07+00:00",
-      "sha": "0068169",
-      "summary": "probe(ads): vet the 13 unpinned bank advertiser accounts from a runner, not the laptop (#446)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-16T05:32:11+00:00",
-      "sha": "c641c77",
-      "summary": "data(census): refresh the Union Auction forward book (run 31926275326) (#444)",
       "pillar": "data-integration"
     }
   ]
