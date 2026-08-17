@@ -456,6 +456,24 @@ def beat_matrix(ops, board_rows, lv):
             "verdict": verdict,
         })
 
+    # The two worked examples the email uses to show WHY the restatement matters are picked from
+    # the data, not written down. They were hardcoded as "CIMB 5.4 -> 9.95" and "เงินให้ใจ 150 ->
+    # 140" in the first cut, which states a live rival figure as a fact in an exec's inbox and goes
+    # stale the first time either lender moves. Pick the widest headline-vs-restated gap on each
+    # dimension: the biggest gap is also the most persuasive illustration.
+    def widest(field_head, field_real):
+        cands = [r for r in rows
+                 if r[field_head] is not None and r[field_real] is not None
+                 and abs(r[field_head] - r[field_real]) > 0.01]
+        if not cands:
+            return None
+        r = max(cands, key=lambda r: abs(r[field_head] - r[field_real]))
+        return {"key": r["key"], "operator": r["operator"], "name_th": r.get("name_th"),
+                "headline": r[field_head], "restated": r[field_real]}
+
+    examples = {"rate": widest("headline_rate", "their_rate"),
+                "ltv": widest("headline_ltv", "their_ltv")}
+
     ORDER = {"beat": 0, "level": 1, "lose": 2, "thin": 3, "unknown": 4}
     rows.sort(key=lambda r: (ORDER[r["verdict"]], -r["wins"], r["losses"],
                              -(r["their_ltv"] or 0)))
@@ -465,6 +483,7 @@ def beat_matrix(ops, board_rows, lv):
                  "rate_at_cap": x.get("title_rate_at_cap"),
                  "standard_ltv": x.get("standard_cap_pct")},
         "rows": rows,
+        "examples": examples,
         "dims": [("ltv", "LTV cap"), ("rate", "Rate %/yr"), ("tenor", "Tenor")],
         "bands": {"ltv": BEAT_BAND_LTV, "rate": BEAT_BAND_RATE, "tenor": BEAT_BAND_TENOR},
         "n_beat": sum(1 for r in rows if r["verdict"] == "beat"),
@@ -490,6 +509,22 @@ def beat_matrix(ops, board_rows, lv):
         "gated_note": "12.99% is the C-code floor on a low-risk case, not the walk-in rate.",
         "basis_confirmed": False,
     }
+
+
+def _bm_examples(c, bm):
+    """The plain-text twin of the HTML worked examples, off the same derived `examples` block —
+    so the two halves cannot state different lenders or different figures."""
+    ex = bm.get("examples") or {}
+    out = []
+    if ex.get("rate"):
+        out.append("%s advertises %s%% but its own ไม่โอนเล่ม floor is %s%%"
+                   % (th(c["names"], ex["rate"]["key"], ex["rate"].get("name_th")),
+                      fmt(ex["rate"]["headline"]), fmt(ex["rate"]["restated"])))
+    if ex.get("ltv"):
+        out.append("%s's %s%% ceiling is %s%% without the book"
+                   % (th(c["names"], ex["ltv"]["key"], ex["ltv"].get("name_th")),
+                      fmt(ex["ltv"]["headline"]), fmt(ex["ltv"]["restated"])))
+    return (" — " + "; ".join(out)) if out else ""
 
 
 MIN_CROP_DEP = 0.10     # ≥10% of the largest province's crop area — see agri()
@@ -1070,13 +1105,22 @@ def html(c):
         WORD = {"beat": "We win", "level": "Level", "lose": "They win",
                 "thin": "Too thin", "unknown": "No data"}
 
+        ex = bm.get("examples") or {}
+        shown = []
+        if ex.get("rate"):
+            shown.append("%s advertises %s%% but its own ไม่โอนเล่ม floor is %s%%"
+                         % (esc(th(N, ex["rate"]["key"], ex["rate"].get("name_th"))),
+                            fmt(ex["rate"]["headline"]), fmt(ex["rate"]["restated"])))
+        if ex.get("ltv"):
+            shown.append("%s&rsquo;s %s%% ceiling is %s%% once the book stays with the borrower"
+                         % (esc(th(N, ex["ltv"]["key"], ex["ltv"].get("name_th"))),
+                            fmt(ex["ltv"]["headline"]), fmt(ex["ltv"]["restated"])))
         sec("Who we can beat now", "เราชนะใครได้บ้าง · The LTVX board, rival by rival",
             "Our LTVX case (%s%% LTV at a %s%% C-code floor) against every rival, on THEIR "
             "ไม่โอนเล่ม numbers &mdash; the product we actually sell. Headline figures are the "
-            "โอนเล่ม ones and are not used: CIMB advertises %s%% but its own ไม่โอนเล่ม floor is "
-            "%s%%, and เงินให้ใจ&rsquo;s %s%% ceiling is %s%% once the book stays with the borrower. "
-            "Green = we win that column."
-            % (fmt(o["ltv"]), fmt(o["rate"]), "5.4", "9.95", "150", "140"))
+            "โอนเล่ม ones and are not used%s. Green = we win that column."
+            % (fmt(o["ltv"]), fmt(o["rate"]),
+               (": " + ", and ".join(shown)) if shown else ""))
 
         hdr = ('<tr>'
                '<td style="padding:0 0 7px;font-family:%s;font-size:10px;font-weight:700;'
@@ -1468,10 +1512,9 @@ def text(c):
               "%d beat our ceiling, %d lend for longer — three different problems."
               % (bm["n_beat"], len(bm["rows"]), bm["n_level"], bm["n_lose"], bm["n_lose"],
                  lw["rate"], lw["ltv"], lw["tenor"]),
-              "Their HEADLINE numbers are the โอนเล่ม product and are not used — CIMB advertises "
-              "5.4%% but its own ไม่โอนเล่ม floor is 9.95%%; เงินให้ใจ's 150%% ceiling is 140%% "
-              "without the book. Ours: %s%% LTV at a %s%% C-code floor, %s months."
-              % (fmt(o["ltv"]), fmt(o["rate"]), fmt(o["tenor"])),
+              "Their HEADLINE numbers are the โอนเล่ม product and are not used%s. Ours: %s%% LTV "
+              "at a %s%% C-code floor, %s months."
+              % (_bm_examples(c, bm), fmt(o["ltv"]), fmt(o["rate"]), fmt(o["tenor"])),
               "",
               "  %-30s %-11s %-11s %-11s %s"
               % ("LENDER", "LTV", "RATE", "TENOR", "VERDICT")]
