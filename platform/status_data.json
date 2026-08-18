@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-17T22:21:51+00:00",
-    "commit": "7dbe837"
+    "generated_at": "2026-08-18T04:24:14+00:00",
+    "commit": "b135e6f"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-17",
+    "eta_date": "2026-08-18",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-08-18T04:24:14+00:00",
+      "sha": "b135e6f",
+      "summary": "health: freshness-guard rival_youtube.json (video board could freeze silently)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-18T04:06:02+00:00",
+      "sha": "59dc0f4",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-18, run 32097606960)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-18T03:15:41+00:00",
+      "sha": "2e5a901",
+      "summary": "data: NABC live prices (2026-08-18, run 32094326745)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-18T02:40:22+00:00",
+      "sha": "dd40fe6",
+      "summary": "docs(progress): log the ux-loop mtog-disclosure-aria-rayong merge + deploy-verify (PR #494)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-18T09:37:30+07:00",
+      "sha": "d93edbe",
+      "summary": "ux: mtog disclosure aria on rayong-catchment (aria-expanded/aria-controls) (#494)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-18T00:25:46+00:00",
+      "sha": "a43b59d",
+      "summary": "data(swarm): schedule pull_bot_credit — BoT MEASURED NPL/household-debt credit anchor (obj #1)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-17T23:45:31+00:00",
+      "sha": "31b2a5f",
+      "summary": "data: market-pulse swarm refresh (run 32073251218) (#492)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-17T23:15:32+00:00",
+      "sha": "4ef99b4",
+      "summary": "data: rival Facebook promo feed refresh (run 32075583317) (#493)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-17T22:24:39+00:00",
+      "sha": "5c9669c",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival_ads freshness-guard ship",
+      "pillar": "market"
+    },
+    {
       "date": "2026-08-17T22:21:51+00:00",
       "sha": "7dbe837",
       "summary": "health: freshness-guard rival_ads.json (Google-Ads board could freeze silently)",
@@ -657,60 +711,6 @@
       "sha": "e079bda",
       "summary": "feat(peer): contested-mindshare board — outnumbered on the ground AND out-searched by the same rival (obj #2) (#485)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-17T10:03:00+00:00",
-      "sha": "423356c",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-17, run 32017879096)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-17T08:34:56+00:00",
-      "sha": "46f3cb0",
-      "summary": "docs(progress): record ux-dataroom-truncated-title merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-17T15:31:50+07:00",
-      "sha": "e75c7f7",
-      "summary": "ux: recover truncated dataroom Layer cells via title (name + provenance label) (#483)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-17T06:51:11+00:00",
-      "sha": "30af668",
-      "summary": "pipeline: schedule nabc_history + diw_scurve pullers (feeds ageing in silence)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-17T06:37:41+00:00",
-      "sha": "f5644f9",
-      "summary": "data(census): refresh the Union Auction forward book (run 31994211127) (#480)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-17T06:10:13+00:00",
-      "sha": "edc3ae6",
-      "summary": "data: market-pulse swarm refresh (run 31994138954) (#481)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-17T05:38:02+00:00",
-      "sha": "1e54bb0",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 31995514769) (#482)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-17T04:47:06+00:00",
-      "sha": "c90be40",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the provenance-vintage ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-17T04:35:59+00:00",
-      "sha": "a90e337",
-      "summary": "fix(provenance): 9 MEASURED layers showed blank vintage in the Data-room card",
-      "pillar": "data-integration"
     }
   ]
 }
