@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-08-17",
+  "pulled_at": "2026-08-18",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -428,10 +428,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.71255,
-    "ratings": 1562,
-    "score_current_version": 3.71255,
-    "ratings_current_version": 1562,
+    "score": 3.71502,
+    "ratings": 1565,
+    "score_current_version": 3.71502,
+    "ratings_current_version": 1565,
     "version": "3.2.0",
     "app_updated": "2026-08-13",
     "released": "2020-04-30",
@@ -1327,6 +1327,15 @@
      "title": "น่าสนใจ",
      "content": "ใช้งานง่าย และสะดวก",
      "version": "1.0.5",
+     "votes": 0
+    },
+    {
+     "id": "14438252545",
+     "at": null,
+     "score": 1,
+     "title": "สรุปพัฒนาแต่ไม่อัพเดท",
+     "content": "เปิดแอปก็ให้อัพเดทเวอร์ชั่น ใน app store ก็แค่ open  วนอยู่นั่น สรุปพัฒนาอะไรก่อนนนนนนน",
+     "version": "3.2.0",
      "votes": 0
     },
     {
@@ -3305,16 +3314,25 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.28337,
-    "ratings": 427,
-    "score_current_version": 3.28337,
-    "ratings_current_version": 427,
+    "score": 3.27804,
+    "ratings": 428,
+    "score_current_version": 3.27804,
+    "ratings_current_version": 428,
     "version": "1.0.60",
     "app_updated": "2026-07-02",
     "released": "2024-01-16",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14438069960",
+     "at": null,
+     "score": 1,
+     "title": "ในแอปไม่มีสัญญาสินเชื่อส่วนบุคคล",
+     "content": "เพิ่มสัญญาสินเชื่อส่วนบุคคลเข้าไปในแอปด้วยน่าจะดีมากเลยค่ะจะได้ชำระง่ายง่ายจะได้ไม่ต้องติดต่อพนักงานสาขาบ่อยชำระผ่านแอปได้เลยอันนี้ต้องติดต่อกับพนักงานสาขาก่อนถึงจะได้ QR Code ในการชำระ",
+     "version": "1.0.60",
+     "votes": 0
+    },
     {
      "id": "14297393786",
      "at": null,
@@ -5630,16 +5648,25 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.45126,
-    "ratings": 554,
-    "score_current_version": 3.45126,
-    "ratings_current_version": 554,
+    "score": 3.45259,
+    "ratings": 559,
+    "score_current_version": 3.45259,
+    "ratings_current_version": 559,
     "version": "1.0.45",
     "app_updated": "2026-08-17",
     "released": "2024-07-09",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14438770189",
+     "at": null,
+     "score": 5,
+     "title": "อนุมัติไวไม่ถึงหนึ่งวัน",
+     "content": "อนุมัติไวมากๆ ยื่นเรื่องไปวันที่ 16 สิงหาคมหนึ่งทุ่มกว่าๆ วันที่ 17 บ่ายๆ อนุมัติแล้ว ส่งเอกสารแค่สลิปเงินเดือนและสเตจเม้นย้อนหลัง มีsmsมาบอกผลว่าผ่านพร้อมจำนวนเงิน ขอบคุณค่ะ🤟🏻",
+     "version": "1.0.45",
+     "votes": 0
+    },
     {
      "id": "14435711627",
      "at": null,
@@ -10418,16 +10445,43 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.82425,
-    "ratings": 172748,
-    "score_current_version": 4.82425,
-    "ratings_current_version": 172748,
+    "score": 4.82422,
+    "ratings": 172795,
+    "score_current_version": 4.82422,
+    "ratings_current_version": 172795,
     "version": "3.0.6",
     "app_updated": "2026-08-06",
     "released": "2021-04-20",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14439137818",
+     "at": null,
+     "score": 1,
+     "title": "ไม่อนุมัติ",
+     "content": "ไม่อนุญาตให้นำข้อมูลไปเผยแพร่",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14438244737",
+     "at": null,
+     "score": 4,
+     "title": "เพื่อความเป็นธรรมของข้าพเจ้า",
+     "content": "เรียน เจ้าหน้าที่ ข้าพเจ้า ได้ทำการสมัครและกรอกข้อมูลส่วนตัวใน แอปฟินนิกซ์ เมื่อวันที่ 3 สิงหาคม 2569 ไม่ได้รับการอนุมัติสินเชื่อ โดยมีชื่อ-นามสกุล เบอร์โทรศัพท์ เลขบัตรประจำตัวประชาชนทั้งด้านหน้าและด้านหลัง เลขลงท้ายบัตรประชาชน 4396 และรหัสผ่านเข้าแอปธนาคาร และชื่อ-นามสกุล เบอร์โทรศัพท์ บุคคลอ้างอิง 1 คน และการเข้าถึงรายชื่อติดต่อในโทรศัพท์ของข้าพเจ้า\n\nทั้งนี้ถ้าหากทาง แอปฟินนิกซ์ ได้นำข้อมูลของข",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14437568788",
+     "at": null,
+     "score": 1,
+     "title": "ขอแจ้งให้ทราบว่าเลขบัตรประจำตัวประชาชน ลงท้า ด้วย 3548 ไม่อนุญาตให้นำ ข้อมูลส่วนบุคคลของ ข้าพเจ้าไป",
+     "content": "ขอแจ้งให้ทราบว่าเลขบัตรประจำตัวประชาชน ลงท้า ด้วย 3548 ไม่อนุญาตให้นำ ข้อมูลส่วนบุคคลของ ข้าพเจ้าไป",
+     "version": "3.0.6",
+     "votes": 0
+    },
     {
      "id": "14433508048",
      "at": null,
@@ -15317,10 +15371,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.70375,
-    "ratings": 63554,
-    "score_current_version": 4.70375,
-    "ratings_current_version": 63554,
+    "score": 4.70383,
+    "ratings": 63596,
+    "score_current_version": 4.70383,
+    "ratings_current_version": 63596,
     "version": "7.5.0",
     "app_updated": "2026-07-20",
     "released": "2021-10-10",
@@ -19937,16 +19991,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84407,
-    "ratings": 43481,
-    "score_current_version": 4.84407,
-    "ratings_current_version": 43481,
+    "score": 4.84419,
+    "ratings": 43565,
+    "score_current_version": 4.84419,
+    "ratings_current_version": 43565,
     "version": "3.1.1",
     "app_updated": "2026-05-25",
     "released": "2023-03-06",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14438411412",
+     "at": null,
+     "score": 5,
+     "title": "ดีมากๆเลยค่า💛💛",
+     "content": "ไวมากกก",
+     "version": "3.1.1",
+     "votes": 0
+    },
     {
      "id": "14426310209",
      "at": null,
@@ -24656,10 +24719,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.76985,
-    "ratings": 26756,
-    "score_current_version": 4.76985,
-    "ratings_current_version": 26756,
+    "score": 4.76992,
+    "ratings": 26770,
+    "score_current_version": 4.76992,
+    "ratings_current_version": 26770,
     "version": "1.8.7",
     "app_updated": "2026-08-07",
     "released": "2020-08-05",
@@ -28826,16 +28889,43 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.60876,
-    "ratings": 2078,
-    "score_current_version": 2.60876,
-    "ratings_current_version": 2078,
+    "score": 2.61028,
+    "ratings": 2081,
+    "score_current_version": 2.61028,
+    "ratings_current_version": 2081,
     "version": "3.3.0",
     "app_updated": "2026-08-13",
     "released": "2022-05-11",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14437814839",
+     "at": null,
+     "score": 5,
+     "title": "นิกกี้",
+     "content": "เงินเข้าไวมาก",
+     "version": "3.3.0",
+     "votes": 0
+    },
+    {
+     "id": "14437741676",
+     "at": null,
+     "score": 1,
+     "title": "ขอยกเลิกการสมัคร เลขบัตรประชาชนลงท้าย ด้วย 5267 ไม่ผ่านสมัครยากวุ่นวาย หลายขั้นตอน",
+     "content": "สมัครเพื่อขอสินเชื่อเพื่อขยายธุกิจ เเต่ขอเอกสารนู้นนี้วุ่นวายมากสรุปไม่ผ่านเเย่ๆ",
+     "version": "3.3.0",
+     "votes": 0
+    },
+    {
+     "id": "14437638096",
+     "at": null,
+     "score": 5,
+     "title": "MAy",
+     "content": "เงินเข้าไวมากกกก คะ",
+     "version": "3.3.0",
+     "votes": 0
+    },
     {
      "id": "14435608480",
      "at": null,
@@ -33500,16 +33590,34 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.55287,
-    "ratings": 2941,
-    "score_current_version": 2.55287,
-    "ratings_current_version": 2941,
+    "score": 2.55182,
+    "ratings": 2943,
+    "score_current_version": 2.55182,
+    "ratings_current_version": 2943,
     "version": "5.65",
     "app_updated": "2026-02-13",
     "released": "2021-08-03",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14437679930",
+     "at": null,
+     "score": 1,
+     "title": "สมัครสินเชื่อไม่ได้แต่แจ้งเตือนเลขบัตรนี้ถูกใช้ไปแล้ว",
+     "content": "วันที่ 17 สิงหาคม 2569 ฉันนางสาว นางสาว ศิริวรรณ ขันคำได้ลงทะเบียนสมัครสินเชื่อของมันนี่ฮับไปแต่ไปถึงขั้นตอนสุดท้ายบอกว่าบัตรประชาชนนี้ลงทะเบียนไปแล้ว ซึ่งขั้นตอนสุดท้ายยังไม่ได้กดตกลงอะไรเลยแล้วบัตรประชาชนนี้จะใช้แล้วได้ยังไง ฉันได้ใส่ข้อมูลส่วนตัวของฉัน เลขบัตรบัตรประชาชน เลขหลังบัตรประชาชน แล้วสำเนา บัตรประชาชนเซ็นสำเนาถูกต้องแล้ว ลงทะเบียนไปในแอพพลิเคชั่นของคุณ ถ้าข้อมูลฉันรั่วไหลฉันจะทำการฟ้อ",
+     "version": "5.65",
+     "votes": 0
+    },
+    {
+     "id": "14437542714",
+     "at": null,
+     "score": 1,
+     "title": "ยกเลิกข้อมูล, เอกสารและสัญญาทั้งหมด",
+     "content": "ข้าพเจ้า นางสาวหทัยทิพย์ ได้ทำการกรอกข้อมูล\nบัตร ปชช ลงท้าย 583 และทำการสมัคร แอพลิเคชั่น มันนี่ ฮับเมื่อวันที่ 17/08/2569 แต่ไม่ได้รับการอนุมัติสินเชื่อใดๆ ทั้งสิ้น ข้าพเจ้าไม่ยินยอมให้เปิดเผยข้อมูลส่วน\nตัว หรือนำข้อมูลส่วนตัวของข้าพเจ้าไปทำธุรกรรม\nโดยที่ข้าพเจ้าไม่ได้เป็นคนลงรายมือชื่อ หรือหาก ข้อมูลข้าพเจ้าถูกเปิดเผย ข้าพเจ้าขอดำเนินการทางกฎหมาย เอาผิดกับแอพลิเคชั่น เงินทันเต้อ และ ข้าพเจ้าไม่ร",
+     "version": "5.65",
+     "votes": 0
+    },
     {
      "id": "14430679714",
      "at": null,
