@@ -1399,6 +1399,41 @@ def _shape_rival_youtube(d):
     return None
 
 
+def _shape_rival_facebook(d):
+    # The Facebook promo pulse on Competition (#acq) — the feed the owner ranks
+    # ABOVE every rate card ("facebook is always the promo"). drawRivalFacebook
+    # live-fetches rival_facebook.json and renders THREE arrays: .promos (live
+    # on-product posts, fbPostCard), .corporate (whole-bank page posts) and
+    # .silent (operators quiet this run, fbSilentRow), plus the .meta caveats
+    # (methodBox reads label/basis_caveat/followers_caveat/corporate_page_caveat/
+    # routing_rule). This layer had NO site-health coverage at all — neither a
+    # shape probe here nor a freshness guard — so a truncated/404 CDN deploy would
+    # silently blank the promo board with no phone alert, the same "broken exec
+    # demo" blind spot the rival_ads / rival_youtube probes closed for their #acq
+    # siblings. NB it carries NO calendar stamp by deliberate design (build_rival_
+    # facebook.py only parses Facebook's RELATIVE post ages to minutes for ordering
+    # and refuses to invent an absolute pull date — no-fabrication), so it is NOT a
+    # FRESHNESS_LAYERS candidate; a shape probe is the honest coverage it can carry.
+    # The render treats an all-empty file as a valid "not yet pulled" placeholder,
+    # so the probe asserts the three render arrays EXIST as lists (catching a gutted
+    # or truncated deploy) without demanding non-emptiness (a genuinely quiet promo
+    # run is valid) — and validates row shape only on whatever row is present.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    for k in ("promos", "corporate", "silent"):
+        if not isinstance(d.get(k), list):
+            return "missing/non-list '%s' array (drawRivalFacebook render read)" % k
+    if not isinstance(d.get("meta"), dict):
+        return "missing 'meta' object (methodBox caveat read)"
+    row = next((r for r in (d["promos"] + d["corporate"]) if isinstance(r, dict)), None)
+    if row is not None:
+        if not (isinstance(row.get("key"), str) and row["key"].strip()):
+            return "first promo/corporate row missing/empty 'key'"
+        if "name_th" not in row:
+            return "first promo/corporate row missing 'name_th' (card label render read)"
+    return None
+
+
 def _shape_rival_density(d):
     # The district-outnumbered board on Competition (#acq, obj #2): drawRivalDensity
     # live-fetches it (renderRivalDensity) and ranks the districts where the big-4
@@ -3368,6 +3403,7 @@ DATA_FILES = [
     ("data/rival_pulse.json", _shape_rival_pulse, ".sentiment ladder + .promos feed (#acq rival watch)"),
     ("data/rival_ads.json", _shape_rival_ads, ".brands ad-creative board (#acq paid-media pulse)"),
     ("data/rival_youtube.json", _shape_rival_youtube, ".channels video board (#acq video pulse)"),
+    ("data/rival_facebook.json", _shape_rival_facebook, ".promos/.corporate/.silent promo board (#acq Facebook pulse — the feed ranked above every rate card)"),
     # The two borrower-VOICE reads on the same #acq surface — both live-degrade SILENTLY
     # to a "not yet built" placeholder with no phone alert, and NEITHER self-heals (their
     # Pantip / app-review / YouTube pulls are Thai-IP/keyed with no CI cron), so a
