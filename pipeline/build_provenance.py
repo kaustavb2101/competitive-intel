@@ -78,6 +78,15 @@ UPSTREAM_CAPPED = {
     # after its 2026-03-17 last-modified), so latest_month 2026-01 is the newest REAL month, not a laggard.
     # Re-arms the day a >20-row 2569_03+ file lands (vintage string changes → key no longer matches).
     ("vehicle_models.json", "2026-01"): "DLT stat_1_1_01_first_regis_vehicles_car newest complete monthly vintage (Jan 2569); the 2569_02 file is a permanent ~6-row stub (1KB vs Jan's ~1,421 rows), so 2026-01 is the newest real month upstream",
+    # collateral_flow.json is built from DLT dataset_stat_1_008 (car-law registration actions →
+    # source-data/vehicle_flow_by_province.json → build_collateral_flow.py). Its newest monthly
+    # release is sttt_car_tax_mm_2569_02.csv = Feb 2569 (2026-02); every 2569 file is last-modified
+    # 2026-03-17 and there is NO 2569_03+ release (verified live via the gdcatalog CKAN, HTTP 200
+    # from this cloud IP, 2026-08-18). So its trailing-12-month window END (2026-02, newly surfaced
+    # by the _vintage_of window-array read) is the newest COMPLETE monthly vintage upstream — capped
+    # for the same reason as its DLT siblings, not stale by neglect. Re-arms the day a >stub 2569_03+
+    # monthly file lands (the window end advances → this key no longer matches, staleness re-arms).
+    ("collateral_flow.json", "2026-02"): "DLT dataset_stat_1_008 newest complete monthly release (sttt_car_tax_mm_2569_02 = Feb 2569 = 2026-02); no 2569_03+ file published upstream (verified via gdcatalog CKAN, HTTP 200 any-IP, 2026-08-18)",
 }
 
 
@@ -303,6 +312,17 @@ def _vintage_of(m):
             return _trunc(v, 24)
         if isinstance(v, int) and k in ("latest_year_ce", "vintage_ce"):
             return str(v)
+    # window (collateral_flow — the DLT car-law registration-flow / used-collateral pulse): this
+    # layer stamps its data-observation vintage ONLY as a two-element [start, end] month array
+    # (meta.window, e.g. ["2025-03","2026-02"]), never a scalar key, so the scan above never saw it
+    # and the layer showed BLANK in the Data-room card despite carrying a real MEASURED observation
+    # vintage. The trailing-12-month window END is the freshness date (the newest month IN the
+    # series) — a strict ISO month that reads like observed_to. Placed last so any scalar/ISO key
+    # above always wins; verified only collateral_flow carries a window array with no scalar vintage
+    # key, so this is purely additive — no populated layer moves.
+    w = m.get("window")
+    if isinstance(w, (list, tuple)) and len(w) >= 2 and isinstance(w[-1], str) and w[-1].strip():
+        return _trunc(w[-1], 24)
     return ""
 
 
