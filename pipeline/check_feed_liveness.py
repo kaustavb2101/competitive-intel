@@ -93,6 +93,21 @@ FROZEN_EXEMPT = {
     # is re-calibrated via FROZEN_WINDOW_OVERRIDE above rather than exempted. If the Bangchak API
     # dies, gasohol freezes past that horizon and TEST B fires — so coverage of the puller is kept.
     "fuel_diesel": "administered price (Oil Fuel Fund); fuel_gasohol95 is the live canary for this pull",
+    #
+    # The three rival-promo series derive from pull_rival_promos.py, which scrapes the rivals' OWN
+    # corporate sites (www.tidlor.com, muangthaicap.com, www.sawad.co.th). CLAUDE.md documents those
+    # sites as geoblocked from foreign/cloud IPs, and pull_swarm.py registers the feed as ip="thai"
+    # (opt-in via --include-thai only, NEVER in the default CI swarm). So from CI the puller does not
+    # run at all — the value moves ONLY when the owner runs the Thai-laptop pull. TEST B's premise
+    # ("the puller runs, exits 0, and republishes an identical payload") therefore does not hold here:
+    # a flat run seen from CI is the EXPECTED state between the owner's manual pulls, not a dead cron.
+    # Unlike fuel_diesel there is no CI-reachable sibling to keep as a live canary — the whole feed is
+    # CI-unreachable — so all three brand series are exempted. Was crying wolf daily (frozen sawad @5,
+    # tidlor @6 over 2026-07-19..2026-08-17), opening the "Feed liveness check failed" issue + a red
+    # run over a feed CI cannot refresh; muted here so the monitor's real alarms stay trusted.
+    "rival_promo_live_tidlor": "Thai-IP-only pull (rival corporate sites geoblocked from CI); refreshes only on the owner's opt-in --include-thai laptop run, so a flat CI reading is expected",
+    "rival_promo_live_mtc": "Thai-IP-only pull (rival corporate sites geoblocked from CI); refreshes only on the owner's opt-in --include-thai laptop run, so a flat CI reading is expected",
+    "rival_promo_live_sawad": "Thai-IP-only pull (rival corporate sites geoblocked from CI); refreshes only on the owner's opt-in --include-thai laptop run, so a flat CI reading is expected",
 }
 
 
