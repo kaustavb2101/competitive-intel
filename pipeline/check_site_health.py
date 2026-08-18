@@ -2120,6 +2120,34 @@ def _shape_deltas(d):
     return None
 
 
+def _shape_snapshots_index(d):
+    # deltas.json's SIBLING on the Risk-trend (#trend) tab — both are timeseries.py
+    # output. snapVintage() reads SNAPIDX.snapshots[last].label to stamp the current
+    # data-vintage on the #trend baseline header; on a fetch failure / gutted CDN
+    # deploy the client catches to SNAPIDX=null and the vintage label silently
+    # vanishes from the header, MASQUERADING a broken file as "no vintage yet" with
+    # no phone alert — the same deploy blind spot the deltas probe closed for its
+    # own tab. deltas.json is probed; this, its pair, was the one #trend render read
+    # with no coverage. A SHAPE probe, not a freshness guard: meta declares the file
+    # "carries no computed risk/market number" and each row's `label` is a VINTAGE
+    # label (e.g. "2025M12"), not a calendar stamp — a freshness stamp would have to
+    # be fabricated (the same honesty call the rival_facebook probe recorded).
+    # Asserts the render read shape (the .snapshots list + the last row's .label),
+    # not values; stays green if the snapshot history is ever reset to one vintage.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    snaps = d.get("snapshots")
+    if not isinstance(snaps, list):
+        return "missing/invalid 'snapshots' list (snapVintage()/#trend vintage-label read)"
+    if not isinstance(d.get("meta"), dict):
+        return "missing 'meta' object (provenance card)"
+    if snaps:
+        last = snaps[-1]
+        if not isinstance(last, dict) or not (isinstance(last.get("label"), str) and last["label"].strip()):
+            return "newest snapshot row missing a non-blank 'label' (#trend vintage-label render read)"
+    return None
+
+
 def _shape_vehicle_models(d):
     # The Macro tab's nameplate wave (#275/#276, obj #1 collateral context) — the
     # newest surfaced data layer and the last one from that wave with no deploy
@@ -3573,6 +3601,13 @@ DATA_FILES = [
     # render shape (baseline gate + branch/region mover fields + the #trend board list),
     # shape not values, and stays green in a legitimate baseline vintage.
     ("data/deltas.json", _shape_deltas, ".baseline gate + .branches/.region movers + .board YoY (#home Movers card + #trend tab)"),
+    # deltas.json's timeseries.py SIBLING (snapshots_index.json, obj #1) — the #trend
+    # vintage-label read (snapVintage() → SNAPIDX.snapshots[last].label). deltas is
+    # probed; this pair had no deploy coverage, so a truncated/404 file silently drops
+    # the current-vintage label from the Risk-trend header with no phone alert. SHAPE
+    # probe (the .snapshots list + newest row's .label), not a freshness guard — the
+    # label is a vintage string, not a calendar stamp (no-fabrication).
+    ("data/snapshots_index.json", _shape_snapshots_index, ".snapshots list with per-vintage .label (#trend vintage-label read, obj #1)"),
     # The "Since last vintage" exec card at the TOP of the Risk-trend tab (obj #1) — the
     # #trend lead headline + worst-first findings list, and the second read the last two
     # audits flagged. renderVintageDigest HIDES the whole card on a missing/404 file
