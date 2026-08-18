@@ -5,7 +5,7 @@
     "label": "MEASURED — Bank of Thailand. The real-world NPL scale + household-debt backdrop the modelled 0-100 branch-risk triage score is read against. Context only; it does not feed the composite.",
     "source": "ธนาคารแห่งประเทศไทย (ธปท.) — Financial Stability Report 2024 (รายงานการประเมินเสถียรภาพระบบการเงินไทย 2567) + BoT statistics report 984",
     "provenance": "MEASURED. Pure projection of source-data/bot_credit.json (BoT FSR 2024 text layer + BoT statistics report 984). Nothing modelled.",
-    "pulled": "2026-07-18"
+    "pulled": "2026-08-18"
   },
   "metrics": [
     {
