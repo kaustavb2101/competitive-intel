@@ -67,6 +67,17 @@ UPSTREAM_CAPPED = {
     # dated after 2569-02-28 lands. Both layers derive from that one file, so both cap on the same date.
     ("vehicle_collateral.json", "2026-02-28"): "DLT dataset_1_1_04 newest complete vintage (28 Feb 2569); no newer CSV published upstream",
     ("ev_penetration.json", "2026-02-28"): "DLT dataset_1_1_04 newest complete vintage (28 Feb 2569); no newer CSV published upstream",
+    # vehicle_mix.json takes its STOCK shares from the same dataset_1_1_04 file (28 Feb 2569) as the two
+    # above, and its new-registration shares from stat_1_1_01/dataset_stat, which top out at Feb 2569 —
+    # the 2569_02 monthly new-reg file is a permanent ~6-row stub, which the builder already excludes
+    # (its meta.excluded_stub_months = ["2026-02"]). So its 2026-02-28 vintage is the newest COMPLETE data
+    # upstream, capped for the same reason as its two siblings — not stale by neglect (NEXT_STEPS §2).
+    ("vehicle_mix.json", "2026-02-28"): "DLT dataset_1_1_04 stock (28 Feb 2569) + stat_1_1_01 new-reg capped at Feb 2569 (2569_02 is a permanent ~6-row stub, excluded); no newer complete CSV published upstream",
+    # vehicle_models.json is built from stat_1_1_01_first_regis_vehicles_car; its 2569_02 (Feb) monthly
+    # file is a permanent ~6-row stub (1KB vs Jan's 151KB/~1,421 rows, re-verified still-a-stub 4 months
+    # after its 2026-03-17 last-modified), so latest_month 2026-01 is the newest REAL month, not a laggard.
+    # Re-arms the day a >20-row 2569_03+ file lands (vintage string changes → key no longer matches).
+    ("vehicle_models.json", "2026-01"): "DLT stat_1_1_01_first_regis_vehicles_car newest complete monthly vintage (Jan 2569); the 2569_02 file is a permanent ~6-row stub (1KB vs Jan's ~1,421 rows), so 2026-01 is the newest real month upstream",
 }
 
 
