@@ -10177,6 +10177,16 @@
    "channel_title": "ศักดิ์สยามลิสซิ่ง",
    "comments": [
     {
+     "id": "Ugw_xFj7FDIly8Rxph14AaABAg",
+     "likes": 0,
+     "published": "2026-08-11T15:10:50Z",
+     "replies": 0,
+     "text": "😢",
+     "video": "N-wstfQLn2Q",
+     "video_published": "2024-06-24",
+     "video_title": "ครบรอบวันคล้ายวันสถาปนา ปีที่ 31 บริษัท ศักดิ์สยามลิสซิ่ง จำกัด (มหาชน)"
+    },
+    {
      "id": "UgwwFI_oO0YR0CJHMq54AaABAg",
      "likes": 0,
      "published": "2026-05-15T06:04:35Z",
@@ -10964,6 +10974,16 @@
   "SAWAD": {
    "channel_title": "ศรีสวัสดิ์ เงินสดทันใจ",
    "comments": [
+    {
+     "id": "UgxQXcRihaZdo23XJtN4AaABAg",
+     "likes": 0,
+     "published": "2026-08-16T11:18:42Z",
+     "replies": 0,
+     "text": "80 ปี รุ่นอากงอาม่าสืบทอดมาถึงรุ่น 2 รุ่น 3 อย่าเครมเนื้อตุ๋นไทยอร่อยกว่าที่จีนนะ ระยะนี้พบบ่อยมาก ข้าวขาหมูอร่อยกว่าที่จีน ดูหน้าคนขายยัง \"รุ่นที่เท่าไหร่\" แค่เติมน้ำตาลในน้ำจิ้มเอง",
+     "video": "qeRwV-_rEiU",
+     "video_published": "2026-07-31",
+     "video_title": "\"ศรีสวัสดิ์\" ชวนชิม EP.88 ร้านกอเต็กเซียง ก๋วยเตี๋ยวเนื้อตุ่นสูตร 80 ปี"
+    },
     {
      "id": "Ugy3pxmSVCTrEMkhm9F4AaABAg",
      "likes": 0,
@@ -22039,6 +22059,16 @@
    "channel_title": "Ngernturbo",
    "comments": [
     {
+     "id": "Ugyj4EG3eBB2fM1Byzx4AaABAg",
+     "likes": 0,
+     "published": "2026-08-16T10:11:48Z",
+     "replies": 0,
+     "text": "คาราเมล สาขาเพชรเกษม 81 สวยสุด ใจดีด้วย🎉😊",
+     "video": "0deksDGQq50",
+     "video_published": "2026-06-01",
+     "video_title": "เงินเทอร์โบ - รับจ๊อบ EP.1"
+    },
+    {
      "id": "UgwnvgoiL7RnQgq2otB4AaABAg",
      "likes": 0,
      "published": "2026-08-08T00:16:45Z",
@@ -24455,15 +24485,15 @@
   }
  },
  "meta": {
-  "api_calls_this_run": 596,
+  "api_calls_this_run": 602,
   "brands": 13,
-  "comments": 2435,
+  "comments": 2438,
   "comments_disabled_videos": 0,
   "measured": true,
   "mode": "newest 40 commented videos per channel",
   "pages_per_video": 2,
   "privacy": "Comment TEXT only. Author display name, channel id, channel URL and profile image are dropped at parse time and never written to disk; dedup uses the comment id, which identifies the comment and not the person. No per-author history is built and comments are never joined to another dataset.",
-  "pulled": "2026-08-15T13:54:25Z",
+  "pulled": "2026-08-18T20:59:15Z",
   "source": "YouTube Data API v3 · commentThreads.list (public comments on brand-channel videos)"
  }
 }
