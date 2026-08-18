@@ -3763,6 +3763,22 @@ FRESHNESS_LAYERS = [
      "human to act on and never overwrites the card, so a lagging card is owner-side judgement, not "
      "a stuck cron; and contested_mindshare.json — its ground axis rides peer_province -> the "
      "on-demand/paused Places scout, so a lag is the paused scout, not a break"),
+    ("data/rival_youtube.json", "pulled", 21,
+     "Rival + own-channel YouTube video board (the earned-media pulse on the Competition #acq tab — "
+     "channel subscriber base, share-of-subs and per-video engagement for the big-4 rivals vs our own "
+     "เงินไชโย channel) — live-fetch()'d by renderRivalYoutube and preloaded in the #acq Promise.all, "
+     "refreshed by the daily any-IP data-swarm.yml rival_youtube feed (pull_rival_youtube.py, "
+     "cadence=daily ip=any). build_rival_youtube.py carries meta.pulled straight from the raw pull's "
+     "own stamp (every window in the build anchors on it, never the wall clock), so it advances on "
+     "every SUCCESSFUL pull and freezes the moment the pull errors — the swarm isolates a rival_youtube "
+     "failure so the rest stays green, leaving a structurally valid (shape-probe-green) but frozen video "
+     "board shipping forever with no phone alert (the exact blind spot this list closes; rival_youtube "
+     "already has a SHAPE probe — _shape_rival_youtube — but SHAPE cannot see a stale-but-valid vintage). "
+     "It needs YOUTUBE_API_KEY and has NO dedicated backstop cron (only the swarm); the YouTube Data API "
+     "can exhaust its daily quota in day-long clusters that self-resolve at the quota reset, so the TTL is "
+     "generous: a >21-day lag is ~21 missed daily swarm days, well past any quota cluster — an unambiguous "
+     "'the YouTube pull is dead (revoked key / removed channel / script break)' signal, not a slow-upload "
+     "week (the .pulled stamp is the PULL date, not an upload date, so an upload-free week still advances it)"),
 ]
 
 
