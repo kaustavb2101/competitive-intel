@@ -85,8 +85,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "5 observations from 2026-07-17, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 5,
+    "note": "6 observations from 2026-07-17, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 6,
     "series": "set_mtc_mcap"
    },
    "key": "peer_scoreboard",
@@ -166,8 +166,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "5 observations from 2026-07-30, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 5,
+    "note": "6 observations from 2026-07-30, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 6,
     "series": "rival_ads_live"
    },
    "key": "rival_ads",
@@ -296,8 +296,8 @@
    "stamp": "2026-08-18",
    "stamp_iso": "2026-08-18",
    "stamp_kind": "pulled",
-   "unit": "of 796",
-   "value": 123,
+   "unit": "of 798",
+   "value": 122,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -489,7 +489,7 @@
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
   "history_note": "A trend line is drawn only where a stored series exists. 10 of 23 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 256,
+  "history_points": 258,
   "missing_files": [],
   "n_feeds": 23,
   "n_with_history": 10,
