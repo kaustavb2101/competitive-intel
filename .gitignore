@@ -167,3 +167,14 @@ graphify-out/
 # records; regenerable from the pullers, and the auction history alone runs to ~5GB filtered.
 # Aggregates that the app consumes go to platform/data via build_collateral_census.py.
 source-data/census/
+
+# 3D building catchments (<slug>_catchment.json, ~30MB each). Pulled per-province from Overture
+# (pull_overture_buildings.py, owner-side/network) and published to Cloudflare R2 — see
+# .github/workflows/r2-upload-catchments.yml + platform/data/catchments_r2.json (baseUrl). The 3D
+# scene fetches local-first then streams from R2, so committing all 77 (~2.3GB) into master only
+# bloats the repo + every Vercel deploy. Keep ONLY the 3 git-pilot provinces (bangkok, chiang-mai,
+# rayong) in-tree for instant same-origin load; every other province is served from R2.
+platform/data/*_catchment.json
+!platform/data/bangkok_catchment.json
+!platform/data/chiang-mai_catchment.json
+!platform/data/rayong_catchment.json
