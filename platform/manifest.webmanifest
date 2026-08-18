@@ -1,0 +1,16 @@
+{
+  "name": "AutoX · เงินไชโย — Credit Intelligence",
+  "short_name": "AutoX CI",
+  "description": "Competitive-risk and portfolio-risk readouts across all 2,015 AutoX title-loan branches — numbers tagged measured or estimated.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0e17",
+  "theme_color": "#0a0e17",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
+}
