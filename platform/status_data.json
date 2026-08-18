@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-18T04:24:14+00:00",
-    "commit": "b135e6f"
+    "generated_at": "2026-08-18T10:27:45+00:00",
+    "commit": "8b19135"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-08-18T10:27:45+00:00",
+      "sha": "8b19135",
+      "summary": "health: probe rival_facebook.json in site-health (promo board could 404-blank silently)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-18T09:53:28+00:00",
+      "sha": "a79ea1e",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-18, run 32123646837)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-18T08:59:16+00:00",
+      "sha": "ec2dc82",
+      "summary": "data: NABC live prices (2026-08-18, run 32118567568)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-18T08:35:38+00:00",
+      "sha": "26089cc",
+      "summary": "docs(progress): log the ux-loop deckgl-xbtn-aria merge + deploy-verify (PR #498)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-18T15:32:33+07:00",
+      "sha": "fc1e1be",
+      "summary": "ux: aria-label on deck.gl panel-close (✕) buttons (#498)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-18T08:29:27+00:00",
+      "sha": "f1b1a5b",
+      "summary": "data(census): refresh the Union Auction forward book (run 32098613983) (#495)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-18T07:42:54+00:00",
+      "sha": "ce6aff2",
+      "summary": "data: market-pulse swarm refresh (run 32098121862) (#496)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-18T06:56:16+00:00",
+      "sha": "53e269e",
+      "summary": "fix(provenance): cap DLT-frozen vehicle_mix + vehicle_models (stop false stale alarm) (#497)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-18T04:24:34+00:00",
+      "sha": "138cb6a",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival_youtube freshness-guard ship",
+      "pillar": "market"
+    },
+    {
       "date": "2026-08-18T04:24:14+00:00",
       "sha": "b135e6f",
       "summary": "health: freshness-guard rival_youtube.json (video board could freeze silently)",
@@ -657,60 +711,6 @@
       "sha": "9e37eb0",
       "summary": "data: ThaiWater flood + rain pulse (2026-08-17, run 32043147206)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-17T15:20:57+00:00",
-      "sha": "a57fa61",
-      "summary": "docs(progress): confirm ux-live-theme-toggle-missing deployed live",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-17T14:39:28+00:00",
-      "sha": "f796fdd",
-      "summary": "docs(progress): record ux-live-theme-toggle-missing merge + pending deploy",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-17T21:27:15+07:00",
-      "sha": "5c475b1",
-      "summary": "ux: add missing theme toggle + theme-color sync to live.html (#487)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-17T20:37:26+07:00",
-      "sha": "f237e0f",
-      "summary": "docs(claude): correct the deploy command — prod is git-driven, not `cd platform`",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-17T12:50:30+00:00",
-      "sha": "c275cd3",
-      "summary": "feat(swarm): schedule OAE farm-economics feed (obj #1) + add pymupdf to the swarm",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-17T12:19:58+00:00",
-      "sha": "a650d1d",
-      "summary": "data: SET listed-peer scoreboard refresh (run 32025738341) (#486)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-17T11:48:01+00:00",
-      "sha": "e210e81",
-      "summary": "data: market-pulse swarm refresh (run 32018582197) (#484)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-17T11:00:37+00:00",
-      "sha": "b79a50d",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the contested-mindshare ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-17T10:57:36+00:00",
-      "sha": "e079bda",
-      "summary": "feat(peer): contested-mindshare board — outnumbered on the ground AND out-searched by the same rival (obj #2) (#485)",
-      "pillar": "market"
     }
   ]
 }
