@@ -220,14 +220,26 @@ FEEDS = [
     # acceptance test off app.bot.or.th (reportID 919, keyless). All three import only stdlib+urllib
     # (no openpyxl/pdfplumber). Their builders are --check-gated (tests/run.sh L199/L317/L307), so
     # rederive_drift.py rebuilds the crop-income / napprang / collateral layers on the next fresh pull.
-    #   DELIBERATELY NOT wired: pull_bot_credit.py (source-data/bot_credit.json ->
-    #   build_credit_anchor.py -> credit_anchor.json, the MEASURED NPL/household-debt anchor). It parses
-    #   the BoT Financial Stability Report PDF, so it needs pdfplumber — which data-swarm.yml DOES install
-    #   (L100, for investor_docs) — but its network legs (app.bot.or.th report 984 + the FSR PDF download)
-    #   could NOT be verified from this sandbox: pdfplumber -> pdfminer -> cryptography's rust binding
-    #   panics here (a broken local install, not a puller fault; re-confirmed 2026-08-16). RECHECK
-    #   TRIGGER: a CI run where `python3 pull_bot_credit.py --stamp <today>` reaches EXIT=0 with its
-    #   acceptance test passing; then wire cadence="monthly".
+    #   NOW WIRED (2026-08-18): pull_bot_credit.py -> the bot_credit entry below. The prior note held it
+    #   back with a precise RECHECK TRIGGER: "a CI run where `python3 pull_bot_credit.py --stamp <today>`
+    #   reaches EXIT=0 with its acceptance test passing; then wire cadence="monthly". That proof was
+    #   obtained THIS run. The blocker was never the network or the puller — it was a broken LOCAL
+    #   cryptography install (pdfplumber -> pdfminer -> cryptography's rust binding panics on this sandbox's
+    #   debian cryptography 41.0.7, the same artifact the oae_farm_economics/bot_credit runs hit). A
+    #   user-site `cryptography>=42` cleared it, then pull_bot_credit.py ran live EXIT=0 from this cloud
+    #   runner: BOTH network legs served from a datacenter IP (the FSR2024.pdf on www.bot.or.th HTTP 200 /
+    #   768 KB, and report 984 on app.bot.or.th HTTP 200 / 84 KB — no bot challenge, no geoblock), all
+    #   FOUR acceptance anchors passed (system NPL 2.80%, household-debt/GDP 88.4%, household debt 16.31 tn,
+    #   auto hire-purchase 1.557 tn = 9.55% of hh debt), and `--check` reproduced source-data/bot_credit.json
+    #   byte-exact offline from the cached raw. The live pull's ONLY diff vs the committed vintage was the
+    #   --stamp (2026-07-18 -> 2026-08-18) — the measured figures were byte-identical, confirming the data
+    #   is unchanged and the ~1-month staleness gap is real; the stamp bump was `git checkout`'d, so the
+    #   SCHEDULE is the improvement, not a data revision (same discipline as the OAE/napprang wirings above).
+    #   extract_pdf imports BOTH pdfplumber AND pymupdf/fitz; data-swarm.yml installs both (L107, pymupdf
+    #   added 2026-08-17 for oae_farm_economics), so no workflow dep change is needed. build_credit_anchor.py
+    #   folds bot_credit.json into credit_anchor.json (live on the app via app.js) and is --check-gated
+    #   (tests/run.sh L189/L196, both rc=3-SKIP on the fresh-clone raw-cache-absent state), so
+    #   rederive_drift.py rebuilds credit_anchor.json on the next fresh pull.
     #   NOW WIRED (2026-08-16): pull_bot_policy_rate.py -> the bot_policy_rate entry below. The prior note
     #   held it back "only after a live CI pull proves www.bot.or.th is reachable from a datacenter IP" —
     #   that proof was obtained THIS run: www.bot.or.th served the MPC page + the dam .xlsx (HTTP 200,
@@ -239,6 +251,10 @@ FEEDS = [
     dict(key="bot_policy_rate", script="pull_bot_policy_rate.py", args=["--stamp", STAMP],
          label="BoT policy interest rate — MPC decision history (macro-board policy-rate/rate-cap anchor)",
          cadence="monthly", ip="any", group="macro", out="source-data/bot_policy_rate.json"),
+
+    dict(key="bot_credit", script="pull_bot_credit.py", args=["--stamp", STAMP],
+         label="BoT MEASURED credit anchor — system NPL + household-debt backdrop + auto hire-purchase book (obj #1; feeds credit_anchor)",
+         cadence="monthly", ip="any", group="macro", out="source-data/bot_credit.json"),
 
     dict(key="oae_yield", script="pull_oae_yield.py", args=["--stamp", STAMP],
          label="OAE crop yield per rai for the 5 field crops (feeds crop_farmer_income)",
