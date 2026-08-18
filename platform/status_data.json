@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-18T16:42:27+00:00",
-    "commit": "2168e17"
+    "generated_at": "2026-08-18T22:15:41+00:00",
+    "commit": "533e370"
   },
   "overall": {
     "progress_pct": 98,
@@ -509,7 +509,7 @@
           "title": "Pull Overture building catchments per province",
           "state": "done",
           "priority": 2,
-          "evidence": "77 of 77 province catchments present (platform/data/*_catchment.json)",
+          "evidence": "3 of 77 province catchments present (platform/data/*_catchment.json)",
           "owner_side": false
         },
         {
@@ -532,6 +532,66 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-18T22:15:41+00:00",
+      "sha": "533e370",
+      "summary": "health: shape-probe snapshots_index.json (#trend vintage-label read, deltas' sibling)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-18T21:47:20+00:00",
+      "sha": "fc3b348",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-18T21:46:31+00:00",
+      "sha": "f546913",
+      "summary": "data: social listening refresh (run 32184973744) (#508)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-18T21:44:06+00:00",
+      "sha": "d5c9b10",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-18, run 32189086622)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-18T20:50:45+00:00",
+      "sha": "5de8f7b",
+      "summary": "data: Thai-IP-only swarm refresh (run 32178014703) (#506)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-18T20:17:22+00:00",
+      "sha": "4ac06a9",
+      "summary": "docs: log UX-loop web-app-manifest ship + deploy-verify (PR #507)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-19T03:12:30+07:00",
+      "sha": "e49bb37",
+      "summary": "ux: add web app manifest for Android home-screen install (#507)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-18T18:47:46+00:00",
+      "sha": "abcb79a",
+      "summary": "chore(deploy): finish R2 catchment offload — drop 74 non-pilot catchments (~2.2GB) from git (#505)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-18T17:35:02+00:00",
+      "sha": "82c8213",
+      "summary": "data: market-pulse swarm refresh (run 32157788097) (#504)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-18T16:44:28+00:00",
+      "sha": "050f2fa",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after liveness-exempt ship",
+      "pillar": "feature"
+    },
     {
       "date": "2026-08-18T16:42:27+00:00",
       "sha": "2168e17",
@@ -651,66 +711,6 @@
       "sha": "2e5a901",
       "summary": "data: NABC live prices (2026-08-18, run 32094326745)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-18T02:40:22+00:00",
-      "sha": "dd40fe6",
-      "summary": "docs(progress): log the ux-loop mtog-disclosure-aria-rayong merge + deploy-verify (PR #494)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-18T09:37:30+07:00",
-      "sha": "d93edbe",
-      "summary": "ux: mtog disclosure aria on rayong-catchment (aria-expanded/aria-controls) (#494)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-18T00:25:46+00:00",
-      "sha": "a43b59d",
-      "summary": "data(swarm): schedule pull_bot_credit — BoT MEASURED NPL/household-debt credit anchor (obj #1)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-17T23:45:31+00:00",
-      "sha": "31b2a5f",
-      "summary": "data: market-pulse swarm refresh (run 32073251218) (#492)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-17T23:15:32+00:00",
-      "sha": "4ef99b4",
-      "summary": "data: rival Facebook promo feed refresh (run 32075583317) (#493)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-17T22:24:39+00:00",
-      "sha": "5c9669c",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival_ads freshness-guard ship",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-17T22:21:51+00:00",
-      "sha": "7dbe837",
-      "summary": "health: freshness-guard rival_ads.json (Google-Ads board could freeze silently)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-17T21:49:12+00:00",
-      "sha": "d1546dc",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-17, run 32072648347)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-17T21:14:32+00:00",
-      "sha": "bd68807",
-      "summary": "data: Thai-IP-only swarm refresh (run 32061879977) (#490)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-17T20:24:02+00:00",
-      "sha": "fd7b380",
-      "summary": "docs(progress): log the ux-loop mtog-disclosure-aria merge + deploy-verify (PR #491)",
-      "pillar": "uxui"
     }
   ]
 }
