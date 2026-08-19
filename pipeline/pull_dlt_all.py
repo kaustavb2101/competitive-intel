@@ -46,9 +46,21 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--stamp", default="")
+    ap.add_argument("--only", nargs="+", default=None, metavar="DATASET",
+                    help="mirror only these dataset id(s) instead of the whole catalog "
+                         "(the light, targeted mode a scheduled job uses to keep specific "
+                         "flow layers fresh without downloading everything)")
     args = ap.parse_args()
     names = json.loads(_get(BASE + "package_list"))["result"]
-    print("DLT catalog: %d datasets" % len(names))
+    n_catalog = len(names)
+    print("DLT catalog: %d datasets" % n_catalog)
+    if args.only:
+        want = set(args.only)
+        missing = [d for d in args.only if d not in names]
+        if missing:
+            print("  [WARN] requested dataset(s) not in catalog: %s" % ", ".join(missing))
+        names = [d for d in names if d in want]
+        print("--only: mirroring %d of the requested %d dataset(s)" % (len(names), len(args.only)))
     os.makedirs(RAW, exist_ok=True)
     inv_path = os.path.join(RAW, "INVENTORY.json")
     inv = json.load(open(inv_path)) if os.path.exists(inv_path) else {"meta": {}, "datasets": {}}
@@ -103,7 +115,7 @@ def main():
             "label": "MEASURED — raw mirror of every CSV/XLSX/JSON resource on the DLT catalog. Resumable; re-run pull_dlt_all.py when a window opens.",
             "generated_by": "pipeline/pull_dlt_all.py",
             "last_pull": args.stamp,
-            "n_datasets": len(names),
+            "n_datasets": n_catalog,
             "n_files": sum(1 for d in inv["datasets"].values() for k, v in d["resources"].items() if not v.get("stub")),
             "n_stubs": sum(1 for d in inv["datasets"].values() for v in d["resources"].values() if v.get("stub")),
         }
