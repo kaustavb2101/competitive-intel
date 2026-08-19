@@ -1,4 +1,4 @@
-name: Data — DIW factories + DLT vehicles + DLT fuel-type (gov census, weekly)
+name: Data — DIW factories + DLT vehicles + DLT fuel-type + DLT monthly-flow (gov census, weekly)
 
 # The breakthrough this workflow captures: data.go.th is Cloudflare-geoblocked to datacenter IPs, BUT
 # the DEPARTMENTS' OWN CKAN catalogs are NOT — verified HTTP 200 from GitHub-hosted runners:
@@ -14,6 +14,12 @@ name: Data — DIW factories + DLT vehicles + DLT fuel-type (gov census, weekly)
 # was populated by NO scheduled job — the "unscheduled puller aging in silence" case CLAUDE.md warns of,
 # which froze both layers at the 2026-02-28 vintage. Now the re-derive step below (rederive_drift.py,
 # gate-driven) picks both up automatically whenever DLT publishes a newer snapshot.
+#
+# The SAME fix now also covers the DLT monthly-FLOW datasets via pipeline/pull_dlt_all.py --only
+# (stat_1_1_01_first_regis_vehicles_car / dataset_stat_1_003 / dataset_stat_1_008 / dataset_stat_1_009)
+# — the MEASURED base for vehicle_models.json, brand_trends.json, truck_flow.json and collateral_flow.json
+# (obj #1 collateral fleet). Those four raw mirrors were likewise populated by no scheduled job, so those
+# layers could not auto-refresh in CI either; the targeted pull + gate-driven re-derive below closes that.
 #
 # SAFETY: census.py would rewrite source-data/branches_final.json (the master) in place. This workflow
 # runs it against a THROWAWAY COPY (--in) so the master is never touched, and commits only the two
@@ -72,6 +78,26 @@ jobs:
           # the layers stay at their last committed vintage until the next run.
           python3 pipeline/pull_dlt_fuel.py \
             || echo "::warning::DLT fuel-type pull failed (intermittent host) — ev_penetration/vehicle_collateral stay at last vintage this run"
+
+      - name: Land DLT monthly-flow CSVs (feeds vehicle_models + brand_trends + truck_flow + collateral_flow)
+        run: |
+          # Same "unscheduled puller aging in silence" fix as the fuel-type step above, for the DLT
+          # monthly-FLOW datasets. These four gitignored raw mirrors were populated by NO scheduled job
+          # — only by an on-demand pull_dlt_all.py run — so build_vehicle_models / build_brand_trends /
+          # build_truck_flow / build_vehicle_flow could never pick up a newer DLT month in CI; their
+          # layers stayed frozen at their committed vintage. Targeted --only mode (added to
+          # pull_dlt_all.py) mirrors JUST these four datasets, not the whole catalog:
+          #   stat_1_1_01_first_regis_vehicles_car -> vehicle_models.json (+ brand_trends.json)
+          #   dataset_stat_1_003                   -> brand_trends.json (first-registration brand mix)
+          #   dataset_stat_1_009                   -> truck_flow.json (transport-law reg actions)
+          #   dataset_stat_1_008                   -> collateral_flow.json (car-law reg actions)
+          # The re-derive step below (rederive_drift.py) then picks up any newer snapshot automatically.
+          # TOLERANT: gdcatalog.dlt.go.th is intermittent — a failed pull must NOT break the census job;
+          # the four builders then --check-SKIP (no drift) and the layers stay at their last vintage.
+          python3 pipeline/pull_dlt_all.py --only \
+              stat_1_1_01_first_regis_vehicles_car dataset_stat_1_003 \
+              dataset_stat_1_008 dataset_stat_1_009 \
+            || echo "::warning::DLT monthly-flow pull failed (intermittent host) — vehicle_models/brand_trends/truck_flow/collateral_flow stay at last vintage this run"
 
       - name: Re-derive every layer the census pull left stale
         run: |
