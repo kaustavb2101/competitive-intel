@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-18T22:15:41+00:00",
-    "commit": "533e370"
+    "generated_at": "2026-08-19T04:12:28+00:00",
+    "commit": "8b08172"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-18",
+    "eta_date": "2026-08-19",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,78 @@
   ],
   "activity": [
     {
+      "date": "2026-08-19T04:12:28+00:00",
+      "sha": "8b08172",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the cluster_brief health-probe ship",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-19T04:12:28+00:00",
+      "sha": "2eb8cb4",
+      "summary": "health: shape-probe cluster_brief.json (branch-popup macro read + enriched-popup gate)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-19T04:05:16+00:00",
+      "sha": "20a2bf3",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-19, run 32214342810)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-19T03:14:06+00:00",
+      "sha": "ae5231a",
+      "summary": "data: NABC live prices (2026-08-19, run 32211129962)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-19T02:20:46+00:00",
+      "sha": "07e27a1",
+      "summary": "docs: log ux-og-image-share-card merge + deploy-verify (PR #512)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-19T09:18:06+07:00",
+      "sha": "75cc8e3",
+      "summary": "ux: og:image share card across all pages (link-unfurl brand card) (#512)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-19T01:37:30+00:00",
+      "sha": "9eaae58",
+      "summary": "data: rival Facebook promo feed refresh (run 32192135666) (#510)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-19T00:49:56+00:00",
+      "sha": "ae16f8f",
+      "summary": "feat(amphoe): MEASURED district farmland-share lens (NABC/OAE, obj #1) (#511)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-18T23:02:09+00:00",
+      "sha": "96c4bb6",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-18T23:00:52+00:00",
+      "sha": "3e40f4b",
+      "summary": "data: live fuel prices (2026-08-18, run 32195156203)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-18T23:00:18+00:00",
+      "sha": "fe6597d",
+      "summary": "data: market-pulse swarm refresh (run 32189722070) (#509)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-18T22:21:00+00:00",
+      "sha": "d3df69c",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after snapshots_index health-probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-18T22:15:41+00:00",
       "sha": "533e370",
       "summary": "health: shape-probe snapshots_index.json (#trend vintage-label read, deltas' sibling)",
@@ -639,78 +711,6 @@
       "sha": "2ee6a89",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the rival_facebook health-probe ship",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-18T10:27:45+00:00",
-      "sha": "8b19135",
-      "summary": "health: probe rival_facebook.json in site-health (promo board could 404-blank silently)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-18T09:53:28+00:00",
-      "sha": "a79ea1e",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-18, run 32123646837)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-18T08:59:16+00:00",
-      "sha": "ec2dc82",
-      "summary": "data: NABC live prices (2026-08-18, run 32118567568)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-18T08:35:38+00:00",
-      "sha": "26089cc",
-      "summary": "docs(progress): log the ux-loop deckgl-xbtn-aria merge + deploy-verify (PR #498)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-18T15:32:33+07:00",
-      "sha": "fc1e1be",
-      "summary": "ux: aria-label on deck.gl panel-close (✕) buttons (#498)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-18T08:29:27+00:00",
-      "sha": "f1b1a5b",
-      "summary": "data(census): refresh the Union Auction forward book (run 32098613983) (#495)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-18T07:42:54+00:00",
-      "sha": "ce6aff2",
-      "summary": "data: market-pulse swarm refresh (run 32098121862) (#496)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-18T06:56:16+00:00",
-      "sha": "53e269e",
-      "summary": "fix(provenance): cap DLT-frozen vehicle_mix + vehicle_models (stop false stale alarm) (#497)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-18T04:24:34+00:00",
-      "sha": "138cb6a",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival_youtube freshness-guard ship",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-18T04:24:14+00:00",
-      "sha": "b135e6f",
-      "summary": "health: freshness-guard rival_youtube.json (video board could freeze silently)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-18T04:06:02+00:00",
-      "sha": "59dc0f4",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-18, run 32097606960)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-18T03:15:41+00:00",
-      "sha": "2e5a901",
-      "summary": "data: NABC live prices (2026-08-18, run 32094326745)",
-      "pillar": "data-integration"
     }
   ]
 }
