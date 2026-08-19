@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-19T04:12:28+00:00",
-    "commit": "8b08172"
+    "generated_at": "2026-08-19T10:16:50+00:00",
+    "commit": "debce66"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,8 +533,56 @@
   ],
   "activity": [
     {
-      "date": "2026-08-19T04:12:28+00:00",
-      "sha": "8b08172",
+      "date": "2026-08-19T10:16:50+00:00",
+      "sha": "debce66",
+      "summary": "health: shape-probe occupation_income.json (command-center lowest-paid-occupation income floor, obj #1)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-19T09:52:05+00:00",
+      "sha": "02c5972",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-19, run 32239660723)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-19T08:57:29+00:00",
+      "sha": "3c22030",
+      "summary": "data: NABC live prices (2026-08-19, run 32234806208)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-19T08:28:04+00:00",
+      "sha": "cc34fc2",
+      "summary": "docs: log ux-og-url-canonical merge + deploy-verify (PR #516)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-19T15:24:36+07:00",
+      "sha": "2868050",
+      "summary": "ux: add og:url canonical to complete the Open Graph required-property set (#516)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-19T07:16:05+00:00",
+      "sha": "4937f6a",
+      "summary": "feat(data): source per-district factories from the CI-refreshable DIW CKAN census (#515)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-19T05:05:34+00:00",
+      "sha": "6a1e3d8",
+      "summary": "data(census): refresh the Union Auction forward book (run 32215280061) (#514)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-19T04:44:30+00:00",
+      "sha": "1a99cd5",
+      "summary": "data: market-pulse swarm refresh (run 32214750359) (#513)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-19T04:12:40+00:00",
+      "sha": "f8209c4",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the cluster_brief health-probe ship",
       "pillar": "peer"
     },
@@ -663,54 +711,6 @@
       "sha": "050f2fa",
       "summary": "chore(dashboard): refresh CEO autonomy plan after liveness-exempt ship",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-18T16:42:27+00:00",
-      "sha": "2168e17",
-      "summary": "health: exempt Thai-IP-only rival_promo series from FROZEN test",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-18T15:52:48+00:00",
-      "sha": "a4e4ca0",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-18, run 32156704887)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-18T14:55:00+00:00",
-      "sha": "239170f",
-      "summary": "docs: log UX-loop apple-touch-icon ship + deploy-verify (PR #503)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-18T21:51:34+07:00",
-      "sha": "e57ea12",
-      "summary": "ux: add apple-touch-icon for iOS home-screen branding (#503)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-18T13:27:40+00:00",
-      "sha": "8b89682",
-      "summary": "fix(provenance): surface collateral_flow's window-array vintage (2026-02), cap it as upstream-frozen (#501)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-18T12:18:02+00:00",
-      "sha": "88302a0",
-      "summary": "data: SET listed-peer scoreboard refresh (run 32132581326) (#500)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-18T11:17:50+00:00",
-      "sha": "8e6c9f0",
-      "summary": "data: market-pulse swarm refresh (run 32124610912) (#499)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-18T10:28:15+00:00",
-      "sha": "2ee6a89",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival_facebook health-probe ship",
-      "pillar": "market"
     }
   ]
 }
