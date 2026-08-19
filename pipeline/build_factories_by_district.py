@@ -29,8 +29,11 @@ canonical() + norm_district() normalizers every other layer uses, so every outpu
 conforms to the app's district identity (the identity documented in build_pico_district.py). The
 normalizers are idempotent, so already-canonical DIW names pass through unchanged; the one place it
 matters is a bare "เมือง" expanding to "เมือง<province>". Colliding raw keys (if any) are summed,
-never dropped. horsepower / capital are carried in the census but intentionally NOT emitted here —
-the downstream consumers read only fac/workers, so the shape stays byte-identical to the prior file.
+never dropped. `capital` is carried in the census but not emitted (no consumer). `hp` (summed DIW
+installed horsepower — factory SCALE / capital-intensity of the local industrial base, a merchant /
+collateral demand-mass proxy the raw factory COUNT can't express) IS now emitted per district and
+province; the existing downstream consumers read fac/workers by explicit key and ignore the extra
+field, so their outputs are unchanged — only amphoe.json surfaces hp (as `fac_hp`, MEASURED).
 
 Provenance: MEASURED (DIW category-3 factory registry, an official government census — not an OSM
 proxy). Deterministic + network-free; `--check` byte-compares; SKIPs (exit 3) if the census is absent.
@@ -54,8 +57,8 @@ SOURCE = ("DIW โรงงาน (factype3, DIW CKAN diw-dataset.diw.go.th) —
 
 def build():
     census = json.load(open(IN, encoding="utf-8"))
-    districts = collections.defaultdict(lambda: {"fac": 0, "workers": 0})
-    provinces = collections.defaultdict(lambda: {"fac": 0, "workers": 0})
+    districts = collections.defaultdict(lambda: {"fac": 0, "workers": 0, "hp": 0})
+    provinces = collections.defaultdict(lambda: {"fac": 0, "workers": 0, "hp": 0})
     for key, v in census.items():
         if key in ("meta", "_meta"):
             continue
@@ -66,11 +69,14 @@ def build():
             continue
         fac = int(v.get("factories") or 0)
         workers = int(v.get("workers") or 0)
+        hp = int(round(v.get("horsepower") or 0))
         k = f"{p}|{d}"
         districts[k]["fac"] += fac
         districts[k]["workers"] += workers
+        districts[k]["hp"] += hp
         provinces[p]["fac"] += fac
         provinces[p]["workers"] += workers
+        provinces[p]["hp"] += hp
     return {
         "source": SOURCE,
         "n_factories": sum(v["fac"] for v in provinces.values()),

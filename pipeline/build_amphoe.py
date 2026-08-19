@@ -263,13 +263,14 @@ def build():
 
         # DIW factories+workers — MEASURED at amphoe, joinable only when we have a
         # Thai district name (i.e. the amphoe has >=1 branch).
-        fac = work = 0
+        fac = work = fac_hp = 0
         fac_measured = False
         if measured_name:
             fac_attempt += 1
             gd = fbd.get(f"{prov}|{norm_district(name, prov)}")
             if gd:
                 fac, work = gd["fac"], gd["workers"]
+                fac_hp = gd.get("hp", 0)
                 fac_measured = True
                 fac_join += 1
 
@@ -283,7 +284,7 @@ def build():
             "id": sid, "name": name, "name_en": en, "province_th": prov, "region": region,
             "cx": cxx, "cy": cyy, "branches": len(rows),
             "poi": poi,
-            "fac": fac, "workers": work,
+            "fac": fac, "workers": work, "fac_hp": fac_hp,
             "fac_measured": fac_measured, "name_measured": measured_name,
             "veh": {"car": pv.get("car"), "pickup": pv.get("pickup"),
                     "moto": pv.get("moto"), "ev": pv.get("ev")},
@@ -411,9 +412,10 @@ def build():
                 "amphoe — see join_rates.branch_amphoe_fallback — so .branches total-joins "
                 "all of master and matches branch_amphoe)",
                 "poi counts by type (point-in-polygon of osm_layers.json — OSM, measured)",
-                "fac/workers (DIW factories_by_district, prov|district join — MEASURED, "
-                "only where the amphoe has a branch so a Thai district name is readable; "
-                "see fac_measured flag per amphoe)",
+                "fac/workers/fac_hp (DIW factories_by_district, prov|district join — MEASURED; "
+                "fac_hp = summed installed horsepower, factory SCALE / capital-intensity of the "
+                "local industrial base; only where the amphoe has a branch so a Thai district name "
+                "is readable; see fac_measured flag per amphoe)",
                 "pico (district-grain count of licensed PICO-finance rivals name-joined "
                 "province_th|amphoe from pico_district.json — MEASURED, obj #2 competitive, "
                 "kept SEPARATE from risk_proxy; see pico_district_rivals meta. Present only "
@@ -424,9 +426,10 @@ def build():
                 "amphoe — see join_rates.branch_amphoe_fallback — so .branches total-joins "
                 "all of master and matches branch_amphoe)",
                 "poi counts by type (point-in-polygon of osm_layers.json — OSM, measured)",
-                "fac/workers (DIW factories_by_district, prov|district join — MEASURED, "
-                "only where the amphoe has a branch so a Thai district name is readable; "
-                "see fac_measured flag per amphoe)",
+                "fac/workers/fac_hp (DIW factories_by_district, prov|district join — MEASURED; "
+                "fac_hp = summed installed horsepower, factory SCALE / capital-intensity of the "
+                "local industrial base; only where the amphoe has a branch so a Thai district name "
+                "is readable; see fac_measured flag per amphoe)",
             ],
             "province_inherited": [
                 "veh{car,pickup,moto,ev} (DLT vehicles_by_province — every amphoe inherits its province total)",

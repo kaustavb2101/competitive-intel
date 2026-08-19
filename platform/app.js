@@ -8648,13 +8648,25 @@ function amphoePopupHTML(d,sec,r){
   const outnumLine = (orat!=null && a.pico>0)
     ? r('PICO rivals per branch ◆ · measured', `<span style="color:${outColor}">${orat.toFixed(orat<10?1:0)}×</span> <span class="sub">${a.pico} vs ${a.branches} branch${a.branches===1?'':'es'}</span>`, outColor)
     : '';
+  // MEASURED district-grain factory installed CAPACITY (DIW category-3 registry) — factory SCALE /
+  // capital-intensity of the local industrial base, a formal-employment & merchant demand-mass proxy
+  // the raw factory COUNT can't express. Concrete number (Kaustav prefers numbers over indices), not a
+  // choropleth lens: installed HP is spans-orders-of-magnitude skewed (one hydropower district = 48M hp),
+  // so a max-normalized lens would wash out; the click-through number reads honestly. Shown only where
+  // the amphoe has a branch (a readable Thai district name to join DIW on) and carries installed HP.
+  const hp=a.fac_hp||0;
+  const hpTxt = hp>=1e6 ? (hp/1e6).toFixed(hp>=1e7?0:1)+'M' : hp>=1e3 ? Math.round(hp/1e3)+'k' : String(hp);
+  const facLine = (a.fac_measured && hp>0)
+    ? r('Factory capacity ⚙ · measured', `<span style="color:var(--merch)">${hpTxt} hp</span> <span class="sub">installed · ${(a.fac||0).toLocaleString()} factor${a.fac===1?'y':'ies'}</span>`, 'var(--merch)')
+    : '';
   return sec('District (amphoe) — coverage & risk')
     + r('White-space ◇ · measured', `<span style="color:${wc}">${ws}</span> <span class="sub">/100</span>`, wc)
     + r('District risk ▲ · est', `<span style="color:${rc}">${rk}</span> <span class="sub">/100</span>`, rc)
     + r('AutoX in district · measured', (a.branches||0)+(a.branches===1?' branch':' branches'), 'var(--accent)')
+    + facLine
     + picoLine
     + outnumLine
-    + `<div class="sub" style="margin:2px 0 0;font-size:10px">coverage gap = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated); PICO = licensed พิโกไฟแนนซ์ rivals in this district (measured, FPO registry); per-branch = PICO rivals ÷ AutoX branches here (measured, obj #2 competitive pressure)</div>`;
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">coverage gap = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated); factory capacity = summed DIW installed horsepower, the industrial-base scale behind local demand (measured); PICO = licensed พิโกไฟแนนซ์ rivals in this district (measured, FPO registry); per-branch = PICO rivals ÷ AutoX branches here (measured, obj #2 competitive pressure)</div>`;
 }
 // ANSWER-FIRST §1 — "Who to acquire here": the branch's top-3 occupation leads from
 // branch_leads.json. Counts (n) are MEASURED (Overture establishments ≤10km, lower bound);
