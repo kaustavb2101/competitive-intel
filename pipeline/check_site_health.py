@@ -3969,6 +3969,101 @@ def run_freshness_checks(fetcher, now_epoch, record):
         record("%s fresh (%s)" % (rel, note), ok, detail)
 
 
+# Number of R2-only catchments to spot-probe per run. A handful spread across the
+# manifest is enough to catch a whole-bucket outage (deleted bucket / revoked
+# public access / DNS change) without hammering R2 nightly.
+R2_CATCHMENT_SAMPLE = 4
+R2_PROBE_TIMEOUT = 25  # seconds per HEAD
+
+
+def _r2_manifest_path():
+    """Absolute path to the committed catchments_r2.json manifest, resolved
+    relative to THIS file so it works regardless of the caller's cwd."""
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        "..", "platform", "data", "catchments_r2.json")
+
+
+def _r2_sample_slugs(provinces, git, n):
+    """Deterministic sample of up to n R2-ONLY province slugs (served by R2 with
+    NO git fallback), spread evenly across the sorted manifest so a partial-bucket
+    problem is more likely to be seen than clustering the head would allow."""
+    git_set = set(git or [])
+    r2_only = sorted(s for s in (provinces or []) if s not in git_set)
+    if not r2_only or n <= 0:
+        return r2_only[:max(n, 0)]
+    if n >= len(r2_only):
+        return r2_only
+    # even spread: indices 0, len/n, 2*len/n, ... (integer, deterministic)
+    return [r2_only[(i * len(r2_only)) // n] for i in range(n)]
+
+
+def run_r2_catchment_checks(record, opener=None):
+    """LIVE-ONLY probe that the R2 object store still serves the province 3D
+    building catchments. Since the 2026-08-18 offload, 74 of 77 catchment scenes
+    are served ONLY from R2 (local-first -> R2 fallback, no git copy), so an R2
+    outage silently breaks 74 province 3D scenes with nothing else alerting. The
+    nightly probe reaches the deployment's own origin; R2 is a DIFFERENT host, so
+    this runs regardless of any Vercel auth gate on the alias.
+
+    FALSE-ALARM-PROOF, matching this file's philosophy: a clean non-2xx HTTP
+    response (bucket/object gone, access revoked) FAILS; a transient network
+    error (DNS/TLS/timeout) records ok=True 'not evaluated' rather than paging the
+    owner over a blip. `opener` is injectable for offline unit tests."""
+    try:
+        with open(_r2_manifest_path(), "rb") as f:
+            man = json.loads(f.read().decode("utf-8"))
+    except Exception as e:
+        record("R2 catchment store reachable", True,
+               "not evaluated — catchments_r2.json manifest unreadable (%r)" % e)
+        return
+    base = (man.get("meta") or {}).get("baseUrl")
+    slugs = _r2_sample_slugs(man.get("provinces"), man.get("git"),
+                             R2_CATCHMENT_SAMPLE)
+    if not base or not slugs:
+        record("R2 catchment store reachable", True,
+               "not evaluated — no R2 baseUrl or no R2-only catchments in manifest")
+        return
+    if opener is None:
+        opener = urllib.request.urlopen
+    ok_slugs, down_slugs, skipped = [], [], []
+    for slug in slugs:
+        url = "%s/%s_catchment.json" % (base.rstrip("/"), slug)
+        req = urllib.request.Request(url, method="HEAD",
+                                     headers={"User-Agent": USER_AGENT})
+        try:
+            with opener(req, timeout=R2_PROBE_TIMEOUT) as resp:
+                code = resp.getcode()
+            if 200 <= code < 300:
+                ok_slugs.append(slug)
+            else:
+                down_slugs.append("%s(HTTP %d)" % (slug, code))
+        except urllib.error.HTTPError as e:
+            # A clean HTTP status from R2 for a catchment that should exist =
+            # object/bucket gone or public access revoked. Real outage.
+            down_slugs.append("%s(HTTP %d)" % (slug, e.code))
+        except Exception as e:
+            # Transient (DNS/TLS/timeout) — don't false-alarm.
+            skipped.append("%s(%s)" % (slug, type(e).__name__))
+    if down_slugs:
+        record("R2 catchment store reachable", False,
+               "R2 returned a non-2xx for %d/%d sampled catchment(s): %s — the 74 "
+               "R2-only province 3D scenes may be down (bucket deleted / public "
+               "access revoked / DNS). Sampled base=%s"
+               % (len(down_slugs), len(slugs), ", ".join(down_slugs), base))
+    elif ok_slugs:
+        detail = "%d/%d sampled catchment(s) served 200 from R2 (%s)" % (
+            len(ok_slugs), len(slugs), ", ".join(ok_slugs))
+        if skipped:
+            detail += "; %d not evaluated (transient): %s" % (
+                len(skipped), ", ".join(skipped))
+        record("R2 catchment store reachable", True, detail)
+    else:
+        # every sampled slug hit a transient error — inconclusive, not an outage.
+        record("R2 catchment store reachable", True,
+               "not evaluated — all %d sampled probes hit transient network errors: %s"
+               % (len(slugs), ", ".join(skipped)))
+
+
 # ---------------------------------------------------------------------------
 def run_checks(fetcher):
     """Run every check through the given fetcher. Returns a list of dicts:
@@ -4016,6 +4111,10 @@ def run_checks(fetcher):
             record("deep page/data checks", True,
                    "SKIPPED — set the SITE_PASSWORD secret so the nightly probe can "
                    "authenticate and validate pages + data against the protected alias")
+        # R2 is a DIFFERENT origin than the auth-gated alias, so probe it even when
+        # the deployment's own pages are behind the SSO/Basic-Auth wall — an R2
+        # outage breaks the 74 R2-only 3D scenes regardless of the alias gate.
+        run_r2_catchment_checks(record)
         return results
     except RuntimeError:
         pass  # a genuine fetch failure is reported in detail by the loops below.
@@ -4075,6 +4174,8 @@ def run_checks(fetcher):
     # --local gate path (LocalFetcher) skips it so the repo gate is unaffected.
     if isinstance(fetcher, HttpFetcher):
         run_freshness_checks(fetcher, time.time(), record)
+        # R2 catchment-store liveness (own host, independent of the alias gate).
+        run_r2_catchment_checks(record)
 
     return results
 
