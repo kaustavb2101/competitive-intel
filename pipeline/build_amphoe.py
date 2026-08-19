@@ -152,6 +152,42 @@ def build():
     # folded total byte-equal to pico_district.json's authoritative resolved count.
     pico_assigned, n_pico_join = set(), 0
 
+    # ── district-grain agricultural-land area (obj #1, MEASURED, portfolio risk) ──
+    # source-data/staging/nabc_amphoe_agri_area.json is NABC/OAE official per-district
+    # agricultural-land area (total ag land + total district land, in rai; a 2568/2025
+    # administrative snapshot). It is the FIRST amphoe-MEASURED agri signal for this layer —
+    # until now the agri read here (agri_stress) is purely province-inherited (ESTIMATED),
+    # so a farm-heavy district and its urban province-capital neighbour shared one number.
+    # We fold two fields per district:
+    #   agri_area_rai    — MEASURED total agricultural land (the primitive; no ratio artifact)
+    #   agri_land_share  — agri_area_rai / (district_area_sqkm * 625) = the share of the
+    #                      district that is farmland (1 sqkm = 625 rai). Clamped to [0,1]:
+    #                      a minority of districts report ag land exceeding their surveyed
+    #                      district land (double-/multi-season cropped area measured against a
+    #                      single land figure AT THE SOURCE), capped at 1.0 rather than shown
+    #                      as >100% farmland; agri_area_rai keeps the raw measured value.
+    # Name-joined province_th|amphoe via norm_district (which expands a bare 'เมือง' to the
+    # capital 'เมือง<prov>', matching this layer's Thai names). The 4 provinces the source
+    # itself flags with duplicate 'เมือง' rows (ambiguous agri_area) are skipped, never guessed.
+    # Null-safe: absent file -> the agri_* fields are simply omitted (older amphoe.json shape).
+    agri_path = os.path.join(SRC, "staging", "nabc_amphoe_agri_area.json")
+    agri_by, agri_meta = {}, None
+    if os.path.exists(agri_path):
+        aj = _load(agri_path)
+        agri_meta = aj.get("meta") or {}
+        agri_years = set()
+        for r in aj.get("rows", []):
+            if r.get("duplicate_amphoe_key_in_source"):
+                continue
+            ar = r.get("agri_area_rai"); da = r.get("district_area_sqkm")
+            if ar in (None, "") or not da:
+                continue
+            p = canonical(r.get("province_th", ""))
+            agri_by[(p, norm_district(r.get("amphoe_th", ""), p))] = (round(float(ar), 1), float(da))
+            if r.get("year"):
+                agri_years.add(str(r["year"]))
+    n_agri_join = n_agri_clamped = 0
+
     # ── spatial join: branches -> amphoe polygon (PIP, bbox prefilter) ───────────
     # branch_sid[i] = shapeID of the amphoe branch i (master order) falls inside.
     # A few branches sit just off a polygon (coast/border geometry) — those get a
@@ -278,6 +314,27 @@ def build():
             # kept SEPARATE from risk_proxy. round-2 so the byte-exact --check stays stable.
             nb = recs[-1]["branches"]
             recs[-1]["pico_ratio"] = round(pv / nb, 2) if nb > 0 else None
+        # MEASURED district-grain agricultural-land area + farmland share (obj #1, portfolio
+        # risk). Name-joined province_th|amphoe. A district with no measured value — English-
+        # named zero-branch polygons (no Thai key to join), the source-flagged duplicate
+        # provinces, or urban districts NABC returns null for — keeps agri_area_measured=false
+        # and null agri_* fields: an honest ABSENT, never a fabricated zero (0 rai would read
+        # as "measured, no farmland"). Added only when the layer is present (older shape else).
+        if agri_meta is not None:
+            hit = agri_by.get((prov, norm_district(name, prov)))
+            if hit:
+                area_rai, dist_sqkm = hit
+                raw_share = area_rai / (dist_sqkm * 625.0)
+                recs[-1]["agri_area_rai"] = area_rai
+                recs[-1]["agri_land_share"] = round(min(1.0, raw_share), 3)
+                recs[-1]["agri_area_measured"] = True
+                n_agri_join += 1
+                if raw_share > 1.0:
+                    n_agri_clamped += 1
+            else:
+                recs[-1]["agri_area_rai"] = None
+                recs[-1]["agri_land_share"] = None
+                recs[-1]["agri_area_measured"] = False
 
     # ── scores ───────────────────────────────────────────────────────────────────
     # demand proxy: weighted POI footfall + DIW workers, log-compressed so a few
@@ -446,6 +503,35 @@ def build():
                  "pico": r["pico"], "branches": r["branches"], "pico_ratio": r["pico_ratio"]}
                 for r in outnum[:8]
             ],
+        }
+    if agri_meta is not None:
+        meta["provenance"]["measured_at_amphoe"].append(
+            "agri_area_rai / agri_land_share (NABC/OAE official district agricultural-land "
+            "area, name-joined province_th|amphoe — MEASURED at amphoe grain, obj #1. Per-amphoe "
+            "agri_area_measured flag; null where the source carries no value for the district "
+            "(English-named zero-branch polygons, urban districts, the 4 source-flagged "
+            "duplicate provinces) — an honest ABSENT, not a fabricated zero)")
+        meta["join_rates"]["agri_area_to_amphoe"] = (
+            f"{n_agri_join}/{len(recs)} amphoe carry a MEASURED agricultural-land area "
+            f"(name-joined province_th|amphoe; {len(agri_by)} usable source district keys)")
+        meta["agri_land"] = {
+            "source": "NABC/OAE official district agricultural-land area (MEASURED)",
+            "retrieved": agri_meta.get("retrieved"),
+            "survey_year_be": sorted(agri_years),
+            "n_districts_measured": n_agri_join,
+            "n_districts_absent": len(recs) - n_agri_join,
+            "n_share_clamped": n_agri_clamped,
+            "formula": "agri_land_share = min(1.0, agri_area_rai / (district_area_sqkm * 625)); "
+                       "1 sqkm = 625 rai. agri_area_rai keeps the raw measured value.",
+            "clamp_note": f"{n_agri_clamped} districts report agricultural land exceeding their "
+                          "surveyed district land (double-/multi-season cropped area vs a single "
+                          "land figure at the SOURCE); agri_land_share is capped at 1.0 for these "
+                          "rather than shown as >100% farmland.",
+            "note": "First amphoe-MEASURED agri signal on this layer — a portfolio-risk (obj #1) "
+                    "read of how farm-dependent each district's borrower base is, at true district "
+                    "grain. Kept ALONGSIDE the province-inherited ESTIMATED agri_stress (which every "
+                    "amphoe in a province still shares), not replacing it; the two are labelled "
+                    "distinctly (MEASURED area/share vs ESTIMATED stress index).",
         }
     return {"meta": meta, "amphoe": recs, "branch_amphoe": branch_amphoe}, branch_join, len(master), fac_join, fac_attempt
 
