@@ -259,8 +259,13 @@ def build_occupations_census():
     return out
 
 
-LAYERS = {"factories_by_district.json": build_factories,
-          "vehicles_by_province.json": build_vehicles,
+# factories_by_district.json is NO LONGER written here. It is now produced by
+# build_factories_by_district.py from source-data/factory_census_national.json — the DIW department
+# CKAN census that refreshes weekly from CI (any IP), superseding this data.go.th path which is
+# geoblocked to Kaustav's Thai laptop. build_factories() is kept for reference / a manual laptop
+# rebuild, but is intentionally out of LAYERS so a future ingest_gov run can't clobber the
+# CI-refreshable, gate-checked census projection with the stale aggregator pull.
+LAYERS = {"vehicles_by_province.json": build_vehicles,
           "employment_by_province.json": build_employment,
           "crop_prices.json": build_crop_prices}
 
