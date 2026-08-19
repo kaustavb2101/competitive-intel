@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-19T16:28:41+00:00",
-    "commit": "1939a82"
+    "generated_at": "2026-08-19T22:21:20+00:00",
+    "commit": "0359c6b"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-08-19T22:21:20+00:00",
+      "sha": "0359c6b",
+      "summary": "health(deploy): shape-probe the Live board page (live_board.json) — a surfaced nav read with no site-health coverage",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-19T21:46:45+00:00",
+      "sha": "61b39af",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-19, run 32305436793)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-19T21:01:17+00:00",
+      "sha": "da61b91",
+      "summary": "data: Thai-IP-only swarm refresh (run 32294354591) (#523)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-19T20:25:18+00:00",
+      "sha": "3b5c0d4",
+      "summary": "docs(progress): log ux-twitter-image-alt merge+deploy+verify (PR #524)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-20T03:20:26+07:00",
+      "sha": "60e4827",
+      "summary": "ux: add twitter:image:alt so X share cards have SR alt text (#524)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-19T18:46:52+00:00",
+      "sha": "3ee23dc",
+      "summary": "ci(obj#1): schedule the DLT monthly-flow puller so four collateral layers auto-refresh (#522)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-19T17:05:13+00:00",
+      "sha": "8dc5739",
+      "summary": "data: market-pulse swarm refresh (run 32273365168) (#521)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-19T16:31:02+00:00",
+      "sha": "0effd90",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the R2-liveness-probe ship",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-08-19T16:28:41+00:00",
       "sha": "1939a82",
       "summary": "health: probe R2 catchment-store liveness in site-health (deploy-health)",
@@ -663,54 +711,6 @@
       "sha": "75cc8e3",
       "summary": "ux: og:image share card across all pages (link-unfurl brand card) (#512)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-19T01:37:30+00:00",
-      "sha": "9eaae58",
-      "summary": "data: rival Facebook promo feed refresh (run 32192135666) (#510)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-19T00:49:56+00:00",
-      "sha": "ae16f8f",
-      "summary": "feat(amphoe): MEASURED district farmland-share lens (NABC/OAE, obj #1) (#511)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-18T23:02:09+00:00",
-      "sha": "96c4bb6",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-18T23:00:52+00:00",
-      "sha": "3e40f4b",
-      "summary": "data: live fuel prices (2026-08-18, run 32195156203)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-18T23:00:18+00:00",
-      "sha": "fe6597d",
-      "summary": "data: market-pulse swarm refresh (run 32189722070) (#509)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-18T22:21:00+00:00",
-      "sha": "d3df69c",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after snapshots_index health-probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-18T22:15:41+00:00",
-      "sha": "533e370",
-      "summary": "health: shape-probe snapshots_index.json (#trend vintage-label read, deltas' sibling)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-18T21:47:20+00:00",
-      "sha": "fc3b348",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
     }
   ]
 }
