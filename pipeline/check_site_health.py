@@ -2875,6 +2875,35 @@ def _shape_branch_peers(d):
     return None
 
 
+def _shape_cluster_brief(d):
+    # The per-branch macro cluster brief (cluster_brief.json, obj #1 PEER pillar,
+    # ESTIMATED-EDITORIAL composition over MEASURED inputs) — the branch popup's
+    # "Macro read — this cluster" line (briefPopupHTML reads CBRF[i].line, INDEX-
+    # ALIGNED to branches.json). The client loader sets CBRF=null unless
+    # Array.isArray(j.briefs) (app.js ~1102), AND the whole branch-popup enrichment
+    # path gates on CBRF being truthy (the loader-ready guard at ~8078), so a
+    # truncated/404/gutted CDN deploy silently drops the macro read AND the enriched
+    # popup with NO phone alert — the same "broken demo" blind spot the branch_peers /
+    # branch_risk probes closed for their per-branch siblings. It was the last
+    # surfaced per-branch obj-#1 read with no deploy probe. Asserts the client .briefs
+    # gate + the 2015-index-aligned shape + the .line render read on the first record,
+    # as SHAPE not values (robust to a future board/crop/occupation refresh re-wording
+    # the sentences).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    brs = d.get("briefs")
+    if not isinstance(brs, list):
+        return "missing 'briefs' list (client CBRF gate: Array.isArray(j.briefs))"
+    if len(brs) != 2015:
+        return "expected 2015 brief records (index-aligned to branches.json), got %d" % len(brs)
+    b0 = brs[0]
+    if not isinstance(b0, dict):
+        return "first 'briefs' record is not an object"
+    if not (isinstance(b0.get("line"), str) and b0["line"].strip()):
+        return "first brief record missing non-blank 'line' (briefPopupHTML CBRF[i].line render read)"
+    return None
+
+
 def _shape_branch_density(d):
     # Per-branch building density (branch_density.json, MEASURED Overture footprint
     # count ≤10km, projected from source-data/perimeter_counts.json). Consumed in the
@@ -3721,6 +3750,14 @@ DATA_FILES = [
     # for their siblings. Asserts the 2015-index-aligned .branches shape + the outlier
     # row render reads, not values — robust to a future risk-vintage refresh.
     ("data/branch_peers.json", _shape_branch_peers, ".branches index-aligned (2015) with dev + .outliers audit rows (name/prov/risk/peer_median/dev/top_driver/twins) (#trend peer-twin benchmark + #map lens, obj #1)"),
+    # The per-branch macro cluster brief (cluster_brief.json, obj #1 PEER pillar) —
+    # the branch popup's "Macro read — this cluster" line (briefPopupHTML reads
+    # CBRF[i].line, index-aligned). It was the last surfaced per-branch obj-#1 read
+    # with no deploy probe: CBRF=null on a fetch failure/404 not only drops the macro
+    # line but, via the loader-ready guard (~8078), gates the whole enriched branch
+    # popup — a truncated/gutted CDN deploy blanks both with NO phone alert. Closes
+    # that blind spot alongside its branch_peers / branch_risk siblings.
+    ("data/cluster_brief.json", _shape_cluster_brief, ".briefs index-aligned (2015) with per-branch .line macro read (branch-popup 'Macro read — this cluster', obj #1)"),
     # The RAW competitor-census layers (obj #2) that feed the ENTIRE Competition
     # (#acq) readout + the per-branch 5km/10km rival counts, and the National map's
     # competitor-density lens. app.js loadCompetitors() prefers the merged
