@@ -3239,6 +3239,41 @@ def _shape_sme_income(d):
     return _shape_income_floor(d, "sme_income", "smeincHasData")
 
 
+def _shape_occupation_income(d):
+    # The command-center (#home renderRiskReadouts, block "1c") "Lowest-paid occupation
+    # nationally" income-FLOOR fact (obj #1) — the LIST-shaped sibling of the province-keyed
+    # sme/factory/agri income floors above. Frontend reads the worst-first OCCINC_LIST[0]
+    # .label / .national_avg / .min_province / .min_value (occincHasData() gates the render).
+    # Like its siblings it degrades FULLY SILENTLY: occincHasData() goes false on a 404 or a
+    # shape drift and the exec's front-door income-floor callout simply vanishes with NO
+    # placeholder and NO phone alert — the exact "broken demo" this probe exists to catch.
+    # The builder is deterministic + network-free and emits {meta:{absent:true}} when the NSO
+    # source is unavailable, which the app treats as "no data" BY DESIGN, so meta.absent==true
+    # is HEALTHY; only a NON-absent file must carry the populated shape. Asserts SHAPE not
+    # values — robust to a future SES vintage.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    if meta.get("absent") is True:
+        return None  # legitimately absent by design -> healthy; the app degrades gracefully
+    cats = d.get("categories")
+    if not isinstance(cats, list) or not cats:
+        return "missing/empty 'categories' list (occincHasData() render gate)"
+    c0 = cats[0]
+    if not isinstance(c0, dict):
+        return "first category is not an object"
+    if not isinstance(c0.get("label"), str) or not c0.get("label"):
+        return "first category missing 'label' (front-door occupation name)"
+    if not isinstance(c0.get("min_province"), str) or not c0.get("min_province"):
+        return "first category missing 'min_province' (worst-province callout)"
+    for k in ("national_avg", "min_value"):
+        if not isinstance(c0.get(k), (int, float)) or isinstance(c0.get(k), bool):
+            return "first category missing numeric '%s' (income-floor render read)" % k
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -3370,6 +3405,7 @@ DATA_FILES = [
     ("data/factory_income_by_province.json", _shape_factory_income, "province-keyed .provinces w/ factory_income+ratio_to_national (#sim factory income floor, obj #1; meta.absent ok)"),
     ("data/agri_income_by_province.json", _shape_agri_income, "province-keyed .provinces w/ agri_income+ratio_to_national (#sim agri income floor, obj #1; meta.absent ok)"),
     ("data/sme_income_by_province.json", _shape_sme_income, "province-keyed .provinces w/ sme_income+ratio_to_national (#exposure merchant income floor, obj #1; meta.absent ok)"),
+    ("data/occupation_income.json", _shape_occupation_income, ".categories worst-first list w/ label+national_avg+min_province+min_value (#home command-center lowest-paid-occupation floor, obj #1; meta.absent ok)"),
     # The competition pillar's flagship exec layer (obj #2) — the per-province
     # peer board (AutoX next to each big-4 rival, per province) that powers the
     # Competition surface + the command-center thesis clause. Every default-route
