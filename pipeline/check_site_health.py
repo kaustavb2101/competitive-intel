@@ -3274,6 +3274,52 @@ def _shape_occupation_income(d):
     return None
 
 
+def _shape_live_board(d):
+    # The "Live board" page (live.html, linked in the shared nav on every page) —
+    # the service-freshness registry that shows every live feed's age against its
+    # OWN cadence. It is refreshed FREQUENTLY (build_live_board.py re-runs on each
+    # market-pulse swarm pass) yet, unlike its Overview siblings, had NO deploy
+    # shape probe — a real surfaced read left uncovered. The render (live.html)
+    # GATES the whole page on `LB.feeds` (`if (!LB || !LB.feeds)` -> the calm
+    # "live_board.json could not be loaded" note, NO phone alert), then the pulse
+    # strip runs `freshness(f)` over every feed (reading f.fresh_days / f.aging_days
+    # / f.stamp_iso) and the meta counters (M.n_with_history, M.history_points).
+    # So a truncated/404 CDN deploy silently blanks the entire Live board while
+    # every existing check stays green — the same "broken demo" blind spot the
+    # macro_book / collateral_book / deltas obj-#1 probes closed for their
+    # siblings. Unlike a CI-pulled layer it cannot self-heal from a bad deploy
+    # (build_live_board.py has no cron of its own; it rides the swarm). Asserts the
+    # `feeds` gate + the per-feed freshness-render keys + the meta counters the
+    # pulse strip reads, SHAPE not values — robust to any feed vintage/roster
+    # refresh moving the ages or the feed count.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    feeds = d.get("feeds")
+    if not isinstance(feeds, list) or not feeds:
+        return "missing/empty 'feeds' list (live.html `if (!LB.feeds)` render gate)"
+    f0 = feeds[0]
+    if not isinstance(f0, dict):
+        return "first feed is not an object"
+    for k in ("key", "label"):
+        if not isinstance(f0.get(k), str) or not f0.get(k):
+            return "first feed missing '%s' (feed-row label render read)" % k
+    # freshness(f) keys the whole pulse-strip bucketing off these: fresh_days may be
+    # null (a reference feed that never ages), but the KEY must be present, and
+    # stamp_iso must be a string where a feed does carry a cadence stamp. Assert the
+    # keys exist across the roster rather than a single row's nullable value.
+    if "fresh_days" not in f0 or "aging_days" not in f0:
+        return "first feed missing fresh_days/aging_days (freshness() bucket render read)"
+    if not any(isinstance(f.get("stamp_iso"), str) and f.get("stamp_iso") for f in feeds):
+        return "no feed carries a string 'stamp_iso' (freshness() age-render read)"
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object (pulse-strip counter render read)"
+    for k in ("n_with_history", "history_points"):
+        if not isinstance(meta.get(k), (int, float)) or isinstance(meta.get(k), bool):
+            return "meta.%s missing/non-numeric (pulse-strip counter render read)" % k
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -3569,6 +3615,13 @@ DATA_FILES = [
     # per-lens verdict render shape (national KPIs + 77-province drill + npl
     # header), not values.
     ("data/macro_book.json", _shape_macro_book, ".national KPI block + 77-province drill + .npl header (Overview conditions-at-our-grain drill)"),
+    # The "Live board" nav page (live.html) — the service-freshness registry
+    # refreshed on every market-pulse swarm pass but, unlike its Overview
+    # siblings, previously unprobed. live.html gates the whole page on `LB.feeds`
+    # and reads per-feed freshness keys + meta counters; a truncated CDN deploy
+    # silently blanks it with no phone alert, and it cannot self-heal (no cron of
+    # its own). Asserts the feeds gate + freshness-render keys + meta counters.
+    ("data/live_board.json", _shape_live_board, ".feeds registry + per-feed freshness keys + meta history counters (Live board service-freshness page)"),
     # The obj-#1 sibling from the crop/tape line, and the audit's own next flagged
     # "next probe target" after macro_book. renderFarmBook gates the whole "Farm
     # book — where the crop mix meets our money" section on `j.national &&
