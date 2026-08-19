@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 355,
+  "n_points": 363,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -334,7 +334,7 @@
     123.0,
     122.0,
     121.0,
-    132.0
+    133.0
    ]
   },
   "fuel_diesel": {
@@ -690,7 +690,7 @@
     13.0,
     13.0,
     20.0,
-    42.0
+    41.0
    ]
   },
   "rain_max_mm": {
@@ -753,7 +753,7 @@
     110.5,
     82.4,
     130.0,
-    388.2
+    398.5
    ]
   },
   "rival_ads_live": {
@@ -764,11 +764,12 @@
     "2026-08-11",
     "2026-08-15",
     "2026-08-16",
-    "2026-08-18"
+    "2026-08-18",
+    "2026-08-19"
    ],
    "first_seen": "2026-07-30",
    "label": "Rival ad creatives running now",
-   "n": 6,
+   "n": 7,
    "path": "platform/data/rival_ads.json",
    "source": "Google Ads Transparency Center",
    "unit": "creatives",
@@ -778,7 +779,8 @@
     363.0,
     418.0,
     432.0,
-    431.0
+    431.0,
+    433.0
    ]
   },
   "rival_promo_live_mtc": {
@@ -928,11 +930,12 @@
     "2026-08-10",
     "2026-08-13",
     "2026-08-14",
-    "2026-08-17"
+    "2026-08-17",
+    "2026-08-18"
    ],
    "first_seen": "2026-07-17",
    "label": "MTC · market cap",
-   "n": 6,
+   "n": 7,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -942,7 +945,8 @@
     73.67,
     71.55,
     69.96,
-    69.96
+    69.96,
+    69.43
    ]
   },
   "set_mtc_pbv": {
@@ -953,11 +957,12 @@
     "2026-08-10",
     "2026-08-13",
     "2026-08-14",
-    "2026-08-17"
+    "2026-08-17",
+    "2026-08-18"
    ],
    "first_seen": "2026-07-17",
    "label": "MTC · price/book",
-   "n": 6,
+   "n": 7,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -967,7 +972,8 @@
     1.64,
     1.59,
     1.52,
-    1.52
+    1.52,
+    1.51
    ]
   },
   "set_sawad_mcap": {
@@ -978,11 +984,12 @@
     "2026-08-10",
     "2026-08-13",
     "2026-08-14",
-    "2026-08-17"
+    "2026-08-17",
+    "2026-08-18"
    ],
    "first_seen": "2026-07-17",
    "label": "SAWAD · market cap",
-   "n": 6,
+   "n": 7,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -992,7 +999,8 @@
     41.3715,
     40.7069,
     39.2116,
-    39.8762
+    39.8762,
+    39.5439
    ]
   },
   "set_sawad_pbv": {
@@ -1003,11 +1011,12 @@
     "2026-08-10",
     "2026-08-13",
     "2026-08-14",
-    "2026-08-17"
+    "2026-08-17",
+    "2026-08-18"
    ],
    "first_seen": "2026-07-17",
    "label": "SAWAD · price/book",
-   "n": 6,
+   "n": 7,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -1017,6 +1026,7 @@
     1.06,
     1.03,
     0.99,
+    1.0,
     1.0
    ]
   },
@@ -1028,11 +1038,12 @@
     "2026-08-10",
     "2026-08-13",
     "2026-08-14",
-    "2026-08-17"
+    "2026-08-17",
+    "2026-08-18"
    ],
    "first_seen": "2026-07-17",
    "label": "TIDLOR · market cap",
-   "n": 6,
+   "n": 7,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -1042,6 +1053,7 @@
     56.4706,
     55.8914,
     54.7331,
+    56.181,
     56.181
    ]
   },
@@ -1053,11 +1065,12 @@
     "2026-08-10",
     "2026-08-13",
     "2026-08-14",
-    "2026-08-17"
+    "2026-08-17",
+    "2026-08-18"
    ],
    "first_seen": "2026-07-17",
    "label": "TIDLOR · price/book",
-   "n": 6,
+   "n": 7,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -1067,6 +1080,7 @@
     1.56,
     1.55,
     1.55,
+    1.59,
     1.59
    ]
   },
@@ -1079,11 +1093,12 @@
     "2026-08-11",
     "2026-08-15",
     "2026-08-16",
-    "2026-08-18"
+    "2026-08-18",
+    "2026-08-19"
    ],
    "first_seen": "2026-08-07",
    "label": "Social-listening corpus · total demand documents",
-   "n": 7,
+   "n": 8,
    "path": "platform/data/social_themes.json",
    "source": "app-store reviews + YouTube comments + Pantip threads (build_social_themes.py)",
    "unit": "documents",
@@ -1094,6 +1109,7 @@
     12143.0,
     12248.0,
     12289.0,
+    12318.0,
     12318.0
    ]
   }
