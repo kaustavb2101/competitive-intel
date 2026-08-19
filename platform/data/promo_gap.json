@@ -111,7 +111,7 @@
    "cheapest_promo_effective": 10.0,
    "gap_pp": 14.0,
    "key": "TIDLOR",
-   "n_quotes": 5,
+   "n_quotes": 6,
    "name_th": "เงินติดล้อ",
    "quotes": [
     {
@@ -126,6 +126,15 @@
     {
      "channel": "google_ads",
      "context_th": "ิน อัตราดอกเบี้ยพิเศษเริ่มต้น 0.46% ต่อเดือน · ถนน สระ",
+     "effective_worst_case": 10.04,
+     "quoted": 0.46,
+     "read_as": "flat_at_60m",
+     "seen": "2026-06-24",
+     "unit": "pct_per_month"
+    },
+    {
+     "channel": "google_ads",
+     "context_th": "ิน อัตราดอกเบี้ยพิเศษเริ่มต้น 0.46% ต่อเดือน ผ่อนนานสู",
      "effective_worst_case": 10.04,
      "quoted": 0.46,
      "read_as": "flat_at_60m",
