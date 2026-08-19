@@ -11,42 +11,42 @@
     "collateral_read": "Diesel = pickup/farm-vehicle title-loan borrowers; gasohol = motorcycle-title borrowers. Rising pump prices compress those borrowers' disposable income."
   },
   "headline": {
-    "diesel": 37.54,
+    "diesel": 38.39,
     "diesel_name": "Hi Diesel S",
     "diesel_delta_tomorrow": 0.0,
-    "gasohol95": 36.84,
+    "gasohol95": 37.69,
     "gasohol95_name": "Gasohol 95 S EVO",
     "gasohol95_delta_tomorrow": 0.0
   },
   "fuels": {
     "DIESEL B20": {
-      "today": 32.54,
-      "tomorrow": 32.54,
+      "today": 33.39,
+      "tomorrow": 33.39,
       "delta_tomorrow": 0.0
     },
     "Gasohol 91 S EVO": {
-      "today": 36.47,
-      "tomorrow": 36.47,
+      "today": 37.32,
+      "tomorrow": 37.32,
       "delta_tomorrow": 0.0
     },
     "Gasohol 95 S EVO": {
-      "today": 36.84,
-      "tomorrow": 36.84,
+      "today": 37.69,
+      "tomorrow": 37.69,
       "delta_tomorrow": 0.0
     },
     "Gasohol E20 S EVO": {
-      "today": 31.84,
-      "tomorrow": 31.84,
+      "today": 32.69,
+      "tomorrow": 32.69,
       "delta_tomorrow": 0.0
     },
     "Gasohol E85 S EVO": {
-      "today": 27.78,
-      "tomorrow": 27.78,
+      "today": 28.63,
+      "tomorrow": 28.63,
       "delta_tomorrow": 0.0
     },
     "Hi Diesel S": {
-      "today": 37.54,
-      "tomorrow": 37.54,
+      "today": 38.39,
+      "tomorrow": 38.39,
       "delta_tomorrow": 0.0
     },
     "Hi Premium 98 Plus": {
