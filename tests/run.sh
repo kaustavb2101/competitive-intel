@@ -62,6 +62,10 @@ deps(){
 # ---------------------------------------------------------------------------
 phase_check(){
   hdr "determinism + syntax gate"
+  ( cd "$PIPE" && python3 build_factories_by_district.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_factories_by_district.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_factories_by_district.py --check (factory_census_national.json absent — not data drift)"
+  else bad "build_factories_by_district.py --check (factories_by_district.json drifted from factory_census_national.json — run: python3 pipeline/build_factories_by_district.py)"; fi
   ( cd "$PIPE" && python3 derive.py --check >/dev/null 2>&1 ) && ok "derive.py --check" || bad "derive.py --check (platform/data drifted from source-data)"
   ( cd "$PIPE" && python3 build_province.py --check >/dev/null 2>&1 ) && ok "build_province.py --check" || bad "build_province.py --check (province files drifted)"
   ( cd "$PIPE" && python3 build_regions.py --check >/dev/null 2>&1 ) && ok "build_regions.py --check" || bad "build_regions.py --check (regions.json drifted from provinces/*.json + competitors_census.json)"
