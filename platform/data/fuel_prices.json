@@ -3,7 +3,7 @@
     "generated_by": "build_fuel_prices.py",
     "source": "Bangchak retail oil-price API (www.bangchak.co.th/api/oilprice) — daily Bangkok reference prices; free, no key, cloud-reachable (EPPO/PTT/data.go.th are geoblocked).",
     "label": "MEASURED — live Thai retail fuel prices (฿/litre, Bangkok reference)",
-    "pulled": "2026-08-18",
+    "pulled": "2026-08-19",
     "unit": "THB/litre",
     "n_fuels": 8,
     "provenance": "Verbatim projection of source-data/fuel_prices.json (pipeline/pull_fuel_prices.py, refreshed daily by .github/workflows/data-fuel-prices.yml). No recomputation — every price carried through unchanged.",
