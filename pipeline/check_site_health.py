@@ -1140,6 +1140,48 @@ def _shape_peer_npl(d):
     return None
 
 
+def _shape_labour_context(d):
+    # The national labour-market backdrop (labour_context.json, obj #1) —
+    # MEASURED (ILOSTAT mirror of Thailand's official NSO LFS, overlaid with NSO's
+    # own quarterly LFS cross-tabs for self-employment + the agriculture sector).
+    # Appended to the Overview macro board as three MEASURED national KPIs, the
+    # informal-borrower base the whole platform's demand backdrop rests on:
+    # informality.rate_pct ("no payslip — the title-loan borrower base"),
+    # self_employment.self_employed_pct ("own-account + family + employers — no
+    # payslip-issuing employer"), and the Agriculture employment sector's
+    # share_pct + yoy ("the agri-PD demand backdrop"). A genuine deploy-health
+    # blind spot for the usual two reasons: (1) renderLabourContext GATES the
+    # whole block on a non-empty cards list and silently renders NOTHING when the
+    # file is missing/truncated (`absent file -> nothing extra renders`, no phone
+    # alert); and (2) it CANNOT self-heal — build_labour_context.py has no cron in
+    # any workflow, so a truncated/404 CDN deploy that guts it has no CI job to
+    # restore it. Asserts the three rendered-card shapes (numeric rate_pct +
+    # numeric self_employed_pct + an Agriculture sector row carrying a numeric
+    # share_pct, matching the render's /agri/i find), not values — robust to a
+    # future ILOSTAT/NSO-LFS vintage refresh moving the percentages.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    inf = d.get("informality")
+    if not (isinstance(inf, dict) and isinstance(inf.get("rate_pct"), (int, float))):
+        return "missing/non-numeric 'informality.rate_pct' (the lead 'Informal work' borrower-base card)"
+    se = d.get("self_employment")
+    if not (isinstance(se, dict) and isinstance(se.get("self_employed_pct"), (int, float))):
+        return "missing/non-numeric 'self_employment.self_employed_pct' (the 'Self-employed' no-payslip card)"
+    emp = d.get("employment")
+    if not isinstance(emp, dict):
+        return "missing 'employment' block (source of the agri-jobs demand-backdrop card)"
+    sectors = emp.get("sectors")
+    if not isinstance(sectors, list) or not sectors:
+        return "missing/empty 'employment.sectors' list (the sector-share rows)"
+    agri = next((s for s in sectors
+                 if isinstance(s, dict) and "agri" in str(s.get("sector", "")).lower()), None)
+    if agri is None:
+        return "no Agriculture sector row in 'employment.sectors' (the agri-PD demand backdrop card)"
+    if not isinstance(agri.get("share_pct"), (int, float)):
+        return "Agriculture sector row missing/non-numeric 'share_pct' (the 'Agri jobs' card figure)"
+    return None
+
+
 def _shape_province_pressure(d):
     # The cross-objective SYNTHESIS layer (province_pressure.json) — the
     # deterministic JOIN of portfolio risk (province_stress_index composite,
@@ -3615,6 +3657,14 @@ DATA_FILES = [
     # per-lens verdict render shape (national KPIs + 77-province drill + npl
     # header), not values.
     ("data/macro_book.json", _shape_macro_book, ".national KPI block + 77-province drill + .npl header (Overview conditions-at-our-grain drill)"),
+    # The national labour-market backdrop (labour_context.json, obj #1, MEASURED
+    # ILOSTAT/NSO LFS) — three Overview macro KPIs describing the informal-borrower
+    # base (informality / self-employed / agri jobs). renderLabourContext gates the
+    # whole block on a non-empty cards list and silently renders nothing when the
+    # file is missing/truncated, and it CANNOT self-heal (build_labour_context.py
+    # is in no workflow), so a gutted deploy has no CI job to restore it and no
+    # phone alert would fire. Asserts the three rendered-card shapes, not values.
+    ("data/labour_context.json", _shape_labour_context, ".informality.rate_pct + .self_employment.self_employed_pct + Agriculture sector share_pct (Overview informal-borrower-base KPIs, obj #1)"),
     # The "Live board" nav page (live.html) — the service-freshness registry
     # refreshed on every market-pulse swarm pass but, unlike its Overview
     # siblings, previously unprobed. live.html gates the whole page on `LB.feeds`
