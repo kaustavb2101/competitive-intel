@@ -615,6 +615,21 @@ INGESTS
     bad "validate_data.py (platform/data integrity — see report above)"
   fi
 
+  # anti-expansion PRODUCT-MANDATE gate: CLAUDE.md is explicit that this platform makes NO
+  # open/close/where-to-open recommendations — it is a competitive-RISK lens on the footprint AutoX
+  # already runs (no branch-growth target; the network is consolidating). build_regional_outlook.py
+  # once shipped a "📈 Expand — … lead the region's acquisition here" recommendation (reframed to
+  # "Low rival pressure" on 2026-08-02); that fix lived only in a data-builder's source and had NO
+  # gate guard, so it was hand-re-audited every intelligence-loop run. This locks it in: it scans the
+  # committed data-layer STRING VALUES a refresh regenerates and FAILs if forbidden branch-expansion
+  # RECOMMENDATION language reappears. Reporting a RIVAL's growth ("Expansion pace", "+518 branches")
+  # and CUSTOMER acquisition ("who to acquire") are allowed and do NOT trip it (see its self-test).
+  if python3 "$TESTS/mandate_guard.py"; then
+    ok "mandate_guard.py (no branch open/close/expand recommendations in data layers)"
+  else
+    bad "mandate_guard.py (forbidden branch-expansion recommendation language is live — see report above)"
+  fi
+
   # deploy-probe self-test: the SAME code path the nightly live site-health check runs (check_site_health.py),
   # but pointed at the local committed tree (--local platform, LocalFetcher = filesystem only, pure stdlib,
   # NO network). It asserts every deploy probe validator (_shape_*) still ACCEPTS its real committed payload,
