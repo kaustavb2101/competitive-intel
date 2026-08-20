@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-20T04:24:44+00:00",
-    "commit": "06c5d39"
+    "generated_at": "2026-08-20T16:18:50+00:00",
+    "commit": "0f65d60"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,90 @@
   ],
   "activity": [
     {
+      "date": "2026-08-20T16:18:50+00:00",
+      "sha": "0f65d60",
+      "summary": "health(deploy): shape-probe ev_exposure.json — Overview 'ICE auto-parts jobs exposed' obj-#1 EV-workforce-exposure card",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-20T15:52:55+00:00",
+      "sha": "7fc1b20",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-20, run 32388573611)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-20T14:36:57+00:00",
+      "sha": "d74fcde",
+      "summary": "docs(progress): log ux-canonical-link merge+deploy+verify (PR #535)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-20T21:33:02+07:00",
+      "sha": "9e00db3",
+      "summary": "ux: add rel=canonical to every live page (#535)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-20T10:14:49+00:00",
+      "sha": "6dd57f9",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the labour_context probe ship",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-20T10:14:18+00:00",
+      "sha": "1f587dd",
+      "summary": "health(deploy): shape-probe labour_context.json — Overview informal-borrower-base KPIs",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-20T09:52:34+00:00",
+      "sha": "3d4d7b4",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-20, run 32355949694)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-20T09:00:11+00:00",
+      "sha": "7a8f004",
+      "summary": "data: NABC live prices (2026-08-20, run 32351184095)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-20T08:52:13+00:00",
+      "sha": "3358f71",
+      "summary": "docs(progress): log ux-callsheet-doc-lang merge+deploy+verify (PR #531)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-20T15:47:42+07:00",
+      "sha": "a5826e0",
+      "summary": "ux: declare lang=\"th\" on the generated call-sheet document (#531)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-20T06:32:05+00:00",
+      "sha": "7244193",
+      "summary": "test: guard the unverified GPP knowledge base against being surfaced as measured",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-20T06:20:48+00:00",
+      "sha": "ce7e7c8",
+      "summary": "data(census): refresh the Union Auction forward book (run 32331413431) (#530)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-20T05:57:58+00:00",
+      "sha": "f147316",
+      "summary": "data: market-pulse swarm refresh (run 32330872023) (#529)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-20T04:27:39+00:00",
+      "sha": "270793e",
+      "summary": "chore(plan): refresh CEO dashboard after mandate-guard ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-20T04:24:44+00:00",
       "sha": "06c5d39",
       "summary": "test: guard the anti-expansion product mandate in the determinism gate",
@@ -627,90 +711,6 @@
       "sha": "8dc5739",
       "summary": "data: market-pulse swarm refresh (run 32273365168) (#521)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-19T16:31:02+00:00",
-      "sha": "0effd90",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the R2-liveness-probe ship",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-19T16:28:41+00:00",
-      "sha": "1939a82",
-      "summary": "health: probe R2 catchment-store liveness in site-health (deploy-health)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-19T15:50:14+00:00",
-      "sha": "b4ca8df",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-19, run 32272241127)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-19T14:34:58+00:00",
-      "sha": "f552262",
-      "summary": "docs: log ux-favicon-svg-type-raster-fallback merge + deploy-verify (PR #520)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-19T21:31:16+07:00",
-      "sha": "7dc1476",
-      "summary": "ux: SVG favicon type hint + raster fallback so Safari shows a tab icon (#520)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-19T12:46:02+00:00",
-      "sha": "02fce25",
-      "summary": "integrate(obj#1): surface DIW installed factory horsepower as a MEASURED per-district readout (#519)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-19T12:12:30+00:00",
-      "sha": "4af24b1",
-      "summary": "data: SET listed-peer scoreboard refresh (run 32248378904) (#518)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-19T10:52:16+00:00",
-      "sha": "86b0ed7",
-      "summary": "data: market-pulse swarm refresh (run 32240579644) (#517)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-19T10:17:18+00:00",
-      "sha": "06815c9",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the occupation_income health-probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-19T10:16:50+00:00",
-      "sha": "debce66",
-      "summary": "health: shape-probe occupation_income.json (command-center lowest-paid-occupation income floor, obj #1)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-19T09:52:05+00:00",
-      "sha": "02c5972",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-19, run 32239660723)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-19T08:57:29+00:00",
-      "sha": "3c22030",
-      "summary": "data: NABC live prices (2026-08-19, run 32234806208)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-19T08:28:04+00:00",
-      "sha": "cc34fc2",
-      "summary": "docs: log ux-og-url-canonical merge + deploy-verify (PR #516)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-19T15:24:36+07:00",
-      "sha": "2868050",
-      "summary": "ux: add og:url canonical to complete the Open Graph required-property set (#516)",
-      "pillar": "uxui"
     }
   ]
 }

@@ -1140,6 +1140,91 @@ def _shape_peer_npl(d):
     return None
 
 
+def _shape_labour_context(d):
+    # The national labour-market backdrop (labour_context.json, obj #1) —
+    # MEASURED (ILOSTAT mirror of Thailand's official NSO LFS, overlaid with NSO's
+    # own quarterly LFS cross-tabs for self-employment + the agriculture sector).
+    # Appended to the Overview macro board as three MEASURED national KPIs, the
+    # informal-borrower base the whole platform's demand backdrop rests on:
+    # informality.rate_pct ("no payslip — the title-loan borrower base"),
+    # self_employment.self_employed_pct ("own-account + family + employers — no
+    # payslip-issuing employer"), and the Agriculture employment sector's
+    # share_pct + yoy ("the agri-PD demand backdrop"). A genuine deploy-health
+    # blind spot for the usual two reasons: (1) renderLabourContext GATES the
+    # whole block on a non-empty cards list and silently renders NOTHING when the
+    # file is missing/truncated (`absent file -> nothing extra renders`, no phone
+    # alert); and (2) it CANNOT self-heal — build_labour_context.py has no cron in
+    # any workflow, so a truncated/404 CDN deploy that guts it has no CI job to
+    # restore it. Asserts the three rendered-card shapes (numeric rate_pct +
+    # numeric self_employed_pct + an Agriculture sector row carrying a numeric
+    # share_pct, matching the render's /agri/i find), not values — robust to a
+    # future ILOSTAT/NSO-LFS vintage refresh moving the percentages.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    inf = d.get("informality")
+    if not (isinstance(inf, dict) and isinstance(inf.get("rate_pct"), (int, float))):
+        return "missing/non-numeric 'informality.rate_pct' (the lead 'Informal work' borrower-base card)"
+    se = d.get("self_employment")
+    if not (isinstance(se, dict) and isinstance(se.get("self_employed_pct"), (int, float))):
+        return "missing/non-numeric 'self_employment.self_employed_pct' (the 'Self-employed' no-payslip card)"
+    emp = d.get("employment")
+    if not isinstance(emp, dict):
+        return "missing 'employment' block (source of the agri-jobs demand-backdrop card)"
+    sectors = emp.get("sectors")
+    if not isinstance(sectors, list) or not sectors:
+        return "missing/empty 'employment.sectors' list (the sector-share rows)"
+    agri = next((s for s in sectors
+                 if isinstance(s, dict) and "agri" in str(s.get("sector", "")).lower()), None)
+    if agri is None:
+        return "no Agriculture sector row in 'employment.sectors' (the agri-PD demand backdrop card)"
+    if not isinstance(agri.get("share_pct"), (int, float)):
+        return "Agriculture sector row missing/non-numeric 'share_pct' (the 'Agri jobs' card figure)"
+    return None
+
+
+def _shape_ev_exposure(d):
+    # The EV-transition WORKFORCE-exposure card (ev_exposure.json, obj #1) —
+    # MEASURED (DIW fac-10scurve automotive-group factory census: n / workers /
+    # registered capital per province). It renders the "ICE auto-parts jobs
+    # exposed" card on the Overview collateral board (renderCollatOutlook) — the
+    # borrower-INCOME channel of the EV transition (jobs the same electrification
+    # pressures), the measured companion to the editorial diesel-pickup resale
+    # card. A genuine deploy-health blind spot for the usual two reasons:
+    # (1) the render GATES the card on `EVEXP.meta.national.workers != null` and
+    # silently drops it (no phone alert) when the file is missing/truncated; and
+    # (2) it CANNOT self-heal — build_ev_exposure.py is scheduled in NO workflow
+    # (its DIW s-curve input rides no cron of its own), so a truncated/404 CDN
+    # deploy that guts it has no CI job to restore it. Asserts the render shape:
+    # meta.national.{workers,factories} numeric (the gate + the "N workers across
+    # M factories" clause), numeric meta.n_provinces (the "in NP provinces" clause),
+    # and a non-empty provinces list whose rows carry a string `th` + numeric
+    # `workers` (the top-3-by-workers concentration clause) — SHAPE not values,
+    # robust to a future DIW s-curve vintage refresh moving the counts.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' block (source of the national exposure gate)"
+    nat = meta.get("national")
+    if not (isinstance(nat, dict) and isinstance(nat.get("workers"), (int, float))):
+        return "missing/non-numeric 'meta.national.workers' (the card render gate + lead figure)"
+    if not isinstance(nat.get("factories"), (int, float)):
+        return "missing/non-numeric 'meta.national.factories' (the 'across N factories' clause)"
+    if not isinstance(meta.get("n_provinces"), (int, float)):
+        return "missing/non-numeric 'meta.n_provinces' (the 'in N provinces' clause)"
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        return "missing/empty 'provinces' list (the top-3-by-workers concentration rows)"
+    row = provs[0]
+    if not isinstance(row, dict):
+        return "first 'provinces' row is not an object"
+    if not isinstance(row.get("th"), str) or not row.get("th").strip():
+        return "province row missing/blank 'th' (the concentration-clause province label)"
+    if not isinstance(row.get("workers"), (int, float)):
+        return "province row missing/non-numeric 'workers' (the top-3 sort key)"
+    return None
+
+
 def _shape_province_pressure(d):
     # The cross-objective SYNTHESIS layer (province_pressure.json) — the
     # deterministic JOIN of portfolio risk (province_stress_index composite,
@@ -3615,6 +3700,14 @@ DATA_FILES = [
     # per-lens verdict render shape (national KPIs + 77-province drill + npl
     # header), not values.
     ("data/macro_book.json", _shape_macro_book, ".national KPI block + 77-province drill + .npl header (Overview conditions-at-our-grain drill)"),
+    # The national labour-market backdrop (labour_context.json, obj #1, MEASURED
+    # ILOSTAT/NSO LFS) — three Overview macro KPIs describing the informal-borrower
+    # base (informality / self-employed / agri jobs). renderLabourContext gates the
+    # whole block on a non-empty cards list and silently renders nothing when the
+    # file is missing/truncated, and it CANNOT self-heal (build_labour_context.py
+    # is in no workflow), so a gutted deploy has no CI job to restore it and no
+    # phone alert would fire. Asserts the three rendered-card shapes, not values.
+    ("data/labour_context.json", _shape_labour_context, ".informality.rate_pct + .self_employment.self_employed_pct + Agriculture sector share_pct (Overview informal-borrower-base KPIs, obj #1)"),
     # The "Live board" nav page (live.html) — the service-freshness registry
     # refreshed on every market-pulse swarm pass but, unlike its Overview
     # siblings, previously unprobed. live.html gates the whole page on `LB.feeds`
@@ -3649,6 +3742,13 @@ DATA_FILES = [
     # no phone alert. Asserts the two national gate keys + the 77-province backbone.
     ("data/collateral_outlook.json", _shape_collateral_outlook, ".national recovery-value KPIs (used_veh_yoy_blended + exposure_weighted_outlook) + 77-province backbone (Overview collateral board)"),
     ("data/collateral_census.json", _shape_collateral_census, ".book_check priced pools (eval_avg vs measured market_auction, eval_vs_auction gap, dpd30p_pct) — Overview book-vs-recovery card"),
+    # The Overview collateral board's INCOME-side EV-exposure card (ev_exposure.json,
+    # obj #1, MEASURED DIW s-curve automotive census). renderCollatOutlook gates the
+    # "ICE auto-parts jobs exposed" card on `meta.national.workers` and silently drops
+    # it (no phone alert) when the file is missing/truncated; it CANNOT self-heal
+    # (build_ev_exposure.py rides no cron). Asserts the render gate + the province
+    # concentration rows. Shape not values (robust to a DIW s-curve vintage refresh).
+    ("data/ev_exposure.json", _shape_ev_exposure, ".meta.national.{workers,factories} + n_provinces + provinces[].{th,workers} (Overview 'ICE auto-parts jobs exposed' card, obj #1)"),
     # The per-branch "What moves this branch" drill (obj #1), and the second read
     # the last audit flagged. msensRec picks MSENS[idxOf(branch)] off `.branches`
     # so it MUST stay index-aligned to branches.json, and msensPhrase renders each
