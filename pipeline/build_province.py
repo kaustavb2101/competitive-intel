@@ -287,12 +287,12 @@ def build_all():
             en = feats[0]["properties"]["shapeName"]
         slug = slugify(en) or slugify(prov)
 
-        gp = fbd["provinces"].get(prov, {"fac": 0, "workers": 0})
+        gp = fbd["provinces"].get(prov, {"fac": 0, "workers": 0, "hp": 0})
         obj = {"province_th": prov, "province_en": en, "region": REGION[prov],
                "districts": {"type": "FeatureCollection", "features": feats},
                "branches": bout, "competitors": [], "poi": poi, "estates": [],
                "facts": narr.get(prov, EMPTY_FACTS),
-               "gov": {"factories": gp["fac"], "workers": gp["workers"],
+               "gov": {"factories": gp["fac"], "workers": gp["workers"], "hp": gp.get("hp", 0),
                        "vehicles": veh.get(prov, {}), "employment": emp.get(prov, {}),
                        "unemployment": unemp.get(prov) or {},
                        "income": income.get(prov) or {},
@@ -320,6 +320,9 @@ def build_all():
                            "district competitors (MEASURED rival title-loan/vehicle-finance branches, "
                            "Google Places + Overture + official store-locators, deduped ~150m — lower bound)",
                            "gov.factories/workers (DIW factories_by_district.json, province total)",
+                           "gov.hp (DIW factories_by_district.json, province total INSTALLED horsepower "
+                           "— factory installed capacity / capital-intensity of the local industrial base, "
+                           "MEASURED; the SCALE the raw factory count can't express)",
                            "gov.vehicles (DLT vehicles_by_province.json, province total; null when the "
                            "province is genuinely absent from that release — never a fabricated 0)",
                            "gov.employment (NSO labour formal/informal, employment_by_province.json; "

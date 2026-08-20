@@ -84,7 +84,7 @@ because the DERIVED platform layers inherit it.
 | `commodity_board.json`, `commodities.json`, `commodities_protein.json` | MEASURED | World Bank Pink Sheet GLOBAL commodity prices. | Used as a **proxy** for Thai farmgate direction (see crop_stress caveat). |
 | `crop_prices.json` | MEASURED | OAE / gov crop prices fold-in (`ingest_gov.py`). | Blocked from foreign IP; pulled from Thai network. |
 | `crop_prov_area.json`, `rice_prov_area.json` | MEASURED | OAE planting area (rai) per crop per province. | |
-| `factories_by_district.json` | MEASURED | DIW factory registry (via `ingest_gov.py`). | |
+| `factories_by_district.json` | MEASURED | DIW factory registry, projected by `build_factories_by_district.py` from `factory_census_national.json` (DIW CKAN, CI-refreshable). Carries per-district & per-province `fac`/`workers`/`hp` (installed horsepower). | Formerly written by `ingest_gov.py` (retired for this file as of the CKAN-census wiring). |
 | `vehicles_by_province.json` | MEASURED | DLT vehicle registrations per province. | |
 | `employment_by_province.json` | MEASURED | NSO labour-force (formal/informal). | |
 | `estates.json` | MEASURED | 35 industrial estates (IEAT). | |

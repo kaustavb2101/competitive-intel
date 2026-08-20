@@ -1128,6 +1128,9 @@ function buildStrip(){
     (COMP.length?['Rivals',COMP.length,'#E0475B']:null),
     ['Districts',(DISTRICTS&&DISTRICTS.features?DISTRICTS.features.length:0),'#5B7CFA'],
     ['Factories',(gov.factories!=null?gov.factories:(POIS.industrial?POIS.industrial.length:0)),'#7b8aa6'],
+    // MEASURED DIW installed horsepower (province total) — factory SCALE / capital-intensity, the demand
+    // mass the raw factory COUNT can't express. Same signal as the National-map district popup's capacity line.
+    (gov.hp?['Factory capacity',(gov.hp>=1e6?(gov.hp/1e6).toFixed(1)+'M hp':Math.round(gov.hp/1e3)+'k hp'),'#7b8aa6']:null),
     (veh.total?['Vehicles',Math.round(veh.total/1000)+'k','#1FA38C']:null),
     (emp.informal?['Informal',Math.round(emp.informal/1000)+'k','#E0902F']:null),
     ['Vehicle shops',(POIS.vehicle_commerce||[]).length,'#1FA38C'],
