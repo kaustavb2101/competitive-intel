@@ -3,6 +3,30 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-20 — UX loop: `color-scheme` on the 3 deck.gl pages — merged + deployed + verified (PR #538)
+
+- **Finding (`ux-color-scheme-3dpages`).** The three deck.gl pages (`province.html`,
+  `rayong-catchment.html`, `branch-explorer.html`) carry their own inline `<style>` and do NOT load
+  `styles.css`, so they never received the theme-tracking `color-scheme` pair that `ux-color-scheme`
+  (2026-07-16) added to `styles.css` — that fix's note mislabelled these as "styles.css pages".
+  Verified `color-scheme` had 0 hits in all three (lives only in `styles.css:148/655`). Without it,
+  native UA surfaces (the cascading Region/Province/Branch `<select>` dropdown popups, panel
+  scrollbars, overscroll) rendered in the OS default scheme regardless of the app theme.
+- **Fix.** Added `color-scheme:dark` inside each canonical `:root{}` + a
+  `html[data-theme="light"]{color-scheme:light}` rule, byte-mirroring `styles.css`. Keys off the same
+  `data-theme` attr the pre-paint script sets before paint → applies from the first frame, follows the
+  toggle. CSS-only, zero visual change to the deck.gl scene/panels. All 7 nav pages now declare
+  `color-scheme` consistently.
+- **Safeguards.** `bash tests/run.sh check` → 146 passed / 0 failed (incl. `node --check` on every
+  page's inline JS). Headless render + self-review of all three changed pages (branch-explorer full
+  reach-ring scene; province full district relief + POI legend; rayong-catchment nav + calm
+  scene-notice — the 3,631-building scene times out the software-WebGL harness, a known settle-budget
+  limit, not a regression). No secrets in diff; 4 files (3 pages + this-class audit entry).
+- **Merge + deploy + verify.** Squash-merged PR #538 (`a0cae79`). Git-master alias 302 → `vercel.com/sso-api`
+  (Vercel SSO gate = up + gated, expected). Public `-blue` production alias returns 200 on `/`,
+  `/province`, `/rayong-catchment`, `/branch-explorer`; confirmed `color-scheme:dark`/`:light` is live
+  in the shipped `/province` HTML. No rollback needed.
+
 ## 2026-08-20 — Intelligence loop (DEPLOY-HEALTH / SERVICE): **shape-probe the Overview collateral board's MEASURED "ICE auto-parts jobs exposed" card (`ev_exposure.json`) — a surfaced obj-#1 EV-workforce-exposure read with no deploy probe that CANNOT self-heal.** A fetched-vs-probed re-sweep (`app.js` + all `*.html` live-`fetch()`'d `data/*.json`, 130 unique, vs the `check_site_health.py` probe registry, 107) left 31 surfaced-but-unprobed reads; triaged for load-bearing × cannot-self-heal × obj#1/#2 impact, the highest-value was `ev_exposure.json` (obj #1, MEASURED — DIW `fac-10scurve` automotive-group factory census: 173,380 workers across 1,630 factories in 48 provinces, Eastern-corridor-concentrated). It renders the "ICE auto-parts jobs exposed" card on the shared Overview collateral board — the **borrower-INCOME channel of the EV transition** (jobs the same electrification pressures), the measured companion to the editorial diesel-pickup resale card above it (which reads the collateral ASSET side). Genuine blind spot: `renderCollatOutlook` gates the whole card on `EVEXP.meta.national.workers != null` and silently drops it (**no phone alert**) when the file is missing/truncated, and `build_ev_exposure.py` is scheduled in **no** workflow (its `scurve_by_province.json` input rides no cron of its own — the `data-gov-census.yml` cron pulls the SAME DIW CKAN host for the DISTINCT `factype3` category-3 census, not `fac-10scurve`), so a gutted CDN deploy has no CI job to restore it. Closed with `_shape_ev_exposure` + a `DATA_FILES` entry asserting the render gate + card shape — numeric `meta.national.workers` (the gate + lead figure) + numeric `meta.national.factories` (the "across N factories" clause) + numeric `meta.n_provinces` (the "in NP provinces" clause) + non-empty `provinces` list whose rows carry a string `th` + numeric `workers` (the top-3-by-workers concentration clause the render sorts on) — SHAPE not values, robust to any future DIW s-curve vintage refresh.
 - **Why this, this run.** The autonomy plan is 98% (49 done / 1 owner-side open). Per the loop's fallback I re-verified deploy health (public alias 200 on `/` + `/data/meta.json`; master alias correctly 302→SSO) and re-scanned the render path for the highest-value surfaced read still lacking a deploy probe. `ev_exposure.json` was the one obj-#1 MEASURED collateral-board read that both gates a visible Overview card AND cannot self-heal — strictly higher deploy-health value than the alternatives in the unprobed set (most are self-healing via existing crons, per-branch popup reads, or 3D-scene inputs already guarded).
 - **Safeguard protocol (all gates).** (a) `bash tests/run.sh check` → **146 passed / 0 failed** (the `check_site_health.py --local` self-test that gates every probe accepts the committed payload). (b) No secrets in diff. (c) Diff = **+52, 2 files** (`pipeline/check_site_health.py` +50: the probe fn + registry entry; `docs/SERVICE_AUDIT.md` +2) — matches intent, no stray files. (d) Provenance/no-fabrication intact — no `platform/data` file altered, the probe asserts structure not values, zero fabricated numbers. Probe-script-only → no visual/app change → no PR/headless render needed. Verified: real 4,283-B payload → PASS, **11 negatives** rejected, offline `--local platform` **317/317 HEALTHY** (was 314, +3: fetch/parse/shape). Full finding in `docs/SERVICE_AUDIT.md` (2026-08-20 (b)).
