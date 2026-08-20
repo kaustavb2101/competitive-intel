@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-19T22:21:20+00:00",
-    "commit": "0359c6b"
+    "generated_at": "2026-08-20T04:24:44+00:00",
+    "commit": "06c5d39"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-19",
+    "eta_date": "2026-08-20",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-08-20T04:24:44+00:00",
+      "sha": "06c5d39",
+      "summary": "test: guard the anti-expansion product mandate in the determinism gate",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-20T04:05:18+00:00",
+      "sha": "08c3bad",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-20, run 32330423490)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-20T03:13:57+00:00",
+      "sha": "7d5f3a0",
+      "summary": "data: NABC live prices (2026-08-20, run 32327165760)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-20T02:13:23+00:00",
+      "sha": "47370a0",
+      "summary": "docs(progress): log ux-newtab-cue-rivalads-source merge+deploy+verify (PR #528)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-20T09:10:50+07:00",
+      "sha": "2c7c16e",
+      "summary": "ux: add new-tab cue to the rival-ads source citation link (#528)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-20T00:37:38+00:00",
+      "sha": "391edb2",
+      "summary": "feat(province): surface MEASURED installed factory horsepower (gov.hp) as a \"Factory capacity\" chip (#527)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-19T23:27:30+00:00",
+      "sha": "0439a9c",
+      "summary": "data: rival Facebook promo feed refresh (run 32308366181) (#526)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-19T23:01:26+00:00",
+      "sha": "7df1165",
+      "summary": "data: market-pulse swarm refresh (run 32306069962) (#525)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-19T22:24:30+00:00",
+      "sha": "e0d0029",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the live_board shape-probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-19T22:21:20+00:00",
       "sha": "0359c6b",
       "summary": "health(deploy): shape-probe the Live board page (live_board.json) — a surfaced nav read with no site-health coverage",
@@ -656,60 +710,6 @@
       "date": "2026-08-19T15:24:36+07:00",
       "sha": "2868050",
       "summary": "ux: add og:url canonical to complete the Open Graph required-property set (#516)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-19T07:16:05+00:00",
-      "sha": "4937f6a",
-      "summary": "feat(data): source per-district factories from the CI-refreshable DIW CKAN census (#515)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-19T05:05:34+00:00",
-      "sha": "6a1e3d8",
-      "summary": "data(census): refresh the Union Auction forward book (run 32215280061) (#514)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-19T04:44:30+00:00",
-      "sha": "1a99cd5",
-      "summary": "data: market-pulse swarm refresh (run 32214750359) (#513)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-19T04:12:40+00:00",
-      "sha": "f8209c4",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the cluster_brief health-probe ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-19T04:12:28+00:00",
-      "sha": "2eb8cb4",
-      "summary": "health: shape-probe cluster_brief.json (branch-popup macro read + enriched-popup gate)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-19T04:05:16+00:00",
-      "sha": "20a2bf3",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-19, run 32214342810)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-19T03:14:06+00:00",
-      "sha": "ae5231a",
-      "summary": "data: NABC live prices (2026-08-19, run 32211129962)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-19T02:20:46+00:00",
-      "sha": "07e27a1",
-      "summary": "docs: log ux-og-image-share-card merge + deploy-verify (PR #512)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-19T09:18:06+07:00",
-      "sha": "75cc8e3",
-      "summary": "ux: og:image share card across all pages (link-unfurl brand card) (#512)",
       "pillar": "uxui"
     }
   ]
