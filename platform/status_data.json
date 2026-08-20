@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-20T10:14:18+00:00",
-    "commit": "1f587dd"
+    "generated_at": "2026-08-20T16:18:50+00:00",
+    "commit": "0f65d60"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,36 @@
   ],
   "activity": [
     {
+      "date": "2026-08-20T16:18:50+00:00",
+      "sha": "0f65d60",
+      "summary": "health(deploy): shape-probe ev_exposure.json — Overview 'ICE auto-parts jobs exposed' obj-#1 EV-workforce-exposure card",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-20T15:52:55+00:00",
+      "sha": "7fc1b20",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-20, run 32388573611)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-20T14:36:57+00:00",
+      "sha": "d74fcde",
+      "summary": "docs(progress): log ux-canonical-link merge+deploy+verify (PR #535)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-20T21:33:02+07:00",
+      "sha": "9e00db3",
+      "summary": "ux: add rel=canonical to every live page (#535)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-20T10:14:49+00:00",
+      "sha": "6dd57f9",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the labour_context probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-20T10:14:18+00:00",
       "sha": "1f587dd",
       "summary": "health(deploy): shape-probe labour_context.json — Overview informal-borrower-base KPIs",
@@ -681,36 +711,6 @@
       "sha": "8dc5739",
       "summary": "data: market-pulse swarm refresh (run 32273365168) (#521)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-19T16:31:02+00:00",
-      "sha": "0effd90",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the R2-liveness-probe ship",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-19T16:28:41+00:00",
-      "sha": "1939a82",
-      "summary": "health: probe R2 catchment-store liveness in site-health (deploy-health)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-19T15:50:14+00:00",
-      "sha": "b4ca8df",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-19, run 32272241127)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-19T14:34:58+00:00",
-      "sha": "f552262",
-      "summary": "docs: log ux-favicon-svg-type-raster-fallback merge + deploy-verify (PR #520)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-19T21:31:16+07:00",
-      "sha": "7dc1476",
-      "summary": "ux: SVG favicon type hint + raster fallback so Safari shows a tab icon (#520)",
-      "pillar": "uxui"
     }
   ]
 }
