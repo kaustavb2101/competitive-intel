@@ -41,7 +41,8 @@
 <script src="vendor/deck.gl-8.9.35.min.js"></script>
 <script src="pmtiles-layer.js"></script>
 <style>
-:root{--ink:#070a11;--panel:#0e131f;--line:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;--gold:#E0A93B;--accent:#5B7CFA;--agri:#E0574F;--merch:#23A28F}
+:root{--ink:#070a11;--panel:#0e131f;--line:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;--gold:#E0A93B;--accent:#5B7CFA;--agri:#E0574F;--merch:#23A28F;color-scheme:dark}
+html[data-theme="light"]{color-scheme:light}/* native scrollbars/selects/controls/overscroll track the app theme (mirrors styles.css; this page doesn't load it) */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink);color:var(--txt)}
 #map{position:fixed;inset:0;top:44px;background:transparent;z-index:1}
