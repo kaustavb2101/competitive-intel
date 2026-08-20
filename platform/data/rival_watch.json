@@ -6,8 +6,16 @@
     "key": "SAWAD",
     "live_pct": 46.0,
     "n_live": 163,
-    "n_new_30d": 53,
-    "share_of_volume_pct": 24.3
+    "n_new_30d": 45,
+    "share_of_volume_pct": 24.2
+   },
+   {
+    "brand": "Ngern Tid Lor",
+    "key": "TIDLOR",
+    "live_pct": 21.3,
+    "n_live": 172,
+    "n_new_30d": 22,
+    "share_of_volume_pct": 55.2
    },
    {
     "brand": "Ngern Hai Jai",
@@ -18,23 +26,23 @@
     "share_of_volume_pct": 9.5
    },
    {
-    "brand": "Ngern Tid Lor",
-    "key": "TIDLOR",
-    "live_pct": 20.9,
-    "n_live": 168,
-    "n_new_30d": 18,
-    "share_of_volume_pct": 55.1
-   },
-   {
     "brand": "MoneyDD",
     "key": "GSB_MONEYDD",
     "live_pct": 0.0,
     "n_live": 0,
     "n_new_30d": 2,
     "share_of_volume_pct": 1.4
+   },
+   {
+    "brand": "Ngern Turbo",
+    "key": "TURBO",
+    "live_pct": 27.6,
+    "n_live": 34,
+    "n_new_30d": 2,
+    "share_of_volume_pct": 8.4
    }
   ],
-  "as_of": "2026-08-19",
+  "as_of": "2026-08-20",
   "disappeared": [],
   "label": "MEASURED — n_new_30d is Google Ads Transparency's own per-creative first_shown date, counted within 30 days of the pull date.",
   "live_total_series": {
@@ -45,7 +53,7 @@
    "n_observations": 7,
    "prior_date": "2026-08-18"
   },
-  "n_appeared_brands": 4,
+  "n_appeared_brands": 5,
   "n_disappeared_brands": 0,
   "note": "ads.disappeared is empty: rival_ads.json's brand rows are monthly aggregates with no per-creative last_shown, so a specific creative going dark cannot be identified from this input."
  },
