@@ -158,6 +158,25 @@
    "what": "the rivals' own broadcast reach — upload cadence and audience"
   },
   {
+   "aging_days": null,
+   "cadence": "reference",
+   "file": "competitors_census.json",
+   "fresh_days": null,
+   "group": "Competition",
+   "history": null,
+   "key": "competitor_census",
+   "label": "Rival branch census",
+   "measured": true,
+   "no_history": "one official-locator + Places merge per scout pull; a second dated census unlocks rival-count movement",
+   "source": "MEASURED. Official-locator brands: each operator's live branch endpoint (source-data/competitors_official.json). Sample brands: competitors_national.json (Google Places) ∪ competit",
+   "stamp": "2026-07-04",
+   "stamp_iso": "2026-07-04",
+   "stamp_kind": "vintage",
+   "unit": "rival branches",
+   "value": 16503,
+   "what": "where the big-four title lenders actually have branches — the map under every rival-density and contested-ground read"
+  },
+  {
    "aging_days": 21,
    "cadence": "weekly",
    "file": "rival_ads.json",
@@ -488,10 +507,10 @@
  "meta": {
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
-  "history_note": "A trend line is drawn only where a stored series exists. 10 of 23 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
+  "history_note": "A trend line is drawn only where a stored series exists. 10 of 24 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
   "history_points": 265,
   "missing_files": [],
-  "n_feeds": 23,
+  "n_feeds": 24,
   "n_with_history": 10,
   "source": "Per-feed stamps read from each platform/data layer's own meta block (pulled / as_of / vintage / updated). No value is re-derived here."
  }

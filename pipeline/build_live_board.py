@@ -348,6 +348,18 @@ REGISTRY = [
          what="the licensed small-lender field around our branches",
          pick=lambda d: (sum((p or {}).get("total", 0) for p in (d.get("by_province") or {}).values()) or None,
                          "service points"), measured=True),
+    # The four-brand rival branch census — the MEASURED foundation the WHOLE Competition tab derives
+    # from (rival_density / competitor_coverage / rival_pressure / exit_whitespace / contested_pop /
+    # pico_* cross-checks / province rollups all read it). It stamps its own vintage but was the one
+    # foundational competition layer NOT on this board, so its age was invisible while every thinner
+    # feed showed theirs. 'reference' like its sibling pico_census: a pulled census snapshot, and its
+    # only refresher (committee/scout.py) is owner-paused — a daily/monthly clock would render a
+    # permanent false-red, so the board shows its true vintage without crying wolf.
+    dict(key="competitor_census", file="competitors_census.json", cadence="reference",
+         label="Rival branch census", group="Competition",
+         what="where the big-four title lenders actually have branches — the map under every "
+              "rival-density and contested-ground read",
+         pick=lambda d: (dig(d, "meta.counts.total"), "rival branches"), measured=True),
     dict(key="ev_penetration", file="ev_penetration.json", cadence="annual",
          label="Vehicle registry (DLT)", group="Collateral",
          what="the collateral pool itself — what is registered, and how fast EVs are displacing it",
@@ -401,6 +413,8 @@ NO_HISTORY_REASON = {
     "credit_anchor": "one FSR vintage per pull",
     "tape_real": "one export; a second dated export unlocks book-over-book movement",
     "pico_census": "one FPO registry snapshot per pull",
+    "competitor_census": "one official-locator + Places merge per scout pull; a second dated census "
+                         "unlocks rival-count movement",
     "ev_penetration": "one DLT vintage per pull",
     "search_demand": "Google Trends is already relative-to-window; absolute history is not kept",
     "region_debt": "one BoT vintage per pull",
