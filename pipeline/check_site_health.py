@@ -1225,6 +1225,41 @@ def _shape_ev_exposure(d):
     return None
 
 
+def _shape_occupation_risk(d):
+    # The per-branch occupation-stress triage flag (occupation_risk.json, obj #1) —
+    # ESTIMATED COMPOSITE: MEASURED occupation shares (Overture Places, a lower
+    # bound) weighted by an ESTIMATED "stressed sector" judgement. Load-bearing on
+    # TWO surfaces: the #map occupation-stress lens (occriskVal(d)=OCCRISK[i].s, so
+    # the array MUST stay index-aligned to branches.json) AND the branch popup's
+    # "Occupation × stress" block (occriskPopupHTML reads .t as its render gate,
+    # .s score, .d dominant-bucket key, .ds dominant share, .f flag). A genuine
+    # deploy-health blind spot for the usual two reasons: (1) the client loader sets
+    # OCCRISK=null on any fetch/parse failure and every reader returns 0/'' when the
+    # record is missing, so a truncated/404 CDN deploy silently zeroes the lens and
+    # drops the popup block with NO phone alert; and (2) it CANNOT self-heal —
+    # build_occupation_risk.py needs branch_occupations.json (the Overture pull) and
+    # rides NO cron, so nothing in CI restores a gutted deploy. Asserts the render
+    # contract (the 2015-branch index-aligned array + the numeric .s lens read and
+    # the .t/.d/.f popup reads) as SHAPE not values, robust to a future vintage.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    recs = d.get("branches")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'branches' array (client OCCRISK gate + occriskVal OCCRISK[i] read)"
+    if len(recs) != 2015:
+        return "expected 2015 branch records (index-aligned to branches.json), got %d" % len(recs)
+    r0 = recs[0]
+    if not isinstance(r0, dict):
+        return "first 'branches' record is not an object"
+    if not isinstance(r0.get("s"), (int, float)) or isinstance(r0.get("s"), bool):
+        return "first branch record missing numeric 's' (the #map occupation-stress lens val())"
+    if not isinstance(r0.get("t"), (int, float)) or isinstance(r0.get("t"), bool):
+        return "first branch record missing numeric 't' (the popup render gate occriskRec.t>0)"
+    if not isinstance(r0.get("f"), bool):
+        return "first branch record missing bool 'f' (the popup FLAGGED callout gate)"
+    return None
+
+
 def _shape_province_pressure(d):
     # The cross-objective SYNTHESIS layer (province_pressure.json) — the
     # deterministic JOIN of portfolio risk (province_stress_index composite,
@@ -3865,6 +3900,7 @@ DATA_FILES = [
     ("data/branch_cropland.json", _shape_branch_cropland, ".meta.crops + 2015-branch index-aligned .branches with ha[]/crop_ha (per-branch crop-area popup block)"),
     ("data/branch_pico.json", _shape_branch_pico, "2015-branch index-aligned .branches with numeric pico/head/branch/recent (per-branch PICO-rival popup block, obj #2)"),
     ("data/branch_occupations.json", _shape_branch_occupations, ".buckets labels + 2015-branch index-aligned .branches with t/o[] (per-branch occupation-mix popup + #map estab lens, MEASURED)"),
+    ("data/occupation_risk.json", _shape_occupation_risk, "2015-branch index-aligned .branches with numeric s/t + bool f (#map occupation-stress lens + per-branch 'Occupation × stress' popup, obj #1, ESTIMATED composite / MEASURED shares)"),
     ("data/branch_workforce.json", _shape_branch_workforce, ".buckets labels + 2015-branch index-aligned .branches with t/w[]/mix[] (per-branch workforce-mix popup, lead-by-occupation, ESTIMATED)"),
     ("data/branch_agri.json", _shape_branch_agri, ".meta.crops + 2015-branch index-aligned .branches with crop_ha/ha[]/sh[] (per-branch agri crop-exposure+stress popup, obj #1)"),
     ("data/branch_density.json", _shape_branch_density, "2015-branch index-aligned .branches with buildings_10km (per-branch building-density popup, MEASURED Overture ≤10km)"),
