@@ -39,7 +39,9 @@
 <script src="pmtiles-layer.js"></script>
 <style>
 :root{--ink:#070a11;--card:#0e131f;--cardln:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;
- --gold:#E6B450;--red:#E0474B;--mag:#D65AA0;--blue:#5B7CFA;--orange:#E0902F;--teal:#1FA38C;--purp:#9a7fd6;}
+ --gold:#E6B450;--red:#E0474B;--mag:#D65AA0;--blue:#5B7CFA;--orange:#E0902F;--teal:#1FA38C;--purp:#9a7fd6;
+ color-scheme:dark;}
+html[data-theme="light"]{color-scheme:light}/* native scrollbars/selects/controls/overscroll track the app theme (mirrors styles.css; this page doesn't load it) */
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink);color:var(--txt)}
 #map{position:fixed;inset:0;background:transparent;z-index:1}
