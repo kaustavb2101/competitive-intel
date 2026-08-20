@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-20T16:18:50+00:00",
-    "commit": "0f65d60"
+    "generated_at": "2026-08-20T22:13:31+00:00",
+    "commit": "700be71"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,48 @@
   ],
   "activity": [
     {
+      "date": "2026-08-20T22:13:31+00:00",
+      "sha": "700be71",
+      "summary": "health(deploy): shape-probe occupation_risk.json — per-branch occupation-stress lens+popup obj-#1 read that cannot self-heal",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-20T21:50:01+00:00",
+      "sha": "922f56e",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-20, run 32421205288)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-20T21:22:10+00:00",
+      "sha": "e5a2254",
+      "summary": "data: Thai-IP-only swarm refresh (run 32410463987) (#537)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-20T20:40:43+00:00",
+      "sha": "43f2c00",
+      "summary": "docs(progress): log ux-color-scheme-3dpages merge+deploy+verify (PR #538)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-21T03:37:07+07:00",
+      "sha": "a0cae79",
+      "summary": "ux: add color-scheme to the 3 deck.gl pages (native UA surfaces track theme) (#538)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-20T20:35:02+00:00",
+      "sha": "318c2b9",
+      "summary": "integration(obj#2): surface competitor census freshness on the Live board (#534)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-20T16:19:06+00:00",
+      "sha": "a1a3dcf",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the ev_exposure shape-probe ship",
+      "pillar": "service"
+    },
+    {
       "date": "2026-08-20T16:18:50+00:00",
       "sha": "0f65d60",
       "summary": "health(deploy): shape-probe ev_exposure.json — Overview 'ICE auto-parts jobs exposed' obj-#1 EV-workforce-exposure card",
@@ -669,48 +711,6 @@
       "sha": "e0d0029",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the live_board shape-probe ship",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-19T22:21:20+00:00",
-      "sha": "0359c6b",
-      "summary": "health(deploy): shape-probe the Live board page (live_board.json) — a surfaced nav read with no site-health coverage",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-19T21:46:45+00:00",
-      "sha": "61b39af",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-19, run 32305436793)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-19T21:01:17+00:00",
-      "sha": "da61b91",
-      "summary": "data: Thai-IP-only swarm refresh (run 32294354591) (#523)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-19T20:25:18+00:00",
-      "sha": "3b5c0d4",
-      "summary": "docs(progress): log ux-twitter-image-alt merge+deploy+verify (PR #524)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-20T03:20:26+07:00",
-      "sha": "60e4827",
-      "summary": "ux: add twitter:image:alt so X share cards have SR alt text (#524)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-19T18:46:52+00:00",
-      "sha": "3ee23dc",
-      "summary": "ci(obj#1): schedule the DLT monthly-flow puller so four collateral layers auto-refresh (#522)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-19T17:05:13+00:00",
-      "sha": "8dc5739",
-      "summary": "data: market-pulse swarm refresh (run 32273365168) (#521)",
-      "pillar": "market"
     }
   ]
 }
