@@ -180,9 +180,18 @@
    "cheapest_promo_effective": 14.11,
    "gap_pp": 1.16,
    "key": "SAWAD",
-   "n_quotes": 10,
+   "n_quotes": 11,
    "name_th": "ศรีสวัสดิ์ เงินสดทันใจ",
    "quotes": [
+    {
+     "channel": "google_ads",
+     "context_th": "เงินใช้ทันใจ ดอกเบี้ยเริ่มต้น 0.66% ต่อเดือน ผ่อนนานสู",
+     "effective_worst_case": 14.11,
+     "quoted": 0.66,
+     "read_as": "flat_at_54m",
+     "seen": "2026-08-05",
+     "unit": "pct_per_month"
+    },
     {
      "channel": "google_ads",
      "context_th": "เงินใช้ทันใจ ดอกเบี้ยเริ่มตัน 0.66% ต่อเดือน ผ่อนนานสู",
@@ -226,15 +235,6 @@
      "quoted": 1.0,
      "read_as": "flat_at_54m",
      "seen": "2024-02-06",
-     "unit": "pct_per_month"
-    },
-    {
-     "channel": "google_ads",
-     "context_th": "ม่ต้องโอนเล่ม ดอกเบียเริ่มตัน 1.00% ต่อเดือน ผ่อนชําระ",
-     "effective_worst_case": 20.53,
-     "quoted": 1.0,
-     "read_as": "flat_at_54m",
-     "seen": "2026-03-26",
      "unit": "pct_per_month"
     }
    ],
