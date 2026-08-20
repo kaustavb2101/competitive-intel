@@ -4048,7 +4048,7 @@ function drawRateDetail(){
       }
       const col={transfer:'โอนเล่ม — book transfers',no_transfer:'ไม่โอนเล่ม — borrower keeps it',
                  unstated:'not stated'}[r.collateral]||'—';
-      const cite=r.citation?` <a href="${r.citation}" target="_blank" rel="noopener" class="sub">source</a>`:'';
+      const cite=r.citation?` <a href="${r.citation}" target="_blank" rel="noopener" class="sub">source<span class="sr-only"> (opens in a new tab)</span></a>`:'';
       return `<tr><td><b>${r.operator}</b><div class="sub" style="font-size:11px">${r.source==='published'?'rate card':'advertised'+(r.last_seen?' · seen '+r.last_seen:'')}</div></td>
         <td class="sub">${r.variant||(r.n_ads?r.n_ads+' ad'+(r.n_ads>1?'s':''):'—')}</td>
         <td class="sub">${col}</td><td>${qs}</td><td>${es}</td>
