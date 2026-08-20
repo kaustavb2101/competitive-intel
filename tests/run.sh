@@ -630,6 +630,21 @@ INGESTS
     bad "mandate_guard.py (forbidden branch-expansion recommendation language is live — see report above)"
   fi
 
+  # provenance-honesty gate for the unverified GPP knowledge base: source-data/gpp_by_province.json
+  # looks like an official NESDC pull but only 1 of 77 provinces is CKAN-verified — the other 76 are
+  # round-number estimates. NEXT_STEPS §0a + the file's own meta.provenance: do NOT surface it as
+  # MEASURED until re-pulled per-province from NESDC's CKAN. That instruction lived only in prose and
+  # had NO gate guard, so it kept being hand-audited — and the file's official-looking self-label
+  # keeps fooling careful readers into proposing to project it (a 2026-08-20 negative-space audit
+  # recommended exactly build_gpp_backdrop.py -> platform/data as MEASURED). This locks it in: while
+  # the file stays predominantly unverified, it FAILs if any pipeline builder but its writer reads it
+  # or any page fetches it. Self-lifting — a real per-province CKAN re-pull passes it automatically.
+  if python3 "$TESTS/unverified_gpp_guard.py"; then
+    ok "unverified_gpp_guard.py (unverified GPP knowledge base stays source-only, not surfaced as measured)"
+  else
+    bad "unverified_gpp_guard.py (the unverified GPP layer is being projected toward the app — see report above)"
+  fi
+
   # deploy-probe self-test: the SAME code path the nightly live site-health check runs (check_site_health.py),
   # but pointed at the local committed tree (--local platform, LocalFetcher = filesystem only, pure stdlib,
   # NO network). It asserts every deploy probe validator (_shape_*) still ACCEPTS its real committed payload,
