@@ -1644,7 +1644,7 @@ document.addEventListener('click',e=>{
 
    What changes is that opening one CLOSES the rest, and the closed panels hide their <summary> so
    the reader sees exactly one heading and one panel instead of several stacked headings. The chip
-   row above is the only control; it carries aria-selected so the active topic is announced.
+   row above is the only control; it carries aria-current so the active topic is announced.
    Printing overrides all of it (CSS restores every summary) — the export must still contain the
    whole tab, which is the promise the per-tab print made.
 
@@ -1679,7 +1679,9 @@ function showOvPanel(id,opt){
   if(nav) nav.querySelectorAll('[data-jump]').forEach(c=>{
     const on=c.dataset.jump===target;
     c.classList.toggle('on',on);
-    c.setAttribute('aria-selected',String(on));
+    // aria-current (a global attribute, valid on the <a> link role these chips carry — unlike
+    // aria-selected, which is only allowed on tab/option/row roles and was silently ignored by AT).
+    if(on) c.setAttribute('aria-current','true'); else c.removeAttribute('aria-current');
   });
   // Scroll to the CHIP ROW, not the panel: the switcher is the thing the reader is operating, and
   // leaving it off-screen after a switch strands them with no way back to the other topics.
@@ -1760,7 +1762,8 @@ function ovSubApply(sec,blocks,label){
   const nav=sec.querySelector(':scope > .ovsubnav');
   if(nav) nav.querySelectorAll('[data-ovsub]').forEach(c=>{
     const on=(c.dataset.ovsub||'')===(label||'');
-    c.classList.toggle('on',on); c.setAttribute('aria-selected',String(on));
+    c.classList.toggle('on',on);
+    if(on) c.setAttribute('aria-current','true'); else c.removeAttribute('aria-current');
   });
 }
 function ovSubInit(secId){
@@ -1784,8 +1787,8 @@ function ovSubInit(secId){
   let sel=OV_SUB[secId]||'';
   if(sel&&!blocks.some(b=>b.label===sel)) sel='';
   OV_SUB[secId]=sel;
-  nav.innerHTML=`<button type="button" class="chip" data-ovsub="" aria-selected="${!sel}">All</button>`
-    +blocks.map(b=>`<button type="button" class="chip" data-ovsub="${b.label.replace(/"/g,'&quot;')}" title="${b.full.replace(/"/g,'&quot;')}" aria-selected="${sel===b.label}">${b.label}</button>`).join('');
+  nav.innerHTML=`<button type="button" class="chip" data-ovsub=""${!sel?' aria-current="true"':''}>All</button>`
+    +blocks.map(b=>`<button type="button" class="chip" data-ovsub="${b.label.replace(/"/g,'&quot;')}" title="${b.full.replace(/"/g,'&quot;')}"${sel===b.label?' aria-current="true"':''}>${b.label}</button>`).join('');
   ovSubApply(sec,blocks,sel);
 }
 document.addEventListener('click',e=>{
