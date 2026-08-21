@@ -3496,6 +3496,50 @@ def _shape_occupation_income_individual(d):
     return None
 
 
+def _shape_regions(d):
+    # The province->region rollup that is the BACKBONE of the numbers-first Data Book
+    # (data.html) — the only unprobed layer among the 26 surfaced-but-unregistered
+    # reads that is BOTH load-bearing on a core exec surface (3 fetch sites) AND
+    # cannot self-heal (no workflow cron, no pull_swarm entry rebuilds regions.json,
+    # verified this run). data.html reads it into DATA and:
+    #   - DATA.national (an object rollup: .branches, .occ_income, ...) drives the
+    #     national header + occ-income block (data.html:270/632/685);
+    #   - DATA.regions (an array) drives the region cards, the region filter
+    #     (r.region===key, :630) and the province lookup that walks every region's
+    #     .provinces[].slug (:673) to resolve a slug to its summary + parent region.
+    # The loader THROWS on !r.ok (data.html:1004) and paints "Data book unavailable —
+    # could not load data/regions.json" (:1015); the failure is visible to a human who
+    # opens the Data Book, but the nightly site-health probe (which only fetches the
+    # registered DATA_FILES) never touched regions.json, so a truncated/404 CDN deploy
+    # of it broke the WHOLE Data Book with NO phone alert. This closes that blind spot.
+    # Asserts SHAPE not values — robust to any future rollup vintage.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    nat = d.get("national")
+    if not isinstance(nat, dict) or not nat:
+        return "missing/empty 'national' object (data.html national header + occ-income read)"
+    if not (isinstance(nat.get("branches"), (int, float)) and not isinstance(nat.get("branches"), bool)):
+        return "'national' carries no numeric 'branches' (the national rollup header read)"
+    regs = d.get("regions")
+    if not isinstance(regs, list) or not regs:
+        return "missing/empty 'regions' list (data.html region cards + region filter + province lookup)"
+    ok = False
+    for r in regs:
+        if not isinstance(r, dict):
+            continue
+        if not (isinstance(r.get("region"), str) and r.get("region")):
+            continue  # the r.region===key filter (data.html:630)
+        provs = r.get("provinces")
+        if not isinstance(provs, list) or not provs:
+            continue  # the r.provinces.forEach province walk (data.html:673)
+        if any(isinstance(p, dict) and isinstance(p.get("slug"), str) and p.get("slug") for p in provs):
+            ok = True
+            break
+    if not ok:
+        return "no 'regions' entry carries a string 'region' + non-empty 'provinces[]' with a string 'slug' (the region filter + slug->summary lookup)"
+    return None
+
+
 def _shape_live_board(d):
     # The "Live board" page (live.html, linked in the shared nav on every page) —
     # the service-freshness registry that shows every live feed's age against its
@@ -3683,6 +3727,11 @@ DATA_FILES = [
     # data-book omits the sub-line) with no phone alert, and NO cron/pull_swarm entry
     # rebuilds it, so a truncated deploy has no CI job to restore it. meta.absent ok.
     ("data/occupation_income_individual.json", _shape_occupation_income_individual, ".national[] individual_national + .provinces[prov][occ].individual_est (data-book + province per-person wage, obj #1; meta.absent ok)"),
+    # The province->region rollup that is the BACKBONE of the Data Book (data.html) —
+    # a core exec surface with 3 fetch sites that THROWS "Data book unavailable" on a
+    # truncated/404 deploy, yet was the one load-bearing surfaced read still absent
+    # from this registry and it cannot self-heal (no cron/pull_swarm rebuilds it).
+    ("data/regions.json", _shape_regions, ".national rollup object (numeric .branches) + .regions[] with string .region + .provinces[].slug (Data Book backbone: header, region filter, slug lookup)"),
     # The competition pillar's flagship exec layer (obj #2) — the per-province
     # peer board (AutoX next to each big-4 rival, per province) that powers the
     # Competition surface + the command-center thesis clause. Every default-route
