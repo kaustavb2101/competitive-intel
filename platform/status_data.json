@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-21T10:21:12+00:00",
-    "commit": "d580d1e"
+    "generated_at": "2026-08-21T16:22:03+00:00",
+    "commit": "d59fcf1"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-08-21T16:22:03+00:00",
+      "sha": "d59fcf1",
+      "summary": "service(audit): close the recurring lead-layer surface question + correct the \"cannot self-heal\" triage rationale",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-21T15:51:59+00:00",
+      "sha": "c5b3819",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-21, run 32499756109)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-21T14:20:10+00:00",
+      "sha": "d434d35",
+      "summary": "docs(progress): record ux-loop branch-explorer #status live-region ship (PR #550, deploy-verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-21T21:17:03+07:00",
+      "sha": "bde0cb2",
+      "summary": "ux: announce branch-explorer #status toast to screen readers (role=status live region) (#550)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-21T13:14:31+00:00",
+      "sha": "3331595",
+      "summary": "data: SET listed-peer scoreboard refresh (run 32478047100) (#548)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-21T12:50:50+00:00",
+      "sha": "de13570",
+      "summary": "fix(honesty): badge the poirel National-map lens ESTIMATED, not MEASURED (#549)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-21T10:57:45+00:00",
+      "sha": "2487949",
+      "summary": "data: market-pulse swarm refresh (run 32470826086) (#547)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-21T10:21:38+00:00",
+      "sha": "04c47d6",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the regions.json shape-probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-21T10:21:12+00:00",
       "sha": "d580d1e",
       "summary": "health(deploy): shape-probe regions.json — Data Book backbone rollup that cannot self-heal",
@@ -663,54 +711,6 @@
       "sha": "43f2c00",
       "summary": "docs(progress): log ux-color-scheme-3dpages merge+deploy+verify (PR #538)",
       "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-21T03:37:07+07:00",
-      "sha": "a0cae79",
-      "summary": "ux: add color-scheme to the 3 deck.gl pages (native UA surfaces track theme) (#538)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-20T20:35:02+00:00",
-      "sha": "318c2b9",
-      "summary": "integration(obj#2): surface competitor census freshness on the Live board (#534)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-20T16:19:06+00:00",
-      "sha": "a1a3dcf",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the ev_exposure shape-probe ship",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-20T16:18:50+00:00",
-      "sha": "0f65d60",
-      "summary": "health(deploy): shape-probe ev_exposure.json — Overview 'ICE auto-parts jobs exposed' obj-#1 EV-workforce-exposure card",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-20T15:52:55+00:00",
-      "sha": "7fc1b20",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-20, run 32388573611)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-20T14:36:57+00:00",
-      "sha": "d74fcde",
-      "summary": "docs(progress): log ux-canonical-link merge+deploy+verify (PR #535)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-20T21:33:02+07:00",
-      "sha": "9e00db3",
-      "summary": "ux: add rel=canonical to every live page (#535)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-20T10:14:49+00:00",
-      "sha": "6dd57f9",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the labour_context probe ship",
-      "pillar": "feature"
     }
   ]
 }
