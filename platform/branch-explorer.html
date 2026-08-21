@@ -394,7 +394,7 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
   <button data-s="panel" aria-controls="panel" aria-expanded="false">☰ Info</button>
   <button data-s="ctl" aria-controls="ctl" aria-expanded="false">Layers</button>
 </div>
-<div id="status">Loading…</div>
+<div id="status" role="status" aria-live="polite" aria-atomic="true">Loading…</div>
 <script>
 'use strict';
 const Q = new URLSearchParams(location.search);
