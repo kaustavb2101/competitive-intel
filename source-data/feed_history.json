@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 396,
+  "n_points": 407,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -566,11 +566,12 @@
     "2026-08-17",
     "2026-08-18",
     "2026-08-19",
-    "2026-08-20"
+    "2026-08-20",
+    "2026-08-21"
    ],
    "first_seen": "2026-07-05",
    "label": "Rice (Hom Mali) - NABC farm-gate",
-   "n": 28,
+   "n": 29,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/tonne",
@@ -600,6 +601,7 @@
     17888.33,
     17888.33,
     17888.33,
+    17905.0,
     17905.0,
     17905.0,
     17905.0
@@ -635,11 +637,12 @@
     "2026-08-17",
     "2026-08-18",
     "2026-08-19",
-    "2026-08-20"
+    "2026-08-20",
+    "2026-08-21"
    ],
    "first_seen": "2026-07-05",
    "label": "Rubber (raw sheet) - NABC farm-gate",
-   "n": 28,
+   "n": 29,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/kg",
@@ -671,6 +674,7 @@
     80.88,
     81.03,
     81.14,
+    80.99,
     80.99
    ]
   },
@@ -738,7 +742,7 @@
     20.0,
     41.0,
     41.0,
-    37.0
+    32.0
    ]
   },
   "rain_max_mm": {
@@ -805,7 +809,7 @@
     130.0,
     398.5,
     355.0,
-    243.5
+    194.0
    ]
   },
   "rival_ads_live": {
@@ -817,11 +821,12 @@
     "2026-08-15",
     "2026-08-16",
     "2026-08-18",
-    "2026-08-19"
+    "2026-08-19",
+    "2026-08-20"
    ],
    "first_seen": "2026-07-30",
    "label": "Rival ad creatives running now",
-   "n": 7,
+   "n": 8,
    "path": "platform/data/rival_ads.json",
    "source": "Google Ads Transparency Center",
    "unit": "creatives",
@@ -832,6 +837,7 @@
     418.0,
     432.0,
     431.0,
+    433.0,
     433.0
    ]
   },
@@ -950,11 +956,12 @@
     "2026-08-16",
     "2026-08-17",
     "2026-08-18",
-    "2026-08-19"
+    "2026-08-19",
+    "2026-08-20"
    ],
    "first_seen": "2026-07-30",
    "label": "Rival YouTube brand channels · total views",
-   "n": 8,
+   "n": 9,
    "path": "platform/data/rival_youtube.json",
    "source": "YouTube Data API v3 (official) — public brand-channel statistics",
    "unit": "views",
@@ -966,7 +973,8 @@
     921719354.0,
     922124110.0,
     922571864.0,
-    923085061.0
+    923085061.0,
+    923728400.0
    ]
   },
   "search_share_autox": {
@@ -997,11 +1005,12 @@
     "2026-08-13",
     "2026-08-14",
     "2026-08-17",
-    "2026-08-18"
+    "2026-08-18",
+    "2026-08-19"
    ],
    "first_seen": "2026-07-17",
    "label": "MTC · market cap",
-   "n": 7,
+   "n": 8,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -1012,7 +1021,8 @@
     71.55,
     69.96,
     69.96,
-    69.43
+    69.43,
+    68.9
    ]
   },
   "set_mtc_pbv": {
@@ -1024,11 +1034,12 @@
     "2026-08-13",
     "2026-08-14",
     "2026-08-17",
-    "2026-08-18"
+    "2026-08-18",
+    "2026-08-19"
    ],
    "first_seen": "2026-07-17",
    "label": "MTC · price/book",
-   "n": 7,
+   "n": 8,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -1039,7 +1050,8 @@
     1.59,
     1.52,
     1.52,
-    1.51
+    1.51,
+    1.5
    ]
   },
   "set_sawad_mcap": {
@@ -1051,11 +1063,12 @@
     "2026-08-13",
     "2026-08-14",
     "2026-08-17",
-    "2026-08-18"
+    "2026-08-18",
+    "2026-08-19"
    ],
    "first_seen": "2026-07-17",
    "label": "SAWAD · market cap",
-   "n": 7,
+   "n": 8,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -1066,7 +1079,8 @@
     40.7069,
     39.2116,
     39.8762,
-    39.5439
+    39.5439,
+    39.2116
    ]
   },
   "set_sawad_pbv": {
@@ -1078,11 +1092,12 @@
     "2026-08-13",
     "2026-08-14",
     "2026-08-17",
-    "2026-08-18"
+    "2026-08-18",
+    "2026-08-19"
    ],
    "first_seen": "2026-07-17",
    "label": "SAWAD · price/book",
-   "n": 7,
+   "n": 8,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -1093,7 +1108,8 @@
     1.03,
     0.99,
     1.0,
-    1.0
+    1.0,
+    0.99
    ]
   },
   "set_tidlor_mcap": {
@@ -1105,11 +1121,12 @@
     "2026-08-13",
     "2026-08-14",
     "2026-08-17",
-    "2026-08-18"
+    "2026-08-18",
+    "2026-08-19"
    ],
    "first_seen": "2026-07-17",
    "label": "TIDLOR · market cap",
-   "n": 7,
+   "n": 8,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -1120,7 +1137,8 @@
     55.8914,
     54.7331,
     56.181,
-    56.181
+    56.181,
+    55.6018
    ]
   },
   "set_tidlor_pbv": {
@@ -1132,11 +1150,12 @@
     "2026-08-13",
     "2026-08-14",
     "2026-08-17",
-    "2026-08-18"
+    "2026-08-18",
+    "2026-08-19"
    ],
    "first_seen": "2026-07-17",
    "label": "TIDLOR · price/book",
-   "n": 7,
+   "n": 8,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -1147,7 +1166,8 @@
     1.55,
     1.55,
     1.59,
-    1.59
+    1.59,
+    1.57
    ]
   },
   "social_corpus_docs": {
@@ -1160,11 +1180,12 @@
     "2026-08-15",
     "2026-08-16",
     "2026-08-18",
-    "2026-08-19"
+    "2026-08-19",
+    "2026-08-20"
    ],
    "first_seen": "2026-08-07",
    "label": "Social-listening corpus · total demand documents",
-   "n": 8,
+   "n": 9,
    "path": "platform/data/social_themes.json",
    "source": "app-store reviews + YouTube comments + Pantip threads (build_social_themes.py)",
    "unit": "documents",
@@ -1176,7 +1197,8 @@
     12248.0,
     12289.0,
     12318.0,
-    12367.0
+    12367.0,
+    12392.0
    ]
   }
  }

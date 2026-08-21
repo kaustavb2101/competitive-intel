@@ -85,8 +85,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "7 observations from 2026-07-17, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 7,
+    "note": "8 observations from 2026-07-17, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 8,
     "series": "set_mtc_mcap"
    },
    "key": "peer_scoreboard",
@@ -185,8 +185,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "7 observations from 2026-07-30, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 7,
+    "note": "8 observations from 2026-07-30, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 8,
     "series": "rival_ads_live"
    },
    "key": "rival_ads",
@@ -288,11 +288,11 @@
    "label": "Rain gauges reporting",
    "measured": true,
    "source": "ThaiWater (api-v3.thaiwater.net /public/rain_24h) — live rain-gauge telemetry (DWR/TMD/EGAT networks). Keyless, cloud-reachable.",
-   "stamp": "2026-08-20",
-   "stamp_iso": "2026-08-20",
+   "stamp": "2026-08-21",
+   "stamp_iso": "2026-08-21",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4445,
+   "value": 4440,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -312,10 +312,10 @@
    "label": "River stations above high mark",
    "measured": true,
    "source": "ThaiWater (api-v3.thaiwater.net /public/waterlevel_load) — live river/reservoir water-level telemetry (RID/DWR networks). Keyless, cloud-reachable.",
-   "stamp": "2026-08-20",
-   "stamp_iso": "2026-08-20",
+   "stamp": "2026-08-21",
+   "stamp_iso": "2026-08-21",
    "stamp_kind": "pulled",
-   "unit": "of 799",
+   "unit": "of 800",
    "value": 146,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
@@ -508,7 +508,7 @@
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
   "history_note": "A trend line is drawn only where a stored series exists. 10 of 24 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 268,
+  "history_points": 270,
   "missing_files": [],
   "n_feeds": 24,
   "n_with_history": 10,
