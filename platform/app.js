@@ -596,22 +596,23 @@ function fuelStnRec(d){
 
 /* ---------- per-branch REPEATED-FLOOD HAZARD (data/flood_hazard.json) ----------
    Lazy-loads pipeline/build_flood_hazard.py's projection of the GISTDA Repeated-Flooding 2005-2016
-   census: {meta, by_province, by_district, branches:[freq,...]}, INDEX-ALIGNED to branches.json.
-   branches[i] = MAX flood_freq = the count of the 12 years 2005-2016 in which the branch's district
-   flooded (0 = not in the registry). MEASURED government hazard census; only the district name-match
+   census: {meta, by_province, by_district, branches:[freq,...], branches_last:[year,...]},
+   INDEX-ALIGNED to branches.json. branches[i] = MAX flood_freq = the count of the 12 years 2005-2016
+   in which the branch's district flooded (0 = not in the registry); branches_last[i] = the most
+   recent of those years (recency, 0 = no record). MEASURED government hazard census; only the district name-match
    is inferred (unresolved districts are all zero-branch, so no branch loses a real flag). Immune to
    the per-event polygon overlap that makes area totals unreliable — no flooded AREA is claimed.
    Distinct from thaiwater_flood.json's LIVE water-level pulse — this is the STRUCTURAL hazard.
    Fully null-guarded: absent file → FLOODHZ stays null, floodHzRec() reads null, the popup line is
    omitted. Nothing is fabricated. */
-let FLOODHZ=null, floodhzMeta=null, floodhzLoaded=false, floodhzPromise=null;
+let FLOODHZ=null, FLOODHZ_LAST=null, floodhzMeta=null, floodhzLoaded=false, floodhzPromise=null;
 async function loadFloodHazard(){
   if(floodhzPromise) return floodhzPromise;
   floodhzLoaded=true;
   floodhzPromise=(async()=>{
     try{ const r=await fetch('data/flood_hazard.json'); if(!r.ok){FLOODHZ=null;return FLOODHZ;}
-      const j=await r.json(); floodhzMeta=j.meta||null; FLOODHZ=j.branches||null; }
-    catch(e){ FLOODHZ=null; floodhzMeta=null; }
+      const j=await r.json(); floodhzMeta=j.meta||null; FLOODHZ=j.branches||null; FLOODHZ_LAST=j.branches_last||null; }
+    catch(e){ FLOODHZ=null; FLOODHZ_LAST=null; floodhzMeta=null; }
     return FLOODHZ;
   })();
   return floodhzPromise;
@@ -621,6 +622,13 @@ function floodHzRec(d){
   if(!FLOODHZ||!FLOODHZ.length||!DATA) return null;
   const i=idxOf(d); if(i<0) return null;
   const f=FLOODHZ[i]; return (f==null)?null:f;
+}
+// per-branch most-recent flood year WITHIN the 2005-16 census (recency) — null when absent, 0 = no
+// record, else 2005-2016. Older/absent branches_last arrays degrade to null (no recency shown).
+function floodHzLastRec(d){
+  if(!FLOODHZ_LAST||!FLOODHZ_LAST.length||!DATA) return null;
+  const i=idxOf(d); if(i<0) return null;
+  const y=FLOODHZ_LAST[i]; return (y==null||y===0)?null:y;
 }
 
 /* ---------- per-branch MEASURED-corrected CROP-AREA within 10km (data/branch_cropland.json) ----
@@ -8615,8 +8623,12 @@ function floodHzPopupHTML(d,r){
   const f=floodHzRec(d); if(f==null) return '';
   const lab=f>=10?'chronic':f>=7?'frequent':f>=4?'recurrent':f>=1?'occasional':'none on record';
   const col=f>=10?'var(--agri)':f>=7?'#cda23e':f>=4?'var(--gold)':f>=1?'#8b90a7':'var(--mid)';
+  // recency within the 2005-16 record: last flood year — a de-risking (older) vs still-active
+  // (through 2016) signal on the same measured census. Omitted when the array is absent (older deploy).
+  const ly=floodHzLastRec(d);
+  const lyStr=(f>=1&&ly)?` · last ${ly}`:'';
   return r('Repeat-flood yrs (GISTDA 2005–16) · measured',
-    `${f}<span class="sub">/12 (${lab})</span>`, col);
+    `${f}<span class="sub">/12 (${lab})${lyStr}</span>`, col);
 }
 // Collateral-mix block for a branch popup — the MEASURED DLT split of the province vehicle stock.
 // Motorcycle share is highlighted as the highest-volatility / lowest-recovery title collateral.

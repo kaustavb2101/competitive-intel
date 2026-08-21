@@ -2216,7 +2216,8 @@ def _shape_flood_hazard(d):
     # exposure screen with no phone alert, the same "broken demo" blind spot the
     # collateral_book / macro_book / farm_book obj-#1 probes closed for their siblings,
     # and it was the audit's own flagged "next probe target" after farm_book. Asserts
-    # the render contract — a full-length 2015-branch index-aligned 0-12 array + the
+    # the render contract — a full-length 2015-branch index-aligned 0-12 array, the
+    # index-aligned branches_last recency array the map-popup "· last YYYY" reads, + the
     # meta header keys — as SHAPE not values, robust to a future GISTDA-vintage refresh
     # moving the frequencies.
     if not isinstance(d, dict):
@@ -2231,6 +2232,20 @@ def _shape_flood_hazard(d):
         return "no branch carries a numeric flood frequency (FLOODHZ[i] band-tally read)"
     if min(ints) < 0 or max(ints) > 12:
         return "flood frequency out of the 0-12 census range (min %d, max %d)" % (min(ints), max(ints))
+    # recency companion (branches_last, index-aligned) — the map-popup "· last YYYY" read
+    # (floodHzLastRec). SHAPE not values: a full-length int array, nonzero years in 2005-2016,
+    # and freq>0 <=> last>0 (a flagged branch must carry a recency, an unflagged one must not).
+    last = d.get("branches_last")
+    if not isinstance(last, list) or len(last) != 2015:
+        return "missing/short 'branches_last' recency array (floodHzLastRec popup read)"
+    yrs = [y for y in last if isinstance(y, int) and not isinstance(y, bool) and y != 0]
+    if not yrs:
+        return "no branch carries a last_flood_year (floodHzLastRec '· last YYYY' read)"
+    if min(yrs) < 2005 or max(yrs) > 2016:
+        return "last_flood_year out of the 2005-2016 census window (min %d, max %d)" % (min(yrs), max(yrs))
+    if any((recs[i] > 0) != (last[i] > 0) for i in range(2015)
+           if isinstance(recs[i], int) and isinstance(last[i], int)):
+        return "branches_last is not consistent with branches (freq>0 must carry a recency year)"
     meta = d.get("meta")
     if not isinstance(meta, dict):
         return "missing 'meta' object (header citation render read)"
@@ -3905,7 +3920,7 @@ DATA_FILES = [
     # same blind spot the collateral_book / macro_book / farm_book probes closed for
     # the sibling obj-#1 reads. Asserts the index-aligned array shape + the meta header
     # citation keys, not values.
-    ("data/flood_hazard.json", _shape_flood_hazard, ".branches 0-12 array of 2015 (index-aligned) + meta.source/data_vintage (Exposure flood-hazard panel)"),
+    ("data/flood_hazard.json", _shape_flood_hazard, ".branches 0-12 array of 2015 + .branches_last recency (index-aligned) + meta.source/data_vintage (Exposure flood-hazard panel + map-popup recency)"),
     # The per-region density x service JOIN (rival_threat_region.json, obj #2) — the
     # last surfaced FRONT-DOOR competitive read with no deploy probe. It renders on
     # the command-center "Where the network is hardest to defend" card (renderHomeDefend)
