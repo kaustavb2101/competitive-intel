@@ -46,6 +46,14 @@
 #             weaken the site's protection for anyone else.
 #         (b) an SSO-exempt custom domain (deploymentType all_except_custom_domains).
 # Either way the nightly probe never fires a false alarm just because it is gated.
+#
+# PUBLIC-ALIAS DEEP-CHECK FALLBACK (default on): the canonical master alias is
+# behind Vercel Authentication, so the deep page + data checks would SKIP every
+# night. But the SAME build is also served through a public, SSO-exempt alias
+# (the URL the owner shares — PUBLIC_PROD_ALIAS below / --public-url /
+# PUBLIC_BASE_URL). When the primary alias is auth-gated, the probe runs the full
+# deep checks against that public alias instead of skipping them — restoring
+# nightly deep coverage with NO bypass secret. Pass --public-url "" to disable.
 
 import argparse
 import base64
@@ -64,6 +72,13 @@ import urllib.request
 MAX_BYTES = 100 * 1024 * 1024  # 100 MB
 HTTP_TIMEOUT = 60  # seconds per fetch
 USER_AGENT = "autox-site-health/1.0 (+github-actions nightly probe)"
+
+# The SSO-exempt PUBLIC production alias (the URL the owner actually shares — see
+# CLAUDE.md). The canonical master alias sits behind Vercel Authentication, which
+# would otherwise force the deep page + data checks to SKIP every night. This
+# alias serves the SAME build with no auth wall, so the probe deep-checks it as a
+# fallback. Overridable via --public-url / PUBLIC_BASE_URL.
+PUBLIC_PROD_ALIAS = "https://competitive-intel-blue.vercel.app"
 
 # The four user-facing entry pages; each must serve 200 and carry the wordmark.
 PAGES = [
@@ -4415,59 +4430,12 @@ def run_r2_catchment_checks(record, opener=None):
 
 
 # ---------------------------------------------------------------------------
-def run_checks(fetcher):
-    """Run every check through the given fetcher. Returns a list of dicts:
-    {name, ok, detail}. Same code path for HTTP and local."""
-    results = []
-
-    def record(name, ok, detail=""):
-        results.append({"name": name, "ok": bool(ok), "detail": detail})
-
-    # Pre-flight: distinguish "site up + correctly access-protected" from a real
-    # breakage. A protected alias that answers a credential-less probe with a 401
-    # (basic auth) OR a redirect to Vercel's SSO login is HEALTHY — report it and
-    # skip the deep checks rather than firing a false alarm. (LocalFetcher never
-    # raises AuthGated; for the basic-auth gate, supplying SITE_PASSWORD
-    # authenticates past this and runs the full suite — an SSO gate cannot be
-    # passed from CI at all.)
-    try:
-        fetcher.fetch(PAGES[0])
-    except AuthGated as e:
-        detail = str(e)
-        record("live site is up and access-protected (auth-gated)", True, detail)
-        if "SSO" in detail:
-            # Vercel Authentication (SSO): a Basic-Auth password cannot satisfy it,
-            # but Vercel's Protection-Bypass-for-Automation secret CAN. Deep checks
-            # are correctly SKIPPED (not failed) — the healthy up-and-protected state
-            # — and we name the CI unlock so the owner can restore deep production
-            # coverage without weakening the site's protection.
-            record("deep page/data checks", True,
-                   "SKIPPED — deployment is behind Vercel Authentication (SSO). Site "
-                   "is up + protected. To restore deep production checks from CI, add "
-                   "the project's VERCEL_AUTOMATION_BYPASS_SECRET as a repo secret "
-                   "(Protection Bypass for Automation) — or expose an SSO-exempt "
-                   "custom domain / turn off Vercel Authentication for this alias.")
-        elif getattr(fetcher, "password", ""):
-            # A credential was supplied but the deployment rejected it. The site is
-            # healthy; the probe simply cannot see past the gate. Skip (not fail) the
-            # deep checks and say exactly how to unlock them — align the CI
-            # SITE_PASSWORD secret with the deployment's own SITE_PASSWORD.
-            record("deep page/data checks", True,
-                   "SKIPPED — the supplied SITE_PASSWORD was rejected by the deployment "
-                   "(probe-credential mismatch, not a site outage); align the CI "
-                   "SITE_PASSWORD secret with the deployment's to run the full page + "
-                   "data validation")
-        else:
-            record("deep page/data checks", True,
-                   "SKIPPED — set the SITE_PASSWORD secret so the nightly probe can "
-                   "authenticate and validate pages + data against the protected alias")
-        # R2 is a DIFFERENT origin than the auth-gated alias, so probe it even when
-        # the deployment's own pages are behind the SSO/Basic-Auth wall — an R2
-        # outage breaks the 74 R2-only 3D scenes regardless of the alias gate.
-        run_r2_catchment_checks(record)
-        return results
-    except RuntimeError:
-        pass  # a genuine fetch failure is reported in detail by the loops below.
+def run_deep_checks(fetcher, record):
+    """The deep validation — pages (200 + wordmark), data files (parse + shape),
+    and, live only, data freshness + the R2 catchment store. Runs against
+    whichever fetcher is handed in: normally the primary deployment, but the
+    PUBLIC production alias when the primary is auth-gated (both serve the same
+    build, so the checks are identical either way)."""
 
     def fetch_common(rel):
         """Fetch + the checks every asset shares (non-empty, under size cap).
@@ -4519,14 +4487,116 @@ def run_checks(fetcher):
         else:
             record("%s shape sane (%s)" % (rel, expect), True)
 
-    # --- data freshness (LIVE ONLY) ---
-    # Runs against the real deployment with a real clock; the deterministic
-    # --local gate path (LocalFetcher) skips it so the repo gate is unaffected.
+    # --- data freshness + R2 (LIVE ONLY) ---
+    # Run against the real deployment with a real clock; the deterministic
+    # --local gate path (LocalFetcher) skips them so the repo gate is unaffected.
     if isinstance(fetcher, HttpFetcher):
         run_freshness_checks(fetcher, time.time(), record)
         # R2 catchment-store liveness (own host, independent of the alias gate).
         run_r2_catchment_checks(record)
 
+
+def run_checks(fetcher, public_fetcher=None):
+    """Run every check through the given fetcher. Returns a list of dicts:
+    {name, ok, detail}. Same code path for HTTP and local.
+
+    public_fetcher (optional): an SSO-exempt PUBLIC production alias serving the
+    same deployment. When the primary alias is auth-gated (SSO/Basic-Auth) the
+    deep checks are run against it instead of being skipped, so nightly deep
+    coverage survives Vercel Authentication on the canonical alias — no bypass
+    secret required."""
+    results = []
+
+    def record(name, ok, detail=""):
+        results.append({"name": name, "ok": bool(ok), "detail": detail})
+
+    # Pre-flight: distinguish "site up + correctly access-protected" from a real
+    # breakage. A protected alias that answers a credential-less probe with a 401
+    # (basic auth) OR a redirect to Vercel's SSO login is HEALTHY — report it and
+    # (unless a public fallback can serve the same build) skip the deep checks
+    # rather than firing a false alarm. (LocalFetcher never raises AuthGated; for
+    # the basic-auth gate, supplying SITE_PASSWORD authenticates past this and
+    # runs the full suite — an SSO gate cannot be passed from CI at all.)
+    try:
+        fetcher.fetch(PAGES[0])
+    except AuthGated as e:
+        detail = str(e)
+        record("live site is up and access-protected (auth-gated)", True, detail)
+        # Before skipping the deep checks, try the PUBLIC production alias — it
+        # serves the SAME deployment through an SSO-exempt custom domain, so the
+        # full page + data validation still runs there without any bypass secret.
+        # This is what keeps nightly deep coverage from going dark whenever the
+        # canonical alias sits behind Vercel Authentication.
+        if public_fetcher is not None:
+            deep_ok = False
+            try:
+                public_fetcher.fetch(PAGES[0])
+                deep_ok = True
+            except AuthGated as pe:
+                record("deep page/data checks", True,
+                       "SKIPPED — primary alias is auth-gated and the public "
+                       "fallback alias (%s) is ALSO access-protected (%s). Point "
+                       "--public-url / PUBLIC_BASE_URL at an SSO-exempt production "
+                       "alias, or set VERCEL_AUTOMATION_BYPASS_SECRET, to restore "
+                       "deep coverage." % (public_fetcher.target, pe))
+            except RuntimeError as pe:
+                record("deep page/data checks", True,
+                       "SKIPPED — primary alias is auth-gated and the public "
+                       "fallback alias (%s) was unreachable (%s). Deep checks need "
+                       "a reachable public alias or the "
+                       "VERCEL_AUTOMATION_BYPASS_SECRET."
+                       % (public_fetcher.target, pe))
+            if deep_ok:
+                record("deep page/data checks run against the public production "
+                       "alias", True,
+                       "primary alias is behind Vercel Authentication; the "
+                       "SSO-exempt public alias %s serves the same deployment, so "
+                       "the full page + data validation ran there instead of being "
+                       "skipped" % public_fetcher.target)
+                run_deep_checks(public_fetcher, record)
+                return results
+            # Public fallback unavailable: R2 is a DIFFERENT origin, still probe it.
+            run_r2_catchment_checks(record)
+            return results
+
+        # No public fallback configured — the original healthy-but-gated messaging.
+        if "SSO" in detail:
+            # Vercel Authentication (SSO): a Basic-Auth password cannot satisfy it,
+            # but Vercel's Protection-Bypass-for-Automation secret CAN. Deep checks
+            # are correctly SKIPPED (not failed) — the healthy up-and-protected state
+            # — and we name the CI unlock so the owner can restore deep production
+            # coverage without weakening the site's protection.
+            record("deep page/data checks", True,
+                   "SKIPPED — deployment is behind Vercel Authentication (SSO). Site "
+                   "is up + protected. To restore deep production checks from CI, add "
+                   "the project's VERCEL_AUTOMATION_BYPASS_SECRET as a repo secret "
+                   "(Protection Bypass for Automation), point --public-url at an "
+                   "SSO-exempt production alias, or turn off Vercel Authentication "
+                   "for this alias.")
+        elif getattr(fetcher, "password", ""):
+            # A credential was supplied but the deployment rejected it. The site is
+            # healthy; the probe simply cannot see past the gate. Skip (not fail) the
+            # deep checks and say exactly how to unlock them — align the CI
+            # SITE_PASSWORD secret with the deployment's own SITE_PASSWORD.
+            record("deep page/data checks", True,
+                   "SKIPPED — the supplied SITE_PASSWORD was rejected by the deployment "
+                   "(probe-credential mismatch, not a site outage); align the CI "
+                   "SITE_PASSWORD secret with the deployment's to run the full page + "
+                   "data validation")
+        else:
+            record("deep page/data checks", True,
+                   "SKIPPED — set the SITE_PASSWORD secret so the nightly probe can "
+                   "authenticate and validate pages + data against the protected alias")
+        # R2 is a DIFFERENT origin than the auth-gated alias, so probe it even when
+        # the deployment's own pages are behind the SSO/Basic-Auth wall — an R2
+        # outage breaks the 74 R2-only 3D scenes regardless of the alias gate.
+        run_r2_catchment_checks(record)
+        return results
+    except RuntimeError:
+        pass  # a genuine fetch failure is reported in detail by the loops below.
+
+    # Primary alias served the pre-flight page (public + not gated) — deep-check it.
+    run_deep_checks(fetcher, record)
     return results
 
 
@@ -4573,16 +4643,33 @@ def main(argv=None):
                          "past a Vercel Authentication (SSO) Deployment-Protection wall. "
                          "Falls back to the VERCEL_AUTOMATION_BYPASS_SECRET env var. "
                          "Omit and an SSO redirect is reported as healthy-but-gated.")
+    ap.add_argument("--public-url",
+                    default=os.environ.get("PUBLIC_BASE_URL", PUBLIC_PROD_ALIAS),
+                    help="SSO-exempt PUBLIC production alias serving the same deployment "
+                         "as --base-url. When the primary alias is auth-gated (Vercel "
+                         "Authentication / Basic Auth), the deep page + data checks run "
+                         "against this alias instead of being skipped — restoring nightly "
+                         "deep coverage with no bypass secret. Defaults to the documented "
+                         "production alias (%s) or the PUBLIC_BASE_URL env var. Pass an "
+                         "empty string to disable the fallback." % PUBLIC_PROD_ALIAS)
     ap.add_argument("--json", metavar="OUT",
                     help="also write a machine-readable report to this path")
     args = ap.parse_args(argv)
 
+    public_fetcher = None
     if args.base_url:
         fetcher = HttpFetcher(args.base_url, password=args.site_password,
                               bypass=args.bypass_token)
+        # A public fallback only helps a live HTTP probe, and only when it is a
+        # DIFFERENT origin than the primary alias (probing the same gated alias
+        # twice buys nothing). Absent / same-as-primary -> no fallback.
+        pub = (args.public_url or "").strip().rstrip("/")
+        if pub and pub != fetcher.base:
+            public_fetcher = HttpFetcher(pub, password=args.site_password,
+                                         bypass=args.bypass_token)
     else:
         fetcher = LocalFetcher(args.local)
-    results = run_checks(fetcher)
+    results = run_checks(fetcher, public_fetcher=public_fetcher)
     n_fail = print_report(results, fetcher.target)
 
     if args.json:
