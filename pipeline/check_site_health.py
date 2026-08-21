@@ -1260,6 +1260,46 @@ def _shape_occupation_risk(d):
     return None
 
 
+def _shape_amphoe_occupations(d):
+    # The MEASURED per-district borrower-base rollup (amphoe_occupations.json,
+    # obj #1) — Overture Places establishment points bucketed by occupation per
+    # amphoe. It renders the "Borrower base ◆ meas" column in the Exposure /
+    # district leaderboard (app.js: aoccHasData() gates the header; ampDomOcc /
+    # ampDomShare read AOCC.amphoe[a.id] per row → the dominant occupation the
+    # district would lend into, plus a concentration hint). A genuine deploy-
+    # health blind spot for the usual two reasons: (1) the client loader sets
+    # AOCC=null on any fetch/parse failure and aoccHasData() then goes false, so
+    # a truncated/404 CDN deploy silently DROPS the whole borrower-base column
+    # with NO phone alert (the leaderboard just falls back to the narrower
+    # layout); and (2) it CANNOT self-heal — build_amphoe_occupations.py rides
+    # NO cron and is in no pull_swarm registry, so nothing in CI restores a
+    # gutted deploy. Asserts the render contract (the buckets legend the label
+    # lookup reads + a sample amphoe entry carrying the numeric total and the
+    # bucket-aligned counts array the dominant/share math consumes) as SHAPE not
+    # values, robust to any future Overture Places vintage refresh.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    buckets = d.get("buckets")
+    if not isinstance(buckets, list) or not buckets:
+        return "missing/empty 'buckets' legend (client aoccHasData() gate + AOCC.buckets[idx] label read)"
+    b0 = buckets[0]
+    if not isinstance(b0, dict) or not isinstance(b0.get("key"), str) or not isinstance(b0.get("label"), str):
+        return "first bucket missing string 'key'/'label' (ampDomOcc reads b.label||occLabel(b.key))"
+    amphoe = d.get("amphoe")
+    if not isinstance(amphoe, dict) or not amphoe:
+        return "missing/empty 'amphoe' map (client aoccHasData() gate + AOCC.amphoe[a.id] row read)"
+    e0 = next(iter(amphoe.values()))
+    if not isinstance(e0, dict):
+        return "first amphoe entry is not an object"
+    if not isinstance(e0.get("t"), (int, float)) or isinstance(e0.get("t"), bool):
+        return "first amphoe entry missing numeric 't' total (ampDomShare denominator)"
+    o = e0.get("o")
+    if not isinstance(o, list) or len(o) != len(buckets):
+        return "first amphoe entry 'o' counts not aligned to buckets (len %s vs %d)" % (
+            (len(o) if isinstance(o, list) else "n/a"), len(buckets))
+    return None
+
+
 def _shape_province_pressure(d):
     # The cross-objective SYNTHESIS layer (province_pressure.json) — the
     # deterministic JOIN of portfolio risk (province_stress_index composite,
@@ -3901,6 +3941,7 @@ DATA_FILES = [
     ("data/branch_pico.json", _shape_branch_pico, "2015-branch index-aligned .branches with numeric pico/head/branch/recent (per-branch PICO-rival popup block, obj #2)"),
     ("data/branch_occupations.json", _shape_branch_occupations, ".buckets labels + 2015-branch index-aligned .branches with t/o[] (per-branch occupation-mix popup + #map estab lens, MEASURED)"),
     ("data/occupation_risk.json", _shape_occupation_risk, "2015-branch index-aligned .branches with numeric s/t + bool f (#map occupation-stress lens + per-branch 'Occupation × stress' popup, obj #1, ESTIMATED composite / MEASURED shares)"),
+    ("data/amphoe_occupations.json", _shape_amphoe_occupations, ".buckets legend + per-amphoe {t, o[] aligned to buckets} map (Exposure 'Borrower base ◆ meas' district-leaderboard column, obj #1, MEASURED Overture Places)"),
     ("data/branch_workforce.json", _shape_branch_workforce, ".buckets labels + 2015-branch index-aligned .branches with t/w[]/mix[] (per-branch workforce-mix popup, lead-by-occupation, ESTIMATED)"),
     ("data/branch_agri.json", _shape_branch_agri, ".meta.crops + 2015-branch index-aligned .branches with crop_ha/ha[]/sh[] (per-branch agri crop-exposure+stress popup, obj #1)"),
     ("data/branch_density.json", _shape_branch_density, "2015-branch index-aligned .branches with buildings_10km (per-branch building-density popup, MEASURED Overture ≤10km)"),
