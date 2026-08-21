@@ -871,6 +871,7 @@ function renderBranchBrowse(){
     h+='<p class="db-sub">Every one of the '+num(BR2.length)+' AutoX branches, with all measured features and the estimated lens scores. Sort any column, filter by region, search, or download. Click a branch for its full readout.</p>';
     h+='<div class="db-chiprow" id="brchips">'+regions.map(function(r){return '<button class="db-chip'+(r===brFilter?' on':'')+'" data-r="'+esc(r)+'">'+(r==='all'?'All 77':esc(r))+'</button>';}).join('')+'</div>';
     h+='<input class="search" id="brsearch" type="search" aria-label="Search branches by name, province, or district" placeholder="Search branch / province / district…" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" style="margin-bottom:10px" value="'+esc(brQuery)+'">';
+    h+='<div id="brsearchstatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>';
     h+='<button class="db-chip" id="brcsv" style="margin:0 0 12px">⬇ Download CSV</button>';
     h+='<div class="db-tblwrap"><table class="db-tbl" id="brtbl"><thead><tr>';
     BRCOLS.forEach(function(c,ci){h+='<th data-c="'+ci+'" tabindex="0" role="button">'+esc(c.t)+'</th>';});
@@ -903,8 +904,20 @@ function branchRows(){
     return brSort.dir*((a==null?-1:a)-(b==null?-1:b));});
   return rows;
 }
+var brLastStatus='';
+// Polite, query-aware result-count announcement for #brsearch (WCAG 4.1.3 Status Messages),
+// mirroring the SPA's setSearchStatus: silent on an empty query (tab-open / cleared box),
+// region-qualified when a region chip is active, guarded so a re-sort doesn't re-announce.
+function setBrStatus(n){
+  var el=document.getElementById('brsearchstatus'); if(!el)return;
+  var q=brQuery.trim(), msg='';
+  if(q){var reg=(brFilter&&brFilter!=='all')?(' in '+brFilter):'';
+    msg=n+' '+(n===1?'branch':'branches')+' match'+reg;}
+  if(msg===brLastStatus)return; brLastStatus=msg; el.textContent=msg;
+}
 function fillBranchBody(){
   var rows=branchRows(), body=document.getElementById('brbody'); if(!body)return;
+  setBrStatus(rows.length);
   document.querySelectorAll('#brtbl th').forEach(function(th){var c=+th.getAttribute('data-c');
     th.className=(c===brSort.c)?(brSort.dir>0?'sort-asc':'sort-desc'):'';});
   var out='';
