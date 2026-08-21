@@ -12,6 +12,11 @@ WHAT THE NUMBER MEANS (objective #1 — portfolio/collateral risk)
   A high value marks a district whose collateral (vehicles under title, borrower cash-flow from farm/
   shop ground) sits on repeatedly-inundated land — a chronic PD / recovery hazard on the network we
   already run. This is a MEASURED government hazard census, NOT an estimate.
+  last_flood_year = the most RECENT of those 12 years the district's ground flooded (2005-2016). The
+  recency companion to the frequency: a district that flooded 9/12 years but last in 2011 is
+  de-risking (nothing since, within the record), while one flooding through 2016 was a live hazard at
+  the end of the record. Both are MAX over the district's polygons (overlap-immune); recency is
+  bounded by the census window, so it is relative-within-2005-2016, never an absolute "years ago".
 
 HONEST SCOPE
   - MAX(flood_freq), never SUM(area): the GISTDA polygons OVERLAP (per-event, not dissolved), so any
@@ -26,9 +31,10 @@ INPUT  source-data/gistda_flood_hazard.json  (committed; re-pullable via pull_fl
        platform/data/amphoe.json              (928 canonical districts + branch_amphoe index)
        platform/data/branches.json            (identity/order for the fingerprint + per-branch join)
 OUTPUT platform/data/flood_hazard.json
-       { meta, by_province{prov:{maxfreq,n_chronic,n_districts}}, by_district{"prov|amphoe":freq},
-         branches:[freq,...] }  — branches[i] index-aligned to branches.json (0 = district not in the
-         repeated-flood registry).
+       { meta, by_province{prov:{maxfreq,n_chronic,n_districts,last_flood_year}},
+         by_district{"prov|amphoe":freq}, by_district_last{"prov|amphoe":year},
+         branches:[freq,...], branches_last:[year,...] }  — branches[i]/branches_last[i] both
+         index-aligned to branches.json (0 = district not in the repeated-flood registry).
 
 DETERMINISTIC + NETWORK-FREE. Carries --check; SKIP-passes (exit 3) when the committed source or an
 input layer is absent, same convention as build_branch_density.py / build_pico_district.py.
@@ -103,19 +109,23 @@ def build():
             d.setdefault(en.lower(), i)
 
     amp_freq = [0] * len(amp)          # amphoe-index -> max flood_freq (0 = not in registry)
+    amp_last = [0] * len(amp)          # amphoe-index -> most recent flood year (0 = not in registry)
     by_district = {}                    # "province_th|amphoe" -> freq
-    prov_roll = {}                      # canonical province_th -> [maxfreq, n_chronic, n_districts]
+    by_district_last = {}               # "province_th|amphoe" -> last_flood_year
+    prov_roll = {}                      # canonical province_th -> [maxfreq, n_chronic, n_districts, last]
     n_resolved = 0
     unresolved = []                     # (prov, ap_tn, ap_en, freq)
 
     for row in districts:
         prov = canonical((row.get("pv_tn") or "").strip())
         freq = int(row.get("maxfreq") or 0)
+        last = int(row.get("last") or 0)
         # province rollup uses the SOURCE directly (province match is exact for all rows), so it is
         # complete over all flood-affected provinces regardless of amphoe-name resolution.
-        pr = prov_roll.setdefault(prov, [0, 0, 0])
+        pr = prov_roll.setdefault(prov, [0, 0, 0, 0])
         pr[0] = max(pr[0], freq)
         pr[2] += 1
+        pr[3] = max(pr[3], last)
         if freq >= CHRONIC:
             pr[1] += 1
 
@@ -135,15 +145,19 @@ def build():
         n_resolved += 1
         # a district can appear once per group; keep the max defensively
         amp_freq[idx] = max(amp_freq[idx], freq)
+        amp_last[idx] = max(amp_last[idx], last)
         key = "%s|%s" % (amp[idx]["province_th"], amp[idx]["name"])
         by_district[key] = max(by_district.get(key, 0), freq)
+        by_district_last[key] = max(by_district_last.get(key, 0), last)
 
     # per-branch flag via the branch_amphoe index join
     branch_freq = [0] * n_branches
+    branch_last = [0] * n_branches
     if len(branch_amphoe) == n_branches:
         for i, ai in enumerate(branch_amphoe):
             if isinstance(ai, int) and 0 <= ai < len(amp_freq):
                 branch_freq[i] = amp_freq[ai]
+                branch_last[i] = amp_last[ai]
 
     # SAFETY: no unresolved district may carry a branch. Count branches whose amphoe is an
     # unresolved GISTDA district — must be zero, else the naming gap is dropping a real flag.
@@ -164,25 +178,35 @@ def build():
     n_branches_flagged = sum(1 for f in branch_freq if f > 0)
     n_branches_chronic = sum(1 for f in branch_freq if f >= CHRONIC)
 
-    by_province = {p: {"maxfreq": v[0], "n_chronic": v[1], "n_districts": v[2]}
+    by_province = {p: {"maxfreq": v[0], "n_chronic": v[1], "n_districts": v[2],
+                       "last_flood_year": v[3]}
                    for p, v in sorted(prov_roll.items())}
     by_district = {k: by_district[k] for k in sorted(by_district)}
+    by_district_last = {k: by_district_last[k] for k in sorted(by_district_last)}
     freq_hist = {}
     for f in branch_freq:
         freq_hist[f] = freq_hist.get(f, 0) + 1
+    # recency histogram over FLAGGED branches (last>0) — 0 (no record) tallied separately.
+    last_hist = {}
+    for y in branch_last:
+        last_hist[y] = last_hist.get(y, 0) + 1
 
     meta = {
         "generated_by": "build_flood_hazard.py",
         "label": ("MEASURED — repeated-flood hazard per district & branch: MAX flood_freq (count of "
-                  "the 12 years 2005-2016 a district's ground flooded), GISTDA 50k census."),
+                  "the 12 years 2005-2016 a district's ground flooded) + last_flood_year (the most "
+                  "recent of those years — recency), GISTDA 50k census."),
         "source": smeta.get("source", ""),
         "service": smeta.get("service", ""),
         "data_vintage": smeta.get("data_vintage", ""),
         "pulled": smeta.get("pulled", ""),
-        "method": ("Server-side MAX(flood_freq) per district (immune to the per-event polygon "
-                   "overlap that makes area totals unreliable — no flooded AREA is claimed). Joined "
-                   "onto amphoe.json (Thai name first, English name fallback); per-branch flag via "
-                   "amphoe.json branch_amphoe index. flood_freq 1-12; chronic band = >=%d." % CHRONIC),
+        "method": ("Server-side MAX(flood_freq) AND MAX(year2005..year2016) per district (both immune "
+                   "to the per-event polygon overlap that makes area totals unreliable — no flooded "
+                   "AREA is claimed). last_flood_year = the most recent of the 12 years the district "
+                   "flooded (each yearNNNN is a 0/1 annual flag whose per-polygon count == flood_freq). "
+                   "Joined onto amphoe.json (Thai name first, English name fallback); per-branch flag "
+                   "+ recency via amphoe.json branch_amphoe index. flood_freq 1-12; chronic band = "
+                   ">=%d; last_flood_year in 2005-2016." % CHRONIC),
         "chronic_threshold": CHRONIC,
         "bands": [lab for _lo, lab in BANDS],
         "caveats": [
@@ -190,6 +214,8 @@ def build():
             "every unresolved district is tallied honestly below (all are zero-branch amphoe).",
             "flood_freq is a 2005-2016 STRUCTURAL hazard (does the ground repeatedly flood), distinct "
             "from thaiwater_flood.json's LIVE water-level pulse (is it flooding right now).",
+            "last_flood_year is recency WITHIN the 2005-2016 census window (bounded at 2016), a "
+            "relative de-risking / still-active signal — NOT an absolute 'years since last flood'.",
         ],
         "n_districts_flooded": len(districts),
         "n_resolved": n_resolved,
@@ -198,7 +224,9 @@ def build():
         "n_branches": n_branches,
         "n_branches_flagged": n_branches_flagged,
         "n_branches_chronic": n_branches_chronic,
+        "n_branches_last_2016": sum(1 for y in branch_last if y == 2016),
         "branch_freq_hist": {str(k): freq_hist[k] for k in sorted(freq_hist)},
+        "branch_last_hist": {str(k): last_hist[k] for k in sorted(last_hist)},
         "branches_fingerprint": branches_fingerprint(branches),
         "index_aligned_to": "branches.json (record i == branch i)",
     }
@@ -209,7 +237,8 @@ def build():
         ]
 
     return {"meta": meta, "by_province": by_province, "by_district": by_district,
-            "branches": branch_freq}
+            "by_district_last": by_district_last, "branches": branch_freq,
+            "branches_last": branch_last}
 
 
 def main():
