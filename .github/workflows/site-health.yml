@@ -60,9 +60,12 @@ jobs:
           #     Protection-Bypass-for-Automation secret (VERCEL_AUTOMATION_BYPASS_SECRET),
           #     which the probe sends as the x-vercel-protection-bypass header.
           # As of 2026-08-16 the alias is behind Vercel SSO (ssoProtection enabled,
-          # all_except_custom_domains), so VERCEL_AUTOMATION_BYPASS_SECRET is the one
-          # that restores deep production coverage. Both are optional: without them the
-          # probe reports the site as up + protected, deep checks skipped.
+          # all_except_custom_domains). The deep checks no longer go dark because of
+          # that: the checker falls back to the SSO-EXEMPT PUBLIC production alias
+          # (competitor-intel-blue.vercel.app, the URL the owner shares — baked in as
+          # PUBLIC_PROD_ALIAS, override via PUBLIC_BASE_URL) and runs the full page +
+          # data validation there, no secret needed. VERCEL_AUTOMATION_BYPASS_SECRET
+          # still works to deep-probe the master alias directly; both are optional.
           SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
