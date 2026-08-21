@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-21T16:22:03+00:00",
-    "commit": "d59fcf1"
+    "generated_at": "2026-08-21T22:28:24+00:00",
+    "commit": "711d227"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-08-21T22:28:24+00:00",
+      "sha": "711d227",
+      "summary": "health(deploy): deep-check the public alias when the master alias is SSO-gated",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-21T21:44:52+00:00",
+      "sha": "a626d76",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-21, run 32529824680)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-21T20:19:14+00:00",
+      "sha": "74cc41d",
+      "summary": "docs(progress): log ux-databook-search-results-status merge+deploy+verify (PR #554)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-22T03:14:34+07:00",
+      "sha": "419c1b4",
+      "summary": "ux: announce data-book #brsearch result count to screen readers (role=status live region) (#554)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-21T20:07:47+00:00",
+      "sha": "82f338f",
+      "summary": "data: Thai-IP-only swarm refresh (run 32519485252) (#553)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-21T19:03:51+00:00",
+      "sha": "e55dd56",
+      "summary": "data: advance World Bank Pink Sheet commodity board 2026M06 -> 2026M07 (#552)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-21T17:01:33+00:00",
+      "sha": "a8e6e8f",
+      "summary": "data: market-pulse swarm refresh (run 32500739825) (#551)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-21T16:22:33+00:00",
+      "sha": "c85b76d",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the lead-layer service-audit close-out",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-21T16:22:03+00:00",
       "sha": "d59fcf1",
       "summary": "service(audit): close the recurring lead-layer surface question + correct the \"cannot self-heal\" triage rationale",
@@ -663,54 +711,6 @@
       "sha": "09f7a8c",
       "summary": "data: market-pulse swarm refresh (run 32356990537) (#532)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-21T00:17:21+00:00",
-      "sha": "956bd0c",
-      "summary": "health(deploy): shape-probe amphoe_occupations.json — Exposure \"Borrower base\" column that cannot self-heal",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-20T23:56:32+00:00",
-      "sha": "ad4c91b",
-      "summary": "data: SET listed-peer scoreboard refresh (run 32364769355) (#533)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-20T23:31:27+00:00",
-      "sha": "8fbd765",
-      "summary": "data: rival Facebook promo feed refresh (run 32424007191) (#541)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-21T05:43:17+07:00",
-      "sha": "e2379bd",
-      "summary": "health(deploy): shape-probe occupation_risk.json — per-branch occupation-stress read that cannot self-heal (#540)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-20T22:37:36+00:00",
-      "sha": "8a174b1",
-      "summary": "data: market-pulse swarm refresh (run 32421770540) (#539)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-20T21:50:01+00:00",
-      "sha": "922f56e",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-20, run 32421205288)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-20T21:22:10+00:00",
-      "sha": "e5a2254",
-      "summary": "data: Thai-IP-only swarm refresh (run 32410463987) (#537)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-20T20:40:43+00:00",
-      "sha": "43f2c00",
-      "summary": "docs(progress): log ux-color-scheme-3dpages merge+deploy+verify (PR #538)",
-      "pillar": "3d-enrichment"
     }
   ]
 }
