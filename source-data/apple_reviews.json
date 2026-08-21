@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-08-20",
+  "pulled_at": "2026-08-21",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -5363,10 +5363,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 1.5,
-    "ratings": 2,
-    "score_current_version": 1.5,
-    "ratings_current_version": 2,
+    "score": 2.25,
+    "ratings": 4,
+    "score_current_version": 2.25,
+    "ratings_current_version": 4,
     "version": "1.12.0",
     "app_updated": "2026-08-10",
     "released": "2025-01-09",
@@ -5657,16 +5657,25 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.46619,
-    "ratings": 562,
-    "score_current_version": 3.46619,
-    "ratings_current_version": 562,
+    "score": 3.46277,
+    "ratings": 564,
+    "score_current_version": 3.46277,
+    "ratings_current_version": 564,
     "version": "1.0.45",
     "app_updated": "2026-08-17",
     "released": "2024-07-09",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14450497897",
+     "at": null,
+     "score": 1,
+     "title": "แสกนหน้า",
+     "content": "บอกหน้าไม่ตรงกับบัตร งงมาก",
+     "version": "1.0.45",
+     "votes": 0
+    },
     {
      "id": "14438770189",
      "at": null,
@@ -7330,7 +7339,7 @@
      "title": "ช่วยด้วย",
      "content": "ผมใช้ธนาคารอื่น สามารถใช้แอพนี้ได้ไหม",
      "version": "1.0.2",
-     "votes": 10
+     "votes": 11
     }
    ]
   },
@@ -7377,8 +7386,8 @@
     "ratings": 1577,
     "score_current_version": 3.38808,
     "ratings_current_version": 1577,
-    "version": "8.5.0",
-    "app_updated": "2026-07-17",
+    "version": "8.6.0",
+    "app_updated": "2026-08-21",
     "released": "2020-03-03",
     "genre": "Lifestyle"
    },
@@ -10454,10 +10463,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.82413,
-    "ratings": 172919,
-    "score_current_version": 4.82413,
-    "ratings_current_version": 172919,
+    "score": 4.82412,
+    "ratings": 172960,
+    "score_current_version": 4.82412,
+    "ratings_current_version": 172960,
     "version": "3.0.6",
     "app_updated": "2026-08-06",
     "released": "2021-04-20",
@@ -15426,15 +15435,24 @@
    "own": false,
    "stats": {
     "score": 4.70383,
-    "ratings": 63705,
+    "ratings": 63741,
     "score_current_version": 4.70383,
-    "ratings_current_version": 63705,
+    "ratings_current_version": 63741,
     "version": "7.6.0",
     "app_updated": "2026-08-19",
     "released": "2021-10-10",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14451289798",
+     "at": null,
+     "score": 5,
+     "title": "ดีค่ะ",
+     "content": "อนุมัติไวแต่วงเงินไม่เยอะเท่าไร ผ่อนนานดี",
+     "version": "7.6.0",
+     "votes": 0
+    },
     {
      "id": "14442110967",
      "at": null,
@@ -20072,16 +20090,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84422,
-    "ratings": 43734,
-    "score_current_version": 4.84422,
-    "ratings_current_version": 43734,
+    "score": 4.84442,
+    "ratings": 43811,
+    "score_current_version": 4.84442,
+    "ratings_current_version": 43811,
     "version": "3.1.1",
     "app_updated": "2026-05-25",
     "released": "2023-03-06",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14450518427",
+     "at": null,
+     "score": 5,
+     "title": "สิรเชื่อส่วนบุคคล",
+     "content": "บริการดีมากค่ะ",
+     "version": "3.1.1",
+     "votes": 0
+    },
     {
      "id": "14438411412",
      "at": null,
@@ -24800,10 +24827,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.76992,
-    "ratings": 26801,
-    "score_current_version": 4.76992,
-    "ratings_current_version": 26801,
+    "score": 4.76989,
+    "ratings": 26818,
+    "score_current_version": 4.76989,
+    "ratings_current_version": 26818,
     "version": "1.8.7",
     "app_updated": "2026-08-07",
     "released": "2020-08-05",
@@ -26222,6 +26249,15 @@
      "content": "Superb!!!",
      "version": "1.0.5",
      "votes": 11
+    },
+    {
+     "id": "14446097371",
+     "at": null,
+     "score": 1,
+     "title": "ไม่ผ่าน",
+     "content": "ข้าพเจ้าขอแจ้งให้ทราบว่าไม่อนุญาตให้มีการใช้เก็บรวบรวมประมวลผลหรือเปิดเผยข้อมูลบุคคลใดใดของข้าพเจ้าที่เกี่ยวข้องกับเลขบัตรประชาชนลงท้ายด้วย 2220 โดยเด็ดขาด รูปภาพ เบอร์โทรศัพท์ หรือข้อมูลอื่นๆ ทั้งสิ้นหากยังมีการนำข้อมูลไปใช้โดยไม่ได้ได้รับความยินยอมข้าพเจ้าจะดำเนินคดีตามกฏหมายที่เกี่ยวข้องรวมถึงกฎหมายคุ้มครองข้อมูลส่วนบุคคลPDPA)จนถึงที่สุดโดยไม่แจ้งให้ทราบล่วงหน้าและข้าพเจ้ามีการแจ้งความลงบันทึกป",
+     "version": "1.8.7",
+     "votes": 0
     },
     {
      "id": "14422665505",
@@ -28970,16 +29006,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.60797,
-    "ratings": 2084,
-    "score_current_version": 2.60797,
-    "ratings_current_version": 2084,
+    "score": 2.60642,
+    "ratings": 2086,
+    "score_current_version": 2.60642,
+    "ratings_current_version": 2086,
     "version": "3.4.0",
     "app_updated": "2026-08-20",
     "released": "2022-05-11",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14450607180",
+     "at": null,
+     "score": 1,
+     "title": "ยกเลิกๆ",
+     "content": "ยืนยันตัวตนปุ๊บแอปเข้าใช้งานไม่ได้เลย ห่วยแตกมากกกก\nข้าพเจ้า น.ส.ชนาภา โนราช เลขบัตรปชช.ลงท้าย 7624 ได้ทำการยืนยันตัวตนในแอป Rabbit Cash แต่ไม่สามารถเข้าใช้แอปได้",
+     "version": "3.4.0",
+     "votes": 0
+    },
     {
      "id": "14445705541",
      "at": null,
@@ -33689,9 +33734,9 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.55314,
+    "score": 2.55178,
     "ratings": 2945,
-    "score_current_version": 2.55314,
+    "score_current_version": 2.55178,
     "ratings_current_version": 2945,
     "version": "5.65",
     "app_updated": "2026-02-13",
@@ -33699,6 +33744,15 @@
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14450147925",
+     "at": null,
+     "score": 1,
+     "title": "สมัครไม่ผ่าน ขอให้ลบข้อมูล",
+     "content": "วันที่ 20/08/2026 เลข บปช ลงท้ายด้วย 5564 ได้ทำการสมัครสินเชื่อไปแต่ไม่ได้รับอนุมัติ ไม่อนุญาตให้ทางแอพเอาข้อมูลส่วนตัวนำไปใช้ ขอให้ลบข้อมูลการสมัครให้ด้วย หากตรวจเจอว่านำข้อมูลส่วนตัวมาเผยแพร่จะดำเนินคดีทางกฎหมาย",
+     "version": "5.65",
+     "votes": 0
+    },
     {
      "id": "14445245355",
      "at": null,

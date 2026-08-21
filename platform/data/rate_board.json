@@ -1,6 +1,6 @@
 {
  "meta": {
-  "asof_ads": "2026-08-20",
+  "asof_ads": "2026-08-21",
   "asof_card": "2026-08-16",
   "basis_note": "Every rate is restated to NOMINAL reducing-balance %/yr — monthly x 12, never compounded. That is AutoX's own accrual convention and the one Thai lenders publish (CIMB: '0.83% ต่อเดือน ... ลดต้นลดดอก 9.95% ต่อปี'; 0.83 x 12 = 9.96).",
   "cheapest_flat": {
@@ -21,7 +21,7 @@
   "n_ads_basis_stated": 2,
   "n_advertised": 10,
   "n_creatives_basis_stated": 7,
-  "n_creatives_scanned": 773,
+  "n_creatives_scanned": 775,
   "n_operators": 23,
   "n_published": 39,
   "n_rows": 49,
@@ -341,7 +341,7 @@
    "if_reducing": 5.52,
    "is_us": false,
    "key": "TIDLOR",
-   "last_seen": "2026-08-20",
+   "last_seen": "2026-08-21",
    "loan_type": "both",
    "ltv_pct": 160,
    "n_ads_basis_stated": 4,
@@ -649,7 +649,7 @@
    "if_reducing": 7.92,
    "is_us": false,
    "key": "SAWAD",
-   "last_seen": "2026-08-20",
+   "last_seen": "2026-08-21",
    "loan_type": "title_loan",
    "ltv_pct": null,
    "n_ads_basis_stated": 3,
@@ -2382,7 +2382,7 @@
    "variant": "รถยนต์ใหม่ (new)"
   },
   {
-   "asof": "2026-08-20",
+   "asof": "2026-08-21",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2392,7 +2392,7 @@
    "effective_if_reducing": null,
    "effective_note": null,
    "key": "SAWAD",
-   "last_seen": "2026-08-20",
+   "last_seen": "2026-08-21",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": null,
@@ -2420,7 +2420,7 @@
    "variant": null
   },
   {
-   "asof": "2026-08-20",
+   "asof": "2026-08-21",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2430,7 +2430,7 @@
    "effective_if_reducing": null,
    "effective_note": null,
    "key": "SAWAD",
-   "last_seen": "2026-08-20",
+   "last_seen": "2026-08-21",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": null,
@@ -2458,7 +2458,7 @@
    "variant": null
   },
   {
-   "asof": "2026-08-20",
+   "asof": "2026-08-21",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2468,7 +2468,7 @@
    "effective_if_reducing": 7.92,
    "effective_note": null,
    "key": "SAWAD",
-   "last_seen": "2026-08-20",
+   "last_seen": "2026-08-21",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": null,
@@ -2499,7 +2499,7 @@
    "variant": null
   },
   {
-   "asof": "2026-08-20",
+   "asof": "2026-08-21",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2509,7 +2509,7 @@
    "effective_if_reducing": 12.0,
    "effective_note": null,
    "key": "SAWAD",
-   "last_seen": "2026-08-20",
+   "last_seen": "2026-08-21",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": null,
@@ -2540,7 +2540,7 @@
    "variant": null
   },
   {
-   "asof": "2026-08-20",
+   "asof": "2026-08-21",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2550,7 +2550,7 @@
    "effective_if_reducing": 15.0,
    "effective_note": null,
    "key": "SAWAD",
-   "last_seen": "2026-08-20",
+   "last_seen": "2026-08-21",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": null,
@@ -2581,7 +2581,7 @@
    "variant": null
   },
   {
-   "asof": "2026-08-20",
+   "asof": "2026-08-21",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2591,7 +2591,7 @@
    "effective_if_reducing": 5.52,
    "effective_note": null,
    "key": "TIDLOR",
-   "last_seen": "2026-08-20",
+   "last_seen": "2026-08-21",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": 160,
@@ -2622,7 +2622,7 @@
    "variant": null
   },
   {
-   "asof": "2026-08-20",
+   "asof": "2026-08-21",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2632,7 +2632,7 @@
    "effective_if_reducing": null,
    "effective_note": null,
    "key": "TIDLOR",
-   "last_seen": "2026-08-20",
+   "last_seen": "2026-08-21",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": 160,
@@ -2660,7 +2660,7 @@
    "variant": null
   },
   {
-   "asof": "2026-08-20",
+   "asof": "2026-08-21",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2670,7 +2670,7 @@
    "effective_if_reducing": 10.0,
    "effective_note": null,
    "key": "TIDLOR",
-   "last_seen": "2026-08-20",
+   "last_seen": "2026-08-21",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": 160,
@@ -2698,7 +2698,7 @@
    "variant": null
   },
   {
-   "asof": "2026-08-19",
+   "asof": "2026-08-20",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2714,7 +2714,7 @@
    "effective_if_reducing": null,
    "effective_note": null,
    "key": "TIDLOR",
-   "last_seen": "2026-08-19",
+   "last_seen": "2026-08-20",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": 160,
@@ -2742,7 +2742,7 @@
    "variant": null
   },
   {
-   "asof": "2026-08-19",
+   "asof": "2026-08-20",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2758,7 +2758,7 @@
    "effective_if_reducing": null,
    "effective_note": null,
    "key": "TIDLOR",
-   "last_seen": "2026-08-19",
+   "last_seen": "2026-08-20",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": 160,
