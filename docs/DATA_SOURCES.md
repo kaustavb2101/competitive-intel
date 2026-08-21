@@ -26,19 +26,20 @@ registrations and DIW factories.
 - **Security:** it was exposed in chat — mark Sensitive in Vercel and **rotate it**. Don't hardcode it;
   read from env (`os.environ["DATA_GO_TH_TOKEN"]`).
 
-## World Bank Pink Sheet — current read (2026M06 prices)
-> Refreshed 2026-07-03 (commit `adf5494`); this section previously described the stale Dec-2025
-> vintage after the underlying `source-data/commodit*.json` had already moved to 2026M06 — keep this
-> block in sync with `platform/data/meta.json`'s `updated` field whenever the loop re-pulls.
-- **Crops mostly UP:** rice +17.9%, rubber +32.4%, palm +18.2%; sugar −13.5% (still down); maize +0.5% (flat).
-- **Protein/forestry mixed:** beef +11.8%, lamb +16.7%, fishmeal +27.1%; chicken −0.6% and sawnwood
-  −1.6% (flat/slightly down); logs 0.0% (flat). **Gold +26.1%** (matters to a title/gold-collateral
-  lender). Shrimp still stale (2023M10, −25.0% YoY — never refreshed; excluded from the board for that reason).
+## World Bank Pink Sheet — current read (2026M07 prices)
+> Refreshed 2026-08-21; the underlying `source-data/commodit*.json` moved 2026M06 → 2026M07 (this
+> block previously drifted to a stale Dec-2025 reading after an earlier refresh) — keep this block in
+> sync with `platform/data/meta.json`'s `updated` field whenever the loop re-pulls.
+- **Crops mostly UP:** rice +19.1%, rubber +24.7% (cooling off its +32% peak), palm +12.8%, maize
+  +11.1% (firmed from flat); sugar −8.1% (still down, but stress easing from −13.5%).
+- **Protein/forestry mixed:** beef +8.8%, lamb +19.9%, fishmeal +22.2%; chicken −2.8%, sawnwood
+  −1.0% and logs −2.2% (flat/slightly soft). **Gold +21.9%** (matters to a title/gold-collateral
+  lender; eased from +26.1% as spot pulled back MoM). Shrimp still stale (2023M10, −25.0% YoY — never refreshed; excluded from the board for that reason).
 - OAE Dec-2025 outlook: rice + rubber = 2026 RISK crops; cassava (Laos curbs → prices rise), palm,
   chicken, durian = firmer. *(This OAE outlook citation is independent of the Pink Sheet vintage above
   and has not been re-verified this cycle.)*
 - Pink Sheet URL: the loop scrapes the current month's link off the WB landing page each pull
-  (`pipeline/autox_enrich_loop.py`'s `pinksheet_url()`); last-known-good fallback hash (2026M06 vintage):
+  (`pipeline/autox_enrich_loop.py`'s `pinksheet_url()`); last-known-good fallback hash (2026M07 vintage):
   `https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx`
 
 ## Macro (current, citable — for the Overview panel)
