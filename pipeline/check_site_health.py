@@ -3434,6 +3434,53 @@ def _shape_occupation_income(d):
     return None
 
 
+def _shape_occupation_income_individual(d):
+    # The PER-PERSON (individual) income-by-occupation layer (obj #1) — the measured
+    # ILOSTAT national wage / ESTIMATED per-province companion to the household
+    # income floors above, surfaced on TWO routes:
+    #   - data.html occTable: reads OCCIND.provinces[<Thai prov>][<occ>].individual_est
+    #     to add the "Individual ~฿N/mo EST" line under each household figure;
+    #   - province.html: builds OCCIND_N off .national (keyed by .key, reads
+    #     .individual_national / .household_national_avg for the "the individual wage
+    #     is ~฿N, NOT the household figure below" answer line) and OCCIND_P off
+    #     .provinces[<Thai prov>] (reads .individual_est for the per-occupation line).
+    # Both loaders are r.ok?json():null + .catch-guarded and every reader is null-safe,
+    # so a truncated/404 CDN deploy SILENTLY drops the individual-wage read — the
+    # province answer line falls back to the household figure, the data-book omits the
+    # individual sub-line — with NO phone alert. It CANNOT self-heal: no workflow cron
+    # and no pull_swarm entry rebuilds occupation_income_individual.json (verified this
+    # run), so a gutted deploy has no CI job to restore it — the same blind spot the
+    # sme/factory/agri income-floor probes closed for their siblings. The builder emits
+    # {meta:{absent:true}} when the ILOSTAT/SES source is unavailable, which the app
+    # treats as "no data" by design, so meta.absent==true is HEALTHY; only a NON-absent
+    # file must carry the render shape. Asserts SHAPE not values — robust to a future
+    # ILOSTAT/SES vintage.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    if meta.get("absent") is True:
+        return None  # legitimately absent by design -> healthy; both readers degrade gracefully
+    nat = d.get("national")
+    if not isinstance(nat, list) or not nat:
+        return "missing/empty 'national' list (province.html OCCIND_N map + answer-line read)"
+    if not any(isinstance(n, dict) and isinstance(n.get("key"), str) and n.get("key")
+               and isinstance(n.get("individual_national"), (int, float)) and not isinstance(n.get("individual_national"), bool)
+               for n in nat):
+        return "no 'national' entry carries a string 'key' + numeric 'individual_national' (the answer-line wage read)"
+    provs = d.get("provinces")
+    if not isinstance(provs, dict) or not provs:
+        return "missing/empty 'provinces' map (data.html occTable + province.html OCCIND_P read)"
+    sample = next((v for v in provs.values() if isinstance(v, dict) and v), None)
+    if sample is None:
+        return "'provinces' map carries no populated occupation object"
+    if not any(isinstance(occ, dict) and isinstance(occ.get("individual_est"), (int, float))
+               and not isinstance(occ.get("individual_est"), bool) for occ in sample.values()):
+        return "sample province carries no occupation with a numeric 'individual_est' (the per-person wage render read)"
+    return None
+
+
 def _shape_live_board(d):
     # The "Live board" page (live.html, linked in the shared nav on every page) —
     # the service-freshness registry that shows every live feed's age against its
@@ -3612,6 +3659,15 @@ DATA_FILES = [
     ("data/agri_income_by_province.json", _shape_agri_income, "province-keyed .provinces w/ agri_income+ratio_to_national (#sim agri income floor, obj #1; meta.absent ok)"),
     ("data/sme_income_by_province.json", _shape_sme_income, "province-keyed .provinces w/ sme_income+ratio_to_national (#exposure merchant income floor, obj #1; meta.absent ok)"),
     ("data/occupation_income.json", _shape_occupation_income, ".categories worst-first list w/ label+national_avg+min_province+min_value (#home command-center lowest-paid-occupation floor, obj #1; meta.absent ok)"),
+    # The PER-PERSON companion to the income floors above (occupation_income_individual.json,
+    # obj #1, MEASURED ILOSTAT national / ESTIMATED province): the data-book occTable's
+    # "Individual ~฿N/mo EST" sub-line (.provinces[prov][occ].individual_est) and the
+    # province deep-dive's "individual wage, NOT the household figure below" answer line
+    # (.national[].individual_national + .provinces[prov][occ].individual_est). Both
+    # reads are null-guarded and degrade SILENTLY (province line falls back to household,
+    # data-book omits the sub-line) with no phone alert, and NO cron/pull_swarm entry
+    # rebuilds it, so a truncated deploy has no CI job to restore it. meta.absent ok.
+    ("data/occupation_income_individual.json", _shape_occupation_income_individual, ".national[] individual_national + .provinces[prov][occ].individual_est (data-book + province per-person wage, obj #1; meta.absent ok)"),
     # The competition pillar's flagship exec layer (obj #2) — the per-province
     # peer board (AutoX next to each big-4 rival, per province) that powers the
     # Competition surface + the command-center thesis clause. Every default-route

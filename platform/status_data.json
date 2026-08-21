@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-20T22:13:31+00:00",
-    "commit": "700be71"
+    "generated_at": "2026-08-21T04:20:45+00:00",
+    "commit": "1f7f193"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-20",
+    "eta_date": "2026-08-21",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,10 +533,70 @@
   ],
   "activity": [
     {
-      "date": "2026-08-20T22:13:31+00:00",
-      "sha": "700be71",
-      "summary": "health(deploy): shape-probe occupation_risk.json — per-branch occupation-stress lens+popup obj-#1 read that cannot self-heal",
+      "date": "2026-08-21T04:20:45+00:00",
+      "sha": "1f7f193",
+      "summary": "health(deploy): shape-probe occupation_income_individual.json — per-person occupation-wage read (data-book + province, obj #1) that cannot self-heal",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-21T04:07:07+00:00",
+      "sha": "22beb03",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-21, run 32445666090)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-21T03:19:30+00:00",
+      "sha": "0e9278a",
+      "summary": "data: NABC live prices (2026-08-21, run 32442664011)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-21T02:22:58+00:00",
+      "sha": "3bc8425",
+      "summary": "docs(progress): log ux-jumpnav-chip-aria-current merge+deploy+verify (PR #542)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-21T09:19:52+07:00",
+      "sha": "be2d4c0",
+      "summary": "ux: jump-nav chips use aria-current, not invalid aria-selected (#542)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-21T00:55:23+00:00",
+      "sha": "09f7a8c",
+      "summary": "data: market-pulse swarm refresh (run 32356990537) (#532)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-21T00:17:21+00:00",
+      "sha": "956bd0c",
+      "summary": "health(deploy): shape-probe amphoe_occupations.json — Exposure \"Borrower base\" column that cannot self-heal",
       "pillar": "service"
+    },
+    {
+      "date": "2026-08-20T23:56:32+00:00",
+      "sha": "ad4c91b",
+      "summary": "data: SET listed-peer scoreboard refresh (run 32364769355) (#533)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-20T23:31:27+00:00",
+      "sha": "8fbd765",
+      "summary": "data: rival Facebook promo feed refresh (run 32424007191) (#541)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-21T05:43:17+07:00",
+      "sha": "e2379bd",
+      "summary": "health(deploy): shape-probe occupation_risk.json — per-branch occupation-stress read that cannot self-heal (#540)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-20T22:37:36+00:00",
+      "sha": "8a174b1",
+      "summary": "data: market-pulse swarm refresh (run 32421770540) (#539)",
+      "pillar": "market"
     },
     {
       "date": "2026-08-20T21:50:01+00:00",
@@ -651,66 +711,6 @@
       "sha": "f147316",
       "summary": "data: market-pulse swarm refresh (run 32330872023) (#529)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-20T04:27:39+00:00",
-      "sha": "270793e",
-      "summary": "chore(plan): refresh CEO dashboard after mandate-guard ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-20T04:24:44+00:00",
-      "sha": "06c5d39",
-      "summary": "test: guard the anti-expansion product mandate in the determinism gate",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-20T04:05:18+00:00",
-      "sha": "08c3bad",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-20, run 32330423490)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-20T03:13:57+00:00",
-      "sha": "7d5f3a0",
-      "summary": "data: NABC live prices (2026-08-20, run 32327165760)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-20T02:13:23+00:00",
-      "sha": "47370a0",
-      "summary": "docs(progress): log ux-newtab-cue-rivalads-source merge+deploy+verify (PR #528)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-20T09:10:50+07:00",
-      "sha": "2c7c16e",
-      "summary": "ux: add new-tab cue to the rival-ads source citation link (#528)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-20T00:37:38+00:00",
-      "sha": "391edb2",
-      "summary": "feat(province): surface MEASURED installed factory horsepower (gov.hp) as a \"Factory capacity\" chip (#527)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-19T23:27:30+00:00",
-      "sha": "0439a9c",
-      "summary": "data: rival Facebook promo feed refresh (run 32308366181) (#526)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-19T23:01:26+00:00",
-      "sha": "7df1165",
-      "summary": "data: market-pulse swarm refresh (run 32306069962) (#525)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-19T22:24:30+00:00",
-      "sha": "e0d0029",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the live_board shape-probe ship",
-      "pillar": "feature"
     }
   ]
 }
