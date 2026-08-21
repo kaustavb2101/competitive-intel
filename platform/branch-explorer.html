@@ -358,7 +358,7 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
 <div id="map"></div>
 <div id="atmos"></div>
 <div id="vignette"></div>
-<div class="ctl">
+<div class="ctl" id="ctl">
   <div class="grp">
     <div class="glab" id="baseLbl">Basemap</div>
     <div class="seg" role="group" aria-labelledby="baseLbl">
@@ -391,8 +391,8 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
 <div id="panel"></div>
 <button class="pxbtn" id="panelClose" title="Close" aria-label="Close info panel">✕</button>
 <div id="mtog">
-  <button data-s="panel">☰ Info</button>
-  <button data-s="ctl">Layers</button>
+  <button data-s="panel" aria-controls="panel" aria-expanded="false">☰ Info</button>
+  <button data-s="ctl" aria-controls="ctl" aria-expanded="false">Layers</button>
 </div>
 <div id="status">Loading…</div>
 <script>
@@ -1221,14 +1221,19 @@ function init(){
   (function(){
     const panel=document.querySelector('#panel'), ctl=document.querySelector('.ctl'),
           px=document.getElementById('panelClose');
+    const btns=document.querySelectorAll('#mtog button');
     function setPanel(on){ if(panel)panel.classList.toggle('show',on); if(px)px.classList.toggle('show',on); }
     function setCtl(on){ if(ctl)ctl.classList.toggle('show',on); }
-    document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
+    // disclosure pattern: keep each switcher's aria-expanded in step with whether its panel is shown
+    function syncMtogAria(){btns.forEach(b=>{const e=document.getElementById(b.dataset.s);b.setAttribute('aria-expanded',String(!!(e&&e.classList.contains('show'))));});}
+    btns.forEach(b=>b.onclick=()=>{
       const s=b.dataset.s;
       if(s==='panel'){ const open=!(panel&&panel.classList.contains('show')); setPanel(open); if(open)setCtl(false); }
       else{ const open=!(ctl&&ctl.classList.contains('show')); setCtl(open); if(open)setPanel(false); }
+      syncMtogAria();
     });
-    if(px)px.onclick=()=>setPanel(false);
+    if(px)px.onclick=()=>{setPanel(false);syncMtogAria();};
+    syncMtogAria();
   })();
   loadPanel(); loadBuildings(); loadPOIs();
   startMotion();
