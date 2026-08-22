@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-08-21",
+  "pulled_at": "2026-08-22",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -428,10 +428,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.72036,
-    "ratings": 1577,
-    "score_current_version": 3.72036,
-    "ratings_current_version": 1577,
+    "score": 3.7263,
+    "ratings": 1593,
+    "score_current_version": 3.7263,
+    "ratings_current_version": 1593,
     "version": "3.2.0",
     "app_updated": "2026-08-13",
     "released": "2020-04-30",
@@ -1327,6 +1327,15 @@
      "title": "น่าสนใจ",
      "content": "ใช้งานง่าย และสะดวก",
      "version": "1.0.5",
+     "votes": 0
+    },
+    {
+     "id": "14454217124",
+     "at": null,
+     "score": 5,
+     "title": "ดีมาก",
+     "content": "ดีมาก",
+     "version": "3.2.0",
      "votes": 0
     },
     {
@@ -2258,10 +2267,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.44976,
-    "ratings": 418,
-    "score_current_version": 3.44976,
-    "ratings_current_version": 418,
+    "score": 3.44391,
+    "ratings": 419,
+    "score_current_version": 3.44391,
+    "ratings_current_version": 419,
     "version": "2.7.6",
     "app_updated": "2026-08-19",
     "released": "2017-12-09",
@@ -4955,10 +4964,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.53903,
-    "ratings": 269,
-    "score_current_version": 3.53903,
-    "ratings_current_version": 269,
+    "score": 3.54444,
+    "ratings": 270,
+    "score_current_version": 3.54444,
+    "ratings_current_version": 270,
     "version": "1.0.49",
     "app_updated": "2026-08-10",
     "released": "2022-11-25",
@@ -10463,16 +10472,34 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.82412,
-    "ratings": 172960,
-    "score_current_version": 4.82412,
-    "ratings_current_version": 172960,
+    "score": 4.82411,
+    "ratings": 172997,
+    "score_current_version": 4.82411,
+    "ratings_current_version": 172997,
     "version": "3.0.6",
     "app_updated": "2026-08-06",
     "released": "2021-04-20",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14453767704",
+     "at": null,
+     "score": 1,
+     "title": "ลบบัญชี",
+     "content": "ขอแจ้งงให้ทราบว่าเลขบัตรประจำตัวประชาชนลงท้ายด้วย 0795 ไม่อนุญาตให้น้ำข้อมูลส่วนบุคคลของขาพเจ้าไปใช้ ไม่ว่าจะในรูปแบบใดก็ตาม หากมีการนำไปใช้ถือว่ามีการละเมิดสิทธิส่วนบุลคลเเละขาพเจ้าจะดำเนินการตามกฏหมายอย่างถึงที่สุด",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14451481472",
+     "at": null,
+     "score": 5,
+     "title": "แอปเป็นอะไรหรอครับกดเข้าแล้วเด้งออกตลอด",
+     "content": "แอปเป็นอะไรหรอครับกดเข้าแล้วเด้งออกตลอด",
+     "version": "3.0.6",
+     "votes": 0
+    },
     {
      "id": "14444993369",
      "at": null,
@@ -15434,16 +15461,34 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.70383,
-    "ratings": 63741,
-    "score_current_version": 4.70383,
-    "ratings_current_version": 63741,
+    "score": 4.70401,
+    "ratings": 63785,
+    "score_current_version": 4.70401,
+    "ratings_current_version": 63785,
     "version": "7.6.0",
     "app_updated": "2026-08-19",
     "released": "2021-10-10",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14455431609",
+     "at": null,
+     "score": 5,
+     "title": "ผ่อนดีมีให้เพิ่ม",
+     "content": "ขอบคุณที่มีให้ต่อยอดค่ะ",
+     "version": "7.6.0",
+     "votes": 0
+    },
+    {
+     "id": "14453847274",
+     "at": null,
+     "score": 5,
+     "title": "ขอบคุณครับผมต้องการความช่วยเหลือเลยครับ",
+     "content": "ขอบคุณที่พัฒนาการเรื่อยเรื่อยครับ",
+     "version": "7.6.0",
+     "votes": 0
+    },
     {
      "id": "14451289798",
      "at": null,
@@ -20090,16 +20135,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84442,
-    "ratings": 43811,
-    "score_current_version": 4.84442,
-    "ratings_current_version": 43811,
+    "score": 4.84417,
+    "ratings": 43881,
+    "score_current_version": 4.84417,
+    "ratings_current_version": 43881,
     "version": "3.1.1",
     "app_updated": "2026-05-25",
     "released": "2023-03-06",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14452482014",
+     "at": null,
+     "score": 2,
+     "title": "สมัครยาก",
+     "content": "ข้าราชการ ทหารไม่ผ่าน  สมัคร  3  รอบล่ะ  ยากมากๆๆ",
+     "version": "3.1.1",
+     "votes": 0
+    },
     {
      "id": "14450518427",
      "at": null,
@@ -24827,10 +24881,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.76989,
-    "ratings": 26818,
-    "score_current_version": 4.76989,
-    "ratings_current_version": 26818,
+    "score": 4.77003,
+    "ratings": 26830,
+    "score_current_version": 4.77003,
+    "ratings_current_version": 26830,
     "version": "1.8.7",
     "app_updated": "2026-08-07",
     "released": "2020-08-05",
@@ -26249,6 +26303,15 @@
      "content": "Superb!!!",
      "version": "1.0.5",
      "votes": 11
+    },
+    {
+     "id": "14453182650",
+     "at": null,
+     "score": 5,
+     "title": "ดี",
+     "content": "ดี",
+     "version": "1.8.7",
+     "votes": 0
     },
     {
      "id": "14446097371",
@@ -29006,16 +29069,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.60642,
-    "ratings": 2086,
-    "score_current_version": 2.60642,
-    "ratings_current_version": 2086,
+    "score": 2.66043,
+    "ratings": 2138,
+    "score_current_version": 2.66043,
+    "ratings_current_version": 2138,
     "version": "3.4.0",
     "app_updated": "2026-08-20",
     "released": "2022-05-11",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14455086238",
+     "at": null,
+     "score": 1,
+     "title": "จ่ายเงินไปแล้ว แต่ยังทำหนังสือแจ้งเตือนว่ายังไม่คืน",
+     "content": "ได้วงเงินมา5,000.- กดออกมาแบบไม่ได้ชำระเป็นงวด ยังไม่ครบเดือนเราจ่ายเต็ม แต่ส่งหนังสือทวงหนี้ราชบัญญัติมาทางemail ระบบห่วยแตกหรอคะ จ่ายแล้วแต่ทวงหนี้?",
+     "version": "3.4.0",
+     "votes": 0
+    },
     {
      "id": "14450607180",
      "at": null,
