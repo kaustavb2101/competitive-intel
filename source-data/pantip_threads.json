@@ -157,6 +157,15 @@
        "points": 0,
        "replies": 0,
        "text": "จริงหรอ!ไปกู้เงินยังจะให้เสียเงินอีกหาข้อมูลดีๆค่ายอื่นมีเยอะรับเงินภายในวันด้วย"
+      },
+      {
+       "created": "1787399971",
+       "id": "44181498-18",
+       "no": 18,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "จริงหรอ"
       }
      ],
      "created": "1785513784",
@@ -5998,6 +6007,15 @@
        "points": 0,
        "replies": 0,
        "text": "อยากได้ชัวร์ๆไปศรีสวัสดิครับ"
+      },
+      {
+       "created": "1787386303",
+       "id": "43414392-12",
+       "no": 12,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "แนะนำของศ.ศรี🧡ดูนะค่ะืติดต่อสาขาใกล้บ้ายดูพนักงานแนะนำดีค่ะ"
       }
      ],
      "created": "1745440136",
@@ -12639,6 +12657,15 @@
        "points": 0,
        "replies": 0,
        "text": "ไปที่อื่นจะง่ายกว่านะ"
+      },
+      {
+       "created": "1787401465",
+       "id": "44042765-13",
+       "no": 13,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "ถ้าไม่ได้ย้ายไฟแนนซ์เลยค่ะ แนะนำ ศ.สีส้มค่ะ"
       }
      ],
      "created": "1775361104",
@@ -26135,6 +26162,15 @@
        "points": 0,
        "replies": 0,
        "text": "เคยยื่นไปเหมือนกันตามแล้วตามอีก2-3วันเลยกว่าจะรู้ผล"
+      },
+      {
+       "created": "1787405828",
+       "id": "44144556-21",
+       "no": 21,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "ของเราก็นานเหมือนกันค่ะ 🫪"
       }
      ],
      "created": "1782707626",
@@ -26717,6 +26753,15 @@
        "points": 0,
        "replies": 0,
        "text": "เอกสารเยอะขนาดนั่น อนุมัติอยากอีก"
+      },
+      {
+       "created": "1787382890",
+       "id": "44121687-24",
+       "no": 24,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "บริษัทใจร้ายกับลูกค้ามากครับ"
       }
      ],
      "created": "1781055100",
@@ -27155,6 +27200,15 @@
        "points": 0,
        "replies": 0,
        "text": "ปิดไปยังคะถ้ายังไม่ปิดลองย้ายแน่นนไฟที่อื่นมั้ยคะ"
+      },
+      {
+       "created": "1787401081",
+       "id": "44072100-13",
+       "no": 13,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "2 งวด ตามยึดเลยหรอคะ พี่ลองหาที่ใหม่ดูนะ 2งวดที่อื่นคุยกันได้นะคะ ลองไปปรึกษา บ.สีสวัสดูค่ะ เราไปมาละ เกือบไม่รอดเหมือนกัน ดีที่บ.นั้นเขาคุยง่าย"
       }
      ],
      "created": "1777526709",
@@ -28285,6 +28339,15 @@
        "points": 0,
        "replies": 0,
        "text": "ระวังด้วยนะครับดูไม่น่าไว้ใจ"
+      },
+      {
+       "created": "1787404488",
+       "id": "44131781-12",
+       "no": 12,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "ลองศึกษาหลายๆที่ดูบางที่เอกสารไม่ยุ่งยากรับเงินภายในวันด้วย"
       }
      ],
      "created": "1781774771",
@@ -28726,6 +28789,15 @@
        "points": 0,
        "replies": 0,
        "text": "เคยยื่น ใช้เวลานานยุนะคะ เราเลยยกเลิกไปยื่น บ อื่นแทน วันเดียวก็ได้💵"
+      },
+      {
+       "created": "1787409398",
+       "id": "44028900-5",
+       "no": 5,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "ขอเอกสารคืน ลองถามที่อื่น ถ้านานไม่ได้คำตอบ น่าจะไม่ผ่าน อาจขอเอกสารเพิ่ม"
       }
      ],
      "created": "1774413852",
@@ -36749,9 +36821,9 @@
    "_CATEGORY"
   ],
   "coverage": "SEARCH IS CAPPED AT 10 THREADS PER TERM by Pantip itself — ?page=2+ repeats page 1 with last_page:true and the POST search API refuses limit>10. The reported totals in meta.reported_totals are what Pantip CLAIMS exists, not what is retrievable. Coverage widens only by adding query terms and by re-running as relevance ordering drifts, never by paging.",
-  "generated": "2026-08-21T19:43:09Z",
+  "generated": "2026-08-22T19:41:02Z",
   "measured": "Thread and comment COUNTS and TEXT are measured — read verbatim from Pantip.",
-  "n_comments": 3680,
+  "n_comments": 3688,
   "n_threads": 234,
   "privacy": "Text only. No author name, member id, profile link or avatar is read or stored at any stage. The single retained attribute is org:true, Pantip's own verified-organisation badge, which marks a company account rather than a person — a category, not an identity.",
   "reported_totals": {
@@ -36765,7 +36837,7 @@
    "จำนำทะเบียนรถ": "พบ 1,232 กระทู้",
    "ติดล้อ จำนำทะเบียน": "พบ 17 กระทู้",
    "รถแลกเงิน": "พบ 1,695 กระทู้",
-   "ศรีสวัสดิ์": "พบ 4,676 กระทู้",
+   "ศรีสวัสดิ์": "พบ 4,677 กระทู้",
    "ศรีสวัสดิ์ เงินสดทันใจ": "พบ 442 กระทู้",
    "ศักดิ์สยามลิสซิ่ง": "พบ 150 กระทู้",
    "สมหวัง ทิสโก้": "พบ 53 กระทู้",
@@ -36775,7 +36847,7 @@
    "เงินดีดี GSB": null,
    "เงินติดล้อ": "พบ 2,853 กระทู้",
    "เงินเทอร์โบ": "พบ 324 กระทู้",
-   "เงินให้ใจ": "พบ 6,364 กระทู้",
+   "เงินให้ใจ": "พบ 6,362 กระทู้",
    "เงินไชโย": "พบ 256 กระทู้",
    "เมืองไทย แคปปิตอล": "พบ 859 กระทู้",
    "เมืองไทยแคปปิตอล": "พบ 897 กระทู้",
