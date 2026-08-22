@@ -48,10 +48,10 @@
   "live_total_series": {
    "delta_vs_prior_pull": 0.0,
    "first_seen": "2026-07-30",
-   "latest_date": "2026-08-20",
+   "latest_date": "2026-08-21",
    "latest_value": 433.0,
-   "n_observations": 8,
-   "prior_date": "2026-08-19"
+   "n_observations": 9,
+   "prior_date": "2026-08-20"
   },
   "n_appeared_brands": 5,
   "n_disappeared_brands": 0,
