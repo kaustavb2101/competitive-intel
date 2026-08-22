@@ -10138,6 +10138,46 @@ function renderHomeDefend(){
   `<div class="sub" style="margin-top:6px;color:var(--dim)"><b>${lead.length}</b> of <b>${ordered.length}</b> regions ${hard.length?'classed hardest to defend':'shown (none classed hardest — most-outgunned instead)'}. Density &amp; service both <b>measured</b> (rival:AutoX census + Google rating sample) — rivals outnumber us in every region, so the class is service-led. All ${ordered.length} regions, with the full numbers → <a class="cc-link no-print" data-v="acq" href="#acq" style="display:inline">Competition</a>.</div>`;
   wrap.style.display='';
 }
+/* ---------- DOUBLE-PRESSURE PROVINCE WATCHLIST (obj #1 × obj #2) ----------
+   Surfaces data/province_pressure.json (build_province_pressure.py): the NAMED provinces that sit
+   top-third on BOTH portfolio stress (stress_pctile) AND rival dominance (contest_pctile). The
+   thesis line already states HOW MANY are double-pressure + the single worst; this card drills that
+   headline into the actual watchlist — the list an away exec can act on. We RANK & show, never
+   recompute. Both axes are RELATIVE percentiles over the same 77 provinces, so this is a RANKING
+   ("worse than most provinces on both"), NOT a probability or an absolute default level; the combined
+   read inherits the ESTIMATED label (the portfolio axis is a percentile blend). NO open/close/expand
+   call — a risk lens on the footprint we already run. Null-safe: stays hidden until PROVPRESS resolves
+   and only appears when at least one double-pressure province exists. */
+function renderHomeDoublePressure(){
+  const wrap=$('#cc-double'), body=$('#cc-double-body');
+  if(!wrap||!body) return;
+  const recs=(PROVPRESS&&Array.isArray(PROVPRESS.provinces))?PROVPRESS.provinces:[];
+  if(!recs.length) return;                                   // stay hidden until the fetch resolves
+  const dp=recs.filter(r=>r&&r.double_pressure)
+    .sort((a,b)=>(b.both_min||0)-(a.both_min||0));           // worst double-pressure first
+  if(!dp.length) return;                                     // no province top-third on BOTH → stay hidden
+  const m=PROVPRESS.meta||{};
+  const pct=v=>(typeof v==='number')?Math.round(v):'—';
+  const dti=v=>(typeof v==='number')?v.toFixed(2)+'×':'—';
+  const rat=v=>(typeof v==='number')?v.toFixed(1)+'×':'—';
+  body.innerHTML=
+    `<div class="tblwrap"><table class="tbl"><tr><th scope="col">Province</th>`+
+      `<th scope="col" title="Portfolio-risk percentile (obj #1) — composite of MEASURED NSO debt-to-income + unemployment, expressed as a 0–100 rank across the 77 provinces. ESTIMATED (a percentile blend, not an absolute default level).">Stress ▲</th>`+
+      `<th scope="col" title="Competitive-risk percentile (obj #2) — 0–100 rank of the MEASURED rival:AutoX branch ratio across the 77 provinces. COMPUTED over measured census counts.">Rival ◆</th>`+
+      `<th scope="col" title="Rivals ÷ AutoX branches in the province (MEASURED census), and the top rival brand.">Outgunned</th>`+
+      `<th scope="col" title="Share of the province's districts where the big-4 rivals outnumber AutoX (MEASURED, point-in-district).">Dist. lost</th></tr>`+
+    dp.map(r=>{
+      const distLost=(r.n_outnumbered_districts!=null&&r.n_districts)?`${r.n_outnumbered_districts}/${r.n_districts}`:'—';
+      return `<tr>
+        <td><b style="border-left:3px solid var(--agri);padding-left:7px">${r.province_th||'—'}</b> <span class="sub">${r.region||''}</span></td>
+        <td class="mono" style="color:var(--agri)"><b>${pct(r.stress_pctile)}</b> <span class="sub" style="font-weight:400">DTI ${dti(r.debt_to_income)}${r.unemployment_rate!=null?' · unemp '+(+r.unemployment_rate).toFixed(1)+'%':''}</span></td>
+        <td class="mono" style="color:var(--agri)"><b>${pct(r.contest_pctile)}</b></td>
+        <td class="mono">${rat(r.ratio)} <span class="sub" style="font-weight:400">${r.leader?'· '+r.leader:''}</span></td>
+        <td class="mono">${distLost}</td>
+      </tr>`;}).join('')+`</table></div>`+
+    `<div class="sub" style="margin-top:6px;color:var(--dim)"><b>${dp.length}</b> province${dp.length===1?'':'s'} sit top-third on <b>both</b> axes — a fragile book where margin defence is hardest. Where to look first, <b>not</b> a verdict or an action. Portfolio stress is <b>estimated</b> (percentile blend of MEASURED NSO debt-to-income + unemployment); rival ratio is <b>computed over MEASURED</b> census counts — so the combined read is a RANKING across the 77 provinces, not a probability. Full per-province board &amp; brand split → <a class="cc-link no-print" data-v="acq" href="#acq" style="display:inline">Competition</a>.</div>`;
+  wrap.style.display='';
+}
 /* ---------- REAL loan tape · assistance radar (obj #1, MEASURED) ----------
    data/tape_real.json (build_tape_layers.py ← ingest_real_tape.py no-PII aggregates).
    Card is hidden entirely when the layer is absent — calm, never fabricated. */
@@ -12502,6 +12542,7 @@ function renderHome(){
   renderHomeRisk();         // uses META.region + crop_stress when loaded + PROV moto mix
   renderHomeMacro();        // META.macro + META.board
   renderHomeDefend();       // rival_threat_region.json — hardest-to-defend regions (lazy, null-safe)
+  renderHomeDoublePressure(); // province_pressure.json — provinces top-third on BOTH axes (lazy, null-safe)
   renderHomeMovers();       // deltas.json
   renderWatchlist();
   renderHomeDataRoom();     // provenance.json — measured/estimated/unlabelled census (lazy, null-safe)
@@ -12554,7 +12595,7 @@ function renderHome(){
     loadRivThreatRegion().then(()=>{ if(onHome()){ renderHomeDefend(); renderHomeThesis(); } });
     // obj#1 x obj#2 — the INTERSECTION clause: provinces both borrower-stressed AND rival-dominated
     // (province_pressure.json, a deterministic join of the two per-province axes). Null-safe re-render.
-    loadProvincePressure().then(()=>{ if(onHome()) renderHomeThesis(); });
+    loadProvincePressure().then(()=>{ if(onHome()){ renderHomeThesis(); renderHomeDoublePressure(); } });
     const c=$('#cc-csv'), p=$('#cc-print');
     if(c) c.onclick=ccBriefCSV;
     if(p) p.onclick=()=>window.print();
