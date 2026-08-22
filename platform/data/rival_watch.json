@@ -4,17 +4,17 @@
    {
     "brand": "Srisawad",
     "key": "SAWAD",
-    "live_pct": 46.0,
-    "n_live": 163,
-    "n_new_30d": 45,
+    "live_pct": 46.2,
+    "n_live": 164,
+    "n_new_30d": 44,
     "share_of_volume_pct": 24.2
    },
    {
     "brand": "Ngern Tid Lor",
     "key": "TIDLOR",
-    "live_pct": 21.3,
-    "n_live": 172,
-    "n_new_30d": 22,
+    "live_pct": 21.1,
+    "n_live": 171,
+    "n_new_30d": 23,
     "share_of_volume_pct": 55.2
    },
    {
@@ -28,21 +28,21 @@
    {
     "brand": "MoneyDD",
     "key": "GSB_MONEYDD",
-    "live_pct": 0.0,
-    "n_live": 0,
+    "live_pct": 4.8,
+    "n_live": 1,
     "n_new_30d": 2,
     "share_of_volume_pct": 1.4
    },
    {
     "brand": "Ngern Turbo",
     "key": "TURBO",
-    "live_pct": 27.6,
-    "n_live": 34,
+    "live_pct": 26.8,
+    "n_live": 33,
     "n_new_30d": 2,
     "share_of_volume_pct": 8.4
    }
   ],
-  "as_of": "2026-08-20",
+  "as_of": "2026-08-21",
   "disappeared": [],
   "label": "MEASURED — n_new_30d is Google Ads Transparency's own per-creative first_shown date, counted within 30 days of the pull date.",
   "live_total_series": {
