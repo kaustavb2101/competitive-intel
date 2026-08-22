@@ -3555,6 +3555,45 @@ def _shape_regions(d):
     return None
 
 
+def _shape_provinces_index(d):
+    # The BACKBONE of the entire 77-province deep-dive: the index list every
+    # province surface reads to build its selector, table and drill links.
+    # It is the single most load-bearing unprobed read left — 4 fetch sites,
+    # more than any other, gating TWO primary nav routes plus the SPA boot
+    # lookup and the branch-explorer province picker:
+    #   - #provinces selector (renderProvinces, app.js): PROV.map(p=>p.region)
+    #     builds the region-filter chips; PLOOK is keyed on p.th; each row links
+    #     out on p.slug (rayong-catchment.html?city=<slug> / province.html?p=<slug>);
+    #   - #market table (renderMarket, app.js): same PROV list, same p.region chips;
+    #   - app.js boot (provLookupByName, m[p.th]=p) resolves province-name -> record;
+    #   - branch-explorer.html reads the same index for its province picker.
+    # renderProvinces degrades to "Could not load provinces." on a fetch reject,
+    # but a truncated/404 CDN deploy blanks the #provinces selector AND the #market
+    # table AND the boot lookup with NO phone alert — the nightly probe only fetched
+    # the registered DATA_FILES and this index was never registered. Like regions.json
+    # it is a structural index (build_province.py writes it), so a byte-identical
+    # rebuild can't restore a CDN-truncated-but-repo-correct file; the live-URL probe
+    # is the only thing that catches that class. Asserts SHAPE not values (a non-empty
+    # list of records carrying the four render-critical fields) — robust to any future
+    # spatial-join / DLT / census vintage refresh moving the counts.
+    if not isinstance(d, list):
+        return "expected a list, got %s" % type(d).__name__
+    if not d:
+        return "empty index — the #provinces selector + #market table have no rows to render"
+    r0 = d[0]
+    if not isinstance(r0, dict):
+        return "first record is not an object, got %s" % type(r0).__name__
+    if not (isinstance(r0.get("slug"), str) and r0.get("slug")):
+        return "first record carries no string 'slug' (the province.html?p=/rayong-catchment?city= drill links)"
+    if not (isinstance(r0.get("th"), str) and r0.get("th")):
+        return "first record carries no string 'th' (the PLOOK/provLookupByName province-name key)"
+    if not (isinstance(r0.get("region"), str) and r0.get("region")):
+        return "first record carries no string 'region' (the region-filter chips PROV.map(p=>p.region))"
+    if not (isinstance(r0.get("branches"), (int, float)) and not isinstance(r0.get("branches"), bool)):
+        return "first record carries no numeric 'branches' (the branch-count column / index sort key)"
+    return None
+
+
 def _shape_live_board(d):
     # The "Live board" page (live.html, linked in the shared nav on every page) —
     # the service-freshness registry that shows every live feed's age against its
@@ -3747,6 +3786,13 @@ DATA_FILES = [
     # truncated/404 deploy, yet was the one load-bearing surfaced read still absent
     # from this registry and it cannot self-heal (no cron/pull_swarm rebuilds it).
     ("data/regions.json", _shape_regions, ".national rollup object (numeric .branches) + .regions[] with string .region + .provinces[].slug (Data Book backbone: header, region filter, slug lookup)"),
+    # The 77-province deep-dive INDEX (build_province.py) — the single most
+    # load-bearing surfaced read still absent from this registry: 4 fetch sites
+    # gating the #provinces selector + the #market table + the SPA boot
+    # province-name lookup + the branch-explorer province picker. A truncated/404
+    # CDN deploy blanks all of them with no phone alert, and a byte-identical
+    # rebuild can't restore a CDN-truncated repo-correct file.
+    ("data/provinces/index.json", _shape_provinces_index, "non-empty list of province records carrying string slug/th/region + numeric branches (77-province deep-dive index: #provinces selector, #market table, boot name-lookup, branch-explorer picker)"),
     # The competition pillar's flagship exec layer (obj #2) — the per-province
     # peer board (AutoX next to each big-4 rival, per province) that powers the
     # Competition surface + the command-center thesis clause. Every default-route
