@@ -3640,6 +3640,52 @@ def _shape_live_board(d):
     return None
 
 
+def _shape_occupation_leads(d):
+    # The acquisition lead board's DATA SOURCE (obj #2, MEASURED Overture Places).
+    # occupation_leads.json is the heaviest surfaced-but-unprobed read left (~6.8 MB —
+    # the largest of the residual unprobed layers, so the one MOST exposed to a
+    # partial/truncated CDN deploy), and it feeds a headline surface on TWO nav pages:
+    #   - the SPA branch popup "Who to acquire here — nearest workplaces to call"
+    #     (app.js:8400 reads OCCL[i].L, the per-branch [bucket, name, phone, dist_km]
+    #     lead rows; the bucket labels come from OCCLB = meta.buckets);
+    #   - branch-explorer.html reads the same layer for its per-branch lead list.
+    # loadOccLeads() is null-guarded (a fetch reject -> OCCL=null -> the board simply
+    # doesn't render), so a truncated/404 CDN deploy silently blanks the acquisition
+    # lead board on BOTH pages with NO phone alert — the same "broken demo" blind spot
+    # the occupation_income / lead-layer probes close for their siblings. It cannot
+    # self-heal from CI (build_occupation_leads.py is an Overture Places pull with no CI
+    # cron), so the live-URL probe is the only deploy safeguard. Asserts render SHAPE not
+    # values: the object, the index-aligned .branches list of 2015 (a truncation drops the
+    # count), meta.buckets (the OCCLB occupation-label read), and at least one branch
+    # carrying a well-formed .L lead row — robust to any future Places vintage moving which
+    # workplaces / phones each branch lists.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    br = d.get("branches")
+    if not isinstance(br, list) or not br:
+        return "missing/empty 'branches' list (the per-branch lead-board render read)"
+    if len(br) != 2015:
+        return "'branches' length %d != 2015 (index-aligned to branches.json; a partial/truncated deploy)" % len(br)
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not isinstance(meta.get("buckets"), list) or not meta.get("buckets"):
+        return "missing/empty 'meta.buckets' (OCCLB occupation-label render read)"
+    # At least one branch must carry a well-formed lead row [bucket_idx, name, phone, dist_km];
+    # an all-empty .L across 2015 branches would mean the Places index produced no leads (a gutted
+    # layer), which the board render treats as "no leads" -> a silently empty visible surface.
+    ok = False
+    for b in br:
+        if isinstance(b, dict):
+            L = b.get("L")
+            if isinstance(L, list) and L:
+                r0 = L[0]
+                if isinstance(r0, list) and len(r0) >= 4 and isinstance(r0[1], str):
+                    ok = True
+                    break
+    if not ok:
+        return "no branch carries a well-formed 'L' lead row [bucket, name, phone, dist_km] (the lead-board render read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -4223,6 +4269,15 @@ DATA_FILES = [
     ("data/competitors_census.json", _shape_competitors_census, ".items[] merged all-brand rival census (lat/lng/brand) — the primary #acq competitor overlay + per-branch catchment rival read (obj #2)"),
     ("data/competitors_national.json", _shape_competitors_national, ".items[] Google-Places rival sample (lat/lng/brand) — census fallback source for the #acq overlay (obj #2)"),
     ("data/competitors_overture.json", _shape_competitors_overture, ".items[] Overture rival sample (lat/lng/brand) — census fallback source for the #acq overlay (obj #2)"),
+    # The acquisition lead board's DATA SOURCE (obj #2) — the last heavy, load-bearing,
+    # surfaced-but-unprobed read. At ~6.8 MB it is the largest residual unprobed layer
+    # (so the one most exposed to a partial CDN deploy) and feeds a headline surface on
+    # TWO pages: the SPA branch popup "Who to acquire here — nearest workplaces to call"
+    # (app.js OCCL[i].L rows, labelled from meta.buckets) and the branch-explorer per-
+    # branch lead list. loadOccLeads() is null-guarded, so a truncated/404 CDN deploy
+    # silently blanks the lead board on both pages with no phone alert; it cannot self-
+    # heal from CI (Overture Places pull, no cron), so the probe is the only safeguard.
+    ("data/occupation_leads.json", _shape_occupation_leads, ".branches index-aligned (2015) with per-branch .L [bucket,name,phone,dist] lead rows + meta.buckets (SPA + branch-explorer acquisition lead board, obj #2)"),
 ]
 
 
