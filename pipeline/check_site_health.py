@@ -3686,6 +3686,52 @@ def _shape_occupation_leads(d):
     return None
 
 
+def _shape_national_places(d):
+    # The national POI fallback layer behind EVERY province's 3D building scene
+    # (national_places.json, obj #1/#2 context, MEASURED Overture named places,
+    # grid-thinned to ~2.22km cells → 264k points across 14 buckets). It is now the
+    # heaviest surfaced-but-unprobed read left (~5.4 MB — after occupation_leads was
+    # probed 2026-08-22, the largest of the residual unprobed layers, so the one MOST
+    # exposed to a partial/truncated CDN deploy). rayong-catchment.html (the primary 3D
+    # entry point for all 77 provinces) fetches it as the "national fallback for every
+    # province's 3D scene" wherever a per-city <city>_places.json is absent, and the
+    # fetch is null-guarded (`r.ok ? r.json() : null`), so a truncated/404 CDN deploy
+    # silently drops the establishment layer from every non-pilot province's building
+    # scene with NO phone alert — the same "broken demo" blind spot the sibling probes
+    # close. It cannot self-heal from CI (build_national_places.py is an Overture pull
+    # with no CI cron), so the live-URL probe is the only deploy safeguard. Asserts
+    # render SHAPE not values: the object, meta.buckets (the scene's bucket legend), the
+    # .places dict keyed by those buckets, at least one bucket carrying a well-formed
+    # [lng, lat] point, and — when meta.count is present — that the point total across
+    # buckets matches it (a strong truncation tripwire) — robust to a future Overture
+    # vintage moving which places each bucket lists.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not isinstance(meta.get("buckets"), list) or not meta.get("buckets"):
+        return "missing/empty 'meta.buckets' (the 3D scene's bucket legend render read)"
+    places = d.get("places")
+    if not isinstance(places, dict) or not places:
+        return "missing/empty 'places' dict (the per-bucket POI point render read)"
+    total = 0
+    ok = False
+    for b in meta["buckets"]:
+        pts = places.get(b)
+        if not isinstance(pts, list):
+            continue
+        total += len(pts)
+        if not ok and pts:
+            p0 = pts[0]
+            if isinstance(p0, list) and len(p0) >= 2 and all(isinstance(v, (int, float)) for v in p0[:2]):
+                ok = True
+    if not ok:
+        return "no bucket carries a well-formed [lng, lat] point (the POI render read; a gutted/truncated layer)"
+    cnt = meta.get("count")
+    if isinstance(cnt, int) and cnt != total:
+        return "point total %d != meta.count %d (a partial/truncated deploy)" % (total, cnt)
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -4278,6 +4324,14 @@ DATA_FILES = [
     # silently blanks the lead board on both pages with no phone alert; it cannot self-
     # heal from CI (Overture Places pull, no cron), so the probe is the only safeguard.
     ("data/occupation_leads.json", _shape_occupation_leads, ".branches index-aligned (2015) with per-branch .L [bucket,name,phone,dist] lead rows + meta.buckets (SPA + branch-explorer acquisition lead board, obj #2)"),
+    # The national POI fallback behind every province's 3D building scene
+    # (national_places.json, MEASURED Overture, ~5.4 MB) — the heaviest surfaced read
+    # still absent from this registry after occupation_leads was probed. rayong-catchment.html
+    # (the primary 3D entry point for all 77 provinces) loads it as the "national fallback"
+    # wherever a per-city places file is absent, null-guarded, so a truncated/404 CDN deploy
+    # silently drops the establishment layer from every non-pilot province scene with no phone
+    # alert; it has no CI cron to self-heal, so the live probe is the only safeguard. Closes it.
+    ("data/national_places.json", _shape_national_places, ".places dict keyed by meta.buckets with [lng,lat] points, point total == meta.count (national 3D-scene POI fallback)"),
 ]
 
 
