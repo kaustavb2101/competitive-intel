@@ -280,6 +280,33 @@ def _shape_amphoe_geo(d):
     return None
 
 
+def _shape_province_geo(d):
+    # The National-map province CHOROPLETH polygons (loadProvinceGeo/drawProvinceChoropleth):
+    # 77 amphoe-regrouped province features whose properties.province (Thai name) is the JOIN
+    # key onto the per-province risk lens values (hhdti/pstress). The fetch is r.ok?json():null
+    # and PGEO stays null on any fault, so a truncated/404 CDN deploy silently drops the
+    # choropleth back to dots-only with NO phone alert — and a CDN-truncated file with the
+    # features[] present but properties.province stripped would paint an all-grey no-op layer,
+    # which this probe also catches by asserting the join key on a sampled feature.
+    if not isinstance(d, dict) or d.get("type") != "FeatureCollection":
+        return "not a FeatureCollection"
+    feats = d.get("features")
+    if not isinstance(feats, list):
+        return "missing features[]"
+    if len(feats) != 77:
+        return "expected 77 province features, got %d" % len(feats)
+    f0 = feats[0]
+    if not isinstance(f0, dict):
+        return "feature 0 is not an object"
+    props = f0.get("properties")
+    if not isinstance(props, dict) or not isinstance(props.get("province"), str) or not props.get("province"):
+        return "feature 0 missing string properties.province (choropleth join key)"
+    geom = f0.get("geometry")
+    if not isinstance(geom, dict) or not geom.get("type"):
+        return "feature 0 missing geometry"
+    return None
+
+
 def _shape_crop_stress(d):
     provs = d.get("provinces") if isinstance(d, dict) else None
     if not isinstance(provs, list) or not provs:
@@ -3737,6 +3764,15 @@ DATA_FILES = [
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
     ("data/amphoe.json", _shape_amphoe, ".amphoe list of 928 districts"),
     ("data/amphoe_geo.json", _shape_amphoe_geo, "FeatureCollection, 928 features"),
+    # The National-map province CHOROPLETH boundaries (build_province_geo.py) — the
+    # heaviest surfaced-but-unprobed read left on the site (~1.18 MB): 77 province
+    # polygons that paint the hhdti/pstress risk lenses UNDER the branch dots. Its
+    # fetch is r.ok?json():null and PGEO stays null on any fault, so a truncated/404
+    # CDN deploy silently degrades the map to dots-only with NO phone alert, and a
+    # byte-identical rebuild can't restore a CDN-truncated repo-correct file. Geometry
+    # only (no meta.updated) so not a FRESHNESS_LAYERS candidate; a shape probe that
+    # asserts the properties.province join key is the honest coverage it can carry.
+    ("data/province_geo.json", _shape_province_geo, "FeatureCollection, 77 province features w/ string properties.province (National-map choropleth join key)"),
     ("data/crop_stress.json", _shape_crop_stress, ".provinces list (~76)"),
     ("data/branch_labor.json", _shape_branch_labor, ".branches list of 2015 (index-aligned)"),
     # Was opportunity_score.json — that growth leaderboard was dropped in the
