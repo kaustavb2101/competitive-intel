@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-21T22:28:24+00:00",
-    "commit": "711d227"
+    "generated_at": "2026-08-22T04:14:40+00:00",
+    "commit": "529c959"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-21",
+    "eta_date": "2026-08-22",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-08-22T04:14:40+00:00",
+      "sha": "529c959",
+      "summary": "health(deploy): shape-probe provinces/index.json — the 77-province deep-dive backbone",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-22T04:01:50+00:00",
+      "sha": "042f75c",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-22, run 32550516529)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-22T03:11:51+00:00",
+      "sha": "89f350a",
+      "summary": "data: NABC live prices (2026-08-22, run 32548058295)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-22T02:53:42+00:00",
+      "sha": "379b311",
+      "summary": "data: market-pulse swarm refresh (run 32530415790) (#555)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-22T02:15:32+00:00",
+      "sha": "a5f345f",
+      "summary": "docs(progress): log ux-deckgl-main-landmark-branchexplorer merge+deploy+verify (PR #558)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-22T09:12:21+07:00",
+      "sha": "223b9aa",
+      "summary": "ux: add <main> landmark to branch-explorer 3D page (#558)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-22T01:20:30+00:00",
+      "sha": "bed47f0",
+      "summary": "data: rival Facebook promo feed refresh (run 32532571903) (#556)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-22T00:41:21+00:00",
+      "sha": "45a5d70",
+      "summary": "feat(exposure): surface flood recency in the portfolio flood-hazard panel (#557)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-21T23:01:57+00:00",
+      "sha": "181f4b2",
+      "summary": "data: live fuel prices (2026-08-21, run 32535181913)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-21T22:30:39+00:00",
+      "sha": "fc74a3e",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the public-alias deep-check ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-21T22:28:24+00:00",
       "sha": "711d227",
       "summary": "health(deploy): deep-check the public alias when the master alias is SSO-gated",
@@ -651,66 +711,6 @@
       "sha": "94f5ee3",
       "summary": "ux: branch-explorer #mtog switcher gets aria-expanded/aria-controls (#546)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-21T06:49:39+00:00",
-      "sha": "8a4dc5f",
-      "summary": "data(flood): add MEASURED last_flood_year recency to the GISTDA repeated-flood layer (#545)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-21T05:25:57+00:00",
-      "sha": "7327c3e",
-      "summary": "data(census): refresh the Union Auction forward book (run 32446521234) (#544)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-21T05:00:46+00:00",
-      "sha": "9d9e8dd",
-      "summary": "data: market-pulse swarm refresh (run 32446066533) (#543)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-21T04:22:56+00:00",
-      "sha": "39cb550",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the occupation_income_individual probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-21T04:20:45+00:00",
-      "sha": "1f7f193",
-      "summary": "health(deploy): shape-probe occupation_income_individual.json — per-person occupation-wage read (data-book + province, obj #1) that cannot self-heal",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-21T04:07:07+00:00",
-      "sha": "22beb03",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-21, run 32445666090)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-21T03:19:30+00:00",
-      "sha": "0e9278a",
-      "summary": "data: NABC live prices (2026-08-21, run 32442664011)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-21T02:22:58+00:00",
-      "sha": "3bc8425",
-      "summary": "docs(progress): log ux-jumpnav-chip-aria-current merge+deploy+verify (PR #542)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-21T09:19:52+07:00",
-      "sha": "be2d4c0",
-      "summary": "ux: jump-nav chips use aria-current, not invalid aria-selected (#542)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-21T00:55:23+00:00",
-      "sha": "09f7a8c",
-      "summary": "data: market-pulse swarm refresh (run 32356990537) (#532)",
-      "pillar": "market"
     }
   ]
 }
