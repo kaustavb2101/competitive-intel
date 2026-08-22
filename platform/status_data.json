@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-22T04:14:40+00:00",
-    "commit": "529c959"
+    "generated_at": "2026-08-22T10:14:57+00:00",
+    "commit": "be4252f"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-08-22T10:14:57+00:00",
+      "sha": "be4252f",
+      "summary": "health(deploy): shape-probe occupation_leads.json — the acquisition lead board's source",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-22T09:45:28+00:00",
+      "sha": "4d4ebaf",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-22, run 32565721647)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-22T08:26:12+00:00",
+      "sha": "0921015",
+      "summary": "docs(progress): log province.html <main> landmark ship + deploy verify (PR #563)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-22T15:23:18+07:00",
+      "sha": "0ead38d",
+      "summary": "ux: add <main> landmark to province.html deck.gl page (#563)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-22T06:40:39+00:00",
+      "sha": "08f3b04",
+      "summary": "feat(map): add MEASURED repeated-flood-hazard National-map lens (obj #1) (#562)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-22T05:45:20+00:00",
+      "sha": "b790c8d",
+      "summary": "data(census): refresh the Union Auction forward book (run 32550934928) (#560)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-22T05:20:20+00:00",
+      "sha": "80a29c2",
+      "summary": "data: market-pulse swarm refresh (run 32550881566) (#561)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-22T04:58:20+00:00",
+      "sha": "432f27d",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 32549672014) (#559)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-22T04:16:50+00:00",
+      "sha": "e5e92c1",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the provinces/index shape-probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-22T04:14:40+00:00",
       "sha": "529c959",
       "summary": "health(deploy): shape-probe provinces/index.json — the 77-province deep-dive backbone",
@@ -656,60 +710,6 @@
       "date": "2026-08-21T14:20:10+00:00",
       "sha": "d434d35",
       "summary": "docs(progress): record ux-loop branch-explorer #status live-region ship (PR #550, deploy-verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-21T21:17:03+07:00",
-      "sha": "bde0cb2",
-      "summary": "ux: announce branch-explorer #status toast to screen readers (role=status live region) (#550)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-21T13:14:31+00:00",
-      "sha": "3331595",
-      "summary": "data: SET listed-peer scoreboard refresh (run 32478047100) (#548)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-21T12:50:50+00:00",
-      "sha": "de13570",
-      "summary": "fix(honesty): badge the poirel National-map lens ESTIMATED, not MEASURED (#549)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-21T10:57:45+00:00",
-      "sha": "2487949",
-      "summary": "data: market-pulse swarm refresh (run 32470826086) (#547)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-21T10:21:38+00:00",
-      "sha": "04c47d6",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the regions.json shape-probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-21T10:21:12+00:00",
-      "sha": "d580d1e",
-      "summary": "health(deploy): shape-probe regions.json — Data Book backbone rollup that cannot self-heal",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-21T09:55:00+00:00",
-      "sha": "0539b26",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-21, run 32470005749)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-21T08:19:59+00:00",
-      "sha": "f7bb2e9",
-      "summary": "docs(progress): log ux-mtog-disclosure-aria-branchexplorer merge+deploy+verify (PR #546)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-21T15:16:36+07:00",
-      "sha": "94f5ee3",
-      "summary": "ux: branch-explorer #mtog switcher gets aria-expanded/aria-controls (#546)",
       "pillar": "uxui"
     }
   ]
