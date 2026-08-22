@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-22T16:15:21+00:00",
-    "commit": "c156237"
+    "generated_at": "2026-08-22T22:12:40+00:00",
+    "commit": "879693b"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-08-22T22:12:40+00:00",
+      "sha": "879693b",
+      "summary": "service(deploy-health): shape-probe province_geo.json — heaviest unprobed National-map choropleth read",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-22T21:42:41+00:00",
+      "sha": "c1cd8d2",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-22, run 32600275300)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-22T20:27:21+00:00",
+      "sha": "afbc004",
+      "summary": "docs(progress): log branch-explorer.html viewport-fit=cover ship + deploy verify (PR #572)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-23T03:24:26+07:00",
+      "sha": "3b5bd58",
+      "summary": "ux: add viewport-fit=cover to branch-explorer.html for notched-device parity (#572)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-22T20:05:08+00:00",
+      "sha": "37382e3",
+      "summary": "data: Thai-IP-only swarm refresh (run 32594195186) (#571)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-22T18:43:56+00:00",
+      "sha": "ee06f2d",
+      "summary": "feat(home): name the double-pressure provinces on the command center (obj #1 × #2) (#570)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-22T17:01:52+00:00",
+      "sha": "046f063",
+      "summary": "data: market-pulse swarm refresh (run 32582887934) (#568)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-22T23:25:58+07:00",
+      "sha": "9a767bd",
+      "summary": "Merge pull request #569 from kaustavb2101/intel/national-places-probe",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-22T16:15:37+00:00",
+      "sha": "4bc6e63",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the national_places shape-probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-22T16:15:21+00:00",
       "sha": "c156237",
       "summary": "health(deploy): shape-probe national_places.json — the national POI fallback behind every province 3D scene",
@@ -657,60 +711,6 @@
       "sha": "379b311",
       "summary": "data: market-pulse swarm refresh (run 32530415790) (#555)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-22T02:15:32+00:00",
-      "sha": "a5f345f",
-      "summary": "docs(progress): log ux-deckgl-main-landmark-branchexplorer merge+deploy+verify (PR #558)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-22T09:12:21+07:00",
-      "sha": "223b9aa",
-      "summary": "ux: add <main> landmark to branch-explorer 3D page (#558)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-22T01:20:30+00:00",
-      "sha": "bed47f0",
-      "summary": "data: rival Facebook promo feed refresh (run 32532571903) (#556)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-22T00:41:21+00:00",
-      "sha": "45a5d70",
-      "summary": "feat(exposure): surface flood recency in the portfolio flood-hazard panel (#557)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-21T23:01:57+00:00",
-      "sha": "181f4b2",
-      "summary": "data: live fuel prices (2026-08-21, run 32535181913)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-21T22:30:39+00:00",
-      "sha": "fc74a3e",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the public-alias deep-check ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-21T22:28:24+00:00",
-      "sha": "711d227",
-      "summary": "health(deploy): deep-check the public alias when the master alias is SSO-gated",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-21T21:44:52+00:00",
-      "sha": "a626d76",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-21, run 32529824680)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-21T20:19:14+00:00",
-      "sha": "74cc41d",
-      "summary": "docs(progress): log ux-databook-search-results-status merge+deploy+verify (PR #554)",
-      "pillar": "uxui"
     }
   ]
 }
