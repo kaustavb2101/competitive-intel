@@ -26,6 +26,7 @@ const LENS = {
   cstress:  {pill:'Agri PD', label:'Agri crop-stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED triage (0–100) — the branch's province crop-household stress (crop price pressure × drought, scaled by how farm-dependent the area is). A warning flag, not a measured default rate.", color:'#C8433B', unit:'crop-stress (est)', est:true, tag:'e', val:d=>cstressVal(d)},
   estab:    {pill:'Merchant', label:'Establishments ≤10km', desc:'MERCHANT BASE · MEASURED (Overture Places, a sample / lower bound) — total businesses within 10 km of each branch, a proxy for how much trade surrounds it. Brighter = a denser merchant ecosystem.', color:'#1C8C7D', unit:'estab', tag:'m', val:d=>estabCount(d)},
   motomix:  {pill:'Collateral', label:'Motorcycle-title share ▲', desc:'COLLATERAL EXPOSURE · MEASURED (DLT) — motorcycle share of the province vehicle stock. Motorcycles are the most volatile, lowest-recovery title collateral; brighter = more exposure to a used-bike value fall.', color:'#7A4FE0', unit:'% moto (DLT)', tag:'m', val:d=>motoShare(d)},
+  floodhz:  {pill:'Flood hazard', label:'Repeated-flood hazard ▲', desc:"COLLATERAL / RECOVERY RISK · MEASURED (GISTDA 50k Repeated-Flooding census 2005–2016) — the number of the 12 years 2005–2016 the branch's district flooded. Brighter = ground that flooded in more years, so collateral seized there is harder to recover and re-sell. A chronic band (≥7/12) is a STRUCTURAL hazard on land we already lend against — distinct from the live water-level pulse. Frequency only (a hazard flag, not a flooded-area or loss estimate — no area is claimed, the source polygons overlap); recency (last flood year) rides the branch popup. Hidden until the hazard layer loads.", color:'#3E7CB1', unit:'yrs flooded /12', floodhz:true, tag:'m', val:d=>floodHzRec(d)||0},
   occrisk:  {pill:'Occupation risk', label:'Occupation × stress ◆▲', desc:"PORTFOLIO RISK · MEASURED occupation mix × ESTIMATED stress weighting — flags branches whose borrower base is concentrated in a stressed sector (factories in a slowdown · farming under crop-stress). A triage flag, not a measured default rate.", color:'#C8433B', unit:'occ-stress (est)', est:true, occr:true, tag:'e', val:d=>occriskVal(d)},
   poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇ est', desc:"BORROWER BASE · MEASURED counts × ESTIMATED relevance weighting (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model, so this reads as an estimated composite, not a measured count.", color:'#E6B450', unit:'relevant-POI (0–100, est)', poirel:true, est:true, tag:'e', val:d=>poiRelevanceVal(d)},
   drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + province unemployment + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
@@ -623,6 +624,8 @@ function floodHzRec(d){
   const i=idxOf(d); if(i<0) return null;
   const f=FLOODHZ[i]; return (f==null)?null:f;
 }
+// true once the repeated-flood hazard layer is loaded AND non-empty — gates the map lens legend/pill.
+function floodhzHasData(){ return !!(FLOODHZ&&FLOODHZ.length); }
 // per-branch most-recent flood year WITHIN the 2005-16 census (recency) — null when absent, 0 = no
 // record, else 2005-2016. Older/absent branches_last arrays degrade to null (no recency shown).
 function floodHzLastRec(d){
@@ -7834,6 +7837,7 @@ function lensAbsent(k){
   if(l.poirel) return poirelLoaded && !poiRelevanceHasData();
   if(l.peers) return peersLoaded && !peerHasData();
   if(l.macx)  return macxDone && !macxHasData();
+  if(l.floodhz) return floodhzLoaded && !floodhzHasData();
   if(l.cat)   return cropLuLoaded && !cropHasData();
   // pico district-rival lens: hide only once the district layer is loaded AND it predates the
   // pico fold (no record carries a pico field) — so an older amphoe.json degrades gracefully.
@@ -7947,6 +7951,20 @@ function renderLegend(){
       `<span><i style="background:${lensColor(.5,l.color)}"></i>${mid}%</span>`+
       `<span><i style="background:${lensColor(1,l.color)}"></i>${hi}% unemployment</span>`+
       ` <span class="sub" title="NSO Labour Force Survey — province-inherited district rate, measured">● measured · NSO LFS</span>`;
+    return;
+  }
+  // Repeated-flood hazard lens: MEASURED count of the 12 years 2005-2016 the branch's district
+  // flooded (0-12). Skeleton while the GISTDA layer loads, then an integer-years scale + an honest
+  // 'measured · GISTDA' tag. Frequency only — no flooded AREA is claimed (the popup carries recency).
+  if(l.floodhz){
+    if(!floodhzLoaded){ $('#maplegend').innerHTML='<span class="skel skel-line" style="display:inline-block;width:160px;vertical-align:middle" aria-hidden="true"></span> <span class="sub">repeated-flood hazard…</span>'; return; }
+    if(!floodhzHasData()){ $('#maplegend').innerHTML='<span class="sub" title="Repeated-flood hazard layer not loaded">Repeated-flood hazard layer not present — run pipeline/build_flood_hazard.py.</span>'; return; }
+    const vint=(floodhzMeta&&floodhzMeta.data_vintage)||'2005–2016';
+    $('#maplegend').innerHTML =
+      `<span><i style="background:${lensColor(.12,l.color)}"></i>0</span>`+
+      `<span><i style="background:${lensColor(.5,l.color)}"></i>${Math.round(mx*.5)}</span>`+
+      `<span><i style="background:${lensColor(1,l.color)}"></i>${Math.round(mx)} yrs flooded (of 12)</span>`+
+      ` <span class="sub" title="GISTDA 50k Repeated-Flooding census — count of the 12 years 2005-2016 the district flooded; a hazard flag, not a flooded-area estimate (source polygons overlap)">▲ measured · GISTDA ${vint}</span>`;
     return;
   }
   // Search-demand lens: ESTIMATED relative index (0-100, Google Trends) — skeleton while loading,
@@ -8094,8 +8112,10 @@ function initMap(){
   if(!croplandLoaded) loadBranchCropland();
   // warm the MEASURED per-branch fuel-station-within-10km popup line (OSM). Popup-only, no lens.
   if(!fuelstnLoaded) loadBranchFuel();
-  // warm the MEASURED per-branch repeated-flood-hazard popup line (GISTDA 2005-16). Popup-only, no lens.
-  if(!floodhzLoaded) loadFloodHazard();
+  // warm the MEASURED per-branch repeated-flood-hazard layer — feeds both the branch popup line AND
+  // the "Repeated-flood hazard" map lens. Chain a repaint so a direct ?lens=floodhz open colours in
+  // once the layer lands (mirrors the macx/hhdti warm-loads); otherwise the markers would stay 0s.
+  if(!floodhzLoaded) loadFloodHazard().then(()=>{ if(curLens==='floodhz'){ renderLenses(); renderLegend(); if(mapReady) styleMarkers(); } });
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -8960,6 +8980,12 @@ function setLens(k){
   }
   if(k==='poirel' && !poirelLoaded){
     loadPoiRelevance().then(()=>{ renderLenses(); if(curLens==='poirel'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  // floodhz is warm-loaded at map init for the popup, so its flag may already be set before this
+  // lens is picked; loadFloodHazard() caches its promise, so always chain the recolor on it rather
+  // than guarding on !floodhzLoaded (which would skip the repaint if the warm-load is still in flight).
+  if(k==='floodhz'){
+    loadFloodHazard().then(()=>{ renderLenses(); if(curLens==='floodhz'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   if(isAmpLens(k) && !ampJoinAttached){
     loadAmphoe().then(()=>{ if(isAmpLens(curLens)){ renderLegend(); if(mapReady) styleMarkers(); } });
