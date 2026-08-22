@@ -6806,6 +6806,15 @@ function renderFloodExposure(){
   let natRep=0, natChr=0, natUnk=0;
   const freq=new Array(13).fill(0);              // 0-12 flood years, tallied from the same join as everything else
   const byReg={}, byProv={};
+  // Recency of the CHRONIC tail (data/flood_hazard.json branches_last → FLOODHZ_LAST): of the branches
+  // on chronically-flooding ground, how many sat in a district that flooded again in the FINAL census
+  // year (still-live hazard) vs last flooded earlier (receding WITHIN the record). Same measured census,
+  // no recompute. Graceful: on an older deploy whose file lacks branches_last, hasRecency is false and
+  // the recency block is skipped entirely (exactly as the popup's "· last YYYY" degrades away).
+  const hasRecency=!!(FLOODHZ_LAST&&FLOODHZ_LAST.length);
+  const cyM=String((floodhzMeta&&floodhzMeta.data_vintage)||'2005-2016').match(/\d{4}/g)||['2005','2016'];
+  const cyStart=+cyM[0], cyEnd=+cyM[cyM.length-1];
+  let recLive=0, recLate=0, recEarly=0, recUnk=0; // chronic-branch recency bands
   DATA.forEach(d=>{
     const f=floodHzRec(d);                       // index-safe, null when absent
     const r=d.r||'—', v=d.v||'—';
@@ -6813,7 +6822,12 @@ function renderFloodExposure(){
     const po=byProv[v]||(byProv[v]={v,r,n:0,rep:0,chr:0});
     ro.n++; po.n++;
     if(f==null) natUnk++; else freq[Math.max(0,Math.min(12,f))]++;
-    if(f!=null && f>=1){ natRep++; ro.rep++; po.rep++; if(f>=FLOOD_CHRONIC){ natChr++; ro.chr++; po.chr++; } }
+    if(f!=null && f>=1){ natRep++; ro.rep++; po.rep++;
+      if(f>=FLOOD_CHRONIC){ natChr++; ro.chr++; po.chr++;
+        if(hasRecency){ const y=floodHzLastRec(d);   // most-recent flood year within the census (null/0 = none)
+          if(!y) recUnk++; else if(y>=cyEnd) recLive++; else if(y>=cyEnd-3) recLate++; else recEarly++; }
+      }
+    }
   });
   // How the network spreads across the frequency scale. Counted off the per-branch join rather than
   // meta.branch_freq_hist so every number in this panel rests on one basis and cannot disagree with
@@ -6852,13 +6866,34 @@ function renderFloodExposure(){
       ['Frequency is <b>measured</b> — GISTDA 1:50,000 repeated-flooding census, '+vint+'.',
        'Only the district name-match is inferred; every unresolved district is zero-branch, so no branch loses a real flag.',
        'This is a <b>hazard flag</b> (did the ground flood, how often), <b>not</b> a flooded-area or loss estimate — no area is claimed (the source polygons overlap).',
-       'Distinct from the LIVE ThaiWater water-level pulse on Overview — this is the standing structural hazard.'])+
+       'Distinct from the LIVE ThaiWater water-level pulse on Overview — this is the standing structural hazard.']
+       .concat(hasRecency?['Recency (last flood year) is measured on the same census but bounded within '+cyStart+'–'+cyEnd+' — a relative still-live-vs-receding read, <b>not</b> an absolute years-ago.']:[]))+
     `<h3 class="sub" style="margin:14px 0 6px">How the network spreads across the flood-frequency scale</h3>`+
     `<div class="tbl-wrap"><table class="tbl" id="expo-flood-band"><tr><th scope="col">Band</th><th scope="col">Flood years</th>`+
       `<th scope="col">Branches</th><th scope="col">Share</th></tr>`+
       bands.map(([lab,yrs,n,col])=>`<tr><td><b style="color:${col}">${lab}</b></td><td class="sub">${yrs}</td>`+
         `<td class="mono">${n.toLocaleString()}</td><td class="mono" style="color:${col}">${(100*n/N).toFixed(1)}%</td></tr>`).join('')+
       `</table></div>`+
+    // Recency of the chronic tail — is that hazard still live at the end of the record, or receding
+    // within it? Frequency alone cannot separate a district that flooded 9/12 yrs but last in 2013
+    // from one flooding through the final census year. MEASURED (branches_last), skipped gracefully
+    // on an older deploy whose flood_hazard.json predates the branches_last array.
+    (hasRecency&&natChr>0?
+      `<h3 class="sub" style="margin:14px 0 6px">Is the chronic hazard still live, or receding within the record?</h3>`+
+      `<p class="lead"><b>${recLive.toLocaleString()} of ${natChr.toLocaleString()} chronic branches (${natChr?(100*recLive/natChr).toFixed(0):'0'}%)</b> `+
+      `sat in a district that flooded again in <b>${cyEnd}</b>, the final census year — so the structural hazard was <b>still live at the end of the record</b>, not abating; `+
+      `${(recLate+recEarly).toLocaleString()} last flooded earlier, a within-record de-risking signal.<br>`+
+      `<span class="sub">Recency is bounded by the ${cyStart}–${cyEnd} census window — a relative still-live-vs-receding read, <b>not</b> an absolute years-ago (the record ends in ${cyEnd}).</span></p>`+
+      `<div class="tbl-wrap"><table class="tbl" id="expo-flood-recency"><tr><th scope="col">Recency (within ${cyStart}–${cyEnd})</th><th scope="col">Last flood</th>`+
+        `<th scope="col">Chronic branches</th><th scope="col">Share</th></tr>`+
+      [['Still live at record end',`${cyEnd}`,recLive,'var(--agri)'],
+       ['Receding (late record)',`${cyEnd-3}–${cyEnd-1}`,recLate,'var(--gold)'],
+       ['Receded (early–mid record)',`≤${cyEnd-4}`,recEarly,'var(--merch)']]
+        .concat(recUnk?[['No recency on record','—',recUnk,'var(--dim)']]:[])
+        .map(([lab,yr,n,col])=>`<tr><td><b style="color:${col}">${lab}</b></td><td class="sub">${yr}</td>`+
+          `<td class="mono">${n.toLocaleString()}</td><td class="mono" style="color:${col}">${natChr?(100*n/natChr).toFixed(0):'0'}%</td></tr>`).join('')+
+      `</table></div>`
+    :'')+
     `<div class="dash2"><div class="dash2-side">`+
       `<h2 class="risk">By region</h2>`+
       `<p class="lead">Share of each region's branches sitting on repeat- and chronic-flood ground. Chronic ranked first.</p>`+

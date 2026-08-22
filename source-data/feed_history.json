@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 419,
+  "n_points": 421,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -406,11 +406,12 @@
     "2026-08-17",
     "2026-08-18",
     "2026-08-19",
-    "2026-08-20"
+    "2026-08-20",
+    "2026-08-21"
    ],
    "first_seen": "2026-07-05",
    "label": "Diesel · retail pump",
-   "n": 29,
+   "n": 30,
    "path": "source-data/fuel_prices.json",
    "source": "Bangchak retail oil-price API",
    "unit": "฿/L",
@@ -441,6 +442,7 @@
     37.54,
     37.54,
     37.54,
+    38.39,
     38.39,
     38.39,
     38.39
@@ -477,11 +479,12 @@
     "2026-08-17",
     "2026-08-18",
     "2026-08-19",
-    "2026-08-20"
+    "2026-08-20",
+    "2026-08-21"
    ],
    "first_seen": "2026-07-05",
    "label": "Gasohol 95 · retail pump",
-   "n": 29,
+   "n": 30,
    "path": "source-data/fuel_prices.json",
    "source": "Bangchak retail oil-price API",
    "unit": "฿/L",
@@ -512,6 +515,7 @@
     36.84,
     36.84,
     36.84,
+    37.69,
     37.69,
     37.69,
     37.69
