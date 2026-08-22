@@ -487,8 +487,8 @@ body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!importan
 </style>
 </head>
 <body>
-  <a class="skip-link" href="#strip">Skip to main content</a>
-  <script>(function(){var s=document.querySelector('.skip-link');if(!s)return;s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('strip');if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <script>(function(){var s=document.querySelector('.skip-link');if(!s)return;s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('main-content');if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
   <noscript>
     <div style="max-width:640px;margin:72px auto;padding:20px 22px;background:var(--card);border:1px solid var(--cardln);border-left:3px solid #5B7CFA;border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55;position:relative;z-index:9999">
       <strong style="color:var(--hi);display:block;margin-bottom:6px">This 3D scene needs JavaScript enabled.</strong>
@@ -541,6 +541,7 @@ body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!importan
  sync();
  b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});})();
 </script>
+<main id="main-content" tabindex="-1">
 <div id="sky"></div>
 <div id="map"></div>
 <!-- focal-branch label as HTML (browser shapes Thai correctly, unlike deck.gl TextLayer) — positioned
@@ -549,7 +550,7 @@ body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!importan
 <div id="atmos"></div>
 <div id="vignette"></div>
 
-<div id="strip" tabindex="-1"><span class="ttl" id="cityTitle">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
+<div id="strip"><span class="ttl" id="cityTitle">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
 
 <div id="scenesearch">
   <div class="ss-box">
@@ -638,6 +639,7 @@ body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!importan
     <div id="legend" role="group" aria-label="POI layer toggles"></div>
   </div>
 </div>
+</main>
 <script>/* legend collapse — tap the header to minimize; default COLLAPSED on phones so the map is viewable. */
 (function(){var w=document.getElementById('legendwrap'),h=document.getElementById('lgToggle');if(!w||!h)return;
   function set(c){w.classList.toggle('collapsed',c);h.setAttribute('aria-expanded',String(!c));
