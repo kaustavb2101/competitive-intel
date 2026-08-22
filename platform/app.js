@@ -35,6 +35,7 @@ const LENS = {
   doutnum:{pill:'Outnumbered', label:'PICO rivals per branch ◆', desc:"COMPETITIVE PRESSURE · MEASURED (FPO registry ÷ AutoX footprint) — licensed พิโกไฟแนนซ์ (PICO-finance) operators PER AutoX branch in the same district. Unlike raw PICO density, this weighs the rival field against how many branches we run there: brighter = the existing footprint is more heavily outnumbered street-by-street (obj #2 — pressure on the network we run, not a where-to-open cue). Defined only where AutoX operates; coverage-gap districts are the white-space lens's story. Kept separate from portfolio risk. Hidden until the district layer loads.", color:'#7A4FE0', unit:'PICO rivals / AutoX branch', amp:true, pico:true, tag:'m', val:d=>(d._amp&&d._amp.pico_ratio!=null)?d._amp.pico_ratio:null},
   crop: {pill:'Crop mix', label:'Dominant crop ◇ est', desc:"AGRI EXPOSURE · ESTIMATED (model-allocated crop areas) — each district coloured by its DOMINANT credit-relevant crop (rice / cassava / maize / sugarcane / oil palm) from SPAM 2010, a modeled spatial disaggregation of measured subnational statistics onto a ~9km grid. Shows which crop a district's borrower base depends on, so a macro move against that crop maps to exposure. Rubber is absent from SPAM (a known blind spot for the rubber belt).", color:'#4E9A6B', unit:'dominant crop', amp:true, cat:true, tag:'e', est:true, val:d=>0},
   dfarm:{pill:'Farmland share', label:'District farmland share ◆', desc:"AGRI EXPOSURE · MEASURED (NABC/OAE official district data, 2568/2025) — the share of each district that is agricultural land, at true district (อำเภอ) grain. This is the amphoe-MEASURED counterpart to the estimated crop-mix and province-inherited agri-stress lenses: brighter = a more farm-dependent local borrower base, so a crop-price or drought shock reaches more of the book there (obj #1 portfolio risk). Districts the source carries no value for (most of Bangkok, some remote / island districts) show 'n/a', not zero. A few intensively multi-cropped districts are capped at 100%.", color:'#4E9A6B', unit:'% farmland (measured)', amp:true, dfarm:true, tag:'m', val:d=>(d._amp&&d._amp.agri_land_share!=null)?Math.round(d._amp.agri_land_share*100):null},
+  ddrought:{pill:'District drought', label:'District drought ▲ modelled', desc:"PORTFOLIO RISK · MODELLED (OAE SPEI, ERA5-Land reanalysis) — the branch's district drought intensity on OAE's Standardized Precipitation-Evapotranspiration Index, resolved to true district (อำเภอ) grain (0–100 index, drier = higher; lower SPEI = drier). An official model product — NOT station rainfall and NOT a disaster declaration. This resolves drought to the district, unlike the province-inherited agri-stress lens which every amphoe in a province shares: brighter = a drier local farm economy, so a drought shock reaches more of the book there (obj #1 portfolio risk). Kept SEPARATE from the estimated agri-stress proxy — this is the modelled OAE index, not our proxy, and does not modify it. Districts the source flags ambiguous or a grid-gap zero show 'n/a', never a guessed reading. Hidden until the district layer loads.", color:'#E6B450', unit:'drought (0–100, modelled SPEI)', amp:true, drought:true, est:true, tag:'e', val:d=>{const a=d&&d._amp; const s=a?a.spei:null; if(typeof s!=='number'||!isFinite(s)) return null; const dry=s<0?-s:0; /* -SPEI capped at 2.5 (exceptional drought) -> 0–100 for the ramp/popup; raw spei kept in the record + shown in the polygon popup */ return Math.round(Math.min(1,dry/2.5)*100);}},
   pstress:{pill:'Province stress', label:'Province structural stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — blends the branch's province household debt-to-income percentile (NSO SES) with its province unemployment percentile (NSO LFS) into ONE 'which provinces are structurally riskiest' read, equal-weighted. Both inputs are measured; the blend + weighting are an editorial triage ordering, not a measured default rate. Hidden until the layer loads.", color:'#C8433B', unit:'stress (0–100, est)', pstr:true, prov:true, est:true, tag:'e', val:d=>pstressVal(d)},
   dsrch:{pill:'Search demand', label:'Title-loan search demand ▲ est', desc:"BRAND DEMAND · ESTIMATED (Google Trends relative index, 0–100) — how hard people in the branch's province search title-loan intent terms (จำนำทะเบียนรถ · สินเชื่อรถแลกเงิน). A demand/attention signal, NOT query volume or bookings. Hidden until the layer loads.", color:'#E6B450', unit:'search demand (0–100, est)', dsrch:true, prov:true, est:true, tag:'e', val:d=>sdemandVal(d)},
   peerdev:  {pill:'Vs twins', label:'Risk vs statistical twins ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how many points the branch's composite risk sits ABOVE its 15 statistical twins (branches with the most similar measured market elsewhere in the country, same household-leverage backdrop). Bright = the market alone doesn't explain the risk; something local is different. Audit these first.", color:'#E0574F', unit:'pts above twins (est)', est:true, peers:true, tag:'e', val:d=>peerDevVal(d)},
@@ -6327,6 +6328,20 @@ function drawAmphoeChoropleth(){
       const v=l.val({_amp:a});
       const unit=l.unit||'';
       const vtxt=(typeof v==='number'&&isFinite(v))?Math.round(v):'n/a';
+      if(l.drought){
+        // district-drought popup: surface the raw MODELLED SPEI + OAE severity band, not just
+        // the 0–100 ramp index, so the number matches the Overview drought card. n/a = the
+        // source is ambiguous / a grid-gap zero / carries no reading (never a guessed 0).
+        const sp=(typeof a.spei==='number'&&isFinite(a.spei))?a.spei:null;
+        const band=a.drought_cls||(sp==null?'n/a':'normal');
+        layer.bindPopup(`<div class="pop" style="min-width:0"><div class="pn" style="color:${l.color}">◇ ${nm}</div>`+
+          `<div class="pv">${a.province_th||''}${a.region?' · '+a.region:''}</div>`+
+          `<div class="sub" style="margin-top:4px">SPEI <b style="color:${l.color}">${sp!=null?sp.toFixed(2):'n/a'}</b> · <b>${band}</b> <span title="OAE Standardized Precipitation-Evapotranspiration Index — MODELLED (ERA5-Land), not station rainfall">modelled</span></div>`+
+          `<div class="sub">Drought index: ${vtxt}${sp!=null?' / 100 (drier = higher)':''}</div>`+
+          `<div class="sub">AutoX branches inside: ${a.branches!=null?a.branches:'n/a'}</div></div>`,
+          {closeButton:true,maxWidth:260});
+        return;
+      }
       layer.bindPopup(`<div class="pop" style="min-width:0"><div class="pn" style="color:${l.color}">◇ ${nm}</div>`+
         `<div class="pv">${a.province_th||''}${a.region?' · '+a.region:''}</div>`+
         `<div class="sub" style="margin-top:4px"><b style="color:${l.color}">${vtxt}</b> ${unit}</div>`+
@@ -7842,6 +7857,9 @@ function lensAbsent(k){
   // pico district-rival lens: hide only once the district layer is loaded AND it predates the
   // pico fold (no record carries a pico field) — so an older amphoe.json degrades gracefully.
   if(l.pico)  return !!(AMP&&AMP.length)&&!AMP.some(a=>a&&a.pico!=null);
+  // district-drought lens: hide once the district layer is loaded AND it predates the
+  // drought fold (no record carries a spei field) — so an older amphoe.json degrades gracefully.
+  if(l.drought) return !!(AMP&&AMP.length)&&!AMP.some(a=>a&&a.spei!=null);
   return false;
 }
 function renderLenses(){

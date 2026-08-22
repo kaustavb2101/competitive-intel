@@ -188,6 +188,37 @@ def build():
                 agri_years.add(str(r["year"]))
     n_agri_join = n_agri_clamped = 0
 
+    # ── district-grain drought (obj #1, MODELLED, portfolio risk) ─────────────────
+    # platform/data/drought_district.json is OAE's SPEI (Standardized Precipitation-
+    # Evapotranspiration Index) per amphoe — an official MODELLED drought index from
+    # ERA5-Land reanalysis (NOT station rainfall, NOT a disaster declaration; lower =
+    # drier). Until now this per-district signal only surfaced on the Overview drought
+    # card and the province drought radar; folding spei + its severity band onto each
+    # amphoe record lets the National map paint drought at true district (อำเภอ) grain —
+    # the objective-#1 read the province-inherited agri_stress cannot resolve. Kept
+    # SEPARATE from and alongside agri_stress (this is a MODELLED index, NOT the ESTIMATED
+    # province crop-stress proxy; it does not modify agri_stress). Joined on name_en
+    # (== th_amphoe shapeName, the key both files derive from), so it covers zero-branch
+    # polygons too. Districts the source flags ambiguous (shapeName not unique) or
+    # suspect_zero (a grid gap read as 0.0) are SKIPPED — an honest ABSENT (null spei),
+    # never a guessed reading. Null-safe: absent file -> the drought fields are simply
+    # omitted (older amphoe.json shape; the map lens gates on the field being present).
+    drought_path = os.path.join(REPO, "platform", "data", "drought_district.json")
+    drought_by_en, drought_meta = None, None
+    n_drought_join = n_drought_dry = 0
+    if os.path.exists(drought_path):
+        dj = _load(drought_path)
+        drought_meta = dj.get("meta") or {}
+        drought_by_en = {}
+        for d in dj.get("districts", []):
+            if d.get("join_ambiguous") or d.get("suspect_zero"):
+                continue
+            en = d.get("name_en")
+            sp = d.get("spei")
+            if not en or not isinstance(sp, (int, float)):
+                continue
+            drought_by_en[en] = (round(float(sp), 3), d.get("cls"))
+
     # ── spatial join: branches -> amphoe polygon (PIP, bbox prefilter) ───────────
     # branch_sid[i] = shapeID of the amphoe branch i (master order) falls inside.
     # A few branches sit just off a polygon (coast/border geometry) — those get a
@@ -336,6 +367,23 @@ def build():
                 recs[-1]["agri_area_rai"] = None
                 recs[-1]["agri_land_share"] = None
                 recs[-1]["agri_area_measured"] = False
+        # MODELLED district-grain drought (obj #1, portfolio risk) — OAE SPEI + severity
+        # band, name-joined on the English shapeName (en). Added only when the drought
+        # layer is present (older record shape else — the map lens gates on the field).
+        # Ambiguous / suspect-zero districts and any polygon the source carries no reading
+        # for keep null spei / drought_cls: an honest ABSENT, never a guessed 0.
+        if drought_by_en is not None:
+            hit = drought_by_en.get(en)
+            if hit:
+                sp, cls = hit
+                recs[-1]["spei"] = sp
+                recs[-1]["drought_cls"] = cls
+                n_drought_join += 1
+                if sp < 0:
+                    n_drought_dry += 1
+            else:
+                recs[-1]["spei"] = None
+                recs[-1]["drought_cls"] = None
 
     # ── scores ───────────────────────────────────────────────────────────────────
     # demand proxy: weighted POI footfall + DIW workers, log-compressed so a few
@@ -535,6 +583,26 @@ def build():
                     "grain. Kept ALONGSIDE the province-inherited ESTIMATED agri_stress (which every "
                     "amphoe in a province still shares), not replacing it; the two are labelled "
                     "distinctly (MEASURED area/share vs ESTIMATED stress index).",
+        }
+    if drought_meta is not None:
+        meta["join_rates"]["drought_to_amphoe"] = (
+            f"{n_drought_join}/{len(recs)} amphoe carry a MODELLED OAE SPEI drought reading "
+            f"(name-joined on the English shapeName; ambiguous / suspect-zero districts skipped, "
+            f"never guessed)")
+        meta["drought"] = {
+            "source": "OAE district SPEI via platform/data/drought_district.json (build_drought_district.py)",
+            "label": drought_meta.get("label"),
+            "snapshot": drought_meta.get("snapshot"),
+            "n_districts_with_reading": n_drought_join,
+            "n_districts_dry": n_drought_dry,
+            "fields": "spei (float; lower/more-negative = drier), drought_cls (OAE severity band). "
+                      "null where the source is ambiguous / suspect-zero / carries no reading.",
+            "note": "District-grain MODELLED drought (obj #1) — OAE's SPEI (ERA5-Land reanalysis, an "
+                    "official model product, NOT station rainfall and NOT a disaster declaration) folded "
+                    "onto each amphoe so the National map can paint drought at true district grain. Kept "
+                    "SEPARATE from and ALONGSIDE the province-inherited ESTIMATED agri_stress (which every "
+                    "amphoe in a province still shares) — this is a MODELLED index, not the estimated "
+                    "crop-stress proxy, and does NOT modify agri_stress.",
         }
     return {"meta": meta, "amphoe": recs, "branch_amphoe": branch_amphoe}, branch_join, len(master), fac_join, fac_attempt
 
