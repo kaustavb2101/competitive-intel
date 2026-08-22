@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-22T10:14:57+00:00",
-    "commit": "be4252f"
+    "generated_at": "2026-08-22T16:15:21+00:00",
+    "commit": "c156237"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-08-22T16:15:21+00:00",
+      "sha": "c156237",
+      "summary": "health(deploy): shape-probe national_places.json — the national POI fallback behind every province 3D scene",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-22T15:40:05+00:00",
+      "sha": "d705060",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-22, run 32582286820)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-22T14:45:11+00:00",
+      "sha": "cc739c1",
+      "summary": "docs(progress): log rayong-catchment.html <main> landmark ship + deploy verify (PR #567)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-22T21:41:50+07:00",
+      "sha": "89d003a",
+      "summary": "ux: add <main> landmark to rayong-catchment.html deck.gl page (#567)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-22T14:26:46+00:00",
+      "sha": "00f1b06",
+      "summary": "data: SET peer filings refresh (run 32575518874) (#566)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-22T12:58:25+00:00",
+      "sha": "9670e86",
+      "summary": "feat(map): add MODELLED District-drought (OAE SPEI) National-map lens (obj #1) (#565)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-22T10:44:07+00:00",
+      "sha": "d4c0385",
+      "summary": "data: market-pulse swarm refresh (run 32566175548) (#564)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-22T10:15:30+00:00",
+      "sha": "1d42a69",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the occupation_leads shape-probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-22T10:14:57+00:00",
       "sha": "be4252f",
       "summary": "health(deploy): shape-probe occupation_leads.json — the acquisition lead board's source",
@@ -662,54 +710,6 @@
       "date": "2026-08-21T20:19:14+00:00",
       "sha": "74cc41d",
       "summary": "docs(progress): log ux-databook-search-results-status merge+deploy+verify (PR #554)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-22T03:14:34+07:00",
-      "sha": "419c1b4",
-      "summary": "ux: announce data-book #brsearch result count to screen readers (role=status live region) (#554)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-21T20:07:47+00:00",
-      "sha": "82f338f",
-      "summary": "data: Thai-IP-only swarm refresh (run 32519485252) (#553)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-21T19:03:51+00:00",
-      "sha": "e55dd56",
-      "summary": "data: advance World Bank Pink Sheet commodity board 2026M06 -> 2026M07 (#552)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-21T17:01:33+00:00",
-      "sha": "a8e6e8f",
-      "summary": "data: market-pulse swarm refresh (run 32500739825) (#551)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-21T16:22:33+00:00",
-      "sha": "c85b76d",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the lead-layer service-audit close-out",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-21T16:22:03+00:00",
-      "sha": "d59fcf1",
-      "summary": "service(audit): close the recurring lead-layer surface question + correct the \"cannot self-heal\" triage rationale",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-21T15:51:59+00:00",
-      "sha": "c5b3819",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-21, run 32499756109)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-21T14:20:10+00:00",
-      "sha": "d434d35",
-      "summary": "docs(progress): record ux-loop branch-explorer #status live-region ship (PR #550, deploy-verified)",
       "pillar": "uxui"
     }
   ]
