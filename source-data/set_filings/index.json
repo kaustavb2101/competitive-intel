@@ -2,7 +2,7 @@
  "meta": {
   "title": "SET filings — MD&A narrative + Financial Statements/NOTES for the six SET-listed Thai title-loan peers (measured, autonomous pull)",
   "generated_by": "pipeline/pull_set_filings.py",
-  "generated_date": "2026-08-15",
+  "generated_date": "2026-08-22",
   "label": "MEASURED — Stock Exchange of Thailand (set.or.th) company disclosures. kind=mda: the Management Discussion & Analysis PDF (management's narrative). kind=fs: the Financial Statement ZIP, whose NOTES.DOCX carries the IFRS-9 Stage 1/2/3 ECL tables, allowance movement and receivables-by-collateral breakdowns, and whose FINANCIAL_STATEMENTS.XLSX carries the primary statements. Text extracted with pdfplumber / openpyxl / a zip+XML docx reader. Newest 4 of each kind per symbol.",
   "source": "Stock Exchange of Thailand · set.or.th news search + weblink.set.or.th attachments",
   "symbols": [
@@ -27,7 +27,7 @@
   ],
   "search_window": {
    "from": "01/01/2026",
-   "to": "15/08/2026"
+   "to": "22/08/2026"
   },
   "per_symbol": 4
  },
@@ -248,9 +248,20 @@
    "id": "105738000",
    "date": "2026-08-07",
    "headline": "Management Discussion and Analysis Quarter 2 Ending 30 Jun 2026",
-   "url": "https://weblink.set.or.th/dat/news/202601/1667NWS070820261932091200E.pdf",
-   "status": "download_failed",
-   "error": "HTTP Error 404: Not Found"
+   "url": "https://weblink.set.or.th/dat/news/202608/1667NWS070820261932091200E.pdf",
+   "raw_path": "source-data/set_filings/pdf/HENG_mda_2026-08-07_105738000.pdf",
+   "sha256": "c14215c5660c8d8dd4f2ab1be6bef83c9a68f171ea0f0840e0a51ba444fb3a5d",
+   "cached": false,
+   "n_pages": 7,
+   "status": "ok",
+   "text_files": [
+    {
+     "member": "HENG_mda_2026-08-07_105738000.pdf",
+     "text_path": "source-data/set_filings/text/HENG_mda_2026-08-07_105738000__MDA.txt",
+     "n_chars": 10262
+    }
+   ],
+   "n_chars": 10262
   },
   {
    "symbol": "MTC",
