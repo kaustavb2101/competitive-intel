@@ -295,8 +295,8 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
 </style>
 </head>
 <body>
-  <a class="skip-link" href="#bar">Skip to main content</a>
-  <script>(function(){var s=document.querySelector('.skip-link');if(!s)return;s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('bar');if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <script>(function(){var s=document.querySelector('.skip-link');if(!s)return;s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('main-content');if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
   <h1 class="sr-only" id="pageH1">Branch 3D explorer — AutoX · <span lang="th">เงินไชโย</span></h1>
   <noscript>
     <div style="max-width:640px;margin:72px auto;padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55;position:relative;z-index:9999">
@@ -350,7 +350,8 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
  sync();
  b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});})();
 </script>
-<div id="bar" tabindex="-1">
+<main id="main-content" tabindex="-1">
+<div id="bar">
   <a href="index.html#map">← National</a>
   <span class="nm" id="bnm">Branch</span><span class="sub" id="bsub"></span><span class="sub" id="brival"></span>
 </div>
@@ -395,6 +396,7 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
   <button data-s="ctl" aria-controls="ctl" aria-expanded="false">Layers</button>
 </div>
 <div id="status" role="status" aria-live="polite" aria-atomic="true">Loading…</div>
+</main>
 <script>
 'use strict';
 const Q = new URLSearchParams(location.search);
