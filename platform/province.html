@@ -359,8 +359,8 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 </style>
 </head>
 <body>
-  <a class="skip-link" href="#strip">Skip to main content</a>
-  <script>(function(){var s=document.querySelector('.skip-link');if(!s)return;s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('strip');if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <script>(function(){var s=document.querySelector('.skip-link');if(!s)return;s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('main-content');if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
   <h1 class="sr-only" id="pageH1">Province deep-dive — AutoX · <span lang="th">เงินไชโย</span></h1>
   <noscript>
     <div style="max-width:640px;margin:72px auto;padding:20px 22px;background:var(--card);border:1px solid var(--cardln);border-left:3px solid #5B7CFA;border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55;position:relative;z-index:9999">
@@ -419,12 +419,13 @@ html[data-theme="light"] .lg.on b{color:#11151F}
  }
 })();
 </script>
+<main id="main-content" tabindex="-1">
 <div id="sky"></div>
 <div id="map"></div>
 <div id="atmos"></div>
 <div id="vignette"></div>
 
-<div id="strip" tabindex="-1"><span class="ttl" id="stripTtl">Province <b>·</b> branches · POIs · 10km reach</span><span id="kpis"></span></div>
+<div id="strip"><span class="ttl" id="stripTtl">Province <b>·</b> branches · POIs · 10km reach</span><span id="kpis"></span></div>
 
 <div id="ctl">
   <div class="grp">
@@ -494,6 +495,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
   <div id="legend" role="group" aria-label="POI layer toggles"></div>
   <div id="croplegend"></div>
 </div>
+</main>
 
 <script>window.initProvince=function(){
 'use strict';
