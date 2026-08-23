@@ -8767,12 +8767,21 @@ function collatMixPopupHTML(d,sec,r){
   const gapLine=(rg!=null)
     ? r('Pickup inflow vs stock ▲', `<span style="color:${rg<0?'var(--agri)':'var(--collat)'}">${rg>0?'+':rg<0?'−':''}${Math.abs(rg).toFixed(1)} pp</span> <span class="sub">${rg<0?'pool thinning':'pool refilling'}</span>`, rg<0?'var(--agri)':'var(--collat)')
     : '';
+  // Mirror of the pickup line: gap_pp.ry12 = motorcycles' share of NEW registrations minus their
+  // share of parked STOCK (percentage points, DLT measured). Positive = the collateral inflow is
+  // skewing to thin-ticket bikes (lower-value, faster-depreciating recovery collateral than the
+  // used pickups it displaces) — an obj-#1 collateral-supply signal. Shown once vehicle_mix loads.
+  const mg=(g&&g.ry12!=null)?g.ry12:null;
+  const motoLine=(mg!=null)
+    ? r('Moto inflow vs stock ▲', `<span style="color:${mg>0?'var(--agri)':'var(--collat)'}">${mg>0?'+':mg<0?'−':''}${Math.abs(mg).toFixed(1)} pp</span> <span class="sub">${mg>0?'inflow skewing to bikes':'inflow off bikes'}</span>`, mg>0?'var(--agri)':'var(--collat)')
+    : '';
   return sec('Collateral mix — DLT vehicle stock · measured')
     + r('Motorcycle share ▲', mp!=null?mp+'%':'n/a', mc)
     + (cp!=null?r('Car share', cp+'%', '#8b90a7'):'')
     + (pp!=null?r('Pickup share', pp+'%', '#8b90a7'):'')
     + (ep!=null?r('EV share', ep+'%', 'var(--merch)'):'')
-    + gapLine;
+    + gapLine
+    + motoLine;
 }
 // District (amphoe) block for a branch popup — shows the whole-district scores joined to this
 // branch. White-space is MEASURED (demand POIs vs AutoX saturation); risk is ESTIMATED. Renders
