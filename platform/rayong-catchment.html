@@ -555,7 +555,7 @@ body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!importan
 <div id="scenesearch">
   <div class="ss-box">
     <span class="ss-ico" aria-hidden="true">⌕</span>
-    <input id="ssInput" type="text" placeholder="Search branches, rivals, places" aria-label="Search the scene — branches, competitors, places" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="ssResults">
+    <input id="ssInput" type="text" placeholder="Search branches, rivals, places" aria-label="Search the scene — branches, competitors, places" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ssResults">
     <span class="ss-kbd" aria-hidden="true">/</span>
     <button id="ssClear" class="ss-clr" type="button" aria-label="Clear search">✕</button>
   </div>
@@ -2317,22 +2317,24 @@ function buildSearch(){
     matches=starts.concat(contains).slice(0,10);
   }
   function rowHTML(e,i){ const c=e.color;
-    return '<div class="ss-row'+(i===active?' active':'')+'" data-i="'+i+'" role="option">'+
+    return '<div class="ss-row'+(i===active?' active':'')+'" id="ss-opt-'+i+'" data-i="'+i+'" role="option" aria-selected="'+(i===active)+'">'+
       '<span class="ss-sw" style="background:rgb('+c[0]+','+c[1]+','+c[2]+')"></span>'+
       '<span class="ss-tx"><span class="ss-lb">'+esc(e.label)+'</span><span class="ss-sb">'+esc(e.sub)+'</span></span>'+
       '<span class="ss-kind">'+esc(e.klab)+'</span></div>'; }
   function paint(){
-    if(!inp.value.trim()){res.classList.remove('show');res.innerHTML='';inp.setAttribute('aria-expanded','false');return;}
-    if(!matches.length){res.innerHTML='<div class="ss-empty">No matches in this scene</div>';res.classList.add('show');inp.setAttribute('aria-expanded','true');return;}
+    if(!inp.value.trim()){res.classList.remove('show');res.innerHTML='';inp.setAttribute('aria-expanded','false');inp.removeAttribute('aria-activedescendant');return;}
+    if(!matches.length){res.innerHTML='<div class="ss-empty">No matches in this scene</div>';res.classList.add('show');inp.setAttribute('aria-expanded','true');inp.removeAttribute('aria-activedescendant');return;}
     res.innerHTML=matches.map(rowHTML).join('');
-    res.classList.add('show'); inp.setAttribute('aria-expanded','true');
+    res.classList.add('show'); inp.setAttribute('aria-expanded','true'); syncActiveDesc();
     res.querySelectorAll('.ss-row').forEach(el=>{
       el.onmousedown=ev=>{ev.preventDefault();pick(+el.dataset.i);};
       el.onmouseenter=()=>{active=+el.dataset.i;paintActive();}; });
   }
-  function paintActive(){res.querySelectorAll('.ss-row').forEach(el=>el.classList.toggle('active',+el.dataset.i===active));}
+  // keep the ARIA active-option state in step with the visual .active highlight (aria-selected on the option + aria-activedescendant on the combobox)
+  function syncActiveDesc(){const el=(active>=0)?res.querySelector('.ss-row.active'):null;if(el&&el.id)inp.setAttribute('aria-activedescendant',el.id);else inp.removeAttribute('aria-activedescendant');}
+  function paintActive(){res.querySelectorAll('.ss-row').forEach(el=>{const on=(+el.dataset.i===active);el.classList.toggle('active',on);el.setAttribute('aria-selected',String(on));});syncActiveDesc();}
   function scrollActive(){const el=res.querySelector('.ss-row.active');if(el&&el.scrollIntoView)el.scrollIntoView({block:'nearest'});}
-  function hide(){res.classList.remove('show');active=-1;inp.setAttribute('aria-expanded','false');}
+  function hide(){res.classList.remove('show');active=-1;inp.setAttribute('aria-expanded','false');inp.removeAttribute('aria-activedescendant');}
   function pick(i){ const e=matches[i]; if(!e)return;
     inp.value=e.label; clr.classList.add('show'); hide(); inp.blur();
     if(e.kind==='branch'&&e.ref){ selectBranch(e.ref,true); }
