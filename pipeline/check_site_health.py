@@ -3759,6 +3759,85 @@ def _shape_national_places(d):
     return None
 
 
+def _shape_poi_relevance(d):
+    # The per-branch RELEVANT-POI density layer (poi_relevance.json, obj #2 —
+    # MEASURED Overture/OSM category counts fused by an ESTIMATED relevance model
+    # into a 0-100 `rel` score). loadPoiRelevance() reads POIREL = j.branches,
+    # INDEX-ALIGNED to branches.json (entry i <-> DATA[i]); poiRelevanceVal(d)
+    # reads POIREL[i].rel to colour the #map "relevant-POI density" lens and the
+    # branch popup. The fetch is null-guarded (`if(!r.ok){POIREL=null}`), so a
+    # truncated/404 CDN deploy silently hides the lens and zeroes the popup block
+    # with NO phone alert — and at ~0.6 MB it is the heaviest surfaced-but-unprobed
+    # graceful-degrading read left after the 5-7 MB 3D-scene reads were covered
+    # (2026-08-22). It cannot self-heal from CI (build_poi_relevance.py is an
+    # Overture pull with no CI cron), so the live-URL probe is the only safeguard.
+    # Asserts render SHAPE not values: the object, the index-aligned .branches list
+    # of exactly 2015 (a truncation drops the count), and at least one branch
+    # carrying a numeric `rel` (the lens/popup render read) — robust to any future
+    # Overture vintage or reweighting moving the individual scores.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    br = d.get("branches")
+    if not isinstance(br, list) or not br:
+        return "missing/empty 'branches' list (the per-branch relevance render read)"
+    if len(br) != 2015:
+        return "'branches' length %d != 2015 (index-aligned to branches.json; a partial/truncated deploy)" % len(br)
+    ok = False
+    for b in br:
+        if isinstance(b, dict) and isinstance(b.get("rel"), (int, float)):
+            ok = True
+            break
+    if not ok:
+        return "no branch carries a numeric 'rel' score (the relevance-lens render read; a gutted layer)"
+    return None
+
+
+def _shape_lead_sites(d):
+    # The per-branch MEASURED lead-site COORDINATES (lead_sites.json, obj #2) —
+    # the K<=12 nearest lead-relevant OSM establishments within 10km of each branch,
+    # drawn as tiny category-coloured pins around a branch WHILE its popup is open
+    # (drawLeadSites). loadLeadSites() reads LSITES = j.branches, INDEX-ALIGNED to
+    # branches.json; each entry is a list of rows [cat_idx, lng, lat, dist_km], and
+    # the pin colour/label come from lsitesMeta.categories[cat_idx].{k,label}. The
+    # fetch is null-guarded (`if(!r.ok){LSITES=null}`), so a truncated/404 CDN deploy
+    # silently drops the lead-site pins from the map with NO phone alert; a deploy
+    # that kept .branches but stripped meta.categories would draw every pin grey with
+    # a generic 'Lead site' label (a silent degradation this probe also catches by
+    # asserting the categories legend). It cannot self-heal from CI (build_lead_sites.py
+    # is an OSM pull with no CI cron), so the live-URL probe is the only safeguard.
+    # Asserts render SHAPE not values: the object, the index-aligned .branches list of
+    # exactly 2015, a non-empty meta.categories carrying a string `k` (the pin
+    # colour/label key), and at least one branch with a well-formed row
+    # [cat_idx, lng, lat, dist_km] — robust to any future OSM vintage moving which
+    # sites each branch lists.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    br = d.get("branches")
+    if not isinstance(br, list) or not br:
+        return "missing/empty 'branches' list (the per-branch pin render read)"
+    if len(br) != 2015:
+        return "'branches' length %d != 2015 (index-aligned to branches.json; a partial/truncated deploy)" % len(br)
+    meta = d.get("meta")
+    cats = meta.get("categories") if isinstance(meta, dict) else None
+    if not isinstance(cats, list) or not cats:
+        return "missing/empty 'meta.categories' (the pin colour/label legend render read)"
+    c0 = cats[0]
+    if not isinstance(c0, dict) or not isinstance(c0.get("k"), str) or not c0.get("k"):
+        return "meta.categories[0] missing string 'k' (the LEADSITE_COL pin-colour key)"
+    ok = False
+    for b in br:
+        if isinstance(b, list) and b:
+            r0 = b[0]
+            if (isinstance(r0, list) and len(r0) >= 4
+                    and isinstance(r0[0], int)
+                    and all(isinstance(v, (int, float)) for v in r0[1:4])):
+                ok = True
+                break
+    if not ok:
+        return "no branch carries a well-formed '[cat_idx, lng, lat, dist_km]' site row (the pin render read; a gutted layer)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -4368,6 +4447,13 @@ DATA_FILES = [
     # silently drops the establishment layer from every non-pilot province scene with no phone
     # alert; it has no CI cron to self-heal, so the live probe is the only safeguard. Closes it.
     ("data/national_places.json", _shape_national_places, ".places dict keyed by meta.buckets with [lng,lat] points, point total == meta.count (national 3D-scene POI fallback)"),
+    # The two next-heaviest surfaced-but-unprobed graceful-degrading acquisition
+    # reads (obj #2), flagged as the next targets by the 2026-08-22 site-health runs
+    # once the 5-7 MB 3D-scene reads were covered. Both are lazy-loaded, null-guarded
+    # (fetch reject -> layer null -> the surface silently vanishes), and have no CI
+    # cron to self-heal a CDN truncation, so the live-URL probe is the only safeguard.
+    ("data/poi_relevance.json", _shape_poi_relevance, ".branches index-aligned (2015) with numeric per-branch .rel score (#map relevant-POI density lens + branch popup, obj #2)"),
+    ("data/lead_sites.json", _shape_lead_sites, ".branches index-aligned (2015) of [cat_idx,lng,lat,dist] site rows + meta.categories legend (per-branch lead-site map pins, obj #2)"),
 ]
 
 
