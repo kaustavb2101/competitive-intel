@@ -3,7 +3,7 @@
   "generated_by": "pipeline/pull_swarm.py",
   "label": "Each row is one swarm run: which feeds were pulled concurrently, whether each one succeeded / changed its declared output file / failed / timed out / was skipped (exit 3, the repo-wide SKIP convention), plus the rc of the append_history.py and rederive_drift.py steps that followed. This file makes the pulse observable.",
   "max_runs": 60,
-  "n_runs": 52,
+  "n_runs": 53,
   "title": "pull_swarm.py run history -- the swarm's own audit trail"
  },
  "runs": [
@@ -3002,6 +3002,125 @@
    "n_timeout": 0,
    "rederive_drift_rc": null,
    "started": "2026-08-23T19:35:48Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 1443,
+     "bytes_before": 1443,
+     "key": "fuel_prices",
+     "rc": 0,
+     "seconds": 1.6,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 7109,
+     "bytes_before": 7109,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 3.7,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8869,
+     "bytes_before": 8869,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 4.0,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 4003,
+     "bytes_before": 4003,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 114.8,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 24189,
+     "bytes_before": 24189,
+     "key": "nabc_agri",
+     "rc": 0,
+     "seconds": 13.5,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 1797,
+     "bytes_before": 3237,
+     "key": "macro",
+     "rc": 0,
+     "seconds": 5.2,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 6482,
+     "bytes_before": 6482,
+     "key": "oae_yield",
+     "rc": 1,
+     "seconds": 4.9,
+     "status": "failed"
+    },
+    {
+     "bytes_after": 7903,
+     "bytes_before": 7903,
+     "key": "oae_farm_economics",
+     "rc": 0,
+     "seconds": 11.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 634173,
+     "bytes_before": 628473,
+     "key": "app_reviews",
+     "rc": 0,
+     "seconds": 5.6,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 2533987,
+     "bytes_before": 2526174,
+     "key": "apple_reviews",
+     "rc": 0,
+     "seconds": 142.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 498700,
+     "bytes_before": 498698,
+     "key": "rival_youtube",
+     "rc": 0,
+     "seconds": 31.5,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 1407014,
+     "bytes_before": 1407014,
+     "key": "google_ads",
+     "rc": 3,
+     "seconds": 334.0,
+     "status": "skipped"
+    },
+    {
+     "bytes_after": 79625,
+     "bytes_before": 79625,
+     "key": "place_ratings",
+     "rc": 0,
+     "seconds": 56.3,
+     "status": "ok"
+    }
+   ],
+   "finished": "2026-08-23T21:54:24Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 8,
+   "n_failed": 1,
+   "n_ok": 11,
+   "n_skipped": 1,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-08-23T21:48:40Z"
   }
  ]
 }

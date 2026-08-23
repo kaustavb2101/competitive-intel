@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-08-22",
+  "pulled_at": "2026-08-23",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -428,10 +428,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.7263,
-    "ratings": 1593,
-    "score_current_version": 3.7263,
-    "ratings_current_version": 1593,
+    "score": 3.75031,
+    "ratings": 1630,
+    "score_current_version": 3.75031,
+    "ratings_current_version": 1630,
     "version": "3.2.0",
     "app_updated": "2026-08-13",
     "released": "2020-04-30",
@@ -1327,6 +1327,15 @@
      "title": "น่าสนใจ",
      "content": "ใช้งานง่าย และสะดวก",
      "version": "1.0.5",
+     "votes": 0
+    },
+    {
+     "id": "14457529384",
+     "at": null,
+     "score": 1,
+     "title": "จะจ่ายเงินก็เข้าไม่ได้",
+     "content": "แอฟเด้งตลอดมีให้อัพเดตอัพเดตเสร็จก็เข้าไม่ได้",
+     "version": "3.2.0",
      "votes": 0
     },
     {
@@ -5372,10 +5381,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 2.25,
-    "ratings": 4,
-    "score_current_version": 2.25,
-    "ratings_current_version": 4,
+    "score": 2,
+    "ratings": 5,
+    "score_current_version": 2,
+    "ratings_current_version": 5,
     "version": "1.12.0",
     "app_updated": "2026-08-10",
     "released": "2025-01-09",
@@ -5666,10 +5675,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.46277,
-    "ratings": 564,
-    "score_current_version": 3.46277,
-    "ratings_current_version": 564,
+    "score": 3.46113,
+    "ratings": 566,
+    "score_current_version": 3.46113,
+    "ratings_current_version": 566,
     "version": "1.0.45",
     "app_updated": "2026-08-17",
     "released": "2024-07-09",
@@ -7391,10 +7400,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.38808,
-    "ratings": 1577,
-    "score_current_version": 3.38808,
-    "ratings_current_version": 1577,
+    "score": 3.39051,
+    "ratings": 1580,
+    "score_current_version": 3.39051,
+    "ratings_current_version": 1580,
     "version": "8.6.0",
     "app_updated": "2026-08-21",
     "released": "2020-03-03",
@@ -10472,16 +10481,34 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.82411,
-    "ratings": 172997,
-    "score_current_version": 4.82411,
-    "ratings_current_version": 172997,
+    "score": 4.82408,
+    "ratings": 173039,
+    "score_current_version": 4.82408,
+    "ratings_current_version": 173039,
     "version": "3.0.6",
     "app_updated": "2026-08-06",
     "released": "2021-04-20",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14458079175",
+     "at": null,
+     "score": 1,
+     "title": "ขอให้ลบข้อมูล",
+     "content": "วันที่ 22/08/2569 ข้าพเจ้า นายไพฑูรย์ เฮงสุวรรณ ได้สมัครสินเชื่อบุคคลกับแอปลิเคชั่นฟินนิกซ์ แต่ไม่ได้รับการอนุมัติสินเชื่อ ทั้งนี้ข้าพเจ้าได้กรอกข้อมูลส่วนตัวไปเพื่อใช้ในการสมัคร อาทิ ข้อมูลบัตรประชาชน ที่อยู่ปัจจุบัน ที่ทำงาน เลขที่บัญชีธนาคาร รวมถึงข้อมูลบุคคลอ้างอิง ข้อมูลเหล่านี้ข้าพเจ้าไม่อนุญาตให้ฟินนิกซ์ นำข้อมูลดังกล่าวไปเผยแพร่โดยเด็ดขาด และขอให้ฟินนิกซ์ลบข้อมูลส่วนบุคคลทั้งหมดของข้าพเจ้า",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14458032476",
+     "at": null,
+     "score": 1,
+     "title": "โหลดแอป",
+     "content": "ขอบคุณที่โทรมาสอบถามเรื่องการโหลดแอปใช้งาน ไม่อนุญาติให้นำเอกสารบัตรประชาชน ลงท้าย7251ไปใช้ในการกระทำใดๆทั้งสิ้น มิฉะนั้นจะดำเนินคดีให้ถึงที่สุด",
+     "version": "3.0.6",
+     "votes": 0
+    },
     {
      "id": "14453767704",
      "at": null,
@@ -15461,16 +15488,34 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.70401,
-    "ratings": 63785,
-    "score_current_version": 4.70401,
-    "ratings_current_version": 63785,
+    "score": 4.7039,
+    "ratings": 63822,
+    "score_current_version": 4.7039,
+    "ratings_current_version": 63822,
     "version": "7.6.0",
     "app_updated": "2026-08-19",
     "released": "2021-10-10",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14458424468",
+     "at": null,
+     "score": 5,
+     "title": "การรักษาเครดิต",
+     "content": "จ่ายตรง จะใด้วงเงินเพิ่มด้วย",
+     "version": "7.6.0",
+     "votes": 0
+    },
+    {
+     "id": "14456986377",
+     "at": null,
+     "score": 3,
+     "title": "การเพิ่มวงเงิน",
+     "content": "ได้น้อยกว่าที่ขอเพิ่ม",
+     "version": "7.6.0",
+     "votes": 0
+    },
     {
      "id": "14455431609",
      "at": null,
@@ -20135,16 +20180,34 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84417,
-    "ratings": 43881,
-    "score_current_version": 4.84417,
-    "ratings_current_version": 43881,
+    "score": 4.84408,
+    "ratings": 43956,
+    "score_current_version": 4.84408,
+    "ratings_current_version": 43956,
     "version": "3.1.1",
     "app_updated": "2026-05-25",
     "released": "2023-03-06",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14458477818",
+     "at": null,
+     "score": 5,
+     "title": "Service",
+     "content": "Wonderful",
+     "version": "3.1.1",
+     "votes": 0
+    },
+    {
+     "id": "14458075756",
+     "at": null,
+     "score": 5,
+     "title": "สะดวก",
+     "content": "ยุติธรรม",
+     "version": "3.1.1",
+     "votes": 0
+    },
     {
      "id": "14452482014",
      "at": null,
@@ -23437,7 +23500,7 @@
      "title": "ร้องเรียน",
      "content": "เรียน เจ้าหน้าที่ ข้าพเจ้า นางสาวสิรินยาจาปรัง\nได้ทำการสมัคร และกรอกข้อมูลส่วนตัวในPROMISE (THAILAND) เมื่อวันที่ 17/06/25 และไม่ได้รับการอนุมัติ โดยมี ชื่อ - นามสกุลเบอร์โทรศัพท์และ เลขบัตรประชาชน (หน้าบัตร และหลังบัตร) ที่อยู่และที่ทำงาน\nทั้งนี้ ถ้าแอป PROMISE (THAILAND) ได้ข้อมูลไปปลอมแปลง ในรูปแบบใดๆที่ผิดกฎหมายคุกคาม หรือ สิทธิส่วนบุคคล ข้าพเจ้า นางสาวสิรินยาจาปรัง จะไม่ขอรับผิดชอบใดๆทั้งสิ้น",
      "version": "3.0.7",
-     "votes": 1
+     "votes": 2
     },
     {
      "id": "12784243708",
@@ -24881,10 +24944,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.77003,
-    "ratings": 26830,
-    "score_current_version": 4.77003,
-    "ratings_current_version": 26830,
+    "score": 4.77012,
+    "ratings": 26844,
+    "score_current_version": 4.77012,
+    "ratings_current_version": 26844,
     "version": "1.8.7",
     "app_updated": "2026-08-07",
     "released": "2020-08-05",
@@ -29069,16 +29132,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.66043,
-    "ratings": 2138,
-    "score_current_version": 2.66043,
-    "ratings_current_version": 2138,
+    "score": 2.62458,
+    "ratings": 2107,
+    "score_current_version": 2.62458,
+    "ratings_current_version": 2107,
     "version": "3.4.0",
     "app_updated": "2026-08-20",
     "released": "2022-05-11",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14456485505",
+     "at": null,
+     "score": 1,
+     "title": "ไม่อนุญาต",
+     "content": "ข้าพเจ้าขอแจ้งให้ทราบว่า ไม่อนุญาตให้มีการใช้ เก็บรวมรวม ประมวลผล หรือเปิดเผยข้อมูลส่วนบุคคลใด ๆ\nของข้าพเจ้า ที่เกี่ยวข้องกับเลขบัตรประชาชนลงท้าย ด้วย 3548โดยเด็ดขาด\nหากยังมีการนำข้อมูลไปใช้โดยไม่ได้ความยินยอม ข้าพเจ้าจะดำเนินคดีตามกฎหมายที่เกี่ยวข้อง รวมถึงกฎหมายคุ้มครองข้อมูลส่วนบุคคล (PDPA) จนถึงที่สุด\nโดยไม่แจ้งให้ทราบล่วงหน้า\nมีการแจ้งความลงบันทึกประจำวันว่ามีการชำระเงินครบ ถ้วนแล้ว และมีการโ",
+     "version": "3.4.0",
+     "votes": 0
+    },
     {
      "id": "14455086238",
      "at": null,
@@ -33806,16 +33878,43 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.55178,
-    "ratings": 2945,
-    "score_current_version": 2.55178,
-    "ratings_current_version": 2945,
+    "score": 2.55103,
+    "ratings": 2949,
+    "score_current_version": 2.55103,
+    "ratings_current_version": 2949,
     "version": "5.65",
     "app_updated": "2026-02-13",
     "released": "2021-08-03",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14458037902",
+     "at": null,
+     "score": 1,
+     "title": "ลบข้อมูล",
+     "content": "วันที่ 22/08/2569 ข้าพเจ้า นายไพฑูรย์ เฮงสุวรรณ ได้สมัครสินเชื่อบุคคลกับบริษัทมันนี่ฮับ แต่ไม่ได้รับการอนุมัติสินเชื่อ ทั้งนี้ข้าพเจ้าได้กรอกข้อมูลส่วนตัวไปเพื่อใช้ในการสมัคร อาทิ ข้อมูลบัตรประชาชน ที่อยู่ปัจจุบัน ที่ทำงาน เลขที่บัญชีธนาคาร รวมถึงข้อมูลบุคคลอ้างอิง ข้อมูลเหล่านี้ข้าพเจ้าไม่อนุญาตให้บริษัทมันนี่ฮับนำไปเผยแพร่โดยเด็ดขาด และขอให้บริษัทมันนี่ฮับลบข้อมูลส่วนบุคคลทั้งหมดของข้าพเจ้าออกด้",
+     "version": "5.65",
+     "votes": 0
+    },
+    {
+     "id": "14456901237",
+     "at": null,
+     "score": 1,
+     "title": "ไม่อนุญาตเปิดเผยข้อมูล",
+     "content": "ไม่อนุญาตเลขท้ายบัตร9689เปิดเผยข้อมูลมิฉะนั้นจะดำเนินคดีตามกฏหมาย",
+     "version": "5.65",
+     "votes": 0
+    },
+    {
+     "id": "14456479633",
+     "at": null,
+     "score": 1,
+     "title": "ข้าพเจ้าขอแจ้งให้ทราบว่า ไม่อนุญาตให้มีการใช้ เก็บรวมรวม ประมวลผล หรือเปิดเผยข้อมูลส่วนบุคคลใด ๆ\nของ",
+     "content": "ข้าพเจ้าขอแจ้งให้ทราบว่า ไม่อนุญาตให้มีการใช้ เก็บรวมรวม ประมวลผล หรือเปิดเผยข้อมูลส่วนบุคคลใด ๆ\nของข้าพเจ้า ที่เกี่ยวข้องกับเลขบัตรประชาชนลงท้าย ด้วย 3548โดยเด็ดขาด\nหากยังมีการนำข้อมูลไปใช้โดยไม่ได้ความยินยอม ข้าพเจ้าจะดำเนินคดีตามกฎหมายที่เกี่ยวข้อง รวมถึงกฎหมายคุ้มครองข้อมูลส่วนบุคคล (PDPA) จนถึงที่สุด\nโดยไม่แจ้งให้ทราบล่วงหน้า\nมีการแจ้งความลงบันทึกประจำวันว่ามีการชำระเงินครบ ถ้วนแล้ว และมีการโ",
+     "version": "5.65",
+     "votes": 0
+    },
     {
      "id": "14450147925",
      "at": null,
