@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 450,
+  "n_points": 455,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -406,7 +406,7 @@
     149.0,
     149.0,
     153.0,
-    143.0
+    140.0
    ]
   },
   "fuel_diesel": {
@@ -612,11 +612,12 @@
     "2026-08-19",
     "2026-08-20",
     "2026-08-21",
-    "2026-08-22"
+    "2026-08-22",
+    "2026-08-23"
    ],
    "first_seen": "2026-07-05",
    "label": "Rice (Hom Mali) - NABC farm-gate",
-   "n": 30,
+   "n": 31,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/tonne",
@@ -646,6 +647,7 @@
     17888.33,
     17888.33,
     17888.33,
+    17905.0,
     17905.0,
     17905.0,
     17905.0,
@@ -685,11 +687,12 @@
     "2026-08-19",
     "2026-08-20",
     "2026-08-21",
-    "2026-08-22"
+    "2026-08-22",
+    "2026-08-23"
    ],
    "first_seen": "2026-07-05",
    "label": "Rubber (raw sheet) - NABC farm-gate",
-   "n": 30,
+   "n": 31,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/kg",
@@ -721,6 +724,7 @@
     80.88,
     81.03,
     81.14,
+    80.99,
     80.99,
     80.99,
     80.99
@@ -865,7 +869,7 @@
     355.0,
     176.8,
     64.6,
-    64.2
+    89.8
    ]
   },
   "rival_ads_live": {
@@ -879,11 +883,12 @@
     "2026-08-18",
     "2026-08-19",
     "2026-08-20",
-    "2026-08-21"
+    "2026-08-21",
+    "2026-08-22"
    ],
    "first_seen": "2026-07-30",
    "label": "Rival ad creatives running now",
-   "n": 9,
+   "n": 10,
    "path": "platform/data/rival_ads.json",
    "source": "Google Ads Transparency Center",
    "unit": "creatives",
@@ -896,7 +901,8 @@
     431.0,
     433.0,
     433.0,
-    433.0
+    433.0,
+    430.0
    ]
   },
   "rival_promo_live_mtc": {
@@ -1028,11 +1034,12 @@
     "2026-08-18",
     "2026-08-19",
     "2026-08-20",
-    "2026-08-21"
+    "2026-08-21",
+    "2026-08-22"
    ],
    "first_seen": "2026-07-30",
    "label": "Rival YouTube brand channels · total views",
-   "n": 10,
+   "n": 11,
    "path": "platform/data/rival_youtube.json",
    "source": "YouTube Data API v3 (official) — public brand-channel statistics",
    "unit": "views",
@@ -1046,7 +1053,8 @@
     922571864.0,
     923085061.0,
     923728400.0,
-    924335870.0
+    924335870.0,
+    924956814.0
    ]
   },
   "search_share_autox": {
@@ -1266,11 +1274,12 @@
     "2026-08-18",
     "2026-08-19",
     "2026-08-20",
-    "2026-08-21"
+    "2026-08-21",
+    "2026-08-22"
    ],
    "first_seen": "2026-08-07",
    "label": "Social-listening corpus · total demand documents",
-   "n": 10,
+   "n": 11,
    "path": "platform/data/social_themes.json",
    "source": "app-store reviews + YouTube comments + Pantip threads (build_social_themes.py)",
    "unit": "documents",
@@ -1284,7 +1293,8 @@
     12318.0,
     12367.0,
     12412.0,
-    12445.0
+    12445.0,
+    12482.0
    ]
   }
  }
