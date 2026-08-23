@@ -3882,6 +3882,47 @@ def _shape_catchment_poi(d):
     return None
 
 
+def _shape_province_bbox(d):
+    # The per-province bounding-box index behind the per-branch 3D scene's MEASURED
+    # building source (province_bbox.json, obj #1, .provinces keyed by slug with a
+    # [S, W, N, E] bbox = the union of that province's amphoe-polygon extents,
+    # GeoBoundaries THA ADM2 — measured). branch-explorer.html's resolveProvinceSlug()
+    # point-in-boxes the branch to its province slug, then fetchCatchment() pulls that
+    # province's Overture catchment to draw the "buildings: Overture catchment (measured)"
+    # layer. The fetch is `if(!r.ok)return null` + try/caught, so a truncated/404 CDN
+    # deploy resolves NO slug and the scene silently degrades from the measured Overture
+    # catchment to the live-OSM Overpass fallback — a different, coarser building source —
+    # with NO error and NO phone alert, the same "broken demo" blind spot the sibling
+    # 3D-scene probes close. It cannot self-heal from CI (write_province_bbox is an offline
+    # emit of pull_overture_buildings.py off the static amphoe geometry, with no cron), so
+    # the live-URL probe is the only deploy safeguard. Asserts render SHAPE not values: the
+    # object, the .provinces dict, at least one province carrying a well-formed 4-number
+    # bbox (the point-in-box render read), and — when meta.count is present — that the
+    # province total matches it (a truncation tripwire) — robust to a future amphoe-geometry
+    # refresh moving the extents.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    provs = d.get("provinces")
+    if not isinstance(provs, dict) or not provs:
+        return "missing/empty 'provinces' dict (resolveProvinceSlug iterates j.provinces)"
+    ok = False
+    for v in provs.values():
+        if not isinstance(v, dict):
+            continue
+        bb = v.get("bbox")
+        if isinstance(bb, list) and len(bb) == 4 and all(
+                isinstance(x, (int, float)) and not isinstance(x, bool) for x in bb):
+            ok = True
+            break
+    if not ok:
+        return "no province carries a well-formed 4-number 'bbox' (the point-in-box slug-resolve read; a gutted/truncated layer)"
+    meta = d.get("meta")
+    count = meta.get("count") if isinstance(meta, dict) else None
+    if isinstance(count, int) and not isinstance(count, bool) and count != len(provs):
+        return "provinces count %d != meta.count %d (a partial/truncated deploy)" % (len(provs), count)
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -4508,6 +4549,15 @@ DATA_FILES = [
     # no phone alert. It has no CI cron to self-heal (an offline bake of osm_layers.json),
     # so the live-URL probe is the only safeguard. Closes it.
     ("data/catchment_poi.json", _shape_catchment_poi, ".poi dict keyed by 11 scene pin types with [lat,lng] points, point total == meta.n_points (nationwide 3D-scene POI fabric, window.POINAT)"),
+    # The per-province bbox index (province_bbox.json, MEASURED amphoe-polygon extents)
+    # behind the per-branch 3D scene's MEASURED building source — the last structural
+    # surfaced-but-unprobed read that silently degrades a scene on a CDN truncation.
+    # branch-explorer.html point-in-boxes the branch to its province slug to pull that
+    # province's Overture catchment; a broken layer resolves no slug and the scene drops
+    # silently from the measured Overture catchment to the coarser live-OSM fallback with
+    # no alert. No CI cron to self-heal (offline emit off static amphoe geometry), so the
+    # live-URL probe is the only deploy safeguard.
+    ("data/province_bbox.json", _shape_province_bbox, ".provinces dict (77) keyed by slug with a 4-number [S,W,N,E] bbox, province count == meta.count (per-branch 3D-scene province slug-resolve → Overture catchment source)"),
 ]
 
 
