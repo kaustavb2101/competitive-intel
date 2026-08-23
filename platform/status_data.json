@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-23T04:14:54+00:00",
-    "commit": "508f744"
+    "generated_at": "2026-08-23T10:14:30+00:00",
+    "commit": "9a83e4c"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-08-23T10:14:30+00:00",
+      "sha": "9a83e4c",
+      "summary": "service(deploy-health): shape-probe catchment_poi.json — nationwide 3D-scene POI fabric (window.POINAT)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-23T09:46:01+00:00",
+      "sha": "ca213ec",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-23, run 32631817834)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-23T15:30:35+07:00",
+      "sha": "c3ff398",
+      "summary": "chore(log): record ux-loop combobox aria-activedescendant ship (PR #580, deployed + verified) (#581)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-23T15:27:21+07:00",
+      "sha": "066b5ea",
+      "summary": "ux: scene-search combobox announces active option (aria-activedescendant) (#580)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-23T06:35:14+00:00",
+      "sha": "ba1e601",
+      "summary": "feat(map): pair motorcycle inflow-vs-stock gap beside pickup replace-gap in collateral popup (obj #1) (#579)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-23T05:09:47+00:00",
+      "sha": "4b24e9b",
+      "summary": "data(census): refresh the Union Auction forward book (run 32617558254) (#578)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-23T04:49:30+00:00",
+      "sha": "1c0b041",
+      "summary": "data: market-pulse swarm refresh (run 32617230799) (#577)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-23T04:15:24+00:00",
+      "sha": "93407b4",
+      "summary": "chore(plan): refresh CEO autonomy dashboard after site-health probe ship (2026-08-23)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-23T04:14:54+00:00",
       "sha": "508f744",
       "summary": "service(site-health): shape-probe poi_relevance.json + lead_sites.json (obj #2 acquisition reads)",
@@ -662,54 +710,6 @@
       "date": "2026-08-22T21:41:50+07:00",
       "sha": "89d003a",
       "summary": "ux: add <main> landmark to rayong-catchment.html deck.gl page (#567)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-22T14:26:46+00:00",
-      "sha": "00f1b06",
-      "summary": "data: SET peer filings refresh (run 32575518874) (#566)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-22T12:58:25+00:00",
-      "sha": "9670e86",
-      "summary": "feat(map): add MODELLED District-drought (OAE SPEI) National-map lens (obj #1) (#565)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-22T10:44:07+00:00",
-      "sha": "d4c0385",
-      "summary": "data: market-pulse swarm refresh (run 32566175548) (#564)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-22T10:15:30+00:00",
-      "sha": "1d42a69",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the occupation_leads shape-probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-22T10:14:57+00:00",
-      "sha": "be4252f",
-      "summary": "health(deploy): shape-probe occupation_leads.json — the acquisition lead board's source",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-22T09:45:28+00:00",
-      "sha": "4d4ebaf",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-22, run 32565721647)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-22T08:26:12+00:00",
-      "sha": "0921015",
-      "summary": "docs(progress): log province.html <main> landmark ship + deploy verify (PR #563)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-22T15:23:18+07:00",
-      "sha": "0ead38d",
-      "summary": "ux: add <main> landmark to province.html deck.gl page (#563)",
       "pillar": "3d-enrichment"
     }
   ]
