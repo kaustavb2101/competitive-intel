@@ -3838,6 +3838,50 @@ def _shape_lead_sites(d):
     return None
 
 
+def _shape_catchment_poi(d):
+    # The NATIONWIDE OSM POI fabric behind EVERY province's 3D catchment scene
+    # (catchment_poi.json, obj #1/#2, MEASURED OSM establishment coordinates for
+    # all 11 scene pin types, bbox-filtered client-side so each province's 3D scene
+    # shows the same commercial fabric). rayong-catchment.html — the primary 3D
+    # entry point for all 77 provinces — fetches it in the deferred second wave and
+    # exposes it as window.POINAT (`d.poi.poi`, keyed by scene pin type); the scene
+    # falls back to POINAT sliced to a city's building extent to draw its POI columns
+    # wherever a curated per-city set is absent. At ~1.2 MB it is the heaviest
+    # surfaced-but-unprobed read left after the 5-7 MB national_places / occupation_leads
+    # scene reads were covered (2026-08-22..23). The fetch is opt()/null-guarded, so a
+    # truncated/404 CDN deploy silently drops the commercial-fabric POI columns from
+    # every province's 3D scene with NO phone alert — the same "broken demo" blind spot
+    # the sibling probes close. It cannot self-heal from CI (build_catchment_poi.py is
+    # an offline bake of osm_layers.json with no CI cron), so the live-URL probe is the
+    # only deploy safeguard. Asserts render SHAPE not values: the object, the .poi dict
+    # keyed by scene pin type, at least one pin type carrying a well-formed [lat, lng]
+    # point (the column render read), and — when meta.n_points is present — that the
+    # point total across pin types matches it (a strong truncation tripwire) — robust
+    # to a future OSM vintage moving which points each pin type lists.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    poi = d.get("poi")
+    if not isinstance(poi, dict) or not poi:
+        return "missing/empty 'poi' dict (the window.POINAT scene-column render read)"
+    total = 0
+    ok = False
+    for pts in poi.values():
+        if not isinstance(pts, list):
+            continue
+        total += len(pts)
+        if not ok and pts:
+            p0 = pts[0]
+            if isinstance(p0, list) and len(p0) >= 2 and all(isinstance(v, (int, float)) for v in p0[:2]):
+                ok = True
+    if not ok:
+        return "no pin type carries a well-formed [lat, lng] point (the POI column render read; a gutted/truncated layer)"
+    meta = d.get("meta")
+    n_points = meta.get("n_points") if isinstance(meta, dict) else None
+    if isinstance(n_points, int) and n_points != total:
+        return "point total %d != meta.n_points %d (a partial/truncated deploy)" % (total, n_points)
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -4454,6 +4498,16 @@ DATA_FILES = [
     # cron to self-heal a CDN truncation, so the live-URL probe is the only safeguard.
     ("data/poi_relevance.json", _shape_poi_relevance, ".branches index-aligned (2015) with numeric per-branch .rel score (#map relevant-POI density lens + branch popup, obj #2)"),
     ("data/lead_sites.json", _shape_lead_sites, ".branches index-aligned (2015) of [cat_idx,lng,lat,dist] site rows + meta.categories legend (per-branch lead-site map pins, obj #2)"),
+    # The nationwide OSM POI fabric behind every province's 3D catchment scene
+    # (catchment_poi.json, MEASURED OSM, ~1.2 MB) — the heaviest surfaced-but-unprobed
+    # read left after the 5-7 MB national_places/occupation_leads 3D-scene reads were
+    # covered. rayong-catchment.html (the primary 3D entry point for all 77 provinces)
+    # loads it in the deferred second wave and exposes it as window.POINAT to draw the
+    # per-city POI columns; the fetch is opt()/null-guarded, so a truncated/404 CDN
+    # deploy silently drops the commercial-fabric columns from every province scene with
+    # no phone alert. It has no CI cron to self-heal (an offline bake of osm_layers.json),
+    # so the live-URL probe is the only safeguard. Closes it.
+    ("data/catchment_poi.json", _shape_catchment_poi, ".poi dict keyed by 11 scene pin types with [lat,lng] points, point total == meta.n_points (nationwide 3D-scene POI fabric, window.POINAT)"),
 ]
 
 
