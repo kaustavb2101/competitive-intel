@@ -1,0 +1,118 @@
+name: Data — World Bank Pink Sheet commodity board (monthly)
+
+# Rolls the MEASURED global-commodity board to the newest World Bank CMO "Monthly Prices" vintage —
+# the read that drives the agri portfolio-risk lens (objective #1). Until this job existed, the board
+# was refreshed only by hand or opportunistically by the autonomous loop, so it silently aged a month
+# between refreshes (energy and fuel prices each already had their own cron; the Pink Sheet did not).
+#
+# thedocs.worldbank.org is free, no key, and REACHABLE from GitHub runners (Apache, verified 200).
+#
+# Output: source-data/commodit{ies,ies_protein,y_board,y_history}.json + platform/data/meta.json's
+# vintage stamp, plus the whole board-derived fan-out (commodities, collateral_outlook, macro_*,
+# crop_mix, vintage_digest, …) and a fresh time-dimension snapshot for the new vintage. Committed to a
+# fresh data/pinksheet-<run_id> branch as a DRAFT PR back to the branch this ran on — never an
+# unattended push to master, because a vintage roll changes visible MEASURED numbers on
+# Overview / Command center / Risk-trend and merits a human glance. No-ops (opens nothing) when the WB
+# vintage has not advanced. If a maintainer later wants this to auto-merge on a green gate like
+# data-fuel-prices.yml, the merge block there is the template to copy.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 06:00 UTC on the 6th of each month — the WB Pink Sheet monthly release lands in the first days
+    # of the month; the 6th is a safe margin. Off-minute intentional.
+    - cron: "0 6 6 * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        # openpyxl: parse the CMO xlsx (pull_pinksheet + build_commodity_history --refresh).
+        # numpy pinned to qa.yml: WITHOUT it build_branch_peers.py --check SKIPs in the re-derive and
+        # the gate, so a stale branch_peers.json would ride through green and only qa.yml would catch
+        # it — same trap data-fuel-prices.yml documents.
+        run: pip install openpyxl numpy==2.4.6
+      - name: Offline selftest (parse + mapping contract, no network)
+        run: python pipeline/pull_pinksheet.py --selftest
+      - name: Pull the Pink Sheet and roll the board
+        run: python pipeline/pull_pinksheet.py
+      - name: Re-derive the fan-out when the vintage advanced
+        run: |
+          if git status --porcelain -- source-data/commodities.json source-data/commodity_board.json | grep -q .; then
+            echo "Pink Sheet moved — regenerating the board-derived layers."
+            # history/sparklines from the same cached xlsx pull_pinksheet just wrote
+            python pipeline/build_commodity_history.py --refresh
+            # project meta.board + the bumped `updated` stamp into platform/data
+            python pipeline/derive.py
+            # capture the new vintage as a time-dimension snapshot (rederive_drift deliberately will
+            # NOT do this unattended; a vintage roll is exactly the "someone asked for it" case)
+            python pipeline/timeseries.py
+            # iterate the determinism gate's OWN --check set to a fixed point — no hand-kept fan-out
+            # list to go stale (the mechanism data-fuel-prices.yml / data-nabc-prices.yml rely on)
+            python pipeline/rederive_drift.py --report-md /tmp/rederived.md || true
+            cat /tmp/rederived.md 2>/dev/null || true
+            # provenance censuses every other layer's bytes, so it runs LAST (house rule)
+            python pipeline/build_provenance.py
+          else
+            echo "WB vintage unchanged — nothing to re-derive."
+          fi
+      - name: Gate, then open a DRAFT PR (green = ready to merge, red = flagged for review)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/pinksheet-${{ github.run_id }}
+        run: |
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list, and never adds an untracked generated layer. The new
+          # snapshot file IS untracked, so add source-data/snapshots explicitly.
+          git add -u source-data platform/data
+          git add source-data/snapshots
+          if git diff --cached --quiet; then
+            echo "No change vs committed board — WB vintage has not advanced. Nothing to PR."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          V="$(python -c "import json;print(json.load(open('platform/data/meta.json'))['updated'])")"
+          GATE_STATE="green"
+          if bash tests/run.sh check; then
+            echo "Determinism gate GREEN at $V."
+          else
+            GATE_STATE="red"
+            echo "Determinism gate RED — opening the PR flagged for review."
+          fi
+          git commit -m "data: roll Pink Sheet commodity board ($V, run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-pinksheet.yml — World Bank CMO Monthly Prices. Gate: $GATE_STATE."
+          git checkout -b "$DATA_BRANCH"
+          # base may have advanced during the run; rebase-free resync of generated layers, then push
+          git fetch -q origin "$BASE_BRANCH" || true
+          {
+            echo "Automated monthly World Bank Pink Sheet roll (run ${{ github.run_id }}) from \`$BASE_BRANCH\`."
+            echo ""
+            echo "**Vintage:** $V"
+            echo "**Determinism gate:** $GATE_STATE"
+            echo ""
+            echo "MEASURED — World Bank CMO \"Monthly Prices\" (global commodity YoY). Cloud-reachable, no key."
+            echo "Changes visible MEASURED numbers on Overview / Command center / Risk-trend, so this is a"
+            echo "draft PR for a human glance rather than an auto-merge."
+            if [ -f /tmp/rederived.md ]; then echo ""; echo "<details><summary>Re-derived fan-out</summary>"; echo ""; cat /tmp/rederived.md; echo ""; echo "</details>"; fi
+          } > /tmp/pr_body.md
+          for attempt in 1 2 3; do
+            git push origin "$DATA_BRANCH" && break
+            echo "push rejected — retry $attempt"; sleep 3
+          done
+          TITLE="data: roll Pink Sheet commodity board ($V)"
+          [ "$GATE_STATE" = "red" ] && TITLE="$TITLE [gate failed]"
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "$TITLE" --body-file /tmp/pr_body.md
