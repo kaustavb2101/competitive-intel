@@ -8,6 +8,10 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png"><!-- iOS home-screen icon: 180x180 PNG (iOS ignores SVG here); rasterised from favicon.svg -->
 <link rel="manifest" href="/manifest.webmanifest"><!-- Android/Chrome PWA: home-screen name, standalone display, branded icon -->
+<meta name="mobile-web-app-capable" content="yes"><!-- standardized standalone-launch hint -->
+<meta name="apple-mobile-web-app-capable" content="yes"><!-- iOS: Safari ignores the manifest display:standalone, so THIS launches the pinned home-screen icon standalone (no browser chrome), matching the Android install -->
+<meta name="apple-mobile-web-app-status-bar-style" content="default"><!-- solid (non-translucent) status bar so the notch never overlaps the fixed top nav -->
+<meta name="apple-mobile-web-app-title" content="AutoX CI"><!-- iOS home-screen label = manifest short_name, not the long <title> -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rayong 3D · เงินไชโย</title>
 <!-- RETIRED: the Rayong 3D + Catchment views were consolidated into a single page (rayong-catchment.html).
