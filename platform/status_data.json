@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-23T10:14:30+00:00",
-    "commit": "9a83e4c"
+    "generated_at": "2026-08-23T16:14:17+00:00",
+    "commit": "755adfa"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,48 @@
   ],
   "activity": [
     {
+      "date": "2026-08-23T16:14:17+00:00",
+      "sha": "755adfa",
+      "summary": "service(deploy-health): shape-probe province_bbox.json — per-branch 3D-scene province slug-resolve → Overture catchment source",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-23T15:42:07+00:00",
+      "sha": "e6d4452",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-23, run 32649273751)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-23T14:21:48+00:00",
+      "sha": "299017e",
+      "summary": "chore(log): record ux-loop catchment-notice exec-facing microcopy ship (PR #584, deployed + verified)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-23T21:18:44+07:00",
+      "sha": "665fd95",
+      "summary": "ux: exec-facing microcopy for the catchment 'not pulled' notice (#584)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-23T12:40:33+00:00",
+      "sha": "4f55be6",
+      "summary": "feat(map): National-map Double-pressure lens — the cross-objective watchlist, spatial (obj #1 × #2) (#583)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-23T10:44:11+00:00",
+      "sha": "b8bc2f4",
+      "summary": "data: market-pulse swarm refresh (run 32632302556) (#582)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-23T10:14:42+00:00",
+      "sha": "a20e54c",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the catchment_poi shape-probe ship",
+      "pillar": "3d-enrichment"
+    },
+    {
       "date": "2026-08-23T10:14:30+00:00",
       "sha": "9a83e4c",
       "summary": "service(deploy-health): shape-probe catchment_poi.json — nationwide 3D-scene POI fabric (window.POINAT)",
@@ -669,48 +711,6 @@
       "sha": "ee06f2d",
       "summary": "feat(home): name the double-pressure provinces on the command center (obj #1 × #2) (#570)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-22T17:01:52+00:00",
-      "sha": "046f063",
-      "summary": "data: market-pulse swarm refresh (run 32582887934) (#568)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-22T23:25:58+07:00",
-      "sha": "9a767bd",
-      "summary": "Merge pull request #569 from kaustavb2101/intel/national-places-probe",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-22T16:15:37+00:00",
-      "sha": "4bc6e63",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the national_places shape-probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-22T16:15:21+00:00",
-      "sha": "c156237",
-      "summary": "health(deploy): shape-probe national_places.json — the national POI fallback behind every province 3D scene",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-22T15:40:05+00:00",
-      "sha": "d705060",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-22, run 32582286820)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-22T14:45:11+00:00",
-      "sha": "cc739c1",
-      "summary": "docs(progress): log rayong-catchment.html <main> landmark ship + deploy verify (PR #567)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-22T21:41:50+07:00",
-      "sha": "89d003a",
-      "summary": "ux: add <main> landmark to rayong-catchment.html deck.gl page (#567)",
-      "pillar": "3d-enrichment"
     }
   ]
 }
