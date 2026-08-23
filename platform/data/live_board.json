@@ -264,11 +264,11 @@
    "label": "Rice · world price",
    "measured": true,
    "source": "World Bank Pink Sheet (Commodity Markets), sheet 'Monthly Prices'",
-   "stamp": "2026M06",
-   "stamp_iso": "2026-06-30",
+   "stamp": "2026M07",
+   "stamp_iso": "2026-07-31",
    "stamp_kind": "vintage",
    "unit": "$/mt",
-   "value": 494.0,
+   "value": 467.0,
    "what": "the GLOBAL benchmark in $/mt, monthly — context for the Thai farm-gate price above it, not a substitute for it"
   },
   {
