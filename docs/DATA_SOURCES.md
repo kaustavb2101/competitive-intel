@@ -41,6 +41,11 @@ registrations and DIW factories.
 - Pink Sheet URL: the loop scrapes the current month's link off the WB landing page each pull
   (`pipeline/autox_enrich_loop.py`'s `pinksheet_url()`); last-known-good fallback hash (2026M07 vintage):
   `https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx`
+- **Refresh cadence:** a monthly cron now keeps this current — `.github/workflows/data-pinksheet.yml`
+  runs `pipeline/pull_pinksheet.py` (the standalone, self-testing roll of the four `commodit*.json`
+  source files + the `meta.updated` stamp), re-derives the board-derived fan-out + a new time-dimension
+  snapshot, and opens a DRAFT PR when the WB vintage advances. Before this cron (added 2026-08-23) the
+  board was refreshed only by hand / opportunistically, so it aged a month between refreshes.
 
 ## Macro (current, citable — for the Overview panel)
 GDP 2026 ~1.6%; household debt 86.8% (Sep 2025); inflation ~0.3% (near-zero); tourists 2025 32.9M
