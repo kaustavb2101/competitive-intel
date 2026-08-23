@@ -2281,7 +2281,10 @@ function renderOverview(){
   // The live 24h RAIN pulse is kept, demoted to a disclosure under the drill: it is same-day
   // telemetry and worth having, but the flood and drought columns that drive decisions are in the
   // drill itself now (point 22).
-  loadThaiwater().then(renderThaiwater);
+  // Load the peer/province footprint alongside the pulse so renderThaiwater can tie the live flood
+  // to our own branches (MEASURED × MEASURED). Null-safe: loadPeerProvince degrades to null and the
+  // portfolio clause simply omits itself.
+  Promise.all([loadThaiwater(), loadPeerProvince()]).then(renderThaiwater);
 }
 function renderCommodityBoard(){
   if(!META||!META.board) return;
@@ -3008,9 +3011,24 @@ function renderThaiwater(){
   const vb=$('#thaiwater-verdict');
   if(vb){
     vb.className='verdict v-warn'; vb.style.display='block';
-    const fLine=worstF&&worstF.max_level>=4
+    // PORTFOLIO JOIN (MEASURED × MEASURED) — tie the live station pulse to our own footprint so the
+    // weather read becomes a book-exposure number. AutoX branches-per-province come from
+    // peer_province.autox, keyed by Thai province name (an exact 77/77 match against TWFLOOD's keys).
+    // Report the ACUTE tier only: provinces with a station at BANK OVERFLOW (max_level 5). The clause
+    // self-omits when nothing is at overflow or peer_province is absent — never fabricated, and it
+    // falls back to the high-water-only sentence.
+    let expF='';
+    const axMap=(PEERPROV&&Array.isArray(PEERPROV.provinces))
+      ? Object.fromEntries(PEERPROV.provinces.map(r=>[r.province_th, r.autox])) : null;
+    const axTot=(PEERPROV&&PEERPROV.meta&&PEERPROV.meta.total_autox)||null;
+    if(axMap){
+      const ovf=fRows.filter(r=>r.max_level>=5);
+      const ovB=ovf.reduce((s,r)=>s+(axMap[r.th]||0), 0);
+      if(ovf.length&&ovB>0) expF=` <b>${axTot?`${num(ovB)} of our ${num(axTot)} branches`:`${num(ovB)} of our branches`}</b> sit in the ${ovf.length} province${ovf.length===1?'':'s'} now at bank overflow (${ovf.map(r=>r.th).join(', ')}) — a live collateral &amp; collections exposure on the footprint inside the flood.`;
+    }
+    const fLine=(worstF&&worstF.max_level>=4
       ? `<b>${fHigh.length}</b> province${fHigh.length===1?'':'s'} have river/reservoir stations at high water (level ≥4) — worst is <b>${worstF.th}</b> (${num(worstF.n_high)}/${num(worstF.n_stations)} stations${worstF.max_level>=5?', at bank overflow':''} high).`
-      : `No province currently shows a station at high water (level ≥4) — the highest is <b>${worstF?worstF.th:'—'}</b> at level ${worstF?worstF.max_level:'—'}.`;
+      : `No province currently shows a station at high water (level ≥4) — the highest is <b>${worstF?worstF.th:'—'}</b> at level ${worstF?worstF.max_level:'—'}.`)+expF;
     const rLine=worstRW
       ? `Most widespread 24h rain: <b>${worstRW.th}</b> — <b>${pct(worstRW.pct_heavy)}</b> of its stations over the heavy threshold, peaking at ${num(worstRW.max_mm)}mm.`
         +(rSuspect.length?` <span class="sub">(${rSuspect.map(r=>`${r.th} reports ${num(r.max_mm)}mm at one gauge with only ${pct(r.pct_heavy)} of its stations heavy — treated as a suspect reading, not the headline.)`).join(' ')}</span>`:'')
