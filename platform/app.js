@@ -26,6 +26,7 @@ const LENS = {
   cstress:  {pill:'Agri PD', label:'Agri crop-stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED triage (0–100) — the branch's province crop-household stress (crop price pressure × drought, scaled by how farm-dependent the area is). A warning flag, not a measured default rate.", color:'#C8433B', unit:'crop-stress (est)', est:true, tag:'e', val:d=>cstressVal(d)},
   estab:    {pill:'Merchant', label:'Establishments ≤10km', desc:'MERCHANT BASE · MEASURED (Overture Places, a sample / lower bound) — total businesses within 10 km of each branch, a proxy for how much trade surrounds it. Brighter = a denser merchant ecosystem.', color:'#1C8C7D', unit:'estab', tag:'m', val:d=>estabCount(d)},
   motomix:  {pill:'Collateral', label:'Motorcycle-title share ▲', desc:'COLLATERAL EXPOSURE · MEASURED (DLT) — motorcycle share of the province vehicle stock. Motorcycles are the most volatile, lowest-recovery title collateral; brighter = more exposure to a used-bike value fall.', color:'#7A4FE0', unit:'% moto (DLT)', tag:'m', val:d=>motoShare(d)},
+  pugap:    {pill:'Pickup replace-gap', label:'Pickup replacement gap ▲', desc:"COLLATERAL SUPPLY · MEASURED (DLT gdcatalog) — by how many percentage points pickups (รย.3) are a SMALLER share of the province's NEW registrations than of its parked STOCK. A larger gap = the used-pickup collateral pool AutoX lends against and recovers into is thinning fastest here, because the inflow isn't refilling the fleet. This is the per-PROVINCE view of the national 'the pickup fleet is ageing without being replaced' verdict on the Overview: the motorcycle-share lens says WHAT the collateral is, this says whether it is being REPLACED. MEASURED arithmetic over two DLT shares — a forward-looking collateral-supply signal, not a default rate. Hidden until the DLT layer loads.", color:'#7A4FE0', unit:'pp pickup thinning', pugap:true, prov:true, tag:'m', val:d=>puGapVal(d)},
   floodhz:  {pill:'Flood hazard', label:'Repeated-flood hazard ▲', desc:"COLLATERAL / RECOVERY RISK · MEASURED (GISTDA 50k Repeated-Flooding census 2005–2016) — the number of the 12 years 2005–2016 the branch's district flooded. Brighter = ground that flooded in more years, so collateral seized there is harder to recover and re-sell. A chronic band (≥7/12) is a STRUCTURAL hazard on land we already lend against — distinct from the live water-level pulse. Frequency only (a hazard flag, not a flooded-area or loss estimate — no area is claimed, the source polygons overlap); recency (last flood year) rides the branch popup. Hidden until the hazard layer loads.", color:'#3E7CB1', unit:'yrs flooded /12', floodhz:true, tag:'m', val:d=>floodHzRec(d)||0},
   occrisk:  {pill:'Occupation risk', label:'Occupation × stress ◆▲', desc:"PORTFOLIO RISK · MEASURED occupation mix × ESTIMATED stress weighting — flags branches whose borrower base is concentrated in a stressed sector (factories in a slowdown · farming under crop-stress). A triage flag, not a measured default rate.", color:'#C8433B', unit:'occ-stress (est)', est:true, occr:true, tag:'e', val:d=>occriskVal(d)},
   poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇ est', desc:"BORROWER BASE · MEASURED counts × ESTIMATED relevance weighting (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model, so this reads as an estimated composite, not a measured count.", color:'#E6B450', unit:'relevant-POI (0–100, est)', poirel:true, est:true, tag:'e', val:d=>poiRelevanceVal(d)},
@@ -224,6 +225,38 @@ async function loadProvinceStress(){
 function pstressHasData(){return !!(PSTRESS&&Object.keys(PSTRESS).length);}
 // ESTIMATED composite_stress (0-100) for a branch's province. 0 when unknown.
 function pstressVal(d){const p=PSTRESS&&PSTRESS[d.v]; return p&&p.composite_stress!=null?Math.round(p.composite_stress):0;}
+
+/* ---------- per-province pickup-replacement gap (data/vehicle_mix.json — DLT, MEASURED) ----------
+   VMIXP maps Thai province name -> that province's gap_pp object from vehicle_mix.provinces[*].
+   gap_pp.ry3 = pickups' share of the province's NEW registrations minus their share of the parked
+   STOCK, in percentage points. Every province's ry3 gap is negative today (new pickups are a
+   smaller slice of the inflow than of the fleet already on the road), so the used-pickup collateral
+   pool AutoX lends against and recovers into is thinning — the more negative, the faster. Both
+   shares are MEASURED (DLT gdcatalog: dataset_1_1_04 stock + stat_1_008/009 new); the gap is pure
+   arithmetic over them with no editorial weighting, so it reads MEASURED — exactly like the gap
+   column of the national fleet-mix table on the Overview. This is the per-PROVINCE view of the
+   national "the pickup fleet is ageing without being replaced" verdict, which was only shown
+   nationally. Reuses tmliFetch's cache (the Overview already loads vehicle_mix). Lazy + null-safe:
+   an absent / failed / older file (no .provinces) leaves VMIXP empty, the lens hides, val reads 0. */
+let VMIXP=null, VMIXP_META=null, vmixpLoaded=false, vmixpPromise=null;
+function loadVehicleMixProv(){
+  if(vmixpPromise) return vmixpPromise;
+  vmixpLoaded=true;
+  vmixpPromise=tmliFetch('vehicle_mix').then(j=>{
+    VMIXP={};
+    if(j&&j.provinces&&typeof j.provinces==='object'){
+      VMIXP_META=j.meta||null;
+      Object.keys(j.provinces).forEach(th=>{ const g=(j.provinces[th]||{}).gap_pp; if(g&&typeof g==='object') VMIXP[th]=g; });
+    }
+    return VMIXP;
+  }).catch(()=>{ VMIXP={}; VMIXP_META=null; return VMIXP; });
+  return vmixpPromise;
+}
+function vmixpHasData(){return !!(VMIXP&&Object.keys(VMIXP).length);}
+// Magnitude (percentage points) by which pickups (รย.3) are a SMALLER share of the province's new
+// registrations than of its parked stock — i.e. how fast the used-pickup collateral pool is thinning.
+// 0 when unknown, or when the gap is positive (pickup share is growing there = not thinning).
+function puGapVal(d){const g=VMIXP&&VMIXP[d.v]; if(!g||g.ry3==null) return 0; const gap=g.ry3; return gap<0?Math.round(-gap*10)/10:0;}
 
 /* ---------- lowest-paid occupation nationally (objective #1) ----------
    Lazy-loaded from data/occupation_income.json (pipeline/build_occupation_income.py) — a national
@@ -7846,6 +7879,7 @@ function lensAbsent(k){
   const l=LENS[k]; if(!l) return false;
   if(l.hh)    return hhriskLoaded && !hhriskHasData();
   if(l.pstr)  return pstressLoaded && !pstressHasData();
+  if(l.pugap) return vmixpLoaded && !vmixpHasData();
   if(l.dsrch) return sdemandLoaded && !sdemandHasData();
   if(l.occr)  return occriskLoaded && !occriskHasData();
   if(l.brisk) return briskLoaded && !briskHasData();
@@ -8007,6 +8041,18 @@ function renderLegend(){
       ` <span class="sub" title="0.5×household-DTI percentile (NSO SES) + 0.5×unemployment percentile (NSO LFS), both measured inputs, equal-weighted blend">▲ estimated · NSO SES + NSO LFS blend</span>`;
     return;
   }
+  // Pickup replacement-gap lens: MEASURED (DLT), a percentage-point scale to one decimal (values run
+  // ~4–22pp), with an honest "measured · DLT new-vs-stock" tag — no estimated marker, unlike the
+  // percentile blends above, because the gap is plain arithmetic over two published DLT shares.
+  if(l.pugap){
+    if(!vmixpLoaded){ $('#maplegend').innerHTML='<span class="skel skel-line" style="display:inline-block;width:160px;vertical-align:middle" aria-hidden="true"></span> <span class="sub">pickup replacement gap…</span>'; return; }
+    $('#maplegend').innerHTML =
+      `<span><i style="background:${lensColor(.12,l.color)}"></i>${(mx*.12).toFixed(1)}</span>`+
+      `<span><i style="background:${lensColor(.5,l.color)}"></i>${(mx*.5).toFixed(1)}</span>`+
+      `<span><i style="background:${lensColor(1,l.color)}"></i>${mx.toFixed(1)} ${l.unit}</span>`+
+      ` <span class="sub" title="Pickup (รย.3) new-registration share minus its parked-stock share, in percentage points, per province — DLT gdcatalog, measured. Larger = the used-pickup collateral pool is thinning fastest.">● measured · DLT new-vs-stock</span>`;
+    return;
+  }
   // Relevant-POI density lens: a shimmer skeleton while the (measured-counts) layer loads, then an
   // honest "measured counts · estimated weighting" tag so the M-badged pill is not misread as a
   // fully measured score.
@@ -8089,6 +8135,9 @@ function initMap(){
   // itself when absent. Absent file (build_province_stress.py not run / inputs missing) → PSTRESS
   // empty, lens filtered out.
   if(!pstressLoaded) loadProvinceStress().then(()=>{ renderLenses(); if(mapReady&&curLens==='pstress'){ renderLegend(); styleMarkers(); } });
+  // warm the per-province pickup-replacement gap so the collateral-supply lens un-disables + repaints
+  // the province choropleth once the DLT layer lands (mirrors the pstress warm-load). Null-safe.
+  if(!vmixpLoaded) loadVehicleMixProv().then(()=>{ renderLenses(); if(mapReady){ drawProvinceChoropleth(); if(curLens==='pugap'){ renderLegend(); styleMarkers(); } } });
   // warm the ESTIMATED title-loan search-demand layer (Google Trends) so its lens hides itself when
   // absent. Absent file (build_search_demand.py not run) → SDEMAND empty, lens filtered out.
   if(!sdemandLoaded) loadSearchDemand().then(()=>{ renderLenses(); if(mapReady&&curLens==='dsrch'){ renderLegend(); styleMarkers(); } });
@@ -8710,11 +8759,20 @@ function collatMixPopupHTML(d,sec,r){
   const pct=v=>v==null?null:Math.round(100*v/p.vehicles);
   const mp=pct(p.moto), cp=pct(p.car), pp=pct(p.pickup), ep=pct(p.ev);
   const mc=mp!=null&&mp>=55?'var(--agri)':'var(--collat)';
+  // Forward-looking supply pair to the stock-share lines above: is the pickup collateral pool being
+  // REPLACED? gap_pp.ry3 = pickups' share of NEW registrations minus their share of parked STOCK
+  // (percentage points, DLT measured). Negative = the inflow isn't refilling the fleet, so the
+  // used-pickup pool AutoX recovers into is thinning here. Shown only once vehicle_mix has loaded.
+  const g=VMIXP&&VMIXP[d.v]; const rg=(g&&g.ry3!=null)?g.ry3:null;
+  const gapLine=(rg!=null)
+    ? r('Pickup inflow vs stock ▲', `<span style="color:${rg<0?'var(--agri)':'var(--collat)'}">${rg>0?'+':rg<0?'−':''}${Math.abs(rg).toFixed(1)} pp</span> <span class="sub">${rg<0?'pool thinning':'pool refilling'}</span>`, rg<0?'var(--agri)':'var(--collat)')
+    : '';
   return sec('Collateral mix — DLT vehicle stock · measured')
     + r('Motorcycle share ▲', mp!=null?mp+'%':'n/a', mc)
     + (cp!=null?r('Car share', cp+'%', '#8b90a7'):'')
     + (pp!=null?r('Pickup share', pp+'%', '#8b90a7'):'')
-    + (ep!=null?r('EV share', ep+'%', 'var(--merch)'):'');
+    + (ep!=null?r('EV share', ep+'%', 'var(--merch)'):'')
+    + gapLine;
 }
 // District (amphoe) block for a branch popup — shows the whole-district scores joined to this
 // branch. White-space is MEASURED (demand POIs vs AutoX saturation); risk is ESTIMATED. Renders
@@ -8980,6 +9038,9 @@ function setLens(k){
   }
   if(k==='pstress' && !pstressLoaded){
     loadProvinceStress().then(()=>{ renderLenses(); if(curLens==='pstress'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  if(k==='pugap' && !vmixpLoaded){
+    loadVehicleMixProv().then(()=>{ renderLenses(); if(curLens==='pugap'){ renderLegend(); if(mapReady){ styleMarkers(); drawProvinceChoropleth(); } } });
   }
   if(k==='dsrch' && !sdemandLoaded){
     loadSearchDemand().then(()=>{ renderLenses(); if(curLens==='dsrch'){ renderLegend(); if(mapReady) styleMarkers(); } });
