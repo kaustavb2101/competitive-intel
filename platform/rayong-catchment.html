@@ -2845,8 +2845,12 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
         'pull — reloading usually fixes it. The district view works either way.')
      : ('The Overture building scene is pulled per province from the desktop. Until then, the '+
         'district view has '+prettyP+'’s branches, districts, POIs and 10&nbsp;km reach.');
-   var foot=served?('reload to retry · manifest: data/catchments_r2.json')
-                  :('pull command: pull_overture_buildings.py --province '+CITY);
+   // Exec-facing microcopy: the reader here is the owner/board, not a developer, so the footnote
+   // states status in plain language — no internal script name, slug or repo file path (same
+   // owner-not-developer principle as the front-door boot-error reword). The district-view button
+   // above is the real next step; this line only sets expectations.
+   var foot=served?('Reload the page to try again.')
+                  :('3D building scenes are added province by province — this one is on the way.');
    var el=document.createElement('div');el.className='err';el.style.color='#A7B0C2';
    el.innerHTML='<div style="max-width:560px;line-height:1.6">'+
      '<div style="font:700 17px \'IBM Plex Sans Thai\';color:#D7DEEC;margin-bottom:10px">'+head+'</div>'+
