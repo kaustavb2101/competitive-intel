@@ -62,7 +62,7 @@ jobs:
           # As of 2026-08-16 the alias is behind Vercel SSO (ssoProtection enabled,
           # all_except_custom_domains). The deep checks no longer go dark because of
           # that: the checker falls back to the SSO-EXEMPT PUBLIC production alias
-          # (competitor-intel-blue.vercel.app, the URL the owner shares — baked in as
+          # (competitive-intel-blue.vercel.app, the URL the owner shares — baked in as
           # PUBLIC_PROD_ALIAS, override via PUBLIC_BASE_URL) and runs the full page +
           # data validation there, no secret needed. VERCEL_AUTOMATION_BYPASS_SECRET
           # still works to deep-probe the master alias directly; both are optional.

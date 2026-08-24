@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-24T16:27:54+00:00",
-    "commit": "5739173"
+    "generated_at": "2026-08-24T22:18:12+00:00",
+    "commit": "181eb1b"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-08-24T22:18:12+00:00",
+      "sha": "181eb1b",
+      "summary": "fix(site-health): correct SSO-exempt fallback hostname in workflow comment",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-24T21:50:17+00:00",
+      "sha": "31f7925",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-24, run 32781443610)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-24T20:59:17+00:00",
+      "sha": "76303b9",
+      "summary": "data: Thai-IP-only swarm refresh (run 32769955280) (#607)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-24T20:20:23+00:00",
+      "sha": "361ecda",
+      "summary": "chore(progress-log): record ux-loop close-out — branch-explorer user-scalable=no drop (PR #608, deployed + verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-25T03:17:25+07:00",
+      "sha": "cff01fc",
+      "summary": "ux: drop user-scalable=no from branch-explorer viewport (WCAG 1.4.4 parity) (#608)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-24T18:39:24+00:00",
+      "sha": "52acb2a",
+      "summary": "feat(overview): surface the vehicle_mix.regions pickup-replacement gap rollup (#606)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-24T17:06:17+00:00",
+      "sha": "9926134",
+      "summary": "data: market-pulse swarm refresh (run 32748850394) (#605)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-24T16:28:54+00:00",
+      "sha": "4ca21d4",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after health-sweep close-out",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-24T16:27:54+00:00",
       "sha": "5739173",
       "summary": "service(deploy-health): verified full-stack health sweep GREEN — docs-only close-out, no forced fix",
@@ -663,54 +711,6 @@
       "sha": "3957c51",
       "summary": "ux: inline .tblwrap scroll regions keyboard-reachable + labelled (WCAG 2.1.1) (#595)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-24T01:11:43+00:00",
-      "sha": "d93a19d",
-      "summary": "data: market-pulse swarm refresh (run 32668620364) (#590)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-24T00:50:45+00:00",
-      "sha": "57e2f7c",
-      "summary": "feat(cc-brief): fold double-pressure watchlist into the Command-center CSV export (#594)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T00:29:58+00:00",
-      "sha": "8a5704f",
-      "summary": "data: rival Facebook promo feed refresh (run 32670151290) (#591)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-24T00:04:35+00:00",
-      "sha": "9dcbd0a",
-      "summary": "data: rival published rate pages re-read (run 32673873748) (#593)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-23T22:59:29+00:00",
-      "sha": "8032443",
-      "summary": "data: live fuel prices (2026-08-23, run 32672141621)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-23T22:27:43+00:00",
-      "sha": "93efa46",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after flood-exposure ship (#592)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-24T05:26:32+07:00",
-      "sha": "05f68f8",
-      "summary": "market(flood-exposure): name AutoX branch exposure inside the live flood on the Overview verdict (#592)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-23T21:42:43+00:00",
-      "sha": "44b9193",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-23, run 32668237460)",
-      "pillar": "data-integration"
     }
   ]
 }
