@@ -13194,6 +13194,27 @@ function ccBriefCSV(){
     Object.entries(byP).map(([th,o])=>[th,o.r,o.s/o.n]).sort((a,b)=>b[2]-a[2]).slice(0,3).forEach(([th,r,avg])=>
       rows.push(['coverage_gap_province',th,r,avg.toFixed(0),'estimated']));
   }
+  // double-pressure watchlist (obj #1 × obj #2) — the SAME provinces the #cc-double card & the board
+  // thesis lead with (province_pressure.json: top-third on BOTH portfolio stress AND rival dominance).
+  // The brief exported everything else on the front door but silently dropped its sharpest cross-
+  // objective read, so a director downloading it lost the exact watchlist the screen leads with.
+  // We RANK & emit (worst both_min first), never recompute — mirroring renderHomeDoublePressure.
+  // Provenance = estimated: the rival ratio is computed over MEASURED census counts, but the stress
+  // axis is a percentile blend, so the combined read is a RANKING across the 77 provinces (matches
+  // the card's caveat), not a probability or an open/close call.
+  if(PROVPRESS&&Array.isArray(PROVPRESS.provinces)){
+    PROVPRESS.provinces.filter(r=>r&&r.double_pressure)
+      .sort((a,b)=>(b.both_min||0)-(a.both_min||0)).forEach(r=>{
+        const pct=v=>(typeof v==='number')?Math.round(v):'—';
+        const distLost=(r.n_outnumbered_districts!=null&&r.n_districts)?`${r.n_outnumbered_districts}/${r.n_districts} districts lost`:'';
+        const parts=[r.region||'',
+          (typeof r.ratio==='number')?`outgunned ${r.ratio.toFixed(1)}×${r.leader?' by '+r.leader:''}`:'',
+          distLost,
+          (typeof r.debt_to_income==='number')?`DTI ${r.debt_to_income.toFixed(2)}×`:''].filter(Boolean);
+        rows.push(['double_pressure_province',r.province_th||'—',parts.join(' | '),
+          `stress p${pct(r.stress_pctile)} · rival p${pct(r.contest_pctile)}`,'estimated']);
+      });
+  }
   // risk
   if(CSTRESS_LIST&&CSTRESS_LIST.length){const w=CSTRESS_LIST[0];
     rows.push(['risk_crop_stress',w.th,`${w.region} | price ${w.price_stress}%`,Math.round((w.agri_stress||0)*100),'estimated']);}
