@@ -111,7 +111,7 @@
    "cheapest_promo_effective": 10.0,
    "gap_pp": 14.0,
    "key": "TIDLOR",
-   "n_quotes": 7,
+   "n_quotes": 6,
    "name_th": "เงินติดล้อ",
    "quotes": [
     {
@@ -142,15 +142,6 @@
      "unit": "pct_per_month"
     },
     {
-     "channel": "facebook",
-     "context_th": "ฟแนนซ์ โปรดอกพิเศษ เริ่มเพียง 0.51% ต่อเดือน...",
-     "effective_worst_case": 11.05,
-     "quoted": 0.51,
-     "read_as": "flat_at_60m",
-     "seen": "2 วัน",
-     "unit": "pct_per_month"
-    },
-    {
      "channel": "google_ads",
      "context_th": "บัตรติดล้อ · ชนปนนน 24 · ย 12-24% ต่อปี · ณ วันที",
      "effective_worst_case": 24.0,
@@ -166,6 +157,15 @@
      "quoted": 24.0,
      "read_as": "as_quoted_per_year",
      "seen": "2025-11-06",
+     "unit": "pct_per_year"
+    },
+    {
+     "channel": "google_ads",
+     "context_th": "นและชําระคืนไหว อัตราดอกเนี้ย 24% ต่อปี · ไม่มีสล",
+     "effective_worst_case": 24.0,
+     "quoted": 24.0,
+     "read_as": "as_quoted_per_year",
+     "seen": "2026-06-18",
      "unit": "pct_per_year"
     }
    ],
