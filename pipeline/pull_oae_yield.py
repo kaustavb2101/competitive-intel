@@ -17,10 +17,12 @@ WHAT IS MEASURED, AND AT WHAT LEVEL (be honest — it differs by crop):
     province and TAGS that leg as national-applied-to-province. Nothing is invented.
   Sugarcane has NO OAE yield dataset at all — EXCLUDED (noted in build meta.gaps).
 
-SCHEMA DRIFT handled: the value column name differs per dataset (rice=amount, oilpalm=values,
-others=value); the year column differs (rice=year_th, others=year); maize carries รุ่น 1 / รุ่น 2 /
-รวมรุ่น sub-seasons (we take รวมรุ่น, the combined total). Column roles are resolved from the header,
-never by fixed index.
+SCHEMA DRIFT handled (incl. OAE's 2026 catalog migration): column roles are resolved from the header
+case-insensitively via COL_ALIASES, never by fixed index — value = amount|values|value|Value|data;
+attribute = attribute|Attribute|item; province = province_name|province; year = year_th|year;
+subcommod = subcommod|subcom. rubber & oil-palm national production moved from CSV to XLSX (parsed via
+openpyxl); oil palm reports yield as ผลผลิตต่อเนื้อที่ให้ผล (per fruit-bearing area). maize carries
+รุ่น 1 / รุ่น 2 / รวมทุกฤดูปลูก sub-seasons — we target the รวมทุกฤดูปลูก (combined-season) national file.
 
 FLOW (network — run from a host that can reach catalog.oae.go.th; CI runners can):
   1. package_show?id=<stable dataset slug>  (never a rotating resource id).
@@ -64,12 +66,25 @@ UA = {"User-Agent": "Mozilla/5.0"}
 MIN_RICE_PROV = 50
 
 # Yield-per-rai attribute labels (Thai) across the 5 datasets. เพาะปลูก (per PLANTED area) is
-# deliberately NOT here — we want per-HARVESTED/tapped area (เก็บเกี่ยว / กรีดได้ / ต่อไร่).
-YIELD_ATTRS = {"ผลผลิตต่อเนื้อที่เก็บเกี่ยว", "ผลผลิตต่อไร่", "ผลผลิตต่อเนื้อที่กรีดได้"}
-VALUE_KEYS = ("amount", "values", "value")   # header priority; datasets use exactly one
+# deliberately NOT here — we want per-HARVESTED/tapped/bearing area (เก็บเกี่ยว / กรีดได้ /
+# ให้ผล / ต่อไร่). Oil palm reports ผลผลิตต่อเนื้อที่ให้ผล (per fruit-BEARING area).
+YIELD_ATTRS = {"ผลผลิตต่อเนื้อที่เก็บเกี่ยว", "ผลผลิตต่อไร่",
+               "ผลผลิตต่อเนื้อที่กรีดได้", "ผลผลิตต่อเนื้อที่ให้ผล"}
+# Column ROLES are resolved case-insensitively from the header, never by fixed index. OAE's 2026
+# catalog migration renamed columns and moved rubber/oil-palm from CSV to XLSX, so a role now has
+# several spellings across the 5 datasets: value = amount|values|value|Value|data; attribute =
+# attribute|Attribute|item; province = province_name|province; subcommod = subcommod|subcom.
+COL_ALIASES = {
+    "value": ("amount", "values", "value", "data"),
+    "attr":  ("attribute", "item"),
+    "year":  ("year_th", "year"),
+    "prov":  ("province_name", "province"),
+    "sub":   ("subcommod", "subcom"),
+}
 PROD_ATTR = "ผลผลิต"            # rice: production (tons), for the weighted national yield
 HARV_ATTR = "เนื้อที่เก็บเกี่ยว"  # rice: harvested area (rai), for the weighted national yield
 SKIP_PROV = ("ประเทศไทย", "", "รวม", "รวมทั้งประเทศ")
+FMT_EXT = {"CSV": "csv", "XLSX": "xlsx"}   # accepted resource formats -> raw-cache extension
 
 # Each crop: dataset slug + mode. name_include/name_exclude filter the resource list.
 CROPS = {
@@ -77,7 +92,7 @@ CROPS = {
                 "name_include": "ข้าวนาปี", "name_exclude": "ระดับประเทศ",
                 "commod_th": "ข้าว"},
     "maize":   {"dataset": "dataoae1204", "mode": "national",
-                "name_include": "ระดับประเทศ", "commod_th": "ข้าวโพดเลี้ยงสัตว์"},
+                "name_include": "รวมทุกฤดูปลูก ระดับประเทศ", "commod_th": "ข้าวโพดเลี้ยงสัตว์"},
     "cassava": {"dataset": "dataoae1304", "mode": "national",
                 "name_include": "ระดับประเทศ", "commod_th": "มันสำปะหลัง"},
     "rubber":  {"dataset": "dataoae1404", "mode": "national",
@@ -115,33 +130,53 @@ def _be_year(name):
 
 
 def _resolve(cfg):
-    """Return (url, name) of the newest matching CSV resource for a crop config."""
+    """Return (url, name, fmt) of the newest matching CSV/XLSX resource for a crop config."""
     meta = json.loads(_get(PKG % cfg["dataset"]))
     inc, exc = cfg.get("name_include"), cfg.get("name_exclude")
     cands = []
     for r in meta["result"].get("resources", []):
         nm = r.get("name", "")
-        if (r.get("format", "").upper() == "CSV"
+        fmt = r.get("format", "").upper()
+        if (fmt in FMT_EXT
                 and (inc is None or inc in nm)
                 and (exc is None or exc not in nm)):
-            cands.append((_be_year(nm), r["url"], nm))
+            # fmt_rank: CSV (1) sorts ahead of XLSX (0) under reverse=True at equal year+name, so a
+            # dataset still offering CSV is preferred over its XLSX twin.
+            cands.append((_be_year(nm), nm, 1 if fmt == "CSV" else 0, r["url"], fmt))
     if not cands:
         return None
-    cands.sort(key=lambda t: (t[0], t[2]), reverse=True)  # newest BE year first, name tiebreak
-    return cands[0][1], cands[0][2]
+    cands.sort(key=lambda t: (t[0], t[1], t[2]), reverse=True)  # newest year, name, CSV-before-XLSX
+    top = cands[0]
+    return top[3], top[1], top[4]
 
 
-def _rows(url):
-    raw = _get(url)
+def _parse_bytes(raw, fmt):
+    """Decode a raw CSV/XLSX resource into stripped-cell rows (skipping blank rows)."""
+    if fmt == "XLSX":
+        import openpyxl  # only the XLSX crops (rubber, oil palm) need it; CI installs it for the swarm
+        wb = openpyxl.load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
+        ws = wb.active
+        rows = []
+        for row in ws.iter_rows(values_only=True):
+            cells = ["" if c is None else str(c).strip() for c in row]
+            if any(cells):
+                rows.append(cells)
+        wb.close()
+        return rows
     text = raw.decode("utf-8-sig", errors="replace")
-    return raw, [[c.strip() for c in r] for r in csv.reader(io.StringIO(text)) if any(r)]
+    return [[c.strip() for c in r] for r in csv.reader(io.StringIO(text)) if any(r)]
 
 
-def _colmap(hdr):
-    ix = {h: i for i, h in enumerate(hdr)}
-    val = next((k for k in VALUE_KEYS if k in ix), None)
-    year = "year_th" if "year_th" in ix else ("year" if "year" in ix else None)
-    return ix, val, year
+def _rows(url, fmt):
+    raw = _get(url)
+    return raw, _parse_bytes(raw, fmt)
+
+
+def _cols(hdr):
+    """Resolve column ROLE -> index from the header, case-insensitively, via COL_ALIASES."""
+    low = {h.strip().lower(): i for i, h in enumerate(hdr)}
+    return {role: next((low[n] for n in names if n in low), None)
+            for role, names in COL_ALIASES.items()}
 
 
 def _num(s):
@@ -153,28 +188,29 @@ def _num(s):
 
 def _parse_province(rows):
     """Rice per-province: {canonical: yield_kg_rai} + weighted national + BE year."""
-    hdr = rows[0]
-    ix, val, year = _colmap(hdr)
-    need = ("province_name", "attribute")
-    if not (all(k in ix for k in need) and val):
-        sys.exit("pull_oae_yield.py: rice CSV header unexpected: %s" % hdr)
+    col = _cols(rows[0])
+    ip, ia, iv, iy = col["prov"], col["attr"], col["value"], col["year"]
+    if None in (ip, ia, iv):
+        sys.exit("pull_oae_yield.py: rice CSV header unexpected: %s" % rows[0])
     provinces, prod, harv = {}, {}, {}
     be = 0
     for r in rows[1:]:
-        if len(r) <= max(ix["province_name"], ix["attribute"], ix[val]):
+        if len(r) <= max(ip, ia, iv):
             continue
-        pname = r[ix["province_name"]]
+        pname = r[ip]
         if pname in SKIP_PROV:
             continue
         c = canonical(pname)
         if not c or c not in REGION:
             continue
-        attr = r[ix["attribute"]]
-        v = _num(r[ix[val]])
+        attr = r[ia]
+        v = _num(r[iv])
         if v is None:
             continue
-        if year and len(r) > ix[year]:
-            be = max(be, _num(r[ix[year]]) and int(_num(r[ix[year]])) or 0)
+        if iy is not None and len(r) > iy:
+            yv = _num(r[iy])
+            if yv:
+                be = max(be, int(yv))
         if attr in YIELD_ATTRS:
             provinces[c] = round(v)
         elif attr == PROD_ATTR:
@@ -188,23 +224,22 @@ def _parse_province(rows):
 
 
 def _parse_national(rows, commod_th):
-    """Non-rice: national yield from the latest BE year; prefer รวมรุ่น (combined-season) subcommod."""
-    hdr = rows[0]
-    ix, val, year = _colmap(hdr)
-    if not (val and year and "attribute" in ix):
-        sys.exit("pull_oae_yield.py: national CSV header unexpected: %s" % hdr)
-    sub_ix = ix.get("subcommod")
+    """Non-rice: national yield from the latest BE year; prefer รวม (combined-season) subcommod."""
+    col = _cols(rows[0])
+    ia, iv, iy, isub = col["attr"], col["value"], col["year"], col["sub"]
+    if None in (ia, iv, iy):
+        sys.exit("pull_oae_yield.py: national CSV/XLSX header unexpected: %s" % rows[0])
     yields = []   # (be_year, subcommod, value)
     for r in rows[1:]:
-        if len(r) <= max(ix["attribute"], ix[val], ix[year]):
+        if len(r) <= max(ia, iv, iy):
             continue
-        if r[ix["attribute"]] not in YIELD_ATTRS:
+        if r[ia] not in YIELD_ATTRS:
             continue
-        by = _num(r[ix[year]])
-        v = _num(r[ix[val]])
+        by = _num(r[iy])
+        v = _num(r[iv])
         if by is None or v is None:
             continue
-        sub = r[sub_ix] if (sub_ix is not None and len(r) > sub_ix) else commod_th
+        sub = r[isub] if (isub is not None and len(r) > isub) else commod_th
         yields.append((int(by), sub, v))
     if not yields:
         return None, 0
@@ -249,7 +284,7 @@ def _crop_entry(name, cfg, rows):
     }, vintage
 
 
-def _assemble(crops, vintage_by_crop, resolved, stamp):
+def _assemble(crops, vintage_by_crop, resolved, formats, stamp):
     return {
         "meta": {
             "title": "OAE crop yield per rai (kg/rai) — 5 field crops (portfolio risk, objective #1)",
@@ -260,6 +295,7 @@ def _assemble(crops, vintage_by_crop, resolved, stamp):
             "source": BASE,
             "dataset_ids": {n: CROPS[n]["dataset"] for n in CROP_ORDER},
             "resources": resolved,
+            "formats": formats,
             "unit": "kg/rai (กก./ไร่)",
             "vintage_by_crop": vintage_by_crop,
             "pulled": stamp,
@@ -271,40 +307,39 @@ def _assemble(crops, vintage_by_crop, resolved, stamp):
 
 
 def build_live(stamp, dry_run=False):
-    """Network pull: resolve + download each crop's CSV, cache the raw, distil."""
+    """Network pull: resolve + download each crop's CSV/XLSX, cache the raw, distil."""
     os.makedirs(RAW_DIR, exist_ok=True)
-    crops, vintage_by_crop, resolved = {}, {}, {}
+    crops, vintage_by_crop, resolved, formats = {}, {}, {}, {}
     for name in CROP_ORDER:
         cfg = CROPS[name]
         r = _resolve(cfg)
         if not r:
-            sys.exit("pull_oae_yield.py: no CSV resource for %s (%s) — abort."
+            sys.exit("pull_oae_yield.py: no CSV/XLSX resource for %s (%s) — abort."
                      % (name, cfg["dataset"]))
-        url, res_name = r
+        url, res_name, fmt = r
         resolved[name] = res_name
+        formats[name] = fmt
         if dry_run:
-            print("  %-8s [%s] %s" % (name, cfg["mode"], res_name))
+            print("  %-8s [%s] (%s) %s" % (name, cfg["mode"], fmt, res_name))
             continue
-        raw, rows = _rows(url)
-        with open(os.path.join(RAW_DIR, "%s.csv" % name), "wb") as f:
+        raw, rows = _rows(url, fmt)
+        with open(os.path.join(RAW_DIR, "%s.%s" % (name, FMT_EXT[fmt])), "wb") as f:
             f.write(raw)
         crops[name], vintage_by_crop[name] = _crop_entry(name, cfg, rows)
     if dry_run:
         return None
-    return _assemble(crops, vintage_by_crop, resolved, stamp)
+    return _assemble(crops, vintage_by_crop, resolved, formats, stamp)
 
 
-def build_from_raw(stamp, resolved):
-    """Offline re-derive from the cached raw CSVs (for --check byte-reproduce)."""
+def build_from_raw(stamp, resolved, formats):
+    """Offline re-derive from the cached raw CSV/XLSX files (for --check byte-reproduce)."""
     crops, vintage_by_crop = {}, {}
     for name in CROP_ORDER:
-        path = os.path.join(RAW_DIR, "%s.csv" % name)
-        raw = open(path, "rb").read()
-        rows = [[c.strip() for c in r]
-                for r in csv.reader(io.StringIO(raw.decode("utf-8-sig", errors="replace")))
-                if any(r)]
+        fmt = formats.get(name, "CSV")
+        raw = open(os.path.join(RAW_DIR, "%s.%s" % (name, FMT_EXT[fmt])), "rb").read()
+        rows = _parse_bytes(raw, fmt)
         crops[name], vintage_by_crop[name] = _crop_entry(name, CROPS[name], rows)
-    return _assemble(crops, vintage_by_crop, resolved, stamp)
+    return _assemble(crops, vintage_by_crop, resolved, formats, stamp)
 
 
 def _dumps(data):
@@ -330,13 +365,14 @@ def main():
     args = ap.parse_args()
 
     if args.check:
-        raws = [os.path.join(RAW_DIR, "%s.csv" % n) for n in CROP_ORDER]
-        if not os.path.exists(OUT) or not all(os.path.exists(p) for p in raws):
+        prev = json.load(open(OUT, encoding="utf-8")) if os.path.exists(OUT) else None
+        fmts = (prev or {}).get("meta", {}).get("formats", {})
+        raws = [os.path.join(RAW_DIR, "%s.%s" % (n, FMT_EXT[fmts.get(n, "CSV")])) for n in CROP_ORDER]
+        if prev is None or not all(os.path.exists(p) for p in raws):
             print("pull_oae_yield.py --check: SKIP (committed oae_yield.json or gitignored raw "
                   "scratch source-data/.oae_yield_raw/ absent — network-pulled input, not drift)")
             sys.exit(3)
-        prev = json.load(open(OUT, encoding="utf-8"))
-        data = build_from_raw(prev["meta"]["pulled"], prev["meta"]["resources"])
+        data = build_from_raw(prev["meta"]["pulled"], prev["meta"]["resources"], prev["meta"]["formats"])
         if _dumps(data) != open(OUT, encoding="utf-8").read():
             sys.exit("pull_oae_yield.py --check: oae_yield.json drifted from a fresh parse of the "
                      "cached raw CSVs — re-run python3 pipeline/pull_oae_yield.py")

@@ -13,20 +13,27 @@
     },
     "resources": {
       "rice": "ปริมาณการผลิตข้าวนาปี ปี 2567",
-      "maize": "ปริมาณการผลิตข้าวโพดเลี้ยงสัตว์ ระดับประเทศ ปี 2563-2566",
-      "cassava": "ปริมาณการผลิตมันสำปะหลัง ระดับประเทศ ปี 2563-2567",
-      "rubber": "ปริมาณการผลิตยางพารา ระดับประเทศ ปี 2563-2566",
-      "oilpalm": "ปริมาณการผลิตปาล์มน้ำมัน ระดับประเทศ ปี 2563-2566"
+      "maize": "ปริมาณการผลิตข้าวโพดเลี้ยงสัตว์ รวมทุกฤดูปลูก ระดับประเทศ",
+      "cassava": "ปริมาณการผลิตมันสำปะหลังโรงงาน ระดับประเทศ",
+      "rubber": "ปริมาณการผลิตยางพารา ระดับประเทศ",
+      "oilpalm": "ปริมาณการผลิตปาล์มน้ำมัน ระดับประเทศ"
+    },
+    "formats": {
+      "rice": "CSV",
+      "maize": "CSV",
+      "cassava": "CSV",
+      "rubber": "XLSX",
+      "oilpalm": "XLSX"
     },
     "unit": "kg/rai (กก./ไร่)",
     "vintage_by_crop": {
       "rice": "2567 (CE 2024)",
-      "maize": "2566 (CE 2023)",
-      "cassava": "2567 (CE 2024)",
-      "rubber": "2566 (CE 2023)",
-      "oilpalm": "2566 (CE 2023)"
+      "maize": "2567 (CE 2024)",
+      "cassava": "2568 (CE 2025)",
+      "rubber": "2567 (CE 2024)",
+      "oilpalm": "2567 (CE 2024)"
     },
-    "pulled": "2026-08-16",
+    "pulled": "2026-08-24",
     "provenance": "MEASURED. Nothing modelled. Sugarcane EXCLUDED (no OAE yield dataset).",
     "consumer": "pipeline/build_crop_farmer_income.py (yield leg of gross farmer income)."
   },
@@ -119,34 +126,34 @@
     },
     "maize": {
       "commod_th": "ข้าวโพดเลี้ยงสัตว์",
-      "national": 744,
+      "national": 796,
       "provinces": {},
       "yield_scope": "national only (per-province is PDF-only at OAE — national applied to provinces downstream)",
-      "vintage": "2566 (CE 2023)",
+      "vintage": "2567 (CE 2024)",
       "dataset": "dataoae1204"
     },
     "cassava": {
       "commod_th": "มันสำปะหลัง",
-      "national": 3226,
+      "national": 3169,
       "provinces": {},
       "yield_scope": "national only (per-province is PDF-only at OAE — national applied to provinces downstream)",
-      "vintage": "2567 (CE 2024)",
+      "vintage": "2568 (CE 2025)",
       "dataset": "dataoae1304"
     },
     "rubber": {
       "commod_th": "ยางพารา",
-      "national": 214,
+      "national": 215,
       "provinces": {},
       "yield_scope": "national only (per-province is PDF-only at OAE — national applied to provinces downstream)",
-      "vintage": "2566 (CE 2023)",
+      "vintage": "2567 (CE 2024)",
       "dataset": "dataoae1404"
     },
     "oilpalm": {
       "commod_th": "ปาล์มน้ำมัน",
-      "national": 2942,
+      "national": 2934,
       "provinces": {},
       "yield_scope": "national only (per-province is PDF-only at OAE — national applied to provinces downstream)",
-      "vintage": "2566 (CE 2023)",
+      "vintage": "2567 (CE 2024)",
       "dataset": "dataoae1504"
     }
   }
