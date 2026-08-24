@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-23T16:14:17+00:00",
-    "commit": "755adfa"
+    "generated_at": "2026-08-24T05:26:32+07:00",
+    "commit": "05f68f8"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-23",
+    "eta_date": "2026-08-24",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-08-24T05:26:32+07:00",
+      "sha": "05f68f8",
+      "summary": "market(flood-exposure): name AutoX branch exposure inside the live flood on the Overview verdict (#592)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-23T21:42:43+00:00",
+      "sha": "44b9193",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-23, run 32668237460)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-23T20:16:57+00:00",
+      "sha": "07f4c1e",
+      "summary": "chore(dashboard): log iOS standalone PWA meta ship (PR #589, deployed + verified)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-24T03:14:12+07:00",
+      "sha": "b2a68b0",
+      "summary": "ux: iOS standalone home-screen meta (apple-mobile-web-app-capable) (#589)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-23T20:03:41+00:00",
+      "sha": "6ba48de",
+      "summary": "data: Thai-IP-only swarm refresh (run 32661717957) (#588)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-23T19:11:21+00:00",
+      "sha": "20cb95a",
+      "summary": "ops: monthly World Bank Pink Sheet refresh cron (+ standalone puller) (#587)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-23T16:51:18+00:00",
+      "sha": "4521e3b",
+      "summary": "data: market-pulse swarm refresh (run 32649853184) (#585)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-23T16:16:33+00:00",
+      "sha": "852192e",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after province_bbox shape-probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-23T16:14:17+00:00",
       "sha": "755adfa",
       "summary": "service(deploy-health): shape-probe province_bbox.json — per-branch 3D-scene province slug-resolve → Overture catchment source",
@@ -663,54 +711,6 @@
       "sha": "77e9d3e",
       "summary": "data: rival Facebook promo feed refresh (run 32602059096) (#574)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-22T22:48:51+00:00",
-      "sha": "cc6fbd1",
-      "summary": "data: market-pulse swarm refresh (run 32600656170) (#573)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-22T22:13:03+00:00",
-      "sha": "b9d68f8",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the province_geo shape-probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-22T22:12:40+00:00",
-      "sha": "879693b",
-      "summary": "service(deploy-health): shape-probe province_geo.json — heaviest unprobed National-map choropleth read",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-22T21:42:41+00:00",
-      "sha": "c1cd8d2",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-22, run 32600275300)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-22T20:27:21+00:00",
-      "sha": "afbc004",
-      "summary": "docs(progress): log branch-explorer.html viewport-fit=cover ship + deploy verify (PR #572)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-23T03:24:26+07:00",
-      "sha": "3b5bd58",
-      "summary": "ux: add viewport-fit=cover to branch-explorer.html for notched-device parity (#572)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-22T20:05:08+00:00",
-      "sha": "37382e3",
-      "summary": "data: Thai-IP-only swarm refresh (run 32594195186) (#571)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-22T18:43:56+00:00",
-      "sha": "ee06f2d",
-      "summary": "feat(home): name the double-pressure provinces on the command center (obj #1 × #2) (#570)",
-      "pillar": "feature"
     }
   ]
 }
