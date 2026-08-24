@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-24T10:28:03+00:00",
-    "commit": "c08f033"
+    "generated_at": "2026-08-24T16:27:54+00:00",
+    "commit": "5739173"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-08-24T16:27:54+00:00",
+      "sha": "5739173",
+      "summary": "service(deploy-health): verified full-stack health sweep GREEN — docs-only close-out, no forced fix",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-24T16:00:11+00:00",
+      "sha": "7395f21",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-24, run 32748069961)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-24T14:31:04+00:00",
+      "sha": "86b6774",
+      "summary": "docs(progress): log ux data.html CSV UTF-8 BOM ship (PR #604, deployed + verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-24T21:27:32+07:00",
+      "sha": "c5da121",
+      "summary": "ux: add UTF-8 BOM to data.html branch CSV export (Thai Excel fix) (#604)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-24T13:21:13+00:00",
+      "sha": "f4783d7",
+      "summary": "data: SET listed-peer scoreboard refresh (run 32723086117) (#602)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-24T13:00:25+00:00",
+      "sha": "c2f9054",
+      "summary": "data(labour): fold NSO LFS 2026-Q1 national unemployment into labour_context (obj #1) (#603)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-24T11:06:34+00:00",
+      "sha": "fdbb8ac",
+      "summary": "data: market-pulse swarm refresh (run 32716186443) (#601)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-24T10:28:36+00:00",
+      "sha": "69fc594",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after deploy-health probe-tail ship",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-08-24T10:28:03+00:00",
       "sha": "c08f033",
       "summary": "service(deploy-health): shape-probe the residual 5 unprobed app data reads (unprobed count → 0)",
@@ -662,54 +710,6 @@
       "date": "2026-08-23T21:42:43+00:00",
       "sha": "44b9193",
       "summary": "data: ThaiWater flood + rain pulse (2026-08-23, run 32668237460)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-23T20:16:57+00:00",
-      "sha": "07f4c1e",
-      "summary": "chore(dashboard): log iOS standalone PWA meta ship (PR #589, deployed + verified)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-24T03:14:12+07:00",
-      "sha": "b2a68b0",
-      "summary": "ux: iOS standalone home-screen meta (apple-mobile-web-app-capable) (#589)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-23T20:03:41+00:00",
-      "sha": "6ba48de",
-      "summary": "data: Thai-IP-only swarm refresh (run 32661717957) (#588)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-23T19:11:21+00:00",
-      "sha": "20cb95a",
-      "summary": "ops: monthly World Bank Pink Sheet refresh cron (+ standalone puller) (#587)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-23T16:51:18+00:00",
-      "sha": "4521e3b",
-      "summary": "data: market-pulse swarm refresh (run 32649853184) (#585)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-23T16:16:33+00:00",
-      "sha": "852192e",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after province_bbox shape-probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-23T16:14:17+00:00",
-      "sha": "755adfa",
-      "summary": "service(deploy-health): shape-probe province_bbox.json — per-branch 3D-scene province slug-resolve → Overture catchment source",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-23T15:42:07+00:00",
-      "sha": "e6d4452",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-23, run 32649273751)",
       "pillar": "data-integration"
     }
   ]
