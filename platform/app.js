@@ -2630,21 +2630,14 @@ function renderCollatOutlook(){
 }
 /* ---------- Diesel-pickup collateral · per-province diesel share + national brand mix ----------
    objective #1, MEASURED. AutoX's core title collateral is the diesel pickup; the EV/diesel
-   transition is the resale-value risk under it. Two MEASURED reads from data/vehicle_collateral.json:
-   (a) per-province DIESEL SHARE of the car(รย.1)+pickup(รย.3) registered fleet (DLT dataset_1_1_04) —
-       where diesel dominates, resale is most exposed as the fleet electrifies; and
-   (b) the NATIONAL collateral BRAND mix (DLT first registrations) — Toyota+Isuzu pickups, Honda/Toyota
-       cars, BYD/EV rising. Brand is NATIONAL ONLY (no measured brand×province in reachable Thai open
-       data) — said plainly. Lazy-loaded; graceful/null-safe when absent. */
-let VCOLL=null, vcollLoaded=false, vcollPromise=null;
-function loadVehicleCollateral(){
-  if(vcollPromise) return vcollPromise;
-  vcollLoaded=true;
-  vcollPromise=fetch('data/vehicle_collateral.json').then(r=>r.ok?r.json():null)
-    .then(j=>{VCOLL=j||null;return VCOLL;}).catch(()=>{VCOLL=null;return null;});
-  return vcollPromise;
-}
-/* RETIRED 2026-08-02 — renderDieselCollateral (the diesel-share + brand-tile block) and
+   transition is the resale-value risk under it. The two MEASURED reads that used to live here —
+   (a) per-province DIESEL SHARE of the car(รย.1)+pickup(รย.3) registered fleet (DLT dataset_1_1_04),
+   (b) the NATIONAL collateral BRAND mix (DLT first registrations) — still come from
+   data/vehicle_collateral.json, but the app no longer fetches that file directly: since the
+   2026-08-02 retirement below, build_collateral_book.py folds both reads server-side into
+   collateral_book.json, which renderCollateralBook already loads. The dead client-side fetch
+   (loadVehicleCollateral / VCOLL) was removed 2026-08-24 — it was never called after the retirement.
+   RETIRED 2026-08-02 — renderDieselCollateral (the diesel-share + brand-tile block) and
    renderCollatMix (the "most motorcycle-heavy provinces" table). Both are inside renderCollateralBook
    now, and both were exactly what the owner objected to:
 
