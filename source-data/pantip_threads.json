@@ -760,6 +760,24 @@
        "points": 0,
        "replies": 0,
        "text": "นานมากเสียเวลา มีบริษัทอื่นไห้เลือกเยอะเดี๋ยวนี้เป็นแบบนี้เจ้าอื่นได้ลูกค้าหมด"
+      },
+      {
+       "created": "1787558890",
+       "id": "44069410-41",
+       "no": 41,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "เปลี่ยนบริษัทดูนะค่ะ หรือลองติดต่อบ.ศ.ศรี🧡 สาขาใกล้บ้านดูนะค่ะ พนักงานแนะนำและบริการดีค่ะ"
+      },
+      {
+       "created": "1787571485",
+       "id": "44069410-42",
+       "no": 42,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "เอกสารเยอะจริง ช้าด้วย"
       }
      ],
      "created": "1777342593",
@@ -967,6 +985,15 @@
        "points": 0,
        "replies": 0,
        "text": "แบบนี้ก็แย่สำหรับลูกค้าที่ไม่มีแอปโอนเงินนะคะ เพราะลูกค้าสินเชื่อก็มีหลายวัย บางคนถนัดจ่ายเงินสดหน้าสาขา แย่เลยทีนี้"
+      },
+      {
+       "created": "1787571381",
+       "id": "43969591-11",
+       "no": 11,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "ถ้าไม่มีแอปหรือเงินติดบัญชีจะจ่ายยังไงละทีนี้ ระบบบ้าบอ"
       }
      ],
      "created": "1770205161",
@@ -12360,6 +12387,15 @@
        "points": 0,
        "replies": 0,
        "text": "สงสัยอีกอย่างนึงของเมืองไทยคือลูกค้าจ่ายก่อนดิวไม่ได้เลยหรอคะ เห็นแถวบ้านมีปฏิเสธลูกค้า บอกว่าต้องจ่ายเดือนตรงเดือน"
+      },
+      {
+       "created": "1787566642",
+       "id": "44146310-12",
+       "no": 12,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "ย้ายไฟแนนซ์เลยค่ะพี่"
       }
      ],
      "created": "1782819753",
@@ -21362,6 +21398,15 @@
        "points": 0,
        "replies": 0,
        "text": "ญาติเราเคยยื่นค่ะ สี่วัน ไม่มีเจ้าหน้าที่ติดต่อกลับมาเลย ได้ยื่นที่ใหม่ วันเดียวได้เงินค่ะ"
+      },
+      {
+       "created": "1787580332",
+       "id": "44137553-5",
+       "no": 5,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "รอนาน น่าจะไม่ผ่าน ขอเอกสารคืน ถามที่อื่น"
       }
      ],
      "created": "1782195549",
@@ -21587,6 +21632,15 @@
        "points": 0,
        "replies": 0,
        "text": "ผ่อนหมดก่อนครับ และไปหาไฟแนนอื่นครับ"
+      },
+      {
+       "created": "1787566909",
+       "id": "43976003-8",
+       "no": 8,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "ของเราทำที่บ.ศ…สีส้ม🧡ได้ไวนะแบบไม่ต้องรอนานเลย"
       }
      ],
      "created": "1770641027",
@@ -35052,6 +35106,24 @@
        "points": 0,
        "replies": 0,
        "text": "นานมากเสียเวลา มีบริษัทอื่นไห้เลือกเยอะเดี๋ยวนี้เป็นแบบนี้เจ้าอื่นได้ลูกค้าหมด"
+      },
+      {
+       "created": "1787558890",
+       "id": "44069410-41",
+       "no": 41,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "เปลี่ยนบริษัทดูนะค่ะ หรือลองติดต่อบ.ศ.ศรี🧡 สาขาใกล้บ้านดูนะค่ะ พนักงานแนะนำและบริการดีค่ะ"
+      },
+      {
+       "created": "1787571485",
+       "id": "44069410-42",
+       "no": 42,
+       "org": false,
+       "points": 0,
+       "replies": 0,
+       "text": "เอกสารเยอะจริง ช้าด้วย"
       }
      ],
      "created": "1777342593",
@@ -36830,9 +36902,9 @@
    "_CATEGORY"
   ],
   "coverage": "SEARCH IS CAPPED AT 10 THREADS PER TERM by Pantip itself — ?page=2+ repeats page 1 with last_page:true and the POST search API refuses limit>10. The reported totals in meta.reported_totals are what Pantip CLAIMS exists, not what is retrievable. Coverage widens only by adding query terms and by re-running as relevance ordering drifts, never by paging.",
-  "generated": "2026-08-23T19:40:14Z",
+  "generated": "2026-08-24T19:49:56Z",
   "measured": "Thread and comment COUNTS and TEXT are measured — read verbatim from Pantip.",
-  "n_comments": 3689,
+  "n_comments": 3697,
   "n_threads": 234,
   "privacy": "Text only. No author name, member id, profile link or avatar is read or stored at any stage. The single retained attribute is org:true, Pantip's own verified-organisation badge, which marks a company account rather than a person — a category, not an identity.",
   "reported_totals": {
@@ -36845,8 +36917,8 @@
    "จำนำทะเบียน": "พบ 1,272 กระทู้",
    "จำนำทะเบียนรถ": "พบ 1,232 กระทู้",
    "ติดล้อ จำนำทะเบียน": "พบ 17 กระทู้",
-   "รถแลกเงิน": "พบ 1,695 กระทู้",
-   "ศรีสวัสดิ์": "พบ 4,677 กระทู้",
+   "รถแลกเงิน": "พบ 1,696 กระทู้",
+   "ศรีสวัสดิ์": "พบ 4,679 กระทู้",
    "ศรีสวัสดิ์ เงินสดทันใจ": "พบ 442 กระทู้",
    "ศักดิ์สยามลิสซิ่ง": "พบ 150 กระทู้",
    "สมหวัง ทิสโก้": "พบ 53 กระทู้",
