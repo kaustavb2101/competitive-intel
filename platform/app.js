@@ -11824,6 +11824,22 @@ function renderCollateralBook(){
       const fu=k=>f[k]?`${f[k].share_pct.toFixed(2)}%`:'—';
       const ry3n=(NAT.new.ry3||{}).share_pct, ry3s=(NAT.stock.ry3||{}).share_pct;
       const ry12n=(NAT.new.ry12||{}).share_pct, ry12s=(NAT.stock.ry12||{}).share_pct;
+      // REGION rollup of the pickup-replacement gap (vehicle_mix.regions.gap_pp.ry3, MEASURED DLT).
+      // The exec-grain MIDDLE view the tab was missing: the verdict above is one national number and
+      // the "Pickup replace-gap" map lens is per-province — this answers, at the 5-region grain the
+      // rest of the platform is organised by, WHERE the used-pickup collateral pool is thinning
+      // fastest. Region totals are summed COUNTS (per this file's own formula note), not a mean of
+      // province percentages. Null-safe: an absent/older file with no .regions drops the strip.
+      const RG=(v||{}).regions||{};
+      const rgRows=Object.keys(RG).map(r=>({r,g:((RG[r].gap_pp||{}).ry3)}))
+        .filter(x=>typeof x.g==='number').sort((a,b)=>a.g-b.g);
+      const rgStrip=rgRows.length?`<div class="vm-regions">
+          <div class="vm-rg-hd">Where the used-pickup pool is thinning fastest <span class="s">— รย.3 replacement gap by region · MEASURED (DLT)</span></div>
+          <div class="vm-rg-row">${rgRows.map(x=>`<span class="vm-rg-cell">
+              <span class="vm-rg-dot" style="background:${REGION_ACCENT[x.r]||'var(--dim)'}"></span>
+              <span class="vm-rg-name">${x.r}</span>
+              <b class="vm-rg-val">${x.g>0?'+':x.g<0?'−':''}${Math.abs(x.g).toFixed(1)}<span class="vm-rg-u">pp</span></b></span>`).join('')}</div>
+          <p class="s vm-rg-f">Every region's new-pickup share sits below its stock share; the most negative is where the inflow is refilling the fleet slowest. This is the region rollup of the per-province “Pickup replace-gap” map lens.</p></div>`:'';
       mx.innerHTML=`<div class="verdict">
           <b>The pickup fleet is ageing without being replaced.</b> Pickups are <b>${shp(ry3s)}</b> of every vehicle registered in Thailand
           but only <b>${shp(ry3n)}</b> of everything newly plated in the last twelve months${
@@ -11834,6 +11850,7 @@ function renderCollateralBook(){
           Motorcycles run the other way (${shp(ry12s)} of stock, <b>${shp(ry12n)}</b> of new).
           <span class="sub">Read against the resale block above: the class whose value has fallen furthest is also the class the country has largely stopped buying new.
           That thins the future used-pickup pool we both lend against and recover into.</span></div>
+        ${rgStrip}
         ${PU.new_count?`<div class="vm-pu"><b>Under our own definition — PU = pickup + PPV</b> — new-registration share rises from
           <b>${shp(ry3n)}</b> to <b>${shp(PU.new_share_pct)}</b> (${num(PU.new_count)} units), because pickup-based SUVs are counted in.
           <span class="s">${np.length?`Measured by nameplate: ${np.map(([k,c])=>`${k} ${num(c)}`).join(' · ')}.`:''}

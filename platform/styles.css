@@ -1605,6 +1605,20 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .vm-ax .gd-geo b{color:var(--collat)}
 .vm-star{color:var(--collat);font-size:11px;margin-left:5px;cursor:help;vertical-align:1px}
 .vm-vs{font:500 10.5px var(--mono);color:var(--dim);white-space:nowrap}
+/* Region rollup of the รย.3 replacement gap — the exec-grain middle view between the national verdict
+   and the per-province map lens. All five region cells wrap on a phone; each is coloured by REGION_ACCENT. */
+.vm-regions{margin:9px 0;padding:9px 12px;border:1px solid rgba(122,79,224,.35);border-radius:8px;
+  background:var(--panel2)}
+.vm-rg-hd{font-size:12px;font-weight:600;color:var(--txt);margin-bottom:8px}
+.vm-rg-hd .s{font-weight:400;color:var(--dim)}
+.vm-rg-row{display:flex;flex-wrap:wrap;gap:8px}
+.vm-rg-cell{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--line);
+  border-radius:6px;background:var(--panel);font-size:12px;white-space:nowrap}
+.vm-rg-dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.vm-rg-name{color:var(--mid)}
+.vm-rg-val{font-family:var(--mono);color:var(--agri);font-weight:700}
+.vm-rg-u{font-size:9.5px;color:var(--dim);font-weight:400;margin-left:1px}
+.vm-rg-f{margin:7px 0 0;color:var(--dim);line-height:1.5}
 /* DLT brand mix — pickups beside passenger cars, because the finding IS the contrast (pickup
    concentrated in two nameplates, cars fragmenting toward BEV). Two columns that stack on a phone. */
 .vb-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
