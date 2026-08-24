@@ -1225,7 +1225,7 @@ function riskVal(d){
   return riskMetric==='a'?a : riskMetric==='m'?m : riskMetric==='c'?c : Math.max(a,m,c);
 }
 
-let DATA=null, META=null, map=null, markers=[], curLens='dws', branchSort='dwork', mapReady=false;
+let DATA=null, META=null, map=null, markers=[], curLens='dws', branchSort='risk', mapReady=false;
 let radiusCircle=null, showRadius=true;
 
 const $ = s => document.querySelector(s);
