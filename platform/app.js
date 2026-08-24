@@ -1588,19 +1588,28 @@ function wrapTables(){
   // again would create a scroller inside a scroller and a duplicate labelled region. Its overflow bug
   // was that .ic-scroll had no max-width — fixed in styles.css, not here.
   document.querySelectorAll('table.tbl').forEach(t=>{
-    if(t.parentElement&&t.parentElement.classList.contains('tblwrap')) return;
-    const w=document.createElement('div'); w.className='tblwrap';
+    // Reuse an existing .tblwrap (created here on a prior pass, or shipped inline in a template
+    // string) rather than skipping it: a table pre-wrapped in a manual <div class="tblwrap"> — e.g.
+    // the #home dataroom/tape and the #overview commodity boards — used to be early-returned, so its
+    // wrapper never received the keyboard/SR treatment below and a keyboard user could not pan it.
+    let w=t.parentElement;
+    if(!(w&&w.classList.contains('tblwrap'))){
+      w=document.createElement('div'); w.className='tblwrap';
+      t.parentNode.insertBefore(w,t); w.appendChild(t);
+    }
     // a11y: a horizontally-scrollable region must be keyboard-reachable + labelled so a
     // keyboard / screen-reader user can pan a wide table (WCAG 2.1.1 / scrollable-region-focusable).
-    w.setAttribute('role','region');
-    w.setAttribute('tabindex','0');
-    // Name it from its section heading, and de-dup so every scrollable region is uniquely named
-    // (axe landmark-unique) rather than all reading "Scrollable data table".
-    let base='Scrollable table: '+(tableSectionLabel(t)||'data table');
-    let lbl=base, k=1; while(used[lbl]) lbl=base+' ('+(++k)+')';
-    used[lbl]=1;
-    w.setAttribute('aria-label',lbl);
-    t.parentNode.insertBefore(w,t); w.appendChild(t);
+    // Idempotent — only fill in what's missing so a hand-set role/tabindex/label is preserved.
+    if(w.getAttribute('role')!=='region') w.setAttribute('role','region');
+    if(!w.hasAttribute('tabindex')) w.setAttribute('tabindex','0');
+    if(!w.hasAttribute('aria-label')){
+      // Name it from its section heading, and de-dup so every scrollable region is uniquely named
+      // (axe landmark-unique) rather than all reading "Scrollable data table".
+      let base='Scrollable table: '+(tableSectionLabel(t)||'data table');
+      let lbl=base, k=1; while(used[lbl]) lbl=base+' ('+(++k)+')';
+      used[lbl]=1;
+      w.setAttribute('aria-label',lbl);
+    }
   });
 }
 
@@ -10287,6 +10296,7 @@ function renderHomeDoublePressure(){
         <td class="mono">${distLost}</td>
       </tr>`;}).join('')+`</table></div>`+
     `<div class="sub" style="margin-top:6px;color:var(--dim)"><b>${dp.length}</b> province${dp.length===1?'':'s'} sit top-third on <b>both</b> axes — a fragile book where margin defence is hardest. Where to look first, <b>not</b> a verdict or an action. Portfolio stress is <b>estimated</b> (percentile blend of MEASURED NSO debt-to-income + unemployment); rival ratio is <b>computed over MEASURED</b> census counts — so the combined read is a RANKING across the 77 provinces, not a probability. Full per-province board &amp; brand split → <a class="cc-link no-print" data-v="acq" href="#acq" style="display:inline">Competition</a>.</div>`;
+  wrapTables();   // this card mounts AFTER the PROVPRESS fetch resolves, past the boot-time wrapTables() — upgrade its inline .tblwrap to a keyboard-reachable, labelled scroll region (WCAG 2.1.1)
   wrap.style.display='';
 }
 /* ---------- REAL loan tape · assistance radar (obj #1, MEASURED) ----------
@@ -12352,6 +12362,7 @@ function renderFarmCrops(host,j,FI){
       OCCUPATION, never a crop, so they were allocations resting on an allocation and read as measured fact. The question they were
       trying to answer is now answered on measured inputs by margin shock and the two income columns in the drill above.
       Price and cost are MEASURED; the margin arithmetic is DERIVED and the two vintages differ — read direction, not decimals.</p>`;
+  wrapTables();   // mounts AFTER the crop fetch resolves, past the boot-time wrapTables() — upgrade its inline .tblwrap to a keyboard-reachable, labelled scroll region (WCAG 2.1.1), matching sibling renderFarmHousehold()
   host.style.display='';
 }
 
