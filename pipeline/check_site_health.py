@@ -3923,6 +3923,180 @@ def _shape_province_bbox(d):
     return None
 
 
+def _shape_ev_penetration(d):
+    # The Overview collateral-outlook EV watch (ev_penetration.json, obj #1 — the
+    # MEASURED DLT registered-fleet fuel-type split behind the "EV/PHEV transition
+    # erodes ICE resale" leading indicator). renderEvWatch GATES the whole block on
+    # `EVDATA && EVDATA.meta && EVDATA.meta.national` (else it prints the "not
+    # available" note and blanks the cards + table), then the three KPI cards read
+    # nat.total / nat.bev / nat.phev / nat.hybrid / nat.diesel (bev_pct optional) and
+    # the per-province table reads .provinces[].th / .electrified_pct / .bev_pct /
+    # .diesel_pct joined onto the AutoX footprint. Its fetch is r.ok?json():null, so a
+    # truncated/404 CDN deploy silently hides the collateral EV watch with no phone
+    # alert — the same "broken demo" blind spot the sibling Overview obj-#1 probes
+    # (collateral_flow / truck_flow / vehicle_registry) close. Asserts render SHAPE
+    # not values (the national KPI gate + a well-formed province row + a truncation
+    # tripwire on meta.n_provinces), robust to a future DLT vintage moving the counts.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    nat = meta.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'meta.national' object (renderEvWatch display gate)"
+    for k in ("total", "bev", "phev", "hybrid", "diesel"):
+        if not isinstance(nat.get(k), (int, float)) or isinstance(nat.get(k), bool):
+            return "meta.national.%s missing/non-numeric (KPI-card render read)" % k
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or len(provs) < 70:
+        return "missing/short 'provinces' list (expected ~77)"
+    p0 = provs[0]
+    if not isinstance(p0, dict) or not (isinstance(p0.get("th"), str) and p0["th"].strip()):
+        return "first province missing 'th' (footprint-join render read)"
+    for k in ("electrified_pct", "diesel_pct"):
+        if not isinstance(p0.get(k), (int, float)) or isinstance(p0.get(k), bool):
+            return "first province %s missing/non-numeric (per-province table render read)" % k
+    n = meta.get("n_provinces")
+    if isinstance(n, int) and not isinstance(n, bool) and n != len(provs):
+        return "provinces count %d != meta.n_provinces %d (a partial/truncated deploy)" % (len(provs), n)
+    return None
+
+
+def _shape_nso_wage_anchor(d):
+    # The province deep-dive's MEASURED wage reality-check (nso_wage_anchor.json, obj
+    # #1 — NSO Labour Force Survey average monthly wage by region, the real number the
+    # occupation-income panel checks its ESTIMATED individual figure against).
+    # province.html reads window.NSOWAGE.by_app_region[region][bucket] (bucket ∈
+    # Agriculture / Construction / FactoryWorkers / Merchants / OfficeStaff / headline),
+    # window.NSOWAGE.ratio_to_bangkok[region] and window.NSOWAGE.meta.vintage; the fetch
+    # is r.ok?json():null and a null layer just omits the measured-wage line — so a
+    # truncated/404 CDN deploy silently drops the one MEASURED anchor on the province
+    # panel with no phone alert. Asserts render SHAPE not values: the .by_app_region
+    # dict, at least one non-'National' region carrying numeric occupation + headline
+    # wages, and the meta.vintage the line stamps — robust to a future LFS year moving
+    # every wage. (The 'National' region legitimately carries null occupation cells, so
+    # the probe checks a real regional row, not National.)
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    reg = d.get("by_app_region")
+    if not isinstance(reg, dict) or not reg:
+        return "missing/empty 'by_app_region' dict (province-panel wage-line render read)"
+    ok = False
+    for name, cell in reg.items():
+        if name == "National" or not isinstance(cell, dict):
+            continue
+        if (isinstance(cell.get("headline"), (int, float)) and not isinstance(cell.get("headline"), bool)
+                and isinstance(cell.get("OfficeStaff"), (int, float)) and not isinstance(cell.get("OfficeStaff"), bool)):
+            ok = True
+            break
+    if not ok:
+        return "no non-'National' region carries numeric 'headline'+'OfficeStaff' wages (a gutted/truncated layer)"
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not (isinstance(meta.get("vintage"), str) and meta["vintage"].strip()):
+        return "missing 'meta.vintage' (the wage-line 'NSO LFS <year>' render read)"
+    return None
+
+
+def _shape_promo_gap(d):
+    # The Competition tab's rival promo-vs-card verdict (promo_gap.json, obj #2 — does
+    # each operator's live promo undercut its OWN published rate-card floor). drawPromoGap
+    # GATES on `!rows.length && !cardOnly.length` (rows = .operators, cardOnly = .card_only;
+    # else it prints "not yet built" and blanks the table/readout), then the readout +
+    # table read each operator's .name_th / .key / .card_floor / .cheapest_promo_effective /
+    # .gap_pp / .undercuts_own_card / .n_quotes and the meta method box reads
+    # .meta.so_what / .label / .method. Its fetch is r.ok?json():null, so a truncated/404
+    # CDN deploy silently blanks the promo verdict with no phone alert — the same "broken
+    # demo" blind spot the sibling #acq probes (rival_ads / rival_pulse / search_demand)
+    # close. Asserts render SHAPE not values: at least one of the two arrays populated, a
+    # well-formed operator row (name_th + key), the meta object, and a truncation tripwire
+    # on meta.n_checked / meta.n_card_only — robust to a future promo-pull moving the field.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    ops = d.get("operators")
+    cardonly = d.get("card_only")
+    if not isinstance(ops, list):
+        return "missing 'operators' list (drawPromoGap rows render read)"
+    if not isinstance(cardonly, list):
+        return "missing 'card_only' list (drawPromoGap cardOnly render read)"
+    if not ops and not cardonly:
+        return "both 'operators' and 'card_only' empty (drawPromoGap self-hide gate — a gutted layer)"
+    if ops:
+        o0 = ops[0]
+        if not isinstance(o0, dict) or not (isinstance(o0.get("name_th"), str) and o0["name_th"].strip()):
+            return "first operator missing 'name_th' (verdict/table render read)"
+        if not (isinstance(o0.get("key"), str) and o0["key"].strip()):
+            return "first operator missing 'key' (table render read)"
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object (method-box render read)"
+    nc = meta.get("n_checked")
+    if isinstance(nc, int) and not isinstance(nc, bool) and nc != len(ops):
+        return "operators count %d != meta.n_checked %d (a partial/truncated deploy)" % (len(ops), nc)
+    nco = meta.get("n_card_only")
+    if isinstance(nco, int) and not isinstance(nco, bool) and nco != len(cardonly):
+        return "card_only count %d != meta.n_card_only %d (a partial/truncated deploy)" % (len(cardonly), nco)
+    return None
+
+
+def _shape_tiles_config(d):
+    # The 3D scenes' streamed-Overture-buildings config (tiles_config.json — read by
+    # branch-explorer.html, province.html and rayong-catchment.html, the deck.gl deep
+    # dives). Each page fetches it r.ok?json():null → TILECFG and reads TILECFG.buildings
+    # (.pmtilesUrl + .coverageBbox [W,S,E,N] gate whether the operator's streamed building
+    # tiles paint at all) and TILECFG.scenery (the HAS_SCENERY allowlist that gates the
+    # isochrone / trees toggles). A truncated/404 CDN deploy that guts buildings/scenery
+    # silently falls the scenes back to the curated catchment with the tile layer + toggles
+    # missing and no phone alert — the same silent-3D-degradation class the catchment_poi /
+    # province_bbox probes close. It has no CI cron to self-heal (a hand-authored operator
+    # config), so the live-URL probe is the only deploy safeguard. Asserts render SHAPE not
+    # values: the .buildings object with a string pmtilesUrl + a 4-number coverageBbox and
+    # the .scenery allowlist — robust to a future operator re-point of the tile URLs.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    b = d.get("buildings")
+    if not isinstance(b, dict):
+        return "missing 'buildings' object (TILECFG.buildings tile-layer render read)"
+    if not (isinstance(b.get("pmtilesUrl"), str) and b["pmtilesUrl"].strip()):
+        return "buildings.pmtilesUrl missing/empty (the streamed-tiles source render read)"
+    bb = b.get("coverageBbox")
+    if not (isinstance(bb, list) and len(bb) == 4 and all(
+            isinstance(x, (int, float)) and not isinstance(x, bool) for x in bb)):
+        return "buildings.coverageBbox not a 4-number [W,S,E,N] (the tile-coverage gate render read)"
+    if not isinstance(d.get("scenery"), list):
+        return "missing 'scenery' list (the HAS_SCENERY isochrone/trees allowlist render read)"
+    return None
+
+
+def _shape_catchments_r2(d):
+    # The 3D scenes' per-province building-catchment availability manifest
+    # (catchments_r2.json — read by rayong-catchment.html, the primary 3D entry point
+    # for all 77 provinces). It is opt()-fetched into CATALOG, and the scene reads
+    # CATALOG.meta.baseUrl as the R2 CDN fallback base for every province's
+    # <slug>_catchment.json (used when tiles_config carries no catchments.baseUrl
+    # override) plus .provinces as the served-province list. A truncated/404 CDN deploy
+    # that guts meta.baseUrl silently drops the CDN fallback, so any province without a
+    # git-committed catchment (i.e. all but the 3 pilots) loses its building scene with
+    # no phone alert — the same silent-3D-degradation class the catchment_poi /
+    # province_bbox / tiles_config probes close. Asserts render SHAPE not values: the
+    # meta.baseUrl fallback read, the .provinces slug list, and a truncation tripwire on
+    # meta.n — robust to a future R2 re-point or province-set change.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not (isinstance(meta.get("baseUrl"), str) and meta["baseUrl"].strip()):
+        return "missing 'meta.baseUrl' (the R2 CDN-fallback base render read)"
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or len(provs) < 70:
+        return "missing/short 'provinces' list (expected ~77 served slugs)"
+    if not (isinstance(provs[0], str) and provs[0].strip()):
+        return "first province is not a non-empty slug string"
+    n = meta.get("n")
+    if isinstance(n, int) and not isinstance(n, bool) and n != len(provs):
+        return "provinces count %d != meta.n %d (a partial/truncated deploy)" % (len(provs), n)
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -4558,6 +4732,19 @@ DATA_FILES = [
     # no alert. No CI cron to self-heal (offline emit off static amphoe geometry), so the
     # live-URL probe is the only deploy safeguard.
     ("data/province_bbox.json", _shape_province_bbox, ".provinces dict (77) keyed by slug with a 4-number [S,W,N,E] bbox, province count == meta.count (per-branch 3D-scene province slug-resolve → Overture catchment source)"),
+    # The residual sub-13 KB unprobed-reads tail — the last four static data/*.json the
+    # app fetches that the live-URL probe never covered, each r.ok?json():null-guarded so
+    # a truncated/404 CDN deploy degrades it SILENTLY with no phone alert. Closing them
+    # takes the app-fetched-but-unprobed count to 0:
+    #  - ev_penetration (renderEvWatch): Overview EV collateral watch, obj #1;
+    #  - nso_wage_anchor (province.html): the province panel's MEASURED wage anchor, obj #1;
+    #  - promo_gap (drawPromoGap): the Competition promo-vs-card verdict, obj #2;
+    #  - tiles_config (the 3D deep dives): the streamed-buildings + scenery-toggle config.
+    ("data/ev_penetration.json", _shape_ev_penetration, "meta.national fuel-split KPIs + .provinces (~77) with electrified_pct, count == meta.n_provinces (Overview EV collateral watch, obj #1)"),
+    ("data/nso_wage_anchor.json", _shape_nso_wage_anchor, ".by_app_region with numeric headline+OfficeStaff wages + meta.vintage (province-panel MEASURED wage anchor, obj #1)"),
+    ("data/promo_gap.json", _shape_promo_gap, ".operators + .card_only (≥1 populated) with name_th/key + meta counts (Competition promo-vs-card verdict, obj #2)"),
+    ("data/tiles_config.json", _shape_tiles_config, ".buildings{pmtilesUrl,coverageBbox[4]} + .scenery allowlist (3D deep-dive streamed-buildings + toggle config)"),
+    ("data/catchments_r2.json", _shape_catchments_r2, ".meta.baseUrl R2 CDN fallback + .provinces (~77) served slugs, count == meta.n (3D per-province building-catchment availability manifest)"),
 ]
 
 
