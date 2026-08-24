@@ -2,15 +2,17 @@
  "meta": {
   "title": "Rival rate OBSERVATION — live re-read of each operator's pinned rate_url",
   "generated_by": "pipeline/pull_rival_rates.py",
-  "label": "MEASURED — the verbatim rate text found on each operator's own rate_url this run, PLUS what pipeline/rate_basis.py could read off the page about its basis/tenor/LTV. `basis` is null (and `effective_pct_year` is null) wherever the page does not itself state which convention it is quoting — never inferred. This file is NOT the rate board's input and NEVER overwrites source-data/rival_rate_card.json, which stays hand-curated; `drift` on each operator is this script's own comparison against that card, for a human to act on.",
+  "label": "MEASURED — the verbatim rate text found on each operator's own rate_url this run, PLUS what pipeline/rate_basis.py could read off the page about its basis/tenor/LTV. `basis` is null (and `effective_pct_year` is null) wherever the page does not itself state which convention it is quoting — never inferred. This file is NOT the rate board's input and NEVER overwrites source-data/rival_rate_card.json, which stays hand-curated; `drift` on each operator is this script's own comparison against that card, for a human to act on. Each drift line carries a `kind`: `drift` = the quote moved outside a band the card DOES publish in that unit (a real rate move); `gap` = the card carries no figure in that unit for the operator, so there is nothing to compare (a coverage gap in the card, NOT drift — counted in n_card_unit_gaps, never n_with_drift_vs_card); `in_band` = within tolerance.",
   "why": "rival_rate_card.json only moved when a human edited it by hand. This script is the scheduled eyes that re-visit every rate_url and say what changed, so the card (and everything measured against it, incl. build_promo_gap.py's undercut check) does not go stale without anyone noticing.",
-  "not_wired_up": "Deliberately absent from tests/run.sh (network puller, not a deterministic --check build) and has no GitHub workflow here — scheduling is the owner's to add separately.",
-  "pulled_at": "2026-08-16",
+  "scheduling": "Deliberately absent from tests/run.sh — this is a network puller, not a deterministic --check build, so it has nothing byte-exact to gate. It IS scheduled: .github/workflows/data-rival-rates.yml runs it weekly (cron 10 23 * * 0 — 06:10 Bangkok Monday) and opens a PR carrying the drift report below. Registered in pull_swarm.py as `rival_rates` (needs_browser), which is why it needs that dedicated workflow: data-swarm.yml runs --skip-browser and would never pick it up.",
+  "pulled_at": "2026-08-23",
   "n_operators_in_plan": 23,
   "n_read": 22,
   "n_error": 1,
   "n_no_rate_found": 3,
-  "n_with_drift_vs_card": 7,
+  "n_with_drift_vs_card": 5,
+  "n_card_unit_gaps": 3,
+  "summary": "22 of 23 pages read, 19 with a parseable rate, 5 showing drift vs the card, 3 quoting a unit the card does not cover",
   "rate_url_missing": [],
   "requested_keys_not_found": [],
   "drift_tolerance": {
@@ -24,10 +26,10 @@
    "name_th": "เงินไชโย",
    "rate_url": "https://chaiyo.co.th/product/detail/loan-car",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
-   "n_chars": 2117,
+   "n_chars": 2023,
    "quotes": [
     {
      "value": 14.99,
@@ -61,7 +63,8 @@
       ],
       "card_field": "นิติบุคคล.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 23.99,
@@ -72,7 +75,8 @@
       ],
       "card_field": "บุคคลทั่วไป.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -82,10 +86,10 @@
    "name_th": "เมืองไทย แคปปิตอล",
    "rate_url": "https://muangthaicap.com/loan/car-pickup/",
    "fetched_via": "http",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
-   "n_chars": 10015,
+   "n_chars": 9995,
    "quotes": [
     {
      "value": 0.75,
@@ -119,7 +123,8 @@
       ],
       "card_field": "สินเชื่อทะเบียนรถยนต์ทุกประเภท.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 16.98,
@@ -130,7 +135,8 @@
       ],
       "card_field": "สินเชื่อทะเบียนรถยนต์ทุกประเภท.lender_effective",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -140,10 +146,10 @@
    "name_th": "เงินติดล้อ",
    "rate_url": "https://tidlor.com/th/loan/car",
    "fetched_via": "http",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
-   "n_chars": 3787,
+   "n_chars": 3815,
    "quotes": [
     {
      "value": 10.0,
@@ -168,7 +174,8 @@
       ],
       "card_field": "โปรพิเศษ รีไฟแนนซ์ เก๋ง-กระบะ (live promo).lender_effective",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -178,10 +185,10 @@
    "name_th": "ศรีสวัสดิ์ เงินสดทันใจ",
    "rate_url": "https://www.sawad.co.th/loan_calculator/",
    "fetched_via": "http",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
-   "n_chars": 7390,
+   "n_chars": 5232,
    "quotes": [
     {
      "value": 0.66,
@@ -193,18 +200,18 @@
      "effective_pct_year": null
     },
     {
-     "value": 0.75,
+     "value": 0.72,
      "unit": "pct_per_month",
-     "quote_th": "👉 ดอกเบี้ยเริ่มต้น 0.75% ต่อเดือน",
+     "quote_th": "👉 ดอกเบี้ยเริ่มต้น 0.72% ต่อเดือน",
      "basis": null,
      "tenor_months": null,
      "ltv_pct": null,
      "effective_pct_year": null
     },
     {
-     "value": 1.0,
+     "value": 0.72,
      "unit": "pct_per_month",
-     "quote_th": "👉 ดอกเบี้ยเริ่มต้นเพียง 1.00% ต่อเดือน",
+     "quote_th": "👉 ดอกเบี้ยเริ่มต้นเพียง 0.72% ต่อเดือน",
      "basis": null,
      "tenor_months": null,
      "ltv_pct": null,
@@ -222,16 +229,7 @@
     {
      "value": 24.0,
      "unit": "pct_per_year",
-     "quote_th": "*อัตราดอกเบี้ยที่แท้จริง 17.04% – 24.00% ต่อปี",
-     "basis": "effective",
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": 24.0
-    },
-    {
-     "value": 24.0,
-     "unit": "pct_per_year",
-     "quote_th": "*อัตราดอกเบี้ยที่แท้จริง 17.85% – 24.00% ต่อปี",
+     "quote_th": "*อัตราดอกเบี้ยที่แท้จริง 15.27% – 24.00% ต่อปี",
      "basis": "effective",
      "tenor_months": null,
      "ltv_pct": null,
@@ -248,25 +246,28 @@
       "card_range": null,
       "card_field": null,
       "delta": null,
-      "drift": true,
+      "drift": false,
+      "kind": "gap",
       "note": "card has no figure in this unit for this operator"
      },
      {
-      "observed": 0.75,
+      "observed": 0.72,
       "unit": "pct_per_month",
       "card_range": null,
       "card_field": null,
       "delta": null,
-      "drift": true,
+      "drift": false,
+      "kind": "gap",
       "note": "card has no figure in this unit for this operator"
      },
      {
-      "observed": 1.0,
+      "observed": 0.72,
       "unit": "pct_per_month",
       "card_range": null,
       "card_field": null,
       "delta": null,
-      "drift": true,
+      "drift": false,
+      "kind": "gap",
       "note": "card has no figure in this unit for this operator"
      },
      {
@@ -278,7 +279,8 @@
       ],
       "card_field": "สินเชื่อรถยนต์.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 24.0,
@@ -289,18 +291,8 @@
       ],
       "card_field": "สินเชื่อรถยนต์.quoted",
       "delta": 0.0,
-      "drift": false
-     },
-     {
-      "observed": 24.0,
-      "unit": "pct_per_year",
-      "card_range": [
-       15.27,
-       24.0
-      ],
-      "card_field": "สินเชื่อรถยนต์.quoted",
-      "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -310,7 +302,7 @@
    "name_th": "เงินเทอร์โบ",
    "rate_url": "https://www.turbo.co.th/loans/car",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "no_rate_found",
    "error": null,
    "n_chars": 13,
@@ -326,7 +318,7 @@
    "name_th": "เฮงลิสซิ่ง",
    "rate_url": "https://www.hengleasing.com/heng_hirepurchase/",
    "fetched_via": "http",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "error",
    "error": "HTTP Error 403: Forbidden",
    "n_chars": null,
@@ -341,7 +333,7 @@
    "name_th": "ศักดิ์สยามลิสซิ่ง",
    "rate_url": "https://saksiam.com/service/car",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
    "n_chars": 3108,
@@ -369,7 +361,8 @@
       ],
       "card_field": "สินเชื่อที่มีทะเบียนรถเป็นประกัน.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -379,7 +372,7 @@
    "name_th": "ไมโครลิสซิ่ง",
    "rate_url": "https://microleasingplc.com/th/micro-products/truck-to-cash",
    "fetched_via": "http",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
    "n_chars": 6481,
@@ -416,7 +409,8 @@
       ],
       "card_field": "สินเชื่อเพิ่มสภาพคล่อง (จำนำทะเบียนรถบรรทุก).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 22.0,
@@ -427,7 +421,8 @@
       ],
       "card_field": "สินเชื่อเพิ่มสภาพคล่อง (จำนำทะเบียนรถบรรทุก).quoted",
       "delta": 2.0,
-      "drift": true
+      "drift": true,
+      "kind": "drift"
      }
     ]
    }
@@ -437,7 +432,7 @@
    "name_th": "อะมานะฮ์ ลิสซิ่ง",
    "rate_url": "https://amanah.co.th/car-loan",
    "fetched_via": "http",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
    "n_chars": 12467,
@@ -510,7 +505,8 @@
       ],
       "card_field": "ไม่โอนเล่มทะเบียนรถยนต์.quoted",
       "delta": 9.0,
-      "drift": true
+      "drift": true,
+      "kind": "drift"
      },
      {
       "observed": 24.0,
@@ -521,7 +517,8 @@
       ],
       "card_field": "ไม่โอนเล่มทะเบียนรถยนต์.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 24.0,
@@ -532,7 +529,8 @@
       ],
       "card_field": "ไม่โอนเล่มทะเบียนรถยนต์.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 24.0,
@@ -543,7 +541,8 @@
       ],
       "card_field": "ไม่โอนเล่มทะเบียนรถยนต์.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 24.0,
@@ -554,7 +553,8 @@
       ],
       "card_field": "ไม่โอนเล่มทะเบียนรถยนต์.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 24.0,
@@ -565,7 +565,8 @@
       ],
       "card_field": "ไม่โอนเล่มทะเบียนรถยนต์.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -575,7 +576,7 @@
    "name_th": "สมหวัง เงินสั่งได้",
    "rate_url": "https://www.somwang.co.th",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
    "n_chars": 3170,
@@ -621,7 +622,8 @@
       ],
       "card_field": "สินเชื่อทะเบียนรถ.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 24.0,
@@ -632,7 +634,8 @@
       ],
       "card_field": "สินเชื่อทะเบียนรถ.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 24.0,
@@ -643,7 +646,8 @@
       ],
       "card_field": "สินเชื่อทะเบียนรถ.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -653,7 +657,7 @@
    "name_th": "เงินให้ใจ",
    "rate_url": "https://www.ngernhaijai.com/product/car-title-loan",
    "fetched_via": "http",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
    "n_chars": 5655,
@@ -717,7 +721,8 @@
       ],
       "card_field": "แบบไม่โอนเล่มทะเบียน (รถส่วนบุคคล).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 15.0,
@@ -728,7 +733,8 @@
       ],
       "card_field": "แบบจำนำเล่มทะเบียน.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 15.0,
@@ -739,7 +745,8 @@
       ],
       "card_field": "แบบจำนำเล่มทะเบียน.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 24.0,
@@ -750,7 +757,8 @@
       ],
       "card_field": "แบบจำนำเล่มทะเบียน.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 26.62,
@@ -761,7 +769,8 @@
       ],
       "card_field": "แบบไม่โอนเล่มทะเบียน (รถเชิงพาณิชย์).lender_effective",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -771,7 +780,7 @@
    "name_th": "คาร์ ฟอร์ แคช",
    "rate_url": "https://www.car4cash.com/",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "no_rate_found",
    "error": null,
    "n_chars": 2247,
@@ -787,7 +796,7 @@
    "name_th": "KTC พี่เบิ้ม รถแลกเงิน",
    "rate_url": "https://ktc.co.th/ktc-p-berm",
    "fetched_via": "http",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
    "n_chars": 5968,
@@ -833,7 +842,8 @@
       ],
       "card_field": "รถยนต์ รถกระบะ รถเก๋ง รถตู้.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 21.5,
@@ -844,7 +854,8 @@
       ],
       "card_field": "รถยนต์ รถกระบะ รถเก๋ง รถตู้.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 24.0,
@@ -855,7 +866,8 @@
       ],
       "card_field": "รถยนต์ รถกระบะ รถเก๋ง รถตู้.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -865,7 +877,7 @@
    "name_th": "เงินดีดี (Good Money by GSB)",
    "rate_url": "https://www.moneydd.co.th",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
    "n_chars": 4113,
@@ -920,7 +932,8 @@
       ],
       "card_field": "จำนำทะเบียนเพื่อคนมีฝัน.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 24.0,
@@ -931,7 +944,8 @@
       ],
       "card_field": "จำนำทะเบียนเพื่อคนมีฝัน.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 25.0,
@@ -942,7 +956,8 @@
       ],
       "card_field": "จำนำทะเบียนเพื่อคนมีฝัน.quoted",
       "delta": 1.0,
-      "drift": true
+      "drift": true,
+      "kind": "drift"
      },
      {
       "observed": 33.0,
@@ -953,7 +968,8 @@
       ],
       "card_field": "จำนำทะเบียนเพื่อคนมีฝัน.quoted",
       "delta": 9.0,
-      "drift": true
+      "drift": true,
+      "kind": "drift"
      }
     ]
    }
@@ -963,10 +979,10 @@
    "name_th": "มีที่ มีเงิน",
    "rate_url": "https://meetee.co.th/mortgage/",
    "fetched_via": "http",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
-   "n_chars": 20452,
+   "n_chars": 20202,
    "quotes": [
     {
      "value": 6.75,
@@ -1054,7 +1070,8 @@
       ],
       "card_field": "จำนอง (mortgage, ~90% of the book).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 6.75,
@@ -1065,7 +1082,8 @@
       ],
       "card_field": "จำนอง (mortgage, ~90% of the book).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 6.75,
@@ -1076,7 +1094,8 @@
       ],
       "card_field": "จำนอง (mortgage, ~90% of the book).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 6.75,
@@ -1087,7 +1106,8 @@
       ],
       "card_field": "จำนอง (mortgage, ~90% of the book).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 9.99,
@@ -1098,7 +1118,8 @@
       ],
       "card_field": "ขายฝาก (sale-and-leaseback).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 9.99,
@@ -1109,7 +1130,8 @@
       ],
       "card_field": "ขายฝาก (sale-and-leaseback).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 9.99,
@@ -1120,7 +1142,8 @@
       ],
       "card_field": "ขายฝาก (sale-and-leaseback).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 9.99,
@@ -1131,7 +1154,8 @@
       ],
       "card_field": "ขายฝาก (sale-and-leaseback).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -1141,10 +1165,10 @@
    "name_th": "ttb รถแลกเงิน (cash your car)",
    "rate_url": "https://www.ttbbank.com/th/personal/loans/hire-purchase/cash-your-car",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
-   "n_chars": 18125,
+   "n_chars": 18327,
    "quotes": [
     {
      "value": 0.27,
@@ -1283,7 +1307,8 @@
       "card_range": null,
       "card_field": null,
       "delta": null,
-      "drift": true,
+      "drift": false,
+      "kind": "gap",
       "note": "card has no figure in this unit for this operator"
      },
      {
@@ -1292,7 +1317,8 @@
       "card_range": null,
       "card_field": null,
       "delta": null,
-      "drift": true,
+      "drift": false,
+      "kind": "gap",
       "note": "card has no figure in this unit for this operator"
      },
      {
@@ -1301,7 +1327,8 @@
       "card_range": null,
       "card_field": null,
       "delta": null,
-      "drift": true,
+      "drift": false,
+      "kind": "gap",
       "note": "card has no figure in this unit for this operator"
      },
      {
@@ -1310,7 +1337,8 @@
       "card_range": null,
       "card_field": null,
       "delta": null,
-      "drift": true,
+      "drift": false,
+      "kind": "gap",
       "note": "card has no figure in this unit for this operator"
      },
      {
@@ -1319,7 +1347,8 @@
       "card_range": null,
       "card_field": null,
       "delta": null,
-      "drift": true,
+      "drift": false,
+      "kind": "gap",
       "note": "card has no figure in this unit for this operator"
      },
      {
@@ -1328,7 +1357,8 @@
       "card_range": null,
       "card_field": null,
       "delta": null,
-      "drift": true,
+      "drift": false,
+      "kind": "gap",
       "note": "card has no figure in this unit for this operator"
      },
      {
@@ -1340,7 +1370,8 @@
       ],
       "card_field": "โอนเล่มทะเบียน (registration transferred).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 6.79,
@@ -1351,7 +1382,8 @@
       ],
       "card_field": "โอนเล่มทะเบียน (registration transferred).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 8.7,
@@ -1362,7 +1394,8 @@
       ],
       "card_field": "โอนเล่มทะเบียน (registration transferred).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 11.11,
@@ -1373,7 +1406,8 @@
       ],
       "card_field": "โอนเล่มทะเบียน (registration transferred).lender_effective",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 12.0,
@@ -1384,7 +1418,8 @@
       ],
       "card_field": "โอนเล่มทะเบียน (registration transferred).lender_effective",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 13.0,
@@ -1395,7 +1430,8 @@
       ],
       "card_field": "โอนเล่มทะเบียน (registration transferred).lender_effective",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 24.0,
@@ -1406,7 +1442,8 @@
       ],
       "card_field": "ไม่โอนเล่มทะเบียน (registration retained — the AutoX-comparable product).quoted",
       "delta": 1.0,
-      "drift": true
+      "drift": true,
+      "kind": "drift"
      },
      {
       "observed": 24.0,
@@ -1417,7 +1454,8 @@
       ],
       "card_field": "ไม่โอนเล่มทะเบียน (registration retained — the AutoX-comparable product).quoted",
       "delta": 1.0,
-      "drift": true
+      "drift": true,
+      "kind": "drift"
      }
     ]
    }
@@ -1427,7 +1465,7 @@
    "name_th": "KKP รถเรียกเงิน",
    "rate_url": "https://kkpauto.com/th/carquickcash",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "no_rate_found",
    "error": null,
    "n_chars": 0,
@@ -1443,7 +1481,7 @@
    "name_th": "คาร์ฟินน์ (CarFinn)",
    "rate_url": "https://www.carfinn.com/car-loan",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
    "n_chars": 3387,
@@ -1489,7 +1527,8 @@
       ],
       "card_field": "รถยนต์เก่า (used).quoted_monthly",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 0.5,
@@ -1500,7 +1539,8 @@
       ],
       "card_field": "รถยนต์เก่า (used).quoted_monthly",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 3.0,
@@ -1511,7 +1551,8 @@
       ],
       "card_field": "รถยนต์ใหม่ (new).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -1521,10 +1562,10 @@
    "name_th": "สินเชื่อรถคือเงิน My Car My Cash",
    "rate_url": "https://www.scb.co.th/th/personal-banking/loans/car-loans/my-car-my-cash.html",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
-   "n_chars": 7782,
+   "n_chars": 15611,
    "quotes": [
     {
      "value": 0.25,
@@ -1572,6 +1613,15 @@
      "effective_pct_year": null
     },
     {
+     "value": 8.65,
+     "unit": "pct_per_year",
+     "quote_th": "สินเชื่อรถคือเงิน อัตราดอกเบี้ยคงที่อยู่ระหว่าง 2.99%-8.65% ต่อปี (อัตราดอกเบี้ยที่แท้จริงอยู่ระหว่าง 5.47%-15% ต่อปี ตลอดอายุสัญญา) ทั้งนี้ อาจมีการเปลี่ยนแปลงได้ซึ่งไม่เกินตามที่ธนาคารประกาศกำหนด",
+     "basis": "flat",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": null
+    },
+    {
      "value": 8.97,
      "unit": "pct_per_year",
      "quote_th": "สมมติฐานการคำนวณมาจากการกู้สินเชื่อที่ผ่อนชำระเป็นงวด จากเงินต้น 100,000 บาท ประเภทรถเก๋ง ปีที่จดทะเบียน 2024 อัตราดอกเบี้ยคงที่ 5% ต่อปี (อัตราดอกเบี้ยที่แท้จริง 8.97% ต่อปี) และระยะเวลาผ่อน 84 เดือน (7 ปี) ค่างวด (รวม VAT) 1,720 บาทต่อเดือน จำนวนดอกเบี้ยทั้งสัญญา 35,000 บาท",
@@ -1588,6 +1638,15 @@
      "tenor_months": null,
      "ltv_pct": null,
      "effective_pct_year": 15.0
+    },
+    {
+     "value": 15.0,
+     "unit": "pct_per_year",
+     "quote_th": "สินเชื่อรถคือเงิน อัตราดอกเบี้ยคงที่อยู่ระหว่าง 2.99%-8.65% ต่อปี (อัตราดอกเบี้ยที่แท้จริงอยู่ระหว่าง 5.47%-15% ต่อปี ตลอดอายุสัญญา) ทั้งนี้ อาจมีการเปลี่ยนแปลงได้ซึ่งไม่เกินตามที่ธนาคารประกาศกำหนด",
+     "basis": "effective",
+     "tenor_months": null,
+     "ltv_pct": null,
+     "effective_pct_year": 15.0
     }
    ],
    "quotes_truncated": false,
@@ -1600,7 +1659,8 @@
       "card_range": null,
       "card_field": null,
       "delta": null,
-      "drift": true,
+      "drift": false,
+      "kind": "gap",
       "note": "card has no figure in this unit for this operator"
      },
      {
@@ -1609,7 +1669,8 @@
       "card_range": null,
       "card_field": null,
       "delta": null,
-      "drift": true,
+      "drift": false,
+      "kind": "gap",
       "note": "card has no figure in this unit for this operator"
      },
      {
@@ -1621,7 +1682,8 @@
       ],
       "card_field": "รถจดทะเบียนปี 2026–2021.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 5.0,
@@ -1632,7 +1694,8 @@
       ],
       "card_field": "รถจดทะเบียนปี 2026–2021.quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 8.65,
@@ -1643,7 +1706,20 @@
       ],
       "card_field": "รถจดทะเบียนปี 2026–2021.lender_effective",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
+     },
+     {
+      "observed": 8.65,
+      "unit": "pct_per_year",
+      "card_range": [
+       5.47,
+       10.98
+      ],
+      "card_field": "รถจดทะเบียนปี 2026–2021.lender_effective",
+      "delta": 0.0,
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 8.97,
@@ -1654,7 +1730,8 @@
       ],
       "card_field": "รถจดทะเบียนปี 2026–2021.lender_effective",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 15.0,
@@ -1665,7 +1742,20 @@
       ],
       "card_field": "รถจดทะเบียนปี 2015–2011.lender_effective",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
+     },
+     {
+      "observed": 15.0,
+      "unit": "pct_per_year",
+      "card_range": [
+       10.0,
+       15.0
+      ],
+      "card_field": "รถจดทะเบียนปี 2015–2011.lender_effective",
+      "delta": 0.0,
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -1675,7 +1765,7 @@
    "name_th": "สินเชื่อทะเบียนรถยนต์ ยูโอบี Car2Cash",
    "rate_url": "https://www.uob.co.th/personal/loans/car-2-cash.page",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
    "n_chars": 9464,
@@ -1730,7 +1820,8 @@
       ],
       "card_field": "โปรโมชันสมัครออนไลน์ (online application promo).quoted_monthly",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 0.5,
@@ -1741,7 +1832,8 @@
       ],
       "card_field": "โปรโมชันสมัครออนไลน์ (online application promo).quoted_monthly",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 10.99,
@@ -1752,7 +1844,8 @@
       ],
       "card_field": "โปรโมชันสมัครออนไลน์ (online application promo).lender_effective",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 24.0,
@@ -1763,7 +1856,8 @@
       ],
       "card_field": "อัตราปกติ รวมค่าธรรมเนียม (standard band, fees included).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -1773,7 +1867,7 @@
    "name_th": "สินเชื่อทะเบียนรถยนต์ ทิสโก้ ออโต้แคช",
    "rate_url": "https://www.tisco.co.th/th/personal/loan/auto-loan.html",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
    "n_chars": 3851,
@@ -1828,7 +1922,8 @@
       ],
       "card_field": "รถเก๋ง/กระบะ/ตู้/บรรทุก/บิ๊กไบค์.quoted_monthly",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 1.15,
@@ -1839,7 +1934,8 @@
       ],
       "card_field": "รถเก๋ง/กระบะ/ตู้/บรรทุก/บิ๊กไบค์.quoted_monthly",
       "delta": 0.15,
-      "drift": true
+      "drift": true,
+      "kind": "drift"
      },
      {
       "observed": 24.0,
@@ -1850,7 +1946,8 @@
       ],
       "card_field": "รถเก๋ง/กระบะ/ตู้/บรรทุก/บิ๊กไบค์.lender_effective",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 24.0,
@@ -1861,7 +1958,8 @@
       ],
       "card_field": "รถเก๋ง/กระบะ/ตู้/บรรทุก/บิ๊กไบค์.lender_effective",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -1871,7 +1969,7 @@
    "name_th": "สินเชื่อรถช่วยได้กสิกรไทย (จำนำทะเบียนรถ)",
    "rate_url": "https://www.kasikornbank.com/th/personal/autoloan/pages/car-to-cash/top-up.aspx",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
    "n_chars": 8522,
@@ -1899,7 +1997,8 @@
       ],
       "card_field": "จำนำทะเบียนรถ ลูกค้าทั่วไป (registration retained).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
@@ -1909,7 +2008,7 @@
    "name_th": "สินเชื่อรถปลดล็อก ซีไอเอ็มบี ไทย ออโต้",
    "rate_url": "https://www.cimbthaiauto.com/product/autocash",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-16",
+   "fetched_at": "2026-08-23",
    "status": "ok",
    "error": null,
    "n_chars": 5937,
@@ -1973,7 +2072,8 @@
       ],
       "card_field": "โอนเล่ม (registration transferred).quoted_monthly",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 0.74,
@@ -1984,7 +2084,8 @@
       ],
       "card_field": "โอนเล่ม (registration transferred).quoted_monthly",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 1.56,
@@ -1995,7 +2096,8 @@
       ],
       "card_field": "ไม่โอนเล่ม (registration retained — the AutoX-comparable product).quoted_monthly",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 8.87,
@@ -2006,7 +2108,8 @@
       ],
       "card_field": "โอนเล่ม (registration transferred).quoted",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      },
      {
       "observed": 10.66,
@@ -2017,7 +2120,8 @@
       ],
       "card_field": "โอนเล่ม (registration transferred).lender_effective",
       "delta": 0.0,
-      "drift": false
+      "drift": false,
+      "kind": "in_band"
      }
     ]
    }
