@@ -10128,7 +10128,11 @@ function renderImfWeo(){
     const un=LABCTX&&LABCTX.unemployment;
     if(un&&un.total_rate_pct!=null) TH.LUR={
       val:un.total_rate_pct, per:un.as_of, src:'NSO LFS', kind:'measured',
-      full:'NSO Labour Force Survey via the ILOSTAT mirror'};
+      // When the NSO-quarterly override is present (source-data/staging/nso_lfs.json), the hover
+      // states the true provenance — the labour-force-weighted 77-province aggregate that the
+      // district-unemployment lens reads — instead of the old "via the ILOSTAT mirror" line, which
+      // stays only as the honest fallback for when that staging file is absent.
+      full:un.nso_source||'NSO Labour Force Survey via the ILOSTAT mirror'};
     const rows=Object.entries(T).map(([code,v])=>{
       const la=v.latest_actual||{}, pr=v.projection||{}, t=TH[code];
       // The measured cell wins the "latest" column when we have one; the IMF's own annual actual

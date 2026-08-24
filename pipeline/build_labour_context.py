@@ -34,6 +34,7 @@ import argparse, json, os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "source-data", "ilostat_labour.json")
 SRC_NSO = os.path.join(ROOT, "source-data", "nso_lfs_status.json")
+SRC_PLFS = os.path.join(ROOT, "source-data", "staging", "nso_lfs.json")
 OUT = os.path.join(ROOT, "platform", "data", "labour_context.json")
 
 SECTORS = {  # ILO aggregate -> plain label (segment-relevant order)
@@ -114,6 +115,54 @@ def _apply_nso_override(self_emp, sectors):
             "the ILOSTAT annual mirror both were carrying." % as_of)
 
 
+def _apply_nso_unemployment_override(unemployment):
+    """Mutates unemployment (in place): replaces total_rate_pct — an ILOSTAT ANNUAL mirror figure —
+    with the labour-force-weighted NATIONAL aggregate of NSO's own quarterly provincial LFS
+    (source-data/staging/nso_lfs.json, the SAME measured source as the district-unemployment map
+    lens and platform/data/province_lfs.json), when that staging file is present.
+
+    Uses NSO's own definition: unemployment rate = unemployed / labour force. Seasonal-waiting
+    workers (ผู้รอฤดูกาล) are a SEPARATE labour-force category, NOT counted as unemployed — folding
+    them in (labour_force - employed) overstates the rate ~1.8x (1.71% vs the correct 0.94%), so we
+    sum the published unemployed_k, matching how NSO computes each province's own rate.
+
+    youth_15_24_rate_pct stays the ILOSTAT annual figure: the provincial cut carries employed-by-age
+    but no unemployed-by-age, so no youth rate is derivable. Returns a meta note, never silently."""
+    if unemployment is None:
+        return "unemployment block absent — NSO quarterly override skipped."
+    prior = unemployment.get("total_rate_pct")
+    prior_asof = unemployment.get("as_of")
+    prior_str = ("%s%% %s" % (prior, prior_asof)) if prior is not None else "n/a"
+    if not os.path.exists(SRC_PLFS):
+        return ("source-data/staging/nso_lfs.json absent — unemployment.total_rate_pct stays the "
+                "ILOSTAT annual mirror (%s)." % prior_str)
+    doc = json.load(open(SRC_PLFS, encoding="utf-8"))
+    provs = doc.get("provinces") or []
+    lf = sum((p.get("labor_force_total_k") or 0) for p in provs)
+    une = sum((p.get("unemployed_k") or 0) for p in provs)
+    if not provs or not lf:
+        return ("source-data/staging/nso_lfs.json has no usable labour-force totals — "
+                "unemployment.total_rate_pct stays the ILOSTAT annual mirror (%s)." % prior_str)
+    rate = round(100.0 * une / lf, 2)
+    sw = round(sum((p.get("seasonal_waiting_k") or 0) for p in provs))
+    as_of = _nso_quarter_label(provs[0])   # year_be / quarter present on every province row
+    unemployment["total_rate_pct"] = rate
+    unemployment["as_of"] = as_of
+    unemployment["nso_source"] = (
+        "total_rate_pct is the labour-force-weighted NATIONAL aggregate of NSO LFS %s provincial "
+        "data (source-data/staging/nso_lfs.json — the SAME measured source as the district-"
+        "unemployment map lens and platform/data/province_lfs.json), on NSO's own definition "
+        "(unemployed ÷ labour force; the %dk seasonal-waiting workers are a separate category, "
+        "not counted as unemployed). It SUPERSEDES the ILOSTAT annual mirror this entry carried "
+        "(%s). youth_15_24_rate_pct remains the ILOSTAT annual figure — the provincial LFS cut "
+        "carries employed-by-age but no unemployed-by-age, so no youth rate is derivable."
+        % (as_of, sw, prior_str))
+    return ("OVERRODE unemployment.total_rate_pct with the NSO LFS %s national aggregate "
+            "(%.2f%%, labour-force-weighted over %d provinces, NSO definition) — fresher than and "
+            "consistent with the district-unemployment lens; was the ILOSTAT annual mirror (%s)."
+            % (as_of, rate, len(provs), prior_str))
+
+
 def build():
     src = json.load(open(SRC, encoding="utf-8"))
     S = src.get("series", {})
@@ -166,19 +215,32 @@ def build():
 
     nso_note = _apply_nso_override(self_emp, sectors)
 
+    unemployment = {
+        "total_rate_pct": round(une_tot, 2) if une_tot is not None else None,
+        "youth_15_24_rate_pct": round(une_youth, 2) if une_youth is not None else None,
+        "as_of": une_tot_t,
+        "note": "headline unemployment is structurally low in Thailand because "
+                "informal work absorbs slack — read WITH the informality rate, "
+                "not instead of it",
+    }
+    nso_unemp_note = _apply_nso_unemployment_override(unemployment)
+
     return {
         "meta": {
             "title": "National labour context — the informal-borrower base (measured)",
             "generated_by": "pipeline/build_labour_context.py",
             "label": "MEASURED — ILOSTAT mirror of Thailand's official NSO LFS submissions "
-                     "(informality, unemployment, other sectors), OVERLAID with NSO's own "
-                     "quarterly LFS cross-tabs for self-employment and the agriculture sector "
-                     "where source-data/nso_lfs_status.json is present (see nso_source note on "
-                     "those two entries). NATIONAL level only (the geoblock verdict: no cloud "
-                     "path to per-province LFS; vendored SES 2566 remains the per-province source).",
+                     "(informality, other sectors), OVERLAID with NSO's own quarterly LFS "
+                     "cross-tabs for self-employment + the agriculture sector "
+                     "(source-data/nso_lfs_status.json) AND for the national unemployment rate "
+                     "(source-data/staging/nso_lfs.json, labour-force-weighted over 77 provinces) "
+                     "where those files are present (see nso_source notes on those entries). "
+                     "NATIONAL level only (the geoblock verdict: no cloud path to per-province "
+                     "LFS; vendored SES 2566 remains the per-province source).",
             "source": "source-data/ilostat_labour.json (pull_ilostat_labour.py, pulled %s)"
                       % src.get("meta", {}).get("pulled", "?"),
             "nso_override": nso_note,
+            "nso_unemployment_override": nso_unemp_note,
             "why": "Informal workers lack payslips — that is the title-loan borrower base. "
                    "Informality + sector employment set the demand backdrop for every segment "
                    "score on this platform.",
@@ -190,12 +252,7 @@ def build():
         "self_employment": self_emp,
         "employment": {"total_thousands": round(tot_v, 1) if tot_v is not None else None,
                        "as_of": tot_t, "sectors": sectors},
-        "unemployment": {"total_rate_pct": round(une_tot, 2) if une_tot is not None else None,
-                         "youth_15_24_rate_pct": round(une_youth, 2) if une_youth is not None else None,
-                         "as_of": une_tot_t,
-                         "note": "headline unemployment is structurally low in Thailand because "
-                                 "informal work absorbs slack — read WITH the informality rate, "
-                                 "not instead of it"},
+        "unemployment": unemployment,
     }
 
 
