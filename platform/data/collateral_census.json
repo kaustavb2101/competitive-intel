@@ -13,36 +13,6 @@
    "year": 2021
   },
   {
-   "age": 14,
-   "auction": {
-    "median": 6000,
-    "n": 8,
-    "p25": 4250,
-    "p75": 11375
-   },
-   "body": "moto",
-   "collateral_class": "HONDA WAVE",
-   "year": 2012
-  },
-  {
-   "age": 10,
-   "auction": {
-    "median": 12000,
-    "n": 8,
-    "p25": 8875,
-    "p75": 16500
-   },
-   "body": "moto",
-   "collateral_class": "HONDA WAVE",
-   "km": {
-    "median": 50309,
-    "n": 8,
-    "p25": 22702,
-    "p75": 56643
-   },
-   "year": 2016
-  },
-  {
    "age": 5,
    "auction": {
     "median": 20000,
@@ -82,83 +52,107 @@
    "age": 3,
    "auction": {
     "median": 17000,
-    "n": 19,
-    "p25": 13000,
-    "p75": 21000
+    "n": 23,
+    "p25": 15000,
+    "p75": 22000
    },
    "body": "moto",
    "collateral_class": "HONDA WAVE",
    "km": {
-    "median": 32326,
-    "n": 18,
-    "p25": 14920,
-    "p75": 38894
+    "median": 32334,
+    "n": 22,
+    "p25": 18431,
+    "p75": 38653
    },
    "year": 2023
   },
   {
    "age": 2,
    "auction": {
-    "median": 19500,
-    "n": 8,
-    "p25": 16500,
-    "p75": 22500
+    "median": 19000,
+    "n": 9,
+    "p25": 17000,
+    "p75": 22000
    },
    "body": "moto",
    "collateral_class": "HONDA WAVE",
+   "km": {
+    "median": 25204,
+    "n": 8,
+    "p25": 16735,
+    "p75": 27416
+   },
    "year": 2024
+  },
+  {
+   "age": 1,
+   "auction": {
+    "median": 28000,
+    "n": 12,
+    "p25": 25250,
+    "p75": 33750
+   },
+   "body": "moto",
+   "collateral_class": "HONDA WAVE",
+   "km": {
+    "median": 9704,
+    "n": 12,
+    "p25": 4613,
+    "p75": 19297
+   },
+   "year": 2025
   },
   {
    "age": 13,
    "auction": {
     "median": 8000,
-    "n": 14,
+    "n": 8,
     "p25": 6000,
-    "p75": 18500
+    "p75": 27000
    },
    "body": "moto",
    "collateral_class": "HONDA",
    "km": {
-    "median": 45462,
-    "n": 13,
-    "p25": 22282,
-    "p75": 64250
+    "median": 34178,
+    "n": 8,
+    "p25": 18204,
+    "p75": 58225
    },
    "year": 2013
   },
   {
    "age": 12,
    "auction": {
-    "median": 8500,
-    "n": 15,
+    "median": 9000,
+    "n": 9,
     "p25": 7500,
-    "p75": 10000
+    "p75": 20500
    },
    "body": "moto",
    "collateral_class": "HONDA",
    "km": {
-    "median": 36732,
-    "n": 12,
-    "p25": 20574,
-    "p75": 70972
+    "median": 45418,
+    "n": 8,
+    "p25": 28522,
+    "p75": 91202
    },
    "year": 2014
   },
   {
    "age": 9,
    "auction": {
-    "median": 12500,
-    "n": 12,
-    "p25": 7000,
+    "median": 14000,
+    "n": 11,
+    "p25": 10000,
     "p75": 15000
    },
    "body": "moto",
    "collateral_class": "HONDA",
    "km": {
-    "median": 41925,
+    "median": 50853,
     "n": 10,
-    "p25": 32030,
-    "p75": 65941
+    "p25": 34887,
+    "p75": 75134
    },
    "year": 2017
   },
@@ -166,66 +160,66 @@
    "age": 8,
    "auction": {
     "median": 21000,
-    "n": 12,
-    "p25": 13250,
-    "p75": 29750
+    "n": 14,
+    "p25": 13750,
+    "p75": 60000
    },
    "body": "moto",
    "collateral_class": "HONDA",
    "km": {
-    "median": 21332,
-    "n": 8,
-    "p25": 16374,
-    "p75": 40881
+    "median": 23873,
+    "n": 11,
+    "p25": 16089,
+    "p75": 63420
    },
    "year": 2018
   },
   {
    "age": 7,
    "auction": {
-    "median": 16000,
+    "median": 16500,
     "n": 12,
-    "p25": 14000,
-    "p75": 20250
+    "p25": 14250,
+    "p75": 21000
    },
    "body": "moto",
    "collateral_class": "HONDA",
    "km": {
-    "median": 50684,
-    "n": 10,
-    "p25": 41986,
-    "p75": 56450
+    "median": 49591,
+    "n": 9,
+    "p25": 40098,
+    "p75": 54476
    },
    "year": 2019
   },
   {
    "age": 6,
    "auction": {
-    "median": 25000,
-    "n": 8,
-    "p25": 17250,
-    "p75": 49625
+    "median": 29250,
+    "n": 10,
+    "p25": 17750,
+    "p75": 51500
    },
    "body": "moto",
    "collateral_class": "HONDA",
+   "km": {
+    "median": 36654,
+    "n": 9,
+    "p25": 22516,
+    "p75": 63884
+   },
    "year": 2020
   },
   {
    "age": 5,
    "auction": {
-    "median": 20500,
-    "n": 10,
-    "p25": 15000,
-    "p75": 23500
+    "median": 20000,
+    "n": 9,
+    "p25": 14000,
+    "p75": 24000
    },
    "body": "moto",
    "collateral_class": "HONDA",
-   "km": {
-    "median": 40730,
-    "n": 8,
-    "p25": 20452,
-    "p75": 87715
-   },
    "year": 2021
   },
   {
@@ -243,56 +237,68 @@
   {
    "age": 3,
    "auction": {
-    "median": 20000,
-    "n": 15,
-    "p25": 10000,
-    "p75": 27000
+    "median": 22000,
+    "n": 18,
+    "p25": 12250,
+    "p75": 38500
    },
    "body": "moto",
    "collateral_class": "HONDA",
    "km": {
-    "median": 18474,
-    "n": 11,
-    "p25": 12706,
-    "p75": 25249
+    "median": 21552,
+    "n": 14,
+    "p25": 15576,
+    "p75": 35272
    },
    "year": 2023
   },
   {
-   "age": 16,
+   "age": 2,
    "auction": {
-    "median": 80000,
-    "n": 9,
-    "p25": 65000,
-    "p75": 90000
+    "median": 43500,
+    "n": 12,
+    "p25": 31750,
+    "p75": 74750
    },
-   "body": "car",
-   "collateral_class": "ISUZU PU",
+   "body": "moto",
+   "collateral_class": "HONDA",
    "km": {
-    "median": 231575,
-    "n": 9,
-    "p25": 172016,
-    "p75": 268719
+    "median": 21608,
+    "n": 10,
+    "p25": 15677,
+    "p75": 41587
    },
-   "year": 2010
+   "year": 2024
   },
   {
-   "age": 9,
+   "age": 1,
    "auction": {
-    "median": 191000,
+    "median": 39000,
+    "n": 11,
+    "p25": 36000,
+    "p75": 45000
+   },
+   "body": "moto",
+   "collateral_class": "HONDA",
+   "km": {
+    "median": 6536,
     "n": 8,
-    "p25": 165000,
-    "p75": 212000
+    "p25": 5350,
+    "p75": 11104
+   },
+   "year": 2025
+  },
+  {
+   "age": 21,
+   "auction": {
+    "median": 60000,
+    "n": 9,
+    "p25": 40000,
+    "p75": 86500
    },
    "body": "car",
    "collateral_class": "ISUZU PU",
-   "km": {
-    "median": 165238,
-    "n": 8,
-    "p25": 145163,
-    "p75": 191010
-   },
-   "year": 2017
+   "year": 2005
   },
   {
    "age": 6,
@@ -311,7 +317,7 @@
    "auction": {
     "median": 270000,
     "n": 10,
-    "p25": 170500,
+    "p25": 166500,
     "p75": 300000
    },
    "body": "car",
@@ -327,88 +333,64 @@
   {
    "age": 4,
    "auction": {
-    "median": 345000,
-    "n": 8,
-    "p25": 287500,
-    "p75": 374000
+    "median": 340000,
+    "n": 11,
+    "p25": 260000,
+    "p75": 350000
    },
    "body": "car",
    "collateral_class": "ISUZU PU",
    "km": {
-    "median": 55622,
-    "n": 8,
-    "p25": 38997,
-    "p75": 77744
+    "median": 57502,
+    "n": 11,
+    "p25": 47096,
+    "p75": 103133
    },
    "year": 2022
   },
   {
+   "age": 3,
+   "auction": {
+    "median": 320000,
+    "n": 9,
+    "p25": 261500,
+    "p75": 405000
+   },
+   "body": "car",
+   "collateral_class": "ISUZU PU",
+   "km": {
+    "median": 46971,
+    "n": 8,
+    "p25": 35226,
+    "p75": 107688
+   },
+   "year": 2023
+  },
+  {
    "age": 13,
    "auction": {
-    "median": 70000,
-    "n": 9,
-    "p25": 34500,
-    "p75": 101000
+    "median": 82500,
+    "n": 8,
+    "p25": 37000,
+    "p75": 102000
    },
    "body": "car",
    "collateral_class": "MAZDA",
    "km": {
-    "median": 211308,
+    "median": 206055,
     "n": 8,
     "p25": 144792,
-    "p75": 301917
+    "p75": 249706
    },
    "year": 2013
   },
   {
-   "age": 19,
-   "auction": {
-    "median": 50000,
-    "n": 9,
-    "p25": 27500,
-    "p75": 60000
-   },
-   "body": "car",
-   "collateral_class": "TOYOTA PU",
-   "year": 2007
-  },
-  {
-   "age": 14,
-   "auction": {
-    "median": 65000,
-    "n": 8,
-    "p25": 49000,
-    "p75": 140000
-   },
-   "body": "car",
-   "collateral_class": "TOYOTA",
-   "year": 2012
-  },
-  {
-   "age": 14,
-   "auction": {
-    "median": 1750,
-    "n": 14,
-    "p25": 1000,
-    "p75": 3250
-   },
-   "body": "moto",
-   "collateral_class": "YAMAHA",
-   "km": {
-    "median": 66588,
-    "n": 14,
-    "p25": 47963,
-    "p75": 83550
-   },
-   "year": 2012
-  },
-  {
    "age": 10,
    "auction": {
-    "median": 12500,
-    "n": 10,
+    "median": 12000,
+    "n": 9,
     "p25": 6000,
-    "p75": 17500
+    "p75": 16000
    },
    "body": "moto",
    "collateral_class": "YAMAHA",
@@ -430,24 +412,24 @@
    "age": 7,
    "auction": {
     "median": 17000,
-    "n": 11,
-    "p25": 12000,
-    "p75": 30000
+    "n": 13,
+    "p25": 12500,
+    "p75": 40000
    },
    "body": "moto",
    "collateral_class": "YAMAHA",
    "km": {
-    "median": 45310,
-    "n": 8,
-    "p25": 23771,
-    "p75": 50298
+    "median": 48215,
+    "n": 9,
+    "p25": 25334,
+    "p75": 68942
    },
    "year": 2019
   },
   {
    "age": 6,
    "auction": {
-    "median": 19000,
+    "median": 20000,
     "n": 9,
     "p25": 13500,
     "p75": 22000
@@ -459,54 +441,54 @@
   {
    "age": 5,
    "auction": {
-    "median": 20500,
-    "n": 19,
-    "p25": 14000,
-    "p75": 26000
+    "median": 21250,
+    "n": 18,
+    "p25": 13750,
+    "p75": 26250
    },
    "body": "moto",
    "collateral_class": "YAMAHA",
    "km": {
-    "median": 36621,
-    "n": 18,
-    "p25": 24688,
-    "p75": 58620
+    "median": 37578,
+    "n": 17,
+    "p25": 28035,
+    "p75": 65736
    },
    "year": 2021
   },
   {
    "age": 4,
    "auction": {
-    "median": 22000,
-    "n": 19,
-    "p25": 14000,
-    "p75": 36000
+    "median": 22500,
+    "n": 22,
+    "p25": 14750,
+    "p75": 36500
    },
    "body": "moto",
    "collateral_class": "YAMAHA",
    "km": {
     "median": 25134,
-    "n": 18,
-    "p25": 18218,
-    "p75": 37658
+    "n": 20,
+    "p25": 18314,
+    "p75": 37702
    },
    "year": 2022
   },
   {
    "age": 3,
    "auction": {
-    "median": 25000,
-    "n": 19,
-    "p25": 17000,
-    "p75": 37000
+    "median": 26500,
+    "n": 24,
+    "p25": 17250,
+    "p75": 38000
    },
    "body": "moto",
    "collateral_class": "YAMAHA",
    "km": {
-    "median": 25010,
-    "n": 16,
-    "p25": 20852,
-    "p75": 39622
+    "median": 25653,
+    "n": 21,
+    "p25": 21002,
+    "p75": 39372
    },
    "year": 2023
   }
@@ -528,7 +510,7 @@
   },
   {
    "age_band": "1.<=5 yr.",
-   "auction_n": 62,
+   "auction_n": 79,
    "body": "moto",
    "collateral_class": "HONDA WAVE",
    "dpd30p_pct": 24.3,
@@ -539,133 +521,78 @@
     2021,
     2022,
     2023,
-    2024
+    2024,
+    2025
    ],
    "n_accounts": 24398
   },
   {
-   "age_band": "2.(5-10]yr.",
-   "auction_n": 8,
-   "body": "moto",
-   "collateral_class": "HONDA WAVE",
-   "dpd30p_pct": 25.34,
-   "eval_avg": 25464,
-   "eval_vs_auction": 2.122,
-   "market_auction": 12000,
-   "model_years": [
-    2016
-   ],
-   "n_accounts": 8314
-  },
-  {
-   "age_band": "4.(12-15]yr.",
-   "auction_n": 8,
-   "body": "moto",
-   "collateral_class": "HONDA WAVE",
-   "dpd30p_pct": 21.41,
-   "eval_avg": 15949,
-   "eval_vs_auction": 2.658,
-   "market_auction": 6000,
-   "model_years": [
-    2012
-   ],
-   "n_accounts": 1429
-  },
-  {
    "age_band": "1.<=5 yr.",
-   "auction_n": 18,
+   "auction_n": 30,
    "body": "car",
    "collateral_class": "ISUZU PU",
    "dpd30p_pct": 25.15,
    "eval_avg": 505703,
-   "eval_vs_auction": 1.645,
-   "market_auction": 307500,
+   "eval_vs_auction": 1.58,
+   "market_auction": 320000,
    "model_years": [
     2021,
-    2022
+    2022,
+    2023
    ],
    "n_accounts": 1634
   },
   {
    "age_band": "2.(5-10]yr.",
-   "auction_n": 17,
+   "auction_n": 9,
    "body": "car",
    "collateral_class": "ISUZU PU",
    "dpd30p_pct": 21.97,
    "eval_avg": 381774,
-   "eval_vs_auction": 1.858,
-   "market_auction": 205500,
+   "eval_vs_auction": 1.735,
+   "market_auction": 220000,
    "model_years": [
-    2017,
     2020
    ],
    "n_accounts": 11171
   },
   {
-   "age_band": "5.(15-18]yr.",
+   "age_band": "7.(20-25]yr.",
    "auction_n": 9,
    "body": "car",
    "collateral_class": "ISUZU PU",
-   "dpd30p_pct": 27.7,
-   "eval_avg": 211577,
-   "eval_vs_auction": 2.645,
-   "market_auction": 80000,
+   "dpd30p_pct": 27.38,
+   "eval_avg": 135424,
+   "eval_vs_auction": 2.257,
+   "market_auction": 60000,
    "model_years": [
-    2010
+    2005
    ],
-   "n_accounts": 9931
+   "n_accounts": 3411
   },
   {
    "age_band": "4.(12-15]yr.",
-   "auction_n": 9,
+   "auction_n": 8,
    "body": "car",
    "collateral_class": "MAZDA",
    "dpd30p_pct": 27.64,
    "eval_avg": 179815,
-   "eval_vs_auction": 2.569,
-   "market_auction": 70000,
+   "eval_vs_auction": 2.18,
+   "market_auction": 82500,
    "model_years": [
     2013
    ],
    "n_accounts": 2001
   },
   {
-   "age_band": "4.(12-15]yr.",
-   "auction_n": 8,
-   "body": "car",
-   "collateral_class": "TOYOTA",
-   "dpd30p_pct": 25.92,
-   "eval_avg": 218955,
-   "eval_vs_auction": 3.369,
-   "market_auction": 65000,
-   "model_years": [
-    2012
-   ],
-   "n_accounts": 8125
-  },
-  {
-   "age_band": "6.(18-20]yr.",
-   "auction_n": 9,
-   "body": "car",
-   "collateral_class": "TOYOTA PU",
-   "dpd30p_pct": 28.07,
-   "eval_avg": 189159,
-   "eval_vs_auction": 3.783,
-   "market_auction": 50000,
-   "model_years": [
-    2007
-   ],
-   "n_accounts": 5640
-  },
-  {
    "age_band": "1.<=5 yr.",
-   "auction_n": 57,
+   "auction_n": 64,
    "body": "moto",
    "collateral_class": "YAMAHA",
    "dpd30p_pct": 24.67,
    "eval_avg": 46706,
-   "eval_vs_auction": 2.123,
-   "market_auction": 22000,
+   "eval_vs_auction": 2.076,
+   "market_auction": 22500,
    "model_years": [
     2021,
     2022,
@@ -675,7 +602,7 @@
   },
   {
    "age_band": "2.(5-10]yr.",
-   "auction_n": 45,
+   "auction_n": 46,
    "body": "moto",
    "collateral_class": "YAMAHA",
    "dpd30p_pct": 27.33,
@@ -689,20 +616,6 @@
     2020
    ],
    "n_accounts": 5771
-  },
-  {
-   "age_band": "4.(12-15]yr.",
-   "auction_n": 14,
-   "body": "moto",
-   "collateral_class": "YAMAHA",
-   "dpd30p_pct": 28.52,
-   "eval_avg": 14907,
-   "eval_vs_auction": 8.518,
-   "market_auction": 1750,
-   "model_years": [
-    2012
-   ],
-   "n_accounts": 2128
   }
  ],
  "meta": {
@@ -712,14 +625,14 @@
   "generated_by": "pipeline/build_collateral_census.py",
   "label": "MEASURED prices (observed listings and auction lots, every cell carries its own n, nothing below 8 published) x MEASURED eval_avg from the real loan tape. The mapping of venue brand/model onto the tape's collateral classes is an ESTIMATED classification, and the retail-to-auction recovery corridor is an ESTIMATED corridor, not a realised recovery rate.",
   "min_cell": 8,
-  "n_board": 32,
-  "n_book_cells": 13,
+  "n_board": 30,
+  "n_book_cells": 8,
   "observed_to": "",
-  "rows_read": 2672,
+  "rows_read": 2840,
   "tape_source": "Car_Brand_Group data V2.xlsx (loan-level export, 60 columns)",
   "title": "Used-collateral price census — measured market value of the collateral we lend on",
   "venues": {
-   "auct": 2672
+   "auct": 2840
   },
   "why": "BoT UVPI publishes car, truck and overall only — there is no motorcycle series, and motorcycles are the largest collateral type in the book at 127,628 accounts. This is the first measured price anchor that layer has ever had."
  },
