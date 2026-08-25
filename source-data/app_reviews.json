@@ -3,7 +3,7 @@
   "title": "Title-lender app sentiment — Google Play ratings + newest reviews (incl. our own)",
   "generated_by": "pipeline/pull_app_reviews.py",
   "label": "MEASURED — Google Play store pages (th/th). Star histogram + dated public reviews; review store accumulates across pulls (dedup by reviewId, newest 1500 kept per app).",
-  "pulled_at": "2026-08-24"
+  "pulled_at": "2026-08-25"
  },
  "apps": {
   "AUTOX": {
@@ -13,7 +13,7 @@
    "stats": {
     "score": 4.07767,
     "ratings": 1030,
-    "reviews_total": 332,
+    "reviews_total": 333,
     "installs": "500,000+",
     "histogram": [
      139,
@@ -1673,21 +1673,165 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.671875,
-    "ratings": 16620,
-    "reviews_total": 5201,
+    "score": 4.6955743,
+    "ratings": 16715,
+    "reviews_total": 5217,
     "installs": "1,000,000+",
     "histogram": [
-     608,
-     179,
-     548,
-     1377,
-     13902
+     529,
+     189,
+     519,
+     1358,
+     14114
     ],
     "app_updated": "2026-08-06",
     "version": "3.2.0"
    },
    "reviews_store": [
+    {
+     "id": "f14e3e71-c17f-48b4-a1b3-6a7dbaf71c9c",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "ใช้ดี ใช้ง่าย เบิกถอนง่าย แต่ให้อัพเดทบ่อยไปนิดค่ะ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "ef3211c3-c3c3-4d9c-bfc2-2ec1f8a186ff",
+     "at": "2026-08-24",
+     "score": 4,
+     "content": "ดีครับ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "bb84be9a-aae2-4931-89b0-d1c381210def",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "พนักงานให้คำแนะนำและบริการดีครับ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "baca5faa-c872-4c4c-815e-c3a79c9c8e98",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "ใช้งานง่าย ถอนเงินอย่างไว ไม่ต้องไปทำที่สาขา",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "b330e2af-4abf-45bf-85a6-9ddea1ba3efc",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "ใช้แล้วดีพนักงานต้อนรับดีมากครับ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "96f6e670-d200-43b3-aff3-7985a093698a",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "ดีมากๆคะ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "84ee4e7e-4ddd-4814-820c-1e89b83b369a",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "สะดวก รวดเร็ว",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "5d0aaca7-50ba-4c99-bf66-3cb8a436f9b8",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "สะดวกดี มีแอปติดใจ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "57ee6668-4686-4823-8058-68f189e78a3d",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "ถอนเงินไวทันใจ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "5636f071-ca64-4044-9bb3-9df242d1fe0c",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "ใช้ดี",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "4e70f9c6-0bd1-4283-8cfb-d21c3d86a5d8",
+     "at": "2026-08-24",
+     "score": 4,
+     "content": "บริการดีคะ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "4c22f53c-b209-4a07-9cfd-e9c8c4414e24",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "สดวกดีมาก",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "3c357390-29f1-46a7-96ff-56a6d5d717f3",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "ใช้งานสะดวกมากครับ เช็คข้อมูลได้ละเอียดทุกอย่าง ดีมากครับ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "39017651-c06c-4f29-ac02-048fc9ec0f84",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "ดี",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "30e5df63-d67f-4044-b3b8-2e9e72d0f7bc",
+     "at": "2026-08-24",
+     "score": 4,
+     "content": "สะดวกน้องพนักงานบริการดีอธิบายเข้าใจง่ายดีค่ะ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "301871f6-455a-4ee8-836f-becb0a751e93",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "เข้าใช้งานง่ายสะดวกทันใจ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "2d2a8135-c346-4d1b-a2d8-03539c7b2d23",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "เป็นแอพที่เข้าใจง่าย",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "14a07f54-d0f6-4171-a28d-3078f77ca319",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "ใช้ง่ายผ่อนสบาย",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "d181b053-97b3-4597-9f02-5088aa430bb2",
      "at": "2026-08-23",
@@ -2205,7 +2349,7 @@
      "at": "2026-08-20",
      "score": 5,
      "content": "ดีมากๆครับแถมมีบัตรกดยอดเงินที่ผ่อนไปแล้วมาใช้ใด้ด้วยเมื่อจำเป็นสะดวกไม่ต้องไปรีไฟฯที่เงินติดล้อแค่กดเงินได้ที่ตู้atmง่ายๆมากแนะนำครับดอกก็ถูกมาก",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": false
     },
     {
@@ -5343,16 +5487,16 @@
    "name": "เมืองไทย แคปปิตอล",
    "own": false,
    "stats": {
-    "score": 4.6718507,
-    "ratings": 6443,
-    "reviews_total": 2140,
+    "score": 4.6713395,
+    "ratings": 6442,
+    "reviews_total": 2141,
     "installs": "1,000,000+",
     "histogram": [
      260,
      69,
      210,
-     440,
-     5460
+     441,
+     5457
     ],
     "app_updated": "2026-08-18",
     "version": "2.5.114"
@@ -5523,7 +5667,7 @@
      "at": "2026-08-03",
      "score": 5,
      "content": "บริการลูกค้าดีมากค่ะซื่อตรงมีวินัยในการเงิน เป็นลูกค้ามานานหลายปีแล้วค่ะไม่เคยทําให้ ผิดหวังเลยค่ะ ยอดเยี่ยมมากค่ะ",
-     "thumbs": 4,
+     "thumbs": 5,
      "replied": false
     },
     {
@@ -5627,7 +5771,7 @@
      "at": "2026-07-10",
      "score": 5,
      "content": "บริการดีครับผมตรงจุดตรงเป้าหมายสอบถามได้ครับ",
-     "thumbs": 1,
+     "thumbs": 2,
      "replied": false
     },
     {
@@ -5995,7 +6139,7 @@
      "at": "2026-04-17",
      "score": 5,
      "content": "ให้บริการสะดวกรวดเร็วมาก บริการดีทุกอย่าง",
-     "thumbs": 11,
+     "thumbs": 12,
      "replied": false
     },
     {
@@ -6043,7 +6187,7 @@
      "at": "2026-04-04",
      "score": 5,
      "content": "พนักงานบริกานดีมากๆๆๆเลยคะสุภาพพูดจาดีแนะนำเลยคะ",
-     "thumbs": 11,
+     "thumbs": 12,
      "replied": false
     },
     {
@@ -7197,21 +7341,69 @@
    "name": "ศรีสวัสดิ์",
    "own": false,
    "stats": {
-    "score": 4.6163263,
-    "ratings": 2404,
-    "reviews_total": 854,
+    "score": 4.607438,
+    "ratings": 2425,
+    "reviews_total": 859,
     "installs": "500,000+",
     "histogram": [
-     107,
-     39,
-     78,
-     215,
-     1962
+     120,
+     30,
+     70,
+     240,
+     1963
     ],
     "app_updated": "2026-07-01",
     "version": "1.0.60"
    },
    "reviews_store": [
+    {
+     "id": "dce2b4a5-0336-49ec-8508-e0c0fd855daa",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "บริการดีเยี่ยมครับ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "d747764e-c30c-47fb-b8fb-44bd47df45bf",
+     "at": "2026-08-24",
+     "score": 1,
+     "content": "เวลาต้องการใช้เงิน ไม่ให้รี แต่เวลาไม่ต้องชอบชวนให้รี",
+     "thumbs": 0,
+     "replied": true
+    },
+    {
+     "id": "a07863e3-2b51-42c2-8f3b-37dc111300ee",
+     "at": "2026-08-24",
+     "score": 1,
+     "content": "แอฟคุณมันห่วย ฉันชำระดอกเบี้ย และค่าอากรสแตมป์ไป2รอบแล้ว ในสัปดาห์นี้ ฉันถ่ายรูปส่งแนบในแอฟ!ก็หลุดๆ คุณต้องการจะเอาแค่ดดกเบี้ยลูกค้าหรือ พัฒนาและติดต่อกลับด้วยค่ะ",
+     "thumbs": 0,
+     "replied": true
+    },
+    {
+     "id": "8ccd1a12-bc48-4e0f-a0f9-ded93be24a58",
+     "at": "2026-08-24",
+     "score": 4,
+     "content": "จำนำโฉนด รวดเร็วมากครับ แต่เอกสารต้องถูกต้องครับ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "6ca42b73-7511-40d8-9102-bddc2268f21d",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "บริการดีมาก",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "480f3b81-0579-4cb5-aa9e-67da3663b71a",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "ตอนนี้เขามีวงเงินพร้อมใช้แล้วนะ",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "9cfcd936-fc97-4570-98be-bf4bd497ca23",
      "at": "2026-08-17",
@@ -9139,16 +9331,16 @@
    "name": "เงินเทอร์โบ",
    "own": false,
    "stats": {
-    "score": 4.11,
-    "ratings": 830,
+    "score": 4.15,
+    "ratings": 831,
     "reviews_total": 261,
     "installs": "500,000+",
     "histogram": [
-     157,
+     149,
      8,
      24,
      33,
-     605
+     614
     ],
     "app_updated": "2026-08-07",
     "version": "1.0.61-ngernturbo"
@@ -10778,7 +10970,7 @@
    "own": false,
    "stats": {
     "score": 4.21,
-    "ratings": 344,
+    "ratings": 345,
     "reviews_total": 133,
     "installs": "100,000+",
     "histogram": [
@@ -12189,16 +12381,16 @@
    "name": "Good Money เงินดีดี (GSB)",
    "own": false,
    "stats": {
-    "score": 3.8654435,
-    "ratings": 3196,
-    "reviews_total": 1402,
+    "score": 3.8401253,
+    "ratings": 3197,
+    "reviews_total": 1405,
     "installs": "1,000,000+",
     "histogram": [
-     624,
-     205,
-     117,
-     273,
-     1973
+     630,
+     220,
+     120,
+     280,
+     1943
     ],
     "app_updated": "2026-08-11",
     "version": "1.0.45"
@@ -12210,7 +12402,7 @@
      "score": 5,
      "content": "ดีมากค่ะชอบมากด้วย",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "ea92595e-dbe8-4c9e-bd01-b6dbbe60251b",
@@ -12218,15 +12410,15 @@
      "score": 5,
      "content": "เชื้อมั่น มั่นคง จริงใจ",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "67afdb7d-8e8f-4bc2-ba4d-581bd4f403ca",
      "at": "2026-08-22",
      "score": 1,
      "content": "ติดตรงอัพสเตทเม้น ttb ครับ ไฟล์ที่ได้มาจากแอพธนาคารมันไม่มีรหัสเปิดไฟล์อยู่แล้ว ดูได้เลย ตรวจสอบไม่ผ่าน ถอดใจแล้วครับ",
-     "thumbs": 0,
-     "replied": false
+     "thumbs": 1,
+     "replied": true
     },
     {
      "id": "d1f02ee8-ebc0-4633-a5a7-b5f50f3e0a51",
@@ -12234,7 +12426,7 @@
      "score": 5,
      "content": "ดี",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "95683a70-f40f-46ad-a24d-8aff24a3328d",
@@ -12242,7 +12434,7 @@
      "score": 2,
      "content": "สมัครไม่ผ่านไม่อนุญาตนำเลขบัตรประชาชนลงท้าย 316 ไปทำอย่างอื่เด็ดขาด",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "2f12dd08-29fb-4911-9b01-0d28742ffdd6",
@@ -12250,7 +12442,7 @@
      "score": 1,
      "content": "สแกนหน้าไม่ผ่านสักที รำคาญ",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "e508dc7a-d390-4346-a356-0637c8f4a8fd",
@@ -12258,7 +12450,7 @@
      "score": 1,
      "content": "ยุ้งยากต้องมีสลิปสเตทเม้นอัปโหลดยุ้งยากมากเลย",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "df64c54d-66a0-4430-852d-17005074b462",
@@ -12266,7 +12458,7 @@
      "score": 1,
      "content": "ผ่านยากมาก",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "70b91f3d-5380-450a-9388-f40e8e4a6ee5",
@@ -12274,7 +12466,7 @@
      "score": 1,
      "content": "กดสมัครสินเชื่อก็ไม่ได้เด้งอยู่หน้าเดียวมาสองวันเเล้ว ห่วยมากๆ",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "64f2c56a-bc6e-4d6a-8401-c209508a7081",
@@ -12282,7 +12474,7 @@
      "score": 2,
      "content": "ผมว่าดีมากครับ",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "ef241078-fdad-415c-a78e-3cd86dc24770",
@@ -12290,7 +12482,7 @@
      "score": 1,
      "content": "กดสมัครสินเชื่อไม่ได้ หมุนอยู่หน้าเดิม",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "e69dd148-60b3-4e85-b069-1c7ca3c30812",
@@ -12298,7 +12490,7 @@
      "score": 1,
      "content": "ข้าพเจ้าสมัครแล้วไม่ผ่านการอนุมัติ ได้มีการกรอกและสแกนใบหน้าและบัตรที่ลงท้ายด้วย9977 ไม่อนุญาตให้เอาไปเผยแพร่ทำการใดๆ มิฉะนั้นจะดำเนินการตามกฎหมาย",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "dd1b98d1-47c5-4949-acf2-2532fe151989",
@@ -12306,7 +12498,7 @@
      "score": 5,
      "content": "เริส",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "d70ed9ef-375e-4329-9f29-cdb4389e6539",
@@ -12314,7 +12506,7 @@
      "score": 4,
      "content": "สแกนบัตรประชาชนไม่ได้ค่ะ สแกนตั้งหลายรอบแล้วขึ้นแจ้งเตือนว่าให้ใช้บัตรจริงคืองงมากค่ะ",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "c6e81c11-ec8e-4ce6-91a7-6818bf069bf2",
@@ -12322,7 +12514,7 @@
      "score": 5,
      "content": "สะดวกปลอดภัยดอกต่ำมาก",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "abf1b1b5-291b-4374-bcb4-1e06c3c1822e",
@@ -12330,7 +12522,7 @@
      "score": 1,
      "content": "สมัครไม่เคยได้",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "62f28ff9-a70d-48f9-8ca0-cfcda1f49b10",
@@ -12338,7 +12530,7 @@
      "score": 1,
      "content": "ยุ่งยากชิปหาย เก้บไปใช้กันเองเถอะ",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "49753962-7858-486d-830d-01f33e966de2",
@@ -12346,7 +12538,7 @@
      "score": 5,
      "content": "เป็นแอปที่ดีมากเข้ามาในช่วงชีวิตที่ยากลำบากพอดีเลยค่ะ ขอบคุณมากค่ะ",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "20f8ad18-f471-4cb0-8129-de0d750e4030",
@@ -12354,7 +12546,7 @@
      "score": 1,
      "content": "ไม่อนุญาตให้นำข้อมูลส่วนตัว ภาพสแกนใบหน้า บัตรประชาชนเลขท้าย4551ไปใช้หรือเผยแพร่ทุกกรณี",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "f9bfe5b7-c638-4cbb-ae1d-a7a21c2ebcdf",
@@ -12362,7 +12554,7 @@
      "score": 3,
      "content": "แอพเข้าไม่ได้นะครับ ขึ้นให้อัพเดตอัพไม่ได้ ลบแล้วโหลดใหม่ก็ไม่ได้",
      "thumbs": 1,
-     "replied": false
+     "replied": true
     },
     {
      "id": "61fca012-7421-4c7e-85ef-8b84b318d6d8",
@@ -12370,7 +12562,7 @@
      "score": 5,
      "content": "เป็นแอปที่ดีค่ะ ไม่ยุ่งยาก ผ่านง่าย ช่วยได้เยอะเลย",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "46718b55-5398-4744-aaa0-c4906632d2fa",
@@ -12378,7 +12570,7 @@
      "score": 1,
      "content": "สมัครแล้วไม่ผ่านการอนุมัติได้กรอกข้อมูลส่วนตัวสแกนใบหน้าและบัตรประชาชนที่ลงท้ายด้วย9109ไม่อนุญาตให้เอาไปเผยแพร่ทำการใดๆมิฉะนั้นจะดำเนินการตามกฎหมายให้ถึงที่สุด",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "1a2811ec-51d4-434a-b9b2-fb545e047d41",
@@ -12386,7 +12578,7 @@
      "score": 1,
      "content": "ถ่ายบัตรไม่ได้ถ่ายได้บอกบัตรปลอม",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "fa4f13a5-5328-4561-b74c-da67727e4531",
@@ -12394,7 +12586,7 @@
      "score": 5,
      "content": "ดีมากๆๆๆๆๆ ดีที่สุดดด ตั้งแต่ตามหาแอปเงินกู้มา....ที่สำคัญคือ ปลอดภัยหายห่วง...ถึงดอก💲💲💲💲💲⬆️จะสูงไปหน่อย",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "91f7aeee-c607-4147-9809-046ce3c051c7",
@@ -12402,7 +12594,7 @@
      "score": 1,
      "content": "ไม่ผ่าน ห้ามนำข้อมูลทุกอย่างที่กรอกลงไปเลขท้ายบัตรประชาชน5976ห้ามนำไปทำธุรกรรมใดๆห้ามนำออกมาเผยแพร่",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "4efa2b01-1162-45bf-a9bf-3f43efcafd7d",
@@ -12410,7 +12602,7 @@
      "score": 2,
      "content": "ไม่ผ่านการสมัคร ไม่อนุญาตินำเอกสารข้อมูลบัตรลงท้าย** 1595 ไปใช้ในทางที่ผิด กรุณาลบข้อมูลด้วยนะคะ",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "6df8511a-9266-498f-8f8c-8f71ee072c91",
@@ -12418,7 +12610,7 @@
      "score": 4,
      "content": "รอเพิ่มวงเงินค่ะ^^",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "3a68ed13-108d-4d7b-99da-27eb6ff72e25",
@@ -12442,7 +12634,7 @@
      "score": 2,
      "content": "ควรปรับปรุงแอปให้มีความเสถียรมากกว่านี้ โหลดช้าถึงขั้นบางทีเข้าแอปไม่ได้เลย เน็ตก็ไม่ได้มีปัญหา",
      "thumbs": 1,
-     "replied": false
+     "replied": true
     },
     {
      "id": "5b4f89cc-3d33-4e78-8080-94bdb977930f",
@@ -12450,7 +12642,7 @@
      "score": 1,
      "content": "ห้ามนำข้อมุลไปใช่ทุกกรณี ไม่ได้สินเชื่อเลย พบเจอไม่รับผิดชอบทั้งนี้น พร้อมดำเนินคดี",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "7488c295-d7e6-47df-8b96-35ce9f9ebf1e",
@@ -12458,7 +12650,7 @@
      "score": 1,
      "content": "สมัครยังไม่เสร็จสมบูรณ์มีการกรอกข้อมูลสแกนหน้า ไม่อนุญาตให้นำหมายเลขบัตรลงท้าย 5756 ไปทำธุรกรรมหรือเผยแพร่ใดๆทั้งสิ้น มิเช่นนั้นจะดำเนินคดีตามกฎหมายให้ถึงที่สุด",
      "thumbs": 1,
-     "replied": false
+     "replied": true
     },
     {
      "id": "4115d49b-3bbf-4a94-9cb0-f6fc8cc8f33b",
@@ -12466,7 +12658,7 @@
      "score": 1,
      "content": "ไม่ผ่าน ผ่านยาก",
      "thumbs": 0,
-     "replied": false
+     "replied": true
     },
     {
      "id": "6deb3272-7764-47c1-af1d-a8cf4da42f5e",
@@ -12777,7 +12969,7 @@
      "at": "2026-08-04",
      "score": 5,
      "content": "เป็น app ที่ดีมากๆ ครับ ส่วนตัวผมถือว่าดีมากๆ ครับ เข้ามาในช่วงเวลาฉุกเฉินที่ผมจำเป็นต้องใช้เงินพอดี ดอกเบี้ยก็ถูก ผ่อนจ่ายสบายๆ สมกับเป็นชื่อ app (เงินดี ^_^ ตามชื่อเลยครับ...)",
-     "thumbs": 3,
+     "thumbs": 4,
      "replied": true
     },
     {
@@ -12833,7 +13025,7 @@
      "at": "2026-08-04",
      "score": 5,
      "content": "เป็น app ที่ดีมากๆทำสินเชื่อได้ง่ายเอกสารไม่ยุ่งยากเป็น app ถูกกฎหมายกู้เท่าที่จำเป็นชำระคืนให้ตรงต่อเวลาไม่มีปัญหาสมัครครั้งแรกก็ผ่านแล้วง่ายมากๆเมื่อชำระคืนแล้วยอดเก่าก็จะทบกลับมา",
-     "thumbs": 8,
+     "thumbs": 9,
      "replied": true
     },
     {
@@ -15033,21 +15225,29 @@
    "name": "GO by Krungsri Auto",
    "own": false,
    "stats": {
-    "score": 4.383948,
-    "ratings": 9290,
+    "score": 4.383279,
+    "ratings": 9293,
     "reviews_total": 3802,
     "installs": "1,000,000+",
     "histogram": [
-     735,
-     261,
-     533,
-     926,
+     736,
+     262,
+     534,
+     927,
      6830
     ],
     "app_updated": "2026-08-19",
     "version": "8.5.0"
    },
    "reviews_store": [
+    {
+     "id": "ceeee9d9-9ed2-4d03-aa47-c6aa0d1c8ab1",
+     "at": "2026-08-24",
+     "score": 5,
+     "content": "ok later",
+     "thumbs": 0,
+     "replied": true
+    },
     {
      "id": "d89803bc-cb98-4d15-bfe8-a07d5ee16f91",
      "at": "2026-08-15",
@@ -15117,7 +15317,7 @@
      "at": "2026-07-31",
      "score": 3,
      "content": "อยากให้แอปมีตั้งค่าแจ้งเตือนจ่ายค่างวด.. ถ้ามีจะให้ 10 ดาว",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": true
     },
     {
@@ -15173,7 +15373,7 @@
      "at": "2026-07-18",
      "score": 4,
      "content": "บอกรายละเอียดของการทำธุรกรรมดี",
-     "thumbs": 5,
+     "thumbs": 6,
      "replied": true
     },
     {
