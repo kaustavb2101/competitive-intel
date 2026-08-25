@@ -1262,6 +1262,17 @@
           <table class="tbl" id="expo-tape-coll"></table>
         </div>
       </div>
+      <!-- Agri book: measured delinquency vs the whole book + the provinces where the agri book runs
+           hot. From tape_real.json agri_impact (real loan tape). Answers obj #1's recurring agri
+           question with MEASURED book truth, not the estimated crop-stress proxy. Null-safe: an
+           absent/older tape with no agri_impact.benchmark → the whole block stays display:none. -->
+      <div id="expo-tape-agriwrap" style="display:none;margin-top:4px">
+        <h3 class="compsub" style="color:var(--agri)">Agri book · measured delinquency, and where it runs hot</h3>
+        <p class="lead" id="expo-tape-agri-lead" style="font-size:12px"></p>
+        <div id="expo-tape-agri-kpi" class="grid macro" style="margin-bottom:12px"></div>
+        <table class="tbl" id="expo-tape-agri"></table>
+        <p class="lead" style="font-size:11px;margin-top:6px">Provinces with ≥300 agri accounts, ranked by 90+dpd (the decision-relevant cut — smaller cells omitted as noise). MEASURED · real loan tape.</p>
+      </div>
     </div>
 
     <!-- Product → segment → driver map (data/product_segments.json) — measured book economics per

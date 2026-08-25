@@ -6732,6 +6732,36 @@ function renderExposureTape(){
         return `<td class="mono" style="font-size:11px" title="${c.n} accounts · ${c.dpd30p_pct}% 30+dpd">${(c.eval_avg/1000).toFixed(0)}k<br><span style="color:${c.dpd30p_pct>=30?'var(--agri)':'var(--dim)'};font-size:10px">${c.dpd30p_pct}%</span></td>`;
       }).join('')+`</tr>`).join('');
   }
+  // --- agri book: measured delinquency vs the whole book + the provinces where it runs hot ---
+  // Answers obj #1's recurring "is the agri book riskier, and where" with MEASURED tape truth
+  // (agri_impact), complementing the ESTIMATED crop-stress proxies elsewhere in the app.
+  const ag=$('#expo-tape-agri'), agw=$('#expo-tape-agriwrap'), agi=TAPE.agri_impact;
+  if(agw&&ag&&agi&&agi.benchmark&&agi.benchmark.agri&&agi.benchmark.book_avg){
+    const a=agi.benchmark.agri, bkA=agi.benchmark.book_avg;
+    agw.style.display='';
+    const resilient=a.dpd90p_pct<bkA.dpd90p_pct;
+    const lead=$('#expo-tape-agri-lead');
+    if(lead) lead.innerHTML=`Agri is <b>${agi.benchmark.agri_share_of_accounts_pct}%</b> of accounts (${N(a.n)} a/c · ${bnf(a.os_sum)} OS). `+
+      `At 90+dpd the agri book runs <b style="color:${resilient?'var(--merch)':'var(--agri)'}">${a.dpd90p_pct}%</b> vs <b>${bkA.dpd90p_pct}%</b> for the whole book — `+
+      (resilient
+        ? `<b style="color:var(--merch)">more resilient</b> where risk hardens, even though it falls behind earlier (early ${a.early_pct}% vs ${bkA.early_pct}%, roll ${a.roll_pct}% vs ${bkA.roll_pct}%): seasonal income tends to cure the arrears before 90 days.`
+        : `<b style="color:var(--agri)">hotter</b> than the whole book.`)+
+      ` The provinces below are where the agri book itself runs hot.`;
+    const kpi=$('#expo-tape-agri-kpi');
+    if(kpi) kpi.innerHTML=[
+      ['Agri share of book',agi.benchmark.agri_share_of_accounts_pct+'%',N(a.n)+' accounts'],
+      ['Agri 90+dpd',a.dpd90p_pct+'%','whole book '+bkA.dpd90p_pct+'%'],
+      ['Agri early / roll',a.early_pct+'% / '+a.roll_pct+'%','book '+bkA.early_pct+'% / '+bkA.roll_pct+'%'],
+      ['Agri OS',bnf(a.os_sum),'฿'+N(a.npat_margin_avg)+' NPAT/acct'],
+    ].map(k=>`<div class="mcard"><div class="k">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join('');
+    const prov=(agi.by_province||[]).filter(p=>p&&p.n>=300&&p.dpd90p_pct!=null).sort((x,y)=>y.dpd90p_pct-x.dpd90p_pct).slice(0,12);
+    const worst=prov.length?Math.max(...prov.map(p=>p.dpd90p_pct)):1;
+    ag.innerHTML=`<tr><th scope="col">Agri book · province</th><th scope="col">Accounts</th><th scope="col">OS ฿m</th><th scope="col" title="share of the province's agri accounts 90+ days past due">90+dpd</th><th scope="col" title="early→NPL roll rate">roll</th></tr>`+
+      prov.map(p=>`<tr><td>${p.province}</td><td class="mono sub">${N(p.n)}</td>
+        <td class="mono sub">${(p.os_sum/1e6).toFixed(0)}</td>
+        <td class="mono" style="color:${sev(p.dpd90p_pct)}">${barHTML(p.dpd90p_pct,'var(--agri)',worst)} <b>${p.dpd90p_pct}%</b></td>
+        <td class="mono sub">${p.roll_pct}%</td></tr>`).join('');
+  }
 }
 function renderExposure(){
   if(!DATA||!$('#expocards')||!$('#expotbl')) return;
