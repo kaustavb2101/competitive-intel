@@ -3,6 +3,42 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-25 — UX loop: fix Autonomous-loops panel text overlap on status.html (mobile/tablet) — merged + deployed + verified (PR #618)
+
+- **Picked / why (`ux-status-loop-row-overlap`).** The numbered `docs/UXUI_AUDIT.md` backlog (1–7) is
+  fully fixed and the remaining open items are either deck.gl *gesture* items explicitly deferred as
+  unsafe for an unattended auto-merge (`ux-viewport-user-scalable-3dpages`, `ux-navmore-*-3dpages` —
+  they need `touch-action` + real-device gesture testing) or test-infra items that touch `tests/`, not
+  `platform/`. So per the mandate I reviewed a route and found a NEW concrete bug on `status.html`.
+- **The bug.** The "Autonomous loops" panel laid each loop as a single non-wrapping flex row —
+  `.nm` name · `.ow` owns (`flex:1;min-width:0`) · `.cd` cadence (`white-space:nowrap`). The cadence
+  field carries long descriptive notes ("account-scheduled routine (no committed workflow)",
+  "paused — on demand via workflow_dispatch") that can't share one line with the name+owns inside the
+  narrow `.st-two` grid column. So at BOTH the default two-column desktop width (~1000px, each column
+  ~460px) AND mobile single-column (500px), `.ow` collapsed to ~0 (member list "data · feature ·
+  deploy" stacked one word per line) and the nowrap cadence overflowed the panel's right edge and
+  **visually overlapped the bold loop name** ("data" ran into "account-scheduled…" →
+  "dataccount-scheduled…"). Only at ≥~1500px did it lay out acceptably.
+- **Fix (CSS-only, `.st-loop` block, 3 property tweaks + a comment).** `flex-wrap:wrap` + a 3px
+  row-gap; `.ow` `flex:1`→`flex:0 1 auto` (stop it collapsing/consuming the line so the cadence can
+  sit beside it when there's room); `.cd` `white-space:nowrap`→`normal` (drop the note to its own line
+  and wrap in place instead of overflowing). Adaptive — short loops keep the cadence on line 1, longer
+  ones wrap it below; member lists flow horizontally again. No JS/body change.
+- **Verified.** Headless renders at 500 / 1000 / 1600px — no overlap, no member-word stacking, no
+  right-edge overflow; hero/pillar-cards/recent-activity/footer unchanged. `node --check` clean;
+  `bash tests/run.sh check` **146 passed / 0 failed**.
+- **Ship (safeguard-gated auto-merge, mandated).** All four safeguards green (gate 0-failed · headless
+  self-review · no secrets in diff · diff matches intent, no stray files). Squash-merged own PR #618
+  → master auto-deploys to Vercel. **Deploy-verify:** public production alias
+  `competitive-intel-blue.vercel.app` returns **HTTP 200** on `/` and on the changed `/status` route,
+  and the served `/status` now carries the fixed rule (`.st-loop{…flex-wrap:wrap;gap:3px 8px…}`) — live
+  and correct. The `…-git-master-…` alias returns 302 (documented Vercel-SSO gate = up + SSO-gated,
+  not an outage). No regression → no rollback.
+- **Next recommended.** Remaining open platform/ UX item is `ux-live-chart-mobile-viewbox-responsive`
+  (live.html's fixed `viewBox="0 0 1000 250"` serves both a desktop and a phone card, so no single
+  label size is optimal at both) — bigger than surgical (touches `lineChart()` coordinate math),
+  deserves its own run. The deck.gl gesture items still need a device-tested (not unattended) run.
+
 ## 2026-08-25 — Intelligence loop (SURFACING, obj #1 repayment capacity): **wire the built-but-unrendered `tape_real.json.income_tiers` rollup — a MEASURED delinquency-vs-return read by borrower income band on the `#exposure` real-book section, with a computed non-monotonic narrative** — PR `feat/tape-income-tiers-exposure` (app-visual → owner review)
 - **Picked / why.** Baseline GREEN (`bash tests/run.sh check` = **146 passed / 0 failed**). The named integration backlog (FPO PICO, `build_branch_cropland`, DBD/MOT/DIW distillations, GISTDA 40m) is confirmed DONE + wired across the prior runs, and the CI-doable NEW-DATA backlog stays exhausted (data.go.th aggregator 403 from CI; dept CKANs folded; DLT at newest vintage; GISTDA/YouTube keys absent from this CI runtime). The genuinely-open item is the one the last two tape-surfacing runs (#612 agri, #614 product) both flagged next: of the MEASURED-but-unwired tape rollups, `income_tiers` is the on-theme obj #1 read (repayment capacity). `grep` re-confirmed **0 frontend refs** for `income_tiers` (and `occ_x_income`, left for a follow-up).
 - **The gap (built but never wired).** `tape_real.json.income_tiers` splits the real book into 7 borrower income bands (No income → ≥50k) with full bucket + NPAT economics — computed by the gated `build_tape_layers.py`, committed, read by nothing in `app.js`/`index.html`/`data.html`. The app could not answer obj #1's *does repayment capacity govern the hard delinquency* from measured truth.
