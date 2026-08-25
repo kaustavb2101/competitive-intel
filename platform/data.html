@@ -878,7 +878,7 @@ function renderBranchBrowse(){
     h+='<div id="brsearchstatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>';
     h+='<button class="db-chip" id="brcsv" style="margin:0 0 12px">⬇ Download CSV</button>';
     h+='<div class="db-tblwrap"><table class="db-tbl" id="brtbl"><thead><tr>';
-    BRCOLS.forEach(function(c,ci){h+='<th data-c="'+ci+'" tabindex="0" role="button">'+esc(c.t)+'</th>';});
+    BRCOLS.forEach(function(c,ci){h+='<th data-c="'+ci+'" scope="col" tabindex="0" aria-sort="none">'+esc(c.t)+'</th>';});
     h+='</tr></thead><tbody id="brbody"></tbody></table></div>';
     h+='<p class="db-note" style="padding:14px 0 0;text-align:left">Scores (opportunity / agri-PD / merchant / collateral) are ESTIMATED 0–100 screens over measured inputs — not measured default rates. Pop / workers / factories / establishments / rain are MEASURED. Click any branch for its full readout.</p>';
     document.getElementById('db-root').innerHTML=h;
@@ -922,8 +922,9 @@ function setBrStatus(n){
 function fillBranchBody(){
   var rows=branchRows(), body=document.getElementById('brbody'); if(!body)return;
   setBrStatus(rows.length);
-  document.querySelectorAll('#brtbl th').forEach(function(th){var c=+th.getAttribute('data-c');
-    th.className=(c===brSort.c)?(brSort.dir>0?'sort-asc':'sort-desc'):'';});
+  document.querySelectorAll('#brtbl th').forEach(function(th){var c=+th.getAttribute('data-c');var on=(c===brSort.c);
+    th.className=on?(brSort.dir>0?'sort-asc':'sort-desc'):'';
+    th.setAttribute('aria-sort',on?(brSort.dir>0?'ascending':'descending'):'none');});
   var out='';
   rows.forEach(function(row){var d=row.d;out+='<tr data-i="'+row.i+'" style="cursor:pointer">';
     BRCOLS.forEach(function(c){var v=c.g(d);
