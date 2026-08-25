@@ -1292,6 +1292,19 @@
         <table class="tbl" id="expo-tape-inc"></table>
         <p class="lead" style="font-size:11px;margin-top:6px">Borrower income bands (declared at origination), income-ascending; bar = 90+dpd. MEASURED · real loan tape.</p>
       </div>
+      <!-- Occupation × income heat-grid: measured 90+dpd for every occupation×income-band cell from
+           tape_real.json occ_x_income (real loan tape). Answers obj #1 — which axis governs the hard
+           delinquency, livelihood (occupation) or repayment capacity (income)? The computed read is
+           that occupation spreads 90+dpd far wider than income does, so the narrative flips honestly
+           if a future tape reverses it. Null-safe: absent occ_x_income (<2 occ or <2 inc) → display:none. -->
+      <div id="expo-tape-occincwrap" style="display:none;margin-top:4px">
+        <h3 class="compsub">Occupation × income · measured 90+dpd heat-grid</h3>
+        <p class="lead" id="expo-tape-occinc-lead" style="font-size:12px"></p>
+        <div class="tblwrap" role="region" aria-label="Occupation by income 90-plus-dpd heat grid" tabindex="0">
+          <table class="tbl heat-grid" id="expo-tape-occinc"></table>
+        </div>
+        <p class="lead" style="font-size:11px;margin-top:6px">Each cell = share of that occupation×income-band's accounts 90+ days past due (hover for account count); colour = severity, — = cell suppressed below the disclosure floor. Rows ranked by the occupation's own 90+dpd, riskiest first; the "All" row/column are account-weighted marginals. MEASURED · real loan tape.</p>
+      </div>
     </div>
 
     <!-- Product → segment → driver map (data/product_segments.json) — measured book economics per
