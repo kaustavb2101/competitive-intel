@@ -6762,6 +6762,34 @@ function renderExposureTape(){
         <td class="mono" style="color:${sev(p.dpd90p_pct)}">${barHTML(p.dpd90p_pct,'var(--agri)',worst)} <b>${p.dpd90p_pct}%</b></td>
         <td class="mono sub">${p.roll_pct}%</td></tr>`).join('');
   }
+  // --- product mix: measured delinquency & return by loan product (Title Loan vs Refinance) ---
+  // obj #1 portfolio risk: which product carries the HARD delinquency (90+dpd) vs which earns the
+  // margin. From tape_real.json.product_groups (real loan tape). Null-safe: absent/older tape with no
+  // product_groups (or <2 products) → the whole block stays display:none, like the agri card above.
+  const pgw=$('#expo-tape-prodwrap'), pgt=$('#expo-tape-prod'), PG=TAPE.product_groups;
+  if(pgw&&pgt&&PG&&typeof PG==='object'){
+    const rows=Object.entries(PG).filter(([,d])=>d&&d.n&&d.dpd90p_pct!=null).sort((a,b)=>b[1].n-a[1].n);
+    if(rows.length>=2){
+      pgw.style.display='';
+      const tot=rows.reduce((s,[,d])=>s+d.n,0);
+      const hot=rows.reduce((m,r)=>r[1].dpd90p_pct>m[1].dpd90p_pct?r:m);
+      const rich=rows.reduce((m,r)=>r[1].npat_margin_avg>m[1].npat_margin_avg?r:m);
+      const lead=$('#expo-tape-prod-lead');
+      if(lead) lead.innerHTML=`<b>${hot[0]}</b> carries the hard delinquency — <b style="color:var(--agri)">${hot[1].dpd90p_pct}%</b> at 90+dpd on <b>${(100*hot[1].n/tot).toFixed(0)}%</b> of accounts (${bnf(hot[1].os_sum)} OS). `+
+        (rich[0]!==hot[0]
+          ? `<b>${rich[0]}</b> earns the margin — <b style="color:var(--merch)">฿${N(rich[1].npat_margin_avg)}</b> NPAT/acct on ฿${N(rich[1].eval_avg)} average collateral — and stays lower at 90+dpd (<b>${rich[1].dpd90p_pct}%</b>) even though it falls behind earlier (early ${rich[1].early_pct}% vs ${hot[1].early_pct}%): larger-ticket arrears tend to cure before 90 days.`
+          : `It also earns the most per account (฿${N(hot[1].npat_margin_avg)} NPAT).`);
+      const worstP=Math.max(...rows.map(([,d])=>d.dpd90p_pct));
+      pgt.innerHTML=`<tr><th scope="col">Product</th><th scope="col">Accounts</th><th scope="col">OS ฿bn</th><th scope="col" title="share of accounts 90+ days past due">90+dpd</th><th scope="col" title="early-bucket share">early</th><th scope="col" title="early→NPL roll rate">roll</th><th scope="col" title="NPAT per account, ฿/yr basis as exported">NPAT/acct</th></tr>`+
+        rows.map(([p,d])=>`<tr><td><b>${p}</b> <span class="sub">${(100*d.n/tot).toFixed(0)}%</span></td>
+          <td class="mono sub">${N(d.n)}</td>
+          <td class="mono sub">${(d.os_sum/1e9).toFixed(1)}</td>
+          <td class="mono" style="color:${sev(d.dpd90p_pct)}">${barHTML(d.dpd90p_pct,'var(--agri)',worstP)} <b>${d.dpd90p_pct}%</b></td>
+          <td class="mono sub">${d.early_pct}%</td>
+          <td class="mono sub">${d.roll_pct}%</td>
+          <td class="mono" style="color:var(--merch)">฿${N(d.npat_margin_avg)}</td></tr>`).join('');
+    }
+  }
 }
 function renderExposure(){
   if(!DATA||!$('#expocards')||!$('#expotbl')) return;
