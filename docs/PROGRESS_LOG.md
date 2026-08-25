@@ -3,6 +3,43 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-25 — UX loop: date-stamp the four static CSV export filenames with data vintage — merged + deployed + verified (PR #613)
+
+- **Finding (`ux-csv-export-filename-vintage`).** Four of the six client-side CSV exports used STATIC
+  filenames — `acqCSV`→`autox_catchment_coverage.csv`, district-coverage→`autox_district_coverage.csv`,
+  `#mktcsv`→`autox_market_assessment.csv`, `ccBriefCSV`→`autox_command_center_brief.csv` — so a
+  director re-downloading the same brief across data refreshes got silent Downloads-folder overwrites
+  (or browser `(1)`/`(2)` collisions) with no vintage cue. The other two exports already stamp their
+  filename with DATA vintage (`autox_rate_board_<asof_card>.csv`, `autox_rival_ads_<pulled>.csv`) — the
+  established convention these four broke. The standard UXUI_AUDIT backlog is otherwise drained: every
+  original finding + surgical follow-up is fixed; the remaining open items are deferred (deck.gl
+  gesture class — `ux-viewport-user-scalable-3dpages`, `ux-navmore-*-3dpages` — needing real-device
+  testing, NOT unattended auto-merge) or test-infra (`tests/`, out of `platform/` scope). So this run
+  reviewed the export surface and found a new concrete improvement.
+- **Fix.** Added a shared hoisted `vintageTag()` helper (app.js, next to `dqEsc`) that slugs
+  `META.updated` (the global data vintage, `"2026M07 prices · drought 2026-06-21"`) to a filename-safe
+  `[0-9A-Za-z-]` token (`2026M07-prices-drought-2026-06-21`), falling back to `latest` when absent, and
+  appended `_'+vintageTag()+'` to all four filenames. Deterministic (data vintage, no wall-clock — like
+  the two existing dated exports). Download-attribute only → zero visual/body change.
+- **Safeguard protocol (all gates PASSED).** (a) `bash tests/run.sh check` → **146 passed / 0 failed**.
+  (b) Headless `#home` render clean, PNG self-reviewed (the "⬇ Download brief (CSV)" button intact,
+  layout unchanged), settled DOM `data-errors="[]"`. (c) No secrets in diff. (d) Diff = **+9/−4, 2
+  files** (`platform/app.js` 4 filename edits + 1 helper; `docs/UXUI_AUDIT.md` one-line entry) — matches
+  intent, no stray files. Slug verified filename-safe + collision-free across vintages, empty→`latest`.
+- **Merge + deploy-verify.** Squash-merged PR #613 to master. Deploy verified on the public production
+  alias `competitive-intel-blue.vercel.app`: `/` **200**, `/app.js` **200**, and the fix is **live** —
+  `vintageTag` present 5× in the served `app.js` with all four date-stamped filenames. The git-master
+  alias correctly returns **302→SSO** (gated, not an outage). No rollback needed. (Branch delete blocked
+  by a transient proxy sideband disconnect — merged branch left in place, harmless, consistent with the
+  many lingering merged `claude/*` branches.)
+- **Next recommended.** The remaining open UXUI backlog is the deferred deck.gl **gesture class**
+  (`ux-viewport-user-scalable-3dpages` — remove `maximum-scale=1` AND add `touch-action:none`, then
+  real-device pinch-zoom test; `ux-navmore-*-3dpages`) and **test-infra** (`qa-visual-overflow-not-in-ci`
+  — wire the global-Playwright fallback so the bleed/clip/page-x gate actually runs; `qa-visual-baseline-stale`
+  — refresh the visual baseline PNGs post five-pillar IA). None is safe for unattended auto-merge; each
+  wants its own device-tested or infra-scoped run. Otherwise keep reviewing routes for concrete
+  surgical wins.
+
 ## 2026-08-25 — Intelligence loop (SURFACING, obj #1 agri): **wire the built-but-unrendered `tape_real.json` `agri_impact` rollup — a MEASURED agri-book delinquency benchmark (agri vs whole book) + the provinces where the agri book runs hot, on the `#exposure` real-book section** — PR `feat/tape-agri-impact-exposure` (app-visual → owner review)
 - **Picked / why.** The named integration backlog is confirmed DONE + wired and re-verified GREEN at baseline (`bash tests/run.sh check` = **146 passed / 0 failed**; prod alias `competitive-intel-blue.vercel.app` HTTP 200; provenance 146 layers / 0 unlabelled / stale=[]). CI-doable NEW-DATA backlog stays exhausted (`GISTDA_SPHERE_KEY`/`GOOGLE_MAPS_API_KEY`/`YOUTUBE_API_KEY` all re-verified **absent** from this CI runtime; data.go.th aggregator 403 from CI; dept CKANs folded; DLT at newest vintage). A negative-space sweep found the highest-value genuinely-open item: **the real loan tape (`tape_real.json`, 382,735 MEASURED accounts) carries several fully-computed top-level rollups that NO frontend renderer reads** — verified 0 literal frontend refs for `agri_impact`, `income_tiers`, `product_groups`, `occ_x_income` (each emitted by the gated `build_tape_layers.py`, committed in the file). Took the most on-theme of them.
 - **The gap (built but never wired).** `tape_real.json.agri_impact` holds `benchmark.agri` vs `benchmark.book_avg` (MEASURED delinquency of the 58,913-account agri book vs the whole book) + `by_province` (67 provinces). The app answered obj #1's recurring "is the agri book riskier, and where" **only** via ESTIMATED proxies (crop_stress, agri_stress) — the MEASURED book-truth answer sat in the file, unshown. The finding is non-obvious and honest: the agri book runs **12.11% at 90+dpd vs 14.87% for the whole book** — MORE resilient where risk hardens, even though it falls behind earlier (early 23.7% vs 20.8%, roll 11.2% vs 10.5%): seasonal income tends to cure arrears before 90 days. But specific provinces run hot: Chai Nat 22.0%, Nakhon Sawan 19.1%, Loei 18.5%, Kalasin 17.7% — above both the agri benchmark and the whole book.
