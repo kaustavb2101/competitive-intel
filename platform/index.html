@@ -1273,6 +1273,15 @@
         <table class="tbl" id="expo-tape-agri"></table>
         <p class="lead" style="font-size:11px;margin-top:6px">Provinces with ≥300 agri accounts, ranked by 90+dpd (the decision-relevant cut — smaller cells omitted as noise). MEASURED · real loan tape.</p>
       </div>
+      <!-- Product mix: measured 90+dpd & NPAT by loan product (Title Loan vs Refinance) from
+           tape_real.json product_groups (real loan tape). Answers obj #1 — which product carries the
+           hard delinquency vs which earns the margin. Null-safe: absent product_groups → display:none. -->
+      <div id="expo-tape-prodwrap" style="display:none;margin-top:4px">
+        <h3 class="compsub">Product mix · measured delinquency &amp; return</h3>
+        <p class="lead" id="expo-tape-prod-lead" style="font-size:12px"></p>
+        <table class="tbl" id="expo-tape-prod"></table>
+        <p class="lead" style="font-size:11px;margin-top:6px">Loan products by outstanding book, ranked by size; bar = 90+dpd. MEASURED · real loan tape.</p>
+      </div>
     </div>
 
     <!-- Product → segment → driver map (data/product_segments.json) — measured book economics per
