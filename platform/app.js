@@ -3253,6 +3253,9 @@ function drawSearchDemand(){
    coverage_pct}. Makes the census UNDERCOUNT explicit and honest. Lazy-loaded once; degrades
    gracefully (calm notice) when the file is absent. We DO NOT compute anything here. */
 let COMPCOV=null, compcovLoaded=false, compcovPromise=null;
+// one-shot guard so the book-intensity×return join (drawCompCoverage) fetches the peer scoreboard at
+// most once if the coverage card happens to render before the scoreboard card populates PEERSCORE.
+let compcovRoePending=false;
 // promise-cached loader so the Home command center can read the national coverage % without
 // duplicating the fetch the Overview table already issues. Null-safe; never throws.
 function loadCompCoverage(){
@@ -3383,6 +3386,42 @@ function drawCompCoverage(){
         }).join(' &rsaquo; ');
         nstxt+=`<div style="margin-top:6px"><b>Book per <em>measured</em> service point — consistent-denominator read</b>: ${ppchain}. ${TAG_M} ${TAG_E} `+
           `<span class="sub">${bpp.insight||''} Same books, but divided by each operator's <b>measured</b> footprint (store-locator doors ★, AutoX its own network ◆) instead of peers' listed-entity IR counts — so the group-brand distortion above is removed. The numerator basis still mixes AutoX's measured tape with peers' reported IR; a structural book-per-door read, not profitability, NPL or market share.</span></div>`;
+        // JOIN (obj #2): pair each rival's book-per-door (footprint intensity, the chain just above) with
+        // the return the market actually pays for it — SET-MEASURED ROE + price-to-book from the listed-peer
+        // scoreboard (peer_scoreboard.json, rendered lower on this same #acq tab into PEERSCORE). The two
+        // reads were siloed until now: footprint intensity here, ROE/PBV there. Together they answer which
+        // rival runs the model the market rewards (margin headroom to keep pressing on the network we run)
+        // vs a book-heavy low-return one. Honest scoping: book-per-door numerator is REPORTED-IR book, ROE/
+        // PBV are measured on the listed GROUP — a directional pairing, never a computed per-door return.
+        // AutoX is unlisted → its 25% ROE TARGET is the reference line only, never a measured figure.
+        const OP2SYM={Muangthai:'MTC',Tidlor:'TIDLOR',Srisawad:'SAWAD',Heng:'HENG'};
+        const psPeers=(PEERSCORE&&Array.isArray(PEERSCORE.peers))?PEERSCORE.peers:null;
+        if(!psPeers&&!compcovRoePending){
+          // coverage card drew before the scoreboard populated PEERSCORE — fetch it once, then redraw so
+          // the joined line fills in. Null-safe: a failed/absent scoreboard just leaves this line unshown.
+          compcovRoePending=true;
+          fetch('data/peer_scoreboard.json').then(r=>r.ok?r.json():null).then(j=>{ if(j)PEERSCORE=j; drawCompCoverage(); }).catch(()=>{});
+        }
+        if(psPeers){
+          const roeBy={}; psPeers.forEach(p=>{ if(p&&p.symbol) roeBy[p.symbol]=p; });
+          const tgt=(typeof PEERSCORE.autox_roe_target==='number')?PEERSCORE.autox_roe_target:null;
+          // walk the book-per-door ranking so the two chains read in the same order; annotate each listed
+          // peer with its SET ROE (+ PBV, flagging below-book valuation). Peers absent from the scoreboard
+          // (or with no numeric ROE) show book-per-door only — never a fabricated return.
+          const jchain=bpp.ranking.map(o=>{
+            const perDoor=`฿${o.book_per_point_m}m`;
+            if(o.operator==='AutoX'){
+              return `<b style="color:var(--accent)">AutoX</b> <span class="mono">${perDoor}</span>◆`+(tgt!=null?` · <span class="mono" style="color:var(--gold)">${tgt}% ROE target</span>`:'');
+            }
+            const p=roeBy[OP2SYM[o.operator]];
+            if(!p||typeof p.roe!=='number') return `${o.operator} <span class="mono">${perDoor}</span>★`;
+            const pbv=(typeof p.pbv==='number')?` <span class="sub">(PBV ${p.pbv.toFixed(2)}×${p.pbv<1?', below book':''})</span>`:'';
+            return `${o.operator} <span class="mono">${perDoor}</span>★ · <span class="mono">ROE ${p.roe}%</span>${pbv}`;
+          }).join(' &rsaquo; ');
+          const paidAsof=((PEERSCORE.meta||{}).price_asof)||'the price date';
+          nstxt+=`<div style="margin-top:6px"><b>Book intensity vs the return the market pays for it</b> (obj #2): ${jchain}. ${TAG_M} `+
+            `<span class="sub">Pairs each rival's book-per-door (the chain above) with its <b>SET-measured</b> ROE + price-to-book (the listed-peer scoreboard lower on this tab, as of ${paidAsof} ◆). A rival that is heavy per door <em>and</em> earns a high ROE at a premium to book (PBV&gt;1) has the margin headroom to keep pressing on the network we run; one trading below book (PBV&lt;1) is the market's least-rewarded model. Different scopes — book-per-door is REPORTED-IR book ÷ measured footprint ★, while ROE/PBV are measured on the listed <em>group</em> ◆ — so a directional pairing, not a computed per-door return. AutoX is unlisted (25% ROE target, reference only).</span></div>`;
+        }
       }
     }
     ro.innerHTML=`<b>The census is now the near-complete rival network.</b> ${ttxt} ${TAG_M} ${TAG_E}${nstxt}`+
