@@ -109,11 +109,13 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
 
 /* loops + activity */
 .st-two{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));margin-top:18px}
-.st-loop{display:flex;align-items:baseline;gap:8px;padding:8px 0;border-bottom:1px dashed var(--line2)}
+/* wrap the 3-part loop row (name · owns · cadence): in a narrow column the long cadence note
+   can't share one line, so allow it to drop below instead of collapsing .ow to zero + overflowing */
+.st-loop{display:flex;align-items:baseline;flex-wrap:wrap;gap:3px 8px;padding:8px 0;border-bottom:1px dashed var(--line2)}
 .st-loop:last-child{border-bottom:none}
 .st-loop .nm{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--hi)}
-.st-loop .ow{font-size:11.5px;color:var(--mid);flex:1;min-width:0}
-.st-loop .cd{font-family:var(--mono);font-size:10.5px;color:var(--accent);white-space:nowrap}
+.st-loop .ow{font-size:11.5px;color:var(--mid);flex:0 1 auto;min-width:0}
+.st-loop .cd{font-family:var(--mono);font-size:10.5px;color:var(--accent);white-space:normal}
 .st-act{display:flex;gap:9px;align-items:baseline;padding:7px 0;border-bottom:1px dashed var(--line2)}
 .st-act:last-child{border-bottom:none}
 .st-act .sha{font-family:var(--mono);font-size:10.5px;color:var(--dim);flex:none}
