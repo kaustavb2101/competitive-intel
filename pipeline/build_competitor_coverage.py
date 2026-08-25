@@ -253,6 +253,87 @@ def _book_intensity(autox_n, autox_book_bn):
     }
 
 
+def _book_per_point(autox_n, autox_book_bn, counts):
+    """BOOK PER MEASURED SERVICE POINT — the consistent-denominator companion to _book_intensity.
+    book_intensity divides each operator's book by its BRANCH count, but that count is not measured the
+    same way for everyone: AutoX uses its own operating network while each peer uses its REPORTED
+    listed-entity IR figure. For a GROUP brand the listed entity is a fraction of the doors it actually
+    runs (Srisawad: 1,138 listed-entity vs 5,203 store-locator points, ~4.6×), so dividing its book by
+    1,138 inflates its per-branch intensity ~4.6× and the IR-basis ranking is not apples-to-apples on
+    the denominator. This block fixes exactly that: it divides the SAME books by the MEASURED footprint
+    (each operator's de-duplicated store-locator count on the ground, the same `found` figures the
+    footprint ranking uses; AutoX by its own network). The NUMERATOR basis is unchanged and still mixed
+    (AutoX book MEASURED from the real tape, peers REPORTED IR) — that is inherent, we only hold AutoX's
+    real tape — but the DENOMINATOR is now measured identically for all, which is the specific correction.
+    Heng is excluded for the same reason as book_intensity (GROSS HP/leasing receivable, not total loans
+    outstanding). Returns None when the AutoX book or count is unavailable, so it degrades honestly."""
+    if not autox_n or not autox_book_bn:
+        return None
+    pool = [{"operator": "AutoX", "book_bn": autox_book_bn, "points": autox_n,
+             "book_per_point_m": round(autox_book_bn * 1000.0 / autox_n, 1),
+             "basis": "MEASURED book (real loan tape, current outstanding) / MEASURED own network"}]
+    for b in LOCATOR_COMPLETE_BRANDS:
+        pts = counts.get(b)
+        fin = PEER_FINANCIALS.get(b)
+        book = fin.get("loan_book_bn") if fin else None
+        if pts and book:
+            pool.append({"operator": b, "book_bn": book, "points": pts,
+                         "book_per_point_m": round(book * 1000.0 / pts, 1),
+                         "basis": "REPORTED book (cited IR) / MEASURED store-locator footprint"})
+    order = ["AutoX"] + BRANDS
+    ranked = sorted(pool, key=lambda o: (-o["book_per_point_m"], order.index(o["operator"])))
+    for i, o in enumerate(ranked, 1):
+        o["rank"] = i
+    autox_rank = next(o["rank"] for o in ranked if o["operator"] == "AutoX")
+    # brands in our set that carry a cited book but are NOT ranked here (no near-complete locator).
+    # All four locator-complete brands with a cited book enter; Heng lacks a comparable book basis.
+    excluded = [b for b in BRANDS
+                if not (b in LOCATOR_COMPLETE_BRANDS and (PEER_FINANCIALS.get(b) or {}).get("loan_book_bn"))]
+    autox_ppp = next(o["book_per_point_m"] for o in ranked if o["operator"] == "AutoX")
+    heavier = [o["operator"] for o in ranked
+               if o["operator"] != "AutoX" and o["rank"] < autox_rank]
+    lighter = [o["operator"] for o in ranked
+               if o["operator"] != "AutoX" and o["rank"] > autox_rank]
+    insight = None
+    if len(ranked) > 1:
+        lead = ranked[0]
+        # Contrast with the IR-basis read: name the operators that look heavier per IR-branch but
+        # lighter (or comparable) per measured point, which is the whole point of this companion block.
+        lighter_txt = (" — ahead of " + " & ".join("%s (~฿%.0fm)" % (o["operator"], o["book_per_point_m"])
+                       for o in ranked if o["operator"] in lighter)) if lighter else ""
+        insight = (
+            "On a CONSISTENT measured-footprint denominator AutoX carries ~฿%.0fm of book per physical "
+            "service point, ranking #%d of %d%s. This reorders the per-branch read: Srisawad looks heaviest "
+            "per IR-listed branch (~฿82m) only because its listed entity (1,138) is a fraction of its "
+            "~5,203 store-locator doors — per actual point on the ground it carries ~฿18m, LIGHTER than "
+            "AutoX. Measured door-for-door, %s leads; AutoX's density is heavier than the group brands' "
+            "(Srisawad, Muangthai) and below only %s. A structural intensity read for objective #2, NOT "
+            "profitability, NPL or market share."
+            % (autox_ppp, autox_rank, len(ranked), lighter_txt, lead["operator"], lead["operator"])
+        )
+    return {
+        "autox_rank": autox_rank,
+        "n_ranked": len(ranked),
+        "ranking": ranked,
+        "heavier_per_point": heavier,
+        "lighter_per_point": lighter,
+        "excluded_uncited": excluded,
+        "insight": insight,
+        "label": "BOOK PER MEASURED SERVICE POINT — outstanding loan book ÷ MEASURED footprint (physical "
+                 "doors on the ground). The consistent-denominator companion to book-per-branch: every "
+                 "operator's denominator is its de-duplicated store-locator count (AutoX its own network), "
+                 "measured identically — unlike book-per-branch, which divides peers' books by their "
+                 "REPORTED listed-entity IR counts. AutoX book is MEASURED (real tape, current "
+                 "outstanding); each peer's book is REPORTED (cited FY2025 / 2025 IR).",
+        "caveat": "The DENOMINATOR is now measured identically for all operators (store-locator footprint), "
+                  "which is the correction over book-per-branch. The NUMERATOR basis is still mixed — AutoX "
+                  "book is a current loan-tape snapshot, peer books are their latest reported IR figures "
+                  "(FY2025 / 30 Jun 2025) — so this remains a STRUCTURAL intensity read (book per door), NOT "
+                  "profitability, NPL or market share. Heng is excluded (GROSS HP/leasing receivable, a "
+                  "different basis from the others' total loans outstanding).",
+    }
+
+
 def _footprint_measured(autox_n, counts):
     """SECOND, all-MEASURED ranking that complements the IR-count ranking: operators by physical
     POINTS ON THE GROUND — AutoX's own operating network (branches.json) vs each near-complete-locator
@@ -343,6 +424,7 @@ def _national_standing(autox_n, counts):
     excluded = [b for b in BRANDS if not EXPECTED.get(b)]
     footprint = _footprint_measured(autox_n, counts)
     book_intensity = _book_intensity(autox_n, _autox_book_bn())
+    book_per_point = _book_per_point(autox_n, _autox_book_bn(), counts)
     # The one-line reframe the exec should read: IR-count basis vs measured-footprint basis can rank
     # AutoX differently, and both are true. Built from the two rankings, never hard-coded.
     insight = None
@@ -366,6 +448,7 @@ def _national_standing(autox_n, counts):
         "excluded_uncited": excluded,
         "footprint_measured": footprint,
         "book_intensity": book_intensity,
+        "book_per_point": book_per_point,
         "reported_vs_measured_insight": insight,
         "basis": "NETWORK SIZE — AutoX's MEASURED own-network branch count vs each peer's REPORTED "
                  "(cited public IR) branch count. A national footprint-scale read, NOT market share.",
@@ -471,6 +554,11 @@ def run(check=False):
             print("  book per branch (structural intensity): AutoX #%d of %d — %s"
                   % (bi["autox_rank"], bi["n_ranked"],
                      " > ".join("%s ฿%sm" % (o["operator"], o["book_per_branch_m"]) for o in bi["ranking"])))
+        bpp = ns.get("book_per_point")
+        if bpp:
+            print("  book per measured point (consistent denominator): AutoX #%d of %d — %s"
+                  % (bpp["autox_rank"], bpp["n_ranked"],
+                     " > ".join("%s ฿%sm" % (o["operator"], o["book_per_point_m"]) for o in bpp["ranking"])))
     return 0
 
 
