@@ -1510,6 +1510,10 @@ function foldLongTables(root){
     // 77-province drill back to 10 rows behind a "+67 more rows" button re-creates exactly the
     // pattern the drill exists to replace — and it is redundant, because .gd-wrap already scrolls.
     if(t.classList.contains('gd-tbl')) return;
+    // A heat-grid is a complete occupation×income MATRIX, not a top-N list: folding it mid-way hides
+    // the low-risk rows AND the "All" marginal row, which are half the read (the whole point is the
+    // spread between the safe and risky ends). Same rationale as the geo-drill exemption above.
+    if(t.classList.contains('heat-grid')) return;
     const host=t.tBodies&&t.tBodies.length?t.tBodies[0]:t;
     // data rows only — this app builds several tables as bare <tr><th> headers with no <thead>
     const rows=[...host.children].filter(r=>r.tagName==='TR'&&!r.querySelector('th'));
@@ -6848,6 +6852,71 @@ function renderExposureTape(){
           <td class="mono sub">${d.early_pct}%</td>
           <td class="mono sub">${d.roll_pct}%</td>
           <td class="mono" style="color:var(--merch)">฿${N(d.npat_margin_avg)}</td></tr>`).join('');
+    }
+  }
+  // --- occupation × income heat-grid: which axis governs the hard delinquency? ---
+  // obj #1 portfolio risk. From tape_real.json.occ_x_income (real loan tape): 90+dpd for every
+  // occupation×income-band cell. The computed read is whether livelihood (occupation) or repayment
+  // capacity (income) spreads the hard delinquency wider — it sharpens the income_tiers card, which
+  // found income non-monotonic, by showing occupation is the confound. Narrative is computed (spread
+  // comparison), so a future tape where income dominates ships the honest opposite sentence.
+  // Null-safe: absent/older tape with no occ_x_income (or <2 occ / <2 inc) → block stays display:none.
+  const oiw=$('#expo-tape-occincwrap'), oit=$('#expo-tape-occinc'), OI=TAPE.occ_x_income;
+  if(oiw&&oit&&OI&&typeof OI==='object'){
+    const iRank=k=>{const s=String(k).replace(/^[0-9]+\.\s*/,'').trim();
+      if(/no\s*income/i.test(s)) return -1;
+      if(/^<\s*10k/i.test(s)) return 0;
+      const m=s.match(/(\d+)\s*[-–]\s*\d+k/i); if(m) return +m[1];
+      const g=s.match(/>=?\s*(\d+)k/i); if(g) return +g[1];
+      return 999;};
+    const iLbl=k=>String(k).replace(/^[0-9]+\.\s*/,'').trim();
+    // parse "occ|inc" cells, drop the unlabelled occupation bucket
+    const occs={}, incs={};
+    Object.entries(OI).forEach(([key,v])=>{
+      if(!v||v.dpd90p_pct==null||!v.n) return;
+      const bar=String(key).indexOf('|'); if(bar<0) return;
+      const occ=key.slice(0,bar), inc=key.slice(bar+1);
+      if(occ==='(blank)'||!occ) return;
+      (occs[occ]=occs[occ]||{}) [inc]=v;
+      incs[inc]=true;
+    });
+    const incCols=Object.keys(incs).sort((a,b)=>iRank(a)-iRank(b));
+    // n-weighted marginal 90+dpd per occupation, and per income band
+    const occMarg=occ=>{let n=0,w=0; Object.values(occs[occ]).forEach(v=>{n+=v.n; w+=v.dpd90p_pct*v.n;}); return {n,dpd:n?w/n:null};};
+    const incMarg=inc=>{let n=0,w=0; Object.keys(occs).forEach(o=>{const v=occs[o][inc]; if(v){n+=v.n; w+=v.dpd90p_pct*v.n;}}); return {n,dpd:n?w/n:null};};
+    const occNames=Object.keys(occs);
+    if(occNames.length>=2 && incCols.length>=2){
+      oiw.style.display='';
+      const occRows=occNames.map(o=>({o,...occMarg(o)})).sort((a,b)=>b.dpd-a.dpd); // riskiest occupation first
+      const incMargs=incCols.map(inc=>({inc,...incMarg(inc)}));
+      let bookN=0,bookW=0; occRows.forEach(r=>{bookN+=r.n; bookW+=r.dpd*r.n;});
+      const bookDpd=bookN?bookW/bookN:null;
+      // spread of the n-weighted marginals on each axis — the honest "which axis governs" measure
+      const occVals=occRows.map(r=>r.dpd), incVals=incMargs.map(r=>r.dpd);
+      const occSpread=Math.max(...occVals)-Math.min(...occVals);
+      const incSpread=Math.max(...incVals)-Math.min(...incVals);
+      const safeOcc=occRows[occRows.length-1], riskOcc=occRows[0];
+      const lead=$('#expo-tape-occinc-lead');
+      if(lead){
+        const occWider=occSpread>=incSpread;
+        lead.innerHTML=(occWider
+          ? `<b>Occupation, not income, governs the hard delinquency.</b> Reading down the grid, 90+dpd spans <b style="color:var(--agri)">${occSpread.toFixed(1)} pts</b> by occupation (<b>${safeOcc.o}</b> ${safeOcc.dpd.toFixed(1)}% → <b>${riskOcc.o}</b> ${riskOcc.dpd.toFixed(1)}%); reading across, it moves only <b>${incSpread.toFixed(1)} pts</b> by income band. The book's risk axis is livelihood type, not repayment capacity — which is why the income-tier read above is nearly flat.`
+          : `<b>Income, not occupation, governs the hard delinquency here.</b> 90+dpd spans <b style="color:var(--agri)">${incSpread.toFixed(1)} pts</b> across income bands but only <b>${occSpread.toFixed(1)} pts</b> across occupations — repayment capacity is the dominant axis in this tape.`);
+      }
+      const short=s=>s.length>10?s.slice(0,9)+'…':s;
+      const cell=v=>{
+        if(!v) return '<td class="mono sub" style="text-align:center">—</td>';
+        return `<td class="mono" style="color:${sev(v.dpd90p_pct)};text-align:center;font-size:11px" title="${N(v.n)} accounts · OS ฿${(v.os_sum/1e6).toFixed(0)}m · early ${v.early_pct}%">${v.dpd90p_pct.toFixed(0)}</td>`;
+      };
+      oit.innerHTML=`<tr><th scope="col" style="text-align:left">Occupation ↓ / income →</th>`+
+        incCols.map(c=>`<th scope="col" class="mono" style="font-size:10px;text-align:center" title="${c}">${short(iLbl(c))}</th>`).join('')+
+        `<th scope="col" class="mono" style="font-size:10px;text-align:center" title="account-weighted across income bands">All</th></tr>`+
+        occRows.map(r=>`<tr><td style="font-size:12px" title="${N(r.n)} accounts">${r.o}</td>`+
+          incCols.map(c=>cell(occs[r.o][c])).join('')+
+          `<td class="mono" style="color:${sev(r.dpd)};text-align:center;font-weight:700" title="${N(r.n)} accounts">${r.dpd.toFixed(1)}</td></tr>`).join('')+
+        `<tr style="border-top:1px solid var(--line)"><td class="sub" style="font-size:11px">All occupations</td>`+
+          incMargs.map(m=>`<td class="mono sub" style="color:${sev(m.dpd)};text-align:center;font-size:11px" title="${N(m.n)} accounts">${m.dpd.toFixed(1)}</td>`).join('')+
+          `<td class="mono" style="color:${sev(bookDpd)};text-align:center;font-weight:700" title="${N(bookN)} accounts">${bookDpd.toFixed(1)}</td></tr>`;
     }
   }
 }
