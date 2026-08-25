@@ -159,6 +159,44 @@ timeseries `--check` plus `node --check` on every page's JS.*
 - `pull_buildings.py`, `pull_wide.py` — Overpass building-footprint pulls. `build_platform.py` —
   assembles the Rayong HTML pages from head + app + loader, wires the nav.
 
+#### MEASURED layers shipped since this inventory was first written
+> This section was materially stale: the contract documented ~15 of 136 `build_*.py` scripts and none of
+> the major competitive/portfolio layers that shipped through the autonomous loop. Below is the current
+> set (each deterministic + `--check`-gated in `tests/run.sh check` unless noted; all keyed on the
+> canonical 77 Thai provinces / 928 amphoe; provenance labelled MEASURED vs ESTIMATED throughout).
+- **Competitor / rival pressure (objective #2):** `build_pico_census.py` → `pico_census.json` (+
+  `build_pico_competitors.py`, `build_pico_district.py`, `build_branch_pico.py`) — the **MEASURED FPO
+  licensed-PICO-finance operator registry** (2,042 operators, 75 provinces, `catalog.fpo.go.th`, snapshot
+  2026-05-22): a distinct small-ticket non-bank rival class to the big-4 title lenders, carrying
+  licence- and operating-momentum reads (newest sub-scale rivals, not just densest). `build_rival_density.py`
+  → `rival_density.json` and `build_competitor_coverage.py` → `competitor_coverage.json` project the
+  16,503-branch national `competitors_census.json` into per-district rival density + coverage.
+  `build_province_pressure.py` → `province_pressure.json` is the deterministic **cross-objective join**
+  (provinces top-third on BOTH portfolio stress AND rival dominance) behind the command-center "double
+  pressure" thesis and a National-map lens. Peer comparison: `build_peer_scoreboard.py` →
+  `peer_scoreboard.json` (MEASURED SET-listed peer ROE / price-to-book, `set.or.th`), `build_peer_province.py`,
+  `build_peer_npl.py` — surfaced on `#acq`.
+- **Portfolio risk (objective #1):** `build_branch_cropland.py` → `branch_cropland.json` (SPAM-2010
+  spatial pattern ESTIMATED, rescaled to DOAE-2025 MEASURED farmer-registry planted area);
+  `build_flood_hazard.py` → `flood_hazard.json` (MEASURED GISTDA repeated-flood MAX-freq per district &
+  branch — a hazard flag, **no flooded-AREA claim**; the overlap trap is documented in `docs/NEXT_STEPS.md` §0);
+  the `build_occupation*.py` family (`build_occupations.py`, `build_occupation_risk.py`,
+  `build_occupation_income*.py`, `build_occupation_leads.py`) — who-works-here from Overture places.
+- **Demand / collateral / penetration distillations** from the Thai-gov puller `pull_datagoth.py`
+  (`data.go.th` + department CKANs; raw cache gitignored in `source-data/datagoth/`, see
+  `docs/DATAGOTH_CATALOG.md`): `build_dbd_formation.py` → `dbd_formation.json` (MEASURED DBD new-company
+  registrations — business-formation demand); `build_vehicle_fleet.py` / `build_vehicle_registry.py` →
+  vehicle layers (MEASURED DLT/MOT registered-vehicle stock — the collateral base); `build_sfi_credit.py`
+  → `sfi_credit.json` (MEASURED FPO quarterly SFI credit/NPL). BAAC and SME-bank **penetration** remain
+  Thai-IP / owner-side blocked (the `data.go.th` aggregator is 403 from CI) — see `docs/BLOCKED_SOURCES.md`.
+- The real loan tape (`build_tape_layers.py` → `tape_real.json` + `tape_geo_occ.json`) is surfaced on
+  `#exposure` by product, income band, agri, and occupation×income (all MEASURED, real accounts).
+- **Provenance + guards:** `build_provenance.py` → `platform/data/provenance.json` censuses every layer's
+  MEASURED/ESTIMATED label (146 layers · 85 MEASURED / 61 ESTIMATED / **0 unlabelled** at this revision).
+  `tests/orphan_layers.py` proves every committed leaf is actually consumed; `tests/mandate_guard.py`
+  proves no layer emits a branch open/close/expand recommendation. **A new `platform/data` file requires
+  a `build_provenance.py` re-run before the gate.**
+
 ### The data-quality committee — `committee/` (+ `deploy/`)
 Brought over from the sibling **TMLI** effort (`kaustavb2101/watcher`). A standing, gated multi-agent
 loop that generates the MEASURED data the derive/build pipeline consumes — one verifiable improvement
@@ -166,15 +204,20 @@ per cycle, never regressing a metric (see `committee/COMMITTEE.md`). Members:
 - **Competitor Scout** (`scout.py`) — pulls rival title-lenders (Srisawad, Muangthai, Tidlor, Krungsri…)
   province-by-province via **Google Places** (`GOOGLE_MAPS_API_KEY`) → `source-data/competitor_census.json`
   + `competitors_national.json`, joins `competitors_prov` onto the master. **Runs from any IP incl.
-  cloud/CI** (no Thai network needed) — this is the path to close the Rayong-only competitor gap
-  nationally without the laptop.
+  cloud/CI** (no Thai network needed). ✅ **The Rayong-only competitor gap is CLOSED** (corrected
+  2026-08-10 — see `docs/NEXT_STEPS.md` §0): the MEASURED national census
+  `platform/data/competitors_census.json` (**16,503** deduped rival title-loan / vehicle-finance
+  branches — Google Places ∪ official store-locators ∪ Overture) now covers all 77 provinces and is the
+  competitor source for every province deep-dive.
 - **Geocoder** (`geocoder.py`) — tambon/zip centroid → precise branch coordinates (Google/OSM).
 - **Industry Census** (`census.py`) — DIW factory census per province/district.
 - **Validator** (`validator.py`) — the acceptance gate; **Orchestrator** (`run_cycle.py`) picks the next
   smallest highest-value task; **daemon** (`daemon.py`) runs members continuously. `deploy/` (Dockerfile +
   Procfile + systemd unit) runs the daemon persistently. Keys come from env/`.env` — never committed.
-- Not wired into the determinism gate yet (its outputs are network-pulled inputs, like `branches.json`).
-  Next step: point `build_rival_pressure.py` at `competitor_census.json` once a national scout run lands.
+- The scout's raw pulls are not in the determinism gate (they're network inputs, like `branches.json`),
+  but the DERIVED competitive-risk layers built from the census (see the shipped-since inventory below)
+  ARE `--check`-gated. ✅ Done: `build_rival_density.py` / `build_competitor_coverage.py` already read the
+  national `competitors_census.json` — the "once a national scout run lands" step is complete.
 
 ### Master data — `source-data/`
 - `branches_final.json` — **the master**, all 2,015 branches, 46 fields each (see DATA_SOURCES.md
