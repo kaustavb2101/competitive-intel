@@ -10507,22 +10507,34 @@ function renderHomeDoublePressure(){
   const pct=v=>(typeof v==='number')?Math.round(v):'—';
   const dti=v=>(typeof v==='number')?v.toFixed(2)+'×':'—';
   const rat=v=>(typeof v==='number')?v.toFixed(1)+'×':'—';
+  // MEASURED real-book money formatter (฿bn/฿m) — the concrete scale behind the percentile ranking.
+  const baht=v=>{if(typeof v!=='number')return '—';const a=Math.abs(v);return a>=1e9?'฿'+(v/1e9).toFixed(2)+'bn':a>=1e6?'฿'+Math.round(v/1e6)+'m':'฿'+Math.round(v/1e3)+'k';};
+  const nplp=v=>(typeof v==='number')?v.toFixed(1)+'%':'—';
+  // Only add the MEASURED book column when the loaded layer carries it (older layers degrade cleanly).
+  const hasBook=dp.some(r=>typeof r.book_os==='number');
+  const db=(m.double_pressure_book&&typeof m.double_pressure_book.book_os_total==='number')?m.double_pressure_book:null;
+  const mob=(m.book_source&&m.book_source.mob_anchor)?m.book_source.mob_anchor:null;
   body.innerHTML=
     `<div class="tblwrap"><table class="tbl"><tr><th scope="col">Province</th>`+
       `<th scope="col" title="Portfolio-risk percentile (obj #1) — composite of MEASURED NSO debt-to-income + unemployment, expressed as a 0–100 rank across the 77 provinces. ESTIMATED (a percentile blend, not an absolute default level).">Stress ▲</th>`+
       `<th scope="col" title="Competitive-risk percentile (obj #2) — 0–100 rank of the MEASURED rival:AutoX branch ratio across the 77 provinces. COMPUTED over measured census counts.">Rival ◆</th>`+
       `<th scope="col" title="Rivals ÷ AutoX branches in the province (MEASURED census), and the top rival brand.">Outgunned</th>`+
-      `<th scope="col" title="Share of the province's districts where the big-4 rivals outnumber AutoX (MEASURED, point-in-district).">Dist. lost</th></tr>`+
+      `<th scope="col" title="Share of the province's districts where the big-4 rivals outnumber AutoX (MEASURED, point-in-district).">Dist. lost</th>`+
+      (hasBook?`<th scope="col" title="MEASURED real loan tape (tape_real.json) — the province's outstanding book (฿, combined) and its LIVE-book NPL (outstanding-weighted). The real-money scale behind the ranking; a percentile is not ฿. LIVE book only — 180+ legacy held apart.">Book ฿ · live NPL</th>`:'')+
+      `</tr>`+
     dp.map(r=>{
       const distLost=(r.n_outnumbered_districts!=null&&r.n_districts)?`${r.n_outnumbered_districts}/${r.n_districts}`:'—';
+      const bookCell=hasBook?`<td class="mono"><b>${baht(r.book_os)}</b> <span class="sub" style="font-weight:400">${r.book_npl_os_pct!=null?'· NPL '+nplp(r.book_npl_os_pct):''}</span></td>`:'';
       return `<tr>
         <td><b style="border-left:3px solid var(--agri);padding-left:7px">${r.province_th||'—'}</b> <span class="sub">${r.region||''}</span></td>
         <td class="mono" style="color:var(--agri)"><b>${pct(r.stress_pctile)}</b> <span class="sub" style="font-weight:400">DTI ${dti(r.debt_to_income)}${r.unemployment_rate!=null?' · unemp '+(+r.unemployment_rate).toFixed(1)+'%':''}</span></td>
         <td class="mono" style="color:var(--agri)"><b>${pct(r.contest_pctile)}</b></td>
         <td class="mono">${rat(r.ratio)} <span class="sub" style="font-weight:400">${r.leader?'· '+r.leader:''}</span></td>
         <td class="mono">${distLost}</td>
+        ${bookCell}
       </tr>`;}).join('')+`</table></div>`+
-    `<div class="sub" style="margin-top:6px;color:var(--dim)"><b>${dp.length}</b> province${dp.length===1?'':'s'} sit top-third on <b>both</b> axes — a fragile book where margin defence is hardest. Where to look first, <b>not</b> a verdict or an action. Portfolio stress is <b>estimated</b> (percentile blend of MEASURED NSO debt-to-income + unemployment); rival ratio is <b>computed over MEASURED</b> census counts — so the combined read is a RANKING across the 77 provinces, not a probability. Full per-province board &amp; brand split → <a class="cc-link no-print" data-v="acq" href="#acq" style="display:inline">Competition</a>.</div>`;
+    (db?`<div class="sub" style="margin-top:6px;color:var(--txt)">These <b>${db.n_provinces}</b> provinces hold <b>${baht(db.book_os_total)}</b> of MEASURED outstanding book at a <b>${nplp(db.book_npl_os_pct)}</b> live NPL${mob?' (tape '+mob+')':''} — the real ฿ behind the ranking. A percentile rank is not a ฿ amount: a top-ranked province can still carry a small book, so read the ฿ column before acting.</div>`:'')+
+    `<div class="sub" style="margin-top:6px;color:var(--dim)"><b>${dp.length}</b> province${dp.length===1?'':'s'} sit top-third on <b>both</b> axes — a fragile book where margin defence is hardest. Where to look first, <b>not</b> a verdict or an action. Portfolio stress is <b>estimated</b> (percentile blend of MEASURED NSO debt-to-income + unemployment); rival ratio is <b>computed over MEASURED</b> census counts — so the combined read is a RANKING across the 77 provinces, not a probability. The <b>Book ฿ · live NPL</b> column is <b>MEASURED</b> real tape (live book; 180+ legacy apart). Full per-province board &amp; brand split → <a class="cc-link no-print" data-v="acq" href="#acq" style="display:inline">Competition</a>.</div>`;
   wrapTables();   // this card mounts AFTER the PROVPRESS fetch resolves, past the boot-time wrapTables() — upgrade its inline .tblwrap to a keyboard-reachable, labelled scroll region (WCAG 2.1.1)
   wrap.style.display='';
 }

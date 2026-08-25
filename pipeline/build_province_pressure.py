@@ -61,7 +61,14 @@ ROOT = os.path.dirname(HERE)
 DATA = os.path.join(ROOT, "platform", "data")
 STRESS = os.path.join(DATA, "province_stress_index.json")
 PEER = os.path.join(DATA, "peer_province.json")
+# MEASURED real-book axis (optional additive join). tape_real.json is gated + --check-reproducible;
+# its province aggregates are the real loan tape (382,735 accounts, no-PII, floored at MIN_CELL).
+TAPE = os.path.join(DATA, "tape_real.json")
 OUT = os.path.join(DATA, "province_pressure.json")
+
+# Disclosure floor for the real tape (see .claude/skills/tape-pii-floor). tape_real.json is already
+# floored at ingest; we re-assert it here so a province book row is NEVER carried on < 30 accounts.
+MIN_CELL = 30
 
 # A percentile at or above this cut counts as "top third" for the double_pressure alert flag.
 # 100/3 = 33.3% of provinces sit above it on a single axis; requiring BOTH axes above it is a
@@ -99,9 +106,35 @@ def build():
     if not srows or not prows:
         return None
 
+    # MEASURED real-book context (optional): tape_real.json province aggregates, keyed by Thai
+    # province name. os_sum = outstanding ฿ (LIVE + 180+ legacy combined book value); npl_live_os_pct
+    # = the LIVE book's NPL, outstanding-weighted (the actionable read — reported apart from legacy).
+    # Absent in a stripped sandbox → book fields stay null (an honest gap, never guessed); the gate
+    # runs in CI where tape_real.json is committed, so --check reproduces byte-exact there.
+    tape_pv, tape_meta, n_book_suppressed = {}, {}, 0
+    if os.path.exists(TAPE):
+        tape = _load(TAPE)
+        tape_meta = tape.get("meta") or {}
+        for prov, v in (tape.get("provinces") or {}).items():
+            if not isinstance(v, dict):
+                continue
+            if (v.get("n") or 0) < MIN_CELL:
+                n_book_suppressed += 1          # never carry a book row below the disclosure floor
+                continue
+            tape_pv[prov] = v
+
     # competitive-risk axis: rival:AutoX ratio per province (null where autox == 0 → no footprint
     # to be outnumbered in; excluded from the percentile pool and never flagged double_pressure).
     ratios = sorted(p["ratio"] for p in prows if p.get("ratio") is not None)
+
+    # MEASURED-book scale pool: outstanding ฿ across the provinces the peer board also covers, so
+    # book_pctile answers "how much of AutoX's real book actually sits here" on the same 77-province
+    # scale as the two pressure axes. COMPUTED over a MEASURED input.
+    book_os_pool = sorted(
+        float(tape_pv[p["province_th"]]["os_sum"])
+        for p in prows
+        if p["province_th"] in tape_pv and tape_pv[p["province_th"]].get("os_sum") is not None
+    )
 
     records = []
     for p in prows:
@@ -115,6 +148,14 @@ def build():
             stress_pctile = s.get("composite_stress")
         ratio = p.get("ratio")
         contest_pctile = _percentile_rank(ratio, ratios) if ratio is not None else None
+
+        # MEASURED real-book context for this province (null when tape absent or below MIN_CELL).
+        tv = tape_pv.get(prov)
+        book_os = round(float(tv["os_sum"])) if tv and tv.get("os_sum") is not None else None
+        book_npl_os_pct = tv.get("npl_live_os_pct") if tv else None
+        book_n = tv.get("n") if tv else None
+        book_pctile = (_percentile_rank(float(book_os), book_os_pool)
+                       if book_os is not None and book_os_pool else None)
 
         if stress_pctile is not None and contest_pctile is not None:
             both_min = round(min(stress_pctile, contest_pctile), 2)
@@ -143,6 +184,11 @@ def build():
             "n_ranked": p.get("n_ranked"),
             "n_districts": p.get("n_districts"),
             "n_outnumbered_districts": p.get("n_outnumbered_districts"),
+            # MEASURED real-book context (tape_real.json; live-book NPL reported apart from 180+ legacy)
+            "book_os": book_os,
+            "book_npl_os_pct": book_npl_os_pct,
+            "book_n": book_n,
+            "book_pctile": book_pctile,
             # combined
             "both_min": both_min,
             "both_mean": both_mean,
@@ -168,14 +214,27 @@ def build():
     quad_counts = {k: quad_counts[k] for k in sorted(quad_counts)}
     worst = records[0] if records and records[0]["both_min"] is not None else None
 
+    # MEASURED book carried by the double-pressure alert set — the concrete "how much real ฿ sits in
+    # the worst-pressured provinces, at what live NPL" read. Outstanding-weighted so the NPL is honest.
+    dbl_book_rows = [r for r in dbl_rows if r.get("book_os") is not None]
+    dbl_book_os = sum(r["book_os"] for r in dbl_book_rows) or 0
+    dbl_book_npl_num = sum((r["book_os"] * (r.get("book_npl_os_pct") or 0.0))
+                           for r in dbl_book_rows if r.get("book_npl_os_pct") is not None)
+    dbl_book_os_with_npl = sum(r["book_os"] for r in dbl_book_rows
+                               if r.get("book_npl_os_pct") is not None)
+    dbl_book_npl_pct = (round(dbl_book_npl_num / dbl_book_os_with_npl, 2)
+                        if dbl_book_os_with_npl else None)
+
     meta = {
         "generated_by": "pipeline/build_province_pressure.py",
         "label": "COMBINED PROVINCE PRESSURE — where the two objectives coincide: provinces that "
                  "are BOTH borrower-stressed (portfolio risk) AND rival-dominated (competitive "
                  "risk), for all 77 provinces. A pure deterministic JOIN of province_stress_index"
                  ".json (composite_stress) and peer_province.json (rival:AutoX ratio); each axis "
-                 "expressed as a 0-100 percentile so the two are comparable. Makes NO open / close "
-                 "/ expand recommendation — a risk lens on the footprint we already run.",
+                 "expressed as a 0-100 percentile so the two are comparable. Each province also "
+                 "carries its MEASURED real-book context (tape_real.json: outstanding ฿ + LIVE-book "
+                 "NPL) so the ranking can be read in real money, not just ranks. Makes NO open / "
+                 "close / expand recommendation — a risk lens on the footprint we already run.",
         "objective": "Serves BOTH standing objectives at once (the command-centre's 'two questions "
                      "on one screen'): portfolio risk #1 (stress_pctile) x competitive risk #2 "
                      "(contest_pctile). The intersection is where a fragile portfolio meets the "
@@ -184,6 +243,7 @@ def build():
             "source_files": [
                 "platform/data/province_stress_index.json (gated, --check-reproducible)",
                 "platform/data/peer_province.json (gated, --check-reproducible)",
+                "platform/data/tape_real.json (gated, --check-reproducible; MEASURED book context)",
             ],
             "stress_pctile": "ESTIMATED — composite_stress carried verbatim from "
                              "province_stress_index.json: a 0-100 percentile blend (0.5*DTI + "
@@ -211,6 +271,21 @@ def build():
                            "unemployment_rate (NSO, from the stress index), autox / rivals / ratio "
                            "/ leader / autox_rank / n_outnumbered_districts (from the peer board). "
                            "Carried so the board is readable without re-joining the two sources.",
+            "book_os": "MEASURED — the province's outstanding book value in ฿ (os_sum) from the real "
+                       "loan tape (tape_real.json). The COMBINED book (live + 180+ legacy). Carried so "
+                       "the pressure ranking can be read against where AutoX actually holds ฿ at risk "
+                       "— a percentile rank is not a scale, and ฿ exposure is the scale that matters. "
+                       "null where tape_real.json is absent or the province is below MIN_CELL=%d "
+                       "accounts (never carried below the disclosure floor)." % MIN_CELL,
+            "book_npl_os_pct": "MEASURED — the LIVE book's NPL, outstanding-weighted (npl_live_os_pct "
+                               "from tape_real.json). The actionable credit-quality read, reported "
+                               "APART from the 180+ legacy book (a blended figure is not actionable). "
+                               "This is a real, absolute level — NOT a percentile.",
+            "book_n": "MEASURED — the province's real account count in the tape (>= MIN_CELL=%d)." % MIN_CELL,
+            "book_pctile": "COMPUTED over a MEASURED input — 0-100 percentile rank of book_os across "
+                           "the provinces the peer board covers (same mid-rank-ties method as the two "
+                           "pressure axes, so ฿-scale is directly comparable to stress/contest). "
+                           "Lets the reader ask 'is this a big-book province too?' on one scale.",
         },
         "caveats": [
             "Both axes are RELATIVE percentiles over the same 77 provinces, so every combined read "
@@ -233,13 +308,21 @@ def build():
             "null competitive axis and are EXCLUDED from the percentile pool and the alert set — "
             "an honest gap, never a guessed 0. (Today every one of the 77 provinces has an AutoX "
             "footprint, so the pool is complete.)",
+            "The MEASURED book columns (book_os / book_npl_os_pct / book_pctile) are CONTEXT, not a "
+            "third pressure axis: they do NOT change double_pressure, both_min, both_mean or the sort "
+            "order. They answer a separate question — 'of the double-pressure provinces, which hold "
+            "the most real ฿ and the worst live NPL?' — so an abstract percentile ranking can be read "
+            "in real money. book_npl_os_pct is the LIVE book only; the 180+ legacy book is held apart "
+            "(see tape_real.json) and is never blended in here. book_os is the combined outstanding.",
         ],
         "thresholds": {"top_third_pctile": TOP_THIRD, "median_pctile": MEDIAN},
         "record_format": "{province_th, region, stress_pctile, debt_to_income, unemployment_rate, "
                          "contest_pctile, autox, rivals, ratio, leader, autox_rank, n_ranked, "
-                         "n_districts, n_outnumbered_districts, both_min, both_mean, quadrant, "
-                         "double_pressure}. provinces[] sorted by both_min desc (worst double "
-                         "pressure first); null-axis provinces sort last.",
+                         "n_districts, n_outnumbered_districts, book_os, book_npl_os_pct, book_n, "
+                         "book_pctile, both_min, both_mean, quadrant, double_pressure}. provinces[] "
+                         "sorted by both_min desc (worst double pressure first); null-axis provinces "
+                         "sort last. The book_* columns are MEASURED context (tape_real.json), not a "
+                         "sort or alert axis.",
         "n_provinces": len(records),
         "n_provinces_scored": len(scored),
         "n_double_pressure": len(dbl_rows),
@@ -265,6 +348,22 @@ def build():
             "total_autox": (peer.get("meta") or {}).get("total_autox"),
             "total_rivals": (peer.get("meta") or {}).get("total_rivals"),
         },
+        "book_source": {
+            "layer": "platform/data/tape_real.json",
+            "metric": "os_sum (outstanding ฿, combined book) + npl_live_os_pct (LIVE-book NPL, os-weighted)",
+            "provenance": "MEASURED — real loan tape, no-PII province aggregates (>= MIN_CELL).",
+            "mob_anchor": tape_meta.get("mob_anchor"),
+            "min_cell": MIN_CELL,
+            "n_provinces_with_book": len(book_os_pool),
+            "n_book_suppressed": n_book_suppressed,
+        } if tape_pv else None,
+        # concrete money read on the alert set: total outstanding + os-weighted LIVE NPL across the
+        # double-pressure provinces (MEASURED). null when tape absent. Lets the thesis say ฿, not ranks.
+        "double_pressure_book": ({
+            "n_provinces": len(dbl_book_rows),
+            "book_os_total": dbl_book_os,
+            "book_npl_os_pct": dbl_book_npl_pct,
+        } if dbl_book_rows else None),
     }
     return {"meta": meta, "provinces": records}
 
@@ -301,6 +400,15 @@ def run(check=False):
     if w:
         print("  worst: %s (both_min %.1f — stress %.1f pctile, contest %.1f pctile, led by %s)"
               % (w["province_th"], w["both_min"], w["stress_pctile"], w["contest_pctile"], w["leader"]))
+    db = m.get("double_pressure_book")
+    if db:
+        print("  MEASURED book in the alert set: ฿%.2fbn outstanding across %d provinces, "
+              "LIVE NPL %.2f%% (os-weighted)"
+              % (db["book_os_total"] / 1e9, db["n_provinces"],
+                 db["book_npl_os_pct"] if db["book_npl_os_pct"] is not None else float("nan")))
+    bs = m.get("book_source")
+    if bs and bs.get("n_book_suppressed"):
+        print("  book rows suppressed below MIN_CELL=%d: %d" % (MIN_CELL, bs["n_book_suppressed"]))
     return 0
 
 
