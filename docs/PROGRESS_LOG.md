@@ -3,7 +3,38 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
-## 2026-08-25 — UX loop: fix Autonomous-loops panel text overlap on status.html (mobile/tablet) — merged + deployed + verified (PR #618)
+## 2026-08-25 — Market/peer loop: book-per-MEASURED-service-point companion to book-per-branch (#acq) — merged + deployed + verified
+
+- **Picked / why (peer-comparison pillar).** The autonomy plan reads 98% (only the owner-side access-gate
+  item open), and the service audit keeps closing HEALTHY, so I hunted a fresh peer-intelligence sharpening
+  from committed REAL data. Found a genuine **mixed-denominator distortion** in `competitor_coverage.json`'s
+  `book_intensity` (book-per-branch): AutoX's book is divided by its own MEASURED network (2,015) while each
+  peer's book is divided by its **REPORTED listed-entity IR count**. For a GROUP brand the listed entity is
+  a fraction of the doors it runs — Srisawad reports **1,138** listed-entity branches but the census MEASURES
+  **5,203** store-locator points (~4.6×) — so dividing its ฿93.2bn book by 1,138 inflates it to **฿82m/branch**
+  and ranks it *heaviest* per branch, ~3.5× AutoX. That headline is not apples-to-apples on the denominator.
+- **Shipped (one improvement).** Added `_book_per_point()` to `pipeline/build_competitor_coverage.py` →
+  new `national_standing.book_per_point` block: the SAME books divided by each operator's **MEASURED footprint**
+  (de-duplicated store-locator doors; AutoX its own network) — the denominator now measured identically for all.
+  This **reorders the read**: `Tidlor ฿57.1m › AutoX ฿23.1m › Muangthai ฿20.5m › Srisawad ฿17.9m` — Srisawad
+  drops from *heaviest-per-IR-branch* to **lightest-per-door** (฿18m, below AutoX), and AutoX rises from #3 to
+  **#2 of 4**: measured door-for-door it carries more book per physical point than the group brands, below only
+  Tidlor. A structural intensity read for objective #2 (competitive/margin pressure on the network we run).
+  Surfaced on `#acq` right under the existing book-per-branch line (`platform/app.js`, `drawCompCoverage`),
+  mirroring its style, with full provenance: **denominator is now MEASURED for all** (the correction); the
+  **numerator basis is still mixed** (AutoX measured tape ◆ vs peers' reported IR ★) — stated inline — so it
+  stays a book-per-door structural read, NOT profitability/NPL/market share. Heng excluded (gross HP/leasing
+  receivable, a different basis). No new external data — every input was already committed and cited.
+- **Safeguards (all pass).** (a) `bash tests/run.sh check` → **146 passed, 0 failed** (determinism +455 data-
+  validation + mandate-guard + provenance). (b) no secrets in diff. (c) diff = intent only: `book_per_point`
+  is the ONLY key added to `national_standing` — brands, totals, every other key byte-identical (proven by a
+  git-HEAD compare); `build_provenance.py` regenerated (146 layers · 85 measured / 61 estimated / 0 unlabelled).
+  (d) no fabrication — REPORTED cited books ÷ MEASURED footprint, both already in-repo, labelled measured-vs-
+  reported. (e) headless render self-review of `index.html#acq`: `#compcovreadout` carries both the book-per-
+  branch and the new book-per-measured-point lines with the correct `฿57.1/23.1/20.5/17.9m` chain, **0 console
+  errors** (only proxy-blocked basemap tiles), layout intact / nothing overlapping.
+
+
 
 - **Picked / why (`ux-status-loop-row-overlap`).** The numbered `docs/UXUI_AUDIT.md` backlog (1–7) is
   fully fixed and the remaining open items are either deck.gl *gesture* items explicitly deferred as

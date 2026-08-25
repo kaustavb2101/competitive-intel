@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-25T11:15:48+07:00",
-    "commit": "55e7090"
+    "generated_at": "2026-08-25T17:22:10+07:00",
+    "commit": "5ef2c34"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-08-25T17:22:10+07:00",
+      "sha": "5ef2c34",
+      "summary": "feat(acq): book-per-MEASURED-service-point companion to book-per-branch (#620)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-25T09:54:09+00:00",
+      "sha": "08fbce6",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-25, run 32834240673)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-25T08:27:53+00:00",
+      "sha": "cf4a33e",
+      "summary": "docs(progress): log ux-status-loop-row-overlap merge+deploy+verify (PR #618)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-25T15:25:14+07:00",
+      "sha": "b8f3662",
+      "summary": "ux: fix Autonomous-loops panel text overlap on status.html (mobile/tablet) (#618)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-25T06:44:12+00:00",
+      "sha": "426e49d",
+      "summary": "feat(exposure): surface measured delinquency & return by income band from tape_real.json (#617)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-25T05:25:31+00:00",
+      "sha": "2f50854",
+      "summary": "data(census): refresh the Union Auction forward book (run 32808529797) (#616)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-25T05:00:53+00:00",
+      "sha": "26bd87a",
+      "summary": "data: market-pulse swarm refresh (run 32807973559) (#615)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-25T04:18:22+00:00",
+      "sha": "e3367c3",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after product-groups exposure ship",
+      "pillar": "service"
+    },
+    {
       "date": "2026-08-25T11:15:48+07:00",
       "sha": "55e7090",
       "summary": "feat(exposure): surface measured per-product delinquency & return from tape_real.json (#614)",
@@ -662,54 +710,6 @@
       "date": "2026-08-24T16:00:11+00:00",
       "sha": "7395f21",
       "summary": "data: ThaiWater flood + rain pulse (2026-08-24, run 32748069961)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T14:31:04+00:00",
-      "sha": "86b6774",
-      "summary": "docs(progress): log ux data.html CSV UTF-8 BOM ship (PR #604, deployed + verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-24T21:27:32+07:00",
-      "sha": "c5da121",
-      "summary": "ux: add UTF-8 BOM to data.html branch CSV export (Thai Excel fix) (#604)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-24T13:21:13+00:00",
-      "sha": "f4783d7",
-      "summary": "data: SET listed-peer scoreboard refresh (run 32723086117) (#602)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-24T13:00:25+00:00",
-      "sha": "c2f9054",
-      "summary": "data(labour): fold NSO LFS 2026-Q1 national unemployment into labour_context (obj #1) (#603)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T11:06:34+00:00",
-      "sha": "fdbb8ac",
-      "summary": "data: market-pulse swarm refresh (run 32716186443) (#601)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-24T10:28:36+00:00",
-      "sha": "69fc594",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after deploy-health probe-tail ship",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-24T10:28:03+00:00",
-      "sha": "c08f033",
-      "summary": "service(deploy-health): shape-probe the residual 5 unprobed app data reads (unprobed count → 0)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T10:07:02+00:00",
-      "sha": "312b7c0",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-24, run 32714943303)",
       "pillar": "data-integration"
     }
   ]

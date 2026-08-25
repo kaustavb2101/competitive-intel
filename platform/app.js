@@ -3366,6 +3366,20 @@ function drawCompCoverage(){
         nstxt+=`<div style="margin-top:6px"><b>Book per branch — a structural intensity read</b>: ${bchain}. ${TAG_M} ${TAG_E} `+
           `<span class="sub">${bi.insight||''} AutoX book is <b>measured</b> (real loan tape ◆, current outstanding); peer books are <b>reported</b> IR (★). Structural density, not profitability, NPL or market share; Heng excluded here (it reports a gross hire-purchase/leasing book, a different basis from the others' loans outstanding).</span></div>`;
       }
+      // BOOK PER MEASURED SERVICE POINT — the consistent-denominator companion to book-per-branch:
+      // divides the SAME books by each operator's MEASURED store-locator footprint (not peers' listed-
+      // entity IR counts), which is the correct fix for the group-brand inflation the caveat flags. This
+      // REORDERS the read (Srisawad drops from heaviest-per-IR-branch to lightest-per-door). Null-safe.
+      const bpp=ns.book_per_point;
+      if(bpp&&bpp.autox_rank&&Array.isArray(bpp.ranking)){
+        const ppchain=bpp.ranking.map(o=>{
+          const nm=o.operator==='AutoX'?'<b style="color:var(--accent)">AutoX</b>':o.operator;
+          const tag=o.operator==='AutoX'?'◆':'★';
+          return `${nm} <span class="mono">฿${o.book_per_point_m}m</span>${tag}`;
+        }).join(' &rsaquo; ');
+        nstxt+=`<div style="margin-top:6px"><b>Book per <em>measured</em> service point — consistent-denominator read</b>: ${ppchain}. ${TAG_M} ${TAG_E} `+
+          `<span class="sub">${bpp.insight||''} Same books, but divided by each operator's <b>measured</b> footprint (store-locator doors ★, AutoX its own network ◆) instead of peers' listed-entity IR counts — so the group-brand distortion above is removed. The numerator basis still mixes AutoX's measured tape with peers' reported IR; a structural book-per-door read, not profitability, NPL or market share.</span></div>`;
+      }
     }
     ro.innerHTML=`<b>The census is now the near-complete rival network.</b> ${ttxt} ${TAG_M} ${TAG_E}${nstxt}`+
       methodBox(null,
