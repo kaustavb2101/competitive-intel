@@ -6247,7 +6247,7 @@ function gapCSV(){
       .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
   const blob=new Blob(['\ufeff',lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='autox_catchment_coverage.csv'; a.click(); URL.revokeObjectURL(a.href);
+  a.download='autox_catchment_coverage_'+vintageTag()+'.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
 
 /* ---------- district (amphoe) white-space + risk (Step 2) ----------
@@ -6640,7 +6640,7 @@ function ampCSV(){
       .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
   const blob=new Blob(['\ufeff',lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='autox_district_coverage.csv'; a.click(); URL.revokeObjectURL(a.href);
+  a.download='autox_district_coverage_'+vintageTag()+'.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
 
 /* ---------- portfolio exposure / concentration (item 3) ----------
@@ -9392,7 +9392,7 @@ function drawMarket(){
         .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
     const blob=new Blob(['\ufeff',lines.join('\n')],{type:'text/csv;charset=utf-8;'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-    a.download='autox_market_assessment.csv'; a.click(); URL.revokeObjectURL(a.href);
+    a.download='autox_market_assessment_'+vintageTag()+'.csv'; a.click(); URL.revokeObjectURL(a.href);
   };
 }
 
@@ -9469,6 +9469,10 @@ function loadDecisionQueue(){
     .catch(()=>{DQUEUE=null;dqLoaded=true;return null;});
 }
 function dqEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+// filename-safe DATA-vintage token from META.updated, so a re-downloaded CSV self-identifies its
+// vintage and doesn't silently overwrite the last one. Matches the rate-board / rival-ads exports
+// (which already stamp their filename with data vintage); slugs the prose vintage to [0-9A-Za-z-].
+function vintageTag(){var v=(typeof META!=='undefined'&&META&&META.updated)||'';v=String(v).replace(/[^0-9A-Za-z]+/g,'-').replace(/^-+|-+$/g,'');return v||'latest';}
 /* LANE 3D-7 — road each queue action INTO the 3D scene it references. defend/audit name a
    specific branch → centre the building scene on it (found by exact name in DATA); expand/tighten
    name a district/province → open that province's building scene. Null-safe: no slug/branch → ''. */
@@ -13291,7 +13295,7 @@ function ccBriefCSV(){
   const csv=rows.map(r=>r.map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob=new Blob(['\ufeff',csv],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='autox_command_center_brief.csv'; a.click(); URL.revokeObjectURL(a.href);
+  a.download='autox_command_center_brief_'+vintageTag()+'.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
 
 boot();
