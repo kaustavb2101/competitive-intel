@@ -6790,6 +6790,52 @@ function renderExposureTape(){
           <td class="mono" style="color:var(--merch)">฿${N(d.npat_margin_avg)}</td></tr>`).join('');
     }
   }
+  // --- income tiers: measured 90+dpd & return by borrower repayment capacity (income band) ---
+  // obj #1 portfolio risk: does repayment capacity govern the hard delinquency? From
+  // tape_real.json.income_tiers (real loan tape). The shipped read is non-monotonic — 90+dpd does
+  // NOT simply fall as income rises. Narrative is computed (like the agri card), so a future tape
+  // that IS monotonic gets the honest opposite sentence. Robust income-ascending sort from the
+  // (inconsistently-prefixed) band keys. Null-safe: absent/older tape with no income_tiers (or <2
+  // bands) → the whole block stays display:none, like the product card above.
+  const itw=$('#expo-tape-incwrap'), itt=$('#expo-tape-inc'), IT=TAPE.income_tiers;
+  if(itw&&itt&&IT&&typeof IT==='object'){
+    const incRank=k=>{const s=String(k).replace(/^[0-9]+\.\s*/,'').trim();
+      if(/no\s*income/i.test(s)) return -1;
+      if(/^<\s*10k/i.test(s)) return 0;
+      const m=s.match(/(\d+)\s*[-–]\s*\d+k/i); if(m) return +m[1];
+      const g=s.match(/>=?\s*(\d+)k/i); if(g) return +g[1];
+      return 999;};
+    const incLbl=k=>String(k).replace(/^[0-9]+\.\s*/,'').trim();
+    const rows=Object.entries(IT).filter(([,d])=>d&&d.n&&d.dpd90p_pct!=null)
+      .sort((a,b)=>incRank(a[0])-incRank(b[0]));
+    if(rows.length>=2){
+      itw.style.display='';
+      const tot=rows.reduce((s,[,d])=>s+d.n,0);
+      // headline off the SUBSTANTIVE bands only (n>=1000) so a tiny "No income" cell can't drive it
+      const sub=rows.filter(([,d])=>d.n>=1000);
+      const pool=sub.length>=2?sub:rows;
+      const hot=pool.reduce((m,r)=>r[1].dpd90p_pct>m[1].dpd90p_pct?r:m);
+      const cool=pool.reduce((m,r)=>r[1].dpd90p_pct<m[1].dpd90p_pct?r:m);
+      const loInc=pool[0], hiInc=pool[pool.length-1];  // pool preserves income-ascending order
+      // is 90+dpd monotonically non-increasing as income rises (the "expected" shape)?
+      let mono=true; for(let i=1;i<pool.length;i++){ if(pool[i][1].dpd90p_pct>pool[i-1][1].dpd90p_pct+0.01){ mono=false; break; } }
+      const npatClimbs=hiInc[1].npat_margin_avg>loInc[1].npat_margin_avg;
+      const npatSent=npatClimbs?` NPAT per account still climbs with income (฿${N(loInc[1].npat_margin_avg)} at ${incLbl(loInc[0])} → ฿${N(hiInc[1].npat_margin_avg)} at ${incLbl(hiInc[0])}), so the higher-income book earns more per account at a similar hard-loss rate.`:'';
+      const lead=$('#expo-tape-inc-lead');
+      if(lead) lead.innerHTML=(mono
+        ? `Hard delinquency does fall as repayment capacity rises: 90+dpd is lowest in the <b>${incLbl(hiInc[0])}</b> band (<b style="color:var(--merch)">${hiInc[1].dpd90p_pct}%</b>) and highest in the <b>${incLbl(loInc[0])}</b> band (<b style="color:var(--agri)">${loInc[1].dpd90p_pct}%</b>).`
+        : `Repayment capacity doesn't govern the hard delinquency the way you'd expect: 90+dpd does <b>not</b> decline as income rises — it is lowest in the <b>${incLbl(cool[0])}</b> band (<b style="color:var(--merch)">${cool[1].dpd90p_pct}%</b>) and peaks in the <b>${incLbl(hot[0])}</b> band (<b style="color:var(--agri)">${hot[1].dpd90p_pct}%</b>).`)+npatSent;
+      const worstI=Math.max(...rows.map(([,d])=>d.dpd90p_pct));
+      itt.innerHTML=`<tr><th scope="col">Income band</th><th scope="col">Accounts</th><th scope="col">OS ฿bn</th><th scope="col" title="share of accounts 90+ days past due">90+dpd</th><th scope="col" title="early-bucket share">early</th><th scope="col" title="early→NPL roll rate">roll</th><th scope="col" title="NPAT per account, ฿/yr basis as exported">NPAT/acct</th></tr>`+
+        rows.map(([k,d])=>`<tr><td><b>${incLbl(k)}</b> <span class="sub">${(100*d.n/tot).toFixed(0)}%</span></td>
+          <td class="mono sub">${N(d.n)}</td>
+          <td class="mono sub">${(d.os_sum/1e9).toFixed(1)}</td>
+          <td class="mono" style="color:${sev(d.dpd90p_pct)}">${barHTML(d.dpd90p_pct,'var(--agri)',worstI)} <b>${d.dpd90p_pct}%</b></td>
+          <td class="mono sub">${d.early_pct}%</td>
+          <td class="mono sub">${d.roll_pct}%</td>
+          <td class="mono" style="color:var(--merch)">฿${N(d.npat_margin_avg)}</td></tr>`).join('');
+    }
+  }
 }
 function renderExposure(){
   if(!DATA||!$('#expocards')||!$('#expotbl')) return;

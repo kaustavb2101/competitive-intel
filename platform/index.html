@@ -1282,6 +1282,16 @@
         <table class="tbl" id="expo-tape-prod"></table>
         <p class="lead" style="font-size:11px;margin-top:6px">Loan products by outstanding book, ranked by size; bar = 90+dpd. MEASURED · real loan tape.</p>
       </div>
+      <!-- Income tiers: measured 90+dpd & NPAT by borrower repayment capacity (income band) from
+           tape_real.json income_tiers (real loan tape). Answers obj #1 — does repayment capacity
+           govern the hard delinquency? The shipped read is non-monotonic (computed narrative).
+           Null-safe: absent income_tiers → display:none. -->
+      <div id="expo-tape-incwrap" style="display:none;margin-top:4px">
+        <h3 class="compsub">Income tiers · measured delinquency &amp; return</h3>
+        <p class="lead" id="expo-tape-inc-lead" style="font-size:12px"></p>
+        <table class="tbl" id="expo-tape-inc"></table>
+        <p class="lead" style="font-size:11px;margin-top:6px">Borrower income bands (declared at origination), income-ascending; bar = 90+dpd. MEASURED · real loan tape.</p>
+      </div>
     </div>
 
     <!-- Product → segment → driver map (data/product_segments.json) — measured book economics per
