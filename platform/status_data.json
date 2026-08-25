@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-24T22:18:12+00:00",
-    "commit": "181eb1b"
+    "generated_at": "2026-08-25T11:15:48+07:00",
+    "commit": "55e7090"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-24",
+    "eta_date": "2026-08-25",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,78 @@
   ],
   "activity": [
     {
+      "date": "2026-08-25T11:15:48+07:00",
+      "sha": "55e7090",
+      "summary": "feat(exposure): surface measured per-product delinquency & return from tape_real.json (#614)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-25T04:05:46+00:00",
+      "sha": "e7760bf",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-25, run 32807513510)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-25T03:16:49+00:00",
+      "sha": "410fb73",
+      "summary": "data: NABC live prices (2026-08-25, run 32804229933)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-25T02:16:15+00:00",
+      "sha": "de4d4dc",
+      "summary": "docs(progress): log ux-csv-export-filename-vintage merge+deploy+verify (PR #613)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-25T09:12:20+07:00",
+      "sha": "5a859ca",
+      "summary": "ux: date-stamp the four static CSV export filenames with data vintage (#613)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-25T00:47:07+00:00",
+      "sha": "b3cd0a6",
+      "summary": "feat(exposure): surface measured agri-book delinquency from tape_real.json (#612)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-24T23:52:01+00:00",
+      "sha": "2aa8e94",
+      "summary": "data: macro indicators (2026-08-24, run 32781583890) (#609)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-24T23:27:36+00:00",
+      "sha": "41f8adf",
+      "summary": "data: rival Facebook promo feed refresh (run 32784276197) (#611)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-24T23:03:46+00:00",
+      "sha": "69702e2",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-24T23:02:55+00:00",
+      "sha": "212212d",
+      "summary": "data: live fuel prices (2026-08-24, run 32787313295)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-24T23:01:05+00:00",
+      "sha": "de54f11",
+      "summary": "data: market-pulse swarm refresh (run 32782011079) (#610)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-24T22:18:58+00:00",
+      "sha": "81020b5",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after site-health comment fix",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-24T22:18:12+00:00",
       "sha": "181eb1b",
       "summary": "fix(site-health): correct SSO-exempt fallback hostname in workflow comment",
@@ -639,78 +711,6 @@
       "sha": "312b7c0",
       "summary": "data: ThaiWater flood + rain pulse (2026-08-24, run 32714943303)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T09:08:25+00:00",
-      "sha": "6c4dab6",
-      "summary": "data: NABC live prices (2026-08-24, run 32709418426)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T08:25:36+00:00",
-      "sha": "7e1dabc",
-      "summary": "docs(progress): log #branches default-sort ship (PR #600, deployed + verified)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-24T15:20:28+07:00",
-      "sha": "0671249",
-      "summary": "ux: default the #branches list to portfolio-risk sort (worst-first) (#600)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-24T07:01:06+00:00",
-      "sha": "f5f5b59",
-      "summary": "fix(data): repair pull_oae_yield.py for OAE's 2026 catalog migration (#599)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T05:22:30+00:00",
-      "sha": "cd3c288",
-      "summary": "data(census): refresh the Union Auction forward book (run 32689900309) (#597)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T05:01:50+00:00",
-      "sha": "7ecb54d",
-      "summary": "data: market-pulse swarm refresh (run 32689839225) (#598)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-24T04:15:48+00:00",
-      "sha": "d3f0608",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after dead-vcoll-fetch removal ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-24T11:14:55+07:00",
-      "sha": "725ac95",
-      "summary": "service(dead-code): remove orphaned client-side vehicle_collateral.json fetch (VCOLL) (#596)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-24T04:11:49+00:00",
-      "sha": "01f12c2",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-24, run 32688975950)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T03:20:36+00:00",
-      "sha": "0903ce5",
-      "summary": "data: NABC live prices (2026-08-24, run 32685810016)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T02:31:01+00:00",
-      "sha": "e4cf471",
-      "summary": "docs: log ux-tblwrap-inline-region-a11y merge + deploy-verify (PR #595)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-24T09:26:50+07:00",
-      "sha": "3957c51",
-      "summary": "ux: inline .tblwrap scroll regions keyboard-reachable + labelled (WCAG 2.1.1) (#595)",
-      "pillar": "uxui"
     }
   ]
 }
