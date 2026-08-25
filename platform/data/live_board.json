@@ -85,8 +85,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "10 observations from 2026-07-17, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 10,
+    "note": "11 observations from 2026-07-17, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 11,
     "series": "set_mtc_mcap"
    },
    "key": "peer_scoreboard",
@@ -292,7 +292,7 @@
    "stamp_iso": "2026-08-25",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4415,
+   "value": 4410,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -316,7 +316,7 @@
    "stamp_iso": "2026-08-25",
    "stamp_kind": "pulled",
    "unit": "of 795",
-   "value": 134,
+   "value": 144,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -508,7 +508,7 @@
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
   "history_note": "A trend line is drawn only where a stored series exists. 10 of 24 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 287,
+  "history_points": 288,
   "missing_files": [],
   "n_feeds": 24,
   "n_with_history": 10,
