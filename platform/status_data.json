@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-25T23:42:50+07:00",
-    "commit": "9ce1599"
+    "generated_at": "2026-08-26T05:29:11+07:00",
+    "commit": "d4b1ef1"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-25",
+    "eta_date": "2026-08-26",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-08-26T05:29:11+07:00",
+      "sha": "d4b1ef1",
+      "summary": "feat(command-center): MEASURED real-book axis on the double-pressure join (obj #1 × obj #2) (#632)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-25T21:52:29+00:00",
+      "sha": "66c23c7",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-25T21:50:56+00:00",
+      "sha": "f9566b9",
+      "summary": "data: social listening refresh (run 32898449963) (#629)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-25T21:49:33+00:00",
+      "sha": "460dd8e",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-25, run 32902895772)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-25T20:54:31+00:00",
+      "sha": "71bc41e",
+      "summary": "data: Thai-IP-only swarm refresh (run 32891453092) (#627)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-25T20:14:38+00:00",
+      "sha": "1981c9a",
+      "summary": "docs: log ux-reduced-motion-data-status merge+deploy+verify (PR #628)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-26T03:12:51+07:00",
+      "sha": "16ef9af",
+      "summary": "ux: honour prefers-reduced-motion on data.html + status.html (#628)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-25T18:29:09+00:00",
+      "sha": "9b771d4",
+      "summary": "docs(contract): correct stale competitor claim + document MEASURED layers shipped since",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-25T17:18:59+00:00",
+      "sha": "aa38b29",
+      "summary": "data: market-pulse swarm refresh (run 32870306088) (#625)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-25T16:49:19+00:00",
+      "sha": "6453e57",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after peer book-intensity×return ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-25T23:42:50+07:00",
       "sha": "9ce1599",
       "summary": "feat(acq): join book-per-door intensity with SET-measured ROE/PBV (peer comparison, obj #2) (#626)",
@@ -651,66 +711,6 @@
       "sha": "410fb73",
       "summary": "data: NABC live prices (2026-08-25, run 32804229933)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-25T02:16:15+00:00",
-      "sha": "de4d4dc",
-      "summary": "docs(progress): log ux-csv-export-filename-vintage merge+deploy+verify (PR #613)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-25T09:12:20+07:00",
-      "sha": "5a859ca",
-      "summary": "ux: date-stamp the four static CSV export filenames with data vintage (#613)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-25T00:47:07+00:00",
-      "sha": "b3cd0a6",
-      "summary": "feat(exposure): surface measured agri-book delinquency from tape_real.json (#612)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-24T23:52:01+00:00",
-      "sha": "2aa8e94",
-      "summary": "data: macro indicators (2026-08-24, run 32781583890) (#609)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T23:27:36+00:00",
-      "sha": "41f8adf",
-      "summary": "data: rival Facebook promo feed refresh (run 32784276197) (#611)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-24T23:03:46+00:00",
-      "sha": "69702e2",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-24T23:02:55+00:00",
-      "sha": "212212d",
-      "summary": "data: live fuel prices (2026-08-24, run 32787313295)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T23:01:05+00:00",
-      "sha": "de54f11",
-      "summary": "data: market-pulse swarm refresh (run 32782011079) (#610)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-24T22:18:58+00:00",
-      "sha": "81020b5",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after site-health comment fix",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-24T22:18:12+00:00",
-      "sha": "181eb1b",
-      "summary": "fix(site-health): correct SSO-exempt fallback hostname in workflow comment",
-      "pillar": "deployment"
     }
   ]
 }
