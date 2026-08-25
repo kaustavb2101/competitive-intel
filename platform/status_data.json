@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-25T17:22:10+07:00",
-    "commit": "5ef2c34"
+    "generated_at": "2026-08-25T23:42:50+07:00",
+    "commit": "9ce1599"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-08-25T23:42:50+07:00",
+      "sha": "9ce1599",
+      "summary": "feat(acq): join book-per-door intensity with SET-measured ROE/PBV (peer comparison, obj #2) (#626)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-25T16:04:50+00:00",
+      "sha": "4946e40",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-25, run 32869554890)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-25T14:44:04+00:00",
+      "sha": "d605012",
+      "summary": "chore(docs): log ux-databook-branches-aria-sort merge+deploy+verify (PR #624)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-25T21:41:14+07:00",
+      "sha": "d35ed41",
+      "summary": "ux: announce sort state on data-book \"All branches\" table (aria-sort) (#624)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-25T12:53:23+00:00",
+      "sha": "087b87c",
+      "summary": "feat(exposure): occupation×income 90+dpd heat-grid from the real tape (obj #1) (#623)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-25T12:12:47+00:00",
+      "sha": "d7bf5db",
+      "summary": "data: SET listed-peer scoreboard refresh (run 32843427239) (#622)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-25T11:30:42+00:00",
+      "sha": "99da339",
+      "summary": "data: market-pulse swarm refresh (run 32835227816) (#619)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-25T11:06:55+00:00",
+      "sha": "fc1b336",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 32836868860) (#621)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-25T10:22:56+00:00",
+      "sha": "1968fe0",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after book-per-point ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-25T17:22:10+07:00",
       "sha": "5ef2c34",
       "summary": "feat(acq): book-per-MEASURED-service-point companion to book-per-branch (#620)",
@@ -657,60 +711,6 @@
       "sha": "181eb1b",
       "summary": "fix(site-health): correct SSO-exempt fallback hostname in workflow comment",
       "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-24T21:50:17+00:00",
-      "sha": "31f7925",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-24, run 32781443610)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T20:59:17+00:00",
-      "sha": "76303b9",
-      "summary": "data: Thai-IP-only swarm refresh (run 32769955280) (#607)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-24T20:20:23+00:00",
-      "sha": "361ecda",
-      "summary": "chore(progress-log): record ux-loop close-out — branch-explorer user-scalable=no drop (PR #608, deployed + verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-25T03:17:25+07:00",
-      "sha": "cff01fc",
-      "summary": "ux: drop user-scalable=no from branch-explorer viewport (WCAG 1.4.4 parity) (#608)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-24T18:39:24+00:00",
-      "sha": "52acb2a",
-      "summary": "feat(overview): surface the vehicle_mix.regions pickup-replacement gap rollup (#606)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-24T17:06:17+00:00",
-      "sha": "9926134",
-      "summary": "data: market-pulse swarm refresh (run 32748850394) (#605)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-24T16:28:54+00:00",
-      "sha": "4ca21d4",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after health-sweep close-out",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-24T16:27:54+00:00",
-      "sha": "5739173",
-      "summary": "service(deploy-health): verified full-stack health sweep GREEN — docs-only close-out, no forced fix",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-24T16:00:11+00:00",
-      "sha": "7395f21",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-24, run 32748069961)",
-      "pillar": "data-integration"
     }
   ]
 }
