@@ -3583,6 +3583,21 @@ function loadAgriSqueeze(){
     .catch(()=>{ AGRISQ=null; return null; });
   return agrisqPromise;
 }
+// COLLATERAL-COMPETITIVE SQUEEZE (collateral_squeeze.json) — the THIRD DISTINCT cross alongside the
+// household double-pressure and agri-squeeze boards: the portfolio axis here is the COLLATERAL recovery
+// channel (collateral_outlook `outlook`: ESTIMATED directional composite of a MEASURED gold direction,
+// MEASURED BoT used-vehicle resale-price direction, and the MEASURED motorcycle-title fleet share),
+// crossed with the SAME competitive axis (peer_province rival:AutoX ratio). It names provinces whose
+// title-loan collateral is softening exactly where rivals dominate — the recovery-value channel neither
+// the DTI nor the agri board sees. Fetches once, caches, degrades to null.
+let COLLATSQ=null, collatsqPromise=null;
+function loadCollateralSqueeze(){
+  if(collatsqPromise) return collatsqPromise;
+  collatsqPromise=fetch('data/collateral_squeeze.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ COLLATSQ=(j&&Array.isArray(j.provinces))?j:null; return COLLATSQ; })
+    .catch(()=>{ COLLATSQ=null; return null; });
+  return collatsqPromise;
+}
 function renderPeerProvince(){
   const tbl=$('#peerprovtbl'); if(!tbl) return;
   if(peerprovLoaded){ drawPeerProvince(); return; }
@@ -10683,6 +10698,59 @@ function renderHomeAgriSqueeze(){
   wrapTables();   // mounts AFTER the AGRISQ fetch resolves, past boot-time wrapTables() — upgrade its .tblwrap to a keyboard-reachable, labelled scroll region (WCAG 2.1.1)
   wrap.style.display='';
 }
+/* ---------- COLLATERAL-COMPETITIVE SQUEEZE PROVINCE WATCHLIST (obj #1 × obj #2, the THIRD cross) ----------
+   Surfaces data/collateral_squeeze.json (build_collateral_squeeze.py): the NAMED provinces top-third on BOTH
+   the COLLATERAL portfolio axis (collat_risk_pctile — collateral_outlook `outlook`: ESTIMATED directional
+   recovery-value composite of a MEASURED gold direction + MEASURED BoT used-vehicle resale-price direction +
+   MEASURED motorcycle-title fleet share) AND rival dominance (contest_pctile — same measured rival:AutoX census
+   as the double-pressure and agri cards above). This is a THIRD question, distinct from both the household-DTI
+   and the agri boards: it sees the collateral recovery-value channel neither of those captures. We RANK & show,
+   never recompute. Both axes are RELATIVE percentiles over the same 77 provinces → a RANKING ("worse than most
+   provinces on both"), NOT a probability; the portfolio axis is an ESTIMATED directional outlook whose price
+   legs are measured but NATIONAL, so its cross-province ordering keys on the MEASURED moto-title fleet share
+   (stated inline). NO open/close/expand call — a risk lens on the network we run. Null-safe: stays hidden until
+   COLLATSQ resolves and only appears when at least one squeeze province exists. Mounted directly below the agri
+   card so the three crosses read together. */
+function renderHomeCollatSqueeze(){
+  const wrap=$('#cc-collatsqueeze'), body=$('#cc-collatsqueeze-body');
+  if(!wrap||!body) return;
+  const recs=(COLLATSQ&&Array.isArray(COLLATSQ.provinces))?COLLATSQ.provinces:[];
+  if(!recs.length) return;                                   // stay hidden until the fetch resolves
+  const sq=recs.filter(r=>r&&r.collat_squeeze)
+    .sort((a,b)=>(b.squeeze_min||0)-(a.squeeze_min||0));      // worst collateral-squeeze first
+  if(!sq.length) return;                                     // no province top-third on BOTH → stay hidden
+  const m=COLLATSQ.meta||{};
+  const pct=v=>(typeof v==='number')?Math.round(v):'—';
+  const rat=v=>(typeof v==='number')?v.toFixed(1)+'×':'—';
+  const pctg=v=>(typeof v==='number')?Math.round(v*100)+'%':'—';
+  // Which of these collateral-squeeze provinces ALSO sit on the household double-pressure board and/or the
+  // agri-squeeze board (the intersection of the three crosses) — computed from the sibling layers already
+  // loaded, so the card can say what is NEW here (a collateral risk neither other board flags).
+  const dpSet=(PROVPRESS&&Array.isArray(PROVPRESS.provinces))
+    ? new Set(PROVPRESS.provinces.filter(r=>r&&r.double_pressure).map(r=>r.province_th)) : null;
+  const agSet=(AGRISQ&&Array.isArray(AGRISQ.provinces))
+    ? new Set(AGRISQ.provinces.filter(r=>r&&r.agri_squeeze).map(r=>r.province_th)) : null;
+  body.innerHTML=
+    `<div class="tblwrap"><table class="tbl"><tr><th scope="col">Province</th>`+
+      `<th scope="col" title="Collateral portfolio-risk percentile (obj #1) — 0–100 rank of the softening direction of collateral_outlook `+"`outlook`"+` across the 77 provinces. An ESTIMATED directional recovery-value composite (MEASURED global gold + MEASURED BoT used-vehicle resale-price + MEASURED motorcycle-title fleet share); its price legs are national, so the cross-province order keys on moto-title exposure.">Collateral softening ▼</th>`+
+      `<th scope="col" title="Competitive-risk percentile (obj #2) — 0–100 rank of the MEASURED rival:AutoX branch ratio across the 77 provinces (same census as the double-pressure and agri boards).">Rival ◆</th>`+
+      `<th scope="col" title="Rivals ÷ AutoX branches in the province (MEASURED census), and the top rival brand.">Outgunned</th>`+
+      `<th scope="col" title="Motorcycle share of the province DLT vehicle fleet (MEASURED) — the fast-depreciating, hard-to-price title collateral that drives the softening axis; and whether the household or agri board also flags this province.">Collateral base</th>`+
+      `</tr>`+
+    sq.map(r=>{
+      const alsoDP=dpSet?dpSet.has(r.province_th):false;
+      const alsoAG=agSet?agSet.has(r.province_th):false;
+      return `<tr>
+        <td><b style="border-left:3px solid var(--collat);padding-left:7px">${r.province_th||'—'}</b> <span class="sub">${r.region||''}</span></td>
+        <td class="mono" style="color:var(--collat)"><b>${pct(r.collat_risk_pctile)}</b> <span class="sub" style="font-weight:400">${r.used_veh_yoy!=null?'used-veh '+((+r.used_veh_yoy>=0)?'+':'')+(+r.used_veh_yoy).toFixed(1)+'%':''}</span></td>
+        <td class="mono" style="color:var(--collat)"><b>${pct(r.contest_pctile)}</b></td>
+        <td class="mono">${rat(r.ratio)} <span class="sub" style="font-weight:400">${r.leader?'· '+r.leader:''}</span></td>
+        <td class="sub" style="font-size:12px">${r.moto_title_share!=null?'moto '+pctg(r.moto_title_share)+' of fleet':'—'}${alsoDP?' <span class="mono" style="color:var(--agri)" title="Also top-third on the household debt-to-income double-pressure board">· also DTI ▲</span>':''}${alsoAG?' <span class="mono" style="color:var(--gold)" title="Also top-third on the agri-competitive squeeze board">· also agri ◆</span>':''}</td>
+      </tr>`;}).join('')+`</table></div>`+
+    `<div class="sub" style="margin-top:6px;color:var(--dim)"><b>${sq.length}</b> province${sq.length===1?'':'s'} sit top-third on <b>both</b> the <b>collateral</b>-softening axis and rival dominance — a book whose title-loan recovery value is trending the wrong way where margin defence is hardest. A THIRD, DISTINCT cross from the household-DTI and agri boards above: it reads the <b>collateral recovery</b> channel (used-vehicle resale prices + gold + motorcycle-title exposure) that neither debt-to-income nor farm income captures${(dpSet||agSet)?', so the provinces without an <b>· also DTI ▲</b> or <b>· also agri ◆</b> tag are ones the other two boards do not flag':''}. Where to look first, <b>not</b> a verdict or an action. The collateral axis is an <b>estimated directional</b> outlook (its price legs measured but national, so it keys on the <b>measured</b> moto-title fleet share${(m.mean_moto_title_share_in_alert_set!=null)?', mean '+Math.round(m.mean_moto_title_share_in_alert_set*100)+'% across this set':''}); rival ratio is <b>computed over MEASURED</b> census counts — a RANKING across the 77 provinces, not a probability. Full collateral read → <a class="cc-link no-print" data-v="overview" href="#overview" style="display:inline">Overview</a>; rival board → <a class="cc-link no-print" data-v="acq" href="#acq" style="display:inline">Competition</a>.</div>`;
+  wrapTables();   // mounts AFTER the COLLATSQ fetch resolves, past boot-time wrapTables() — upgrade its .tblwrap to a keyboard-reachable, labelled scroll region (WCAG 2.1.1)
+  wrap.style.display='';
+}
 /* ---------- REAL loan tape · assistance radar (obj #1, MEASURED) ----------
    data/tape_real.json (build_tape_layers.py ← ingest_real_tape.py no-PII aggregates).
    Card is hidden entirely when the layer is absent — calm, never fabricated. */
@@ -13067,6 +13135,7 @@ function renderHome(){
   renderHomeDefend();       // rival_threat_region.json — hardest-to-defend regions (lazy, null-safe)
   renderHomeDoublePressure(); // province_pressure.json — provinces top-third on BOTH axes (lazy, null-safe)
   renderHomeAgriSqueeze();  // agri_squeeze.json — provinces top-third on BOTH the AGRI axis AND rival dominance (lazy, null-safe)
+  renderHomeCollatSqueeze();// collateral_squeeze.json — provinces top-third on BOTH the COLLATERAL-softening axis AND rival dominance (lazy, null-safe)
   renderHomeMovers();       // deltas.json
   renderWatchlist();
   renderHomeDataRoom();     // provenance.json — measured/estimated/unlabelled census (lazy, null-safe)
@@ -13119,11 +13188,16 @@ function renderHome(){
     loadRivThreatRegion().then(()=>{ if(onHome()){ renderHomeDefend(); renderHomeThesis(); } });
     // obj#1 x obj#2 — the INTERSECTION clause: provinces both borrower-stressed AND rival-dominated
     // (province_pressure.json, a deterministic join of the two per-province axes). Null-safe re-render.
-    loadProvincePressure().then(()=>{ if(onHome()){ renderHomeThesis(); renderHomeDoublePressure(); renderHomeAgriSqueeze(); } });
+    loadProvincePressure().then(()=>{ if(onHome()){ renderHomeThesis(); renderHomeDoublePressure(); renderHomeAgriSqueeze(); renderHomeCollatSqueeze(); } });
     // obj#1(agri) x obj#2 — the DISTINCT agri-competitive squeeze: farm-borrower stress (crop_stress
     // agri_stress) AND rival dominance coincide (agri_squeeze.json). Loads after province_pressure so the
     // card can tag which squeeze provinces are ALSO household double-pressure. Null-safe re-render.
-    loadAgriSqueeze().then(()=>{ if(onHome()) renderHomeAgriSqueeze(); });
+    loadAgriSqueeze().then(()=>{ if(onHome()){ renderHomeAgriSqueeze(); renderHomeCollatSqueeze(); } });
+    // obj#1(collateral) x obj#2 — the THIRD DISTINCT cross, the collateral-competitive squeeze: title-loan
+    // collateral RECOVERY softening (collateral_outlook `outlook`) AND rival dominance coincide
+    // (collateral_squeeze.json). Re-renders on the provpress/agri loaders too so its "· also DTI ▲ / · also
+    // agri ◆" cross-tags fill in as the sibling boards resolve. Null-safe.
+    loadCollateralSqueeze().then(()=>{ if(onHome()) renderHomeCollatSqueeze(); });
     const c=$('#cc-csv'), p=$('#cc-print');
     if(c) c.onclick=ccBriefCSV;
     if(p) p.onclick=()=>window.print();
