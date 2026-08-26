@@ -936,6 +936,10 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
 .sim-toggle{cursor:pointer}
 .sim-toggle input{accent-color:var(--agri);margin-right:6px}
 .sim-out .grid.macro{margin-bottom:6px}
+/* sim provenance captions carry long unbreakable filename tokens (e.g. factory_income_by_province.json);
+   in the narrow auto-fit macro cards (~118px content box on iPad-portrait 768px) they bleed past the
+   card border. Break the token to fit — same fix the #expocards .mcard .n captions already use (:446). */
+#v-sim .mcard .n{overflow-wrap:anywhere}
 
 /* ---------- Acquisition: in-tab jump-nav + collapsible sections ---------- */
 .jumpnav{display:flex;gap:7px;flex-wrap:wrap;position:sticky;top:48px;z-index:20;
