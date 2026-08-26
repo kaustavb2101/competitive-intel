@@ -3570,6 +3570,19 @@ function provpressHasData(){return !!(PROVPRESS_BY_TH&&Object.keys(PROVPRESS_BY_
 // BOTH axes. ESTIMATED (the stress axis is a percentile blend of measured inputs); a RANKING, never a
 // probability. 0/absent when the province isn't scored — never a guessed value.
 function dblPressVal(d){const p=PROVPRESS_BY_TH&&PROVPRESS_BY_TH[d.v]; return p&&p.both_min!=null?Math.round(p.both_min*10)/10:0;}
+// AGRI-COMPETITIVE SQUEEZE (agri_squeeze.json) — a DISTINCT cross from province_pressure above: the
+// portfolio axis here is AGRICULTURAL (crop_stress agri_stress: MEASURED farm-gate price + OAE drought),
+// not the household debt-to-income blend. Crossed with the SAME competitive axis (peer_province
+// rival:AutoX ratio), it names provinces whose FARM book is fragile exactly where rivals dominate — the
+// farm-income channel the DTI double-pressure board cannot see. Fetches once, caches, degrades to null.
+let AGRISQ=null, agrisqPromise=null;
+function loadAgriSqueeze(){
+  if(agrisqPromise) return agrisqPromise;
+  agrisqPromise=fetch('data/agri_squeeze.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ AGRISQ=(j&&Array.isArray(j.provinces))?j:null; return AGRISQ; })
+    .catch(()=>{ AGRISQ=null; return null; });
+  return agrisqPromise;
+}
 function renderPeerProvince(){
   const tbl=$('#peerprovtbl'); if(!tbl) return;
   if(peerprovLoaded){ drawPeerProvince(); return; }
@@ -10623,6 +10636,53 @@ function renderHomeDoublePressure(){
   wrapTables();   // this card mounts AFTER the PROVPRESS fetch resolves, past the boot-time wrapTables() — upgrade its inline .tblwrap to a keyboard-reachable, labelled scroll region (WCAG 2.1.1)
   wrap.style.display='';
 }
+/* ---------- AGRI-COMPETITIVE SQUEEZE PROVINCE WATCHLIST (obj #1 × obj #2, DISTINCT cross) ----------
+   Surfaces data/agri_squeeze.json (build_agri_squeeze.py): the NAMED provinces top-third on BOTH the
+   AGRICULTURAL portfolio axis (agri_pctile — crop_stress agri_stress: MEASURED farm-gate price + OAE
+   drought) AND rival dominance (contest_pctile — same measured rival:AutoX census as the double-pressure
+   card above). This is a DIFFERENT question from the household-DTI board: it sees the farm-income channel
+   the DTI blend cannot. We RANK & show, never recompute. Both axes are RELATIVE percentiles over the same
+   77 provinces → a RANKING ("worse than most provinces on both"), NOT a probability; the combined read is
+   MIXED-leaning-measured (farm-gate + drought are measured; a global price proxy is a fallback only for
+   unpriced crops — price_coverage is carried). NO open/close/expand call — a risk lens on the network we
+   run. Null-safe: stays hidden until AGRISQ resolves and only appears when at least one squeeze province
+   exists. Deliberately mounted directly below the double-pressure card so the two crosses read together. */
+function renderHomeAgriSqueeze(){
+  const wrap=$('#cc-agrisqueeze'), body=$('#cc-agrisqueeze-body');
+  if(!wrap||!body) return;
+  const recs=(AGRISQ&&Array.isArray(AGRISQ.provinces))?AGRISQ.provinces:[];
+  if(!recs.length) return;                                   // stay hidden until the fetch resolves
+  const sq=recs.filter(r=>r&&r.agri_squeeze)
+    .sort((a,b)=>(b.squeeze_min||0)-(a.squeeze_min||0));      // worst agri-squeeze first
+  if(!sq.length) return;                                     // no province top-third on BOTH → stay hidden
+  const m=AGRISQ.meta||{};
+  const pct=v=>(typeof v==='number')?Math.round(v):'—';
+  const rat=v=>(typeof v==='number')?v.toFixed(1)+'×':'—';
+  const pctg=v=>(typeof v==='number')?Math.round(v*100)+'%':'—';
+  // Which of these agri-squeeze provinces are ALSO household double-pressure (the intersection of the two
+  // crosses) — computed from the sibling layer already loaded, so the card can say what is NEW here.
+  const dpSet=(PROVPRESS&&Array.isArray(PROVPRESS.provinces))
+    ? new Set(PROVPRESS.provinces.filter(r=>r&&r.double_pressure).map(r=>r.province_th)) : null;
+  body.innerHTML=
+    `<div class="tblwrap"><table class="tbl"><tr><th scope="col">Province</th>`+
+      `<th scope="col" title="Agricultural portfolio-risk percentile (obj #1) — 0–100 rank of crop_stress agri_stress (MEASURED Thai farm-gate price + OAE drought) across the 77 provinces. MIXED-leaning-measured; a global price proxy is a fallback only for unpriced crops.">Farm stress ▲</th>`+
+      `<th scope="col" title="Competitive-risk percentile (obj #2) — 0–100 rank of the MEASURED rival:AutoX branch ratio across the 77 provinces (same census as the double-pressure board).">Rival ◆</th>`+
+      `<th scope="col" title="Rivals ÷ AutoX branches in the province (MEASURED census), and the top rival brand.">Outgunned</th>`+
+      `<th scope="col" title="The province's dominant crop by planted area (OAE), and whether the household double-pressure board also flags it.">What they grow</th>`+
+      `</tr>`+
+    sq.map(r=>{
+      const alsoDP=dpSet?dpSet.has(r.province_th):false;
+      return `<tr>
+        <td><b style="border-left:3px solid var(--gold);padding-left:7px">${r.province_th||'—'}</b> <span class="sub">${r.region||''}</span></td>
+        <td class="mono" style="color:var(--gold)"><b>${pct(r.agri_pctile)}</b> <span class="sub" style="font-weight:400">${r.drought!=null?'drought '+(+r.drought).toFixed(2):''}${(r.price_coverage!=null&&r.price_coverage<1)?' · price cov '+pctg(r.price_coverage):''}</span></td>
+        <td class="mono" style="color:var(--gold)"><b>${pct(r.contest_pctile)}</b></td>
+        <td class="mono">${rat(r.ratio)} <span class="sub" style="font-weight:400">${r.leader?'· '+r.leader:''}</span></td>
+        <td class="sub" style="font-size:12px">${r.top_crop||'—'}${alsoDP?' <span class="mono" style="color:var(--agri)" title="Also top-third on the household debt-to-income double-pressure board — stressed on both channels">· also DTI ▲</span>':''}</td>
+      </tr>`;}).join('')+`</table></div>`+
+    `<div class="sub" style="margin-top:6px;color:var(--dim)"><b>${sq.length}</b> province${sq.length===1?'':'s'} sit top-third on <b>both</b> the <b>agricultural</b>-stress axis and rival dominance — a fragile <b>farm</b> book where margin defence is hardest. A DISTINCT cross from the household-DTI board above: it reads the farm-income channel (farm-gate price + drought) that debt-to-income cannot see${dpSet?', so the provinces without an <b>· also DTI ▲</b> tag are ones the household board does not flag':''}. Where to look first, <b>not</b> a verdict or an action. Farm stress is <b>measured</b> (Thai farm-gate + OAE drought${(m.min_price_coverage_in_alert_set!=null&&m.min_price_coverage_in_alert_set>=1)?', 100% farm-gate-priced in this set':''}); rival ratio is <b>computed over MEASURED</b> census counts — a RANKING across the 77 provinces, not a probability. Full board &amp; brand split → <a class="cc-link no-print" data-v="acq" href="#acq" style="display:inline">Competition</a>.</div>`;
+  wrapTables();   // mounts AFTER the AGRISQ fetch resolves, past boot-time wrapTables() — upgrade its .tblwrap to a keyboard-reachable, labelled scroll region (WCAG 2.1.1)
+  wrap.style.display='';
+}
 /* ---------- REAL loan tape · assistance radar (obj #1, MEASURED) ----------
    data/tape_real.json (build_tape_layers.py ← ingest_real_tape.py no-PII aggregates).
    Card is hidden entirely when the layer is absent — calm, never fabricated. */
@@ -13006,6 +13066,7 @@ function renderHome(){
   renderHomeMacro();        // META.macro + META.board
   renderHomeDefend();       // rival_threat_region.json — hardest-to-defend regions (lazy, null-safe)
   renderHomeDoublePressure(); // province_pressure.json — provinces top-third on BOTH axes (lazy, null-safe)
+  renderHomeAgriSqueeze();  // agri_squeeze.json — provinces top-third on BOTH the AGRI axis AND rival dominance (lazy, null-safe)
   renderHomeMovers();       // deltas.json
   renderWatchlist();
   renderHomeDataRoom();     // provenance.json — measured/estimated/unlabelled census (lazy, null-safe)
@@ -13058,7 +13119,11 @@ function renderHome(){
     loadRivThreatRegion().then(()=>{ if(onHome()){ renderHomeDefend(); renderHomeThesis(); } });
     // obj#1 x obj#2 — the INTERSECTION clause: provinces both borrower-stressed AND rival-dominated
     // (province_pressure.json, a deterministic join of the two per-province axes). Null-safe re-render.
-    loadProvincePressure().then(()=>{ if(onHome()){ renderHomeThesis(); renderHomeDoublePressure(); } });
+    loadProvincePressure().then(()=>{ if(onHome()){ renderHomeThesis(); renderHomeDoublePressure(); renderHomeAgriSqueeze(); } });
+    // obj#1(agri) x obj#2 — the DISTINCT agri-competitive squeeze: farm-borrower stress (crop_stress
+    // agri_stress) AND rival dominance coincide (agri_squeeze.json). Loads after province_pressure so the
+    // card can tag which squeeze provinces are ALSO household double-pressure. Null-safe re-render.
+    loadAgriSqueeze().then(()=>{ if(onHome()) renderHomeAgriSqueeze(); });
     const c=$('#cc-csv'), p=$('#cc-print');
     if(c) c.onclick=ccBriefCSV;
     if(p) p.onclick=()=>window.print();
