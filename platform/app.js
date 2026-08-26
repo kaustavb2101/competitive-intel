@@ -3147,6 +3147,7 @@ function renderCompetition(){
     META.cws.map(c=>`<tr><td class="mono" style="color:var(--collat)">${c.c}</td><td class="mono">${c.veh}</td><td class="mono">${c.gold}</td><td class="mono">${c.own}</td><td>${c.v}</td><td class="sub">${c.n}</td></tr>`).join('');
   renderGapBoard();
   renderPeerScore();
+  renderPeerAssetQuality();
   renderDebtSource();
   // SPLIT 2026-08-17 — eight renderers left this function for renderBrand(): renderSearchDemand,
   // renderRivalPulse (Play + iOS in one call), renderRivalFacebook, renderRivalAds, renderRivalVideo,
@@ -3962,6 +3963,62 @@ function drawPeerScore(){
          m.roe_caveat||'ROE is each peer’s own SET-reported ratio.',
          m.holdco_caveat||null,
          m.fs_type_caveat||null]);
+  }
+}
+
+/* ---------- listed-peer loan-book asset quality · SET filings (obj #2 × #1, MEASURED) ----------
+   Surfaces data/peer_asset_quality.json (build_peer_asset_quality.py, parsed from the six SET-listed
+   peers' own IFRS-9 credit-quality NOTES). Stage-3 (non-performing / credit-impaired) gross share of
+   gross receivables + ECL coverage. NOT in the SET market-data API — read from the filings themselves.
+   MEASURED, the rivals' own disclosures. NOT an AutoX row (unlisted). Lazy, null-safe, graceful. */
+let PEERAQ=null, peeraqLoaded=false;
+function renderPeerAssetQuality(){
+  const tbl=$('#peeraqtbl'); if(!tbl) return;
+  if(peeraqLoaded){ drawPeerAssetQuality(); return; }
+  fetch('data/peer_asset_quality.json').then(r=>r.ok?r.json():null).then(j=>{
+    PEERAQ=j; peeraqLoaded=true; drawPeerAssetQuality();
+  }).catch(()=>{ PEERAQ=null; peeraqLoaded=true; drawPeerAssetQuality(); });
+}
+function drawPeerAssetQuality(){
+  const tbl=$('#peeraqtbl'), ro=$('#peeraqreadout'); if(!tbl) return;
+  const peers=(PEERAQ&&Array.isArray(PEERAQ.peers))?PEERAQ.peers:[];
+  if(!peers.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Peer asset-quality read not available.</b> <span class="sub">data/peer_asset_quality.json is absent — run pipeline/pull_set_filings.py then build_peer_asset_quality.py.</span>';
+    return;
+  }
+  const m=PEERAQ.meta||{};
+  const npls=peers.map(p=>p.npl_pct).filter(v=>typeof v==='number');
+  const hiNpl=Math.max(...npls, 0.1);
+  // higher NPL = worse; colour the bar on the agri/red ramp so the eye reads "stress"
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Listed peer</th>`+
+    `<th scope="col" title="Stage-3 (non-performing / credit-impaired) gross receivables as a share of total gross receivables — the peer's own NPL-equivalent">NPL (Stage 3)</th>`+
+    `<th scope="col" title="expected-credit-loss allowance held against the Stage-3 book, as a share of Stage-3 gross">S3 coverage</th>`+
+    `<th scope="col" title="gross receivables book (loan + hire-purchase where reported separately)">Gross book</th>`+
+    `<th scope="col" title="reporting basis">Basis</th></tr>`+
+    peers.map((p,i)=>{
+      const bar=(typeof p.npl_pct==='number')?barHTML(p.npl_pct,'var(--agri)',hiNpl):'';
+      const poci=('poci_bn'in p)?` <span class="tag" title="${(p.poci_note||'').replace(/"/g,'&quot;')}">+POCI ฿${p.poci_bn}bn</span>`:'';
+      const basis=/unconsolidated/i.test(p.basis)?`<span title="company-only, not consolidated — not strictly like-for-like">${p.basis} ⚠</span>`:p.basis;
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${p.name||p.symbol}</b> <span class="sub mono">${p.symbol}</span></td>
+        <td class="mono">${bar} <b>${p.npl_pct}%</b></td>
+        <td class="mono sub">${p.s3_coverage_pct}%</td>
+        <td class="mono sub">฿${p.gross_book_bn}bn${poci}</td>
+        <td class="sub" style="font-size:11px">${basis}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const worst=peers[0], best=peers[peers.length-1];
+    ro.innerHTML=`<b>Rival non-performing (Stage-3) share, newest reviewed filings (as of ${m.as_of||'30 Jun 2026'}).</b> ${TAG_M} `+
+      `<b>${best.name}</b> runs the cleanest book (${best.npl_pct}% NPL), <b>${worst.name}</b> the most stressed (${worst.npl_pct}%). `+
+      `The wider a rival's non-performing share and the thinner its coverage, the less margin headroom it has to keep pricing hard against the network we run.`+
+      methodBox(null,
+        [`<b>Measured</b> — read directly from each peer's IFRS-9 credit-quality (Stage 1/2/3) tables in their reviewed financial-statement notes (${m.source||'Stock Exchange of Thailand · set.or.th'}).`,
+         (m.npl_definition||'Stage-3 gross ÷ total gross receivables, combined loan + hire-purchase book.'),
+         '<b>Not a regulator NPL</b> — this is the IFRS-9 Stage-3 gross share the peer itself discloses; comparable across these six (same accounting basis), not identical to a bank 90-days-past-due ratio.',
+         '<b>Not an AutoX row</b> — AutoX is unlisted and files no SET statements.',
+         (Array.isArray(m.caveats)&&m.caveats.length?m.caveats[1]:null)]);
   }
 }
 
