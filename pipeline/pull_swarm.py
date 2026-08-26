@@ -302,6 +302,28 @@ FEEDS = [
          label="DIW S-curve target-industry factory footprint per province (feeds ev_exposure)",
          cadence="monthly", ip="any", group="gov", out="source-data/scurve_by_province.json", timeout=600),
 
+    # The LAST keyless CI-reachable puller feeding a live layer that sat in NO scheduler, ageing in
+    # silence (same silent-stale failure mode as nabc_agri / tpso_cpi / diw_scurve above; the exact
+    # NEXT_STEPS §3 "widen pull_swarm's registry so no puller is left unscheduled to age in silence"
+    # item). Chain: pull_fuel_stations.py -> source-data/fuel_stations.json (national amenity=fuel POI,
+    # OSM Overpass) -> build_branch_fuel.py -> platform/data/branch_fuel.json (per-branch MEASURED
+    # fuel-station count <=10km; a vehicle-economy / rural-reach signal — where fuel sells, the vehicle
+    # collateral lives) -> surfaced live in platform/app.js as a per-branch popup line. It was in no
+    # workflow at all — last pull 2026-07-09 (48 days) — while its --check-gated builder (tests/run.sh
+    # L331, rc=3 SKIP when source-data/fuel_stations.json is absent) kept reproducing the same frozen
+    # POI vintage. VERIFIED reachable + EXIT=0 from THIS cloud runner 2026-08-26 (8,728 stations off the
+    # maps.mail.ru Overpass mirror, a genuine +22 vs the committed 8,706 — confirming the staleness gap
+    # is real; the drift was reverted, the SCHEDULE is the improvement, not a data revision). Keyless,
+    # stdlib+urllib only (no browser, no openpyxl/pdfplumber — no data-swarm.yml dep change needed);
+    # output is sorted -> byte-stable for unchanged upstream, so build_branch_fuel.py reproduces
+    # byte-identical when the POI set is unchanged. rederive_drift.py discovers builders by parsing
+    # tests/run.sh, so it rebuilds branch_fuel.json automatically on the next fresh pull. Quarterly:
+    # fuel-station POI drifts slowly (+22 in 48 days) and this is a weak, low-value proxy — hygiene, not
+    # intelligence — so the cheapest cadence that stops it ageing in silence is the right one.
+    dict(key="fuel_stations", script="pull_fuel_stations.py", args=["--stamp", STAMP],
+         label="National fuel-station POI (OSM amenity=fuel; feeds per-branch branch_fuel rural-reach signal)",
+         cadence="quarterly", ip="any", group="macro", out="source-data/fuel_stations.json", timeout=600),
+
     dict(key="google_trends", script="pull_google_trends.py", args=[],
          label="Google Trends demand + brand share-of-search (ESTIMATED)", cadence="monthly",
          ip="any", group="competitive", out="source-data/google_trends.json", timeout=1200),
