@@ -974,7 +974,8 @@ details.compsec>summary:focus-visible,details.ovsec>summary:focus-visible{outlin
    `display=swap`, so that fallback is also what EVERY phone paints first, and what stays on a slow
    Thai mobile connection. inline-block so it wraps INSIDE one continuous pill border instead of
    breaking the border across two lines. */
-.compsub .tag,.compsub2 .tag,.ovsub .tag{white-space:normal;display:inline-block;max-width:100%}
+.compsub .tag,.compsub2 .tag,.ovsub .tag,
+details.compsec>summary>h2 .tag,details.ovsec>summary>h2 .tag{white-space:normal;display:inline-block;max-width:100%}
 @media print{.jumpnav{display:none!important}details.compsec>summary::after,details.ovsec>summary::after{display:none}}
 
 /* ============================================================
