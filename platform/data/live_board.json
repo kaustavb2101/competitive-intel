@@ -44,14 +44,19 @@
    "file": "search_demand.json",
    "fresh_days": 10,
    "group": "Competition",
-   "history": null,
+   "history": {
+    "file": "feed_history.json",
+    "kind": "accumulated",
+    "note": "4 observations from 2026-07-04, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 4,
+    "series": "search_share_autox"
+   },
    "key": "search_demand",
    "label": "Brand share of search",
    "measured": true,
-   "no_history": "accumulating — 3 observations since 2026-07-04; the line is drawn once 4 have landed",
    "source": "Google Trends (geo=TH, REGION resolution, timeframe today 12-m)",
-   "stamp": "2026-08-09T21:56Z",
-   "stamp_iso": "2026-08-09",
+   "stamp": "2026-08-26T04:13Z",
+   "stamp_iso": "2026-08-26",
    "stamp_kind": "pulled_at_utc",
    "unit": "provinces",
    "value": 77,
@@ -316,7 +321,7 @@
    "stamp_iso": "2026-08-26",
    "stamp_kind": "pulled",
    "unit": "of 795",
-   "value": 126,
+   "value": 127,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -507,11 +512,11 @@
  "meta": {
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
-  "history_note": "A trend line is drawn only where a stored series exists. 10 of 24 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 291,
+  "history_note": "A trend line is drawn only where a stored series exists. 11 of 24 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
+  "history_points": 295,
   "missing_files": [],
   "n_feeds": 24,
-  "n_with_history": 10,
+  "n_with_history": 11,
   "source": "Per-feed stamps read from each platform/data layer's own meta block (pulled / as_of / vintage / updated). No value is re-derived here."
  }
 }
