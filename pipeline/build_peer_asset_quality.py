@@ -219,6 +219,7 @@ def build():
         div = spec["unit_div"]
         gross_k = s3_gross_k = s3_allow_k = allow_k = poci_k = 0.0
         books_used = []
+        book_gross_k = []  # per-book gross (฿k), same order as spec["books"]
         for label, tid in spec["books"]:
             b = parse_book(text, tid, spec["gross_col"], spec["allow_col"])
             gross_k += b["gross_total"] / div
@@ -227,6 +228,7 @@ def build():
             s3_allow_k += abs(b["s3_allow"]) / div
             poci_k += b["poci_gross"] / div
             books_used.append("%s (TABLE %d)" % (label, tid))
+            book_gross_k.append((label, b["gross_total"] / div))
         # organic NPL excludes POCI (a bought-distressed-debt line, SAWAD only)
         denom = gross_k
         npl = 100.0 * s3_gross_k / denom if denom else 0.0
@@ -238,6 +240,19 @@ def build():
         for f in sorted(fs_by.get(sym, []), key=lambda x: x["date"]):
             if f["date"] == fdate:
                 headline = f.get("headline", "")
+        # Book mix (objective #2 — what the rival lends against): the gross split between the
+        # secured "loan" book (title-loan / cash lending) and the "hire-purchase" book (vehicle
+        # instalment / asset-finance), each already reconciled to its printed Total above. Peers
+        # that file a single combined book (SAWAD, TURBO) carry one entry and single_book=True.
+        book_mix = []
+        hp_gross_k = 0.0
+        for label, gk in book_gross_k:
+            share = round(100.0 * gk / gross_k, 1) if gross_k else 0.0
+            book_mix.append({"label": label, "gross_bn": round(gk / 1e6, 2), "share_pct": share})
+            if re.search(r"hire[- ]?purchase", label, re.I):
+                hp_gross_k += gk
+        single_book = len(book_mix) < 2
+        hp_share_pct = None if single_book else round(100.0 * hp_gross_k / gross_k, 1) if gross_k else 0.0
         rec = {
             "symbol": sym, "name": spec["name"], "basis": spec["basis"],
             "npl_pct": round(npl, 1),
@@ -245,6 +260,9 @@ def build():
             "total_coverage_pct": round(tot_cov, 1),
             "gross_book_bn": round(gross_k / 1e6, 2),
             "nonperf_bn": round(s3_gross_k / 1e6, 3),
+            "book_mix": book_mix,
+            "hp_share_pct": hp_share_pct,
+            "single_book": single_book,
             "as_of": "2026-06-30",
             "filing_date": fdate,
             "filing": headline,
@@ -271,6 +289,13 @@ def build():
                            "is gross carrying value incl. accrued interest, net of unearned/deferred income, "
                            "as the peer presents it — combined across the loan + hire-purchase books where "
                            "reported separately."),
+        "book_mix_definition": ("book_mix splits each peer's gross receivables between the secured "
+                                "'loan' book (title-loan / cash lending — AutoX's direct competitive "
+                                "space) and the 'hire-purchase' book (vehicle instalment / asset finance), "
+                                "using the same per-table figures already reconciled to each printed Total. "
+                                "hp_share_pct is the hire-purchase share of the gross book; peers filing a "
+                                "single combined book (SAWAD, TURBO) carry single_book=true and hp_share_pct=null "
+                                "rather than a fabricated split."),
         "unit": "฿ thousand internally; published figures in ฿bn (2dp) and % (1dp).",
         "basis_note": ("Consolidated where reported. HENG files company-only (unconsolidated); SAK's "
                        "consolidated equals its separate statements. Each peer's basis is carried on its row."),
@@ -281,6 +306,8 @@ def build():
             "SAWAD's ratio excludes its purchased/originated-credit-impaired (bought distressed-debt) book, "
             "reported separately as poci_bn; including it would overstate organic delinquency.",
             "Latest interim (Q2/2026 reviewed) statements — reviewed, not year-end audited.",
+            "book_mix is the loan vs hire-purchase gross split as the peer classifies it, not a "
+            "collateral-type census; SAWAD and TURBO file a single combined book so no split is shown.",
             "Correctness guard: for every staging table parsed, the by-stage figures are asserted to "
             "reconcile to the peer's own printed Total (gross and allowance) before publication.",
         ],
