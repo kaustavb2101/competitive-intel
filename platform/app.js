@@ -3979,6 +3979,21 @@ function renderPeerAssetQuality(){
     PEERAQ=j; peeraqLoaded=true; drawPeerAssetQuality();
   }).catch(()=>{ PEERAQ=null; peeraqLoaded=true; drawPeerAssetQuality(); });
 }
+/* Book-mix cell: loan (secured title-loan) vs hire-purchase gross split, as a compact stacked bar +
+   label. Null-safe — an older layer with no book_mix, or a single-book filer, degrades gracefully. */
+function bookMixCell(p){
+  const mix=Array.isArray(p.book_mix)?p.book_mix:null;
+  if(!mix||!mix.length) return '<span class="sub">—</span>';
+  if(p.single_book) return '<span class="sub" style="font-size:11px" title="filed as one combined book — no loan/hire-purchase split disclosed">single combined book</span>';
+  const loan=mix.find(b=>!/hire[- ]?purchase/i.test(b.label));
+  const hp=mix.find(b=>/hire[- ]?purchase/i.test(b.label));
+  const loanPct=loan?loan.share_pct:(typeof p.hp_share_pct==='number'?+(100-p.hp_share_pct).toFixed(1):null);
+  const hpPct=(typeof p.hp_share_pct==='number')?p.hp_share_pct:(hp?hp.share_pct:null);
+  if(loanPct==null||hpPct==null) return '<span class="sub">—</span>';
+  const bar=`<span style="display:inline-flex;width:64px;height:8px;border-radius:2px;overflow:hidden;vertical-align:middle;margin-right:6px" title="loan ${loanPct}% · hire-purchase ${hpPct}%">`+
+    `<span style="width:${loanPct}%;background:var(--merch)"></span><span style="width:${hpPct}%;background:var(--gold)"></span></span>`;
+  return `${bar}<span class="mono sub" style="font-size:11px">${loanPct}% · ${hpPct}%</span>`;
+}
 function drawPeerAssetQuality(){
   const tbl=$('#peeraqtbl'), ro=$('#peeraqreadout'); if(!tbl) return;
   const peers=(PEERAQ&&Array.isArray(PEERAQ.peers))?PEERAQ.peers:[];
@@ -3995,6 +4010,7 @@ function drawPeerAssetQuality(){
     `<th scope="col" title="Stage-3 (non-performing / credit-impaired) gross receivables as a share of total gross receivables — the peer's own NPL-equivalent">NPL (Stage 3)</th>`+
     `<th scope="col" title="expected-credit-loss allowance held against the Stage-3 book, as a share of Stage-3 gross">S3 coverage</th>`+
     `<th scope="col" title="gross receivables book (loan + hire-purchase where reported separately)">Gross book</th>`+
+    `<th scope="col" title="gross split between the secured loan book (title-loan / cash lending — AutoX's direct space) and the hire-purchase book (vehicle instalment / asset finance)">Book mix (loan · HP)</th>`+
     `<th scope="col" title="reporting basis">Basis</th></tr>`+
     peers.map((p,i)=>{
       const bar=(typeof p.npl_pct==='number')?barHTML(p.npl_pct,'var(--agri)',hiNpl):'';
@@ -4006,13 +4022,25 @@ function drawPeerAssetQuality(){
         <td class="mono">${bar} <b>${p.npl_pct}%</b></td>
         <td class="mono sub">${p.s3_coverage_pct}%</td>
         <td class="mono sub">฿${p.gross_book_bn}bn${poci}</td>
+        <td>${bookMixCell(p)}</td>
         <td class="sub" style="font-size:11px">${basis}</td>
       </tr>`;}).join('');
   if(ro){
     const worst=peers[0], best=peers[peers.length-1];
+    // Book-mix read: which rivals compete head-on in the secured title-loan/cash book vs lean auto-finance.
+    const split=peers.filter(p=>p&&p.single_book===false&&typeof p.hp_share_pct==='number');
+    let mixLine='';
+    if(split.length){
+      const hpLean=split.slice().sort((a,b)=>b.hp_share_pct-a.hp_share_pct)[0];
+      const pureLoan=split.filter(p=>p.hp_share_pct<=5).map(p=>p.name||p.symbol);
+      const combined=peers.filter(p=>p&&p.single_book===true).map(p=>p.symbol||p.name);
+      const combinedTxt=combined.length?` ${combined.join(' and ')} file one combined book, so no split is shown.`:'';
+      mixLine=` <b>Book mix:</b> ${pureLoan.length?`${pureLoan.join(', ')} lend almost entirely through the secured loan book (≤5% hire-purchase) — head-on in the title-loan / cash space we run; `:''}`+
+        `<b>${hpLean.name}</b> leans most on hire-purchase (${hpLean.hp_share_pct}% of book — vehicle asset-finance, a step off the pure title-loan contest).${combinedTxt}`;
+    }
     ro.innerHTML=`<b>Rival non-performing (Stage-3) share, newest reviewed filings (as of ${m.as_of||'30 Jun 2026'}).</b> ${TAG_M} `+
       `<b>${best.name}</b> runs the cleanest book (${best.npl_pct}% NPL), <b>${worst.name}</b> the most stressed (${worst.npl_pct}%). `+
-      `The wider a rival's non-performing share and the thinner its coverage, the less margin headroom it has to keep pricing hard against the network we run.`+
+      `The wider a rival's non-performing share and the thinner its coverage, the less margin headroom it has to keep pricing hard against the network we run.`+mixLine+
       methodBox(null,
         [`<b>Measured</b> — read directly from each peer's IFRS-9 credit-quality (Stage 1/2/3) tables in their reviewed financial-statement notes (${m.source||'Stock Exchange of Thailand · set.or.th'}).`,
          (m.npl_definition||'Stage-3 gross ÷ total gross receivables, combined loan + hire-purchase book.'),
