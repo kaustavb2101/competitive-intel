@@ -8,53 +8,6 @@
  },
  "runs": [
   {
-   "append_history_rc": null,
-   "feeds": [
-    {
-     "bytes_after": 15373,
-     "bytes_before": 15373,
-     "key": "rival_promos",
-     "rc": 0,
-     "seconds": 5.3,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 7569503,
-     "bytes_before": 7318103,
-     "key": "pantip",
-     "rc": 0,
-     "seconds": 270.4,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 5613,
-     "bytes_before": 0,
-     "key": "datagoth",
-     "rc": 0,
-     "seconds": 141.5,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 915005,
-     "bytes_before": 915005,
-     "key": "nso_wages",
-     "rc": 0,
-     "seconds": 1.3,
-     "status": "changed"
-    }
-   ],
-   "finished": "2026-08-14T20:01:57Z",
-   "include_thai": true,
-   "jobs": 6,
-   "n_changed": 4,
-   "n_failed": 0,
-   "n_ok": 4,
-   "n_skipped": 0,
-   "n_timeout": 0,
-   "rederive_drift_rc": null,
-   "started": "2026-08-14T19:57:27Z"
-  },
-  {
    "append_history_rc": 0,
    "feeds": [
     {
@@ -3202,6 +3155,53 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-08-26T16:37:02Z"
+  },
+  {
+   "append_history_rc": null,
+   "feeds": [
+    {
+     "bytes_after": 15146,
+     "bytes_before": 15146,
+     "key": "rival_promos",
+     "rc": 0,
+     "seconds": 4.6,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 7817128,
+     "bytes_before": 7812315,
+     "key": "pantip",
+     "rc": 0,
+     "seconds": 265.4,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 5613,
+     "bytes_before": 0,
+     "key": "datagoth",
+     "rc": 0,
+     "seconds": 140.2,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 915005,
+     "bytes_before": 915005,
+     "key": "nso_wages",
+     "rc": 0,
+     "seconds": 0.9,
+     "status": "changed"
+    }
+   ],
+   "finished": "2026-08-26T22:13:56Z",
+   "include_thai": true,
+   "jobs": 6,
+   "n_changed": 4,
+   "n_failed": 0,
+   "n_ok": 4,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": null,
+   "started": "2026-08-26T22:09:31Z"
   }
  ]
 }
