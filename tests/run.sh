@@ -345,6 +345,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_peer_scoreboard.py --check (source-data/set_peers.json absent — SET pull, not data drift)"
   else bad "build_peer_scoreboard.py --check (peer_scoreboard.json drifted from source-data/set_peers.json)"
   fi
+  ( cd "$PIPE" && python3 build_peer_asset_quality.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_peer_asset_quality.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_peer_asset_quality.py --check (source-data/set_filings corpus absent — SET filings pull, not data drift)"
+  else bad "build_peer_asset_quality.py --check (peer_asset_quality.json drifted from source-data/set_filings NOTES — run: python3 pipeline/build_peer_asset_quality.py)"
+  fi
   ( cd "$PIPE" && python3 build_rival_reputation.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_rival_reputation.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_rival_reputation.py --check (source-data/competitor_ratings.json absent — Google Places pull, not data drift)"
