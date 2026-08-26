@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-26T05:29:11+07:00",
-    "commit": "d4b1ef1"
+    "generated_at": "2026-08-26T11:29:45+07:00",
+    "commit": "035f11a"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,72 @@
   ],
   "activity": [
     {
+      "date": "2026-08-26T11:29:45+07:00",
+      "sha": "035f11a",
+      "summary": "feat(acq): rival loan-book structure — secured loan vs hire-purchase split from SET filing NOTES (peer comparison, obj #2) (#637)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-26T04:09:11+00:00",
+      "sha": "a60ae02",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-26, run 32928978796)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-26T03:20:45+00:00",
+      "sha": "56e133a",
+      "summary": "data: NABC live prices (2026-08-26, run 32925814760)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-26T02:16:30+00:00",
+      "sha": "0fc6d6f",
+      "summary": "docs: log 2026-08-26 UX loop — keyboard-operable data.html rows (PR #635, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-26T09:13:34+07:00",
+      "sha": "987ca37",
+      "summary": "ux: keyboard-operable navigating rows in data.html (WCAG 2.1.1) (#635)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-26T00:54:45+00:00",
+      "sha": "5e3f559",
+      "summary": "feat(competition): rival loan-book asset quality — IFRS-9 Stage-3 NPL + ECL coverage from SET filing NOTES (#634)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-25T23:59:19+00:00",
+      "sha": "9dba3b0",
+      "summary": "data: market-pulse swarm refresh (run 32903475738) (#630)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-25T23:37:02+00:00",
+      "sha": "6db4157",
+      "summary": "data: rival Facebook promo feed refresh (run 32905842509) (#631)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-25T23:15:05+00:00",
+      "sha": "83751f1",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 32906371319) (#633)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-25T23:03:36+00:00",
+      "sha": "294f4a7",
+      "summary": "data: live fuel prices (2026-08-25, run 32908900023)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-25T22:31:06+00:00",
+      "sha": "a872987",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after double-pressure measured-book ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-26T05:29:11+07:00",
       "sha": "d4b1ef1",
       "summary": "feat(command-center): MEASURED real-book axis on the double-pressure join (obj #1 × obj #2) (#632)",
@@ -645,72 +711,6 @@
       "sha": "1968fe0",
       "summary": "chore(dashboard): refresh CEO autonomy plan after book-per-point ship",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-25T17:22:10+07:00",
-      "sha": "5ef2c34",
-      "summary": "feat(acq): book-per-MEASURED-service-point companion to book-per-branch (#620)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-25T09:54:09+00:00",
-      "sha": "08fbce6",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-25, run 32834240673)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-25T08:27:53+00:00",
-      "sha": "cf4a33e",
-      "summary": "docs(progress): log ux-status-loop-row-overlap merge+deploy+verify (PR #618)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-25T15:25:14+07:00",
-      "sha": "b8f3662",
-      "summary": "ux: fix Autonomous-loops panel text overlap on status.html (mobile/tablet) (#618)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-25T06:44:12+00:00",
-      "sha": "426e49d",
-      "summary": "feat(exposure): surface measured delinquency & return by income band from tape_real.json (#617)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-25T05:25:31+00:00",
-      "sha": "2f50854",
-      "summary": "data(census): refresh the Union Auction forward book (run 32808529797) (#616)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-25T05:00:53+00:00",
-      "sha": "26bd87a",
-      "summary": "data: market-pulse swarm refresh (run 32807973559) (#615)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-25T04:18:22+00:00",
-      "sha": "e3367c3",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after product-groups exposure ship",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-25T11:15:48+07:00",
-      "sha": "55e7090",
-      "summary": "feat(exposure): surface measured per-product delinquency & return from tape_real.json (#614)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-25T04:05:46+00:00",
-      "sha": "e7760bf",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-25, run 32807513510)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-25T03:16:49+00:00",
-      "sha": "410fb73",
-      "summary": "data: NABC live prices (2026-08-25, run 32804229933)",
-      "pillar": "data-integration"
     }
   ]
 }
