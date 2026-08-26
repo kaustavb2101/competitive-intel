@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-26T10:00:36+00:00",
-    "commit": "0505eff"
+    "generated_at": "2026-08-26T14:35:56+00:00",
+    "commit": "5614ef9"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,42 @@
   ],
   "activity": [
     {
+      "date": "2026-08-26T14:35:56+00:00",
+      "sha": "5614ef9",
+      "summary": "docs: log UX-loop run — status.html Recent-activity clip fix (PR #645, merged + deploy-verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-26T21:31:45+07:00",
+      "sha": "b2edde8",
+      "summary": "ux: fix status.html Recent-activity commit summaries clipped to one line (#645)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-26T12:46:57+00:00",
+      "sha": "2e2fcdf",
+      "summary": "feat(command-center): collateral-competitive squeeze — collateral recovery softening × rival dominance (obj #1[collateral] × obj #2), the third portfolio channel (#644)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-26T12:14:16+00:00",
+      "sha": "0a8c79b",
+      "summary": "data: SET listed-peer scoreboard refresh (run 32964604661) (#643)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-26T10:51:15+00:00",
+      "sha": "e942b75",
+      "summary": "data: market-pulse swarm refresh (run 32956725390) (#642)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-26T10:19:10+00:00",
+      "sha": "33f1131",
+      "summary": "docs(service-audit): 2026-08-26 healthy close-out — grown layer set (148) re-verified, forward-anchor freshness nuance recorded",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-26T10:00:36+00:00",
       "sha": "0505eff",
       "summary": "data: ThaiWater flood + rain pulse (2026-08-26, run 32955837826)",
@@ -675,42 +711,6 @@
       "sha": "460dd8e",
       "summary": "data: ThaiWater flood + rain pulse (2026-08-25, run 32902895772)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-25T20:54:31+00:00",
-      "sha": "71bc41e",
-      "summary": "data: Thai-IP-only swarm refresh (run 32891453092) (#627)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-25T20:14:38+00:00",
-      "sha": "1981c9a",
-      "summary": "docs: log ux-reduced-motion-data-status merge+deploy+verify (PR #628)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-26T03:12:51+07:00",
-      "sha": "16ef9af",
-      "summary": "ux: honour prefers-reduced-motion on data.html + status.html (#628)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-25T18:29:09+00:00",
-      "sha": "9b771d4",
-      "summary": "docs(contract): correct stale competitor claim + document MEASURED layers shipped since",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-25T17:18:59+00:00",
-      "sha": "aa38b29",
-      "summary": "data: market-pulse swarm refresh (run 32870306088) (#625)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-25T16:49:19+00:00",
-      "sha": "6453e57",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after peer book-intensity×return ship",
-      "pillar": "peer"
     }
   ]
 }
