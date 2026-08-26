@@ -25,20 +25,8 @@
     ],
     "national_ts": [
       [
-        "2025-08-03",
-        45
-      ],
-      [
-        "2025-08-10",
-        46
-      ],
-      [
-        "2025-08-17",
-        41
-      ],
-      [
         "2025-08-24",
-        67
+        61
       ],
       [
         "2025-08-31",
@@ -46,155 +34,155 @@
       ],
       [
         "2025-09-07",
-        60
-      ],
-      [
-        "2025-09-14",
-        41
-      ],
-      [
-        "2025-09-21",
-        32
-      ],
-      [
-        "2025-09-28",
-        66
-      ],
-      [
-        "2025-10-05",
-        75
-      ],
-      [
-        "2025-10-12",
         59
       ],
       [
-        "2025-10-19",
-        45
+        "2025-09-14",
+        46
       ],
       [
-        "2025-10-26",
-        40
-      ],
-      [
-        "2025-11-02",
-        52
-      ],
-      [
-        "2025-11-09",
-        44
-      ],
-      [
-        "2025-11-16",
-        33
-      ],
-      [
-        "2025-11-23",
+        "2025-09-21",
         0
       ],
       [
-        "2025-11-30",
-        49
+        "2025-09-28",
+        72
       ],
       [
-        "2025-12-07",
-        51
-      ],
-      [
-        "2025-12-14",
-        51
-      ],
-      [
-        "2025-12-21",
-        35
-      ],
-      [
-        "2025-12-28",
-        0
-      ],
-      [
-        "2026-01-04",
-        43
-      ],
-      [
-        "2026-01-11",
-        54
-      ],
-      [
-        "2026-01-18",
-        53
-      ],
-      [
-        "2026-01-25",
-        64
-      ],
-      [
-        "2026-02-01",
-        49
-      ],
-      [
-        "2026-02-08",
-        0
-      ],
-      [
-        "2026-02-15",
-        31
-      ],
-      [
-        "2026-02-22",
-        42
-      ],
-      [
-        "2026-03-01",
-        53
-      ],
-      [
-        "2026-03-08",
-        34
-      ],
-      [
-        "2026-03-15",
-        39
-      ],
-      [
-        "2026-03-22",
-        0
-      ],
-      [
-        "2026-03-29",
-        52
-      ],
-      [
-        "2026-04-05",
+        "2025-10-05",
         71
       ],
       [
-        "2026-04-12",
+        "2025-10-12",
+        57
+      ],
+      [
+        "2025-10-19",
+        49
+      ],
+      [
+        "2025-10-26",
+        34
+      ],
+      [
+        "2025-11-02",
+        59
+      ],
+      [
+        "2025-11-09",
+        61
+      ],
+      [
+        "2025-11-16",
+        32
+      ],
+      [
+        "2025-11-23",
+        43
+      ],
+      [
+        "2025-11-30",
+        48
+      ],
+      [
+        "2025-12-07",
+        56
+      ],
+      [
+        "2025-12-14",
+        69
+      ],
+      [
+        "2025-12-21",
         39
       ],
       [
-        "2026-04-19",
-        50
+        "2025-12-28",
+        40
       ],
       [
-        "2026-04-26",
-        47
+        "2026-01-04",
+        48
       ],
       [
-        "2026-05-03",
+        "2026-01-11",
+        53
+      ],
+      [
+        "2026-01-18",
+        54
+      ],
+      [
+        "2026-01-25",
+        66
+      ],
+      [
+        "2026-02-01",
+        37
+      ],
+      [
+        "2026-02-08",
+        35
+      ],
+      [
+        "2026-02-15",
+        0
+      ],
+      [
+        "2026-02-22",
         64
       ],
       [
+        "2026-03-01",
+        71
+      ],
+      [
+        "2026-03-08",
+        47
+      ],
+      [
+        "2026-03-15",
+        60
+      ],
+      [
+        "2026-03-22",
+        32
+      ],
+      [
+        "2026-03-29",
+        37
+      ],
+      [
+        "2026-04-05",
+        85
+      ],
+      [
+        "2026-04-12",
+        57
+      ],
+      [
+        "2026-04-19",
+        56
+      ],
+      [
+        "2026-04-26",
+        62
+      ],
+      [
+        "2026-05-03",
+        70
+      ],
+      [
         "2026-05-10",
-        58
+        79
       ],
       [
         "2026-05-17",
-        58
+        64
       ],
       [
         "2026-05-24",
-        49
+        54
       ],
       [
         "2026-05-31",
@@ -202,43 +190,51 @@
       ],
       [
         "2026-06-07",
-        70
+        80
       ],
       [
         "2026-06-14",
-        57
+        65
       ],
       [
         "2026-06-21",
-        73
+        74
       ],
       [
         "2026-06-28",
-        77
+        85
       ],
       [
         "2026-07-05",
-        65
+        91
       ],
       [
         "2026-07-12",
-        68
+        73
       ],
       [
         "2026-07-19",
-        58
+        55
       ],
       [
         "2026-07-26",
-        65
+        77
       ],
       [
         "2026-08-02",
-        80
+        75
+      ],
+      [
+        "2026-08-09",
+        82
+      ],
+      [
+        "2026-08-16",
+        86
       ]
     ],
     "source": "Google Trends (geo=TH, REGION resolution, timeframe today 12-m)",
-    "pulled_at_utc": "2026-08-09T21:56Z",
+    "pulled_at_utc": "2026-08-26T04:13Z",
     "provenance": "Pulled via pytrends. Brand values share one payload axis so per-province share-of-search across brands is meaningful; low-volume provinces are noisy. Provinces Google omits are absent, not zero-filled.",
     "fields": {
       "demand": "ESTIMATED — mean of the two demand terms' Google Trends relative-interest values (0-100). A relative direction/pressure signal for title-loan search intent, NOT absolute query volume. Low-volume provinces are noisy.",
@@ -257,103 +253,35 @@
   },
   "provinces": [
     {
-      "th": "บึงกาฬ",
-      "en": "Bung Khla",
-      "slug": "bung-khla",
-      "region": "Isan",
-      "demand": 50.0,
+      "th": "พิษณุโลก",
+      "en": "Phitsanulok",
+      "slug": "phitsanulok",
+      "region": "North",
+      "demand": 71.5,
       "sos": {
-        "AutoX": 0.13,
-        "Heng": 0.12,
-        "Muangthai": 0.39,
+        "AutoX": 0.1,
+        "Heng": 0.1,
+        "Muangthai": 0.4,
         "Srisawad": 0.0,
-        "Tidlor": 0.36
+        "Tidlor": 0.4
       },
-      "autox_share": 0.13,
+      "autox_share": 0.1,
       "best_rival": {
         "brand": "Muangthai",
-        "share": 0.39
+        "share": 0.4
       },
-      "autox_sos_rank": 9,
+      "autox_sos_rank": 31,
       "raw": {
         "brands": {
-          "AutoX": 13,
-          "Heng": 12,
-          "Muangthai": 39,
-          "Srisawad": 0,
-          "Tidlor": 36
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 100,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "สิงห์บุรี",
-      "en": "Sing Buri",
-      "slug": "sing-buri",
-      "region": "Central&BKK",
-      "demand": 50.0,
-      "sos": {
-        "AutoX": 0.0,
-        "Heng": 0.19,
-        "Muangthai": 0.36,
-        "Srisawad": 0.0,
-        "Tidlor": 0.45
-      },
-      "autox_share": 0.0,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.45
-      },
-      "autox_sos_rank": 75,
-      "raw": {
-        "brands": {
-          "AutoX": 0,
-          "Heng": 19,
-          "Muangthai": 36,
-          "Srisawad": 0,
-          "Tidlor": 45
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 0,
-          "สินเชื่อรถแลกเงิน": 100
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "ยโสธร",
-      "en": "Yasothon",
-      "slug": "yasothon",
-      "region": "Isan",
-      "demand": 47.5,
-      "sos": {
-        "AutoX": 0.15,
-        "Heng": 0.1,
-        "Muangthai": 0.36,
-        "Srisawad": 0.0,
-        "Tidlor": 0.39
-      },
-      "autox_share": 0.15,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.39
-      },
-      "autox_sos_rank": 2,
-      "raw": {
-        "brands": {
-          "AutoX": 15,
+          "AutoX": 10,
           "Heng": 10,
-          "Muangthai": 36,
+          "Muangthai": 40,
           "Srisawad": 0,
-          "Tidlor": 39
+          "Tidlor": 40
         },
         "demand_terms": {
-          "จำนำทะเบียนรถ": 95,
-          "สินเชื่อรถแลกเงิน": 0
+          "จำนำทะเบียนรถ": 43,
+          "สินเชื่อรถแลกเงิน": 100
         },
         "brand_total": 100
       }
@@ -363,132 +291,30 @@
       "en": "Trang",
       "slug": "trang",
       "region": "South",
-      "demand": 35.0,
+      "demand": 50.0,
       "sos": {
-        "AutoX": 0.07,
+        "AutoX": 0.08,
         "Heng": 0.0,
         "Muangthai": 0.39,
         "Srisawad": 0.0,
-        "Tidlor": 0.54
+        "Tidlor": 0.53
       },
-      "autox_share": 0.07,
+      "autox_share": 0.08,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.54
+        "share": 0.53
       },
-      "autox_sos_rank": 60,
+      "autox_sos_rank": 54,
       "raw": {
         "brands": {
-          "AutoX": 7,
+          "AutoX": 8,
           "Heng": 0,
           "Muangthai": 39,
           "Srisawad": 0,
-          "Tidlor": 54
+          "Tidlor": 53
         },
         "demand_terms": {
-          "จำนำทะเบียนรถ": 70,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "ลำพูน",
-      "en": "Lamphun",
-      "slug": "lamphun",
-      "region": "North",
-      "demand": 28.0,
-      "sos": {
-        "AutoX": 0.08,
-        "Heng": 0.1,
-        "Muangthai": 0.37,
-        "Srisawad": 0.0,
-        "Tidlor": 0.45
-      },
-      "autox_share": 0.08,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.45
-      },
-      "autox_sos_rank": 55,
-      "raw": {
-        "brands": {
-          "AutoX": 8,
-          "Heng": 10,
-          "Muangthai": 37,
-          "Srisawad": 0,
-          "Tidlor": 45
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 56,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "สงขลา",
-      "en": "Songkhla",
-      "slug": "songkhla",
-      "region": "South",
-      "demand": 23.0,
-      "sos": {
-        "AutoX": 0.08,
-        "Heng": 0.0,
-        "Muangthai": 0.34,
-        "Srisawad": 0.0,
-        "Tidlor": 0.58
-      },
-      "autox_share": 0.08,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.58
-      },
-      "autox_sos_rank": 56,
-      "raw": {
-        "brands": {
-          "AutoX": 8,
-          "Heng": 0,
-          "Muangthai": 34,
-          "Srisawad": 0,
-          "Tidlor": 58
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 46,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "พระนครศรีอยุธยา",
-      "en": "Ayutthaya",
-      "slug": "ayutthaya",
-      "region": "Central&BKK",
-      "demand": 22.0,
-      "sos": {
-        "AutoX": 0.12,
-        "Heng": 0.05,
-        "Muangthai": 0.28,
-        "Srisawad": 0.0,
-        "Tidlor": 0.55
-      },
-      "autox_share": 0.12,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.55
-      },
-      "autox_sos_rank": 14,
-      "raw": {
-        "brands": {
-          "AutoX": 12,
-          "Heng": 5,
-          "Muangthai": 28,
-          "Srisawad": 0,
-          "Tidlor": 55
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 44,
+          "จำนำทะเบียนรถ": 100,
           "สินเชื่อรถแลกเงิน": 0
         },
         "brand_total": 100
@@ -499,31 +325,31 @@
       "en": "Rayong",
       "slug": "rayong",
       "region": "East",
-      "demand": 22.0,
+      "demand": 48.5,
       "sos": {
-        "AutoX": 0.11,
+        "AutoX": 0.1,
         "Heng": 0.02,
-        "Muangthai": 0.32,
+        "Muangthai": 0.33,
         "Srisawad": 0.01,
         "Tidlor": 0.54
       },
-      "autox_share": 0.11,
+      "autox_share": 0.1,
       "best_rival": {
         "brand": "Tidlor",
         "share": 0.54
       },
-      "autox_sos_rank": 22,
+      "autox_sos_rank": 32,
       "raw": {
         "brands": {
-          "AutoX": 11,
+          "AutoX": 10,
           "Heng": 2,
-          "Muangthai": 32,
+          "Muangthai": 33,
           "Srisawad": 1,
           "Tidlor": 54
         },
         "demand_terms": {
-          "จำนำทะเบียนรถ": 28,
-          "สินเชื่อรถแลกเงิน": 16
+          "จำนำทะเบียนรถ": 40,
+          "สินเชื่อรถแลกเงิน": 57
         },
         "brand_total": 100
       }
@@ -533,439 +359,31 @@
       "en": "Samut Prakan",
       "slug": "samut-prakan",
       "region": "Central&BKK",
-      "demand": 21.5,
+      "demand": 46.0,
       "sos": {
         "AutoX": 0.09,
         "Heng": 0.02,
         "Muangthai": 0.31,
-        "Srisawad": 0.01,
-        "Tidlor": 0.57
+        "Srisawad": 0.0,
+        "Tidlor": 0.58
       },
       "autox_share": 0.09,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.57
+        "share": 0.58
       },
-      "autox_sos_rank": 44,
+      "autox_sos_rank": 47,
       "raw": {
         "brands": {
           "AutoX": 9,
           "Heng": 2,
           "Muangthai": 31,
-          "Srisawad": 1,
-          "Tidlor": 57
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 33,
-          "สินเชื่อรถแลกเงิน": 10
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "สุพรรณบุรี",
-      "en": "Suphan Buri",
-      "slug": "suphan-buri",
-      "region": "Central&BKK",
-      "demand": 20.5,
-      "sos": {
-        "AutoX": 0.1,
-        "Heng": 0.09,
-        "Muangthai": 0.35,
-        "Srisawad": 0.0,
-        "Tidlor": 0.46
-      },
-      "autox_share": 0.1,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.46
-      },
-      "autox_sos_rank": 38,
-      "raw": {
-        "brands": {
-          "AutoX": 10,
-          "Heng": 9,
-          "Muangthai": 35,
           "Srisawad": 0,
-          "Tidlor": 46
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 41,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "อุบลราชธานี",
-      "en": "Ubon Ratchathani",
-      "slug": "ubon-ratchathani",
-      "region": "Isan",
-      "demand": 19.5,
-      "sos": {
-        "AutoX": 0.09,
-        "Heng": 0.09,
-        "Muangthai": 0.41,
-        "Srisawad": 0.0,
-        "Tidlor": 0.41
-      },
-      "autox_share": 0.09,
-      "best_rival": {
-        "brand": "Muangthai",
-        "share": 0.41
-      },
-      "autox_sos_rank": 45,
-      "raw": {
-        "brands": {
-          "AutoX": 9,
-          "Heng": 9,
-          "Muangthai": 41,
-          "Srisawad": 0,
-          "Tidlor": 41
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 39,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "กาญจนบุรี",
-      "en": "Kanchanaburi",
-      "slug": "kanchanaburi",
-      "region": "Central&BKK",
-      "demand": 18.5,
-      "sos": {
-        "AutoX": 0.11,
-        "Heng": 0.06,
-        "Muangthai": 0.39,
-        "Srisawad": 0.0,
-        "Tidlor": 0.44
-      },
-      "autox_share": 0.11,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.44
-      },
-      "autox_sos_rank": 18,
-      "raw": {
-        "brands": {
-          "AutoX": 11,
-          "Heng": 6,
-          "Muangthai": 39,
-          "Srisawad": 0,
-          "Tidlor": 44
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 37,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "สมุทรสาคร",
-      "en": "Samut Sakhon",
-      "slug": "samut-sakhon",
-      "region": "Central&BKK",
-      "demand": 18.0,
-      "sos": {
-        "AutoX": 0.08,
-        "Heng": 0.03,
-        "Muangthai": 0.28,
-        "Srisawad": 0.0,
-        "Tidlor": 0.61
-      },
-      "autox_share": 0.08,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.61
-      },
-      "autox_sos_rank": 57,
-      "raw": {
-        "brands": {
-          "AutoX": 8,
-          "Heng": 3,
-          "Muangthai": 28,
-          "Srisawad": 0,
-          "Tidlor": 61
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 36,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "สระบุรี",
-      "en": "Saraburi",
-      "slug": "saraburi",
-      "region": "Central&BKK",
-      "demand": 18.0,
-      "sos": {
-        "AutoX": 0.11,
-        "Heng": 0.05,
-        "Muangthai": 0.3,
-        "Srisawad": 0.0,
-        "Tidlor": 0.54
-      },
-      "autox_share": 0.11,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.54
-      },
-      "autox_sos_rank": 24,
-      "raw": {
-        "brands": {
-          "AutoX": 11,
-          "Heng": 5,
-          "Muangthai": 30,
-          "Srisawad": 0,
-          "Tidlor": 54
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 36,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "นครปฐม",
-      "en": "Nakhon Pathom",
-      "slug": "nakhon-pathom",
-      "region": "Central&BKK",
-      "demand": 17.5,
-      "sos": {
-        "AutoX": 0.1,
-        "Heng": 0.04,
-        "Muangthai": 0.34,
-        "Srisawad": 0.01,
-        "Tidlor": 0.51
-      },
-      "autox_share": 0.1,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.51
-      },
-      "autox_sos_rank": 29,
-      "raw": {
-        "brands": {
-          "AutoX": 10,
-          "Heng": 4,
-          "Muangthai": 34,
-          "Srisawad": 1,
-          "Tidlor": 51
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 35,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "ปทุมธานี",
-      "en": "Pathum Thani",
-      "slug": "pathum-thani",
-      "region": "Central&BKK",
-      "demand": 17.5,
-      "sos": {
-        "AutoX": 0.1,
-        "Heng": 0.01,
-        "Muangthai": 0.3,
-        "Srisawad": 0.01,
-        "Tidlor": 0.58
-      },
-      "autox_share": 0.1,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.58
-      },
-      "autox_sos_rank": 33,
-      "raw": {
-        "brands": {
-          "AutoX": 10,
-          "Heng": 1,
-          "Muangthai": 30,
-          "Srisawad": 1,
           "Tidlor": 58
         },
         "demand_terms": {
-          "จำนำทะเบียนรถ": 26,
-          "สินเชื่อรถแลกเงิน": 9
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "เพชรบูรณ์",
-      "en": "Phetchabun",
-      "slug": "phetchabun",
-      "region": "North",
-      "demand": 17.5,
-      "sos": {
-        "AutoX": 0.08,
-        "Heng": 0.07,
-        "Muangthai": 0.42,
-        "Srisawad": 0.0,
-        "Tidlor": 0.43
-      },
-      "autox_share": 0.08,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.43
-      },
-      "autox_sos_rank": 59,
-      "raw": {
-        "brands": {
-          "AutoX": 8,
-          "Heng": 7,
-          "Muangthai": 42,
-          "Srisawad": 0,
-          "Tidlor": 43
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 35,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "นครศรีธรรมราช",
-      "en": "Nakhon Si Thammarat",
-      "slug": "nakhon-si-thammarat",
-      "region": "South",
-      "demand": 17.0,
-      "sos": {
-        "AutoX": 0.08,
-        "Heng": 0.03,
-        "Muangthai": 0.33,
-        "Srisawad": 0.0,
-        "Tidlor": 0.56
-      },
-      "autox_share": 0.08,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.56
-      },
-      "autox_sos_rank": 53,
-      "raw": {
-        "brands": {
-          "AutoX": 8,
-          "Heng": 3,
-          "Muangthai": 33,
-          "Srisawad": 0,
-          "Tidlor": 56
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 34,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "ลำปาง",
-      "en": "Lampang",
-      "slug": "lampang",
-      "region": "North",
-      "demand": 17.0,
-      "sos": {
-        "AutoX": 0.09,
-        "Heng": 0.12,
-        "Muangthai": 0.36,
-        "Srisawad": 0.0,
-        "Tidlor": 0.43
-      },
-      "autox_share": 0.09,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.43
-      },
-      "autox_sos_rank": 43,
-      "raw": {
-        "brands": {
-          "AutoX": 9,
-          "Heng": 12,
-          "Muangthai": 36,
-          "Srisawad": 0,
-          "Tidlor": 43
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 0,
-          "สินเชื่อรถแลกเงิน": 34
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "ชลบุรี",
-      "en": "Chon Buri",
-      "slug": "chon-buri",
-      "region": "East",
-      "demand": 16.5,
-      "sos": {
-        "AutoX": 0.11,
-        "Heng": 0.02,
-        "Muangthai": 0.35,
-        "Srisawad": 0.01,
-        "Tidlor": 0.51
-      },
-      "autox_share": 0.11,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.51
-      },
-      "autox_sos_rank": 20,
-      "raw": {
-        "brands": {
-          "AutoX": 11,
-          "Heng": 2,
-          "Muangthai": 35,
-          "Srisawad": 1,
-          "Tidlor": 51
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 25,
-          "สินเชื่อรถแลกเงิน": 8
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "อุดรธานี",
-      "en": "Udon Thani",
-      "slug": "udon-thani",
-      "region": "Isan",
-      "demand": 16.5,
-      "sos": {
-        "AutoX": 0.12,
-        "Heng": 0.06,
-        "Muangthai": 0.38,
-        "Srisawad": 0.0,
-        "Tidlor": 0.44
-      },
-      "autox_share": 0.12,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.44
-      },
-      "autox_sos_rank": 16,
-      "raw": {
-        "brands": {
-          "AutoX": 12,
-          "Heng": 6,
-          "Muangthai": 38,
-          "Srisawad": 0,
-          "Tidlor": 44
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 33,
-          "สินเชื่อรถแลกเงิน": 0
+          "จำนำทะเบียนรถ": 40,
+          "สินเชื่อรถแลกเงิน": 52
         },
         "brand_total": 100
       }
@@ -975,99 +393,31 @@
       "en": "Phuket",
       "slug": "phuket",
       "region": "South",
-      "demand": 14.0,
+      "demand": 43.5,
       "sos": {
         "AutoX": 0.06,
         "Heng": 0.0,
-        "Muangthai": 0.39,
-        "Srisawad": 0.01,
-        "Tidlor": 0.54
+        "Muangthai": 0.38,
+        "Srisawad": 0.0,
+        "Tidlor": 0.56
       },
       "autox_share": 0.06,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.54
+        "share": 0.56
       },
-      "autox_sos_rank": 65,
+      "autox_sos_rank": 66,
       "raw": {
         "brands": {
           "AutoX": 6,
           "Heng": 0,
-          "Muangthai": 39,
-          "Srisawad": 1,
-          "Tidlor": 54
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 28,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "กรุงเทพมหานคร",
-      "en": "Bangkok",
-      "slug": "bangkok",
-      "region": "Central&BKK",
-      "demand": 13.5,
-      "sos": {
-        "AutoX": 0.08,
-        "Heng": 0.02,
-        "Muangthai": 0.27,
-        "Srisawad": 0.01,
-        "Tidlor": 0.62
-      },
-      "autox_share": 0.08,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.62
-      },
-      "autox_sos_rank": 49,
-      "raw": {
-        "brands": {
-          "AutoX": 8,
-          "Heng": 2,
-          "Muangthai": 27,
-          "Srisawad": 1,
-          "Tidlor": 62
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 18,
-          "สินเชื่อรถแลกเงิน": 9
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "ขอนแก่น",
-      "en": "Khon Kaen",
-      "slug": "khon-kaen",
-      "region": "Isan",
-      "demand": 13.5,
-      "sos": {
-        "AutoX": 0.08,
-        "Heng": 0.07,
-        "Muangthai": 0.38,
-        "Srisawad": 0.01,
-        "Tidlor": 0.46
-      },
-      "autox_share": 0.08,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.46
-      },
-      "autox_sos_rank": 50,
-      "raw": {
-        "brands": {
-          "AutoX": 8,
-          "Heng": 7,
           "Muangthai": 38,
-          "Srisawad": 1,
-          "Tidlor": 46
+          "Srisawad": 0,
+          "Tidlor": 56
         },
         "demand_terms": {
-          "จำนำทะเบียนรถ": 27,
-          "สินเชื่อรถแลกเงิน": 0
+          "จำนำทะเบียนรถ": 38,
+          "สินเชื่อรถแลกเงิน": 49
         },
         "brand_total": 100
       }
@@ -1077,7 +427,7 @@
       "en": "Nonthaburi",
       "slug": "nonthaburi",
       "region": "Central&BKK",
-      "demand": 13.5,
+      "demand": 42.0,
       "sos": {
         "AutoX": 0.13,
         "Heng": 0.02,
@@ -1090,7 +440,7 @@
         "brand": "Tidlor",
         "share": 0.59
       },
-      "autox_sos_rank": 8,
+      "autox_sos_rank": 10,
       "raw": {
         "brands": {
           "AutoX": 13,
@@ -1100,42 +450,144 @@
           "Tidlor": 59
         },
         "demand_terms": {
-          "จำนำทะเบียนรถ": 19,
-          "สินเชื่อรถแลกเงิน": 8
+          "จำนำทะเบียนรถ": 36,
+          "สินเชื่อรถแลกเงิน": 48
         },
         "brand_total": 100
       }
     },
     {
-      "th": "พิษณุโลก",
-      "en": "Phitsanulok",
-      "slug": "phitsanulok",
-      "region": "North",
-      "demand": 13.5,
+      "th": "กาฬสินธุ์",
+      "en": "Kalasin",
+      "slug": "kalasin",
+      "region": "Isan",
+      "demand": 41.0,
+      "sos": {
+        "AutoX": 0.13,
+        "Heng": 0.04,
+        "Muangthai": 0.33,
+        "Srisawad": 0.0,
+        "Tidlor": 0.5
+      },
+      "autox_share": 0.13,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.5
+      },
+      "autox_sos_rank": 8,
+      "raw": {
+        "brands": {
+          "AutoX": 13,
+          "Heng": 4,
+          "Muangthai": 33,
+          "Srisawad": 0,
+          "Tidlor": 50
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 82,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "ปทุมธานี",
+      "en": "Pathum Thani",
+      "slug": "pathum-thani",
+      "region": "Central&BKK",
+      "demand": 39.0,
       "sos": {
         "AutoX": 0.11,
-        "Heng": 0.1,
-        "Muangthai": 0.39,
-        "Srisawad": 0.0,
-        "Tidlor": 0.4
+        "Heng": 0.01,
+        "Muangthai": 0.29,
+        "Srisawad": 0.01,
+        "Tidlor": 0.58
       },
       "autox_share": 0.11,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.4
+        "share": 0.58
       },
-      "autox_sos_rank": 21,
+      "autox_sos_rank": 20,
       "raw": {
         "brands": {
           "AutoX": 11,
-          "Heng": 10,
-          "Muangthai": 39,
-          "Srisawad": 0,
-          "Tidlor": 40
+          "Heng": 1,
+          "Muangthai": 29,
+          "Srisawad": 1,
+          "Tidlor": 58
         },
         "demand_terms": {
-          "จำนำทะเบียนรถ": 27,
+          "จำนำทะเบียนรถ": 34,
+          "สินเชื่อรถแลกเงิน": 44
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "ศรีสะเกษ",
+      "en": "Si Sa Ket",
+      "slug": "si-sa-ket",
+      "region": "Isan",
+      "demand": 36.0,
+      "sos": {
+        "AutoX": 0.09,
+        "Heng": 0.07,
+        "Muangthai": 0.39,
+        "Srisawad": 0.0,
+        "Tidlor": 0.45
+      },
+      "autox_share": 0.09,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.45
+      },
+      "autox_sos_rank": 45,
+      "raw": {
+        "brands": {
+          "AutoX": 9,
+          "Heng": 7,
+          "Muangthai": 39,
+          "Srisawad": 0,
+          "Tidlor": 45
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 72,
           "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "กรุงเทพมหานคร",
+      "en": "Bangkok",
+      "slug": "bangkok",
+      "region": "Central&BKK",
+      "demand": 35.5,
+      "sos": {
+        "AutoX": 0.08,
+        "Heng": 0.02,
+        "Muangthai": 0.29,
+        "Srisawad": 0.01,
+        "Tidlor": 0.6
+      },
+      "autox_share": 0.08,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.6
+      },
+      "autox_sos_rank": 51,
+      "raw": {
+        "brands": {
+          "AutoX": 8,
+          "Heng": 2,
+          "Muangthai": 29,
+          "Srisawad": 1,
+          "Tidlor": 60
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 26,
+          "สินเชื่อรถแลกเงิน": 45
         },
         "brand_total": 100
       }
@@ -1145,11 +597,11 @@
       "en": "Chachoengsao",
       "slug": "chachoengsao",
       "region": "East",
-      "demand": 13.0,
+      "demand": 35.0,
       "sos": {
         "AutoX": 0.09,
-        "Heng": 0.02,
-        "Muangthai": 0.36,
+        "Heng": 0.03,
+        "Muangthai": 0.35,
         "Srisawad": 0.0,
         "Tidlor": 0.53
       },
@@ -1158,17 +610,425 @@
         "brand": "Tidlor",
         "share": 0.53
       },
-      "autox_sos_rank": 41,
+      "autox_sos_rank": 38,
       "raw": {
         "brands": {
           "AutoX": 9,
-          "Heng": 2,
-          "Muangthai": 36,
+          "Heng": 3,
+          "Muangthai": 35,
           "Srisawad": 0,
           "Tidlor": 53
         },
         "demand_terms": {
-          "จำนำทะเบียนรถ": 26,
+          "จำนำทะเบียนรถ": 70,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "ชลบุรี",
+      "en": "Chon Buri",
+      "slug": "chon-buri",
+      "region": "East",
+      "demand": 33.0,
+      "sos": {
+        "AutoX": 0.11,
+        "Heng": 0.02,
+        "Muangthai": 0.35,
+        "Srisawad": 0.01,
+        "Tidlor": 0.51
+      },
+      "autox_share": 0.11,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.51
+      },
+      "autox_sos_rank": 17,
+      "raw": {
+        "brands": {
+          "AutoX": 11,
+          "Heng": 2,
+          "Muangthai": 35,
+          "Srisawad": 1,
+          "Tidlor": 51
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 41,
+          "สินเชื่อรถแลกเงิน": 25
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "กาญจนบุรี",
+      "en": "Kanchanaburi",
+      "slug": "kanchanaburi",
+      "region": "Central&BKK",
+      "demand": 32.0,
+      "sos": {
+        "AutoX": 0.08,
+        "Heng": 0.06,
+        "Muangthai": 0.4,
+        "Srisawad": 0.0,
+        "Tidlor": 0.46
+      },
+      "autox_share": 0.08,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.46
+      },
+      "autox_sos_rank": 52,
+      "raw": {
+        "brands": {
+          "AutoX": 8,
+          "Heng": 6,
+          "Muangthai": 40,
+          "Srisawad": 0,
+          "Tidlor": 46
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 64,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "เพชรบูรณ์",
+      "en": "Phetchabun",
+      "slug": "phetchabun",
+      "region": "North",
+      "demand": 29.5,
+      "sos": {
+        "AutoX": 0.07,
+        "Heng": 0.07,
+        "Muangthai": 0.43,
+        "Srisawad": 0.0,
+        "Tidlor": 0.43
+      },
+      "autox_share": 0.07,
+      "best_rival": {
+        "brand": "Muangthai",
+        "share": 0.43
+      },
+      "autox_sos_rank": 63,
+      "raw": {
+        "brands": {
+          "AutoX": 7,
+          "Heng": 7,
+          "Muangthai": 43,
+          "Srisawad": 0,
+          "Tidlor": 43
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 59,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "สงขลา",
+      "en": "Songkhla",
+      "slug": "songkhla",
+      "region": "South",
+      "demand": 29.0,
+      "sos": {
+        "AutoX": 0.09,
+        "Heng": 0.0,
+        "Muangthai": 0.32,
+        "Srisawad": 0.01,
+        "Tidlor": 0.58
+      },
+      "autox_share": 0.09,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.58
+      },
+      "autox_sos_rank": 46,
+      "raw": {
+        "brands": {
+          "AutoX": 9,
+          "Heng": 0,
+          "Muangthai": 32,
+          "Srisawad": 1,
+          "Tidlor": 58
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 58,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "สมุทรสาคร",
+      "en": "Samut Sakhon",
+      "slug": "samut-sakhon",
+      "region": "Central&BKK",
+      "demand": 29.0,
+      "sos": {
+        "AutoX": 0.08,
+        "Heng": 0.03,
+        "Muangthai": 0.29,
+        "Srisawad": 0.0,
+        "Tidlor": 0.6
+      },
+      "autox_share": 0.08,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.6
+      },
+      "autox_sos_rank": 58,
+      "raw": {
+        "brands": {
+          "AutoX": 8,
+          "Heng": 3,
+          "Muangthai": 29,
+          "Srisawad": 0,
+          "Tidlor": 60
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 58,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "สระบุรี",
+      "en": "Saraburi",
+      "slug": "saraburi",
+      "region": "Central&BKK",
+      "demand": 28.5,
+      "sos": {
+        "AutoX": 0.11,
+        "Heng": 0.05,
+        "Muangthai": 0.31,
+        "Srisawad": 0.0,
+        "Tidlor": 0.53
+      },
+      "autox_share": 0.11,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.53
+      },
+      "autox_sos_rank": 23,
+      "raw": {
+        "brands": {
+          "AutoX": 11,
+          "Heng": 5,
+          "Muangthai": 31,
+          "Srisawad": 0,
+          "Tidlor": 53
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 57,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "เชียงใหม่",
+      "en": "Chiang Mai",
+      "slug": "chiang-mai",
+      "region": "North",
+      "demand": 28.0,
+      "sos": {
+        "AutoX": 0.08,
+        "Heng": 0.15,
+        "Muangthai": 0.3,
+        "Srisawad": 0.0,
+        "Tidlor": 0.47
+      },
+      "autox_share": 0.08,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.47
+      },
+      "autox_sos_rank": 60,
+      "raw": {
+        "brands": {
+          "AutoX": 8,
+          "Heng": 15,
+          "Muangthai": 30,
+          "Srisawad": 0,
+          "Tidlor": 47
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 19,
+          "สินเชื่อรถแลกเงิน": 37
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "สุพรรณบุรี",
+      "en": "Suphan Buri",
+      "slug": "suphan-buri",
+      "region": "Central&BKK",
+      "demand": 26.5,
+      "sos": {
+        "AutoX": 0.07,
+        "Heng": 0.08,
+        "Muangthai": 0.36,
+        "Srisawad": 0.0,
+        "Tidlor": 0.49
+      },
+      "autox_share": 0.07,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.49
+      },
+      "autox_sos_rank": 62,
+      "raw": {
+        "brands": {
+          "AutoX": 7,
+          "Heng": 8,
+          "Muangthai": 36,
+          "Srisawad": 0,
+          "Tidlor": 49
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 53,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "พระนครศรีอยุธยา",
+      "en": "Ayutthaya",
+      "slug": "ayutthaya",
+      "region": "Central&BKK",
+      "demand": 26.0,
+      "sos": {
+        "AutoX": 0.12,
+        "Heng": 0.04,
+        "Muangthai": 0.29,
+        "Srisawad": 0.0,
+        "Tidlor": 0.55
+      },
+      "autox_share": 0.12,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.55
+      },
+      "autox_sos_rank": 15,
+      "raw": {
+        "brands": {
+          "AutoX": 12,
+          "Heng": 4,
+          "Muangthai": 29,
+          "Srisawad": 0,
+          "Tidlor": 55
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 52,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "นครปฐม",
+      "en": "Nakhon Pathom",
+      "slug": "nakhon-pathom",
+      "region": "Central&BKK",
+      "demand": 23.5,
+      "sos": {
+        "AutoX": 0.1,
+        "Heng": 0.03,
+        "Muangthai": 0.34,
+        "Srisawad": 0.01,
+        "Tidlor": 0.52
+      },
+      "autox_share": 0.1,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.52
+      },
+      "autox_sos_rank": 28,
+      "raw": {
+        "brands": {
+          "AutoX": 10,
+          "Heng": 3,
+          "Muangthai": 34,
+          "Srisawad": 1,
+          "Tidlor": 52
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 47,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "สิงห์บุรี",
+      "en": "Sing Buri",
+      "slug": "sing-buri",
+      "region": "Central&BKK",
+      "demand": 23.0,
+      "sos": {
+        "AutoX": 0.0,
+        "Heng": 0.11,
+        "Muangthai": 0.31,
+        "Srisawad": 0.1,
+        "Tidlor": 0.48
+      },
+      "autox_share": 0.0,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.48
+      },
+      "autox_sos_rank": 75,
+      "raw": {
+        "brands": {
+          "AutoX": 0,
+          "Heng": 11,
+          "Muangthai": 31,
+          "Srisawad": 10,
+          "Tidlor": 48
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 0,
+          "สินเชื่อรถแลกเงิน": 46
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "นครศรีธรรมราช",
+      "en": "Nakhon Si Thammarat",
+      "slug": "nakhon-si-thammarat",
+      "region": "South",
+      "demand": 22.5,
+      "sos": {
+        "AutoX": 0.08,
+        "Heng": 0.03,
+        "Muangthai": 0.32,
+        "Srisawad": 0.0,
+        "Tidlor": 0.57
+      },
+      "autox_share": 0.08,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.57
+      },
+      "autox_sos_rank": 55,
+      "raw": {
+        "brands": {
+          "AutoX": 8,
+          "Heng": 3,
+          "Muangthai": 32,
+          "Srisawad": 0,
+          "Tidlor": 57
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 45,
           "สินเชื่อรถแลกเงิน": 0
         },
         "brand_total": 100
@@ -1179,7 +1039,7 @@
       "en": "Nakhon Ratchasima",
       "slug": "nakhon-ratchasima",
       "region": "Isan",
-      "demand": 12.5,
+      "demand": 18.0,
       "sos": {
         "AutoX": 0.1,
         "Heng": 0.05,
@@ -1202,42 +1062,76 @@
           "Tidlor": 54
         },
         "demand_terms": {
-          "จำนำทะเบียนรถ": 25,
+          "จำนำทะเบียนรถ": 34,
+          "สินเชื่อรถแลกเงิน": 2
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "อุบลราชธานี",
+      "en": "Ubon Ratchathani",
+      "slug": "ubon-ratchathani",
+      "region": "Isan",
+      "demand": 16.5,
+      "sos": {
+        "AutoX": 0.09,
+        "Heng": 0.09,
+        "Muangthai": 0.4,
+        "Srisawad": 0.0,
+        "Tidlor": 0.42
+      },
+      "autox_share": 0.09,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.42
+      },
+      "autox_sos_rank": 50,
+      "raw": {
+        "brands": {
+          "AutoX": 9,
+          "Heng": 9,
+          "Muangthai": 40,
+          "Srisawad": 0,
+          "Tidlor": 42
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 33,
           "สินเชื่อรถแลกเงิน": 0
         },
         "brand_total": 100
       }
     },
     {
-      "th": "เชียงใหม่",
-      "en": "Chiang Mai",
-      "slug": "chiang-mai",
-      "region": "North",
-      "demand": 11.5,
+      "th": "ขอนแก่น",
+      "en": "Khon Kaen",
+      "slug": "khon-kaen",
+      "region": "Isan",
+      "demand": 15.5,
       "sos": {
         "AutoX": 0.09,
-        "Heng": 0.14,
-        "Muangthai": 0.3,
-        "Srisawad": 0.0,
-        "Tidlor": 0.47
+        "Heng": 0.07,
+        "Muangthai": 0.38,
+        "Srisawad": 0.01,
+        "Tidlor": 0.45
       },
       "autox_share": 0.09,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.47
+        "share": 0.45
       },
-      "autox_sos_rank": 46,
+      "autox_sos_rank": 37,
       "raw": {
         "brands": {
           "AutoX": 9,
-          "Heng": 14,
-          "Muangthai": 30,
-          "Srisawad": 0,
-          "Tidlor": 47
+          "Heng": 7,
+          "Muangthai": 38,
+          "Srisawad": 1,
+          "Tidlor": 45
         },
         "demand_terms": {
-          "จำนำทะเบียนรถ": 16,
-          "สินเชื่อรถแลกเงิน": 7
+          "จำนำทะเบียนรถ": 31,
+          "สินเชื่อรถแลกเงิน": 0
         },
         "brand_total": 100
       }
@@ -1247,30 +1141,234 @@
       "en": "Surat Thani",
       "slug": "surat-thani",
       "region": "South",
-      "demand": 9.5,
+      "demand": 10.5,
       "sos": {
-        "AutoX": 0.08,
-        "Heng": 0.02,
+        "AutoX": 0.09,
+        "Heng": 0.03,
         "Muangthai": 0.35,
-        "Srisawad": 0.02,
-        "Tidlor": 0.53
+        "Srisawad": 0.01,
+        "Tidlor": 0.52
       },
-      "autox_share": 0.08,
+      "autox_share": 0.09,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.53
+        "share": 0.52
       },
-      "autox_sos_rank": 58,
+      "autox_sos_rank": 49,
       "raw": {
         "brands": {
-          "AutoX": 8,
-          "Heng": 2,
+          "AutoX": 9,
+          "Heng": 3,
           "Muangthai": 35,
-          "Srisawad": 2,
-          "Tidlor": 53
+          "Srisawad": 1,
+          "Tidlor": 52
         },
         "demand_terms": {
-          "จำนำทะเบียนรถ": 19,
+          "จำนำทะเบียนรถ": 21,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "เลย",
+      "en": "Loei",
+      "slug": "loei",
+      "region": "Isan",
+      "demand": 7.0,
+      "sos": {
+        "AutoX": 0.15,
+        "Heng": 0.1,
+        "Muangthai": 0.35,
+        "Srisawad": 0.0,
+        "Tidlor": 0.4
+      },
+      "autox_share": 0.15,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.4
+      },
+      "autox_sos_rank": 6,
+      "raw": {
+        "brands": {
+          "AutoX": 15,
+          "Heng": 10,
+          "Muangthai": 35,
+          "Srisawad": 0,
+          "Tidlor": 40
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 0,
+          "สินเชื่อรถแลกเงิน": 14
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "พังงา",
+      "en": "Phangnga",
+      "slug": "phangnga",
+      "region": "South",
+      "demand": 3.0,
+      "sos": {
+        "AutoX": 0.0,
+        "Heng": 0.0,
+        "Muangthai": 0.35,
+        "Srisawad": 0.0,
+        "Tidlor": 0.65
+      },
+      "autox_share": 0.0,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.65
+      },
+      "autox_sos_rank": 71,
+      "raw": {
+        "brands": {
+          "AutoX": 0,
+          "Heng": 0,
+          "Muangthai": 35,
+          "Srisawad": 0,
+          "Tidlor": 65
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 6,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "นครพนม",
+      "en": "Nakhon Phanom",
+      "slug": "nakhon-phanom",
+      "region": "Isan",
+      "demand": 2.5,
+      "sos": {
+        "AutoX": 0.1,
+        "Heng": 0.06,
+        "Muangthai": 0.44,
+        "Srisawad": 0.0,
+        "Tidlor": 0.4
+      },
+      "autox_share": 0.1,
+      "best_rival": {
+        "brand": "Muangthai",
+        "share": 0.44
+      },
+      "autox_sos_rank": 29,
+      "raw": {
+        "brands": {
+          "AutoX": 10,
+          "Heng": 6,
+          "Muangthai": 44,
+          "Srisawad": 0,
+          "Tidlor": 40
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 5,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "ประจวบคีรีขันธ์",
+      "en": "Prachuap Khiri Khan",
+      "slug": "prachuap-khiri-khan",
+      "region": "Central&BKK",
+      "demand": 2.0,
+      "sos": {
+        "AutoX": 0.12,
+        "Heng": 0.0,
+        "Muangthai": 0.3,
+        "Srisawad": 0.0,
+        "Tidlor": 0.58
+      },
+      "autox_share": 0.12,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.58
+      },
+      "autox_sos_rank": 14,
+      "raw": {
+        "brands": {
+          "AutoX": 12,
+          "Heng": 0,
+          "Muangthai": 30,
+          "Srisawad": 0,
+          "Tidlor": 58
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 4,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "นครสวรรค์",
+      "en": "Nakhon Sawan",
+      "slug": "nakhon-sawan",
+      "region": "North",
+      "demand": 1.0,
+      "sos": {
+        "AutoX": 0.12,
+        "Heng": 0.1,
+        "Muangthai": 0.42,
+        "Srisawad": 0.0,
+        "Tidlor": 0.36
+      },
+      "autox_share": 0.12,
+      "best_rival": {
+        "brand": "Muangthai",
+        "share": 0.42
+      },
+      "autox_sos_rank": 13,
+      "raw": {
+        "brands": {
+          "AutoX": 12,
+          "Heng": 10,
+          "Muangthai": 42,
+          "Srisawad": 0,
+          "Tidlor": 36
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 2,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "บุรีรัมย์",
+      "en": "Buri Ram",
+      "slug": "buri-ram",
+      "region": "Isan",
+      "demand": 1.0,
+      "sos": {
+        "AutoX": 0.11,
+        "Heng": 0.07,
+        "Muangthai": 0.4,
+        "Srisawad": 0.0,
+        "Tidlor": 0.42
+      },
+      "autox_share": 0.11,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.42
+      },
+      "autox_sos_rank": 19,
+      "raw": {
+        "brands": {
+          "AutoX": 11,
+          "Heng": 7,
+          "Muangthai": 40,
+          "Srisawad": 0,
+          "Tidlor": 42
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 2,
           "สินเชื่อรถแลกเงิน": 0
         },
         "brand_total": 100
@@ -1281,93 +1379,25 @@
       "en": "Ratchaburi",
       "slug": "ratchaburi",
       "region": "Central&BKK",
-      "demand": 1.5,
-      "sos": {
-        "AutoX": 0.1,
-        "Heng": 0.04,
-        "Muangthai": 0.42,
-        "Srisawad": 0.0,
-        "Tidlor": 0.44
-      },
-      "autox_share": 0.1,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.44
-      },
-      "autox_sos_rank": 36,
-      "raw": {
-        "brands": {
-          "AutoX": 10,
-          "Heng": 4,
-          "Muangthai": 42,
-          "Srisawad": 0,
-          "Tidlor": 44
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 3,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "มหาสารคาม",
-      "en": "Maha Sarakham",
-      "slug": "maha-sarakham",
-      "region": "Isan",
       "demand": 1.0,
       "sos": {
         "AutoX": 0.1,
-        "Heng": 0.07,
-        "Muangthai": 0.46,
-        "Srisawad": 0.0,
-        "Tidlor": 0.37
-      },
-      "autox_share": 0.1,
-      "best_rival": {
-        "brand": "Muangthai",
-        "share": 0.46
-      },
-      "autox_sos_rank": 35,
-      "raw": {
-        "brands": {
-          "AutoX": 10,
-          "Heng": 7,
-          "Muangthai": 46,
-          "Srisawad": 0,
-          "Tidlor": 37
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 2,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "ร้อยเอ็ด",
-      "en": "Roi Et",
-      "slug": "roi-et",
-      "region": "Isan",
-      "demand": 1.0,
-      "sos": {
-        "AutoX": 0.11,
-        "Heng": 0.07,
-        "Muangthai": 0.37,
+        "Heng": 0.05,
+        "Muangthai": 0.4,
         "Srisawad": 0.0,
         "Tidlor": 0.45
       },
-      "autox_share": 0.11,
+      "autox_share": 0.1,
       "best_rival": {
         "brand": "Tidlor",
         "share": 0.45
       },
-      "autox_sos_rank": 23,
+      "autox_sos_rank": 33,
       "raw": {
         "brands": {
-          "AutoX": 11,
-          "Heng": 7,
-          "Muangthai": 37,
+          "AutoX": 10,
+          "Heng": 5,
+          "Muangthai": 40,
           "Srisawad": 0,
           "Tidlor": 45
         },
@@ -1379,31 +1409,31 @@
       }
     },
     {
-      "th": "เชียงราย",
-      "en": "Chiang Rai",
-      "slug": "chiang-rai",
-      "region": "North",
+      "th": "อุดรธานี",
+      "en": "Udon Thani",
+      "slug": "udon-thani",
+      "region": "Isan",
       "demand": 1.0,
       "sos": {
-        "AutoX": 0.1,
-        "Heng": 0.15,
-        "Muangthai": 0.32,
+        "AutoX": 0.11,
+        "Heng": 0.05,
+        "Muangthai": 0.4,
         "Srisawad": 0.0,
-        "Tidlor": 0.43
+        "Tidlor": 0.44
       },
-      "autox_share": 0.1,
+      "autox_share": 0.11,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.43
+        "share": 0.44
       },
-      "autox_sos_rank": 40,
+      "autox_sos_rank": 24,
       "raw": {
         "brands": {
-          "AutoX": 10,
-          "Heng": 15,
-          "Muangthai": 32,
+          "AutoX": 11,
+          "Heng": 5,
+          "Muangthai": 40,
           "Srisawad": 0,
-          "Tidlor": 43
+          "Tidlor": 44
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 2,
@@ -1419,59 +1449,25 @@
       "region": "South",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.08,
-        "Heng": 0.05,
-        "Muangthai": 0.37,
+        "AutoX": 0.1,
+        "Heng": 0.0,
+        "Muangthai": 0.41,
         "Srisawad": 0.0,
-        "Tidlor": 0.5
+        "Tidlor": 0.49
       },
-      "autox_share": 0.08,
+      "autox_share": 0.1,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.5
+        "share": 0.49
       },
-      "autox_sos_rank": 48,
+      "autox_sos_rank": 26,
       "raw": {
         "brands": {
-          "AutoX": 8,
-          "Heng": 5,
-          "Muangthai": 37,
+          "AutoX": 10,
+          "Heng": 0,
+          "Muangthai": 41,
           "Srisawad": 0,
-          "Tidlor": 50
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 0,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "กาฬสินธุ์",
-      "en": "Kalasin",
-      "slug": "kalasin",
-      "region": "Isan",
-      "demand": 0.0,
-      "sos": {
-        "AutoX": 0.13,
-        "Heng": 0.04,
-        "Muangthai": 0.33,
-        "Srisawad": 0.0,
-        "Tidlor": 0.5
-      },
-      "autox_share": 0.13,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.5
-      },
-      "autox_sos_rank": 7,
-      "raw": {
-        "brands": {
-          "AutoX": 13,
-          "Heng": 4,
-          "Muangthai": 33,
-          "Srisawad": 0,
-          "Tidlor": 50
+          "Tidlor": 49
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -1487,25 +1483,25 @@
       "region": "North",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.1,
-        "Heng": 0.13,
+        "AutoX": 0.11,
+        "Heng": 0.11,
         "Muangthai": 0.43,
         "Srisawad": 0.0,
-        "Tidlor": 0.34
+        "Tidlor": 0.35
       },
-      "autox_share": 0.1,
+      "autox_share": 0.11,
       "best_rival": {
         "brand": "Muangthai",
         "share": 0.43
       },
-      "autox_sos_rank": 26,
+      "autox_sos_rank": 16,
       "raw": {
         "brands": {
-          "AutoX": 10,
-          "Heng": 13,
+          "AutoX": 11,
+          "Heng": 11,
           "Muangthai": 43,
           "Srisawad": 0,
-          "Tidlor": 34
+          "Tidlor": 35
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -1521,25 +1517,25 @@
       "region": "East",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.11,
+        "AutoX": 0.06,
         "Heng": 0.0,
-        "Muangthai": 0.37,
+        "Muangthai": 0.39,
         "Srisawad": 0.0,
-        "Tidlor": 0.52
+        "Tidlor": 0.55
       },
-      "autox_share": 0.11,
+      "autox_share": 0.06,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.52
+        "share": 0.55
       },
-      "autox_sos_rank": 19,
+      "autox_sos_rank": 65,
       "raw": {
         "brands": {
-          "AutoX": 11,
+          "AutoX": 6,
           "Heng": 0,
-          "Muangthai": 37,
+          "Muangthai": 39,
           "Srisawad": 0,
-          "Tidlor": 52
+          "Tidlor": 55
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -1555,25 +1551,25 @@
       "region": "Central&BKK",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.12,
+        "AutoX": 0.1,
         "Heng": 0.12,
         "Muangthai": 0.41,
         "Srisawad": 0.0,
-        "Tidlor": 0.35
+        "Tidlor": 0.37
       },
-      "autox_share": 0.12,
+      "autox_share": 0.1,
       "best_rival": {
         "brand": "Muangthai",
         "share": 0.41
       },
-      "autox_sos_rank": 12,
+      "autox_sos_rank": 27,
       "raw": {
         "brands": {
-          "AutoX": 12,
+          "AutoX": 10,
           "Heng": 12,
           "Muangthai": 41,
           "Srisawad": 0,
-          "Tidlor": 35
+          "Tidlor": 37
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -1589,25 +1585,25 @@
       "region": "Isan",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.1,
-        "Heng": 0.05,
-        "Muangthai": 0.44,
+        "AutoX": 0.13,
+        "Heng": 0.04,
+        "Muangthai": 0.43,
         "Srisawad": 0.0,
-        "Tidlor": 0.41
+        "Tidlor": 0.4
       },
-      "autox_share": 0.1,
+      "autox_share": 0.13,
       "best_rival": {
         "brand": "Muangthai",
-        "share": 0.44
+        "share": 0.43
       },
-      "autox_sos_rank": 27,
+      "autox_sos_rank": 9,
       "raw": {
         "brands": {
-          "AutoX": 10,
-          "Heng": 5,
-          "Muangthai": 44,
+          "AutoX": 13,
+          "Heng": 4,
+          "Muangthai": 43,
           "Srisawad": 0,
-          "Tidlor": 41
+          "Tidlor": 40
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -1623,25 +1619,25 @@
       "region": "South",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.1,
+        "AutoX": 0.08,
         "Heng": 0.0,
-        "Muangthai": 0.34,
+        "Muangthai": 0.37,
         "Srisawad": 0.0,
-        "Tidlor": 0.56
+        "Tidlor": 0.55
       },
-      "autox_share": 0.1,
+      "autox_share": 0.08,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.56
+        "share": 0.55
       },
-      "autox_sos_rank": 28,
+      "autox_sos_rank": 53,
       "raw": {
         "brands": {
-          "AutoX": 10,
+          "AutoX": 8,
           "Heng": 0,
-          "Muangthai": 34,
+          "Muangthai": 37,
           "Srisawad": 0,
-          "Tidlor": 56
+          "Tidlor": 55
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -1657,25 +1653,25 @@
       "region": "East",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.0,
+        "AutoX": 0.11,
         "Heng": 0.0,
-        "Muangthai": 0.57,
+        "Muangthai": 0.5,
         "Srisawad": 0.0,
-        "Tidlor": 0.43
+        "Tidlor": 0.39
       },
-      "autox_share": 0.0,
+      "autox_share": 0.11,
       "best_rival": {
         "brand": "Muangthai",
-        "share": 0.57
+        "share": 0.5
       },
-      "autox_sos_rank": 68,
+      "autox_sos_rank": 18,
       "raw": {
         "brands": {
-          "AutoX": 0,
+          "AutoX": 11,
           "Heng": 0,
-          "Muangthai": 57,
+          "Muangthai": 50,
           "Srisawad": 0,
-          "Tidlor": 43
+          "Tidlor": 39
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -1691,25 +1687,25 @@
       "region": "North",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.07,
-        "Heng": 0.08,
-        "Muangthai": 0.38,
+        "AutoX": 0.09,
+        "Heng": 0.0,
+        "Muangthai": 0.39,
         "Srisawad": 0.0,
-        "Tidlor": 0.47
+        "Tidlor": 0.52
       },
-      "autox_share": 0.07,
+      "autox_share": 0.09,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.47
+        "share": 0.52
       },
-      "autox_sos_rank": 61,
+      "autox_sos_rank": 39,
       "raw": {
         "brands": {
-          "AutoX": 7,
-          "Heng": 8,
-          "Muangthai": 38,
+          "AutoX": 9,
+          "Heng": 0,
+          "Muangthai": 39,
           "Srisawad": 0,
-          "Tidlor": 47
+          "Tidlor": 52
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -1725,93 +1721,25 @@
       "region": "Central&BKK",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.08,
+        "AutoX": 0.09,
         "Heng": 0.0,
-        "Muangthai": 0.36,
+        "Muangthai": 0.37,
         "Srisawad": 0.0,
-        "Tidlor": 0.56
+        "Tidlor": 0.54
       },
-      "autox_share": 0.08,
+      "autox_share": 0.09,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.56
+        "share": 0.54
       },
-      "autox_sos_rank": 51,
+      "autox_sos_rank": 40,
       "raw": {
         "brands": {
-          "AutoX": 8,
+          "AutoX": 9,
           "Heng": 0,
-          "Muangthai": 36,
+          "Muangthai": 37,
           "Srisawad": 0,
-          "Tidlor": 56
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 0,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "นครพนม",
-      "en": "Nakhon Phanom",
-      "slug": "nakhon-phanom",
-      "region": "Isan",
-      "demand": 0.0,
-      "sos": {
-        "AutoX": 0.08,
-        "Heng": 0.05,
-        "Muangthai": 0.43,
-        "Srisawad": 0.0,
-        "Tidlor": 0.44
-      },
-      "autox_share": 0.08,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.44
-      },
-      "autox_sos_rank": 52,
-      "raw": {
-        "brands": {
-          "AutoX": 8,
-          "Heng": 5,
-          "Muangthai": 43,
-          "Srisawad": 0,
-          "Tidlor": 44
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 0,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "นครสวรรค์",
-      "en": "Nakhon Sawan",
-      "slug": "nakhon-sawan",
-      "region": "North",
-      "demand": 0.0,
-      "sos": {
-        "AutoX": 0.1,
-        "Heng": 0.09,
-        "Muangthai": 0.43,
-        "Srisawad": 0.0,
-        "Tidlor": 0.38
-      },
-      "autox_share": 0.1,
-      "best_rival": {
-        "brand": "Muangthai",
-        "share": 0.43
-      },
-      "autox_sos_rank": 31,
-      "raw": {
-        "brands": {
-          "AutoX": 10,
-          "Heng": 9,
-          "Muangthai": 43,
-          "Srisawad": 0,
-          "Tidlor": 38
+          "Tidlor": 54
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -1827,25 +1755,25 @@
       "region": "South",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.96,
+        "AutoX": 0.5,
         "Heng": 0.0,
         "Muangthai": 0.0,
         "Srisawad": 0.0,
-        "Tidlor": 0.04
+        "Tidlor": 0.5
       },
-      "autox_share": 0.96,
+      "autox_share": 0.5,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.04
+        "share": 0.5
       },
       "autox_sos_rank": 1,
       "raw": {
         "brands": {
-          "AutoX": 96,
+          "AutoX": 50,
           "Heng": 0,
           "Muangthai": 0,
           "Srisawad": 0,
-          "Tidlor": 4
+          "Tidlor": 50
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -1862,24 +1790,24 @@
       "demand": 0.0,
       "sos": {
         "AutoX": 0.0,
-        "Heng": 0.12,
+        "Heng": 0.11,
         "Muangthai": 0.43,
         "Srisawad": 0.0,
-        "Tidlor": 0.45
+        "Tidlor": 0.46
       },
       "autox_share": 0.0,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.45
+        "share": 0.46
       },
       "autox_sos_rank": 69,
       "raw": {
         "brands": {
           "AutoX": 0,
-          "Heng": 12,
+          "Heng": 11,
           "Muangthai": 43,
           "Srisawad": 0,
-          "Tidlor": 45
+          "Tidlor": 46
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -1889,65 +1817,31 @@
       }
     },
     {
-      "th": "บุรีรัมย์",
-      "en": "Buri Ram",
-      "slug": "buri-ram",
+      "th": "บึงกาฬ",
+      "en": "Bung Khla",
+      "slug": "bung-khla",
       "region": "Isan",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.1,
-        "Heng": 0.08,
-        "Muangthai": 0.4,
+        "AutoX": 0.13,
+        "Heng": 0.1,
+        "Muangthai": 0.37,
         "Srisawad": 0.0,
-        "Tidlor": 0.42
+        "Tidlor": 0.4
       },
-      "autox_share": 0.1,
+      "autox_share": 0.13,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.42
+        "share": 0.4
       },
-      "autox_sos_rank": 32,
+      "autox_sos_rank": 11,
       "raw": {
         "brands": {
-          "AutoX": 10,
-          "Heng": 8,
-          "Muangthai": 40,
+          "AutoX": 13,
+          "Heng": 10,
+          "Muangthai": 37,
           "Srisawad": 0,
-          "Tidlor": 42
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 0,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "ประจวบคีรีขันธ์",
-      "en": "Prachuap Khiri Khan",
-      "slug": "prachuap-khiri-khan",
-      "region": "Central&BKK",
-      "demand": 0.0,
-      "sos": {
-        "AutoX": 0.12,
-        "Heng": 0.03,
-        "Muangthai": 0.32,
-        "Srisawad": 0.0,
-        "Tidlor": 0.53
-      },
-      "autox_share": 0.12,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.53
-      },
-      "autox_sos_rank": 13,
-      "raw": {
-        "brands": {
-          "AutoX": 12,
-          "Heng": 3,
-          "Muangthai": 32,
-          "Srisawad": 0,
-          "Tidlor": 53
+          "Tidlor": 40
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -1963,25 +1857,25 @@
       "region": "East",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.1,
+        "AutoX": 0.11,
         "Heng": 0.05,
         "Muangthai": 0.37,
         "Srisawad": 0.0,
-        "Tidlor": 0.48
+        "Tidlor": 0.47
       },
-      "autox_share": 0.1,
+      "autox_share": 0.11,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.48
+        "share": 0.47
       },
-      "autox_sos_rank": 34,
+      "autox_sos_rank": 21,
       "raw": {
         "brands": {
-          "AutoX": 10,
+          "AutoX": 11,
           "Heng": 5,
           "Muangthai": 37,
           "Srisawad": 0,
-          "Tidlor": 48
+          "Tidlor": 47
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -1999,23 +1893,23 @@
       "sos": {
         "AutoX": 0.0,
         "Heng": 0.0,
-        "Muangthai": 0.69,
+        "Muangthai": 0.57,
         "Srisawad": 0.0,
-        "Tidlor": 0.31
+        "Tidlor": 0.43
       },
       "autox_share": 0.0,
       "best_rival": {
         "brand": "Muangthai",
-        "share": 0.69
+        "share": 0.57
       },
       "autox_sos_rank": 70,
       "raw": {
         "brands": {
           "AutoX": 0,
           "Heng": 0,
-          "Muangthai": 69,
+          "Muangthai": 57,
           "Srisawad": 0,
-          "Tidlor": 31
+          "Tidlor": 43
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2031,59 +1925,25 @@
       "region": "North",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.09,
+        "AutoX": 0.08,
         "Heng": 0.09,
-        "Muangthai": 0.41,
+        "Muangthai": 0.39,
         "Srisawad": 0.0,
-        "Tidlor": 0.41
+        "Tidlor": 0.44
       },
-      "autox_share": 0.09,
-      "best_rival": {
-        "brand": "Muangthai",
-        "share": 0.41
-      },
-      "autox_sos_rank": 42,
-      "raw": {
-        "brands": {
-          "AutoX": 9,
-          "Heng": 9,
-          "Muangthai": 41,
-          "Srisawad": 0,
-          "Tidlor": 41
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 0,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "พังงา",
-      "en": "Phangnga",
-      "slug": "phangnga",
-      "region": "South",
-      "demand": 0.0,
-      "sos": {
-        "AutoX": 0.0,
-        "Heng": 0.0,
-        "Muangthai": 0.37,
-        "Srisawad": 0.0,
-        "Tidlor": 0.63
-      },
-      "autox_share": 0.0,
+      "autox_share": 0.08,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.63
+        "share": 0.44
       },
-      "autox_sos_rank": 71,
+      "autox_sos_rank": 56,
       "raw": {
         "brands": {
-          "AutoX": 0,
-          "Heng": 0,
-          "Muangthai": 37,
+          "AutoX": 8,
+          "Heng": 9,
+          "Muangthai": 39,
           "Srisawad": 0,
-          "Tidlor": 63
+          "Tidlor": 44
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2099,25 +1959,25 @@
       "region": "South",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.06,
+        "AutoX": 0.07,
         "Heng": 0.0,
-        "Muangthai": 0.34,
+        "Muangthai": 0.3,
         "Srisawad": 0.0,
-        "Tidlor": 0.6
+        "Tidlor": 0.63
       },
-      "autox_share": 0.06,
+      "autox_share": 0.07,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.6
+        "share": 0.63
       },
-      "autox_sos_rank": 63,
+      "autox_sos_rank": 61,
       "raw": {
         "brands": {
-          "AutoX": 6,
+          "AutoX": 7,
           "Heng": 0,
-          "Muangthai": 34,
+          "Muangthai": 30,
           "Srisawad": 0,
-          "Tidlor": 60
+          "Tidlor": 63
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2133,25 +1993,59 @@
       "region": "North",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.06,
-        "Heng": 0.14,
-        "Muangthai": 0.45,
+        "AutoX": 0.09,
+        "Heng": 0.11,
+        "Muangthai": 0.44,
         "Srisawad": 0.0,
-        "Tidlor": 0.35
+        "Tidlor": 0.36
       },
-      "autox_share": 0.06,
+      "autox_share": 0.09,
       "best_rival": {
         "brand": "Muangthai",
-        "share": 0.45
+        "share": 0.44
       },
-      "autox_sos_rank": 64,
+      "autox_sos_rank": 41,
       "raw": {
         "brands": {
-          "AutoX": 6,
-          "Heng": 14,
-          "Muangthai": 45,
+          "AutoX": 9,
+          "Heng": 11,
+          "Muangthai": 44,
           "Srisawad": 0,
-          "Tidlor": 35
+          "Tidlor": 36
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 0,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "มหาสารคาม",
+      "en": "Maha Sarakham",
+      "slug": "maha-sarakham",
+      "region": "Isan",
+      "demand": 0.0,
+      "sos": {
+        "AutoX": 0.09,
+        "Heng": 0.05,
+        "Muangthai": 0.46,
+        "Srisawad": 0.0,
+        "Tidlor": 0.4
+      },
+      "autox_share": 0.09,
+      "best_rival": {
+        "brand": "Muangthai",
+        "share": 0.46
+      },
+      "autox_sos_rank": 42,
+      "raw": {
+        "brands": {
+          "AutoX": 9,
+          "Heng": 5,
+          "Muangthai": 46,
+          "Srisawad": 0,
+          "Tidlor": 40
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2167,25 +2061,25 @@
       "region": "Isan",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.14,
+        "AutoX": 0.0,
         "Heng": 0.0,
-        "Muangthai": 0.4,
+        "Muangthai": 0.49,
         "Srisawad": 0.0,
-        "Tidlor": 0.46
+        "Tidlor": 0.51
       },
-      "autox_share": 0.14,
+      "autox_share": 0.0,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.46
+        "share": 0.51
       },
-      "autox_sos_rank": 3,
+      "autox_sos_rank": 72,
       "raw": {
         "brands": {
-          "AutoX": 14,
+          "AutoX": 0,
           "Heng": 0,
-          "Muangthai": 40,
+          "Muangthai": 49,
           "Srisawad": 0,
-          "Tidlor": 46
+          "Tidlor": 51
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2201,25 +2095,59 @@
       "region": "South",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.0,
+        "AutoX": 0.26,
         "Heng": 0.0,
-        "Muangthai": 0.32,
+        "Muangthai": 0.29,
         "Srisawad": 0.0,
-        "Tidlor": 0.68
+        "Tidlor": 0.45
       },
-      "autox_share": 0.0,
+      "autox_share": 0.26,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.68
+        "share": 0.45
       },
-      "autox_sos_rank": 72,
+      "autox_sos_rank": 2,
       "raw": {
         "brands": {
-          "AutoX": 0,
+          "AutoX": 26,
           "Heng": 0,
-          "Muangthai": 32,
+          "Muangthai": 29,
           "Srisawad": 0,
-          "Tidlor": 68
+          "Tidlor": 45
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 0,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "ยโสธร",
+      "en": "Yasothon",
+      "slug": "yasothon",
+      "region": "Isan",
+      "demand": 0.0,
+      "sos": {
+        "AutoX": 0.22,
+        "Heng": 0.0,
+        "Muangthai": 0.39,
+        "Srisawad": 0.0,
+        "Tidlor": 0.39
+      },
+      "autox_share": 0.22,
+      "best_rival": {
+        "brand": "Muangthai",
+        "share": 0.39
+      },
+      "autox_sos_rank": 3,
+      "raw": {
+        "brands": {
+          "AutoX": 22,
+          "Heng": 0,
+          "Muangthai": 39,
+          "Srisawad": 0,
+          "Tidlor": 39
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2237,23 +2165,57 @@
       "sos": {
         "AutoX": 0.0,
         "Heng": 0.0,
-        "Muangthai": 0.35,
+        "Muangthai": 0.33,
         "Srisawad": 0.0,
-        "Tidlor": 0.65
+        "Tidlor": 0.67
       },
       "autox_share": 0.0,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.65
+        "share": 0.67
       },
       "autox_sos_rank": 73,
       "raw": {
         "brands": {
           "AutoX": 0,
           "Heng": 0,
-          "Muangthai": 35,
+          "Muangthai": 33,
           "Srisawad": 0,
-          "Tidlor": 65
+          "Tidlor": 67
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 0,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "ร้อยเอ็ด",
+      "en": "Roi Et",
+      "slug": "roi-et",
+      "region": "Isan",
+      "demand": 0.0,
+      "sos": {
+        "AutoX": 0.1,
+        "Heng": 0.06,
+        "Muangthai": 0.38,
+        "Srisawad": 0.0,
+        "Tidlor": 0.46
+      },
+      "autox_share": 0.1,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.46
+      },
+      "autox_sos_rank": 34,
+      "raw": {
+        "brands": {
+          "AutoX": 10,
+          "Heng": 6,
+          "Muangthai": 38,
+          "Srisawad": 0,
+          "Tidlor": 46
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2270,22 +2232,56 @@
       "demand": 0.0,
       "sos": {
         "AutoX": 0.08,
-        "Heng": 0.07,
+        "Heng": 0.08,
         "Muangthai": 0.39,
         "Srisawad": 0.0,
-        "Tidlor": 0.46
+        "Tidlor": 0.45
       },
       "autox_share": 0.08,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.46
+        "share": 0.45
       },
-      "autox_sos_rank": 54,
+      "autox_sos_rank": 57,
       "raw": {
         "brands": {
           "AutoX": 8,
-          "Heng": 7,
+          "Heng": 8,
           "Muangthai": 39,
+          "Srisawad": 0,
+          "Tidlor": 45
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 0,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "ลำปาง",
+      "en": "Lampang",
+      "slug": "lampang",
+      "region": "North",
+      "demand": 0.0,
+      "sos": {
+        "AutoX": 0.09,
+        "Heng": 0.11,
+        "Muangthai": 0.34,
+        "Srisawad": 0.0,
+        "Tidlor": 0.46
+      },
+      "autox_share": 0.09,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.46
+      },
+      "autox_sos_rank": 43,
+      "raw": {
+        "brands": {
+          "AutoX": 9,
+          "Heng": 11,
+          "Muangthai": 34,
           "Srisawad": 0,
           "Tidlor": 46
         },
@@ -2297,31 +2293,31 @@
       }
     },
     {
-      "th": "ศรีสะเกษ",
-      "en": "Si Sa Ket",
-      "slug": "si-sa-ket",
-      "region": "Isan",
+      "th": "ลำพูน",
+      "en": "Lamphun",
+      "slug": "lamphun",
+      "region": "North",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.1,
-        "Heng": 0.04,
-        "Muangthai": 0.4,
+        "AutoX": 0.09,
+        "Heng": 0.1,
+        "Muangthai": 0.38,
         "Srisawad": 0.0,
-        "Tidlor": 0.46
+        "Tidlor": 0.43
       },
-      "autox_share": 0.1,
+      "autox_share": 0.09,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.46
+        "share": 0.43
       },
-      "autox_sos_rank": 37,
+      "autox_sos_rank": 44,
       "raw": {
         "brands": {
-          "AutoX": 10,
-          "Heng": 4,
-          "Muangthai": 40,
+          "AutoX": 9,
+          "Heng": 10,
+          "Muangthai": 38,
           "Srisawad": 0,
-          "Tidlor": 46
+          "Tidlor": 43
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2337,25 +2333,25 @@
       "region": "Isan",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.12,
+        "AutoX": 0.11,
         "Heng": 0.08,
         "Muangthai": 0.34,
         "Srisawad": 0.0,
-        "Tidlor": 0.46
+        "Tidlor": 0.47
       },
-      "autox_share": 0.12,
+      "autox_share": 0.11,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.46
+        "share": 0.47
       },
-      "autox_sos_rank": 15,
+      "autox_sos_rank": 22,
       "raw": {
         "brands": {
-          "AutoX": 12,
+          "AutoX": 11,
           "Heng": 8,
           "Muangthai": 34,
           "Srisawad": 0,
-          "Tidlor": 46
+          "Tidlor": 47
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2369,40 +2365,6 @@
       "en": "Satun",
       "slug": "satun",
       "region": "South",
-      "demand": 0.0,
-      "sos": {
-        "AutoX": 0.13,
-        "Heng": 0.0,
-        "Muangthai": 0.3,
-        "Srisawad": 0.0,
-        "Tidlor": 0.57
-      },
-      "autox_share": 0.13,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.57
-      },
-      "autox_sos_rank": 10,
-      "raw": {
-        "brands": {
-          "AutoX": 13,
-          "Heng": 0,
-          "Muangthai": 30,
-          "Srisawad": 0,
-          "Tidlor": 57
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 0,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "สมุทรสงคราม",
-      "en": "Samut Songkhram",
-      "slug": "samut-songkhram",
-      "region": "Central&BKK",
       "demand": 0.0,
       "sos": {
         "AutoX": 0.0,
@@ -2433,31 +2395,65 @@
       }
     },
     {
+      "th": "สมุทรสงคราม",
+      "en": "Samut Songkhram",
+      "slug": "samut-songkhram",
+      "region": "Central&BKK",
+      "demand": 0.0,
+      "sos": {
+        "AutoX": 0.1,
+        "Heng": 0.0,
+        "Muangthai": 0.34,
+        "Srisawad": 0.0,
+        "Tidlor": 0.56
+      },
+      "autox_share": 0.1,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.56
+      },
+      "autox_sos_rank": 35,
+      "raw": {
+        "brands": {
+          "AutoX": 10,
+          "Heng": 0,
+          "Muangthai": 34,
+          "Srisawad": 0,
+          "Tidlor": 56
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 0,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
       "th": "สระแก้ว",
       "en": "Sa Kaeo",
       "slug": "sa-kaeo",
       "region": "East",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.11,
-        "Heng": 0.06,
-        "Muangthai": 0.41,
+        "AutoX": 0.09,
+        "Heng": 0.05,
+        "Muangthai": 0.42,
         "Srisawad": 0.0,
-        "Tidlor": 0.42
+        "Tidlor": 0.44
       },
-      "autox_share": 0.11,
+      "autox_share": 0.09,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.42
+        "share": 0.44
       },
-      "autox_sos_rank": 25,
+      "autox_sos_rank": 48,
       "raw": {
         "brands": {
-          "AutoX": 11,
-          "Heng": 6,
-          "Muangthai": 41,
+          "AutoX": 9,
+          "Heng": 5,
+          "Muangthai": 42,
           "Srisawad": 0,
-          "Tidlor": 42
+          "Tidlor": 44
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2473,25 +2469,25 @@
       "region": "Isan",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.05,
-        "Heng": 0.07,
+        "AutoX": 0.08,
+        "Heng": 0.08,
         "Muangthai": 0.46,
         "Srisawad": 0.0,
-        "Tidlor": 0.42
+        "Tidlor": 0.38
       },
-      "autox_share": 0.05,
+      "autox_share": 0.08,
       "best_rival": {
         "brand": "Muangthai",
         "share": 0.46
       },
-      "autox_sos_rank": 67,
+      "autox_sos_rank": 59,
       "raw": {
         "brands": {
-          "AutoX": 5,
-          "Heng": 7,
+          "AutoX": 8,
+          "Heng": 8,
           "Muangthai": 46,
           "Srisawad": 0,
-          "Tidlor": 42
+          "Tidlor": 38
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2507,23 +2503,23 @@
       "region": "North",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.07,
-        "Heng": 0.06,
-        "Muangthai": 0.59,
+        "AutoX": 0.06,
+        "Heng": 0.1,
+        "Muangthai": 0.56,
         "Srisawad": 0.0,
         "Tidlor": 0.28
       },
-      "autox_share": 0.07,
+      "autox_share": 0.06,
       "best_rival": {
         "brand": "Muangthai",
-        "share": 0.59
+        "share": 0.56
       },
-      "autox_sos_rank": 62,
+      "autox_sos_rank": 67,
       "raw": {
         "brands": {
-          "AutoX": 7,
-          "Heng": 6,
-          "Muangthai": 59,
+          "AutoX": 6,
+          "Heng": 10,
+          "Muangthai": 56,
           "Srisawad": 0,
           "Tidlor": 28
         },
@@ -2541,25 +2537,25 @@
       "region": "Isan",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.13,
-        "Heng": 0.0,
-        "Muangthai": 0.41,
+        "AutoX": 0.14,
+        "Heng": 0.08,
+        "Muangthai": 0.35,
         "Srisawad": 0.0,
-        "Tidlor": 0.46
+        "Tidlor": 0.43
       },
-      "autox_share": 0.13,
+      "autox_share": 0.14,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.46
+        "share": 0.43
       },
-      "autox_sos_rank": 11,
+      "autox_sos_rank": 7,
       "raw": {
         "brands": {
-          "AutoX": 13,
-          "Heng": 0,
-          "Muangthai": 41,
+          "AutoX": 14,
+          "Heng": 8,
+          "Muangthai": 35,
           "Srisawad": 0,
-          "Tidlor": 46
+          "Tidlor": 43
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2575,23 +2571,23 @@
       "region": "Isan",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.14,
+        "AutoX": 0.13,
         "Heng": 0.0,
-        "Muangthai": 0.44,
+        "Muangthai": 0.45,
         "Srisawad": 0.0,
         "Tidlor": 0.42
       },
-      "autox_share": 0.14,
+      "autox_share": 0.13,
       "best_rival": {
         "brand": "Muangthai",
-        "share": 0.44
+        "share": 0.45
       },
-      "autox_sos_rank": 4,
+      "autox_sos_rank": 12,
       "raw": {
         "brands": {
-          "AutoX": 14,
+          "AutoX": 13,
           "Heng": 0,
-          "Muangthai": 44,
+          "Muangthai": 45,
           "Srisawad": 0,
           "Tidlor": 42
         },
@@ -2609,25 +2605,25 @@
       "region": "Isan",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.0,
+        "AutoX": 0.16,
         "Heng": 0.0,
-        "Muangthai": 0.4,
+        "Muangthai": 0.38,
         "Srisawad": 0.0,
-        "Tidlor": 0.6
+        "Tidlor": 0.46
       },
-      "autox_share": 0.0,
+      "autox_share": 0.16,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.6
+        "share": 0.46
       },
-      "autox_sos_rank": 76,
+      "autox_sos_rank": 4,
       "raw": {
         "brands": {
-          "AutoX": 0,
+          "AutoX": 16,
           "Heng": 0,
-          "Muangthai": 40,
+          "Muangthai": 38,
           "Srisawad": 0,
-          "Tidlor": 60
+          "Tidlor": 46
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2644,24 +2640,24 @@
       "demand": 0.0,
       "sos": {
         "AutoX": 0.06,
-        "Heng": 0.13,
-        "Muangthai": 0.38,
+        "Heng": 0.12,
+        "Muangthai": 0.4,
         "Srisawad": 0.0,
-        "Tidlor": 0.43
+        "Tidlor": 0.42
       },
       "autox_share": 0.06,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.43
+        "share": 0.42
       },
-      "autox_sos_rank": 66,
+      "autox_sos_rank": 68,
       "raw": {
         "brands": {
           "AutoX": 6,
-          "Heng": 13,
-          "Muangthai": 38,
+          "Heng": 12,
+          "Muangthai": 40,
           "Srisawad": 0,
-          "Tidlor": 43
+          "Tidlor": 42
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2677,25 +2673,25 @@
       "region": "North",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.1,
-        "Heng": 0.12,
-        "Muangthai": 0.39,
+        "AutoX": 0.0,
+        "Heng": 0.14,
+        "Muangthai": 0.43,
         "Srisawad": 0.0,
-        "Tidlor": 0.39
+        "Tidlor": 0.43
       },
-      "autox_share": 0.1,
+      "autox_share": 0.0,
       "best_rival": {
         "brand": "Muangthai",
-        "share": 0.39
+        "share": 0.43
       },
-      "autox_sos_rank": 39,
+      "autox_sos_rank": 76,
       "raw": {
         "brands": {
-          "AutoX": 10,
-          "Heng": 12,
-          "Muangthai": 39,
+          "AutoX": 0,
+          "Heng": 14,
+          "Muangthai": 43,
           "Srisawad": 0,
-          "Tidlor": 39
+          "Tidlor": 43
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2711,25 +2707,59 @@
       "region": "Central&BKK",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.14,
-        "Heng": 0.08,
-        "Muangthai": 0.32,
+        "AutoX": 0.15,
+        "Heng": 0.07,
+        "Muangthai": 0.29,
         "Srisawad": 0.0,
-        "Tidlor": 0.46
+        "Tidlor": 0.49
       },
-      "autox_share": 0.14,
+      "autox_share": 0.15,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.46
+        "share": 0.49
       },
       "autox_sos_rank": 5,
       "raw": {
         "brands": {
-          "AutoX": 14,
-          "Heng": 8,
+          "AutoX": 15,
+          "Heng": 7,
+          "Muangthai": 29,
+          "Srisawad": 0,
+          "Tidlor": 49
+        },
+        "demand_terms": {
+          "จำนำทะเบียนรถ": 0,
+          "สินเชื่อรถแลกเงิน": 0
+        },
+        "brand_total": 100
+      }
+    },
+    {
+      "th": "เชียงราย",
+      "en": "Chiang Rai",
+      "slug": "chiang-rai",
+      "region": "North",
+      "demand": 0.0,
+      "sos": {
+        "AutoX": 0.1,
+        "Heng": 0.14,
+        "Muangthai": 0.32,
+        "Srisawad": 0.0,
+        "Tidlor": 0.44
+      },
+      "autox_share": 0.1,
+      "best_rival": {
+        "brand": "Tidlor",
+        "share": 0.44
+      },
+      "autox_sos_rank": 36,
+      "raw": {
+        "brands": {
+          "AutoX": 10,
+          "Heng": 14,
           "Muangthai": 32,
           "Srisawad": 0,
-          "Tidlor": 46
+          "Tidlor": 44
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
@@ -2745,57 +2775,23 @@
       "region": "Central&BKK",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.12,
-        "Heng": 0.04,
+        "AutoX": 0.11,
+        "Heng": 0.05,
         "Muangthai": 0.42,
         "Srisawad": 0.0,
         "Tidlor": 0.42
       },
-      "autox_share": 0.12,
+      "autox_share": 0.11,
       "best_rival": {
         "brand": "Muangthai",
         "share": 0.42
       },
-      "autox_sos_rank": 17,
+      "autox_sos_rank": 25,
       "raw": {
         "brands": {
-          "AutoX": 12,
-          "Heng": 4,
+          "AutoX": 11,
+          "Heng": 5,
           "Muangthai": 42,
-          "Srisawad": 0,
-          "Tidlor": 42
-        },
-        "demand_terms": {
-          "จำนำทะเบียนรถ": 0,
-          "สินเชื่อรถแลกเงิน": 0
-        },
-        "brand_total": 100
-      }
-    },
-    {
-      "th": "เลย",
-      "en": "Loei",
-      "slug": "loei",
-      "region": "Isan",
-      "demand": 0.0,
-      "sos": {
-        "AutoX": 0.14,
-        "Heng": 0.07,
-        "Muangthai": 0.37,
-        "Srisawad": 0.0,
-        "Tidlor": 0.42
-      },
-      "autox_share": 0.14,
-      "best_rival": {
-        "brand": "Tidlor",
-        "share": 0.42
-      },
-      "autox_sos_rank": 6,
-      "raw": {
-        "brands": {
-          "AutoX": 14,
-          "Heng": 7,
-          "Muangthai": 37,
           "Srisawad": 0,
           "Tidlor": 42
         },
@@ -2813,23 +2809,23 @@
       "region": "North",
       "demand": 0.0,
       "sos": {
-        "AutoX": 0.09,
+        "AutoX": 0.07,
         "Heng": 0.11,
-        "Muangthai": 0.37,
+        "Muangthai": 0.39,
         "Srisawad": 0.0,
         "Tidlor": 0.43
       },
-      "autox_share": 0.09,
+      "autox_share": 0.07,
       "best_rival": {
         "brand": "Tidlor",
         "share": 0.43
       },
-      "autox_sos_rank": 47,
+      "autox_sos_rank": 64,
       "raw": {
         "brands": {
-          "AutoX": 9,
+          "AutoX": 7,
           "Heng": 11,
-          "Muangthai": 37,
+          "Muangthai": 39,
           "Srisawad": 0,
           "Tidlor": 43
         },
@@ -2849,23 +2845,23 @@
       "sos": {
         "AutoX": 0.0,
         "Heng": 0.0,
-        "Muangthai": 0.44,
+        "Muangthai": 0.47,
         "Srisawad": 0.0,
-        "Tidlor": 0.56
+        "Tidlor": 0.53
       },
       "autox_share": 0.0,
       "best_rival": {
         "brand": "Tidlor",
-        "share": 0.56
+        "share": 0.53
       },
       "autox_sos_rank": 77,
       "raw": {
         "brands": {
           "AutoX": 0,
           "Heng": 0,
-          "Muangthai": 44,
+          "Muangthai": 47,
           "Srisawad": 0,
-          "Tidlor": 56
+          "Tidlor": 53
         },
         "demand_terms": {
           "จำนำทะเบียนรถ": 0,
