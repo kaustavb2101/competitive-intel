@@ -8,53 +8,6 @@
  },
  "runs": [
   {
-   "append_history_rc": 0,
-   "feeds": [
-    {
-     "bytes_after": 1443,
-     "bytes_before": 1443,
-     "key": "fuel_prices",
-     "rc": 0,
-     "seconds": 1.2,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 7109,
-     "bytes_before": 7109,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 4.4,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8901,
-     "bytes_before": 8897,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 5.1,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 3989,
-     "bytes_before": 3989,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 124.3,
-     "status": "ok"
-    }
-   ],
-   "finished": "2026-08-14T10:38:27Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 3,
-   "n_failed": 0,
-   "n_ok": 4,
-   "n_skipped": 0,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-14T10:36:23Z"
-  },
-  {
    "append_history_rc": null,
    "feeds": [
     {
@@ -3202,6 +3155,53 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-08-26T10:09:13Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7109,
+     "bytes_before": 7106,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 4.5,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8883,
+     "bytes_before": 8876,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 5.3,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 3990,
+     "bytes_before": 3990,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 155.2,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 1410265,
+     "bytes_before": 1410265,
+     "key": "google_ads",
+     "rc": 3,
+     "seconds": 338.1,
+     "status": "skipped"
+    }
+   ],
+   "finished": "2026-08-26T16:42:40Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 2,
+   "n_failed": 0,
+   "n_ok": 3,
+   "n_skipped": 1,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-08-26T16:37:02Z"
   }
  ]
 }
