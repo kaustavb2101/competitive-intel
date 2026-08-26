@@ -594,9 +594,17 @@ function provinceTable(rows){
   h+='</tr></thead><tbody>'+rows.map(rowHtml).join('')+'</tbody></table></div>';
   return h;
 }
-function rowHtml(p){return '<tr data-slug="'+esc(p.slug)+'">'+COLS.map(function(c){return c.cell(p);}).join('')+'</tr>';}
+function rowHtml(p){return '<tr data-slug="'+esc(p.slug)+'" role="link" tabindex="0">'+COLS.map(function(c){return c.cell(p);}).join('')+'</tr>';}
 
 var sortState={c:3,dir:-1}; // default: rivals/branch desc
+// Clickable table rows navigate to a detail page on click; wire Enter/Space too so keyboard/switch
+// users can activate them (WCAG 2.1.1 Keyboard). Rows carry role="link" tabindex="0"; mirrors the
+// SPA's house pattern (app.js ux-impact-prow-keyboard). `href(tr)` returns the URL or '' to skip.
+function wireRowNav(tbody,href){if(!tbody)return;
+  function go(tr){if(!tr)return;var u=href(tr);if(u)location.href=u;}
+  tbody.addEventListener('click',function(e){go(e.target.closest('tr'));});
+  tbody.addEventListener('keydown',function(e){if(e.key!=='Enter'&&e.key!==' '&&e.key!=='Spacebar')return;var tr=e.target.closest('tr[role="link"]');if(!tr)return;e.preventDefault();go(tr);});
+}
 function wireTable(rows){
   var tbl=document.getElementById('ptbl'); if(!tbl)return;
   applySort(rows);
@@ -608,7 +616,7 @@ function wireTable(rows){
     // headers are tabindex=0 (not native buttons) so wire keyboard sort ourselves (WCAG 2.1.1)
     th.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '||e.key==='Spacebar'){e.preventDefault();doSort(th);}});
   });
-  tbl.querySelector('tbody').addEventListener('click',function(e){var tr=e.target.closest('tr');if(tr&&tr.getAttribute('data-slug'))location.href='?p='+encodeURIComponent(tr.getAttribute('data-slug'))+THEME_QS;});
+  wireRowNav(tbl.querySelector('tbody'),function(tr){var s=tr.getAttribute('data-slug');return s?('?p='+encodeURIComponent(s)+THEME_QS):'';});
 }
 // #ptbl.__rows is the single source of truth for what the table is currently showing. Pass `rows`
 // to swap the set (initial render / region filter); call with no arg to re-sort what's already there
@@ -781,7 +789,7 @@ function fillProvinceBranches(provTh){
     var h='<p class="db-sub" style="margin:2px 0 8px">All '+num(rows.length)+' branches here, highest opportunity first. Scores are estimated 0–100 lens screens; click a branch for its full readout.</p>';
     h+='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Branch</th><th>District</th><th>Opp</th><th>Agri-PD</th><th>Merchant</th><th>Collat</th><th>Pop ≤10km</th><th>Workers</th></tr></thead><tbody>';
     rows.forEach(function(row){var d=row.d;
-      h+='<tr data-i="'+row.i+'" style="cursor:pointer"><td class="name" lang="th">'+esc(d.n)+'</td><td class="sub" lang="th">'+esc(d.d||'—')+'</td>'+
+      h+='<tr data-i="'+row.i+'" role="link" tabindex="0" style="cursor:pointer"><td class="name" lang="th">'+esc(d.n)+'</td><td class="sub" lang="th">'+esc(d.d||'—')+'</td>'+
         '<td class="mono" style="color:'+scoreCol(d.o)+'">'+Math.round(d.o)+'</td>'+
         '<td class="mono" style="color:'+scoreCol(d.a)+'">'+Math.round(d.a)+'</td>'+
         '<td class="mono" style="color:'+scoreCol(d.m)+'">'+Math.round(d.m)+'</td>'+
@@ -790,7 +798,7 @@ function fillProvinceBranches(provTh){
     });
     h+='</tbody></table></div>';
     host.innerHTML=h;
-    host.querySelector('tbody').addEventListener('click',function(e){var tr=e.target.closest('tr');if(tr&&tr.getAttribute('data-i'))location.href='?b='+tr.getAttribute('data-i')+THEME_QS;});
+    wireRowNav(host.querySelector('tbody'),function(tr){var i=tr.getAttribute('data-i');return i?('?b='+i+THEME_QS):'';});
   });
 }
 function metricRow(label,sub,val,graphic){
@@ -892,7 +900,7 @@ function renderBranchBrowse(){
       th.addEventListener('click',so);
       th.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();so();}});
     });
-    document.getElementById('brbody').addEventListener('click',function(e){var tr=e.target.closest('tr');if(tr&&tr.getAttribute('data-i'))location.href='?b='+tr.getAttribute('data-i')+THEME_QS;});
+    wireRowNav(document.getElementById('brbody'),function(tr){var i=tr.getAttribute('data-i');return i?('?b='+i+THEME_QS):'';});
     fillBranchBody();
   });
 }
@@ -927,7 +935,7 @@ function fillBranchBody(){
     th.className=on?(brSort.dir>0?'sort-asc':'sort-desc'):'';
     th.setAttribute('aria-sort',on?(brSort.dir>0?'ascending':'descending'):'none');});
   var out='';
-  rows.forEach(function(row){var d=row.d;out+='<tr data-i="'+row.i+'" style="cursor:pointer">';
+  rows.forEach(function(row){var d=row.d;out+='<tr data-i="'+row.i+'" role="link" tabindex="0" style="cursor:pointer">';
     BRCOLS.forEach(function(c){var v=c.g(d);
       if(c.txt)out+='<td class="'+(c.t==='Branch'?'name':'sub')+'" lang="th">'+esc(v||'—')+'</td>';
       else if(c.score)out+='<td class="mono" style="color:'+scoreCol(v)+'">'+(v==null?'—':Math.round(v))+'</td>';
