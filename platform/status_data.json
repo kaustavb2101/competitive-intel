@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-26T11:29:45+07:00",
-    "commit": "035f11a"
+    "generated_at": "2026-08-26T10:00:36+00:00",
+    "commit": "0505eff"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-08-26T10:00:36+00:00",
+      "sha": "0505eff",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-26, run 32955837826)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-26T09:06:23+00:00",
+      "sha": "85eaa0c",
+      "summary": "data: NABC live prices (2026-08-26, run 32950718695)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-26T08:30:07+00:00",
+      "sha": "14b714c",
+      "summary": "docs: log UX-loop run — #sim caption bleed fix (PR #641, merged + deploy-verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-26T15:25:04+07:00",
+      "sha": "f5f499c",
+      "summary": "ux: fix #sim factory-card provenance caption bleed at 768px (iPad portrait) (#641)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-26T07:47:38+00:00",
+      "sha": "db133ad",
+      "summary": "feat(command-center): agri-competitive squeeze — farm-stress × rival dominance, a distinct cross-objective board (obj #1 agri × obj #2) (#640)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-26T06:16:01+00:00",
+      "sha": "63ac761",
+      "summary": "data(census): refresh the Union Auction forward book (run 32929806025) (#636)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-26T05:51:41+00:00",
+      "sha": "4c6c07a",
+      "summary": "data: market-pulse swarm refresh (run 32929325203) (#638)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-26T05:13:35+00:00",
+      "sha": "1b81d92",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 32930435448) (#639)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-26T04:32:00+00:00",
+      "sha": "df31148",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after peer book-mix ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-26T11:29:45+07:00",
       "sha": "035f11a",
       "summary": "feat(acq): rival loan-book structure — secured loan vs hire-purchase split from SET filing NOTES (peer comparison, obj #2) (#637)",
@@ -657,60 +711,6 @@
       "sha": "6453e57",
       "summary": "chore(dashboard): refresh CEO autonomy plan after peer book-intensity×return ship",
       "pillar": "peer"
-    },
-    {
-      "date": "2026-08-25T23:42:50+07:00",
-      "sha": "9ce1599",
-      "summary": "feat(acq): join book-per-door intensity with SET-measured ROE/PBV (peer comparison, obj #2) (#626)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-25T16:04:50+00:00",
-      "sha": "4946e40",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-25, run 32869554890)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-25T14:44:04+00:00",
-      "sha": "d605012",
-      "summary": "chore(docs): log ux-databook-branches-aria-sort merge+deploy+verify (PR #624)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-25T21:41:14+07:00",
-      "sha": "d35ed41",
-      "summary": "ux: announce sort state on data-book \"All branches\" table (aria-sort) (#624)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-25T12:53:23+00:00",
-      "sha": "087b87c",
-      "summary": "feat(exposure): occupation×income 90+dpd heat-grid from the real tape (obj #1) (#623)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-25T12:12:47+00:00",
-      "sha": "d7bf5db",
-      "summary": "data: SET listed-peer scoreboard refresh (run 32843427239) (#622)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-25T11:30:42+00:00",
-      "sha": "99da339",
-      "summary": "data: market-pulse swarm refresh (run 32835227816) (#619)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-25T11:06:55+00:00",
-      "sha": "fc1b336",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 32836868860) (#621)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-25T10:22:56+00:00",
-      "sha": "1968fe0",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after book-per-point ship",
-      "pillar": "feature"
     }
   ]
 }
