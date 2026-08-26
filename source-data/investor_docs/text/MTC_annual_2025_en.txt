@@ -2556,7 +2556,7 @@ The Company has established a clear target to reduce carbon dioxide emissions, w
 resources. Therefore, it has established
 carbon neutrality by 2030 and net zero greenhouse gas emissions by 2050. In 2025, the Company’s greenhouse
 the following measures for efficient
-gas emissions from operations totaled 34,066.68 tCO2e, representing 11.07%, which remained within the water consumption.
+gas emissions from operations totaled 34,045.16 tCO2e, representing 11.12%, which remained within the water consumption.
 established target range.
 1. Set a water consumption ceiling for branches to control the
 amount and costs of water consumption. This also encourages
@@ -2678,9 +2678,9 @@ employee transfer, training, occupational health, safety and
 Paper Usage (kg) 856,898.95 572,151.43
 Work-related injuries 74 58 8
 career growth, including labor protection and establishing
-Water Consumption (Mliters) 885.6 479,111.92
+Water Consumption (Mliters) 885.6 457,591.74
 Lost time accidents 51 30 5 Welfare Committee in the workplace which is responsible for
-Total Greenhouse Gas Emissions (KgCOe) 34,066,681.89
+Total Greenhouse Gas Emissions (KgCOe) 34,045,161.70
 2 managing the operation plan labor relations activities and
 Fatal accidents 0 1 0
 Remark 1. Diesel usage includes vehicles, motorcycles, generators, and fire pumps. coordinating with relevant agencies.
