@@ -3983,8 +3983,29 @@ function drawPeerScore(){
   if(ro){
     const byRoe=peers.filter(p=>typeof p.roe==='number');
     const below=byRoe.filter(p=>p.roe<tgt).map(p=>p.name), above=byRoe.filter(p=>p.roe>=tgt).map(p=>p.name);
+    // Leverage decomposition (MEASURED) — ROE = ROA × asset leverage, so the ROE league is part
+    // funding-structure, not all operating efficiency. Surfaces roa/de (already MEASURED in the layer,
+    // until now only sitting in the JSON) for the like-for-like CONSOLIDATED (C) filers; the
+    // unconsolidated-basis filer (HENG) is excluded, mirroring the ⚠U flag. Null-guarded; stays silent
+    // when the ROE leader IS also the ROA leader (no inversion to report).
+    const cpeers=peers.filter(p=>p&&p.fs_type==='C'&&typeof p.roe==='number'&&typeof p.roa==='number'&&typeof p.de==='number');
+    let levLine='';
+    if(cpeers.length>=2){
+      const roeLead=cpeers.slice().sort((a,b)=>b.roe-a.roe)[0];
+      const roaLead=cpeers.slice().sort((a,b)=>b.roa-a.roa)[0];
+      // Only report the inversion when the ROE leader is NOT the ROA leader. The leverage-causes-it
+      // clause is asserted only when the ROE leader actually runs MORE leverage than the ROA leader
+      // (roeLead.de>roaLead.de) — otherwise state the inversion without the leverage explanation, so
+      // no superlative is claimed that the current numbers don't support.
+      if(roeLead.symbol!==roaLead.symbol){
+        const lev=(roeLead.de>roaLead.de)
+          ? ` on heavier leverage (D/E ${roeLead.de} vs ${roaLead.de})`
+          : '';
+        levLine=` <b>ROE is leverage-sensitive.</b> ${roeLead.name} tops the ROE column (${roeLead.roe}%)${lev}, yet ${roaLead.name} earns the most per unit of assets (ROA ${roaLead.roa}%) — so the ROE ranking is part funding structure, not all operating efficiency (consolidated filers; HENG's unconsolidated basis excluded).`;
+      }
+    }
     ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
-      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+
+      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+
       methodBox(m.roe_caveat||null,
         [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the newest audited full year'}.`,
          '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE target is a stated goal shown only as the reference line.',
