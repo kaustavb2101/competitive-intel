@@ -653,6 +653,22 @@ INGESTS
     bad "unverified_gpp_guard.py (the unverified GPP layer is being projected toward the app — see report above)"
   fi
 
+  # redundant-STAGING gate for the OAE per-zone crop files: source-data/staging/amphoe_crops_zone*.json
+  # LOOK like unwired MEASURED district-crop coverage waiting to be folded into the already-wired
+  # build_amphoe_crops.py, but the 4 populated files (zone8/9/10/12, 427 rows) are a STRICT DUPLICATE
+  # SUBSET of amphoe_crops_national.json — every row matches on full key + planted_rai, 0 new provinces,
+  # 0 new rows (the national file already covers all 77). That lure has already mis-led two audits into
+  # recommending the fold-in (2026-08-19 PROGRESS_LOG "next recommended (a)"; a 2026-08-27 negative-space
+  # audit ranked it #1) — folding them in would only DOUBLE-COUNT district-crop rows in the live #map
+  # board (platform/data/amphoe_crops.json). Like the gpp guard, this locks the standing "do NOT wire
+  # them in" instruction into the gate; self-lifting — the day a zone file gains a row the national file
+  # lacks, the files stop being pure duplicates and the guard passes, allowing a real integration.
+  if python3 "$TESTS/amphoe_crops_zone_guard.py"; then
+    ok "amphoe_crops_zone_guard.py (redundant OAE zone-crop staging stays unwired — folding it in would double-count)"
+  else
+    bad "amphoe_crops_zone_guard.py (a pipeline script folds the duplicate amphoe_crops_zone staging into the app — see report above)"
+  fi
+
   # deploy-probe self-test: the SAME code path the nightly live site-health check runs (check_site_health.py),
   # but pointed at the local committed tree (--local platform, LocalFetcher = filesystem only, pure stdlib,
   # NO network). It asserts every deploy probe validator (_shape_*) still ACCEPTS its real committed payload,
