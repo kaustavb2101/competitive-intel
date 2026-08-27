@@ -425,6 +425,13 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 #v-trend .mcard .v{font-size:var(--fz-lg)}
 #v-trend .mcard .n{line-height:1.7}
 
+/* collateral-outlook board (#overview): a set of small directional signals, some of which are WORD
+   values ("↓ volatile", "↓ pressure") not numbers. At the ~1000px band each auto-fit card is ~121px
+   wide, and "volatile" as one unbreakable word at the display size (28px mono) bled 9px past the card
+   border. Drop these values to --fz-lg like #v-trend above (the word then wraps intact at its space,
+   numeric values still fit on one line) rather than breaking the word mid-glyph. */
+#collat-outlook .mcard .v{font-size:var(--fz-lg)}
+
 /* inline data bars: visible track + colored glowing fill */
 .bar{display:inline-block;background:#10182A;border-radius:4px;height:8px;width:64px;vertical-align:middle;
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}
