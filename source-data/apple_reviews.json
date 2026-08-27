@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-08-25",
+  "pulled_at": "2026-08-27",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -428,10 +428,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.77148,
-    "ratings": 1676,
-    "score_current_version": 3.77148,
-    "ratings_current_version": 1676,
+    "score": 3.77725,
+    "ratings": 1697,
+    "score_current_version": 3.77725,
+    "ratings_current_version": 1697,
     "version": "3.2.0",
     "app_updated": "2026-08-13",
     "released": "2020-04-30",
@@ -1327,6 +1327,15 @@
      "title": "น่าสนใจ",
      "content": "ใช้งานง่าย และสะดวก",
      "version": "1.0.5",
+     "votes": 0
+    },
+    {
+     "id": "14468627100",
+     "at": null,
+     "score": 1,
+     "title": "ให้อัพเดตทำไมสุดท้ายเข้าไม่ได้",
+     "content": "แอฟเด้งตลอดมีให้อัพเดตอัพเดตเสร็จก็เข้าไม่ได้",
+     "version": "3.2.0",
      "votes": 0
     },
     {
@@ -3359,10 +3368,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.28205,
-    "ratings": 429,
-    "score_current_version": 3.28205,
-    "ratings_current_version": 429,
+    "score": 3.28538,
+    "ratings": 431,
+    "score_current_version": 3.28538,
+    "ratings_current_version": 431,
     "version": "1.0.60",
     "app_updated": "2026-07-02",
     "released": "2024-01-16",
@@ -5693,16 +5702,25 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.46113,
-    "ratings": 566,
-    "score_current_version": 3.46113,
-    "ratings_current_version": 566,
+    "score": 3.46384,
+    "ratings": 567,
+    "score_current_version": 3.46384,
+    "ratings_current_version": 567,
     "version": "1.0.45",
     "app_updated": "2026-08-17",
     "released": "2024-07-09",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14467171812",
+     "at": null,
+     "score": 5,
+     "title": "ทันพอดีเลย",
+     "content": "ขอบคุณมากค่ะ",
+     "version": "1.0.45",
+     "votes": 0
+    },
     {
      "id": "14450497897",
      "at": null,
@@ -7418,10 +7436,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.39051,
-    "ratings": 1580,
-    "score_current_version": 3.39051,
-    "ratings_current_version": 1580,
+    "score": 3.39292,
+    "ratings": 1583,
+    "score_current_version": 3.39292,
+    "ratings_current_version": 1583,
     "version": "8.6.0",
     "app_updated": "2026-08-21",
     "released": "2020-03-03",
@@ -10499,16 +10517,52 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.82414,
-    "ratings": 173108,
-    "score_current_version": 4.82414,
-    "ratings_current_version": 173108,
+    "score": 4.82411,
+    "ratings": 173166,
+    "score_current_version": 4.82411,
+    "ratings_current_version": 173166,
     "version": "3.0.6",
     "app_updated": "2026-08-06",
     "released": "2021-04-20",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14469555585",
+     "at": null,
+     "score": 2,
+     "title": "สมัครไม่ผ่าน",
+     "content": "ข้อแจ้งให้ทราบ ว่าบัตรประชาชน ลงท้ายด้วย 7896 ได้ทำการสมัครและกรอกข้อมูลส่วนบุคคลกับสินเชื่อแอ็ปฟินนิกซ์ ต่อจากนี้ 25/08/2026 ไม่อนุญาตให้นำข้อมูลส่วนบุคคลไปใช้หรือเผยแพร่ทุกกรณีใดๆ",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14468949050",
+     "at": null,
+     "score": 5,
+     "title": "แอปดี",
+     "content": "ดีมากๆๆสมัครครั้งเดียวผ่านเอกสารไม่ยุ่งยาก",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14467594483",
+     "at": null,
+     "score": 1,
+     "title": "มีเงินในยอด แต่เบิกเงินไม่ได้",
+     "content": "เงินมีในบัญชีนะ แต่ไม่ให้เบิก",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14466989459",
+     "at": null,
+     "score": 4,
+     "title": "เพื่อความเป็นธรรม ข้อมูลส่วนตัว",
+     "content": "ข้าพเจ้า นางสาว ณิชนิชา\nได้ทำการสมัครและกรอกข้อมูลส่วนตัวลงไปในแอพ ฟินนิกซ์ ใน วันที่ 24/08/2569ไม่ได้\nรับการอนุมัติ มีชื่อ นามสกุล เลขบัตรประชาชน หน้าและหลัง ที่อยู่และเบอร์\nโทรศัพท์ และ ชื่อสกุล เบอร์โทรศัพท์ของ\nบุคคลอ้างอิง 2ท่าน ทั้งนี้ถ้าแอพ ฟินนิกซ์\nได้นำข้อมูลไปปลอมแปลงในรูปแบบใดๆ ที่ผิดกฎหมาย คุกคาม หรือละเมิด สิทธิ\nส่วนบุคคล ข้าพเจ้า นางสาว ณิชนิชา และบุคคลอ้างอิงจะไม่ขอรับ\nผิดชอบใดๆทั้งส",
+     "version": "3.0.6",
+     "votes": 0
+    },
     {
      "id": "14464664966",
      "at": null,
@@ -15515,16 +15569,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.70392,
-    "ratings": 63901,
-    "score_current_version": 4.70392,
-    "ratings_current_version": 63901,
+    "score": 4.70406,
+    "ratings": 63970,
+    "score_current_version": 4.70406,
+    "ratings_current_version": 63970,
     "version": "7.7.0",
     "app_updated": "2026-08-24",
     "released": "2021-10-10",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14470566754",
+     "at": null,
+     "score": 5,
+     "title": "ไม่ได้รับอนุมัติ แต่มียอดให้จ่ายคืออะไร ไม่อนุญาตให้นำข้อมูลไปใช้",
+     "content": "เรียนเจ้าหน้าที่ ข้าพเจ้านางสาวอัญชลี เกิดผล \nได้ทำการสมัครและกรอกข้อมูลส่วนตัวไป มีเลขบัตรประชาชน(หน้าบัตรและหลังบัตร)\nได้สมัครในเดือนสิงหาคม 2569 แต่ไม่ได้รับการอนุมัติ (แต่มีค่าเรียกเก็บเงินคืออะไร) \nและมีผู้อ้างอิง1ท่าน เบอร์โทรศัพท์ของผู้อ้างอิง \n\nทั้งนี้ถ้าแอปเงินทันเดอร์ได้นำข้อมูลไปปลอมแปลงในรูปแบบใดๆที่ผิดกฏหมายคุกคาม หรือ ละเมิดสิทธิส่วนบุคคล ข้าพเจ้านางสาวอัญชลี เกิดผล และบุคคลอ้างอิง1ค",
+     "version": "7.7.0",
+     "votes": 0
+    },
     {
      "id": "14464834627",
      "at": null,
@@ -20252,16 +20315,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84387,
-    "ratings": 44080,
-    "score_current_version": 4.84387,
-    "ratings_current_version": 44080,
+    "score": 4.84412,
+    "ratings": 44188,
+    "score_current_version": 4.84412,
+    "ratings_current_version": 44188,
     "version": "3.1.1",
     "app_updated": "2026-05-25",
     "released": "2023-03-06",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14468976755",
+     "at": null,
+     "score": 5,
+     "title": "ดูยากนิดนึง",
+     "content": "น่าจะมีให้ตรวจสอบว่าชำระไปเท่าไหร่แล้ว เหลือเท่าไหร่",
+     "version": "3.1.1",
+     "votes": 0
+    },
     {
      "id": "14461558262",
      "at": null,
@@ -25026,9 +25098,9 @@
    "own": false,
    "stats": {
     "score": 4.77001,
-    "ratings": 26854,
+    "ratings": 26879,
     "score_current_version": 4.77001,
-    "ratings_current_version": 26854,
+    "ratings_current_version": 26879,
     "version": "1.8.7",
     "app_updated": "2026-08-07",
     "released": "2020-08-05",
@@ -26447,6 +26519,15 @@
      "content": "Superb!!!",
      "version": "1.0.5",
      "votes": 11
+    },
+    {
+     "id": "14468998235",
+     "at": null,
+     "score": 1,
+     "title": "แย่ๆๆๆๆๆๆๆๆๆๆๆๆๆ",
+     "content": "จ่ายปุ้ป ยึดวงเงินไปเลย แบบไม่แจ้งว่าเพราะอะไร ทั้งที่ไม่เคยค้าง ไม่เคยชำระช้าเลย ไม่มีเหตุผล ทำให้เสียหายด้านการเงินมาก โครตแย่ อย่าหาทำแบบนี้กับใคร บริษัทแย่ๆๆ",
+     "version": "1.8.7",
+     "votes": 0
     },
     {
      "id": "14453182650",
@@ -29213,9 +29294,9 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.62399,
+    "score": 2.62541,
     "ratings": 2109,
-    "score_current_version": 2.62399,
+    "score_current_version": 2.62541,
     "ratings_current_version": 2109,
     "version": "3.4.0",
     "app_updated": "2026-08-20",
@@ -33977,16 +34058,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.55186,
-    "ratings": 2950,
-    "score_current_version": 2.55186,
-    "ratings_current_version": 2950,
+    "score": 2.55216,
+    "ratings": 2952,
+    "score_current_version": 2.55216,
+    "ratings_current_version": 2952,
     "version": "5.65",
     "app_updated": "2026-02-13",
     "released": "2021-08-03",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14468947873",
+     "at": null,
+     "score": 1,
+     "title": "ลบข้อมูล",
+     "content": "ข้าพเจ้านางสาวมัตติกา วาวแววหมายเลขท้ายบัตรประชาชน4384สมัครห้ามนำข้อมูลทั้งหมดไปเผยแพร่และข้อให้ลบข้อมูลทั้งหมด",
+     "version": "5.65",
+     "votes": 0
+    },
     {
      "id": "14458037902",
      "at": null,
