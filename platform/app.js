@@ -11754,6 +11754,14 @@ function renderCollateralBook(){
     const motoLine=(mc&&pu)
       ? `<b>Motorcycles are ${mc.n_share_pct}% of accounts but ${mc.os_share_pct}% of the money</b> — and carry the worst 90+ rate of any class at <b style="color:var(--agri)">${mc.dpd90p_pct}%</b> against ${pu.dpd90p_pct}% on pickup. Counting customers and counting baht give opposite answers here; this section counts baht.`
       : '';
+    // Vintage basis (honesty): the section's tag is "MEASURED · DLT + real loan tape", but the two
+    // measured sources sit on DIFFERENT vintages — the loan book is anchored to the newest month-on-book
+    // IN the tape (mob_anchor, mid-2026), while the DLT registered-stock collateral base is an older
+    // annual vintage (dlt_fleet_vintage). Say the temporal gap out loud so the "book × collateral base"
+    // read is not taken as same-period. Both values come straight from committed meta — no computation.
+    const vintLine=(M.mob_anchor&&M.dlt_fleet_vintage)
+      ? `<span class="sub"><b>Vintage basis:</b> the book is measured to <b>${M.mob_anchor}</b> (real loan tape) while the DLT registered-stock collateral base is a <b>${M.dlt_fleet_vintage}</b> vintage — a live book read against a collateral base about a vintage behind it.</span>`
+      : '';
 
     // ORDER INVERTED 2026-08-02 (owner: "i noticed you are putting our loan book in the macro section
     // in collateral value section. Please advise why?"). The book belongs here — it is the exposure
@@ -11785,7 +11793,8 @@ function renderCollateralBook(){
         We lend <b>${N.ltv_proxy_pct}%</b> of assessed collateral value (${B(N.ticket)} outstanding against a ${B(N.eval_avg)} appraisal, per account) — that gap is the headroom a resale fall eats into.
         ${motoLine}
         ${mort?`The second-largest class is not a vehicle at all: <b>property/mortgage at ${mort.os_share_pct}%</b> of outstanding on ${mort.n_share_pct}% of accounts, at a ${B(mort.ticket)} ticket — it does not move with the vehicle market above.`:''}</div>
-        <span class="sub">Ranked by outstanding baht at every grain. Ranking by account count would lead with motorcycles.</span></div>
+        <span class="sub">Ranked by outstanding baht at every grain. Ranking by account count would lead with motorcycles.</span>
+        ${vintLine}</div>
       <h4 class="fb-h4">The resale market this book recovers into<span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · BoT + DLT</span></h4>
       <div id="cb-value"></div>
       <div id="cb-flow"></div>
