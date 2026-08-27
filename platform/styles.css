@@ -926,6 +926,21 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
   h2::before{
     -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
+/* Windows High Contrast Mode / forced-colors: the SAME background-strip defect as the print block.
+   In `forced-colors:active` the OS overrides every author background-fill with a system colour, so the
+   data-viz marks whose ONLY encoding is that fill collapse to uniform system-coloured blocks — the
+   whole-book delinquency ladder + its legend, the brand/segment proportion bars, and the measured/
+   estimated provenance markers all lose their meaning (the exact honesty + risk-distribution signals
+   the print fixes protect on paper). `forced-color-adjust:none` opts these NON-TEXT swatches back to
+   their author colours so the encoded information survives WHCM. Scoped to the colour swatches +
+   ::before dots/rails ONLY — deliberately NOT the text-bearing `.prov`/`.cc-tag`/`.ic-lad-leg`/heading
+   containers, so all TEXT still uses the forced palette and keeps its high-contrast legibility. The
+   estimated (border-ring) + unlabelled (border-square) markers keep their border colour the same way.
+   Media query is inactive unless the OS forces colours, so default rendering is byte-identical. */
+@media (forced-colors:active){
+  .ic-lad,.ic-lad-seg,.ic-lad-leg i,.rz-bar span,.bar>i,.conc-legend i,.prov .pd,.cc-tag::before,h2::before{
+    forced-color-adjust:none}
+}
 
 /* ---------- scenario simulator ---------- */
 .sim-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;margin:10px 0 4px}
