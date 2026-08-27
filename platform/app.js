@@ -3750,6 +3750,23 @@ function drawPeerProvince(){
           (rest?` (${rest})`:'')+(plb.AutoX>0?`, AutoX in ${plb.AutoX}`:', AutoX in none');
       }
     }
+    // District-grain ground leadership (m.district_leadership) — the SAME MEASURED "who is the single
+    // largest operator" read at DISTRICT resolution, which the province-grain tally masks: a province
+    // can be credited to one network on totals while that network owns almost none of its individual
+    // districts, and AutoX leading "0 of 77 provinces" is easy to dismiss as an aggregate artifact
+    // until you see it leads a single district out of ~900. Sharpens the ground-ownership fact with
+    // the finest grain we have. Degrades to '' on a pre-fold peer_province.json that lacks the field.
+    const dl=m.district_leadership||null;
+    let distLeadStr='';
+    if(dl&&dl.led_by&&dl.n_scored){
+      const dRivals=Object.entries(dl.led_by).filter(([op,n])=>op!=='AutoX'&&n>0).sort((a,b)=>b[1]-a[1]);
+      if(dRivals.length){
+        const [dtop,dtopN]=dRivals[0];
+        const axD=dl.led_by.AutoX||0;
+        distLeadStr=` At district resolution the ground is even more lopsided: of ${dl.n_scored.toLocaleString()} districts, <b>${dtop}</b> is the single largest lender in <b style="color:var(--agri)">${dtopN.toLocaleString()}</b>`+
+          `${dl.n_contested?`, ${dl.n_contested.toLocaleString()} are contested`:''}, and AutoX leads <b style="color:var(--agri)">${axD===0?'none':axD.toLocaleString()}</b> (MEASURED per-district branch counts).`;
+      }
+    }
     // WHERE that lead sits — the same MEASURED `leader` field rolled up by region
     // (m.region_brand_leaders). The national tally hides that a network can dominate everywhere yet
     // be genuinely contested in ONE region; this names the regional leader and flags any region where
@@ -3800,7 +3817,7 @@ function drawPeerProvince(){
     }
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> of 77 provinces.</b>${rankStr} `+
       `Against the full official-locator census (${(m.total_rivals||0).toLocaleString()} rival branches vs `+
-      `${(m.total_autox||0).toLocaleString()} AutoX), ${leadStr}.${regionStr}${concStr} `+
+      `${(m.total_autox||0).toLocaleString()} AutoX), ${leadStr}.${distLeadStr}${regionStr}${concStr} `+
       `National rival footprint: ${brandStr}.${picoStr}${satStr}${outStr}${distStr} ${TAG_M}`+
       methodBox(null,
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
