@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-27T15:21:40+00:00",
-    "commit": "84e085c"
+    "generated_at": "2026-08-28T05:18:54+07:00",
+    "commit": "4d73f48"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-27",
+    "eta_date": "2026-08-28",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-08-28T05:18:54+07:00",
+      "sha": "4d73f48",
+      "summary": "feat(#acq): district-grain ground-leadership rollup on the peer board (#665)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-27T21:39:21+00:00",
+      "sha": "5576c70",
+      "summary": "data: SET listed-peer scoreboard refresh (run 33116026672) (#664)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-27T21:09:23+00:00",
+      "sha": "1667a6f",
+      "summary": "data: market-pulse swarm refresh (run 33110885228) (#662)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-27T20:30:26+00:00",
+      "sha": "2b8503a",
+      "summary": "docs: log UX-loop run (PR #663, prefers-contrast:more on rayong-catchment) — merged + deploy-verified",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-28T03:27:11+07:00",
+      "sha": "68ac61d",
+      "summary": "ux: prefers-contrast:more on rayong-catchment.html (deck.gl page) (#663)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-27T19:53:22+00:00",
+      "sha": "0b3cb4e",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-27, run 33110457013)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-27T18:28:39+00:00",
+      "sha": "cfd3b96",
+      "summary": "test(guard): lock redundant OAE per-zone crop staging out of the gate",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-27T17:12:00+00:00",
+      "sha": "1391b16",
+      "summary": "data(census): refresh the Union Auction forward book (run 33083087506) (#659)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-27T23:31:35+07:00",
+      "sha": "ba5e4c2",
+      "summary": "feat(#acq): cross-read peer P/BV against IFRS-9 NPL — the below-book discount isn't a credit-quality discount (#661)",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-27T15:21:40+00:00",
       "sha": "84e085c",
       "summary": "data: market-pulse swarm refresh (run 33082859957) (#660)",
@@ -657,60 +711,6 @@
       "sha": "e44f21d",
       "summary": "docs: log UX-loop run — Brand section-summary badge bleed fix (PR #648, merged + deploy-verified)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-27T03:20:33+07:00",
-      "sha": "eb0a5d2",
-      "summary": "ux: wrap long provenance badge in Brand/Competition/Macro section summaries (#648)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-26T18:25:45+00:00",
-      "sha": "b83a0a2",
-      "summary": "data(swarm): schedule fuel_stations — the last unscheduled keyless puller feeding a live layer",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-26T17:52:00+00:00",
-      "sha": "ed90231",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 32990343062) (#647)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-26T17:28:21+00:00",
-      "sha": "8918279",
-      "summary": "data: market-pulse swarm refresh (run 32989350858) (#646)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-26T16:37:00+00:00",
-      "sha": "6fe23d3",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-26, run 32989184486)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-26T16:19:36+00:00",
-      "sha": "76add38",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (5614ef9) after service+deploy-health sweep",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-26T14:35:56+00:00",
-      "sha": "5614ef9",
-      "summary": "docs: log UX-loop run — status.html Recent-activity clip fix (PR #645, merged + deploy-verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-26T21:31:45+07:00",
-      "sha": "b2edde8",
-      "summary": "ux: fix status.html Recent-activity commit summaries clipped to one line (#645)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-26T12:46:57+00:00",
-      "sha": "2e2fcdf",
-      "summary": "feat(command-center): collateral-competitive squeeze — collateral recovery softening × rival dominance (obj #1[collateral] × obj #2), the third portfolio channel (#644)",
-      "pillar": "market"
     }
   ]
 }
