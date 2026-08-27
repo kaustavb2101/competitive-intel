@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-26T20:24:13+00:00",
-    "commit": "e44f21d"
+    "generated_at": "2026-08-27T11:30:23+07:00",
+    "commit": "7308507"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-26",
+    "eta_date": "2026-08-27",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-08-27T11:30:23+07:00",
+      "sha": "7308507",
+      "summary": "feat(#acq): flag HENG's unconsolidated statement basis inline on the peer scoreboard (#653)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-27T03:25:13+00:00",
+      "sha": "2b051f4",
+      "summary": "data: rival Facebook promo feed refresh (run 33034614652) (#652)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-27T03:01:00+00:00",
+      "sha": "03f2b5a",
+      "summary": "data: market-pulse swarm refresh (run 33028641508) (#650)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-27T02:21:40+00:00",
+      "sha": "c0c7db1",
+      "summary": "docs: log UX-loop run — collateral-outlook value bleed fix (PR #651, merged + deploy-verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-27T09:19:10+07:00",
+      "sha": "6fb90e1",
+      "summary": "ux: fix collateral-outlook value bleed at ~1000px (#overview) (#651)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-27T00:53:45+00:00",
+      "sha": "0be239b",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-27, run 33028241940)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-27T00:25:46+00:00",
+      "sha": "df0380c",
+      "summary": "test(gate): lock CLAUDE.md's provenance census count to the live census",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-26T22:59:51+00:00",
+      "sha": "e21ced8",
+      "summary": "data: Thai-IP-only swarm refresh (run 33018422118) (#649)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-26T22:24:56+00:00",
+      "sha": "eb835ee",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (e44f21d) after 5-pillar health sweep",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-26T20:24:13+00:00",
       "sha": "e44f21d",
       "summary": "docs: log UX-loop run — Brand section-summary badge bleed fix (PR #648, merged + deploy-verified)",
@@ -657,60 +711,6 @@
       "sha": "1b81d92",
       "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 32930435448) (#639)",
       "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-26T04:32:00+00:00",
-      "sha": "df31148",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after peer book-mix ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-26T11:29:45+07:00",
-      "sha": "035f11a",
-      "summary": "feat(acq): rival loan-book structure — secured loan vs hire-purchase split from SET filing NOTES (peer comparison, obj #2) (#637)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-26T04:09:11+00:00",
-      "sha": "a60ae02",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-26, run 32928978796)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-26T03:20:45+00:00",
-      "sha": "56e133a",
-      "summary": "data: NABC live prices (2026-08-26, run 32925814760)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-26T02:16:30+00:00",
-      "sha": "0fc6d6f",
-      "summary": "docs: log 2026-08-26 UX loop — keyboard-operable data.html rows (PR #635, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-26T09:13:34+07:00",
-      "sha": "987ca37",
-      "summary": "ux: keyboard-operable navigating rows in data.html (WCAG 2.1.1) (#635)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-26T00:54:45+00:00",
-      "sha": "5e3f559",
-      "summary": "feat(competition): rival loan-book asset quality — IFRS-9 Stage-3 NPL + ECL coverage from SET filing NOTES (#634)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-25T23:59:19+00:00",
-      "sha": "9dba3b0",
-      "summary": "data: market-pulse swarm refresh (run 32903475738) (#630)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-25T23:37:02+00:00",
-      "sha": "6db4157",
-      "summary": "data: rival Facebook promo feed refresh (run 32905842509) (#631)",
-      "pillar": "market"
     }
   ]
 }
