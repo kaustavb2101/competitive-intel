@@ -3971,7 +3971,7 @@ function drawPeerScore(){
       const roeBar=(typeof p.roe==='number')?barHTML(p.roe,'var(--merch)',hiRoe):'';
       return `<tr>
         <td class="mono sub">${i+1}</td>
-        <td><b>${p.name||p.symbol}</b> <span class="sub mono">${p.symbol}</span></td>
+        <td><b>${p.name||p.symbol}</b> <span class="sub mono">${p.symbol}</span>${p.fs_type==='U'?` <span class="sub" style="color:var(--gold)" title="Company-only (unconsolidated) SET filing — not strictly like-for-like with the consolidated (C) peers; flagged, not blended in.">⚠U</span>`:''}</td>
         <td class="mono"><b>฿${p.market_cap_bn}bn</b></td>
         <td class="mono" style="color:${yc(p.ytd_pct)}">${p.ytd_pct>0?'+':''}${p.ytd_pct}%</td>
         <td class="mono">${roeBar} <b>${p.roe}%</b></td>
