@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-27T17:20:08+07:00",
-    "commit": "fe3fce1"
+    "generated_at": "2026-08-27T15:21:40+00:00",
+    "commit": "84e085c"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,42 @@
   ],
   "activity": [
     {
+      "date": "2026-08-27T15:21:40+00:00",
+      "sha": "84e085c",
+      "summary": "data: market-pulse swarm refresh (run 33082859957) (#660)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-27T14:39:39+00:00",
+      "sha": "f1de831",
+      "summary": "docs: log UX-loop run (PR #658, prefers-contrast:more) — merged + deploy-verified",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-27T21:36:26+07:00",
+      "sha": "42104fa",
+      "summary": "ux: prefers-contrast:more — strengthen muted-text + hairline tokens (#658)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-27T14:21:21+00:00",
+      "sha": "f68e5d9",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-27, run 33081585923)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-27T12:43:09+00:00",
+      "sha": "809977d",
+      "summary": "feat(#acq): surface P/BV in the listed-peer scoreboard + read what the market rewards (#657)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-27T10:21:19+00:00",
+      "sha": "c68d0a7",
+      "summary": "docs: log intelligence-loop run (PR #656, peer ROE→ROA×leverage) + refresh CEO dashboard to HEAD",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-27T17:20:08+07:00",
       "sha": "fe3fce1",
       "summary": "feat(#acq): decompose the peer ROE league into ROA × leverage (measured, consolidated filers) (#656)",
@@ -675,42 +711,6 @@
       "sha": "2e2fcdf",
       "summary": "feat(command-center): collateral-competitive squeeze — collateral recovery softening × rival dominance (obj #1[collateral] × obj #2), the third portfolio channel (#644)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-26T12:14:16+00:00",
-      "sha": "0a8c79b",
-      "summary": "data: SET listed-peer scoreboard refresh (run 32964604661) (#643)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-26T10:51:15+00:00",
-      "sha": "e942b75",
-      "summary": "data: market-pulse swarm refresh (run 32956725390) (#642)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-26T10:19:10+00:00",
-      "sha": "33f1131",
-      "summary": "docs(service-audit): 2026-08-26 healthy close-out — grown layer set (148) re-verified, forward-anchor freshness nuance recorded",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-26T10:00:36+00:00",
-      "sha": "0505eff",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-26, run 32955837826)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-26T09:06:23+00:00",
-      "sha": "85eaa0c",
-      "summary": "data: NABC live prices (2026-08-26, run 32950718695)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-26T08:30:07+00:00",
-      "sha": "14b714c",
-      "summary": "docs: log UX-loop run — #sim caption bleed fix (PR #641, merged + deploy-verified)",
-      "pillar": "uxui"
     }
   ]
 }

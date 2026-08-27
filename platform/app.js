@@ -3991,7 +3991,7 @@ function drawPeerScore(){
     // unconsolidated-basis filer (HENG) is excluded, mirroring the ⚠U flag. Null-guarded; stays silent
     // when the ROE leader IS also the ROA leader (no inversion to report).
     const cpeers=peers.filter(p=>p&&p.fs_type==='C'&&typeof p.roe==='number'&&typeof p.roa==='number'&&typeof p.de==='number');
-    let levLine='', valLine='';
+    let levLine='', valLine='', aqLine='', aqNote=null;
     if(cpeers.length>=2){
       const roeLead=cpeers.slice().sort((a,b)=>b.roe-a.roe)[0];
       const roaLead=cpeers.slice().sort((a,b)=>b.roa-a.roa)[0];
@@ -4021,14 +4021,49 @@ function drawPeerScore(){
         }
       }
     }
+    // P/BV × asset-quality cross-read (MEASURED × MEASURED) — joins this SET-valuation scoreboard's P/BV to
+    // the IFRS-9 Stage-3 NPL in peer_asset_quality.json (loaded by renderPeerAssetQuality on this same #acq
+    // tab; its drawPeerAssetQuality re-invokes drawPeerScore once that data lands, so the join fills in
+    // regardless of fetch order). Tests whether the market's below-book discount tracks credit quality or is
+    // a leverage/efficiency discount: fires ONLY when at least one peer with a WORSE book (higher NPL) trades
+    // at a RICHER multiple than the cheapest name — i.e. the discount is demonstrably NOT explained by asset
+    // quality. Every clause is asserted only when the committed numbers support it (the "reward-clean-books"
+    // top clause only when the P/BV leader is also the lowest-NPL name; "below book" only when pbv<1; the
+    // low-leverage clause only when the cheapest name actually holds the minimum D/E of the field). Consolidated
+    // filers only (⚠U HENG excluded, mirroring levLine/valLine); fully null-guarded; silent when PEERAQ is
+    // absent or the pattern does not hold, so no stale claim survives a data vintage that reorders the field.
+    if(peeraqLoaded&&PEERAQ&&Array.isArray(PEERAQ.peers)){
+      const nplBy={}; PEERAQ.peers.forEach(p=>{ if(p&&p.symbol&&typeof p.npl_pct==='number') nplBy[p.symbol]=p.npl_pct; });
+      const jj=peers.filter(p=>p&&p.fs_type==='C'&&typeof p.pbv==='number'&&typeof nplBy[p.symbol]==='number')
+        .map(p=>({name:p.name||p.symbol,symbol:p.symbol,pbv:p.pbv,npl:nplBy[p.symbol],de:(typeof p.de==='number'?p.de:null)}));
+      if(jj.length>=3){
+        const pbvMin=jj.slice().sort((a,b)=>a.pbv-b.pbv)[0];
+        const pbvLead=jj.slice().sort((a,b)=>b.pbv-a.pbv)[0];
+        const nplBest=jj.slice().sort((a,b)=>a.npl-b.npl)[0];
+        const worseButRicher=jj.filter(p=>p.symbol!==pbvMin.symbol&&p.npl>pbvMin.npl&&p.pbv>pbvMin.pbv);
+        if(worseButRicher.length){
+          const topClause=(pbvLead.symbol===nplBest.symbol)
+            ? ` At the top the market does reward clean books — ${pbvLead.name} carries both the richest multiple (P/BV ${pbvLead.pbv.toFixed(2)}×) and the lowest NPL (${pbvLead.npl.toFixed(1)}%).`
+            : '';
+          const belowBk=(pbvMin.pbv<1)?', below book':'';
+          const deVals=jj.map(p=>p.de).filter(v=>typeof v==='number');
+          const minDe=deVals.length?Math.min(...deVals):null;
+          const levClause=(typeof pbvMin.de==='number'&&pbvMin.de===minDe)?` (it runs the lowest leverage of the field, D/E ${pbvMin.de})`:'';
+          const rl=worseButRicher.map(p=>`${p.name} (${p.npl.toFixed(1)}%)`).join(' & ');
+          aqLine=` <b>The below-book discount isn't a credit-quality discount.</b>${topClause} Yet ${pbvMin.name} trades cheapest (P/BV ${pbvMin.pbv.toFixed(2)}×${belowBk}) on a ${pbvMin.npl.toFixed(1)}% NPL — a cleaner book than ${rl}, which trade richer — so its discount reflects leverage appetite${levClause}, not asset quality (consolidated filers; Stage-3 IFRS-9).`;
+          aqNote=`<b>P/BV × NPL join</b> — the below-book-discount read joins this SET-valuation scoreboard to <code>peer_asset_quality.json</code> (IFRS-9 Stage-3 gross NPL share from the same six peers' reviewed filing notes, as of ${(PEERAQ.meta&&PEERAQ.meta.as_of)||'30 Jun 2026'}); both MEASURED, joined by SET symbol.`;
+        }
+      }
+    }
     ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
-      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+
+      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+
       methodBox(m.roe_caveat||null,
         [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the newest audited full year'}.`,
          '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE target is a stated goal shown only as the reference line.',
          m.roe_caveat||'ROE is each peer’s own SET-reported ratio.',
          m.holdco_caveat||null,
-         m.fs_type_caveat||null]);
+         m.fs_type_caveat||null,
+         aqNote]);
   }
 }
 
@@ -4114,6 +4149,10 @@ function drawPeerAssetQuality(){
          '<b>Not an AutoX row</b> — AutoX is unlisted and files no SET statements.',
          (Array.isArray(m.caveats)&&m.caveats.length?m.caveats[1]:null)]);
   }
+  // Now that the IFRS-9 NPL layer has landed, refresh the sibling valuation scoreboard so its
+  // P/BV × NPL cross-read (drawPeerScore, same #acq tab) can join the two MEASURED layers regardless
+  // of which fetch resolved first. drawPeerScore does NOT call back here, so there is no render loop.
+  if(peerscoreLoaded) drawPeerScore();
 }
 
 /* ---------- iOS app sentiment · Apple App Store TH (obj #2, MEASURED) ----------
