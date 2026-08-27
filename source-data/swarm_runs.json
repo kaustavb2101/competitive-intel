@@ -11,45 +11,6 @@
    "append_history_rc": 0,
    "feeds": [
     {
-     "bytes_after": 7112,
-     "bytes_before": 7110,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 10.7,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8914,
-     "bytes_before": 8902,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 5.6,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 3989,
-     "bytes_before": 3989,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 127.4,
-     "status": "ok"
-    }
-   ],
-   "finished": "2026-08-14T21:54:06Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 2,
-   "n_failed": 0,
-   "n_ok": 3,
-   "n_skipped": 0,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-14T21:51:59Z"
-  },
-  {
-   "append_history_rc": 0,
-   "feeds": [
-    {
      "bytes_after": 7109,
      "bytes_before": 7111,
      "key": "thaiwater_flood",
@@ -3202,6 +3163,93 @@
    "n_timeout": 0,
    "rederive_drift_rc": null,
    "started": "2026-08-26T22:09:31Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 1443,
+     "bytes_before": 1443,
+     "key": "fuel_prices",
+     "rc": 0,
+     "seconds": 2.0,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 7105,
+     "bytes_before": 7105,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 4.8,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 8882,
+     "bytes_before": 8882,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 7.0,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 3990,
+     "bytes_before": 3990,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 143.5,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 178201,
+     "bytes_before": 177743,
+     "key": "fuel_stations",
+     "rc": 0,
+     "seconds": 86.2,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 652049,
+     "bytes_before": 644023,
+     "key": "app_reviews",
+     "rc": 0,
+     "seconds": 7.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 2546855,
+     "bytes_before": 2540601,
+     "key": "apple_reviews",
+     "rc": 0,
+     "seconds": 164.7,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 497406,
+     "bytes_before": 498755,
+     "key": "rival_youtube",
+     "rc": 0,
+     "seconds": 39.3,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 1410265,
+     "bytes_before": 1410265,
+     "key": "google_ads",
+     "rc": 3,
+     "seconds": 331.7,
+     "status": "skipped"
+    }
+   ],
+   "finished": "2026-08-27T01:05:37Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 7,
+   "n_failed": 0,
+   "n_ok": 8,
+   "n_skipped": 1,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-08-27T00:59:58Z"
   }
  ]
 }
