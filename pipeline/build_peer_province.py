@@ -255,6 +255,41 @@ def build():
     # leads nowhere is itself a signal), so the dict is deterministic and JSON-stable.
     lead_counter = collections.Counter(p["leader"] for p in provinces)
     provinces_led_by = {op: lead_counter.get(op, 0) for op in (["AutoX"] + brands)}
+    # district_leadership: WHO owns the ground DISTRICT by district, not province by province.
+    # provinces_led_by (above) tallies the `leader` field at PROVINCE grain — but a province the
+    # aggregate credits to one operator is stitched from many districts, and the district-grain
+    # picture is far starker: a network can lead a province on totals while owning almost none of
+    # its individual districts. This computes, for each of the 928 MEASURED districts, the single
+    # largest operator by branch count among {AutoX} + the big-4 (the SAME per-district `autox` /
+    # `by_brand` counts the province rollup sums, so it inherits their MEASURED provenance verbatim
+    # and recomputes nothing from geometry). Districts with a TIE for the top (>0) are counted as
+    # `n_contested` rather than force-assigned, so `led_by` is a strict-unique tally; districts with
+    # no operator present are excluded. n_scored == sum(led_by) + n_contested by construction.
+    # Deterministic: pure aggregation of committed records, AutoX-first + census-brand key order,
+    # zeros kept. This is the read that exposes how thin AutoX's ground leadership really is.
+    dist_lead_counter = collections.Counter()
+    n_dist_contested = 0
+    n_dist_scored = 0
+    for r in recs:
+        by_brand_d = r.get("by_brand") or {}
+        counts_d = {"AutoX": r.get("autox", 0) or 0}
+        for b in brands:
+            counts_d[b] = by_brand_d.get(b, 0) or 0
+        top_n = max(counts_d.values())
+        if top_n <= 0:
+            continue
+        n_dist_scored += 1
+        winners = [op for op, c in counts_d.items() if c == top_n]
+        if len(winners) == 1:
+            dist_lead_counter[winners[0]] += 1
+        else:
+            n_dist_contested += 1
+    districts_led_by = {op: dist_lead_counter.get(op, 0) for op in (["AutoX"] + brands)}
+    district_leadership = {
+        "n_scored": n_dist_scored,
+        "led_by": districts_led_by,
+        "n_contested": n_dist_contested,
+    }
     # region_brand_leaders: WHERE each operator's provincial leads sit. provinces_led_by names the
     # dominant network nationally (Muangthai leads most) but hides that a rival's leads can be a
     # single-region stronghold — Srisawad leads several provinces, but every one is in the South,
@@ -519,6 +554,7 @@ def build():
         "n_provinces": len(provinces),
         "n_provinces_autox_leads": n_autox_leads,
         "provinces_led_by": provinces_led_by,
+        "district_leadership": district_leadership,
         "region_brand_leaders": region_brand_leaders,
         "n_provinces_outnumbered": n_outnumbered_prov,
         "n_provinces_autox_last": n_autox_last,
