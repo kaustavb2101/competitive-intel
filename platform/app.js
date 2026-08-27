@@ -3966,6 +3966,7 @@ function drawPeerScore(){
     `<th scope="col" title="return on equity, newest audited full fiscal year (SET quarter code Q9)">ROE</th>`+
     `<th scope="col" title="net profit, newest audited full fiscal year">Net profit/yr</th>`+
     `<th scope="col" title="price / earnings">P/E</th>`+
+    `<th scope="col" title="price / book value — the primary valuation multiple for an equity-heavy lender; below 1.0× = trading under book">P/BV</th>`+
     `<th scope="col" title="dividend yield">Div</th></tr>`+
     peers.map((p,i)=>{
       const roeBar=(typeof p.roe==='number')?barHTML(p.roe,'var(--merch)',hiRoe):'';
@@ -3977,9 +3978,10 @@ function drawPeerScore(){
         <td class="mono">${roeBar} <b>${p.roe}%</b></td>
         <td class="mono sub">฿${p.net_profit_bn}bn</td>
         <td class="mono sub">${p.pe}</td>
+        <td class="mono sub">${(typeof p.pbv==='number')?p.pbv.toFixed(2)+'×'+(p.pbv<1?` <span class="sub" style="color:var(--gold)" title="trading below book value">·bk</span>`:''):'—'}</td>
         <td class="mono sub">${p.div_yield}%</td>
       </tr>`;}).join('')+
-    (tgt?`<tr style="border-top:1px dashed var(--line)"><td></td><td><b style="color:var(--gold)">AutoX target</b> <span class="sub">(unlisted)</span></td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">${tgt}%</b> <span class="sub">ROE goal</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td></tr>`:'');
+    (tgt?`<tr style="border-top:1px dashed var(--line)"><td></td><td><b style="color:var(--gold)">AutoX target</b> <span class="sub">(unlisted)</span></td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">${tgt}%</b> <span class="sub">ROE goal</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td></tr>`:'');
   if(ro){
     const byRoe=peers.filter(p=>typeof p.roe==='number');
     const below=byRoe.filter(p=>p.roe<tgt).map(p=>p.name), above=byRoe.filter(p=>p.roe>=tgt).map(p=>p.name);
@@ -3989,7 +3991,7 @@ function drawPeerScore(){
     // unconsolidated-basis filer (HENG) is excluded, mirroring the ⚠U flag. Null-guarded; stays silent
     // when the ROE leader IS also the ROA leader (no inversion to report).
     const cpeers=peers.filter(p=>p&&p.fs_type==='C'&&typeof p.roe==='number'&&typeof p.roa==='number'&&typeof p.de==='number');
-    let levLine='';
+    let levLine='', valLine='';
     if(cpeers.length>=2){
       const roeLead=cpeers.slice().sort((a,b)=>b.roe-a.roe)[0];
       const roaLead=cpeers.slice().sort((a,b)=>b.roa-a.roa)[0];
@@ -4003,9 +4005,24 @@ function drawPeerScore(){
           : '';
         levLine=` <b>ROE is leverage-sensitive.</b> ${roeLead.name} tops the ROE column (${roeLead.roe}%)${lev}, yet ${roaLead.name} earns the most per unit of assets (ROA ${roaLead.roa}%) — so the ROE ranking is part funding structure, not all operating efficiency (consolidated filers; HENG's unconsolidated basis excluded).`;
       }
+      // Valuation read (MEASURED) — P/BV is the primary multiple for an equity-heavy lender. Surfaces
+      // whether the market pays up for ROE (leverage-driven) or for asset efficiency (ROA): fires only
+      // when the ROA leader is NOT also the valuation (P/BV) leader, and the "lowest of the field" /
+      // "below book" clauses are each asserted only when the committed numbers support them. Null-
+      // guarded on pbv; consolidated filers only (mirrors levLine's ⚠U exclusion).
+      const cpbv=cpeers.filter(p=>typeof p.pbv==='number');
+      if(cpbv.length>=2 && typeof roaLead.pbv==='number'){
+        const pbvLead=cpbv.slice().sort((a,b)=>b.pbv-a.pbv)[0];
+        const pbvMin=cpbv.slice().sort((a,b)=>a.pbv-b.pbv)[0];
+        if(pbvLead.symbol!==roaLead.symbol){
+          const lowest=(pbvMin.symbol===roaLead.symbol)?' — the lowest of the field':'';
+          const belowBk=(roaLead.pbv<1)?', below book':'';
+          valLine=` <b>The market prices ROE over asset efficiency.</b> The richest multiple goes to ${pbvLead.name} (P/BV ${pbvLead.pbv.toFixed(2)}×), while ${roaLead.name}, the ROA leader (${roaLead.roa}%), trades at P/BV ${roaLead.pbv.toFixed(2)}×${lowest}${belowBk} (consolidated filers).`;
+        }
+      }
     }
     ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
-      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+
+      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+
       methodBox(m.roe_caveat||null,
         [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the newest audited full year'}.`,
          '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE target is a stated goal shown only as the reference line.',
