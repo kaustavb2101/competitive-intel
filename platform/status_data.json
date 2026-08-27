@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-27T11:30:23+07:00",
-    "commit": "7308507"
+    "generated_at": "2026-08-27T17:20:08+07:00",
+    "commit": "fe3fce1"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,36 @@
   ],
   "activity": [
     {
+      "date": "2026-08-27T17:20:08+07:00",
+      "sha": "fe3fce1",
+      "summary": "feat(#acq): decompose the peer ROE league into ROA × leverage (measured, consolidated filers) (#656)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-27T09:02:20+00:00",
+      "sha": "7c32f14",
+      "summary": "feat(#overview): state the collateral-book vintage basis inline (book 2026-07 vs DLT base 2025) (#654)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-27T08:25:04+00:00",
+      "sha": "cf5fce4",
+      "summary": "docs: log UX-loop run — forced-colors data-viz protection (PR #655, merged + deploy-verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-27T15:21:53+07:00",
+      "sha": "c553f20",
+      "summary": "ux: preserve data-viz colour in Windows High Contrast Mode (forced-colors) (#655)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-27T04:30:42+00:00",
+      "sha": "7ff40b9",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (7308507) after peer-scoreboard fs_type badge",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-27T11:30:23+07:00",
       "sha": "7308507",
       "summary": "feat(#acq): flag HENG's unconsolidated statement basis inline on the peer scoreboard (#653)",
@@ -681,36 +711,6 @@
       "sha": "14b714c",
       "summary": "docs: log UX-loop run — #sim caption bleed fix (PR #641, merged + deploy-verified)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-26T15:25:04+07:00",
-      "sha": "f5f499c",
-      "summary": "ux: fix #sim factory-card provenance caption bleed at 768px (iPad portrait) (#641)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-26T07:47:38+00:00",
-      "sha": "db133ad",
-      "summary": "feat(command-center): agri-competitive squeeze — farm-stress × rival dominance, a distinct cross-objective board (obj #1 agri × obj #2) (#640)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-26T06:16:01+00:00",
-      "sha": "63ac761",
-      "summary": "data(census): refresh the Union Auction forward book (run 32929806025) (#636)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-26T05:51:41+00:00",
-      "sha": "4c6c07a",
-      "summary": "data: market-pulse swarm refresh (run 32929325203) (#638)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-26T05:13:35+00:00",
-      "sha": "1b81d92",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 32930435448) (#639)",
-      "pillar": "3d-enrichment"
     }
   ]
 }
