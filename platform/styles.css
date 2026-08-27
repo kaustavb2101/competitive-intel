@@ -942,6 +942,20 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
     forced-color-adjust:none}
 }
 
+/* prefers-contrast: more — a separate dimension from forced-colors (which forces a system palette):
+   the user's OS is set to "increase contrast" but keeps our colours. The only marks that fall short
+   of that request are the deliberately-muted tiers — the microcopy tokens `--dim`/`--mid` (captions,
+   provenance notes, axis labels; light `--dim` sits at ~5.4:1, AA but not AAA) and the quiet hairlines
+   `--line`/`--line2`. Push each one step toward its high-contrast neighbour so a viewer who asked for
+   more contrast actually gets it: muted text moves toward `--txt`, hairlines darken/lighten to read
+   clearly. Mirrors the base + `data-theme="light"` override structure (later in the file, same
+   specificity → wins when active); the media query is inactive unless the OS requests more contrast,
+   so default rendering is byte-identical. Token-only, so it lifts every surface that uses them at once. */
+@media (prefers-contrast:more){
+  :root{ --dim:#BFC8D8; --mid:#CAD2E0; --line:#4A5878; --line2:#3A4763; }
+  html[data-theme="light"]{ --dim:#3C4557; --mid:#3A445C; --line:#B4BECE; --line2:#CFD6E2; }
+}
+
 /* ---------- scenario simulator ---------- */
 .sim-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;margin:10px 0 4px}
 @media(max-width:760px){.sim-grid{grid-template-columns:1fr}}
