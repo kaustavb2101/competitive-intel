@@ -180,7 +180,7 @@
    "cheapest_promo_effective": 14.11,
    "gap_pp": 1.16,
    "key": "SAWAD",
-   "n_quotes": 10,
+   "n_quotes": 9,
    "name_th": "ศรีสวัสดิ์ เงินสดทันใจ",
    "quotes": [
     {
@@ -230,11 +230,11 @@
     },
     {
      "channel": "google_ads",
-     "context_th": "ม่ต้องโอนเล่ม ดอกเบียเริ่มตัน 1.00% ต่อเดือน ผ่อนชําระ",
-     "effective_worst_case": 20.53,
-     "quoted": 1.0,
+     "context_th": "ใจ อนุมัติไว ดอกเบี้ยเริ่มต้น 1.25 % ต่อเดือน ผ่อนชำระ",
+     "effective_worst_case": 24.99,
+     "quoted": 1.25,
      "read_as": "flat_at_54m",
-     "seen": "2026-03-26",
+     "seen": "2026-06-17",
      "unit": "pct_per_month"
     }
    ],
