@@ -324,6 +324,25 @@ FEEDS = [
          label="National fuel-station POI (OSM amenity=fuel; feeds per-branch branch_fuel rural-reach signal)",
          cadence="quarterly", ip="any", group="macro", out="source-data/fuel_stations.json", timeout=600),
 
+    # Discovered 2026-08-28: a SECOND keyless any-IP puller feeding a live layer that sat in NO
+    # scheduler — the fuel_stations note above called itself "the LAST", which was already false.
+    # Chain: pull_energy_prices.py -> source-data/energy_prices.json (World Bank Pink Sheet crude-oil,
+    # monthly — the SAME CMO workbook + 12-month-YoY method as the crop drivers) -> build_income_impact.py
+    # (the income engine's FUEL channel, crude-oil YoY) -> platform/data/income_impact.json, rendered
+    # live in platform/app.js (objective #1: macro -> occupation income -> book pressure; the
+    # retail-diesel borrower cost line). It was in no workflow at all — source-data/energy_prices.json
+    # stamped 2026M07 while its --check-gated builder (tests/run.sh L432, rederive map L455) kept
+    # reproducing that frozen vintage. VERIFIED reachable + EXIT=0 + BYTE-IDENTICAL reproduction from
+    # THIS cloud runner 2026-08-28 (Crude oil, average 2026M07 = 79.80 USD/bbl, YoY 15.3%, YTD 25.3%) —
+    # the feed is CURRENT, so the SCHEDULE is the improvement, not a data revision (same as fuel_stations
+    # above). Needs openpyxl, already installed in data-swarm.yml since tpso_cpi. Takes no --stamp
+    # (args=[], like google_trends below). rederive_drift.py discovers builders by parsing tests/run.sh,
+    # so it rebuilds income_impact.json automatically on the next fresh pull. Monthly: the Pink Sheet is
+    # a monthly workbook, so any tighter cadence is a byte-identical no-op that only refreshes the stamp.
+    dict(key="energy_prices", script="pull_energy_prices.py", args=[],
+         label="World Bank Pink Sheet crude-oil baseline (income-engine fuel driver; feeds income_impact)",
+         cadence="monthly", ip="any", group="macro", out="source-data/energy_prices.json", timeout=600),
+
     dict(key="google_trends", script="pull_google_trends.py", args=[],
          label="Google Trends demand + brand share-of-search (ESTIMATED)", cadence="monthly",
          ip="any", group="competitive", out="source-data/google_trends.json", timeout=1200),
