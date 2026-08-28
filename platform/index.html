@@ -829,6 +829,19 @@
     <p class="lead sub" id="rbnote" style="margin-top:6px"></p>
     <details id="rbdetailwrap" style="margin-top:10px"><summary class="sub" style="cursor:pointer">Every offer behind these numbers — each variant, its verbatim Thai quote and its source</summary><div id="rbdetail"></div></details>
 
+    <!-- Rate-card drift watch (build_rival_rate_observed.py → data/rival_rate_observed.json). The
+         board above measures every rival against a HAND-CURATED card; pipeline/pull_rival_rates.py
+         re-reads each operator's OWN rate_url weekly, and this surfaces the ones whose live quote
+         has moved OUTSIDE the card's band — i.e. where the card the board relies on has drifted.
+         MEASURED verbatim quotes; measured-vs-measured drift. Hidden by app.js until a drift exists. -->
+    <div id="rowrap" style="margin-top:18px;display:none">
+      <h3 class="compsub">Rate-card drift watch · each rival's OWN page re-read vs the card <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · verbatim page quote</span></h3>
+      <p class="lead">The board above is only as current as the hand-curated card behind it. This is the weekly re-read of every operator's own rate page — where its live quote has moved <b>outside</b> the band the card carries, the card has drifted and needs reconciling. Every figure is the <b>verbatim</b> rate text on the page; the drift is a measured-against-measured comparison in the same unit, nothing inferred.</p>
+      <div class="insight" id="roreadout" style="border-left-color:var(--merch)"></div>
+      <div id="rodrift" style="margin-top:6px"></div>
+      <p class="lead sub" id="ronote" style="margin-top:6px"></p>
+    </div>
+
 
 
 

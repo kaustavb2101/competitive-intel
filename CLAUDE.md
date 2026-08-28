@@ -192,7 +192,7 @@ timeseries `--check` plus `node --check` on every page's JS.*
 - The real loan tape (`build_tape_layers.py` → `tape_real.json` + `tape_geo_occ.json`) is surfaced on
   `#exposure` by product, income band, agri, and occupation×income (all MEASURED, real accounts).
 - **Provenance + guards:** `build_provenance.py` → `platform/data/provenance.json` censuses every layer's
-  MEASURED/ESTIMATED label (149 layers · 86 MEASURED / 63 ESTIMATED / **0 unlabelled** at this revision).
+  MEASURED/ESTIMATED label (150 layers · 87 MEASURED / 63 ESTIMATED / **0 unlabelled** at this revision).
   `tests/orphan_layers.py` proves every committed leaf is actually consumed; `tests/mandate_guard.py`
   proves no layer emits a branch open/close/expand recommendation. **A new `platform/data` file requires
   a `build_provenance.py` re-run before the gate.**
