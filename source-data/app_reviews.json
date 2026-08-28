@@ -3,7 +3,7 @@
   "title": "Title-lender app sentiment — Google Play ratings + newest reviews (incl. our own)",
   "generated_by": "pipeline/pull_app_reviews.py",
   "label": "MEASURED — Google Play store pages (th/th). Star histogram + dated public reviews; review store accumulates across pulls (dedup by reviewId, newest 1500 kept per app).",
-  "pulled_at": "2026-08-27"
+  "pulled_at": "2026-08-28"
  },
  "apps": {
   "AUTOX": {
@@ -47,7 +47,7 @@
      "at": "2026-08-19",
      "score": 5,
      "content": "คดี app ใช้ง่ายดี น่าจะทำแบบแอปเงินติดล้อ โอนเข้าบัญชีได้เลยไม่ต้องไปเบิก ก็ดีแล้วล่ะจะได้ไม่ต้องเบิกบ่อย",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": false
     },
     {
@@ -1681,21 +1681,85 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.714797,
-    "ratings": 16784,
-    "reviews_total": 5223,
+    "score": 4.7156453,
+    "ratings": 16827,
+    "reviews_total": 5230,
     "installs": "1,000,000+",
     "histogram": [
-     510,
-     150,
-     480,
-     1331,
-     14310
+     529,
+     129,
+     459,
+     1350,
+     14354
     ],
     "app_updated": "2026-08-06",
     "version": "3.2.0"
    },
    "reviews_store": [
+    {
+     "id": "f732f18a-8c74-43fb-8986-833a26063c26",
+     "at": "2026-08-26",
+     "score": 1,
+     "content": "กู้ได้หรือไม่ได้ก็ไม่อนุญาตให้นำการสแกนหน้าและหมายเลขบัตรประจำตัวประชาชนที่ลงท้ายด้วย6435 และหมายเลขโทรศัพท์ของข้าพเจ้าและหมายเลขที่สามารถติดต่อได้ไปทำธุระกรรมไดๆโดยเด็ดขาด",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "bd21ad3c-ab53-429a-ab0a-6e0d555505ae",
+     "at": "2026-08-26",
+     "score": 5,
+     "content": "ง่ายดี..มีดวงให้แลด้วยสุดยอดครับ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "8827df86-13a7-4d5a-9591-2390083eb349",
+     "at": "2026-08-26",
+     "score": 5,
+     "content": "ชอบมากๆ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "7bd71a9d-85b5-46ed-b48c-3f77a0417871",
+     "at": "2026-08-26",
+     "score": 1,
+     "content": "น่ารำคาญป๊อบอัพโฆษณา",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "52382b9e-8a87-404f-9bea-1079243430d5",
+     "at": "2026-08-26",
+     "score": 5,
+     "content": "ใช้ง่ายดสะดวกดี",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "3cc6abe8-b119-4750-b673-a5cb56c05fe6",
+     "at": "2026-08-26",
+     "score": 5,
+     "content": "สะดวกมากครับเยี่ยมมาก",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "12fe9702-2b7b-4b10-8fa7-ff50f506b624",
+     "at": "2026-08-26",
+     "score": 5,
+     "content": "ok",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "01a88262-7eeb-4de3-bf7f-5fc840858311",
+     "at": "2026-08-26",
+     "score": 5,
+     "content": "ดีเลย",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "f55b0580-cfa7-490a-847d-55ee8a70552a",
      "at": "2026-08-25",
@@ -2053,7 +2117,7 @@
      "at": "2026-08-22",
      "score": 5,
      "content": "เป็น app ที่ดีครับเข้าใจง่ายคอยติดตามอยู่ตลอดมีการอัพเดทอยู่เรื่อยๆ",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": false
     },
     {
@@ -2605,7 +2669,7 @@
      "at": "2026-08-17",
      "score": 5,
      "content": "การให้อัพเดทเป็นเรื่องยุ่งยากมาก พออัพเดทไม่ดำเนินการต่อมีแต่ให้อัพเดท",
-     "thumbs": 1,
+     "thumbs": 2,
      "replied": false
     },
     {
@@ -5615,21 +5679,37 @@
    "name": "เมืองไทย แคปปิตอล",
    "own": false,
    "stats": {
-    "score": 4.670827,
-    "ratings": 6445,
-    "reviews_total": 2143,
+    "score": 4.6760125,
+    "ratings": 6452,
+    "reviews_total": 2147,
     "installs": "1,000,000+",
     "histogram": [
-     261,
-     70,
-     211,
-     442,
-     5458
+     260,
+     69,
+     200,
+     431,
+     5486
     ],
     "app_updated": "2026-08-18",
     "version": "2.5.114"
    },
    "reviews_store": [
+    {
+     "id": "837260a3-a7e4-433e-a78f-bb9161ec25d7",
+     "at": "2026-08-26",
+     "score": 5,
+     "content": "จ่ายง่ายดี มียอดให้ดูด้วย",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "2e4f8057-ae61-43d9-91de-86ed4ee354f7",
+     "at": "2026-08-26",
+     "score": 5,
+     "content": "ดีมาก",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "019d7f55-d068-44a8-9838-46833a78dd99",
      "at": "2026-08-25",
@@ -5643,7 +5723,7 @@
      "at": "2026-08-23",
      "score": 5,
      "content": "โอนจ่ายง่ายไม่ต้องไปสาขาสะดวกมากๆ",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": false
     },
     {
@@ -5739,7 +5819,7 @@
      "at": "2026-08-16",
      "score": 5,
      "content": "อยากให้มีกดปรับสัญญาผ่านแอปด้วยค่ะ ที่สามารถทำได้ง่ายๆไม่ต้องเดินทางไปที่สาขา",
-     "thumbs": 3,
+     "thumbs": 4,
      "replied": false
     },
     {
@@ -5803,7 +5883,7 @@
      "at": "2026-08-03",
      "score": 5,
      "content": "บริการลูกค้าดีมากค่ะซื่อตรงมีวินัยในการเงิน เป็นลูกค้ามานานหลายปีแล้วค่ะไม่เคยทําให้ ผิดหวังเลยค่ะ ยอดเยี่ยมมากค่ะ",
-     "thumbs": 5,
+     "thumbs": 6,
      "replied": false
     },
     {
@@ -5867,7 +5947,7 @@
      "at": "2026-07-21",
      "score": 3,
      "content": "ปรับสัญญาเพื่อรี ผ่านแอปไม่ได้เมื่อก่อนเคยทำได้ตอนนี้ต้องไปที่สาขาทำให้เสียเวลาไม่สะดวกเหมือนเมื่อก่อน",
-     "thumbs": 6,
+     "thumbs": 7,
      "replied": true
     },
     {
@@ -6403,7 +6483,7 @@
      "at": "2026-03-27",
      "score": 2,
      "content": "ปกติปรับสัญญาสินเชื่อฝ่ายบุคคลได้ปกติแต่ครั้งนี้ทำไมพอจะปรับสัญญามันขึ้นแจ้งเตือนว่าให้อัปเดตใหใหม่ทั้งที่อัปเดตเป็นเวอร์ชั่นปัจุบันแล้วแบบนี้ต้ งทำยังไงอ่ะ",
-     "thumbs": 8,
+     "thumbs": 9,
      "replied": true
     },
     {
@@ -7477,21 +7557,29 @@
    "name": "ศรีสวัสดิ์",
    "own": false,
    "stats": {
-    "score": 4.573705,
-    "ratings": 2435,
-    "reviews_total": 860,
+    "score": 4.57874,
+    "ratings": 2437,
+    "reviews_total": 861,
     "installs": "500,000+",
     "histogram": [
-     135,
-     29,
-     77,
-     251,
-     1939
+     134,
+     28,
+     76,
+     249,
+     1947
     ],
     "app_updated": "2026-07-01",
     "version": "1.0.60"
    },
    "reviews_store": [
+    {
+     "id": "1a0ff79c-98e2-4a8f-b7de-4670d974df63",
+     "at": "2026-08-26",
+     "score": 5,
+     "content": "เยียมมากเลยค่ะ",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "d6964fe0-5ef7-451d-aff7-3bb647a6602b",
      "at": "2026-08-25",
@@ -11146,7 +11234,7 @@
    "own": false,
    "stats": {
     "score": 4.21,
-    "ratings": 345,
+    "ratings": 346,
     "reviews_total": 133,
     "installs": "100,000+",
     "histogram": [
@@ -11154,7 +11242,7 @@
      3,
      20,
      27,
-     244
+     245
     ],
     "app_updated": "2026-07-20",
     "version": "1.12.0"
@@ -12557,21 +12645,37 @@
    "name": "Good Money เงินดีดี (GSB)",
    "own": false,
    "stats": {
-    "score": 3.840625,
-    "ratings": 3203,
-    "reviews_total": 1407,
+    "score": 3.8271606,
+    "ratings": 3209,
+    "reviews_total": 1411,
     "installs": "1,000,000+",
     "histogram": [
-     620,
-     230,
-     130,
-     280,
-     1941
+     623,
+     237,
+     138,
+     277,
+     1930
     ],
     "app_updated": "2026-08-11",
     "version": "1.0.45"
    },
    "reviews_store": [
+    {
+     "id": "e3ae2658-ec5a-4a31-be82-61b1451e3c92",
+     "at": "2026-08-26",
+     "score": 1,
+     "content": "ห่วยในบัตรประชาชนผมสั้นปัจจุบันปมยาวสแกนหน้าไม่ผ่านปรับปรุงหน่อย",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "6a126b69-61dd-4c8f-bde0-a61f698c9068",
+     "at": "2026-08-26",
+     "score": 5,
+     "content": "ผ่านง่ายไม่ยุ่งยากดีมากๆค่ะ",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "fd969cdf-9add-42b6-87fc-ddc0c3b6bed7",
      "at": "2026-08-25",
@@ -12769,7 +12873,7 @@
      "at": "2026-08-18",
      "score": 5,
      "content": "เป็นแอปที่ดีค่ะ ไม่ยุ่งยาก ผ่านง่าย ช่วยได้เยอะเลย",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": true
     },
     {
@@ -13233,7 +13337,7 @@
      "at": "2026-08-04",
      "score": 5,
      "content": "เป็น app ที่ดีมากๆทำสินเชื่อได้ง่ายเอกสารไม่ยุ่งยากเป็น app ถูกกฎหมายกู้เท่าที่จำเป็นชำระคืนให้ตรงต่อเวลาไม่มีปัญหาสมัครครั้งแรกก็ผ่านแล้วง่ายมากๆเมื่อชำระคืนแล้วยอดเก่าก็จะทบกลับมา",
-     "thumbs": 9,
+     "thumbs": 10,
      "replied": true
     },
     {
@@ -15433,19 +15537,19 @@
    "name": "GO by Krungsri Auto",
    "own": false,
    "stats": {
-    "score": 4.383279,
-    "ratings": 9293,
-    "reviews_total": 3802,
+    "score": 4.3876224,
+    "ratings": 9295,
+    "reviews_total": 3803,
     "installs": "1,000,000+",
     "histogram": [
-     736,
+     726,
      262,
      534,
      927,
-     6830
+     6841
     ],
     "app_updated": "2026-08-19",
-    "version": "8.5.0"
+    "version": "8.6.0"
    },
    "reviews_store": [
     {
@@ -15549,7 +15653,7 @@
      "at": "2026-07-28",
      "score": 1,
      "content": "เข้าใช้แอพนี้อยากมาก เปิดแอพไม่ได้ เข้าค้างตลอดเลย ควรแก้ไข",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": true
     },
     {
@@ -15629,7 +15733,7 @@
      "at": "2026-07-08",
      "score": 1,
      "content": "เข้าไม่ได้ค้างอยู่หน้าแอปแก้ไขด่วน!",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": true
     },
     {
