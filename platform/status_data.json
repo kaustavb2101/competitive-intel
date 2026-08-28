@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-28T11:22:22+07:00",
-    "commit": "022d5c7"
+    "generated_at": "2026-08-28T08:55:15+00:00",
+    "commit": "3ddfb67"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-08-28T08:55:15+00:00",
+      "sha": "3ddfb67",
+      "summary": "data: market-pulse swarm refresh (run 33145164829) (#672)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-28T08:17:31+00:00",
+      "sha": "7012444",
+      "summary": "docs: log ux-loop prefers-contrast:more branch-explorer merge+deploy (PR #675)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-28T15:14:45+07:00",
+      "sha": "995a58c",
+      "summary": "ux: prefers-contrast:more support on branch-explorer.html (closes deck.gl series) (#675)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-28T07:41:34+00:00",
+      "sha": "8dd4c5b",
+      "summary": "data: rival Facebook promo feed refresh (run 33146274278) (#673)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-28T07:21:12+00:00",
+      "sha": "f98f4fd",
+      "summary": "data: Thai-IP-only swarm refresh (run 33139328211) (#670)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-28T06:43:18+00:00",
+      "sha": "c20dddd",
+      "summary": "feat(#map): compound agri-risk stack lens on the National map (#674)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-28T05:30:12+00:00",
+      "sha": "d8a4992",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-28, run 33144872404)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-28T04:28:45+00:00",
+      "sha": "3ae4e47",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-28T04:27:56+00:00",
+      "sha": "b313320",
+      "summary": "data: NABC live prices (2026-08-28, run 33141625187)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-28T04:22:49+00:00",
+      "sha": "26048c0",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (022d5c7) after peer coverage×valuation join",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-28T11:22:22+07:00",
       "sha": "022d5c7",
       "summary": "feat(#acq): read ECL coverage against valuation — the market pays up for conservative provisioning (#671)",
@@ -651,66 +711,6 @@
       "sha": "42104fa",
       "summary": "ux: prefers-contrast:more — strengthen muted-text + hairline tokens (#658)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-27T14:21:21+00:00",
-      "sha": "f68e5d9",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-27, run 33081585923)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-27T12:43:09+00:00",
-      "sha": "809977d",
-      "summary": "feat(#acq): surface P/BV in the listed-peer scoreboard + read what the market rewards (#657)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-27T10:21:19+00:00",
-      "sha": "c68d0a7",
-      "summary": "docs: log intelligence-loop run (PR #656, peer ROE→ROA×leverage) + refresh CEO dashboard to HEAD",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-27T17:20:08+07:00",
-      "sha": "fe3fce1",
-      "summary": "feat(#acq): decompose the peer ROE league into ROA × leverage (measured, consolidated filers) (#656)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-27T09:02:20+00:00",
-      "sha": "7c32f14",
-      "summary": "feat(#overview): state the collateral-book vintage basis inline (book 2026-07 vs DLT base 2025) (#654)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-27T08:25:04+00:00",
-      "sha": "cf5fce4",
-      "summary": "docs: log UX-loop run — forced-colors data-viz protection (PR #655, merged + deploy-verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-27T15:21:53+07:00",
-      "sha": "c553f20",
-      "summary": "ux: preserve data-viz colour in Windows High Contrast Mode (forced-colors) (#655)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-27T04:30:42+00:00",
-      "sha": "7ff40b9",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (7308507) after peer-scoreboard fs_type badge",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-27T11:30:23+07:00",
-      "sha": "7308507",
-      "summary": "feat(#acq): flag HENG's unconsolidated statement basis inline on the peer scoreboard (#653)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-27T03:25:13+00:00",
-      "sha": "2b051f4",
-      "summary": "data: rival Facebook promo feed refresh (run 33034614652) (#652)",
-      "pillar": "market"
     }
   ]
 }
