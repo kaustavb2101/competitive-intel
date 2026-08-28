@@ -4089,7 +4089,7 @@ function drawPeerScore(){
    peers' own IFRS-9 credit-quality NOTES). Stage-3 (non-performing / credit-impaired) gross share of
    gross receivables + ECL coverage. NOT in the SET market-data API — read from the filings themselves.
    MEASURED, the rivals' own disclosures. NOT an AutoX row (unlisted). Lazy, null-safe, graceful. */
-let PEERAQ=null, peeraqLoaded=false;
+let PEERAQ=null, peeraqLoaded=false, peeraqScoreFetch=false;
 function renderPeerAssetQuality(){
   const tbl=$('#peeraqtbl'); if(!tbl) return;
   if(peeraqLoaded){ drawPeerAssetQuality(); return; }
@@ -4156,13 +4156,47 @@ function drawPeerAssetQuality(){
       mixLine=` <b>Book mix:</b> ${pureLoan.length?`${pureLoan.join(', ')} lend almost entirely through the secured loan book (≤5% hire-purchase) — head-on in the title-loan / cash space we run; `:''}`+
         `<b>${hpLean.name}</b> leans most on hire-purchase (${hpLean.hp_share_pct}% of book — vehicle asset-finance, a step off the pure title-loan contest).${combinedTxt}`;
     }
+    // S3-coverage × valuation cross-read (MEASURED × MEASURED) — joins each peer's ECL coverage against its
+    // Stage-3 book (this layer) to the SET P/BV multiple in peer_scoreboard.json (PEERSCORE). DISTINCT from the
+    // scoreboard's P/BV × NPL read (drawPeerScore.aqLine, which tests whether the below-book DISCOUNT tracks
+    // credit quality): this tests whether the market's PREMIUM tracks provisioning conservatism — coverage
+    // (allowance held against the Stage-3 book) is not NPL (headline book cleanliness). Fires ONLY when the two
+    // thickest-covered books are EXACTLY the two richest-valued names AND the thinnest-covered book trades below
+    // the field's median multiple — a strict, self-verifying gate, so a vintage that reorders the field silences
+    // the claim rather than misstating it. Consolidated filers only (HENG's unconsolidated basis excluded via
+    // fs_type); fully null-guarded. If the sibling scoreboard hasn't populated PEERSCORE yet (fetch order), pull
+    // it once and redraw so the join fills in regardless of which #acq card rendered first (mirrors drawCompCoverage).
+    let covLine='';
+    if(peerscoreLoaded&&PEERSCORE&&Array.isArray(PEERSCORE.peers)){
+      const covBy={}; peers.forEach(p=>{ if(p&&p.symbol&&typeof p.s3_coverage_pct==='number') covBy[p.symbol]=p.s3_coverage_pct; });
+      const jc=PEERSCORE.peers.filter(p=>p&&p.fs_type==='C'&&typeof p.pbv==='number'&&typeof covBy[p.symbol]==='number')
+        .map(p=>({name:p.name||p.symbol,symbol:p.symbol,pbv:p.pbv,cov:covBy[p.symbol]}));
+      if(jc.length>=4){
+        const byCov=jc.slice().sort((a,b)=>b.cov-a.cov);
+        const byPbv=jc.slice().sort((a,b)=>b.pbv-a.pbv);
+        const covMin=byCov[byCov.length-1];
+        const topCov2=new Set([byCov[0].symbol,byCov[1].symbol]);
+        const topPbv2=new Set([byPbv[0].symbol,byPbv[1].symbol]);
+        const sameTop2=(topCov2.size===2)&&[...topCov2].every(s=>topPbv2.has(s));
+        const pbvSorted=jc.map(p=>p.pbv).slice().sort((a,b)=>a-b);
+        const n=pbvSorted.length;
+        const medPbv=(n%2)?pbvSorted[(n-1)/2]:(pbvSorted[n/2-1]+pbvSorted[n/2])/2;
+        if(sameTop2&&covMin.pbv<medPbv){
+          covLine=` <b>The market pays up for conservative provisioning.</b> The two books with the thickest ECL coverage — ${byCov[0].name} (${byCov[0].cov.toFixed(1)}%) and ${byCov[1].name} (${byCov[1].cov.toFixed(1)}%) — are also the two richest-valued (P/BV ${byPbv[0].pbv.toFixed(2)}× and ${byPbv[1].pbv.toFixed(2)}×), while the thinnest-covered book, ${covMin.name} (${covMin.cov.toFixed(1)}%), trades below the field's median multiple (P/BV ${covMin.pbv.toFixed(2)}×) — so valuation tracks how well-provisioned the book is, not just its headline NPL (consolidated filers; Stage-3 IFRS-9 × SET P/BV).`;
+        }
+      }
+    } else if(!PEERSCORE&&!peeraqScoreFetch){
+      peeraqScoreFetch=true;
+      fetch('data/peer_scoreboard.json').then(r=>r.ok?r.json():null).then(j=>{ if(j)PEERSCORE=j; drawPeerAssetQuality(); }).catch(()=>{});
+    }
     ro.innerHTML=`<b>Rival non-performing (Stage-3) share, newest reviewed filings (as of ${m.as_of||'30 Jun 2026'}).</b> ${TAG_M} `+
       `<b>${best.name}</b> runs the cleanest book (${best.npl_pct}% NPL), <b>${worst.name}</b> the most stressed (${worst.npl_pct}%). `+
-      `The wider a rival's non-performing share and the thinner its coverage, the less margin headroom it has to keep pricing hard against the network we run.`+mixLine+
+      `The wider a rival's non-performing share and the thinner its coverage, the less margin headroom it has to keep pricing hard against the network we run.`+mixLine+covLine+
       methodBox(null,
         [`<b>Measured</b> — read directly from each peer's IFRS-9 credit-quality (Stage 1/2/3) tables in their reviewed financial-statement notes (${m.source||'Stock Exchange of Thailand · set.or.th'}).`,
          (m.npl_definition||'Stage-3 gross ÷ total gross receivables, combined loan + hire-purchase book.'),
          '<b>Not a regulator NPL</b> — this is the IFRS-9 Stage-3 gross share the peer itself discloses; comparable across these six (same accounting basis), not identical to a bank 90-days-past-due ratio.',
+         (covLine?'<b>S3 coverage × P/BV join</b> — the provisioning-premium read joins this layer\'s ECL-coverage column to the SET P/BV in <code>peer_scoreboard.json</code> (both MEASURED, joined by SET symbol; consolidated filers). It reads the PREMIUM against coverage, a separate question from the scoreboard\'s below-book-discount × NPL read.':null),
          '<b>Not an AutoX row</b> — AutoX is unlisted and files no SET statements.',
          (Array.isArray(m.caveats)&&m.caveats.length?m.caveats[1]:null)]);
   }
