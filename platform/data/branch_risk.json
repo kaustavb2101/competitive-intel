@@ -1786,10 +1786,10 @@
     },
     {
       "code": "@chaiyo20434",
-      "composite_risk": 24.3,
+      "composite_risk": 24.4,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 16.7,
         "segment": 45.5
       },
@@ -2779,7 +2779,7 @@
       "composite_risk": 26.6,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 30.6,
         "segment": 43.0
       },
@@ -2900,7 +2900,7 @@
       "composite_risk": 24.0,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 11.1,
         "segment": 49.4
       },
@@ -3010,7 +3010,7 @@
       "composite_risk": 26.2,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 25.0,
         "segment": 46.4
       },
@@ -3186,7 +3186,7 @@
       "composite_risk": 25.2,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 13.9,
         "segment": 52.7
       },
@@ -4176,7 +4176,7 @@
       "composite_risk": 25.8,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 25.0,
         "segment": 44.4
       },
@@ -4286,7 +4286,7 @@
       "composite_risk": 25.2,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 13.9,
         "segment": 52.7
       },
@@ -6354,7 +6354,7 @@
       "composite_risk": 22.1,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 13.9,
         "segment": 36.9
       },
@@ -6648,10 +6648,10 @@
     },
     {
       "code": "@chaiyo20416",
-      "composite_risk": 22.1,
+      "composite_risk": 22.2,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 8.3,
         "segment": 42.9
       },
@@ -7861,7 +7861,7 @@
       "composite_risk": 26.4,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 22.2,
         "segment": 50.4
       },
@@ -9808,7 +9808,7 @@
       "composite_risk": 25.2,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 13.9,
         "segment": 52.7
       },
@@ -10039,7 +10039,7 @@
       "composite_risk": 25.2,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 13.9,
         "segment": 52.7
       },
@@ -10589,7 +10589,7 @@
       "composite_risk": 25.2,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 19.4,
         "segment": 46.9
       },
@@ -10798,7 +10798,7 @@
       "composite_risk": 25.8,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 30.6,
         "segment": 38.7
       },
@@ -11326,7 +11326,7 @@
       "composite_risk": 24.7,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 11.1,
         "segment": 52.7
       },
@@ -11612,7 +11612,7 @@
       "composite_risk": 23.9,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 22.2,
         "segment": 37.8
       },
@@ -11840,10 +11840,10 @@
     },
     {
       "code": "@chaiyo20422",
-      "composite_risk": 25.2,
+      "composite_risk": 25.3,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 30.6,
         "segment": 36.1
       },
@@ -13229,7 +13229,7 @@
       "composite_risk": 25.5,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 33.3,
         "segment": 34.7
       },
@@ -14725,7 +14725,7 @@
       "composite_risk": 24.3,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 11.1,
         "segment": 51.0
       },
@@ -14879,7 +14879,7 @@
       "composite_risk": 25.2,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 13.9,
         "segment": 52.7
       },
@@ -15349,10 +15349,10 @@
     },
     {
       "code": "@chaiyo20410",
-      "composite_risk": 23.3,
+      "composite_risk": 23.4,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 19.4,
         "segment": 37.8
       },
@@ -15627,7 +15627,7 @@
       "composite_risk": 25.2,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 13.9,
         "segment": 52.7
       },
@@ -19103,7 +19103,7 @@
       "composite_risk": 25.8,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 19.4,
         "segment": 50.0
       },
@@ -19815,10 +19815,10 @@
     },
     {
       "code": "@chaiyo20420",
-      "composite_risk": 24.4,
+      "composite_risk": 24.5,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 19.4,
         "segment": 43.3
       },
@@ -20368,7 +20368,7 @@
       "composite_risk": 26.6,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 22.2,
         "segment": 51.3
       },
@@ -21787,7 +21787,7 @@
       "composite_risk": 21.2,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 13.9,
         "segment": 32.5
       },
@@ -22227,7 +22227,7 @@
       "composite_risk": 26.6,
       "components": {
         "household": 30.5,
-        "agri": 4.9,
+        "agri": 5.0,
         "occupation": 30.6,
         "segment": 43.0
       },
