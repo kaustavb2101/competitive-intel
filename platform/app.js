@@ -1503,6 +1503,21 @@ function tableSectionLabel(t){
    Generic and column-agnostic on purpose: it never has to guess which column means what, so it
    cannot mislabel a table. Idempotent — renderers re-run and re-call wrapTables() freely. */
 const FOLD_KEEP=5, FOLD_MIN=8;
+/* Every folded table spawns a "＋ N more rows" button, but its accessible name is JUST the row count —
+   so on a tab carrying several folded tables of the same length (e.g. two ranked lists both cut to 8
+   rows) the fold buttons share the identical name "＋ 3 more rows" with no way to tell which table each
+   expands (WCAG 4.1.2 Name/Role/Value + 2.4.4 Link/Button Purpose) — the sibling defect to the clamped
+   "more" buttons above. Suffix a stable, content-derived context from the table's own column headers so
+   each fold button's accessible name is distinct. The visible text ("＋ N more rows"/"－ show fewer") is
+   untouched — aria-label wins the accessible-name computation, so sighted layout is byte-identical. */
+function foldLabel(tbl,n,expanded){
+  let ctx='';
+  const hr=tbl&&[...tbl.querySelectorAll('tr')].find(r=>r.querySelector('th'));
+  if(hr) ctx=[...hr.querySelectorAll('th')].map(th=>(th.textContent||'').trim())
+    .filter(Boolean).join(' · ').replace(/\s+/g,' ').slice(0,60);
+  const rows=`${n} more row${n===1?'':'s'}`;
+  return (expanded?'Collapse rows':'Show '+rows)+(ctx?' — '+ctx:'');
+}
 function foldLongTables(root){
   (root||document).querySelectorAll('table.tbl,table.ic-tbl').forEach(t=>{
     if(t.dataset.folded) return;
@@ -1525,7 +1540,8 @@ function foldLongTables(root){
     const cols=Math.max(1,(rows[0].children||[]).length);
     const tr=document.createElement('tr');
     tr.className='tr-foldctl no-print';
-    tr.innerHTML=`<td colspan="${cols}"><button type="button" class="foldbtn" aria-expanded="false">`
+    tr.innerHTML=`<td colspan="${cols}"><button type="button" class="foldbtn" aria-expanded="false"`
+      +` aria-label="${dqEsc(foldLabel(t,hide.length,false))}">`
       +`＋ ${hide.length} more row${hide.length===1?'':'s'}</button></td>`;
     host.appendChild(tr);
   });
@@ -1538,6 +1554,7 @@ document.addEventListener('click',e=>{
   b.setAttribute('aria-expanded',String(!open));
   const n=tbl.querySelectorAll('.tr-folded').length;
   b.textContent=open?`＋ ${n} more row${n===1?'':'s'}`:'－ show fewer';
+  b.setAttribute('aria-label',foldLabel(tbl,n,!open));
 });
 
 /* Long method/caveat paragraphs are the Macro tab's second-biggest source of height after the
