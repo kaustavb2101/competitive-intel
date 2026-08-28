@@ -8,45 +8,6 @@
  },
  "runs": [
   {
-   "append_history_rc": 0,
-   "feeds": [
-    {
-     "bytes_after": 7110,
-     "bytes_before": 7110,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 4.4,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8902,
-     "bytes_before": 8913,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 4.9,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 3989,
-     "bytes_before": 3989,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 139.2,
-     "status": "ok"
-    }
-   ],
-   "finished": "2026-08-15T15:52:54Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 2,
-   "n_failed": 0,
-   "n_ok": 3,
-   "n_skipped": 0,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-15T15:50:35Z"
-  },
-  {
    "append_history_rc": null,
    "feeds": [
     {
@@ -3250,6 +3211,53 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-08-28T00:34:18Z"
+  },
+  {
+   "append_history_rc": null,
+   "feeds": [
+    {
+     "bytes_after": 15146,
+     "bytes_before": 15146,
+     "key": "rival_promos",
+     "rc": 0,
+     "seconds": 4.6,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 7823309,
+     "bytes_before": 7817128,
+     "key": "pantip",
+     "rc": 0,
+     "seconds": 271.4,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 5610,
+     "bytes_before": 0,
+     "key": "datagoth",
+     "rc": 0,
+     "seconds": 148.4,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 915005,
+     "bytes_before": 915005,
+     "key": "nso_wages",
+     "rc": 0,
+     "seconds": 1.3,
+     "status": "changed"
+    }
+   ],
+   "finished": "2026-08-28T03:40:09Z",
+   "include_thai": true,
+   "jobs": 6,
+   "n_changed": 4,
+   "n_failed": 0,
+   "n_ok": 4,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": null,
+   "started": "2026-08-28T03:35:37Z"
   }
  ]
 }
