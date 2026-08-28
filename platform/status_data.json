@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-28T05:18:54+07:00",
-    "commit": "4d73f48"
+    "generated_at": "2026-08-28T11:22:22+07:00",
+    "commit": "022d5c7"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-08-28T11:22:22+07:00",
+      "sha": "022d5c7",
+      "summary": "feat(#acq): read ECL coverage against valuation — the market pays up for conservative provisioning (#671)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-28T02:55:29+00:00",
+      "sha": "e6679ac",
+      "summary": "data: market-pulse swarm refresh (run 33130119280) (#668)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-28T02:16:47+00:00",
+      "sha": "16a083d",
+      "summary": "docs: log UX loop run (PR #669, province.html prefers-contrast:more) + deploy-verify result",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-28T09:12:01+07:00",
+      "sha": "2b516f9",
+      "summary": "ux: province.html prefers-contrast:more support (deck.gl slice 2/3) (#669)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-28T00:41:05+00:00",
+      "sha": "408f5fb",
+      "summary": "feat(#exposure): compound agri-risk stack — where the three MEASURED agri lenses overlap (#667)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-28T00:28:06+00:00",
+      "sha": "bcbe81b",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-28, run 33129711107)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-27T23:02:14+00:00",
+      "sha": "fe8c6f7",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33121997489) (#666)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-27T22:20:24+00:00",
+      "sha": "7e5aaf0",
+      "summary": "docs: log intelligence-loop run (PR #665, district-grain ground leadership) + refresh CEO dashboard to HEAD",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-28T05:18:54+07:00",
       "sha": "4d73f48",
       "summary": "feat(#acq): district-grain ground-leadership rollup on the peer board (#665)",
@@ -663,54 +711,6 @@
       "sha": "2b051f4",
       "summary": "data: rival Facebook promo feed refresh (run 33034614652) (#652)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-27T03:01:00+00:00",
-      "sha": "03f2b5a",
-      "summary": "data: market-pulse swarm refresh (run 33028641508) (#650)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-27T02:21:40+00:00",
-      "sha": "c0c7db1",
-      "summary": "docs: log UX-loop run — collateral-outlook value bleed fix (PR #651, merged + deploy-verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-27T09:19:10+07:00",
-      "sha": "6fb90e1",
-      "summary": "ux: fix collateral-outlook value bleed at ~1000px (#overview) (#651)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-27T00:53:45+00:00",
-      "sha": "0be239b",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-27, run 33028241940)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-27T00:25:46+00:00",
-      "sha": "df0380c",
-      "summary": "test(gate): lock CLAUDE.md's provenance census count to the live census",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-26T22:59:51+00:00",
-      "sha": "e21ced8",
-      "summary": "data: Thai-IP-only swarm refresh (run 33018422118) (#649)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-26T22:24:56+00:00",
-      "sha": "eb835ee",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (e44f21d) after 5-pillar health sweep",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-26T20:24:13+00:00",
-      "sha": "e44f21d",
-      "summary": "docs: log UX-loop run — Brand section-summary badge bleed fix (PR #648, merged + deploy-verified)",
-      "pillar": "uxui"
     }
   ]
 }
