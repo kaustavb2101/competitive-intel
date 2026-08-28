@@ -90,8 +90,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "12 observations from 2026-07-17, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 12,
+    "note": "13 observations from 2026-07-17, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 13,
     "series": "set_mtc_mcap"
    },
    "key": "peer_scoreboard",
@@ -293,11 +293,11 @@
    "label": "Rain gauges reporting",
    "measured": true,
    "source": "ThaiWater (api-v3.thaiwater.net /public/rain_24h) — live rain-gauge telemetry (DWR/TMD/EGAT networks). Keyless, cloud-reachable.",
-   "stamp": "2026-08-27",
-   "stamp_iso": "2026-08-27",
+   "stamp": "2026-08-28",
+   "stamp_iso": "2026-08-28",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4422,
+   "value": 4409,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -317,11 +317,11 @@
    "label": "River stations above high mark",
    "measured": true,
    "source": "ThaiWater (api-v3.thaiwater.net /public/waterlevel_load) — live river/reservoir water-level telemetry (RID/DWR networks). Keyless, cloud-reachable.",
-   "stamp": "2026-08-27",
-   "stamp_iso": "2026-08-27",
+   "stamp": "2026-08-28",
+   "stamp_iso": "2026-08-28",
    "stamp_kind": "pulled",
    "unit": "of 795",
-   "value": 131,
+   "value": 128,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -513,7 +513,7 @@
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
   "history_note": "A trend line is drawn only where a stored series exists. 11 of 24 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 302,
+  "history_points": 303,
   "missing_files": [],
   "n_feeds": 24,
   "n_with_history": 11,
