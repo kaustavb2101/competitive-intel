@@ -116,6 +116,41 @@ PEER_FINANCIALS_SOURCES = {
                  "https://sawad.listedcompany.com/misc/presentation/20250523-sawad-oppday-1q2025.pdf",
 }
 
+# NETWORK MOMENTUM — cited period-over-period branch counts per rival: the DIRECTION each network is
+# moving, which the static "expected" count alone can't show. Objective #2 reads this as where
+# competitive pressure is RISING vs RECEDING on the districts AutoX already runs — a rival opening
+# branches into our catchments erodes margin; a rival vacating them frees ground. Every point is a
+# CITED public figure (each carries its own `src`); only rivals with ≥2 cited dated points get a
+# direction — the rest stay honestly unclassified rather than back-computed. Dates are the figures'
+# own observation dates (never wall-clock); the span is computed from those dates only, so the whole
+# derivation is deterministic. This is REPORTED-from-public-reports (same basis as `expected`), NOT a
+# measured census of the rivals' own sites.
+BRANCH_TRAJECTORY = {
+    "Heng": [
+        {"date": "2024-12-31", "branches": 1018,
+         "src": "Heng annual report 2025 — network built to 1,018 branches by 2024 (the peak; "
+                "'plans to ... increase the number of branches to 1,018 branches by 2024'). "
+                "source-data/investor_docs/text/HENG_annual_2025_en.txt"},
+        {"date": "2025-12-31", "branches": 743,
+         "src": "Heng annual report 2025 — 'As of December 31, 2025, the Company provides services "
+                "to retail customers through 743 branch offices'. "
+                "source-data/investor_docs/text/HENG_annual_2025_en.txt"},
+        {"date": "2026-06-30", "branches": 450,
+         "src": "Heng SET filings, H1-2026 (docs/RESEARCH_DIGEST.md §B); confirmed by the official "
+                "hengleasing.com locator = 450 measured points (competitors_census.json)."},
+    ],
+    "Muangthai": [
+        {"date": "2024-12-31", "branches": 8155,
+         "src": "MTC FY2025 8,673 total − 518 opened in 2025 = 8,155 prior-year (arithmetic on cited "
+                "figures; company IR / kaohoon)."},
+        {"date": "2025-12-31", "branches": 8673,
+         "src": "MTC FY2025 — 8,673 total branches (company IR / kaohoon)."},
+    ],
+    # Tidlor / Srisawad: only ONE cited dated branch count each (1,873 / 1,138) — no cited prior period,
+    # so they carry no trajectory here and are simply omitted from the momentum read rather than assigned
+    # a fabricated direction. (A brand present here with a single point would surface under `unclassified`.)
+}
+
 
 def _count_found():
     """De-duplicated MEASURED per-brand counts across the census files (by place_id; falls
@@ -377,6 +412,92 @@ def _footprint_measured(autox_n, counts):
     }
 
 
+def _network_momentum():
+    """NETWORK MOMENTUM — classify each rival's branch network as expanding / contracting / flat from
+    its CITED period-over-period counts (BRANCH_TRAJECTORY). Only brands with ≥2 cited dated points are
+    classified; the rest are disclosed as unclassified (single cited point, never back-computed). The
+    span is computed from the figures' own observation dates, so the whole read is deterministic and
+    network-free. Objective #2: expanding = rising competitive pressure on the districts we run;
+    contracting = receding pressure (ground freed). Returns None if no brand has ≥2 points."""
+    from datetime import date as _date
+
+    def _pace_per_year(points):
+        first, last = points[0], points[-1]
+        y0, m0, d0 = (int(x) for x in first["date"].split("-"))
+        y1, m1, d1 = (int(x) for x in last["date"].split("-"))
+        days = (_date(y1, m1, d1) - _date(y0, m0, d0)).days
+        if days <= 0:
+            return None
+        net = last["branches"] - first["branches"]
+        return round(net / (days / 365.25), 1)
+
+    classified, unclassified = [], []
+    for b in BRANDS:
+        pts = BRANCH_TRAJECTORY.get(b)
+        if not pts:
+            continue
+        # keep the cited order (chronological as authored); guard with an explicit date sort so the
+        # first/last are unambiguous regardless of dict authoring order.
+        pts = sorted(pts, key=lambda p: p["date"])
+        if len(pts) < 2:
+            unclassified.append({"brand": b, "reason": "only one cited dated branch count — no prior "
+                                 "period to measure direction against; not back-computed",
+                                 "points": pts})
+            continue
+        first, last = pts[0], pts[-1]
+        net = last["branches"] - first["branches"]
+        pct = round(100.0 * net / first["branches"], 1) if first["branches"] else None
+        direction = "expanding" if net > 0 else "contracting" if net < 0 else "flat"
+        pressure = ("rising" if net > 0 else "receding" if net < 0 else "flat")
+        classified.append({
+            "brand": b, "direction": direction, "pressure": pressure,
+            "net": net, "pct": pct, "pace_per_year": _pace_per_year(pts),
+            "span": {"from": first["date"], "to": last["date"]},
+            "first": {"date": first["date"], "branches": first["branches"]},
+            "last": {"date": last["date"], "branches": last["branches"]},
+            "points": pts,
+        })
+    if not classified:
+        return None
+    # deterministic order: most-contracting first (net asc), tie-break by fixed brand order.
+    classified.sort(key=lambda o: (o["net"], BRANDS.index(o["brand"])))
+    expanding = [o["brand"] for o in classified if o["direction"] == "expanding"]
+    contracting = [o["brand"] for o in classified if o["direction"] == "contracting"]
+    insight = None
+    con = next((o for o in classified if o["direction"] == "contracting"), None)
+    exp = next((o for o in classified if o["direction"] == "expanding"), None)
+    if con and exp:
+        chain = " → ".join("{:,}".format(p["branches"]) for p in con["points"])
+        insight = (
+            "%s is the one CONTRACTING listed rival — %s branches (%s%% since %s), regrouping under a "
+            "cluster / hub-and-spoke model — so competitive pressure RECEDES in the districts it vacates. "
+            "%s runs the opposite way: +%s branches (%s → %s over %s–%s), rising pressure. AutoX "
+            "consolidates between them (no branch-growth target). Two big rivals moving in opposite "
+            "directions — read the district-level rival mix to tell a rising-%s story from a receding-%s one."
+            % (con["brand"], chain, ("%+.1f" % con["pct"]) if con["pct"] is not None else "?",
+               con["span"]["from"][:4], exp["brand"], "{:,}".format(exp["net"]),
+               "{:,}".format(exp["first"]["branches"]), "{:,}".format(exp["last"]["branches"]),
+               exp["span"]["from"][:4], exp["span"]["to"][:4], exp["brand"], con["brand"])
+        )
+    return {
+        "label": "NETWORK MOMENTUM — cited period-over-period branch counts per rival: the DIRECTION of "
+                 "each network (objective #2 — where competitive pressure is rising vs receding on the "
+                 "districts AutoX already runs). Each point is a CITED public figure (company IR / SET "
+                 "filings / official locator, see each point's src); only rivals with ≥2 cited dated "
+                 "points are classified — the rest stay unclassified rather than back-computed.",
+        "brands": classified,
+        "expanding": expanding,
+        "contracting": contracting,
+        "unclassified": unclassified,
+        "insight": insight,
+        "caveat": "REPORTED-from-public-reports (same basis as the `expected` counts), NOT a measured "
+                  "census of the rivals' sites. Direction is measured from each rival's own cited counts "
+                  "over its own dated span; spans differ by brand and are stated per row. This is a "
+                  "NETWORK-SIZE trajectory, not market share and not a per-district density read "
+                  "(peer_province.json / rival_density.json answer the local question).",
+    }
+
+
 def _national_standing(autox_n, counts):
     """Where AutoX sits nationally among the big-4 by BRANCH-NETWORK SIZE — the read the
     found-vs-expected board hides (it never places AutoX in its own peer set). AutoX's size is
@@ -425,6 +546,7 @@ def _national_standing(autox_n, counts):
     footprint = _footprint_measured(autox_n, counts)
     book_intensity = _book_intensity(autox_n, _autox_book_bn())
     book_per_point = _book_per_point(autox_n, _autox_book_bn(), counts)
+    network_momentum = _network_momentum()
     # The one-line reframe the exec should read: IR-count basis vs measured-footprint basis can rank
     # AutoX differently, and both are true. Built from the two rankings, never hard-coded.
     insight = None
@@ -449,6 +571,7 @@ def _national_standing(autox_n, counts):
         "footprint_measured": footprint,
         "book_intensity": book_intensity,
         "book_per_point": book_per_point,
+        "network_momentum": network_momentum,
         "reported_vs_measured_insight": insight,
         "basis": "NETWORK SIZE — AutoX's MEASURED own-network branch count vs each peer's REPORTED "
                  "(cited public IR) branch count. A national footprint-scale read, NOT market share.",
@@ -559,6 +682,17 @@ def run(check=False):
             print("  book per measured point (consistent denominator): AutoX #%d of %d — %s"
                   % (bpp["autox_rank"], bpp["n_ranked"],
                      " > ".join("%s ฿%sm" % (o["operator"], o["book_per_point_m"]) for o in bpp["ranking"])))
+        nm = ns.get("network_momentum")
+        if nm:
+            print("  network momentum (cited branch-count direction):")
+            for o in nm["brands"]:
+                print("    %-10s %-11s %+d (%s%%) %s→%s"
+                      % (o["brand"], o["direction"], o["net"],
+                         ("%+.1f" % o["pct"]) if o["pct"] is not None else "?",
+                         o["span"]["from"], o["span"]["to"]))
+            if nm.get("unclassified"):
+                print("    unclassified (single cited point): %s"
+                      % ", ".join(u["brand"] for u in nm["unclassified"]))
     return 0
 
 
