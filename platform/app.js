@@ -7242,6 +7242,9 @@ function renderExposure(){
   // OBJECTIVE #1: portfolio flood-hazard exposure — how much of the book sits on repeatedly-flooding
   // ground (MEASURED GISTDA census, joined client-side; no recompute).
   renderFloodExposure();
+  // OBJECTIVE #1: compound agri-risk stack — where cropland exposure, crop-price/drought stress and
+  // chronic flood hazard OVERLAP (three measured-input layers joined client-side; estimated cut).
+  renderCompoundAgri();
 }
 
 /* ---------- most contested ground · contested population (objective #2, MEASURED) ----------
@@ -7436,6 +7439,114 @@ function renderFloodExposure(){
             `<td class="mono" style="color:${cCol(cs)}">${(100*cs).toFixed(0)}%</td></tr>`;}).join('')+`</table></div>`
         :`<p class="lead sub">No branch sits in a chronic-flood district.</p>`)+
       `</div></div>`;
+}
+
+/* ---------- compound agri-risk stack (objective #1) — where the three MEASURED-input agri lenses OVERLAP ----------
+   The three portfolio agri-risk lenses each already ship on their own (branch_cropland = measured-
+   corrected crop-area in the 10km catchment; crop_stress.agri_stress = a province composite of
+   MEASURED Thai farm-gate price YoY + OAE drought; flood_hazard = the measured GISTDA repeated-flood
+   frequency). Read alone, almost every rural branch trips at least one — so a single lens separates
+   little. The SIGNAL is where all three COMPOUND: a cropland-heavy catchment, in a province whose
+   crops are under price+drought stress, on ground that floods chronically. No view showed that
+   intersection. This joins the three layers CLIENT-SIDE (no recompute, no builder, no new file) and
+   counts the overlap, narrowing lens-by-lens so the reader sees each cut. Cuts are RELATIVE and
+   computed live from the current vintage (top quartile of branches by crop-area; top third of
+   provinces by agri-stress; chronic = ≥7/12 flood years), stated in the panel so nothing is hidden.
+   Provenance: the three INPUTS are measured / measured-corrected, but the intersection FLAG is a
+   derived ESTIMATED triage cut (the thresholds are choices) — labelled ESTIMATED, an audit-first
+   list. Makes NO open/close/expand recommendation. Lazy + graceful: any layer absent → renders
+   nothing (no re-trigger loop). */
+let compoundAgriWired=false;
+function compoundAgriHost(){
+  let h=document.getElementById('expo-compound-agri');
+  if(h) return h;
+  const anchor=document.getElementById('expo-flood'); if(!anchor||!anchor.parentNode) return null;
+  h=document.createElement('div'); h.id='expo-compound-agri'; h.style.marginTop='18px';
+  anchor.parentNode.insertBefore(h, anchor.nextSibling);
+  return h;
+}
+function renderCompoundAgri(){
+  const host=compoundAgriHost(); if(!host) return;
+  // Need all three layers. Wire the lazy loads exactly once; re-render when they land. If any is
+  // genuinely absent it stays null and we render nothing (the funnel would be meaningless partial).
+  const haveAll = CROPLAND && CROPLAND.length && FLOODHZ && FLOODHZ.length && CSTRESS && Object.keys(CSTRESS).length;
+  if(!haveAll){
+    if(!compoundAgriWired){ compoundAgriWired=true;
+      Promise.all([loadBranchCropland(), loadFloodHazard(), loadCropStress()])
+        .then(()=>{ if(onExposureView()) renderCompoundAgri(); });
+    }
+    host.innerHTML=''; return;
+  }
+  if(!DATA||!DATA.length){ host.innerHTML=''; return; }
+  const N=DATA.length, CHR=FLOOD_CHRONIC;
+  // RELATIVE cuts, computed from the current data so they track a refreshed vintage.
+  // Top-quartile crop-area threshold — nearest-rank over every branch's measured catchment crop-area.
+  const chas=[]; for(let i=0;i<CROPLAND.length;i++){ const r=CROPLAND[i]; chas.push((r&&r.crop_ha)||0); }
+  const sortedCha=chas.slice().sort((a,b)=>a-b);
+  const chaCut=sortedCha[Math.floor(0.75*(sortedCha.length-1))]||0;
+  // Top-third agri-stress threshold — nearest-rank over the 77 provinces (descending).
+  const asVals=(CSTRESS_LIST||[]).map(p=>p.agri_stress||0).filter(v=>v>0).sort((a,b)=>b-a);
+  const asCut = asVals.length ? asVals[Math.floor(asVals.length/3)] : 0;
+  // Lens-by-lens narrowing + the compound set.
+  let nCrop=0, nCropStress=0, nAll=0;
+  const byReg={}, byProv={};
+  DATA.forEach((d,i)=>{
+    const cr=CROPLAND[i], p=CSTRESS[d.v], f=FLOODHZ[i];
+    const heavy = cr && (cr.crop_ha||0) >= chaCut && chaCut>0;
+    if(!heavy) return; nCrop++;
+    const stressed = p && (p.agri_stress||0) >= asCut && asCut>0;
+    if(!stressed) return; nCropStress++;
+    const chronic = f!=null && f>=CHR;
+    if(!chronic) return; nAll++;
+    const r=d.r||'—', v=d.v||'—';
+    (byReg[r]||(byReg[r]={r,n:0})).n++;
+    (byProv[v]||(byProv[v]={v,r,n:0})).n++;
+  });
+  const pct=n=>(100*n/N).toFixed(1)+'%';
+  const regs=Object.values(byReg).sort((a,b)=>b.n-a.n);
+  const provs=Object.values(byProv).sort((a,b)=>b.n-a.n).slice(0,8);
+  const csrc=(CSTRESS_META&&CSTRESS_META.title)?'crop_stress agri-stress (farm-gate price + OAE drought)':'crop_stress agri-stress';
+  if(!nAll){
+    host.innerHTML=`<h2 class="risk" style="margin-top:0">Compound agri-risk stack ${TAG_E}</h2>`+
+      `<p class="lead sub">No branch currently sits at the intersection of all three agri-risk lenses at this vintage's cuts.</p>`;
+    return;
+  }
+  const funnel=[
+    ['Cropland-heavy catchment', `top quartile — crop-area ≥ ${Math.round(chaCut).toLocaleString()} ha within 10km`, nCrop, 'var(--gold)'],
+    ['…in a stressed crop province', `+ province agri-stress in the top third (≥ ${asCut.toFixed(3)})`, nCropStress, 'var(--gold)'],
+    ['…on chronic-flood ground', `+ flooded in ≥${CHR} of 12 yrs — the compound stack`, nAll, 'var(--agri)'],
+  ];
+  host.innerHTML=
+    `<h2 class="risk" style="margin-top:0">Compound agri-risk stack ${TAG_E}</h2>`+
+    `<p class="lead"><b>${nAll.toLocaleString()} of ${N.toLocaleString()} branches (${pct(nAll)})</b> sit where <b>all three</b> agri-risk lenses `+
+    `<b>compound</b> — a cropland-heavy catchment, in a province whose crops are under price+drought stress, on chronically-flooded ground. `+
+    `Any single lens flags most rural branches, so it separates little; the overlap is the sharp objective-#1 read — one shock hits collateral, borrower cashflow and recovery <b>at once</b> here.<br>`+
+    `<span class="sub">The three inputs are measured / measured-corrected; the intersection is a derived <b>estimated</b> triage cut (the thresholds are choices, stated below) — an audit list, not a loss estimate.</span></p>`+
+    methodBox('Client-side join of three already-shipped layers, no recompute: branch_cropland (measured-corrected crop-area ≤10km) × '+csrc+' × flood_hazard (measured GISTDA repeated-flood frequency). A branch is in the stack when it clears ALL three RELATIVE cuts below.',
+      ['Crop-area is <b>measured-corrected</b> (SPAM spatial pattern rescaled to the DOAE-2025 farmer registry); flood frequency is <b>measured</b> (GISTDA 1:50,000 repeated-flooding census).',
+       'agri-stress is a province <b>composite</b> of measured farm-gate price YoY + OAE drought — inherited at province grain, so the crop-stress cut is province-level, not per-branch.',
+       'Cuts are <b>relative</b> and recomputed from the current vintage (top quartile / top third / ≥'+CHR+'-of-12), so the count tracks the data — it is a triage <b>ranking</b>, not an absolute threshold.',
+       'The intersection flag is <b>estimated</b> (threshold choices); makes no open / close / expand recommendation.'])+
+    `<div class="tbl-wrap"><table class="tbl" id="expo-compound-funnel"><tr><th scope="col">Lens (narrowing)</th><th scope="col">Cut</th>`+
+      `<th scope="col">Branches</th><th scope="col">Share</th></tr>`+
+      funnel.map(([lab,cut,n,col])=>`<tr><td><b style="color:${col}">${lab}</b></td><td class="sub">${cut}</td>`+
+        `<td class="mono">${n.toLocaleString()}</td><td class="mono" style="color:${col}">${(100*n/N).toFixed(1)}%</td></tr>`).join('')+
+      `</table></div>`+
+    `<div class="dash2"><div class="dash2-side">`+
+      `<h2 class="risk">By region</h2>`+
+      `<p class="lead">Where the compound stack concentrates.</p>`+
+      `<div class="tbl-wrap"><table class="tbl" id="expo-compound-reg"><tr><th scope="col">Region</th><th scope="col" class="h-agri">Stack branches</th><th scope="col">Share of stack</th></tr>`+
+        regs.map(o=>`<tr><td><b>${o.r}</b></td><td class="mono" style="color:var(--agri)">${o.n.toLocaleString()}</td>`+
+          `<td class="mono sub">${(100*o.n/nAll).toFixed(0)}%</td></tr>`).join('')+
+      `</table></div></div>`+
+      `<div class="dash2-main">`+
+      `<h2 class="risk">Provinces most in the stack</h2>`+
+      `<p class="lead">Provinces ranked by how many of their branches sit at the three-lens intersection.</p>`+
+      `<div class="tbl-wrap"><table class="tbl" id="expo-compound-prov"><tr><th scope="col">#</th><th scope="col">Province</th><th scope="col">Region</th>`+
+        `<th scope="col" class="h-agri">Stack branches</th></tr>`+
+        provs.map((o,i)=>`<tr><td class="mono sub">${i+1}</td><td><b>${o.v}</b></td><td class="sub">${o.r}</td>`+
+          `<td class="mono" style="color:var(--agri)">${o.n.toLocaleString()}</td></tr>`).join('')+
+      `</table></div></div></div>`;
 }
 
 /* ---------- portfolio concentration by region · segment mix + HHI (objective #1) ----------
