@@ -384,6 +384,14 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_rate_board.py --check (rate_board.json not built yet, or rival_rate_card.json absent)"
   else bad "build_rate_board.py --check (rate_board.json drifted from rival_rate_card.json + rival_ads.json — run: python3 pipeline/build_rate_board.py)"
   fi
+  # The weekly re-read of every rival's OWN rate page vs the curated card (build_rival_rate_observed.py).
+  # Its input (source-data/rival_rate_observed.json) is committed by the Thai-IP puller, so the
+  # projection IS byte-exact and gated here; SKIP only if that input is absent.
+  ( cd "$PIPE" && python3 build_rival_rate_observed.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_rival_rate_observed.py --check (rate-card drift watch)"
+  elif [ "$rc" -eq 3 ]; then skip "build_rival_rate_observed.py --check (rival_rate_observed.json not built yet, or source-data input absent)"
+  else bad "build_rival_rate_observed.py --check (rival_rate_observed.json drifted from source-data/rival_rate_observed.json — run: python3 pipeline/build_rival_rate_observed.py)"
+  fi
   # Gated BEFORE promo_gap because it is promo_gap's input: the undercut check reads
   # rival_facebook.json, so an ungated Facebook projection could drift and the only symptom
   # would be a promo-gap row that silently stopped matching the post it cites. Every other

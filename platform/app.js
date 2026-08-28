@@ -3177,6 +3177,7 @@ function renderCompetition(){
   // from RIVPULSE at render time, so it is unaffected by the pulse loader moving tabs.
   renderPromoGap();
   renderRateBoard();
+  renderRateObserved();
   renderRivalUniverse();
   renderCompCoverage();
   renderRivalDensity();
@@ -4491,6 +4492,59 @@ function rbCSV(){
   a.download='autox_rate_board_'+(((RATEBOARD&&RATEBOARD.meta)||{}).asof_card||'latest')+'.csv';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+/* ---------- RATE-CARD DRIFT WATCH · rivals' own pages re-read vs the card (obj #2, MEASURED) ----------
+   Surfaces data/rival_rate_observed.json (build_rival_rate_observed.py). The rate board above is
+   built from the hand-curated card; pipeline/pull_rival_rates.py re-reads every operator's OWN
+   rate_url weekly, and this flags the ones whose live quote has moved OUTSIDE the band the card
+   carries for them — i.e. where the card the board relies on may have gone stale. Every quote is
+   MEASURED (verbatim page text); "drift" is a measured-vs-measured comparison in the same unit,
+   nothing inferred or converted. Null-guarded: absent file → the whole panel stays hidden. */
+let RATEOBS=null, roLoaded=false;
+const RO_UNIT={pct_per_year:'%/yr', pct_per_month:'%/mo'};
+function roUnit(u){ return RO_UNIT[u]||u||''; }
+function renderRateObserved(){
+  const el=$('#rodrift'); if(!el) return;
+  if(roLoaded){ drawRateObserved(); return; }
+  fetch('data/rival_rate_observed.json').then(r=>r.ok?r.json():null).then(j=>{
+    RATEOBS=j; roLoaded=true; drawRateObserved();
+  }).catch(()=>{ RATEOBS=null; roLoaded=true; drawRateObserved(); });
+}
+function drawRateObserved(){
+  const wrap=$('#rowrap'), box=$('#rodrift'), ro=$('#roreadout'), note=$('#ronote');
+  if(!box) return;
+  const m=(RATEOBS&&RATEOBS.meta)||{};
+  const ops=(RATEOBS&&Array.isArray(RATEOBS.operators))?RATEOBS.operators:[];
+  const drift=ops.filter(o=>o.drift_lines&&o.drift_lines.length);
+  if(!drift.length){
+    // No drift (or no file) — nothing for a human to reconcile, so keep the panel out of the way.
+    if(wrap) wrap.style.display='none';
+    return;
+  }
+  if(wrap) wrap.style.display='';
+  const above=drift.filter(o=>o.drift_lines.some(l=>l.direction==='above')).length;
+  if(ro){
+    ro.innerHTML=`<b>${m.n_drift_operators||drift.length} of ${m.n_operators||ops.length} rivals now quote a rate OUTSIDE the band our card carries for them`+
+      `${above?` — ${above} HIGHER than the card` : ''}.</b> `+
+      `The rate board above measures every rival against a hand-curated card; this is the weekly re-read of each operator's own page that says when that card has drifted and needs reconciling. `+
+      `<span class="sub">${m.n_read||0}/${m.n_operators||ops.length} pages read on ${m.pulled_at||'—'} · ${m.n_with_quote||0} with a parseable quote · ${m.n_card_gap_operators||0} quote a unit the card does not carry.</span>`;
+  }
+  const rows=drift.map(o=>{
+    const lines=o.drift_lines.map(l=>{
+      const band=(l.card_lo!=null)?`${l.card_lo}${(l.card_hi!=null&&l.card_hi!==l.card_lo)?'–'+l.card_hi:''}${roUnit(l.unit)}`:'—';
+      const up=l.direction==='above', dn=l.direction==='below';
+      const arrow=up?'▲':(dn?'▼':'◆'), col=up?'var(--agri)':(dn?'var(--merch)':'var(--gold)');
+      return `<div style="white-space:nowrap"><b style="color:${col}">${arrow} ${l.observed}${roUnit(l.unit)}</b> `+
+             `<span class="sub">vs card ${band}${l.delta!=null?` · Δ${l.delta}pp`:''}</span></div>`;
+    }).join('');
+    const nm=(o.name||o.key||'');
+    const op=o.rate_url?`<a href="${o.rate_url}" target="_blank" rel="noopener">${nm}<span class="sr-only"> (opens the operator's rate page in a new tab)</span></a>`:nm;
+    return `<tr><td><b>${op}</b> <span class="sub">${o.key||''}</span></td><td>${lines}</td></tr>`;
+  }).join('');
+  box.innerHTML=`<table class="tbl"><thead><tr><th scope="col">Operator</th><th scope="col">Its own page now quotes … vs the card</th></tr></thead><tbody>${rows}</tbody></table>`;
+  if(note) note.innerHTML=`<b>MEASURED.</b> Verbatim rate text read off each operator's own rate_url (${m.pulled_at||'—'}); “drift” is this build's comparison of that quote against the hand-curated card in the same unit — nothing inferred or converted. A move outside the card's band is a real rate change to reconcile into the card, not an error. Source: <span class="mono">source-data/rival_rate_observed.json</span> (pipeline/pull_rival_rates.py, weekly).`;
+  wrapTables();
 }
 
 /* ---------- rival PAID ADS · Google Ads Transparency Center (obj #2, MEASURED) ----------
