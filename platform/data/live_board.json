@@ -117,8 +117,8 @@
    "measured": true,
    "no_history": "each pull overwrites the last; appending our own star score weekly would give the single best line we could have — how borrower perception of us moves",
    "source": "",
-   "stamp": "2026-08-26",
-   "stamp_iso": "2026-08-26",
+   "stamp": "2026-08-27",
+   "stamp_iso": "2026-08-27",
    "stamp_kind": "sentiment_anchor",
    "unit": "★ our app",
    "value": 4.05,
@@ -285,8 +285,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "34 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 34,
+    "note": "35 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 35,
     "series": "rain_max_mm"
    },
    "key": "thaiwater_rain",
@@ -297,7 +297,7 @@
    "stamp_iso": "2026-08-28",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4450,
+   "value": 4437,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -309,8 +309,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "34 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 34,
+    "note": "35 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 35,
     "series": "flood_high"
    },
    "key": "thaiwater_flood",
@@ -320,8 +320,8 @@
    "stamp": "2026-08-28",
    "stamp_iso": "2026-08-28",
    "stamp_kind": "pulled",
-   "unit": "of 795",
-   "value": 128,
+   "unit": "of 794",
+   "value": 136,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -513,7 +513,7 @@
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
   "history_note": "A trend line is drawn only where a stored series exists. 11 of 24 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 304,
+  "history_points": 306,
   "missing_files": [],
   "n_feeds": 24,
   "n_with_history": 11,
