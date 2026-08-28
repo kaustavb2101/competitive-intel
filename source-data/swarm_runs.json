@@ -11,93 +11,6 @@
    "append_history_rc": 0,
    "feeds": [
     {
-     "bytes_after": 7111,
-     "bytes_before": 7110,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 3.6,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8898,
-     "bytes_before": 8902,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 4.1,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 3989,
-     "bytes_before": 3989,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 116.0,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 7534,
-     "bytes_before": 7534,
-     "key": "tpso_cpi",
-     "rc": 0,
-     "seconds": 2.3,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 58434,
-     "bytes_before": 58424,
-     "key": "ilostat_labour",
-     "rc": 0,
-     "seconds": 6.6,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 601312,
-     "bytes_before": 601099,
-     "key": "app_reviews",
-     "rc": 0,
-     "seconds": 5.2,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 2498607,
-     "bytes_before": 2480190,
-     "key": "apple_reviews",
-     "rc": 0,
-     "seconds": 117.2,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 498466,
-     "bytes_before": 497708,
-     "key": "rival_youtube",
-     "rc": 0,
-     "seconds": 28.6,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 1376671,
-     "bytes_before": 1372946,
-     "key": "google_ads",
-     "rc": 0,
-     "seconds": 292.5,
-     "status": "changed"
-    }
-   ],
-   "finished": "2026-08-15T21:53:26Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 8,
-   "n_failed": 0,
-   "n_ok": 9,
-   "n_skipped": 0,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-15T21:48:30Z"
-  },
-  {
-   "append_history_rc": 0,
-   "feeds": [
-    {
      "bytes_after": 7109,
      "bytes_before": 7111,
      "key": "thaiwater_flood",
@@ -3250,6 +3163,61 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-08-28T05:34:45Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7106,
+     "bytes_before": 7106,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 3.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8928,
+     "bytes_before": 8928,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 4.3,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 3990,
+     "bytes_before": 3990,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 133.9,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 747,
+     "bytes_before": 747,
+     "key": "energy_prices",
+     "rc": 0,
+     "seconds": 1.2,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 1413051,
+     "bytes_before": 1413051,
+     "key": "google_ads",
+     "rc": 3,
+     "seconds": 328.1,
+     "status": "skipped"
+    }
+   ],
+   "finished": "2026-08-28T15:42:52Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 1,
+   "n_failed": 0,
+   "n_ok": 4,
+   "n_skipped": 1,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-08-28T15:37:24Z"
   }
  ]
 }
