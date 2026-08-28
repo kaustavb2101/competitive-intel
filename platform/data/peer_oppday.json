@@ -1,0 +1,100 @@
+{
+ "meta": {
+  "as_of": "2026-08-20",
+  "corpus_generated": "2026-08-26",
+  "generated_by": "pipeline/build_peer_oppday.py",
+  "headline": "All 6 SET-listed peers' latest disclosure is the Q2/2026 earnings call (2026-08-13–2026-08-20) — the peer boards above read the newest public quarter.",
+  "label": "MEASURED — the six SET-listed title-loan peers' own SET Opportunity Day quarterly earnings-call filings (round, meeting date, video + snapshot links, page count). CALENDAR / RECENCY ONLY: no figure is parsed out of the call transcripts — the boards above carry the measured peer financials.",
+  "latest_span": [
+   "2026-08-13",
+   "2026-08-20"
+  ],
+  "n_calls": 40,
+  "n_peers": 6,
+  "objective": "Competitive risk (#2) — primary-source access to each rival's latest earnings disclosure and a freshness read on how current the peer boards are.",
+  "provenance": "MEASURED · SET Opportunity Day (api.lcp.setgroup.or.th), pulled by pipeline/pull_investor_docs.py into source-data/investor_docs/. This build projects the committed structured index; it parses no transcript text.",
+  "shared_latest_round": "Q2/2026",
+  "source": "source-data/investor_docs/index.json (pipeline/pull_investor_docs.py)",
+  "title": "Peer earnings watch — each SET-listed peer's latest Opportunity Day call"
+ },
+ "peers": [
+  {
+   "first_date": "2025-06-05",
+   "first_round": "Q1/2025",
+   "has_summary": false,
+   "latest_date": "2026-08-20",
+   "latest_round": "Q2/2026",
+   "n_calls": 7,
+   "n_pages": 21,
+   "name": "Heng Leasing & Capital",
+   "snapshot_link": "",
+   "symbol": "HENG",
+   "video_link": "https://www.youtube.com/embed/VOaBQEAf1NA?"
+  },
+  {
+   "first_date": "2024-11-13",
+   "first_round": "Q3/2024",
+   "has_summary": true,
+   "latest_date": "2026-08-18",
+   "latest_round": "Q2/2026",
+   "n_calls": 8,
+   "n_pages": 14,
+   "name": "Saksiam Leasing",
+   "snapshot_link": "https://lssmedia.setlink.set.or.th/2026/6M/SAK-6M69-ListedCompanySnapshot-TH.html",
+   "symbol": "SAK",
+   "video_link": "https://www.youtube.com/embed/NOWQYbHAIwc?"
+  },
+  {
+   "first_date": "2025-08-14",
+   "first_round": "Q2/2025",
+   "has_summary": false,
+   "latest_date": "2026-08-17",
+   "latest_round": "Q2/2026",
+   "n_calls": 5,
+   "n_pages": 16,
+   "name": "Ngern Tid Lor (Tidlor Holdings)",
+   "snapshot_link": "",
+   "symbol": "TIDLOR",
+   "video_link": "https://www.youtube.com/embed/wG7fjHGk1jc?"
+  },
+  {
+   "first_date": "2025-11-13",
+   "first_round": "Q3/2025",
+   "has_summary": false,
+   "latest_date": "2026-08-14",
+   "latest_round": "Q2/2026",
+   "n_calls": 5,
+   "n_pages": 13,
+   "name": "Ngern Turbo (NTL)",
+   "snapshot_link": "https://lssmedia.setlink.set.or.th/2026/6M/TURBO-6M69-ListedCompanySnapshot-TH.html",
+   "symbol": "TURBO",
+   "video_link": "https://www.youtube.com/embed/SxnJONXhmaI?"
+  },
+  {
+   "first_date": "2025-05-23",
+   "first_round": "Q1/2025",
+   "has_summary": false,
+   "latest_date": "2026-08-14",
+   "latest_round": "Q2/2026",
+   "n_calls": 8,
+   "n_pages": 29,
+   "name": "Srisawad",
+   "snapshot_link": "https://lssmedia.setlink.set.or.th/2026/6M/SAWAD-6M69-ListedCompanySnapshot-TH.html",
+   "symbol": "SAWAD",
+   "video_link": "https://www.youtube.com/embed/y3JaERn8yjc?"
+  },
+  {
+   "first_date": "2025-11-13",
+   "first_round": "Q3/2025",
+   "has_summary": false,
+   "latest_date": "2026-08-13",
+   "latest_round": "Q2/2026",
+   "n_calls": 7,
+   "n_pages": 25,
+   "name": "Muangthai Capital",
+   "snapshot_link": "",
+   "symbol": "MTC",
+   "video_link": "https://www.youtube.com/embed/TyQ6eEJ6VgM?"
+  }
+ ]
+}
