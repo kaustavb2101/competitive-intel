@@ -28,6 +28,7 @@ const LENS = {
   motomix:  {pill:'Collateral', label:'Motorcycle-title share ▲', desc:'COLLATERAL EXPOSURE · MEASURED (DLT) — motorcycle share of the province vehicle stock. Motorcycles are the most volatile, lowest-recovery title collateral; brighter = more exposure to a used-bike value fall.', color:'#7A4FE0', unit:'% moto (DLT)', tag:'m', val:d=>motoShare(d)},
   pugap:    {pill:'Pickup replace-gap', label:'Pickup replacement gap ▲', desc:"COLLATERAL SUPPLY · MEASURED (DLT gdcatalog) — by how many percentage points pickups (รย.3) are a SMALLER share of the province's NEW registrations than of its parked STOCK. A larger gap = the used-pickup collateral pool AutoX lends against and recovers into is thinning fastest here, because the inflow isn't refilling the fleet. This is the per-PROVINCE view of the national 'the pickup fleet is ageing without being replaced' verdict on the Overview: the motorcycle-share lens says WHAT the collateral is, this says whether it is being REPLACED. MEASURED arithmetic over two DLT shares — a forward-looking collateral-supply signal, not a default rate. Hidden until the DLT layer loads.", color:'#7A4FE0', unit:'pp pickup thinning', pugap:true, prov:true, tag:'m', val:d=>puGapVal(d)},
   floodhz:  {pill:'Flood hazard', label:'Repeated-flood hazard ▲', desc:"COLLATERAL / RECOVERY RISK · MEASURED (GISTDA 50k Repeated-Flooding census 2005–2016) — the number of the 12 years 2005–2016 the branch's district flooded. Brighter = ground that flooded in more years, so collateral seized there is harder to recover and re-sell. A chronic band (≥7/12) is a STRUCTURAL hazard on land we already lend against — distinct from the live water-level pulse. Frequency only (a hazard flag, not a flooded-area or loss estimate — no area is claimed, the source polygons overlap); recency (last flood year) rides the branch popup. Hidden until the hazard layer loads.", color:'#3E7CB1', unit:'yrs flooded /12', floodhz:true, tag:'m', val:d=>floodHzRec(d)||0},
+  agristk:  {pill:'Compound agri-risk', label:'Compound agri-risk stack ▲', desc:"PORTFOLIO RISK · ESTIMATED triage over MEASURED inputs — how many of the three agri-risk lenses a branch trips: a cropland-heavy 10km catchment (measured-corrected crop-area, top quartile), in a province whose crops are under price+drought stress (measured farm-gate YoY + OAE drought, top third), on chronically-flooded ground (measured GISTDA repeated-flood ≥7/12 yrs). Brighter = more of the three COMPOUND — where one shock hits collateral, borrower cashflow and recovery at once. A single lens flags most rural branches, so it separates little; the overlap is the sharp read. 3 = the same compound set the Exposure tab's stack table counts. The inputs are measured; the intersection is an estimated triage cut (the thresholds are choices). Makes NO open / close / expand recommendation. Hidden until the three layers load.", color:'#C8433B', unit:'of 3 lenses', agristk:true, tag:'e', val:d=>agriStackVal(d)},
   occrisk:  {pill:'Occupation risk', label:'Occupation × stress ◆▲', desc:"PORTFOLIO RISK · MEASURED occupation mix × ESTIMATED stress weighting — flags branches whose borrower base is concentrated in a stressed sector (factories in a slowdown · farming under crop-stress). A triage flag, not a measured default rate.", color:'#C8433B', unit:'occ-stress (est)', est:true, occr:true, tag:'e', val:d=>occriskVal(d)},
   poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇ est', desc:"BORROWER BASE · MEASURED counts × ESTIMATED relevance weighting (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model, so this reads as an estimated composite, not a measured count.", color:'#E6B450', unit:'relevant-POI (0–100, est)', poirel:true, est:true, tag:'e', val:d=>poiRelevanceVal(d)},
   drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + province unemployment + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
@@ -4089,7 +4090,7 @@ function drawPeerScore(){
    peers' own IFRS-9 credit-quality NOTES). Stage-3 (non-performing / credit-impaired) gross share of
    gross receivables + ECL coverage. NOT in the SET market-data API — read from the filings themselves.
    MEASURED, the rivals' own disclosures. NOT an AutoX row (unlisted). Lazy, null-safe, graceful. */
-let PEERAQ=null, peeraqLoaded=false;
+let PEERAQ=null, peeraqLoaded=false, peeraqScoreFetch=false;
 function renderPeerAssetQuality(){
   const tbl=$('#peeraqtbl'); if(!tbl) return;
   if(peeraqLoaded){ drawPeerAssetQuality(); return; }
@@ -4156,13 +4157,47 @@ function drawPeerAssetQuality(){
       mixLine=` <b>Book mix:</b> ${pureLoan.length?`${pureLoan.join(', ')} lend almost entirely through the secured loan book (≤5% hire-purchase) — head-on in the title-loan / cash space we run; `:''}`+
         `<b>${hpLean.name}</b> leans most on hire-purchase (${hpLean.hp_share_pct}% of book — vehicle asset-finance, a step off the pure title-loan contest).${combinedTxt}`;
     }
+    // S3-coverage × valuation cross-read (MEASURED × MEASURED) — joins each peer's ECL coverage against its
+    // Stage-3 book (this layer) to the SET P/BV multiple in peer_scoreboard.json (PEERSCORE). DISTINCT from the
+    // scoreboard's P/BV × NPL read (drawPeerScore.aqLine, which tests whether the below-book DISCOUNT tracks
+    // credit quality): this tests whether the market's PREMIUM tracks provisioning conservatism — coverage
+    // (allowance held against the Stage-3 book) is not NPL (headline book cleanliness). Fires ONLY when the two
+    // thickest-covered books are EXACTLY the two richest-valued names AND the thinnest-covered book trades below
+    // the field's median multiple — a strict, self-verifying gate, so a vintage that reorders the field silences
+    // the claim rather than misstating it. Consolidated filers only (HENG's unconsolidated basis excluded via
+    // fs_type); fully null-guarded. If the sibling scoreboard hasn't populated PEERSCORE yet (fetch order), pull
+    // it once and redraw so the join fills in regardless of which #acq card rendered first (mirrors drawCompCoverage).
+    let covLine='';
+    if(peerscoreLoaded&&PEERSCORE&&Array.isArray(PEERSCORE.peers)){
+      const covBy={}; peers.forEach(p=>{ if(p&&p.symbol&&typeof p.s3_coverage_pct==='number') covBy[p.symbol]=p.s3_coverage_pct; });
+      const jc=PEERSCORE.peers.filter(p=>p&&p.fs_type==='C'&&typeof p.pbv==='number'&&typeof covBy[p.symbol]==='number')
+        .map(p=>({name:p.name||p.symbol,symbol:p.symbol,pbv:p.pbv,cov:covBy[p.symbol]}));
+      if(jc.length>=4){
+        const byCov=jc.slice().sort((a,b)=>b.cov-a.cov);
+        const byPbv=jc.slice().sort((a,b)=>b.pbv-a.pbv);
+        const covMin=byCov[byCov.length-1];
+        const topCov2=new Set([byCov[0].symbol,byCov[1].symbol]);
+        const topPbv2=new Set([byPbv[0].symbol,byPbv[1].symbol]);
+        const sameTop2=(topCov2.size===2)&&[...topCov2].every(s=>topPbv2.has(s));
+        const pbvSorted=jc.map(p=>p.pbv).slice().sort((a,b)=>a-b);
+        const n=pbvSorted.length;
+        const medPbv=(n%2)?pbvSorted[(n-1)/2]:(pbvSorted[n/2-1]+pbvSorted[n/2])/2;
+        if(sameTop2&&covMin.pbv<medPbv){
+          covLine=` <b>The market pays up for conservative provisioning.</b> The two books with the thickest ECL coverage — ${byCov[0].name} (${byCov[0].cov.toFixed(1)}%) and ${byCov[1].name} (${byCov[1].cov.toFixed(1)}%) — are also the two richest-valued (P/BV ${byPbv[0].pbv.toFixed(2)}× and ${byPbv[1].pbv.toFixed(2)}×), while the thinnest-covered book, ${covMin.name} (${covMin.cov.toFixed(1)}%), trades below the field's median multiple (P/BV ${covMin.pbv.toFixed(2)}×) — so valuation tracks how well-provisioned the book is, not just its headline NPL (consolidated filers; Stage-3 IFRS-9 × SET P/BV).`;
+        }
+      }
+    } else if(!PEERSCORE&&!peeraqScoreFetch){
+      peeraqScoreFetch=true;
+      fetch('data/peer_scoreboard.json').then(r=>r.ok?r.json():null).then(j=>{ if(j)PEERSCORE=j; drawPeerAssetQuality(); }).catch(()=>{});
+    }
     ro.innerHTML=`<b>Rival non-performing (Stage-3) share, newest reviewed filings (as of ${m.as_of||'30 Jun 2026'}).</b> ${TAG_M} `+
       `<b>${best.name}</b> runs the cleanest book (${best.npl_pct}% NPL), <b>${worst.name}</b> the most stressed (${worst.npl_pct}%). `+
-      `The wider a rival's non-performing share and the thinner its coverage, the less margin headroom it has to keep pricing hard against the network we run.`+mixLine+
+      `The wider a rival's non-performing share and the thinner its coverage, the less margin headroom it has to keep pricing hard against the network we run.`+mixLine+covLine+
       methodBox(null,
         [`<b>Measured</b> — read directly from each peer's IFRS-9 credit-quality (Stage 1/2/3) tables in their reviewed financial-statement notes (${m.source||'Stock Exchange of Thailand · set.or.th'}).`,
          (m.npl_definition||'Stage-3 gross ÷ total gross receivables, combined loan + hire-purchase book.'),
          '<b>Not a regulator NPL</b> — this is the IFRS-9 Stage-3 gross share the peer itself discloses; comparable across these six (same accounting basis), not identical to a bank 90-days-past-due ratio.',
+         (covLine?'<b>S3 coverage × P/BV join</b> — the provisioning-premium read joins this layer\'s ECL-coverage column to the SET P/BV in <code>peer_scoreboard.json</code> (both MEASURED, joined by SET symbol; consolidated filers). It reads the PREMIUM against coverage, a separate question from the scoreboard\'s below-book-discount × NPL read.':null),
          '<b>Not an AutoX row</b> — AutoX is unlisted and files no SET statements.',
          (Array.isArray(m.caveats)&&m.caveats.length?m.caveats[1]:null)]);
   }
@@ -7549,6 +7584,62 @@ function renderCompoundAgri(){
       `</table></div></div></div>`;
 }
 
+/* ---------- compound agri-risk stack — NATIONAL-MAP LENS (objective #1) ----------
+   The exact three-layer intersection the #exposure "Compound agri-risk stack" table computes, surfaced
+   geographically on the National map as a 0–3 "how many of the three agri-risk lenses this branch
+   trips" depth. It uses the SAME relative cuts (top-quartile crop-area · top-third province agri-stress
+   · chronic flood ≥FLOOD_CHRONIC/12), so val==3 ⟺ a branch in the table's compound set — the map and
+   the table can never disagree. Cuts are recomputed live from the current vintage and cached once the
+   three layers are present. Provenance: the three INPUTS are measured / measured-corrected; the stack
+   DEPTH is a derived ESTIMATED triage cut (the thresholds are choices). Makes NO open/close/expand
+   recommendation. Ready only once all three layers load; until then the pill warm-loads (reads 0),
+   and if any layer is genuinely absent the pill disables itself (a partial funnel would mislead). */
+let AGRISTK_CUTS=null;   // {chaCut, asCut} — cached once the three layers are present
+let agristkWarmed=false; // one-shot guard for the initMap warm-load of the three agri-risk layers
+function agriStackReady(){
+  return !!(CROPLAND&&CROPLAND.length&&FLOODHZ&&FLOODHZ.length&&CSTRESS&&CSTRESS_LIST&&CSTRESS_LIST.length);
+}
+// all three layers have been ATTEMPTED (loaded flags set) — distinguishes "still warm-loading" from
+// "loaded, but a layer is genuinely absent" so the pill disables only in the latter case.
+function agriStackProbed(){ return croplandLoaded && floodhzLoaded && cstressLoaded; }
+function agriStackCuts(){
+  if(AGRISTK_CUTS) return AGRISTK_CUTS;
+  if(!agriStackReady()) return null;
+  // Top-quartile crop-area threshold — nearest-rank over every branch's measured catchment crop-area.
+  const chas=[]; for(let i=0;i<CROPLAND.length;i++){ const r=CROPLAND[i]; chas.push((r&&r.crop_ha)||0); }
+  const sortedCha=chas.slice().sort((a,b)=>a-b);
+  const chaCut=sortedCha[Math.floor(0.75*(sortedCha.length-1))]||0;
+  // Top-third province agri-stress threshold — nearest-rank over the provinces (descending).
+  const asVals=(CSTRESS_LIST||[]).map(p=>p.agri_stress||0).filter(v=>v>0).sort((a,b)=>b-a);
+  const asCut=asVals.length?asVals[Math.floor(asVals.length/3)]:0;
+  AGRISTK_CUTS={chaCut,asCut};
+  return AGRISTK_CUTS;
+}
+// which of the three agri-risk conditions a branch trips, on the shared relative cuts. Reuses the
+// existing null-guarded, index-aligned accessors. Returns {crop,stress,flood,n} or null when not ready.
+function agriStackBits(d){
+  const cuts=agriStackCuts(); if(!cuts) return null;
+  const cr=croplandRec(d);
+  const p=(CSTRESS&&d)?CSTRESS[d.v]:null;
+  const f=floodHzRec(d);
+  const crop=!!(cr&&(cr.crop_ha||0)>=cuts.chaCut&&cuts.chaCut>0);
+  const stress=!!(p&&(p.agri_stress||0)>=cuts.asCut&&cuts.asCut>0);
+  const flood=(f!=null&&f>=FLOOD_CHRONIC);
+  return {crop,stress,flood,n:(crop?1:0)+(stress?1:0)+(flood?1:0)};
+}
+function agriStackVal(d){ const b=agriStackBits(d); return b?b.n:0; }
+// Compound agri-risk line for a branch popup — how many of the three agri-risk lenses this branch
+// trips, on the SAME cuts as the #exposure stack table. Estimated triage over measured inputs.
+// Omitted until the three layers are present, and when no lens trips (nothing to flag).
+function agriStackPopupHTML(d,r){
+  const b=agriStackBits(d); if(!b||b.n===0) return '';
+  const marks=[['Cropland-heavy ≤10km',b.crop],['Crop-stress province',b.stress],['Chronic-flood ground',b.flood]]
+    .map(([lab,on])=>`<span style="color:${on?'var(--agri)':'var(--mid)'}">${on?'✓':'✗'} ${lab}</span>`).join('<br>');
+  const col=b.n>=3?'var(--agri)':b.n===2?'var(--gold)':'#8b90a7';
+  return r('Compound agri-risk · est', `${b.n}<span class="sub">/3 lenses</span>`, col)
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px;line-height:1.5">${marks}</div>`;
+}
+
 /* ---------- portfolio concentration by region · segment mix + HHI (objective #1) ----------
    Surfaces data/segment_exposure.json (national + 5 regions + 77 provinces; built by
    pipeline/build_segment_exposure.py). For each region we show its dominant segment, a stacked
@@ -8467,6 +8558,9 @@ function lensAbsent(k){
   if(l.peers) return peersLoaded && !peerHasData();
   if(l.macx)  return macxDone && !macxHasData();
   if(l.floodhz) return floodhzLoaded && !floodhzHasData();
+  // compound agri-risk map lens: disable only once all three inputs have been ATTEMPTED and at least
+  // one is genuinely absent (a partial funnel would mislead); still warm-loading → not absent.
+  if(l.agristk) return agriStackProbed() && !agriStackReady();
   if(l.cat)   return cropLuLoaded && !cropHasData();
   // pico district-rival lens: hide only once the district layer is loaded AND it predates the
   // pico fold (no record carries a pico field) — so an older amphoe.json degrades gracefully.
@@ -8597,6 +8691,21 @@ function renderLegend(){
       `<span><i style="background:${lensColor(.5,l.color)}"></i>${Math.round(mx*.5)}</span>`+
       `<span><i style="background:${lensColor(1,l.color)}"></i>${Math.round(mx)} yrs flooded (of 12)</span>`+
       ` <span class="sub" title="GISTDA 50k Repeated-Flooding census — count of the 12 years 2005-2016 the district flooded; a hazard flag, not a flooded-area estimate (source polygons overlap)">▲ measured · GISTDA ${vint}</span>`;
+    return;
+  }
+  // Compound agri-risk stack lens: an integer 0–3 depth (how many of the three agri-risk lenses trip).
+  // Skeleton while the three layers load; disabled-note if one is genuinely absent; otherwise a 4-step
+  // key whose swatches use the same sqrt scaling as the dots, honestly tagged estimated triage.
+  if(l.agristk){
+    if(!agriStackProbed()){ $('#maplegend').innerHTML='<span class="skel skel-line" style="display:inline-block;width:160px;vertical-align:middle" aria-hidden="true"></span> <span class="sub">compound agri-risk…</span>'; return; }
+    if(!agriStackReady()){ $('#maplegend').innerHTML='<span class="sub" title="Compound agri-risk needs branch_cropland + flood_hazard + crop_stress — one is not present">Compound agri-risk needs branch_cropland + flood_hazard + crop_stress; one is not present.</span>'; return; }
+    const sw=v=>lensColor(Math.sqrt(v/3),l.color);
+    $('#maplegend').innerHTML =
+      `<span><i style="background:${sw(0)}"></i>0</span>`+
+      `<span><i style="background:${sw(1)}"></i>1</span>`+
+      `<span><i style="background:${sw(2)}"></i>2</span>`+
+      `<span><i style="background:${sw(3)}"></i>3 lenses</span>`+
+      ` <span class="sub" title="Count of {cropland-heavy 10km catchment (top quartile) · top-third crop-stress province · chronic-flood ground ≥7/12 yrs}. Inputs measured / measured-corrected; the stack depth is an estimated triage cut (threshold choices). 3 = the Exposure-tab compound stack.">▲ estimated triage · measured inputs · 3 = compound stack</span>`;
     return;
   }
   // Search-demand lens: ESTIMATED relative index (0-100, Google Trends) — skeleton while loading,
@@ -8767,6 +8876,12 @@ function initMap(){
   // the "Repeated-flood hazard" map lens. Chain a repaint so a direct ?lens=floodhz open colours in
   // once the layer lands (mirrors the macx/hhdti warm-loads); otherwise the markers would stay 0s.
   if(!floodhzLoaded) loadFloodHazard().then(()=>{ if(curLens==='floodhz'){ renderLenses(); renderLegend(); if(mapReady) styleMarkers(); } });
+  // warm the three layers behind the compound agri-risk MAP lens so it un-disables + repaints once
+  // they land (cropland/flood are already warm-loaded above for popups; this adds crop_stress and
+  // chains a repaint, mirroring the floodhz warm-load). AGRISTK_CUTS caches only when all three exist.
+  if(!agristkWarmed){ agristkWarmed=true;
+    Promise.all([loadBranchCropland(),loadFloodHazard(),loadCropStress()]).then(()=>{
+      AGRISTK_CUTS=null; renderLenses(); if(curLens==='agristk'){ renderLegend(); if(mapReady) styleMarkers(); } }); }
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -9576,6 +9691,7 @@ function popupHTML(d){
     ${poiRelevancePopupHTML(d,sec,r)}
     ${amphoePopupHTML(d,sec,r)}
     ${floodHzPopupHTML(d,r)}
+    ${agriStackPopupHTML(d,r)}
     ${catchmentPopupHTML(d,sec,r)}
     ${compPopupHTML(d,sec,r)}
     ${rivalPressureLineHTML(d)}
@@ -9661,6 +9777,12 @@ function setLens(k){
   // than guarding on !floodhzLoaded (which would skip the repaint if the warm-load is still in flight).
   if(k==='floodhz'){
     loadFloodHazard().then(()=>{ renderLenses(); if(curLens==='floodhz'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  // compound agri-risk lens: ensure all three layers are present, then recompute cuts + repaint
+  // (loaders cache their promises, so this is safe whether or not the warm-load already ran).
+  if(k==='agristk'){
+    Promise.all([loadBranchCropland(),loadFloodHazard(),loadCropStress()]).then(()=>{
+      AGRISTK_CUTS=null; renderLenses(); if(curLens==='agristk'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   if(isAmpLens(k) && !ampJoinAttached){
     loadAmphoe().then(()=>{ if(isAmpLens(curLens)){ renderLegend(); if(mapReady) styleMarkers(); } });
