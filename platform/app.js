@@ -3366,6 +3366,24 @@ function drawCompCoverage(){
         nstxt+=`<div style="margin-top:6px"><b>Expansion pace &amp; book scale</b> — ${bookChain}. ${TAG_E} `+
           `<span class="sub">${ns.expansion_note||''}</span></div>`;
       }
+      // NETWORK MOMENTUM — the DIRECTION each rival's network is moving from its CITED period-over-period
+      // branch counts. Objective #2: expanding = rising competitive pressure on the districts we run;
+      // contracting = receding pressure (ground freed). Surfaces the one contracting rival (Heng, whose
+      // 1,018→743→450 collapse the static "expected" count alone hides) alongside MTC's expansion. The
+      // "expansion pace" block above shows net-adds where disclosed (MTC only); this shows the full
+      // classified trajectory for every rival with ≥2 cited dated points. Null-safe (older data has no block).
+      const nm=ns.network_momentum;
+      if(nm&&Array.isArray(nm.brands)&&nm.brands.length){
+        const arrow=d=>d==='contracting'?'▼':d==='expanding'?'▲':'▬';
+        const col=d=>d==='contracting'?'var(--merch)':d==='expanding'?'var(--agri)':'var(--dim)';
+        const mchain=nm.brands.map(o=>{
+          const pts=Array.isArray(o.points)?o.points.map(p=>(p.branches||0).toLocaleString()).join('→'):'';
+          const pct=(o.pct!=null)?` <span class="mono">${o.pct>0?'+':''}${o.pct}%</span>`:'';
+          return `<span style="color:${col(o.direction)}">${arrow(o.direction)} <b>${o.brand}</b> ${o.direction}</span> ${pts}${pct}`;
+        }).join(' &nbsp;·&nbsp; ');
+        nstxt+=`<div style="margin-top:6px"><b>Network momentum — which rivals are growing vs shrinking</b> (obj #2): ${mchain}. ${TAG_E} `+
+          `<span class="sub">${nm.insight||''} Each point is a <b>cited</b> public figure (company IR / SET filings / official locator); only rivals with ≥2 cited dated counts are classified. Reported network trajectory, not market share — pair with the per-district rival mix for local pressure.</span></div>`;
+      }
       // MEASURED-footprint reframe: rivals' full store-locator networks can outrank AutoX on
       // points-on-the-ground even when it leads on cited listed-entity counts. All-measured, null-safe.
       const fp=ns.footprint_measured;
