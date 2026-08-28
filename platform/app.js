@@ -1546,6 +1546,17 @@ document.addEventListener('click',e=>{
    was made) but they do not need to be open while you scan. Clamp to two lines with a "more"
    affordance; print always shows them in full, and the provenance appendix repeats them anyway. */
 const CLAMP_CHARS=190;
+/* Every clamped lead spawns an identical "more" button, and a content-dense tab like Macro carries
+   ~75 of them — so a screen reader navigating by button hears "more, button" dozens of times with no
+   way to tell which paragraph each one expands (WCAG 4.1.2 Name/Role/Value + 2.4.4 Link/Button
+   Purpose). Give each a stable, content-derived aria-label from the paragraph's opening words. The
+   visible "more"/"less" text is untouched — aria-label wins the accessible-name computation, so
+   sighted layout is byte-identical — and open/closed state is carried by aria-expanded plus the verb
+   ("Show full text" collapsed / "Collapse text" expanded). */
+function clampLabel(p,expanded){
+  const snip=((p&&p.textContent)||'').trim().replace(/\s+/g,' ').slice(0,60);
+  return (expanded?'Collapse text: ':'Show full text: ')+snip+'…';
+}
 function clampLeads(root){
   (root||document).querySelectorAll('p.lead').forEach(p=>{
     if(p.dataset.clamped||p.closest('.print-only')) return;
@@ -1554,6 +1565,7 @@ function clampLeads(root){
     const b=document.createElement('button');
     b.type='button'; b.className='clampbtn no-print'; b.textContent='more';
     b.setAttribute('aria-expanded','false');
+    b.setAttribute('aria-label',clampLabel(p,false));
     p.after(b);
     CLAMP_PRUNE.observe(p);
   });
@@ -1581,6 +1593,7 @@ document.addEventListener('click',e=>{
   p.classList.toggle('lead-clamp',open);
   b.setAttribute('aria-expanded',String(!open));
   b.textContent=open?'more':'less';
+  b.setAttribute('aria-label',clampLabel(p,!open));
 });
 
 function wrapTables(){
