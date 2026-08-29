@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-29T11:21:42+07:00",
-    "commit": "17506c2"
+    "generated_at": "2026-08-29T17:32:09+07:00",
+    "commit": "c6cc19a"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-08-29T17:32:09+07:00",
+      "sha": "c6cc19a",
+      "summary": "intel(#acq): peer scoreboard gains loan-book growth (YoY) — which rivals are outgrowing us (#696)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-29T10:14:55+00:00",
+      "sha": "c85f73a",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-29, run 33247298603)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-29T08:13:43+00:00",
+      "sha": "ad6a573",
+      "summary": "docs: log ux-loop forced-colors WHCM parity for province.html (PR #694)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-29T15:11:01+07:00",
+      "sha": "2058b75",
+      "summary": "ux: forced-colors WHCM parity for province.html legend swatches (#694)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-29T06:29:49+00:00",
+      "sha": "bb6bbe9",
+      "summary": "test(gate): tripwire when the CI DLT vehicle census diverges from the collateral base",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-29T06:24:56+00:00",
+      "sha": "8faa169",
+      "summary": "data: market-pulse swarm refresh (run 33231018226) (#690)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-29T05:46:09+00:00",
+      "sha": "dc964b4",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33233634714) (#693)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-29T05:21:46+00:00",
+      "sha": "f708670",
+      "summary": "data: Thai-IP-only swarm refresh (run 33228378504) (#689)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-29T04:22:00+00:00",
+      "sha": "d07f95b",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after peer β ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-29T11:21:42+07:00",
       "sha": "17506c2",
       "summary": "intel(#acq): peer scoreboard gains share-price risk (β) — the SET beta already pulled but dropped by the build (#692)",
@@ -657,60 +711,6 @@
       "sha": "5d105eb",
       "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (34cbe2b) after network-momentum ship",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-28T23:22:04+07:00",
-      "sha": "34cbe2b",
-      "summary": "intel(#acq): network-momentum read — which rivals are growing vs shrinking (#679)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-28T15:30:59+00:00",
-      "sha": "bbc7a7a",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-28, run 33185348504)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-28T14:51:57+00:00",
-      "sha": "cbd0d60",
-      "summary": "docs: log ux-loop clamp-button aria-label merge+deploy+verify (PR #676)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-28T21:48:38+07:00",
-      "sha": "784da4b",
-      "summary": "ux: unique aria-labels for clamped \"more\" buttons (a11y) (#676)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-28T12:29:38+00:00",
-      "sha": "b02b483",
-      "summary": "data(swarm): schedule energy_prices — a 2nd keyless puller feeding a live layer, left unscheduled",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-28T10:22:27+00:00",
-      "sha": "dce4789",
-      "summary": "service: healthy close-out — correct SERVICE_AUDIT R2-migration-done + refresh CEO dashboard",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-28T08:55:15+00:00",
-      "sha": "3ddfb67",
-      "summary": "data: market-pulse swarm refresh (run 33145164829) (#672)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-28T08:17:31+00:00",
-      "sha": "7012444",
-      "summary": "docs: log ux-loop prefers-contrast:more branch-explorer merge+deploy (PR #675)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-28T15:14:45+07:00",
-      "sha": "995a58c",
-      "summary": "ux: prefers-contrast:more support on branch-explorer.html (closes deck.gl series) (#675)",
-      "pillar": "3d-enrichment"
     }
   ]
 }
