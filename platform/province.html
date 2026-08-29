@@ -51,6 +51,18 @@ html[data-theme="light"]{color-scheme:light}/* native scrollbars/selects/control
    var(--mid) still drive some LIGHT text (.foot/.crop .sub/.hhinc/.wbox .cap); lifting the dark values alone
    would wash those out on the light default, so darken them for light too (styles.css ux-prefers-contrast-more values). */
 @media (prefers-contrast:more){:root{--dim:#BFC8D8;--mid:#CAD2E0;--cardln:#4A5878}html[data-theme="light"]{--dim:#3C4557;--mid:#3A445C}}
+/* Windows High Contrast Mode / forced-colors: the OS overrides every author background-fill with a
+   system colour, so the legend swatches + proportion bars — whose ONLY encoding is that fill (each
+   swatch/bar is built to match its map layer / building-type / crop / occupation colour) — collapse to
+   uniform system-coloured blocks and the legends stop mapping to the scene. `forced-color-adjust:none`
+   opts these NON-TEXT marks back to their author colours so the colour-coding survives WHCM. Scoped to
+   the swatches/bars ONLY, never the text-bearing rows, so all text keeps the forced high-contrast
+   palette. Mirrors the styles.css + rayong-catchment forced-colors block (this page defines its own
+   :root, so that rule can't reach it); inactive unless the OS forces colours → default byte-identical. */
+@media (forced-colors:active){
+  .bchip .d,.krow .sw,.imp .dot,.occ .bar i,#bldglegend .bl-bar,#bldglegend .bl-acc .sw,
+  #croplegend .cl-k .sw,.lg .sw{forced-color-adjust:none}
+}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink);color:var(--txt)}
 #map{position:fixed;inset:0;background:transparent;z-index:1}
