@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-29T14:31:38+00:00",
-    "commit": "d9e73ea"
+    "generated_at": "2026-08-30T05:20:49+07:00",
+    "commit": "9d2d433"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-29",
+    "eta_date": "2026-08-30",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,42 @@
   ],
   "activity": [
     {
+      "date": "2026-08-30T05:20:49+07:00",
+      "sha": "9d2d433",
+      "summary": "intel(#overview): surface tourism MOMENTUM the macro build dropped (YoY + trend) (#708)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-29T20:26:04+00:00",
+      "sha": "3563a2a",
+      "summary": "docs: log ux-loop SPA route-change focus (PR #706, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-30T03:23:10+07:00",
+      "sha": "0cc2bff",
+      "summary": "ux: move focus into the new view on SPA route change (WCAG 2.4.3) (#706)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-29T19:32:11+00:00",
+      "sha": "85f98ff",
+      "summary": "docs: dark-layer audit HEALTHY CLOSE-OUT — farmgate_prices leaf verified consumed (false positive)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-29T18:36:01+00:00",
+      "sha": "363815e",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-29, run 33268637327)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-29T16:15:41+00:00",
+      "sha": "3eb45e7",
+      "summary": "service: dated HEALTHY CLOSE-OUT — five-pillar sweep GREEN, no forced fix",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-29T14:31:38+00:00",
       "sha": "d9e73ea",
       "summary": "data: ThaiWater flood + rain pulse (2026-08-29, run 33257741669)",
@@ -675,42 +711,6 @@
       "sha": "aa69fb6",
       "summary": "data(#acq): record PICO census confirmed-current + fix its CI-refresh provenance",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-29T00:03:09+00:00",
-      "sha": "8b6b56e",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-29, run 33222254012)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-28T22:24:49+00:00",
-      "sha": "f0dc986",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after peer earnings watch ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-29T05:22:48+07:00",
-      "sha": "a4cedfa",
-      "summary": "intel(#acq): peer earnings watch — surface the SET OppDay corpus (latest call per listed rival) (#685)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-28T20:57:47+00:00",
-      "sha": "619b6a2",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-28, run 33210329516)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-28T20:17:43+00:00",
-      "sha": "5471be4",
-      "summary": "docs: log ux-loop foldbtn aria-label merge+deploy+verify (PR #682)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-29T03:14:25+07:00",
-      "sha": "814037c",
-      "summary": "ux: unique aria-labels for ambiguous table fold buttons (a11y) (#682)",
-      "pillar": "uxui"
     }
   ]
 }
