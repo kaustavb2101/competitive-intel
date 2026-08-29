@@ -4027,7 +4027,7 @@ function drawPeerScore(){
   const m=PEERSCORE.meta||{}, tgt=PEERSCORE.autox_roe_target;
   const roes=peers.map(p=>p.roe).filter(v=>typeof v==='number');
   const hiRoe=Math.max(...roes, tgt||0);
-  const yc=v=>v==null?'var(--dim)':(v>0?'var(--merch)':'var(--agri)');
+  const yc=v=>v==null?'var(--dim)':(v>0?'var(--merch)':(v<0?'var(--agri)':'var(--dim)'));
   tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Listed peer</th>`+
     `<th scope="col" title="market capitalisation (SET, price date)">Mkt cap</th>`+
     `<th scope="col" title="year-to-date price change — share-price momentum / investor mindshare">YTD</th>`+
@@ -4153,7 +4153,7 @@ function drawPeerScore(){
       const retreat=(lo.assets_yoy_pct<0)
         ? `${lo.name} is retreating hardest (${gs(lo.assets_yoy_pct)}, ${lo.growth_basis})`
         : `${lo.name} grew its book least (${gs(lo.assets_yoy_pct)}, ${lo.growth_basis})`;
-      growLine=` <b>Loan-book growth (YoY).</b> ${hi.name} is expanding its book fastest (${gs(hi.assets_yoy_pct)}, ${hi.growth_basis}); ${retreat}; ${up.length} of ${grow.length} listed rivals grew their book, ${down.length} shrank — the measured read of which rivals are gaining scale on us and which are pulling back (total assets ≈ the loan book).`;
+      growLine=` <b>Loan-book growth (YoY).</b> ${hi.name} is expanding its book fastest (${gs(hi.assets_yoy_pct)}, ${hi.growth_basis}); ${retreat}; ${up.length} of ${grow.length} listed rivals grew their book, ${down.length} shrank — the measured read of which rivals are expanding their book and which are pulling back (total assets ≈ the loan book; AutoX is unlisted, so it has no comparable audited YoY to rank against).`;
     }
     ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
       (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+betaLine+growLine+
