@@ -1653,7 +1653,7 @@ function wrapTables(){
 // entries, bookmarks and open tabs are indistinguishable (and SPA route changes are silent to
 // screen readers). Keeps the brand suffix so the tab is still recognisable at a glance.
 const TAB_TITLES={home:'Command center',overview:'Macro',map:'Map view',assist:'Assistance',exposure:'Risk',acq:'Competition',brand:'Brand',trend:'Risk trend',provinces:'Provinces',market:'Market',branches:'Branches',sim:'Simulator'};
-function showTab(v){
+function showTab(v,moveFocus){
   if(!v||!document.getElementById('v-'+v)) v='home';
   document.title=(TAB_TITLES[v]?TAB_TITLES[v]+' · ':'')+'AutoX · เงินไชโย';
   // #navMoreMenu is RE-PARENTED to <body> by the nav script (so the dropdown escapes the nav's
@@ -1684,20 +1684,27 @@ function showTab(v){
   renderImpactMounts(v);    // Region→Province→Branch drill on Home + the pillar front doors
   closeBranchSheet();   // the mobile branch sheet belongs to the map — never let it cover another tab
   window.scrollTo(0,0);
+  // WCAG 2.4.3 Focus Order — on a USER-initiated route change, move focus into the freshly-shown view
+  // so keyboard/SR users land on (and hear) the new content instead of being stranded on the old nav
+  // link with the swap silent. #main-content is the tabindex="-1" container the skip-link already
+  // focuses, so this reuses that hook; preventScroll keeps the scrollTo(0,0) above authoritative.
+  // moveFocus is passed only by the interactive paths (nav click / hashchange / content "→" link) —
+  // the boot call (showTab on load) omits it, so first paint never steals focus from the top.
+  if(moveFocus){ const m=document.getElementById('main-content'); if(m){ try{ m.focus({preventScroll:true}); }catch(e){ try{ m.focus(); }catch(_){} } } }
 }
 $('#nav').addEventListener('click', e=>{
   const b=e.target.closest('a[data-v]'); if(!b) return;
   e.preventDefault(); const v=b.dataset.v;
   history.replaceState(null,'','#'+v);
-  showTab(v);
+  showTab(v,true);
 });
-window.addEventListener('hashchange',()=>showTab((location.hash||'').replace('#','')));
+window.addEventListener('hashchange',()=>showTab((location.hash||'').replace('#',''),true));
 // content "→" links carry data-v but live outside #nav (command-center cards + the "Next in the
 // story" tab footers); jump to that tab. Scoped to #main-content so it never double-handles the
 // #nav links (those have their own handler) — nav is a sibling of <main>, not inside it.
 document.addEventListener('click',e=>{
   const a=e.target.closest('#main-content a[data-v]'); if(!a) return;
-  e.preventDefault(); const v=a.dataset.v; history.replaceState(null,'','#'+v); showTab(v);
+  e.preventDefault(); const v=a.dataset.v; history.replaceState(null,'','#'+v); showTab(v,true);
 });
 // Keyboard activation for clickable table rows (role="link" tabindex=0): Enter / Space.
 document.addEventListener('keydown',e=>{
@@ -1972,8 +1979,12 @@ function renderMacroIndicators(){
   const tr=I.tourist_arrivals, t12=tr&&tr.trailing_12m;
   if(tr&&tr.value!=null){
     const win=(t12&&t12.period_start&&t12.period_end)?` (${t12.period_start} → ${t12.period_end})`:'';
+    // Direction, not just level: the TTM total against the TTM a year earlier. A fall is a rising-risk
+    // read for borrower incomes in tourist provinces (Phuket/Krabi/Chon Buri/Chiang Mai), obj #1 —
+    // so the card says which way it's moving, the same as the household-debt card does.
+    const ty=tr.yoy_change, tmove=ty!=null?` · ${arrow(ty)}${Math.abs(ty)}% YoY${ty<0?' (cooling)':''}`:'';
     cards.push([`Tourists`, `${tr.value}M`,
-      `arrivals, trailing 12 months${win} · ${srcShort(tr.source)} ${tr.period}`]);
+      `arrivals, trailing 12 months${win}${tmove} · ${srcShort(tr.source)} ${tr.period}`]);
   }
   // Current account: a SINGLE month swings hard (April 2026 printed −7,591 USD million and on a
   // scanned strip reads as a national crisis), so the chip carries the rolling twelve-month NET,
@@ -2508,7 +2519,8 @@ function renderAnswerBand(){
     if(f&&f.diesel_thb_l!=null) T.push(abTile({k:'Diesel · '+(f.name||'retail'),cad:'daily',cadCls:'d',
       v:f.diesel_thb_l,unit:' ฿/L',move:'cost line, not revenue',moveColor:'var(--mid)',
       why:'daily feed · history not retained yet',sub:'MEASURED Bangchak retail'}));
-    // 4-5. The credit tide. These are the ONLY two series that already ship a real history array.
+    // 4-6. The credit tide. These three ship a real history array (household debt, policy rate, and
+    //      tourism arrivals — the tourism trend line was added once the build stopped dropping it).
     const I=(mi&&mi.indicators)||{};
     if(I.household_debt_gdp) { const h=I.household_debt_gdp;
       T.push(abTile({k:'Household debt',cad:h.period||'quarterly',cadCls:'q',v:h.value,unit:'% GDP',
@@ -2524,6 +2536,15 @@ function renderAnswerBand(){
         moveColor:'var(--mid)',
         spark:svgSpark(p.trend,{color:'var(--accent)',aria:'policy rate trend',title:psrc}),
         sub:'MEASURED '+psrc})); }
+    // Tourism — the income backdrop for borrowers in tourist provinces. The line is the rolling
+    // trailing-12m total (non-seasonal), so a fall is a genuine cooling of that income, not a season.
+    if(I.tourist_arrivals&&I.tourist_arrivals.value!=null&&Array.isArray(I.tourist_arrivals.trend)){
+      const t=I.tourist_arrivals;
+      T.push(abTile({k:'Tourist arrivals',cad:t.period||'monthly',cadCls:'m',v:t.value,unit:'M / 12mo',
+        move:t.yoy_change!=null?`${t.yoy_change<0?'▼':'▲'} ${Math.abs(t.yoy_change)}% YoY`:'',
+        moveColor:t.yoy_change<0?'var(--agri)':'var(--merch)',
+        spark:svgSpark(t.trend,{color:'var(--accent)',aria:'tourist arrivals trailing-12m trend',title:'BOT'}),
+        sub:'MEASURED BOT'})); }
     // 6. Our own book, so the backdrop is never read without the thing it acts on. Live book only —
     //    the 180+ legacy stock is held apart on purpose and blending them would flatter the number.
     //    (regex is anchored on "of accounts" — "NPL-live (90-179dpd) 4.92%" otherwise captures the
@@ -14115,12 +14136,19 @@ function renderHomeDataRoom(){
   // sits. Age is measured against the freshest dated layer (deterministic, from build_provenance.py),
   // so it never reads a wall clock. Only ISO-dated layers get an age; undated ones are stated plainly.
   const fr=PROVEN.freshness;
+  // upstream-capped layers are old ONLY because their source stopped publishing (e.g. DLT froze a
+  // monthly release); provenance.json certifies each is at its newest genuinely-complete vintage.
+  // Reading them as "stale" would paint neglect where there is none — mark them apart, not red.
+  const capped={}; (fr&&fr.upstream_capped||[]).forEach(c=>{ if(c&&c.file) capped[c.file]=c.reason||'newest complete vintage available upstream'; });
+  const cappedN=Object.keys(capped).length;
   if(fr&&fr.n_dated){
-    const staleN=(fr.stale||[]).length, old=fr.oldest;
+    const staleN=(fr.stale||[]).length, old=fr.oldest, oldCapped=old&&(old.file in capped);
     html+=`<div class="dr-fresh cc-sub2">`+
       `<b>Freshness</b> — newest committed data <b>${dqEsc(fr.freshest.vintage)}</b>; `+
-      `oldest dated layer <b>${old.age_days}d</b> behind (<span class="mono">${dqEsc(old.file)}</span> · ${dqEsc(old.vintage)}); `+
+      `oldest dated layer <b>${old.age_days}d</b> behind (<span class="mono">${dqEsc(old.file)}</span> · ${dqEsc(old.vintage)})`+
+      (oldCapped?` — <span class="dr-age-capped">frozen at source</span>, its newest upstream vintage, not stale`:``)+`; `+
       (staleN?`<b style="color:var(--dr-u)">${staleN}</b>`:`<b>0</b>`)+` of ${fr.n_dated} dated layers &gt;${fr.stale_over_days}d stale`+
+      (cappedN?` (${cappedN} older layer${cappedN!==1?'s':''} frozen at source, not counted)`:``)+
       (fr.n_undated?`. ${fr.n_undated} layers carry no machine-readable date.`:`.`)+
       `</div>`;
   }
@@ -14137,7 +14165,10 @@ function renderHomeDataRoom(){
     const src=L.source?dqEsc(L.source):(L.cls==='unlabelled'?'<span class="dr-shame">— no meta.source / meta.provenance</span>':'—');
     const cnt=L.count?`${L.count.toLocaleString()} ${dqEsc(L.count_of||'')}`:'';
     const vint=L.vintage?dqEsc(L.vintage)+' · ':'';
-    const age=(L.age_days!=null)?`<span class="dr-age${L.age_days>staleThresh?' dr-age-stale':''}" title="${L.age_days} days behind the freshest committed layer">${L.age_days}d</span> · `:'';
+    const isCapped=(L.file in capped);
+    const ageCls=(L.age_days>staleThresh)?(isCapped?' dr-age-capped':' dr-age-stale'):'';
+    const ageTitle=isCapped?`Upstream-capped — not stale: ${dqEsc(capped[L.file]).replace(/"/g,'&quot;')}`:`${L.age_days} days behind the freshest committed layer`;
+    const age=(L.age_days!=null)?`<span class="dr-age${ageCls}" title="${ageTitle}">${isCapped?'⤒':''}${L.age_days}d</span> · `:'';
     html+=`<tr class="dr-${L.cls}">`+
       `<td><span class="dr-name" title="${nameTitle}">${name}</span>${shame}`+(L.label?`<span class="dr-desc" title="${dqEsc(L.label).replace(/"/g,'&quot;')}">${dqEsc(L.label)}</span>`:'')+`</td>`+
       `<td>${prChip(L.cls)}</td>`+

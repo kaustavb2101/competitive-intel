@@ -805,6 +805,7 @@ html[data-theme="light"] .dr-tbl tr.dr-unlabelled td{background:rgba(200,67,59,.
 .dr-fresh b{color:var(--mid)}
 .dr-age{display:inline-block;font-size:9px;font-weight:600;color:var(--dr-m);opacity:.9;letter-spacing:.02em}
 .dr-age.dr-age-stale{color:var(--dr-u)}
+.dr-age-capped{color:var(--dr-e)}
 .cc-star{background:none;border:none;cursor:pointer;color:var(--dim);font-size:14px;line-height:1;padding:0 2px;vertical-align:middle}
 .cc-star.on{color:var(--gold)}
 .cc-star:hover{color:var(--gold)}
