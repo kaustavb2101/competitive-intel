@@ -1979,8 +1979,12 @@ function renderMacroIndicators(){
   const tr=I.tourist_arrivals, t12=tr&&tr.trailing_12m;
   if(tr&&tr.value!=null){
     const win=(t12&&t12.period_start&&t12.period_end)?` (${t12.period_start} → ${t12.period_end})`:'';
+    // Direction, not just level: the TTM total against the TTM a year earlier. A fall is a rising-risk
+    // read for borrower incomes in tourist provinces (Phuket/Krabi/Chon Buri/Chiang Mai), obj #1 —
+    // so the card says which way it's moving, the same as the household-debt card does.
+    const ty=tr.yoy_change, tmove=ty!=null?` · ${arrow(ty)}${Math.abs(ty)}% YoY${ty<0?' (cooling)':''}`:'';
     cards.push([`Tourists`, `${tr.value}M`,
-      `arrivals, trailing 12 months${win} · ${srcShort(tr.source)} ${tr.period}`]);
+      `arrivals, trailing 12 months${win}${tmove} · ${srcShort(tr.source)} ${tr.period}`]);
   }
   // Current account: a SINGLE month swings hard (April 2026 printed −7,591 USD million and on a
   // scanned strip reads as a national crisis), so the chip carries the rolling twelve-month NET,
@@ -2515,7 +2519,8 @@ function renderAnswerBand(){
     if(f&&f.diesel_thb_l!=null) T.push(abTile({k:'Diesel · '+(f.name||'retail'),cad:'daily',cadCls:'d',
       v:f.diesel_thb_l,unit:' ฿/L',move:'cost line, not revenue',moveColor:'var(--mid)',
       why:'daily feed · history not retained yet',sub:'MEASURED Bangchak retail'}));
-    // 4-5. The credit tide. These are the ONLY two series that already ship a real history array.
+    // 4-6. The credit tide. These three ship a real history array (household debt, policy rate, and
+    //      tourism arrivals — the tourism trend line was added once the build stopped dropping it).
     const I=(mi&&mi.indicators)||{};
     if(I.household_debt_gdp) { const h=I.household_debt_gdp;
       T.push(abTile({k:'Household debt',cad:h.period||'quarterly',cadCls:'q',v:h.value,unit:'% GDP',
@@ -2531,6 +2536,15 @@ function renderAnswerBand(){
         moveColor:'var(--mid)',
         spark:svgSpark(p.trend,{color:'var(--accent)',aria:'policy rate trend',title:psrc}),
         sub:'MEASURED '+psrc})); }
+    // Tourism — the income backdrop for borrowers in tourist provinces. The line is the rolling
+    // trailing-12m total (non-seasonal), so a fall is a genuine cooling of that income, not a season.
+    if(I.tourist_arrivals&&I.tourist_arrivals.value!=null&&Array.isArray(I.tourist_arrivals.trend)){
+      const t=I.tourist_arrivals;
+      T.push(abTile({k:'Tourist arrivals',cad:t.period||'monthly',cadCls:'m',v:t.value,unit:'M / 12mo',
+        move:t.yoy_change!=null?`${t.yoy_change<0?'▼':'▲'} ${Math.abs(t.yoy_change)}% YoY`:'',
+        moveColor:t.yoy_change<0?'var(--agri)':'var(--merch)',
+        spark:svgSpark(t.trend,{color:'var(--accent)',aria:'tourist arrivals trailing-12m trend',title:'BOT'}),
+        sub:'MEASURED BOT'})); }
     // 6. Our own book, so the backdrop is never read without the thing it acts on. Live book only —
     //    the 180+ legacy stock is held apart on purpose and blending them would flatter the number.
     //    (regex is anchored on "of accounts" — "NPL-live (90-179dpd) 4.92%" otherwise captures the
