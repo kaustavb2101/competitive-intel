@@ -160,6 +160,28 @@ def _fold_tourist_arrivals(indicators):
         entry["value"] = entry["trailing_12m"]["value_million"]
         entry["period"] = ttm["periods"][-1]
         entry["unit"] = "million persons (trailing 12mo)"
+        # MOMENTUM (was dropped): the card showed a directionless "32.16M". Tourism is the income
+        # backdrop for borrowers in tourist provinces (Phuket/Krabi/Chon Buri/Chiang Mai), so its
+        # DIRECTION is a portfolio-risk read (obj #1). The MEASURED monthly series already committed
+        # here carries 100+ months — enough for a real YoY and a trend line, which the sibling
+        # indicators (household_debt_gdp, policy_rate) both ship. Computed from the series only (never
+        # from the base's own previous value) so a --check re-run reproduces byte-for-byte.
+        # A rolling trailing-12m sum is used for BOTH, not raw monthly arrivals, because a single
+        # month is a season — the TTM line is the non-seasonal momentum that matches the headline.
+        srs = (d.get("series") or {}).get("foreign_arrivals_thousand") or {}
+        months = sorted(srs.keys())
+        roll = []  # (period_end, TTM sum in million persons), one per month with >=12 months behind it
+        for i in range(11, len(months)):
+            w = months[i - 11:i + 1]
+            roll.append((months[i], round(sum(srs[p] for p in w) / 1000.0, 2)))
+        # YoY: current TTM vs the TTM ending 12 months earlier (a clean like-for-like annual move).
+        if len(roll) >= 13:
+            cur, prior = roll[-1][1], roll[-13][1]
+            if prior:
+                entry["yoy_change"] = round((cur - prior) / prior * 100.0, 1)
+        # Trend: the last 12 rolling-TTM points — a full year of the TTM's own trajectory.
+        if len(roll) >= 2:
+            entry["trend"] = [v for _p, v in roll[-12:]]
     else:
         entry["value"] = round(latest["foreign_arrivals_thousand"] / 1000.0, 3)
         entry["period"] = period
