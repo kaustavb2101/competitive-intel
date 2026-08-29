@@ -14115,12 +14115,19 @@ function renderHomeDataRoom(){
   // sits. Age is measured against the freshest dated layer (deterministic, from build_provenance.py),
   // so it never reads a wall clock. Only ISO-dated layers get an age; undated ones are stated plainly.
   const fr=PROVEN.freshness;
+  // upstream-capped layers are old ONLY because their source stopped publishing (e.g. DLT froze a
+  // monthly release); provenance.json certifies each is at its newest genuinely-complete vintage.
+  // Reading them as "stale" would paint neglect where there is none — mark them apart, not red.
+  const capped={}; (fr&&fr.upstream_capped||[]).forEach(c=>{ if(c&&c.file) capped[c.file]=c.reason||'newest complete vintage available upstream'; });
+  const cappedN=Object.keys(capped).length;
   if(fr&&fr.n_dated){
-    const staleN=(fr.stale||[]).length, old=fr.oldest;
+    const staleN=(fr.stale||[]).length, old=fr.oldest, oldCapped=old&&(old.file in capped);
     html+=`<div class="dr-fresh cc-sub2">`+
       `<b>Freshness</b> — newest committed data <b>${dqEsc(fr.freshest.vintage)}</b>; `+
-      `oldest dated layer <b>${old.age_days}d</b> behind (<span class="mono">${dqEsc(old.file)}</span> · ${dqEsc(old.vintage)}); `+
+      `oldest dated layer <b>${old.age_days}d</b> behind (<span class="mono">${dqEsc(old.file)}</span> · ${dqEsc(old.vintage)})`+
+      (oldCapped?` — <span class="dr-age-capped">frozen at source</span>, its newest upstream vintage, not stale`:``)+`; `+
       (staleN?`<b style="color:var(--dr-u)">${staleN}</b>`:`<b>0</b>`)+` of ${fr.n_dated} dated layers &gt;${fr.stale_over_days}d stale`+
+      (cappedN?` (${cappedN} older layer${cappedN!==1?'s':''} frozen at source, not counted)`:``)+
       (fr.n_undated?`. ${fr.n_undated} layers carry no machine-readable date.`:`.`)+
       `</div>`;
   }
@@ -14137,7 +14144,10 @@ function renderHomeDataRoom(){
     const src=L.source?dqEsc(L.source):(L.cls==='unlabelled'?'<span class="dr-shame">— no meta.source / meta.provenance</span>':'—');
     const cnt=L.count?`${L.count.toLocaleString()} ${dqEsc(L.count_of||'')}`:'';
     const vint=L.vintage?dqEsc(L.vintage)+' · ':'';
-    const age=(L.age_days!=null)?`<span class="dr-age${L.age_days>staleThresh?' dr-age-stale':''}" title="${L.age_days} days behind the freshest committed layer">${L.age_days}d</span> · `:'';
+    const isCapped=(L.file in capped);
+    const ageCls=(L.age_days>staleThresh)?(isCapped?' dr-age-capped':' dr-age-stale'):'';
+    const ageTitle=isCapped?`Upstream-capped — not stale: ${dqEsc(capped[L.file]).replace(/"/g,'&quot;')}`:`${L.age_days} days behind the freshest committed layer`;
+    const age=(L.age_days!=null)?`<span class="dr-age${ageCls}" title="${ageTitle}">${isCapped?'⤒':''}${L.age_days}d</span> · `:'';
     html+=`<tr class="dr-${L.cls}">`+
       `<td><span class="dr-name" title="${nameTitle}">${name}</span>${shame}`+(L.label?`<span class="dr-desc" title="${dqEsc(L.label).replace(/"/g,'&quot;')}">${dqEsc(L.label)}</span>`:'')+`</td>`+
       `<td>${prChip(L.cls)}</td>`+
