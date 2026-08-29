@@ -80,6 +80,26 @@ def _is_absent(row):
     return row is None or row.get("totalRevenue") is None or row.get("netProfit") is None
 
 
+def _prior_full_year(fin_rows, basis_year):
+    """The audited full year (Q9) IMMEDIATELY BEFORE the basis year — the only clean 1-year YoY
+    comparator. A non-consecutive earlier year (a gap in the series) is NOT a YoY base and is
+    rejected. Returns None if that exact prior year is absent."""
+    if basis_year is None:
+        return None
+    for r in (fin_rows or []):
+        if r.get("quarter") == FULL_YEAR_QUARTER and r.get("year") == basis_year - 1:
+            return r
+    return None
+
+
+def _yoy(cur, prev):
+    """Year-over-year % change, 1 dp, from RAW values (kept at full precision, rounded only at the
+    end so the output is byte-stable). None if either side is missing or the base is non-positive."""
+    if not isinstance(cur, (int, float)) or not isinstance(prev, (int, float)) or prev <= 0:
+        return None
+    return round(100.0 * (cur - prev) / prev, 1)
+
+
 def _fmt_basis(quarter, year):
     if quarter is None or year is None:
         return None
@@ -96,6 +116,20 @@ def build():
         basis = _pick_basis(p.get("fin"))
         absent = _is_absent(basis)
         src = {} if absent else basis   # ABSENT rows contribute nothing — never a false 0
+
+        # Book / revenue / profit growth (objective #2): which rivals are OUTGROWING us. YoY is
+        # emitted only when BOTH the basis year AND its immediately-preceding audited full year are
+        # complete P&L years (neither ABSENT). That single gate also, by construction, suppresses
+        # TIDLOR's YoY — its FY2024 row is ABSENT (null P&L) and the prior series predates the
+        # 2025-05-15 holdco restructure, so no clean like-for-like base exists. totalAsset ≈ the loan
+        # book for a title lender, so assets_yoy_pct is read as loan-book expansion / retreat.
+        prior = _prior_full_year(p.get("fin"), (basis or {}).get("year"))
+        comparable = (not absent) and (not _is_absent(prior))
+        base = prior if comparable else {}
+        assets_yoy = _yoy(src.get("totalAsset"), base.get("totalAsset")) if comparable else None
+        revenue_yoy = _yoy(src.get("totalRevenue"), base.get("totalRevenue")) if comparable else None
+        np_yoy = _yoy(src.get("netProfit"), base.get("netProfit")) if comparable else None
+        growth_basis = ("FY%s→FY%s" % (base["year"], src["year"])) if comparable else None
 
         rec = {
             "symbol": p["symbol"],
@@ -118,6 +152,12 @@ def build():
             "revenue_bn": _bn(src.get("totalRevenue")),
             "assets_bn": _bn(src.get("totalAsset")),
             "equity_bn": _bn(src.get("equity")),
+            # YoY growth off the immediately-preceding audited full year (null unless both years are
+            # complete). assets ≈ the loan book for a title lender — the headline expansion signal.
+            "assets_yoy_pct": assets_yoy,
+            "revenue_yoy_pct": revenue_yoy,
+            "net_profit_yoy_pct": np_yoy,
+            "growth_basis": growth_basis,
             # the basis this row's numbers came from — never left for the reader to guess.
             "fs_type": (basis or {}).get("fsType"),
             "basis_year": (basis or {}).get("year"),
@@ -182,6 +222,14 @@ def build():
                            "share amplifies market moves (more cyclically exposed); <1.0 = defensive. It is "
                            "a market statistic on the rival's equity, not a fundamental of its loan book, "
                            "and AutoX (unlisted) has none.",
+            "growth_caveat": "assets_yoy_pct / revenue_yoy_pct / net_profit_yoy_pct are each peer's own "
+                             "year-over-year change between its two most recent AUDITED FULL YEARS (SET "
+                             "quarter code Q9); totalAsset ≈ the loan book for a title lender, so assets "
+                             "growth reads as loan-book expansion vs retreat. Shown only when BOTH fiscal "
+                             "years are complete P&L years — TIDLOR HOLDINGS is therefore blank (its FY2024 "
+                             "carries no consolidated P&L and predates the 2025-05-15 restructure, so no "
+                             "clean like-for-like base exists). HENG's growth is on an unconsolidated (U) "
+                             "basis; AutoX (unlisted) has no row.",
             "units": "market_cap/assets/profit/revenue/equity in ฿bn; ratios in %",
         },
         "headline": headline,
