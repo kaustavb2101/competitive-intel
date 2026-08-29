@@ -1653,7 +1653,7 @@ function wrapTables(){
 // entries, bookmarks and open tabs are indistinguishable (and SPA route changes are silent to
 // screen readers). Keeps the brand suffix so the tab is still recognisable at a glance.
 const TAB_TITLES={home:'Command center',overview:'Macro',map:'Map view',assist:'Assistance',exposure:'Risk',acq:'Competition',brand:'Brand',trend:'Risk trend',provinces:'Provinces',market:'Market',branches:'Branches',sim:'Simulator'};
-function showTab(v){
+function showTab(v,moveFocus){
   if(!v||!document.getElementById('v-'+v)) v='home';
   document.title=(TAB_TITLES[v]?TAB_TITLES[v]+' · ':'')+'AutoX · เงินไชโย';
   // #navMoreMenu is RE-PARENTED to <body> by the nav script (so the dropdown escapes the nav's
@@ -1684,20 +1684,27 @@ function showTab(v){
   renderImpactMounts(v);    // Region→Province→Branch drill on Home + the pillar front doors
   closeBranchSheet();   // the mobile branch sheet belongs to the map — never let it cover another tab
   window.scrollTo(0,0);
+  // WCAG 2.4.3 Focus Order — on a USER-initiated route change, move focus into the freshly-shown view
+  // so keyboard/SR users land on (and hear) the new content instead of being stranded on the old nav
+  // link with the swap silent. #main-content is the tabindex="-1" container the skip-link already
+  // focuses, so this reuses that hook; preventScroll keeps the scrollTo(0,0) above authoritative.
+  // moveFocus is passed only by the interactive paths (nav click / hashchange / content "→" link) —
+  // the boot call (showTab on load) omits it, so first paint never steals focus from the top.
+  if(moveFocus){ const m=document.getElementById('main-content'); if(m){ try{ m.focus({preventScroll:true}); }catch(e){ try{ m.focus(); }catch(_){} } } }
 }
 $('#nav').addEventListener('click', e=>{
   const b=e.target.closest('a[data-v]'); if(!b) return;
   e.preventDefault(); const v=b.dataset.v;
   history.replaceState(null,'','#'+v);
-  showTab(v);
+  showTab(v,true);
 });
-window.addEventListener('hashchange',()=>showTab((location.hash||'').replace('#','')));
+window.addEventListener('hashchange',()=>showTab((location.hash||'').replace('#',''),true));
 // content "→" links carry data-v but live outside #nav (command-center cards + the "Next in the
 // story" tab footers); jump to that tab. Scoped to #main-content so it never double-handles the
 // #nav links (those have their own handler) — nav is a sibling of <main>, not inside it.
 document.addEventListener('click',e=>{
   const a=e.target.closest('#main-content a[data-v]'); if(!a) return;
-  e.preventDefault(); const v=a.dataset.v; history.replaceState(null,'','#'+v); showTab(v);
+  e.preventDefault(); const v=a.dataset.v; history.replaceState(null,'','#'+v); showTab(v,true);
 });
 // Keyboard activation for clickable table rows (role="link" tabindex=0): Enter / Space.
 document.addEventListener('keydown',e=>{
