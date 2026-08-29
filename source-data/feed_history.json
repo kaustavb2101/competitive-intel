@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 585,
+  "n_points": 593,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -498,7 +498,7 @@
     137.0,
     128.0,
     128.0,
-    135.0
+    127.0
    ]
   },
   "fuel_diesel": {
@@ -734,11 +734,12 @@
     "2026-08-25",
     "2026-08-26",
     "2026-08-27",
-    "2026-08-28"
+    "2026-08-28",
+    "2026-08-29"
    ],
    "first_seen": "2026-07-05",
    "label": "Rice (Hom Mali) - NABC farm-gate",
-   "n": 36,
+   "n": 37,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/tonne",
@@ -774,6 +775,7 @@
     17905.0,
     17905.0,
     17905.0,
+    17700.0,
     17700.0,
     17700.0,
     17700.0,
@@ -819,11 +821,12 @@
     "2026-08-25",
     "2026-08-26",
     "2026-08-27",
-    "2026-08-28"
+    "2026-08-28",
+    "2026-08-29"
    ],
    "first_seen": "2026-07-05",
    "label": "Rubber (raw sheet) - NABC farm-gate",
-   "n": 36,
+   "n": 37,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/kg",
@@ -863,6 +866,7 @@
     81.25,
     80.14,
     80.14,
+    80.01,
     80.01
    ]
   },
@@ -1029,7 +1033,7 @@
     160.0,
     143.0,
     199.0,
-    196.5
+    200.5
    ]
   },
   "rival_ads_live": {
@@ -1258,7 +1262,7 @@
     926015157.0,
     927410043.0,
     928885266.0,
-    930280891.0
+    931272403.0
    ]
   },
   "search_share_autox": {
@@ -1297,11 +1301,12 @@
     "2026-08-21",
     "2026-08-24",
     "2026-08-25",
-    "2026-08-26"
+    "2026-08-26",
+    "2026-08-27"
    ],
    "first_seen": "2026-07-17",
    "label": "MTC · market cap",
-   "n": 13,
+   "n": 14,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -1318,7 +1323,8 @@
     68.9,
     67.31,
     67.31,
-    68.9
+    68.9,
+    67.84
    ]
   },
   "set_mtc_pbv": {
@@ -1336,11 +1342,12 @@
     "2026-08-21",
     "2026-08-24",
     "2026-08-25",
-    "2026-08-26"
+    "2026-08-26",
+    "2026-08-27"
    ],
    "first_seen": "2026-07-17",
    "label": "MTC · price/book",
-   "n": 13,
+   "n": 14,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -1357,7 +1364,8 @@
     1.5,
     1.46,
     1.46,
-    1.5
+    1.5,
+    1.47
    ]
   },
   "set_sawad_mcap": {
@@ -1375,11 +1383,12 @@
     "2026-08-21",
     "2026-08-24",
     "2026-08-25",
-    "2026-08-26"
+    "2026-08-26",
+    "2026-08-27"
    ],
    "first_seen": "2026-07-17",
    "label": "SAWAD · market cap",
-   "n": 13,
+   "n": 14,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -1396,7 +1405,8 @@
     39.3777,
     38.7131,
     39.71,
-    40.5408
+    40.5408,
+    40.0423
    ]
   },
   "set_sawad_pbv": {
@@ -1414,11 +1424,12 @@
     "2026-08-21",
     "2026-08-24",
     "2026-08-25",
-    "2026-08-26"
+    "2026-08-26",
+    "2026-08-27"
    ],
    "first_seen": "2026-07-17",
    "label": "SAWAD · price/book",
-   "n": 13,
+   "n": 14,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -1435,7 +1446,8 @@
     0.99,
     0.98,
     1.0,
-    1.02
+    1.02,
+    1.01
    ]
   },
   "set_tidlor_mcap": {
@@ -1453,11 +1465,12 @@
     "2026-08-21",
     "2026-08-24",
     "2026-08-25",
-    "2026-08-26"
+    "2026-08-26",
+    "2026-08-27"
    ],
    "first_seen": "2026-07-17",
    "label": "TIDLOR · market cap",
-   "n": 13,
+   "n": 14,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -1474,7 +1487,8 @@
     57.3394,
     55.8914,
     57.0498,
-    58.4978
+    58.4978,
+    57.3394
    ]
   },
   "set_tidlor_pbv": {
@@ -1492,11 +1506,12 @@
     "2026-08-21",
     "2026-08-24",
     "2026-08-25",
-    "2026-08-26"
+    "2026-08-26",
+    "2026-08-27"
    ],
    "first_seen": "2026-07-17",
    "label": "TIDLOR · price/book",
-   "n": 13,
+   "n": 14,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -1513,7 +1528,8 @@
     1.62,
     1.58,
     1.62,
-    1.66
+    1.66,
+    1.62
    ]
   },
   "social_corpus_docs": {
@@ -1554,7 +1570,7 @@
     12527.0,
     12611.0,
     12716.0,
-    12744.0
+    12764.0
    ]
   }
  }
