@@ -103,6 +103,10 @@ def build():
             "market_cap_bn": round(p["marketCap"] / 1e9, 1) if p.get("marketCap") is not None else None,
             "pe": p.get("peRatio"), "pbv": p.get("pbRatio"),
             "div_yield": p.get("dividendYield"),
+            # SET-reported beta — the share's systematic (market-correlated) volatility vs the SET index.
+            # >1 amplifies market swings, <1 is defensive. A trailing-window market statistic, not a
+            # fundamental; carried through so the scoreboard reads price RISK, not just price level.
+            "beta": p.get("beta"),
             "ytd_pct": round(p["ytdPercentChange"], 1) if p.get("ytdPercentChange") is not None else None,
             "year_high": p.get("yearHigh"), "year_low": p.get("yearLow"),
             "free_float_pct": round(p["percentFreeFloat"], 1) if p.get("percentFreeFloat") is not None else None,
@@ -173,6 +177,11 @@ def build():
             "fs_type_caveat": "fs_type marks the statement basis SET filed: \"C\" = consolidated, \"U\" = "
                               "unconsolidated (company-only). HENG reports \"U\"; the other five report "
                               "\"C\" — not a like-for-like statement basis, flagged rather than blended in.",
+            "beta_caveat": "beta is each peer's SET-reported share beta — systematic (market-correlated) "
+                           "volatility measured against the SET index over a trailing window. >1.0 = the "
+                           "share amplifies market moves (more cyclically exposed); <1.0 = defensive. It is "
+                           "a market statistic on the rival's equity, not a fundamental of its loan book, "
+                           "and AutoX (unlisted) has none.",
             "units": "market_cap/assets/profit/revenue/equity in ฿bn; ratios in %",
         },
         "headline": headline,
