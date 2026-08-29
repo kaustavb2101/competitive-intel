@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-28T23:22:04+07:00",
-    "commit": "34cbe2b"
+    "generated_at": "2026-08-29T05:22:48+07:00",
+    "commit": "a4cedfa"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-28",
+    "eta_date": "2026-08-29",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-08-29T05:22:48+07:00",
+      "sha": "a4cedfa",
+      "summary": "intel(#acq): peer earnings watch — surface the SET OppDay corpus (latest call per listed rival) (#685)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-28T20:57:47+00:00",
+      "sha": "619b6a2",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-28, run 33210329516)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-28T20:17:43+00:00",
+      "sha": "5471be4",
+      "summary": "docs: log ux-loop foldbtn aria-label merge+deploy+verify (PR #682)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-29T03:14:25+07:00",
+      "sha": "814037c",
+      "summary": "ux: unique aria-labels for ambiguous table fold buttons (a11y) (#682)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-28T18:55:40+00:00",
+      "sha": "d3deaed",
+      "summary": "intel(#acq): rate-card drift watch — surface the weekly MEASURED re-read of every rival's own rate page (#681)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-28T18:04:38+00:00",
+      "sha": "5ea7bc3",
+      "summary": "data(census): refresh the Union Auction forward book (run 33186084681) (#677)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-28T17:38:57+00:00",
+      "sha": "8c5dc1a",
+      "summary": "data: market-pulse swarm refresh (run 33186006027) (#678)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-28T17:13:38+00:00",
+      "sha": "8c42f51",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33189629322) (#680)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-28T16:22:30+00:00",
+      "sha": "5d105eb",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (34cbe2b) after network-momentum ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-28T23:22:04+07:00",
       "sha": "34cbe2b",
       "summary": "intel(#acq): network-momentum read — which rivals are growing vs shrinking (#679)",
@@ -657,60 +711,6 @@
       "sha": "408f5fb",
       "summary": "feat(#exposure): compound agri-risk stack — where the three MEASURED agri lenses overlap (#667)",
       "pillar": "service"
-    },
-    {
-      "date": "2026-08-28T00:28:06+00:00",
-      "sha": "bcbe81b",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-28, run 33129711107)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-27T23:02:14+00:00",
-      "sha": "fe8c6f7",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33121997489) (#666)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-27T22:20:24+00:00",
-      "sha": "7e5aaf0",
-      "summary": "docs: log intelligence-loop run (PR #665, district-grain ground leadership) + refresh CEO dashboard to HEAD",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-28T05:18:54+07:00",
-      "sha": "4d73f48",
-      "summary": "feat(#acq): district-grain ground-leadership rollup on the peer board (#665)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-27T21:39:21+00:00",
-      "sha": "5576c70",
-      "summary": "data: SET listed-peer scoreboard refresh (run 33116026672) (#664)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-27T21:09:23+00:00",
-      "sha": "1667a6f",
-      "summary": "data: market-pulse swarm refresh (run 33110885228) (#662)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-27T20:30:26+00:00",
-      "sha": "2b8503a",
-      "summary": "docs: log UX-loop run (PR #663, prefers-contrast:more on rayong-catchment) — merged + deploy-verified",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-28T03:27:11+07:00",
-      "sha": "68ac61d",
-      "summary": "ux: prefers-contrast:more on rayong-catchment.html (deck.gl page) (#663)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-27T19:53:22+00:00",
-      "sha": "0b3cb4e",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-27, run 33110457013)",
-      "pillar": "data-integration"
     }
   ]
 }

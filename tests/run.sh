@@ -392,6 +392,14 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_rival_rate_observed.py --check (rival_rate_observed.json not built yet, or source-data input absent)"
   else bad "build_rival_rate_observed.py --check (rival_rate_observed.json drifted from source-data/rival_rate_observed.json — run: python3 pipeline/build_rival_rate_observed.py)"
   fi
+  # Each SET-listed peer's latest Opportunity Day earnings call (build_peer_oppday.py). Its input
+  # (source-data/investor_docs/index.json) is committed by the network puller pull_investor_docs.py,
+  # so the calendar/recency projection IS byte-exact and gated here; SKIP only if that input is absent.
+  ( cd "$PIPE" && python3 build_peer_oppday.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_peer_oppday.py --check (peer earnings watch)"
+  elif [ "$rc" -eq 3 ]; then skip "build_peer_oppday.py --check (investor_docs/index.json absent — SET Opportunity Day pull, not data drift)"
+  else bad "build_peer_oppday.py --check (peer_oppday.json drifted from source-data/investor_docs/index.json — run: python3 pipeline/build_peer_oppday.py)"
+  fi
   # Gated BEFORE promo_gap because it is promo_gap's input: the undercut check reads
   # rival_facebook.json, so an ungated Facebook projection could drift and the only symptom
   # would be a promo-gap row that silently stopped matching the post it cites. Every other

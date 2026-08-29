@@ -32,7 +32,8 @@ build_pico_census.py); the licence-recency cutoff is derived from the pinned sna
 wall-clock, so the momentum count is deterministic across re-runs.
 
 DETERMINISTIC + NETWORK-FREE. Carries --check; SKIP-passes (exit 3) when the gitignored fpo_pico.csv
-is absent (the CI gate has no Thai-IP pull), same convention as build_pico_census.py.
+is absent (the raw CSV is re-pullable, not committed — the FPO CKAN is reachable from CI, not
+Thai-IP-gated), same convention as build_pico_census.py.
 
   python3 build_pico_district.py
   python3 build_pico_district.py --check
