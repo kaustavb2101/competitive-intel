@@ -1653,7 +1653,7 @@ function wrapTables(){
 // entries, bookmarks and open tabs are indistinguishable (and SPA route changes are silent to
 // screen readers). Keeps the brand suffix so the tab is still recognisable at a glance.
 const TAB_TITLES={home:'Command center',overview:'Macro',map:'Map view',assist:'Assistance',exposure:'Risk',acq:'Competition',brand:'Brand',trend:'Risk trend',provinces:'Provinces',market:'Market',branches:'Branches',sim:'Simulator'};
-function showTab(v){
+function showTab(v,moveFocus){
   if(!v||!document.getElementById('v-'+v)) v='home';
   document.title=(TAB_TITLES[v]?TAB_TITLES[v]+' · ':'')+'AutoX · เงินไชโย';
   // #navMoreMenu is RE-PARENTED to <body> by the nav script (so the dropdown escapes the nav's
@@ -1684,20 +1684,27 @@ function showTab(v){
   renderImpactMounts(v);    // Region→Province→Branch drill on Home + the pillar front doors
   closeBranchSheet();   // the mobile branch sheet belongs to the map — never let it cover another tab
   window.scrollTo(0,0);
+  // WCAG 2.4.3 Focus Order — on a USER-initiated route change, move focus into the freshly-shown view
+  // so keyboard/SR users land on (and hear) the new content instead of being stranded on the old nav
+  // link with the swap silent. #main-content is the tabindex="-1" container the skip-link already
+  // focuses, so this reuses that hook; preventScroll keeps the scrollTo(0,0) above authoritative.
+  // moveFocus is passed only by the interactive paths (nav click / hashchange / content "→" link) —
+  // the boot call (showTab on load) omits it, so first paint never steals focus from the top.
+  if(moveFocus){ const m=document.getElementById('main-content'); if(m){ try{ m.focus({preventScroll:true}); }catch(e){ try{ m.focus(); }catch(_){} } } }
 }
 $('#nav').addEventListener('click', e=>{
   const b=e.target.closest('a[data-v]'); if(!b) return;
   e.preventDefault(); const v=b.dataset.v;
   history.replaceState(null,'','#'+v);
-  showTab(v);
+  showTab(v,true);
 });
-window.addEventListener('hashchange',()=>showTab((location.hash||'').replace('#','')));
+window.addEventListener('hashchange',()=>showTab((location.hash||'').replace('#',''),true));
 // content "→" links carry data-v but live outside #nav (command-center cards + the "Next in the
 // story" tab footers); jump to that tab. Scoped to #main-content so it never double-handles the
 // #nav links (those have their own handler) — nav is a sibling of <main>, not inside it.
 document.addEventListener('click',e=>{
   const a=e.target.closest('#main-content a[data-v]'); if(!a) return;
-  e.preventDefault(); const v=a.dataset.v; history.replaceState(null,'','#'+v); showTab(v);
+  e.preventDefault(); const v=a.dataset.v; history.replaceState(null,'','#'+v); showTab(v,true);
 });
 // Keyboard activation for clickable table rows (role="link" tabindex=0): Enter / Space.
 document.addEventListener('keydown',e=>{
@@ -1972,8 +1979,12 @@ function renderMacroIndicators(){
   const tr=I.tourist_arrivals, t12=tr&&tr.trailing_12m;
   if(tr&&tr.value!=null){
     const win=(t12&&t12.period_start&&t12.period_end)?` (${t12.period_start} → ${t12.period_end})`:'';
+    // Direction, not just level: the TTM total against the TTM a year earlier. A fall is a rising-risk
+    // read for borrower incomes in tourist provinces (Phuket/Krabi/Chon Buri/Chiang Mai), obj #1 —
+    // so the card says which way it's moving, the same as the household-debt card does.
+    const ty=tr.yoy_change, tmove=ty!=null?` · ${arrow(ty)}${Math.abs(ty)}% YoY${ty<0?' (cooling)':''}`:'';
     cards.push([`Tourists`, `${tr.value}M`,
-      `arrivals, trailing 12 months${win} · ${srcShort(tr.source)} ${tr.period}`]);
+      `arrivals, trailing 12 months${win}${tmove} · ${srcShort(tr.source)} ${tr.period}`]);
   }
   // Current account: a SINGLE month swings hard (April 2026 printed −7,591 USD million and on a
   // scanned strip reads as a national crisis), so the chip carries the rolling twelve-month NET,
@@ -2508,7 +2519,8 @@ function renderAnswerBand(){
     if(f&&f.diesel_thb_l!=null) T.push(abTile({k:'Diesel · '+(f.name||'retail'),cad:'daily',cadCls:'d',
       v:f.diesel_thb_l,unit:' ฿/L',move:'cost line, not revenue',moveColor:'var(--mid)',
       why:'daily feed · history not retained yet',sub:'MEASURED Bangchak retail'}));
-    // 4-5. The credit tide. These are the ONLY two series that already ship a real history array.
+    // 4-6. The credit tide. These three ship a real history array (household debt, policy rate, and
+    //      tourism arrivals — the tourism trend line was added once the build stopped dropping it).
     const I=(mi&&mi.indicators)||{};
     if(I.household_debt_gdp) { const h=I.household_debt_gdp;
       T.push(abTile({k:'Household debt',cad:h.period||'quarterly',cadCls:'q',v:h.value,unit:'% GDP',
@@ -2524,6 +2536,15 @@ function renderAnswerBand(){
         moveColor:'var(--mid)',
         spark:svgSpark(p.trend,{color:'var(--accent)',aria:'policy rate trend',title:psrc}),
         sub:'MEASURED '+psrc})); }
+    // Tourism — the income backdrop for borrowers in tourist provinces. The line is the rolling
+    // trailing-12m total (non-seasonal), so a fall is a genuine cooling of that income, not a season.
+    if(I.tourist_arrivals&&I.tourist_arrivals.value!=null&&Array.isArray(I.tourist_arrivals.trend)){
+      const t=I.tourist_arrivals;
+      T.push(abTile({k:'Tourist arrivals',cad:t.period||'monthly',cadCls:'m',v:t.value,unit:'M / 12mo',
+        move:t.yoy_change!=null?`${t.yoy_change<0?'▼':'▲'} ${Math.abs(t.yoy_change)}% YoY`:'',
+        moveColor:t.yoy_change<0?'var(--agri)':'var(--merch)',
+        spark:svgSpark(t.trend,{color:'var(--accent)',aria:'tourist arrivals trailing-12m trend',title:'BOT'}),
+        sub:'MEASURED BOT'})); }
     // 6. Our own book, so the backdrop is never read without the thing it acts on. Live book only —
     //    the 180+ legacy stock is held apart on purpose and blending them would flatter the number.
     //    (regex is anchored on "of accounts" — "NPL-live (90-179dpd) 4.92%" otherwise captures the
@@ -4027,13 +4048,14 @@ function drawPeerScore(){
   const m=PEERSCORE.meta||{}, tgt=PEERSCORE.autox_roe_target;
   const roes=peers.map(p=>p.roe).filter(v=>typeof v==='number');
   const hiRoe=Math.max(...roes, tgt||0);
-  const yc=v=>v==null?'var(--dim)':(v>0?'var(--merch)':'var(--agri)');
+  const yc=v=>v==null?'var(--dim)':(v>0?'var(--merch)':(v<0?'var(--agri)':'var(--dim)'));
   tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Listed peer</th>`+
     `<th scope="col" title="market capitalisation (SET, price date)">Mkt cap</th>`+
     `<th scope="col" title="year-to-date price change — share-price momentum / investor mindshare">YTD</th>`+
     `<th scope="col" title="SET share beta — systematic (market-correlated) volatility vs the SET index. >1.0 amplifies market swings (more cyclically exposed); <1.0 is defensive. A market statistic on the rival's equity, not a loan-book fundamental.">β</th>`+
     `<th scope="col" title="return on equity, newest audited full fiscal year (SET quarter code Q9)">ROE</th>`+
     `<th scope="col" title="net profit, newest audited full fiscal year">Net profit/yr</th>`+
+    `<th scope="col" title="loan-book growth — year-over-year change in total assets between the two most recent audited full years (SET quarter code Q9). Total assets ≈ the loan book for a title lender, so this reads as book expansion (green) vs retreat (red). Blank where no clean like-for-like prior year exists.">Book Δ</th>`+
     `<th scope="col" title="price / earnings">P/E</th>`+
     `<th scope="col" title="price / book value — the primary valuation multiple for an equity-heavy lender; below 1.0× = trading under book">P/BV</th>`+
     `<th scope="col" title="dividend yield">Div</th></tr>`+
@@ -4047,11 +4069,12 @@ function drawPeerScore(){
         <td class="mono sub">${(typeof p.beta==='number')?p.beta.toFixed(2)+(p.beta>1?` <span style="color:var(--gold)" title="above the market — amplifies cyclical swings">▲</span>`:''):'—'}</td>
         <td class="mono">${roeBar} <b>${p.roe}%</b></td>
         <td class="mono sub">฿${p.net_profit_bn}bn</td>
+        <td class="mono" style="color:${yc(p.assets_yoy_pct)}"${(typeof p.revenue_yoy_pct==='number'||typeof p.net_profit_yoy_pct==='number')?` title="${p.growth_basis||''}${typeof p.revenue_yoy_pct==='number'?` · revenue ${p.revenue_yoy_pct>0?'+':''}${p.revenue_yoy_pct}%`:''}${typeof p.net_profit_yoy_pct==='number'?` · net profit ${p.net_profit_yoy_pct>0?'+':''}${p.net_profit_yoy_pct}%`:''}"`:''}>${(typeof p.assets_yoy_pct==='number')?`<b>${p.assets_yoy_pct>0?'+':''}${p.assets_yoy_pct}%</b>`:'<span class="sub">—</span>'}</td>
         <td class="mono sub">${p.pe}</td>
         <td class="mono sub">${(typeof p.pbv==='number')?p.pbv.toFixed(2)+'×'+(p.pbv<1?` <span class="sub" style="color:var(--gold)" title="trading below book value">·bk</span>`:''):'—'}</td>
         <td class="mono sub">${p.div_yield}%</td>
       </tr>`;}).join('')+
-    (tgt?`<tr style="border-top:1px dashed var(--line)"><td></td><td><b style="color:var(--gold)">AutoX target</b> <span class="sub">(unlisted)</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">${tgt}%</b> <span class="sub">ROE goal</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td></tr>`:'');
+    (tgt?`<tr style="border-top:1px dashed var(--line)"><td></td><td><b style="color:var(--gold)">AutoX target</b> <span class="sub">(unlisted)</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">${tgt}%</b> <span class="sub">ROE goal</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td></tr>`:'');
   if(ro){
     const byRoe=peers.filter(p=>typeof p.roe==='number');
     const below=byRoe.filter(p=>p.roe<tgt).map(p=>p.name), above=byRoe.filter(p=>p.roe>=tgt).map(p=>p.name);
@@ -4136,8 +4159,25 @@ function drawPeerScore(){
       const amp=betas.filter(p=>p.beta>1);
       betaLine=` <b>Share-price risk (β).</b> The equity market treats ${hi.name} as the most cyclically volatile (β ${hi.beta.toFixed(2)}) and ${lo.name} as the most defensive (β ${lo.beta.toFixed(2)}); ${amp.length} of ${betas.length} listed rivals trade above the market (β>1), so their equity — and the capital access that rides on it — swings hardest with the cycle.`;
     }
+    // Loan-book growth read (assets YoY, MEASURED) — objective #2's headline "which rivals are
+    // outgrowing us vs retreating" signal. totalAsset ≈ the loan book for a title lender. Uses only
+    // peers with a clean like-for-like prior audited full year (TIDLOR's restructure-broken series
+    // is null and self-excludes). Fires with ≥3 comparable peers so expanding/shrinking counts mean
+    // something; every superlative is computed from the peers' own audited totals (no wall-clock).
+    const grow=peers.filter(p=>typeof p.assets_yoy_pct==='number');
+    let growLine='';
+    if(grow.length>=3){
+      const gs=v=>(v>0?'+':'')+v+'%';
+      const hi=grow.slice().sort((a,b)=>b.assets_yoy_pct-a.assets_yoy_pct)[0];
+      const lo=grow.slice().sort((a,b)=>a.assets_yoy_pct-b.assets_yoy_pct)[0];
+      const up=grow.filter(p=>p.assets_yoy_pct>0), down=grow.filter(p=>p.assets_yoy_pct<0);
+      const retreat=(lo.assets_yoy_pct<0)
+        ? `${lo.name} is retreating hardest (${gs(lo.assets_yoy_pct)}, ${lo.growth_basis})`
+        : `${lo.name} grew its book least (${gs(lo.assets_yoy_pct)}, ${lo.growth_basis})`;
+      growLine=` <b>Loan-book growth (YoY).</b> ${hi.name} is expanding its book fastest (${gs(hi.assets_yoy_pct)}, ${hi.growth_basis}); ${retreat}; ${up.length} of ${grow.length} listed rivals grew their book, ${down.length} shrank — the measured read of which rivals are expanding their book and which are pulling back (total assets ≈ the loan book; AutoX is unlisted, so it has no comparable audited YoY to rank against).`;
+    }
     ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
-      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+betaLine+
+      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+betaLine+growLine+
       methodBox(m.roe_caveat||null,
         [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the newest audited full year'}.`,
          '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE target is a stated goal shown only as the reference line.',
@@ -4145,6 +4185,7 @@ function drawPeerScore(){
          m.holdco_caveat||null,
          m.fs_type_caveat||null,
          m.beta_caveat||null,
+         m.growth_caveat||null,
          aqNote]);
   }
 }
@@ -14095,12 +14136,19 @@ function renderHomeDataRoom(){
   // sits. Age is measured against the freshest dated layer (deterministic, from build_provenance.py),
   // so it never reads a wall clock. Only ISO-dated layers get an age; undated ones are stated plainly.
   const fr=PROVEN.freshness;
+  // upstream-capped layers are old ONLY because their source stopped publishing (e.g. DLT froze a
+  // monthly release); provenance.json certifies each is at its newest genuinely-complete vintage.
+  // Reading them as "stale" would paint neglect where there is none — mark them apart, not red.
+  const capped={}; (fr&&fr.upstream_capped||[]).forEach(c=>{ if(c&&c.file) capped[c.file]=c.reason||'newest complete vintage available upstream'; });
+  const cappedN=Object.keys(capped).length;
   if(fr&&fr.n_dated){
-    const staleN=(fr.stale||[]).length, old=fr.oldest;
+    const staleN=(fr.stale||[]).length, old=fr.oldest, oldCapped=old&&(old.file in capped);
     html+=`<div class="dr-fresh cc-sub2">`+
       `<b>Freshness</b> — newest committed data <b>${dqEsc(fr.freshest.vintage)}</b>; `+
-      `oldest dated layer <b>${old.age_days}d</b> behind (<span class="mono">${dqEsc(old.file)}</span> · ${dqEsc(old.vintage)}); `+
+      `oldest dated layer <b>${old.age_days}d</b> behind (<span class="mono">${dqEsc(old.file)}</span> · ${dqEsc(old.vintage)})`+
+      (oldCapped?` — <span class="dr-age-capped">frozen at source</span>, its newest upstream vintage, not stale`:``)+`; `+
       (staleN?`<b style="color:var(--dr-u)">${staleN}</b>`:`<b>0</b>`)+` of ${fr.n_dated} dated layers &gt;${fr.stale_over_days}d stale`+
+      (cappedN?` (${cappedN} older layer${cappedN!==1?'s':''} frozen at source, not counted)`:``)+
       (fr.n_undated?`. ${fr.n_undated} layers carry no machine-readable date.`:`.`)+
       `</div>`;
   }
@@ -14117,7 +14165,10 @@ function renderHomeDataRoom(){
     const src=L.source?dqEsc(L.source):(L.cls==='unlabelled'?'<span class="dr-shame">— no meta.source / meta.provenance</span>':'—');
     const cnt=L.count?`${L.count.toLocaleString()} ${dqEsc(L.count_of||'')}`:'';
     const vint=L.vintage?dqEsc(L.vintage)+' · ':'';
-    const age=(L.age_days!=null)?`<span class="dr-age${L.age_days>staleThresh?' dr-age-stale':''}" title="${L.age_days} days behind the freshest committed layer">${L.age_days}d</span> · `:'';
+    const isCapped=(L.file in capped);
+    const ageCls=(L.age_days>staleThresh)?(isCapped?' dr-age-capped':' dr-age-stale'):'';
+    const ageTitle=isCapped?`Upstream-capped — not stale: ${dqEsc(capped[L.file]).replace(/"/g,'&quot;')}`:`${L.age_days} days behind the freshest committed layer`;
+    const age=(L.age_days!=null)?`<span class="dr-age${ageCls}" title="${ageTitle}">${isCapped?'⤒':''}${L.age_days}d</span> · `:'';
     html+=`<tr class="dr-${L.cls}">`+
       `<td><span class="dr-name" title="${nameTitle}">${name}</span>${shame}`+(L.label?`<span class="dr-desc" title="${dqEsc(L.label).replace(/"/g,'&quot;')}">${dqEsc(L.label)}</span>`:'')+`</td>`+
       `<td>${prChip(L.cls)}</td>`+
