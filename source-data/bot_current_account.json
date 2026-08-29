@@ -6,7 +6,7 @@
     "source_url": "https://app.bot.or.th/BTWS_STAT/statistics/BOTWEBSTAT.aspx?reportID=953&language=TH",
     "unit": "USD million",
     "frequency": "monthly",
-    "pulled": "2026-08-16",
+    "pulled": "2026-08-29",
     "period_range": {
       "min": "2005-01",
       "max": "2026-04"
