@@ -685,6 +685,25 @@ INGESTS
     bad "amphoe_crops_zone_guard.py (a pipeline script folds the duplicate amphoe_crops_zone staging into the app — see report above)"
   fi
 
+  # stale-collateral-base tripwire for the DLT vehicle stock. The live collateral base
+  # (source-data/vehicles_by_province.json, read by 10+ vehicle/collateral/province builders) can be
+  # refreshed ONLY from Kaustav's Thai IP (ingest_gov.py's build_vehicles reads the raw dgt_out/ CSV,
+  # incl. the ev fuel column), so it cannot self-heal in CI. Meanwhile the cloud census job
+  # (data-gov-census.yml -> committee/census.py) refreshes the SAME DLT stock WEEKLY into
+  # source-data/vehicle_census_province.json from the department CKAN (any IP) — a file nothing
+  # downstream read until now. So a future DLT vintage bump would silently advance the census while the
+  # base stayed frozen, and the app would keep quoting a stale collateral pool under a MEASURED label.
+  # The guard asserts the base and the fresh census still agree on the CI-refreshable fields
+  # (total/motorcycle/pickup — 0/77 mismatch today; car differs by classification and ev is base-only,
+  # both excluded). Self-clearing: it goes RED only when the census diverges (base is stale -> re-pull
+  # from the Thai IP, or migrate the base to a CI census projection as factories_by_district.json was),
+  # and passes again once the base catches up. Gives vehicle_census_province.json its first consumer.
+  if python3 "$TESTS/vehicle_base_staleness_guard.py"; then
+    ok "vehicle_base_staleness_guard.py (DLT collateral base in sync with the fresh CI vehicle census)"
+  else
+    bad "vehicle_base_staleness_guard.py (the CI DLT census has diverged from the collateral base — the base is stale, see report above)"
+  fi
+
   # deploy-probe self-test: the SAME code path the nightly live site-health check runs (check_site_health.py),
   # but pointed at the local committed tree (--local platform, LocalFetcher = filesystem only, pure stdlib,
   # NO network). It asserts every deploy probe validator (_shape_*) still ACCEPTS its real committed payload,
