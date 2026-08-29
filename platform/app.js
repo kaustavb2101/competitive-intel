@@ -4034,6 +4034,7 @@ function drawPeerScore(){
     `<th scope="col" title="SET share beta — systematic (market-correlated) volatility vs the SET index. >1.0 amplifies market swings (more cyclically exposed); <1.0 is defensive. A market statistic on the rival's equity, not a loan-book fundamental.">β</th>`+
     `<th scope="col" title="return on equity, newest audited full fiscal year (SET quarter code Q9)">ROE</th>`+
     `<th scope="col" title="net profit, newest audited full fiscal year">Net profit/yr</th>`+
+    `<th scope="col" title="loan-book growth — year-over-year change in total assets between the two most recent audited full years (SET quarter code Q9). Total assets ≈ the loan book for a title lender, so this reads as book expansion (green) vs retreat (red). Blank where no clean like-for-like prior year exists.">Book Δ</th>`+
     `<th scope="col" title="price / earnings">P/E</th>`+
     `<th scope="col" title="price / book value — the primary valuation multiple for an equity-heavy lender; below 1.0× = trading under book">P/BV</th>`+
     `<th scope="col" title="dividend yield">Div</th></tr>`+
@@ -4047,11 +4048,12 @@ function drawPeerScore(){
         <td class="mono sub">${(typeof p.beta==='number')?p.beta.toFixed(2)+(p.beta>1?` <span style="color:var(--gold)" title="above the market — amplifies cyclical swings">▲</span>`:''):'—'}</td>
         <td class="mono">${roeBar} <b>${p.roe}%</b></td>
         <td class="mono sub">฿${p.net_profit_bn}bn</td>
+        <td class="mono" style="color:${yc(p.assets_yoy_pct)}"${(typeof p.revenue_yoy_pct==='number'||typeof p.net_profit_yoy_pct==='number')?` title="${p.growth_basis||''}${typeof p.revenue_yoy_pct==='number'?` · revenue ${p.revenue_yoy_pct>0?'+':''}${p.revenue_yoy_pct}%`:''}${typeof p.net_profit_yoy_pct==='number'?` · net profit ${p.net_profit_yoy_pct>0?'+':''}${p.net_profit_yoy_pct}%`:''}"`:''}>${(typeof p.assets_yoy_pct==='number')?`<b>${p.assets_yoy_pct>0?'+':''}${p.assets_yoy_pct}%</b>`:'<span class="sub">—</span>'}</td>
         <td class="mono sub">${p.pe}</td>
         <td class="mono sub">${(typeof p.pbv==='number')?p.pbv.toFixed(2)+'×'+(p.pbv<1?` <span class="sub" style="color:var(--gold)" title="trading below book value">·bk</span>`:''):'—'}</td>
         <td class="mono sub">${p.div_yield}%</td>
       </tr>`;}).join('')+
-    (tgt?`<tr style="border-top:1px dashed var(--line)"><td></td><td><b style="color:var(--gold)">AutoX target</b> <span class="sub">(unlisted)</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">${tgt}%</b> <span class="sub">ROE goal</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td></tr>`:'');
+    (tgt?`<tr style="border-top:1px dashed var(--line)"><td></td><td><b style="color:var(--gold)">AutoX target</b> <span class="sub">(unlisted)</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">${tgt}%</b> <span class="sub">ROE goal</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td></tr>`:'');
   if(ro){
     const byRoe=peers.filter(p=>typeof p.roe==='number');
     const below=byRoe.filter(p=>p.roe<tgt).map(p=>p.name), above=byRoe.filter(p=>p.roe>=tgt).map(p=>p.name);
@@ -4136,8 +4138,25 @@ function drawPeerScore(){
       const amp=betas.filter(p=>p.beta>1);
       betaLine=` <b>Share-price risk (β).</b> The equity market treats ${hi.name} as the most cyclically volatile (β ${hi.beta.toFixed(2)}) and ${lo.name} as the most defensive (β ${lo.beta.toFixed(2)}); ${amp.length} of ${betas.length} listed rivals trade above the market (β>1), so their equity — and the capital access that rides on it — swings hardest with the cycle.`;
     }
+    // Loan-book growth read (assets YoY, MEASURED) — objective #2's headline "which rivals are
+    // outgrowing us vs retreating" signal. totalAsset ≈ the loan book for a title lender. Uses only
+    // peers with a clean like-for-like prior audited full year (TIDLOR's restructure-broken series
+    // is null and self-excludes). Fires with ≥3 comparable peers so expanding/shrinking counts mean
+    // something; every superlative is computed from the peers' own audited totals (no wall-clock).
+    const grow=peers.filter(p=>typeof p.assets_yoy_pct==='number');
+    let growLine='';
+    if(grow.length>=3){
+      const gs=v=>(v>0?'+':'')+v+'%';
+      const hi=grow.slice().sort((a,b)=>b.assets_yoy_pct-a.assets_yoy_pct)[0];
+      const lo=grow.slice().sort((a,b)=>a.assets_yoy_pct-b.assets_yoy_pct)[0];
+      const up=grow.filter(p=>p.assets_yoy_pct>0), down=grow.filter(p=>p.assets_yoy_pct<0);
+      const retreat=(lo.assets_yoy_pct<0)
+        ? `${lo.name} is retreating hardest (${gs(lo.assets_yoy_pct)}, ${lo.growth_basis})`
+        : `${lo.name} grew its book least (${gs(lo.assets_yoy_pct)}, ${lo.growth_basis})`;
+      growLine=` <b>Loan-book growth (YoY).</b> ${hi.name} is expanding its book fastest (${gs(hi.assets_yoy_pct)}, ${hi.growth_basis}); ${retreat}; ${up.length} of ${grow.length} listed rivals grew their book, ${down.length} shrank — the measured read of which rivals are gaining scale on us and which are pulling back (total assets ≈ the loan book).`;
+    }
     ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
-      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+betaLine+
+      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+betaLine+growLine+
       methodBox(m.roe_caveat||null,
         [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the newest audited full year'}.`,
          '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE target is a stated goal shown only as the reference line.',
@@ -4145,6 +4164,7 @@ function drawPeerScore(){
          m.holdco_caveat||null,
          m.fs_type_caveat||null,
          m.beta_caveat||null,
+         m.growth_caveat||null,
          aqNote]);
   }
 }
