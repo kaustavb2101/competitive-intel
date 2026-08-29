@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-29T17:32:09+07:00",
-    "commit": "c6cc19a"
+    "generated_at": "2026-08-29T14:31:38+00:00",
+    "commit": "d9e73ea"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,36 @@
   ],
   "activity": [
     {
+      "date": "2026-08-29T14:31:38+00:00",
+      "sha": "d9e73ea",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-29, run 33257741669)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-29T14:15:36+00:00",
+      "sha": "83a5342",
+      "summary": "docs: log ux-loop branch-explorer forced-colors WHCM parity (PR #701, deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-29T21:12:57+07:00",
+      "sha": "295b171",
+      "summary": "ux: branch-explorer forced-colors parity — WHCM legend/bar fills (#701)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-29T17:41:52+07:00",
+      "sha": "d9a465e",
+      "summary": "intel(#acq): fix peer book-growth review findings — zero-color, overstatement, reversed count (#699)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-29T10:35:05+00:00",
+      "sha": "bc2a4fb",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after peer book-growth ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-29T17:32:09+07:00",
       "sha": "c6cc19a",
       "summary": "intel(#acq): peer scoreboard gains loan-book growth (YoY) — which rivals are outgrowing us (#696)",
@@ -681,36 +711,6 @@
       "sha": "814037c",
       "summary": "ux: unique aria-labels for ambiguous table fold buttons (a11y) (#682)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-28T18:55:40+00:00",
-      "sha": "d3deaed",
-      "summary": "intel(#acq): rate-card drift watch — surface the weekly MEASURED re-read of every rival's own rate page (#681)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-28T18:04:38+00:00",
-      "sha": "5ea7bc3",
-      "summary": "data(census): refresh the Union Auction forward book (run 33186084681) (#677)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-28T17:38:57+00:00",
-      "sha": "8c5dc1a",
-      "summary": "data: market-pulse swarm refresh (run 33186006027) (#678)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-28T17:13:38+00:00",
-      "sha": "8c42f51",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33189629322) (#680)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-28T16:22:30+00:00",
-      "sha": "5d105eb",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (34cbe2b) after network-momentum ship",
-      "pillar": "feature"
     }
   ]
 }
