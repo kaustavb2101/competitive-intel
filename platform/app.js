@@ -3179,6 +3179,7 @@ function renderCompetition(){
   renderGapBoard();
   renderPeerScore();
   renderPeerAssetQuality();
+  renderPeerOppday();
   renderDebtSource();
   // SPLIT 2026-08-17 — eight renderers left this function for renderBrand(): renderSearchDemand,
   // renderRivalPulse (Play + iOS in one call), renderRivalFacebook, renderRivalAds, renderRivalVideo,
@@ -4146,6 +4147,50 @@ function renderPeerAssetQuality(){
   fetch('data/peer_asset_quality.json').then(r=>r.ok?r.json():null).then(j=>{
     PEERAQ=j; peeraqLoaded=true; drawPeerAssetQuality();
   }).catch(()=>{ PEERAQ=null; peeraqLoaded=true; drawPeerAssetQuality(); });
+}
+/* Peer earnings watch — each SET-listed peer's latest Opportunity Day call (data/peer_oppday.json,
+   build_peer_oppday.py). CALENDAR/RECENCY only: a freshness read on how current the peer boards are +
+   a primary-source link to each rival's own call. No transcript figure is parsed. Fully null-guarded:
+   an absent layer self-hides the whole strip (heading + table + readout) rather than showing an error. */
+let peeroppLoaded=false, PEEROPP=null;
+function renderPeerOppday(){
+  const tbl=$('#peeropptbl'); if(!tbl) return;
+  if(peeroppLoaded){ drawPeerOppday(); return; }
+  tmliFetch('peer_oppday').then(j=>{ PEEROPP=j; peeroppLoaded=true; drawPeerOppday(); });
+}
+function drawPeerOppday(){
+  const tbl=$('#peeropptbl'), ro=$('#peeroppreadout'); if(!tbl) return;
+  const peers=(PEEROPP&&Array.isArray(PEEROPP.peers))?PEEROPP.peers:[];
+  // Absent/empty layer → hide the whole strip (heading + lead + readout + table), since this
+  // section shares a tab with other content and a dangling heading would mislead.
+  const h3=$('#peeropph3'), lead=$('#peeropplead');
+  const setHidden=(h)=>{ if(ro) ro.hidden=h; tbl.hidden=h; if(h3) h3.hidden=h; if(lead) lead.hidden=h; };
+  if(!peers.length){ tbl.innerHTML=''; setHidden(true); return; }
+  setHidden(false);
+  const m=PEEROPP.meta||{};
+  const esc=s=>String(s==null?'':s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+  const linkCell=(p)=>{
+    const parts=[];
+    if(p.video_link) parts.push(`<a href="${esc(p.video_link)}" target="_blank" rel="noopener" title="watch the earnings call">▶ call</a>`);
+    if(p.snapshot_link) parts.push(`<a href="${esc(p.snapshot_link)}" target="_blank" rel="noopener" title="SET company snapshot (Thai)">▦ snapshot</a>`);
+    return parts.length?parts.join(' <span class="sub">·</span> '):'<span class="sub">—</span>';
+  };
+  tbl.innerHTML=`<tr><th scope="col">Listed peer</th>`+
+    `<th scope="col" title="the most recent SET Opportunity Day quarterly earnings call the peer has filed">Latest call</th>`+
+    `<th scope="col" title="date the call was held / filed to the SET">Filed</th>`+
+    `<th scope="col" title="number of Opportunity Day calls held in the tracked corpus, and the earliest">Calls tracked</th>`+
+    `<th scope="col" title="the peer's own call recording + SET company snapshot">Source</th></tr>`+
+    peers.map(p=>`<tr>
+        <td><b>${esc(p.name||p.symbol)}</b> <span class="sub mono">${esc(p.symbol)}</span></td>
+        <td class="mono"><b>${esc(p.latest_round)}</b></td>
+        <td class="mono sub">${esc(p.latest_date)}</td>
+        <td class="mono sub" title="earliest tracked: ${esc(p.first_round)} (${esc(p.first_date)})">${p.n_calls}<span class="sub"> since ${esc(p.first_date)}</span></td>
+        <td class="sub" style="font-size:12px">${linkCell(p)}</td>
+      </tr>`).join('');
+  if(ro){
+    ro.innerHTML=`<b>${esc(m.headline||'')}</b> <span class="sub">Primary-source access to every listed rival's own quarterly disclosure — calendar/recency only, no transcript figure is parsed. <span class="tag">MEASURED · SET</span></span>`;
+  }
+  wrapTables();
 }
 /* Book-mix cell: loan (secured title-loan) vs hire-purchase gross split, as a compact stacked bar +
    label. Null-safe — an older layer with no book_mix, or a single-book filer, degrades gracefully. */
