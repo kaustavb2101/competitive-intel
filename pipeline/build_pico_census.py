@@ -24,7 +24,10 @@ timestamp). The registry snapshot vintage + download URL are pinned as constants
 resource filename picofinanceoperate-22052026.csv); bump them when a newer snapshot is pulled.
 
 DETERMINISTIC + NETWORK-FREE. Carries --check; SKIP-passes (exit 3) when the gitignored fpo_pico.csv
-is absent (the CI gate has no Thai-IP pull), so the determinism gate never breaks on a missing input.
+is absent (the raw CSV is re-pullable, not committed — the OUTPUT json is the source of truth), so
+the determinism gate never breaks on a missing input. NB: the FPO CKAN (catalog.fpo.go.th) IS
+reachable from a cloud/CI IP — it is NOT Thai-IP-gated — so this layer can be refreshed from CI; see
+the content_verified provenance block below for why the filename-derived vintage lags the content.
 
   python3 build_pico_census.py
   python3 build_pico_census.py --check
@@ -45,6 +48,16 @@ OUT = os.path.join(ROOT, "platform", "data", "pico_census.json")
 SNAPSHOT_URL = ("https://catalog.fpo.go.th/dataset/2b8aadd9-e0a7-45fc-8301-ea2fbdb781a2/resource/"
                 "32edd6d3-a44e-4bf0-9f54-41d51cd9d4aa/download/picofinanceoperate-22052026.csv")
 SNAPSHOT_VINTAGE = "2026-05-22"  # from the resource filename (DDMMYYYY)
+
+# Content-freshness provenance, kept SEPARATE from SNAPSHOT_VINTAGE (which anchors the deterministic
+# licence-momentum window to the resource FILENAME and must stay byte-stable). The FPO CKAN resource is
+# refreshed IN PLACE — same download filename (…-22052026.csv), a moving last_modified — and IS reachable
+# from a cloud/CI IP (catalog.fpo.go.th package_show → HTTP 200; NOT Thai-IP-gated). A fresh CI re-pull on
+# the date below reproduced this builder's committed output BYTE-EXACT, so the registry CONTENT is confirmed
+# unchanged since the committed snapshot even though the filename-derived vintage reads older. Pinned
+# constants (never wall-clock) so --check stays byte-stable; bump them only when a re-pull actually drifts.
+CONTENT_LAST_MODIFIED = "2026-06-22"  # FPO CKAN resource last_modified / package metadata_modified
+CONTENT_VERIFIED_CI = "2026-08-29"    # date a CI re-pull reproduced the committed output byte-exact
 
 COL_TYPE = "ประเภทสำนักงาน"        # office type: สำนักงานใหญ่ (head) / สำนักสาขา (branch)
 COL_PROV = "จังหวัดที่ให้บริการ"    # province of service
@@ -147,6 +160,18 @@ def build():
         "provenance": "measured (government licence registry, tallied by the registry's own province field)",
         "source_url": SNAPSHOT_URL,
         "vintage": SNAPSHOT_VINTAGE,
+        "content_verified": {
+            "resource_last_modified": CONTENT_LAST_MODIFIED,
+            "reverified_byte_exact_from_ci": CONTENT_VERIFIED_CI,
+            "note": ("The FPO CKAN resource is refreshed IN PLACE — its download filename "
+                     "(picofinanceoperate-22052026.csv) lags its content — and catalog.fpo.go.th is "
+                     "reachable from a cloud/CI IP (NOT Thai-IP-gated). A fresh CI re-pull on %s "
+                     "reproduced this layer BYTE-EXACT, so the registry content is confirmed current "
+                     "as of the %s re-publish; the filename-derived 'vintage' (%s) understates how "
+                     "fresh the data is. SNAPSHOT_VINTAGE stays filename-anchored to keep the "
+                     "licence-momentum cutoff deterministic and byte-stable."
+                     % (CONTENT_VERIFIED_CI, CONTENT_LAST_MODIFIED, SNAPSHOT_VINTAGE)),
+        },
         "n_operators": n_total,
         "n_head_office": n_head,
         "n_branch_office": n_branch,
