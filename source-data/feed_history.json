@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 595,
+  "n_points": 598,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -498,7 +498,7 @@
     137.0,
     128.0,
     128.0,
-    127.0
+    132.0
    ]
   },
   "fuel_diesel": {
@@ -954,7 +954,7 @@
     14.0,
     11.0,
     22.0,
-    22.0
+    30.0
    ]
   },
   "rain_max_mm": {
@@ -1037,7 +1037,7 @@
     160.0,
     143.0,
     199.0,
-    200.5
+    204.2
    ]
   },
   "rival_ads_live": {
@@ -1097,11 +1097,12 @@
     "2026-08-24",
     "2026-08-25",
     "2026-08-26",
-    "2026-08-28"
+    "2026-08-28",
+    "2026-08-29"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC · live promo/news items",
-   "n": 18,
+   "n": 19,
    "path": "source-data/rival_promos.json",
    "source": "muangthaicap.com (own-site pull)",
    "unit": "items",
@@ -1111,6 +1112,7 @@
     13.0,
     13.0,
     13.0,
+    11.0,
     11.0,
     11.0,
     11.0,
@@ -1146,15 +1148,17 @@
     "2026-08-24",
     "2026-08-25",
     "2026-08-26",
-    "2026-08-28"
+    "2026-08-28",
+    "2026-08-29"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD · live promo/news items",
-   "n": 18,
+   "n": 19,
    "path": "source-data/rival_promos.json",
    "source": "sawad.co.th (own-site pull)",
    "unit": "items",
    "values": [
+    5.0,
     5.0,
     5.0,
     5.0,
@@ -1195,15 +1199,17 @@
     "2026-08-24",
     "2026-08-25",
     "2026-08-26",
-    "2026-08-28"
+    "2026-08-28",
+    "2026-08-29"
    ],
    "first_seen": "2026-07-19",
    "label": "TIDLOR · live promo/news items",
-   "n": 18,
+   "n": 19,
    "path": "source-data/rival_promos.json",
    "source": "tidlor.com (own-site pull)",
    "unit": "items",
    "values": [
+    6.0,
     6.0,
     6.0,
     6.0,
@@ -1574,7 +1580,7 @@
     12527.0,
     12611.0,
     12716.0,
-    12764.0
+    12769.0
    ]
   }
  }
