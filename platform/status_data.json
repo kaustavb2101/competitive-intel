@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-29T05:22:48+07:00",
-    "commit": "a4cedfa"
+    "generated_at": "2026-08-29T11:21:42+07:00",
+    "commit": "17506c2"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,78 @@
   ],
   "activity": [
     {
+      "date": "2026-08-29T11:21:42+07:00",
+      "sha": "17506c2",
+      "summary": "intel(#acq): peer scoreboard gains share-price risk (β) — the SET beta already pulled but dropped by the build (#692)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-29T03:54:17+00:00",
+      "sha": "d76d6b1",
+      "summary": "data: live fuel prices (2026-08-29, run 33232448890)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-29T03:13:42+00:00",
+      "sha": "7d6c2e1",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-29, run 33230786455)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-29T02:54:58+00:00",
+      "sha": "9905692",
+      "summary": "data: NABC live prices (2026-08-29, run 33229890939)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-29T02:23:06+00:00",
+      "sha": "0c3abf4",
+      "summary": "docs: log ux-loop WHCM forced-colors merge+deploy+verify (PR #688)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-29T09:21:23+07:00",
+      "sha": "0c2e91d",
+      "summary": "ux: WHCM forced-colors opt-out for rayong-catchment legend swatches (#688)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-29T02:03:03+00:00",
+      "sha": "23a61c7",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33223777745) (#686)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-29T01:40:28+00:00",
+      "sha": "351b836",
+      "summary": "data: market-pulse swarm refresh (run 33210524696) (#683)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-29T00:55:30+00:00",
+      "sha": "a37b2c1",
+      "summary": "data: SET listed-peer scoreboard refresh (run 33212145756) (#684)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-29T00:31:14+00:00",
+      "sha": "aa69fb6",
+      "summary": "data(#acq): record PICO census confirmed-current + fix its CI-refresh provenance",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-29T00:03:09+00:00",
+      "sha": "8b6b56e",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-29, run 33222254012)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-28T22:24:49+00:00",
+      "sha": "f0dc986",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after peer earnings watch ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-29T05:22:48+07:00",
       "sha": "a4cedfa",
       "summary": "intel(#acq): peer earnings watch — surface the SET OppDay corpus (latest call per listed rival) (#685)",
@@ -639,78 +711,6 @@
       "sha": "995a58c",
       "summary": "ux: prefers-contrast:more support on branch-explorer.html (closes deck.gl series) (#675)",
       "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-28T07:41:34+00:00",
-      "sha": "8dd4c5b",
-      "summary": "data: rival Facebook promo feed refresh (run 33146274278) (#673)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-28T07:21:12+00:00",
-      "sha": "f98f4fd",
-      "summary": "data: Thai-IP-only swarm refresh (run 33139328211) (#670)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-28T06:43:18+00:00",
-      "sha": "c20dddd",
-      "summary": "feat(#map): compound agri-risk stack lens on the National map (#674)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-28T05:30:12+00:00",
-      "sha": "d8a4992",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-28, run 33144872404)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-28T04:28:45+00:00",
-      "sha": "3ae4e47",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-28T04:27:56+00:00",
-      "sha": "b313320",
-      "summary": "data: NABC live prices (2026-08-28, run 33141625187)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-28T04:22:49+00:00",
-      "sha": "26048c0",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (022d5c7) after peer coverage×valuation join",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-28T11:22:22+07:00",
-      "sha": "022d5c7",
-      "summary": "feat(#acq): read ECL coverage against valuation — the market pays up for conservative provisioning (#671)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-28T02:55:29+00:00",
-      "sha": "e6679ac",
-      "summary": "data: market-pulse swarm refresh (run 33130119280) (#668)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-28T02:16:47+00:00",
-      "sha": "16a083d",
-      "summary": "docs: log UX loop run (PR #669, province.html prefers-contrast:more) + deploy-verify result",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-28T09:12:01+07:00",
-      "sha": "2b516f9",
-      "summary": "ux: province.html prefers-contrast:more support (deck.gl slice 2/3) (#669)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-28T00:41:05+00:00",
-      "sha": "408f5fb",
-      "summary": "feat(#exposure): compound agri-risk stack — where the three MEASURED agri lenses overlap (#667)",
-      "pillar": "service"
     }
   ]
 }
