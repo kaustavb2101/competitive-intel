@@ -48,6 +48,18 @@
 :root{--ink:#070a11;--panel:#0e131f;--line:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;--gold:#E0A93B;--accent:#5B7CFA;--agri:#E0574F;--merch:#23A28F;color-scheme:dark}
 html[data-theme="light"]{color-scheme:light}/* native scrollbars/selects/controls/overscroll track the app theme (mirrors styles.css; this page doesn't load it) */
 @media(prefers-contrast:more){:root{--dim:#BFC8D8;--mid:#CAD2E0;--line:#4A5878}html[data-theme="light"]{--dim:#3C4557;--mid:#3A445C}}/* honour OS "increase contrast": lift muted microcopy + hairline toward text (dark), darken un-overridden light-default muted text; inactive by default so render is byte-identical (mirrors styles.css ux-prefers-contrast-more) */
+/* Windows High Contrast Mode / forced-colors: the OS overrides every author background-fill with a
+   system colour, so the legend swatches + proportion-bar fills — whose ONLY encoding is that fill (each
+   .sw matches its POI category / building-landmark colour, the .bl-bar is the low→tall height gradient,
+   each .bar i is the occupation-mix proportion colour) — collapse to uniform system-coloured blocks and
+   the legends stop mapping to the scene. `forced-color-adjust:none` opts these NON-TEXT marks back to
+   their author colours so the colour-coding survives WHCM. Scoped to the swatches/bars ONLY, never the
+   text-bearing rows, so all text keeps the forced high-contrast palette. Mirrors the styles.css +
+   province + rayong-catchment forced-colors block (this page defines its own :root, so that rule can't
+   reach it); inactive unless the OS forces colours → default render byte-identical. */
+@media (forced-colors:active){
+  .sw,.bl-bar,.bar i{forced-color-adjust:none}
+}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink);color:var(--txt)}
 #map{position:fixed;inset:0;top:44px;background:transparent;z-index:1}
