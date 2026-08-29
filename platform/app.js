@@ -4031,6 +4031,7 @@ function drawPeerScore(){
   tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Listed peer</th>`+
     `<th scope="col" title="market capitalisation (SET, price date)">Mkt cap</th>`+
     `<th scope="col" title="year-to-date price change — share-price momentum / investor mindshare">YTD</th>`+
+    `<th scope="col" title="SET share beta — systematic (market-correlated) volatility vs the SET index. >1.0 amplifies market swings (more cyclically exposed); <1.0 is defensive. A market statistic on the rival's equity, not a loan-book fundamental.">β</th>`+
     `<th scope="col" title="return on equity, newest audited full fiscal year (SET quarter code Q9)">ROE</th>`+
     `<th scope="col" title="net profit, newest audited full fiscal year">Net profit/yr</th>`+
     `<th scope="col" title="price / earnings">P/E</th>`+
@@ -4043,13 +4044,14 @@ function drawPeerScore(){
         <td><b>${p.name||p.symbol}</b> <span class="sub mono">${p.symbol}</span>${p.fs_type==='U'?` <span class="sub" style="color:var(--gold)" title="Company-only (unconsolidated) SET filing — not strictly like-for-like with the consolidated (C) peers; flagged, not blended in.">⚠U</span>`:''}</td>
         <td class="mono"><b>฿${p.market_cap_bn}bn</b></td>
         <td class="mono" style="color:${yc(p.ytd_pct)}">${p.ytd_pct>0?'+':''}${p.ytd_pct}%</td>
+        <td class="mono sub">${(typeof p.beta==='number')?p.beta.toFixed(2)+(p.beta>1?` <span style="color:var(--gold)" title="above the market — amplifies cyclical swings">▲</span>`:''):'—'}</td>
         <td class="mono">${roeBar} <b>${p.roe}%</b></td>
         <td class="mono sub">฿${p.net_profit_bn}bn</td>
         <td class="mono sub">${p.pe}</td>
         <td class="mono sub">${(typeof p.pbv==='number')?p.pbv.toFixed(2)+'×'+(p.pbv<1?` <span class="sub" style="color:var(--gold)" title="trading below book value">·bk</span>`:''):'—'}</td>
         <td class="mono sub">${p.div_yield}%</td>
       </tr>`;}).join('')+
-    (tgt?`<tr style="border-top:1px dashed var(--line)"><td></td><td><b style="color:var(--gold)">AutoX target</b> <span class="sub">(unlisted)</span></td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">${tgt}%</b> <span class="sub">ROE goal</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td></tr>`:'');
+    (tgt?`<tr style="border-top:1px dashed var(--line)"><td></td><td><b style="color:var(--gold)">AutoX target</b> <span class="sub">(unlisted)</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">${tgt}%</b> <span class="sub">ROE goal</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td></tr>`:'');
   if(ro){
     const byRoe=peers.filter(p=>typeof p.roe==='number');
     const below=byRoe.filter(p=>p.roe<tgt).map(p=>p.name), above=byRoe.filter(p=>p.roe>=tgt).map(p=>p.name);
@@ -4123,14 +4125,26 @@ function drawPeerScore(){
         }
       }
     }
+    // Share-price risk read (β, MEASURED SET statistic) — which listed rivals the equity market treats as
+    // most cyclically volatile. Objective #2: a high-β rival's equity, and the capital access that rides on
+    // it, tightens fastest in a downturn. Null-guarded; fires only with ≥3 betas so the span is meaningful.
+    const betas=peers.filter(p=>typeof p.beta==='number');
+    let betaLine='';
+    if(betas.length>=3){
+      const hi=betas.slice().sort((a,b)=>b.beta-a.beta)[0];
+      const lo=betas.slice().sort((a,b)=>a.beta-b.beta)[0];
+      const amp=betas.filter(p=>p.beta>1);
+      betaLine=` <b>Share-price risk (β).</b> The equity market treats ${hi.name} as the most cyclically volatile (β ${hi.beta.toFixed(2)}) and ${lo.name} as the most defensive (β ${lo.beta.toFixed(2)}); ${amp.length} of ${betas.length} listed rivals trade above the market (β>1), so their equity — and the capital access that rides on it — swings hardest with the cycle.`;
+    }
     ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
-      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+
+      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+betaLine+
       methodBox(m.roe_caveat||null,
         [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the newest audited full year'}.`,
          '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE target is a stated goal shown only as the reference line.',
          m.roe_caveat||'ROE is each peer’s own SET-reported ratio.',
          m.holdco_caveat||null,
          m.fs_type_caveat||null,
+         m.beta_caveat||null,
          aqNote]);
   }
 }
