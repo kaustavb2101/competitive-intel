@@ -835,15 +835,20 @@ function macxFactor(k){
    {meta:{drivers:{key:{label,yoy_pct,dir,…}},…}, branches:[[[key,score,dir,ctx]…]…], provinces:[…]}
    INDEX-ALIGNED to branches.json. ESTIMATED PROXY over measured inputs: real Pink Sheet price YoY
    (GLOBAL direction proxy) × measured OAE crop shares / rainfall / OSM gold shops, scaled by the
-   ESTIMATED branch segment scores (a/c). Feeds the one-line "What moves this branch" popup read and
-   the Overview province macro watchlist. Fully null-guarded: absent file → both surfaces are omitted. */
-let MSENS=null, msensMeta=null, msensProv=null, msensLoaded=false, msensPromise=null;
+   ESTIMATED branch segment scores (a/c). The app reads `.branches` (the per-branch driver tuples)
+   and `.meta.drivers` (msensPhrase's driver-label / YoY lookup) to feed the one-line "What moves
+   this branch" popup. The `provinces` rollup is NOT read client-side (the Overview
+   province macro-watchlist card grid it once fed was retired 2026-08-01) — but it is STILL emitted
+   because pipeline/build_decision_queue.py consumes it at BUILD time (the exec decision queue's
+   "Tighten new-loan LTV in <province>" macro-headwind row), so do not drop it from the build.
+   Fully null-guarded: absent file → the popup read is omitted. */
+let MSENS=null, msensMeta=null, msensLoaded=false, msensPromise=null;
 function loadMacroSens(){
   if(msensPromise) return msensPromise;
   msensLoaded=true;
   msensPromise=fetch('data/macro_sensitivity.json').then(r=>r.ok?r.json():null)
-    .then(j=>{ if(j){msensMeta=j.meta||null;MSENS=j.branches||null;msensProv=j.provinces||null;} return MSENS; })
-    .catch(()=>{ MSENS=null; msensMeta=null; msensProv=null; return null; });
+    .then(j=>{ if(j){msensMeta=j.meta||null;MSENS=j.branches||null;} return MSENS; })
+    .catch(()=>{ MSENS=null; msensMeta=null; return null; });
   return msensPromise;
 }
 // per-branch top-2 driver record — null when the file/entry is absent (no fabrication).
