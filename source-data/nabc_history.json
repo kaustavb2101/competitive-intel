@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_nabc_history.py",
   "source": "NABC Agricultural Data Service (agriapi.nabc.go.th) — the same daily-price endpoint pull_nabc_prices.py reads; this keeps the time and province dimensions that one discards.",
   "label": "MEASURED — no modelling, no interpolation. Monthly values are the plain mean of that month's quotes for the category's most-quoted product; months with fewer than 3 quotes are omitted rather than drawn from a thin sample.",
-  "pulled": "2026-08-23",
+  "pulled": "2026-08-29",
   "recent_window_days": 90,
   "province_note": "Province means cover the last 90 days of quotes, anchored on each category's own newest quote date — NOT on the wall clock, so the output is byte-reproducible. A province appears only where a market in it actually quotes the product; absence is silence, not zero.",
   "coverage_note": "History depth is bounded by how far back the API pages (~3000 records per category), so a heavily-quoted commodity reaches back fewer months than a thinly-quoted one. n_months and first_month state the real span per category instead of implying a uniform window.",
@@ -31,8 +31,8 @@
    "first_month": "2025-01",
    "last_month": "2026-08",
    "n_months": 20,
-   "n_quotes": 727,
-   "latest_date": "2026-08-20",
+   "n_quotes": 737,
+   "latest_date": "2026-08-28",
    "monthly": [
     {
      "month": "2025-01",
@@ -106,7 +106,7 @@
     },
     {
      "month": "2026-03",
-     "mean": 132.5,
+     "mean": 132.62,
      "n": 40
     },
     {
@@ -131,20 +131,20 @@
     },
     {
      "month": "2026-08",
-     "mean": 143.0,
-     "n": 25
+     "mean": 143.14,
+     "n": 35
     }
    ],
    "provinces": [
     {
      "province": "ฉะเชิงเทรา",
-     "mean": 135.09,
-     "n": 55
+     "mean": 137.04,
+     "n": 54
     },
     {
      "province": "สมุทรสาคร",
-     "mean": 128.02,
-     "n": 58
+     "mean": 130.0,
+     "n": 59
     }
    ],
    "n_provinces": 2,
@@ -156,8 +156,8 @@
    "first_month": "2025-01",
    "last_month": "2026-08",
    "n_months": 20,
-   "n_quotes": 2339,
-   "latest_date": "2026-08-20",
+   "n_quotes": 2375,
+   "latest_date": "2026-08-28",
    "monthly": [
     {
      "month": "2025-01",
@@ -211,70 +211,70 @@
     },
     {
      "month": "2025-11",
-     "mean": 14942.09,
+     "mean": 14939.01,
      "n": 120
     },
     {
      "month": "2025-12",
-     "mean": 16157.37,
+     "mean": 16165.26,
      "n": 114
     },
     {
      "month": "2026-01",
-     "mean": 16423.33,
+     "mean": 16395.83,
      "n": 120
     },
     {
      "month": "2026-02",
-     "mean": 16463.43,
+     "mean": 16489.27,
      "n": 120
     },
     {
      "month": "2026-03",
-     "mean": 16769.3,
+     "mean": 16783.59,
      "n": 126
     },
     {
      "month": "2026-04",
-     "mean": 17014.98,
+     "mean": 17031.8,
      "n": 108
     },
     {
      "month": "2026-05",
-     "mean": 17429.65,
+     "mean": 17433.36,
      "n": 113
     },
     {
      "month": "2026-06",
-     "mean": 17690.25,
+     "mean": 17690.0,
      "n": 120
     },
     {
      "month": "2026-07",
-     "mean": 17669.75,
+     "mean": 17712.5,
      "n": 120
     },
     {
      "month": "2026-08",
-     "mean": 17815.26,
-     "n": 78
+     "mean": 17763.33,
+     "n": 114
     }
    ],
    "provinces": [
     {
      "province": "อำนาจเจริญ",
-     "mean": 18830.0,
-     "n": 58
+     "mean": 18751.19,
+     "n": 59
     },
     {
      "province": "ขอนแก่น",
-     "mean": 18596.49,
-     "n": 57
+     "mean": 18627.12,
+     "n": 59
     },
     {
      "province": "บุรีรัมย์",
-     "mean": 18317.54,
-     "n": 57
+     "mean": 18306.78,
+     "n": 59
     },
     {
      "province": "ร้อยเอ็ด",
@@ -283,13 +283,13 @@
     },
     {
      "province": "ศรีสะเกษ",
-     "mean": 17145.76,
+     "mean": 17328.81,
      "n": 59
     },
     {
      "province": "ยโสธร",
-     "mean": 15400.0,
-     "n": 59
+     "mean": 15358.33,
+     "n": 60
     }
    ],
    "n_provinces": 6,
@@ -301,8 +301,8 @@
    "first_month": "2025-01",
    "last_month": "2026-08",
    "n_months": 20,
-   "n_quotes": 1815,
-   "latest_date": "2026-08-20",
+   "n_quotes": 1834,
+   "latest_date": "2026-08-28",
    "monthly": [
     {
      "month": "2025-01",
@@ -351,23 +351,23 @@
     },
     {
      "month": "2025-10",
-     "mean": 8.45,
-     "n": 104
+     "mean": 8.46,
+     "n": 105
     },
     {
      "month": "2025-11",
-     "mean": 8.77,
-     "n": 100
+     "mean": 8.78,
+     "n": 101
     },
     {
      "month": "2025-12",
      "mean": 8.76,
-     "n": 93
+     "n": 92
     },
     {
      "month": "2026-01",
-     "mean": 8.81,
-     "n": 100
+     "mean": 8.83,
+     "n": 101
     },
     {
      "month": "2026-02",
@@ -376,60 +376,60 @@
     },
     {
      "month": "2026-03",
-     "mean": 9.11,
+     "mean": 9.1,
      "n": 91
     },
     {
      "month": "2026-04",
-     "mean": 9.52,
+     "mean": 9.53,
      "n": 90
     },
     {
      "month": "2026-05",
-     "mean": 10.61,
-     "n": 94
+     "mean": 10.63,
+     "n": 93
     },
     {
      "month": "2026-06",
-     "mean": 10.96,
+     "mean": 10.95,
      "n": 90
     },
     {
      "month": "2026-07",
-     "mean": 10.77,
+     "mean": 10.73,
      "n": 71
     },
     {
      "month": "2026-08",
-     "mean": 9.87,
-     "n": 32
+     "mean": 9.76,
+     "n": 50
     }
    ],
    "provinces": [
     {
-     "province": "พระนครศรีอยุธยา",
+     "province": "นครราชสีมา",
      "mean": 11.68,
-     "n": 48
+     "n": 24
     },
     {
-     "province": "นครราชสีมา",
-     "mean": 11.65,
-     "n": 31
+     "province": "พระนครศรีอยุธยา",
+     "mean": 11.32,
+     "n": 49
     },
     {
      "province": "เพชรบูรณ์",
      "mean": 11.25,
-     "n": 24
-    },
-    {
-     "province": "แพร่",
-     "mean": 10.02,
-     "n": 57
+     "n": 18
     },
     {
      "province": "น่าน",
      "mean": 10.0,
-     "n": 58
+     "n": 60
+    },
+    {
+     "province": "แพร่",
+     "mean": 9.96,
+     "n": 60
     }
    ],
    "n_provinces": 5,
@@ -441,8 +441,8 @@
    "first_month": "2025-01",
    "last_month": "2026-08",
    "n_months": 20,
-   "n_quotes": 2099,
-   "latest_date": "2026-08-20",
+   "n_quotes": 2135,
+   "latest_date": "2026-08-28",
    "monthly": [
     {
      "month": "2025-01",
@@ -496,7 +496,7 @@
     },
     {
      "month": "2025-11",
-     "mean": 7.12,
+     "mean": 7.13,
      "n": 20
     },
     {
@@ -511,22 +511,22 @@
     },
     {
      "month": "2026-02",
-     "mean": 6.84,
+     "mean": 6.83,
      "n": 111
     },
     {
      "month": "2026-03",
-     "mean": 7.22,
+     "mean": 7.21,
      "n": 124
     },
     {
      "month": "2026-04",
-     "mean": 7.24,
+     "mean": 7.25,
      "n": 99
     },
     {
      "month": "2026-05",
-     "mean": 7.21,
+     "mean": 7.2,
      "n": 104
     },
     {
@@ -536,35 +536,35 @@
     },
     {
      "month": "2026-07",
-     "mean": 8.3,
+     "mean": 8.29,
      "n": 119
     },
     {
      "month": "2026-08",
-     "mean": 8.55,
-     "n": 68
+     "mean": 8.51,
+     "n": 104
     }
    ],
    "provinces": [
     {
      "province": "กระบี่",
-     "mean": 8.34,
+     "mean": 8.46,
      "n": 111
     },
     {
      "province": "สุราษฎร์ธานี",
-     "mean": 8.16,
+     "mean": 8.24,
      "n": 59
     },
     {
      "province": "ชุมพร",
-     "mean": 7.86,
-     "n": 104
+     "mean": 7.96,
+     "n": 107
     },
     {
      "province": "ชลบุรี",
-     "mean": 7.66,
-     "n": 56
+     "mean": 7.82,
+     "n": 59
     }
    ],
    "n_provinces": 4,
@@ -576,8 +576,8 @@
    "first_month": "2025-01",
    "last_month": "2026-08",
    "n_months": 20,
-   "n_quotes": 391,
-   "latest_date": "2026-08-20",
+   "n_quotes": 397,
+   "latest_date": "2026-08-28",
    "monthly": [
     {
      "month": "2025-01",
@@ -676,15 +676,15 @@
     },
     {
      "month": "2026-08",
-     "mean": 129.23,
-     "n": 13
+     "mean": 146.32,
+     "n": 19
     }
    ],
    "provinces": [
     {
      "province": "เพชรบุรี",
-     "mean": 106.9,
-     "n": 58
+     "mean": 111.86,
+     "n": 59
     }
    ],
    "n_provinces": 1,
@@ -696,13 +696,13 @@
    "first_month": "2025-03",
    "last_month": "2026-08",
    "n_months": 18,
-   "n_quotes": 1672,
-   "latest_date": "2026-08-20",
+   "n_quotes": 1663,
+   "latest_date": "2026-08-28",
    "monthly": [
     {
      "month": "2025-03",
-     "mean": 2343.48,
-     "n": 69
+     "mean": 2336.84,
+     "n": 38
     },
     {
      "month": "2025-04",
@@ -741,75 +741,75 @@
     },
     {
      "month": "2025-11",
-     "mean": 1866.67,
-     "n": 102
+     "mean": 1864.0,
+     "n": 100
     },
     {
      "month": "2025-12",
-     "mean": 1643.55,
-     "n": 62
+     "mean": 1636.07,
+     "n": 61
     },
     {
      "month": "2026-01",
-     "mean": 1317.0,
+     "mean": 1316.0,
      "n": 100
     },
     {
      "month": "2026-02",
-     "mean": 1214.74,
-     "n": 95
+     "mean": 1210.64,
+     "n": 94
     },
     {
      "month": "2026-03",
-     "mean": 990.69,
-     "n": 102
+     "mean": 989.15,
+     "n": 106
     },
     {
      "month": "2026-04",
-     "mean": 830.0,
-     "n": 90
+     "mean": 825.58,
+     "n": 86
     },
     {
      "month": "2026-05",
-     "mean": 851.61,
-     "n": 93
+     "mean": 850.0,
+     "n": 94
     },
     {
      "month": "2026-06",
-     "mean": 604.76,
-     "n": 105
+     "mean": 606.57,
+     "n": 99
     },
     {
      "month": "2026-07",
-     "mean": 552.48,
-     "n": 101
+     "mean": 550.98,
+     "n": 102
     },
     {
      "month": "2026-08",
-     "mean": 606.15,
-     "n": 65
+     "mean": 596.84,
+     "n": 95
     }
    ],
    "provinces": [
     {
      "province": "สมุทรสงคราม",
-     "mean": 672.13,
-     "n": 61
+     "mean": 642.37,
+     "n": 59
     },
     {
      "province": "ประจวบคีรีขันธ์",
-     "mean": 637.29,
-     "n": 118
+     "mean": 624.36,
+     "n": 117
     },
     {
      "province": "ชุมพร",
-     "mean": 627.12,
-     "n": 59
+     "mean": 615.0,
+     "n": 60
     },
     {
      "province": "สุราษฏร์ธานี",
-     "mean": 435.59,
-     "n": 59
+     "mean": 418.33,
+     "n": 60
     }
    ],
    "n_provinces": 4,
@@ -821,8 +821,8 @@
    "first_month": "2025-01",
    "last_month": "2026-08",
    "n_months": 20,
-   "n_quotes": 1361,
-   "latest_date": "2026-08-20",
+   "n_quotes": 1376,
+   "latest_date": "2026-08-28",
    "monthly": [
     {
      "month": "2025-01",
@@ -877,69 +877,69 @@
     {
      "month": "2025-11",
      "mean": 2.24,
-     "n": 71
+     "n": 73
     },
     {
      "month": "2025-12",
      "mean": 2.32,
-     "n": 72
+     "n": 66
     },
     {
      "month": "2026-01",
-     "mean": 2.42,
-     "n": 78
+     "mean": 2.43,
+     "n": 80
     },
     {
      "month": "2026-02",
-     "mean": 2.52,
-     "n": 80
+     "mean": 2.51,
+     "n": 78
     },
     {
      "month": "2026-03",
      "mean": 2.66,
-     "n": 84
+     "n": 83
     },
     {
      "month": "2026-04",
      "mean": 2.91,
-     "n": 67
+     "n": 70
     },
     {
      "month": "2026-05",
      "mean": 3.11,
-     "n": 74
+     "n": 75
     },
     {
      "month": "2026-06",
      "mean": 3.36,
-     "n": 61
+     "n": 59
     },
     {
      "month": "2026-07",
      "mean": 3.45,
-     "n": 57
+     "n": 58
     },
     {
      "month": "2026-08",
-     "mean": 3.75,
-     "n": 39
+     "mean": 3.81,
+     "n": 56
     }
    ],
    "provinces": [
     {
      "province": "นครราชสีมา",
-     "mean": 3.63,
-     "n": 114
+     "mean": 3.7,
+     "n": 116
     },
     {
      "province": "ชลบุรี",
-     "mean": 3.53,
-     "n": 18
+     "mean": 3.65,
+     "n": 19
     },
     {
      "province": "กำแพงเพชร",
-     "mean": 2.99,
-     "n": 44
+     "mean": 2.97,
+     "n": 38
     }
    ],
    "n_provinces": 3,
@@ -951,8 +951,8 @@
    "first_month": "2025-01",
    "last_month": "2026-08",
    "n_months": 20,
-   "n_quotes": 1297,
-   "latest_date": "2026-08-20",
+   "n_quotes": 1324,
+   "latest_date": "2026-08-28",
    "monthly": [
     {
      "month": "2025-01",
@@ -1001,23 +1001,23 @@
     },
     {
      "month": "2025-10",
-     "mean": 54.88,
-     "n": 71
+     "mean": 54.87,
+     "n": 73
     },
     {
      "month": "2025-11",
-     "mean": 56.08,
-     "n": 63
-    },
-    {
-     "month": "2025-12",
-     "mean": 55.38,
+     "mean": 56.02,
      "n": 66
     },
     {
+     "month": "2025-12",
+     "mean": 55.39,
+     "n": 67
+    },
+    {
      "month": "2026-01",
-     "mean": 56.74,
-     "n": 78
+     "mean": 56.75,
+     "n": 82
     },
     {
      "month": "2026-02",
@@ -1026,12 +1026,12 @@
     },
     {
      "month": "2026-03",
-     "mean": 68.17,
+     "mean": 68.11,
      "n": 64
     },
     {
      "month": "2026-04",
-     "mean": 74.8,
+     "mean": 74.94,
      "n": 37
     },
     {
@@ -1046,19 +1046,19 @@
     },
     {
      "month": "2026-07",
-     "mean": 84.52,
-     "n": 58
+     "mean": 84.47,
+     "n": 56
     },
     {
      "month": "2026-08",
-     "mean": 81.51,
-     "n": 48
+     "mean": 81.23,
+     "n": 67
     }
    ],
    "provinces": [
     {
      "province": "ระยอง",
-     "mean": 87.6,
+     "mean": 87.4,
      "n": 26
     },
     {
@@ -1068,18 +1068,18 @@
     },
     {
      "province": "นครศรีธรรมราช",
-     "mean": 84.94,
+     "mean": 84.68,
      "n": 22
     },
     {
      "province": "สงขลา",
-     "mean": 83.92,
-     "n": 17
+     "mean": 83.55,
+     "n": 20
     },
     {
      "province": "สุราษฎร์ธานี",
-     "mean": 82.36,
-     "n": 92
+     "mean": 82.24,
+     "n": 97
     }
    ],
    "n_provinces": 5,
@@ -1251,8 +1251,8 @@
    "first_month": "2025-01",
    "last_month": "2026-08",
    "n_months": 20,
-   "n_quotes": 609,
-   "latest_date": "2026-08-20",
+   "n_quotes": 627,
+   "latest_date": "2026-08-28",
    "monthly": [
     {
      "month": "2025-01",
@@ -1336,7 +1336,7 @@
     },
     {
      "month": "2026-05",
-     "mean": 61.15,
+     "mean": 61.22,
      "n": 56
     },
     {
@@ -1346,29 +1346,29 @@
     },
     {
      "month": "2026-07",
-     "mean": 66.77,
+     "mean": 66.91,
      "n": 56
     },
     {
      "month": "2026-08",
-     "mean": 70.33,
-     "n": 39
+     "mean": 71.18,
+     "n": 57
     }
    ],
    "provinces": [
     {
      "province": "ชลบุรี",
-     "mean": 71.15,
-     "n": 54
+     "mean": 72.32,
+     "n": 56
     },
     {
      "province": "ฉะเชิงเทรา",
-     "mean": 65.28,
-     "n": 54
+     "mean": 67.06,
+     "n": 56
     },
     {
      "province": "นครปฐม",
-     "mean": 62.12,
+     "mean": 63.29,
      "n": 58
     }
    ],
@@ -1381,8 +1381,8 @@
    "first_month": "2025-01",
    "last_month": "2026-08",
    "n_months": 20,
-   "n_quotes": 767,
-   "latest_date": "2026-08-20",
+   "n_quotes": 779,
+   "latest_date": "2026-08-28",
    "monthly": [
     {
      "month": "2025-01",
@@ -1456,7 +1456,7 @@
     },
     {
      "month": "2026-03",
-     "mean": 43.86,
+     "mean": 43.98,
      "n": 42
     },
     {
@@ -1471,7 +1471,7 @@
     },
     {
      "month": "2026-06",
-     "mean": 39.4,
+     "mean": 39.35,
      "n": 40
     },
     {
@@ -1481,20 +1481,20 @@
     },
     {
      "month": "2026-08",
-     "mean": 43.0,
-     "n": 26
+     "mean": 43.05,
+     "n": 38
     }
    ],
    "provinces": [
     {
      "province": "นครปฐม",
-     "mean": 41.76,
-     "n": 58
+     "mean": 42.38,
+     "n": 60
     },
     {
      "province": "ชลบุรี",
-     "mean": 40.0,
-     "n": 54
+     "mean": 40.04,
+     "n": 55
     }
    ],
    "n_provinces": 2,
@@ -1506,8 +1506,8 @@
    "first_month": "2025-01",
    "last_month": "2026-08",
    "n_months": 20,
-   "n_quotes": 781,
-   "latest_date": "2026-08-20",
+   "n_quotes": 793,
+   "latest_date": "2026-08-28",
    "monthly": [
     {
      "month": "2025-01",
@@ -1606,20 +1606,20 @@
     },
     {
      "month": "2026-08",
-     "mean": 346.15,
-     "n": 26
+     "mean": 350.53,
+     "n": 38
     }
    ],
    "provinces": [
     {
      "province": "ฉะเชิงเทรา",
-     "mean": 373.1,
-     "n": 58
+     "mean": 376.95,
+     "n": 59
     },
     {
      "province": "สุพรรณบุรี",
-     "mean": 294.14,
-     "n": 58
+     "mean": 296.27,
+     "n": 59
     }
    ],
    "n_provinces": 2,
