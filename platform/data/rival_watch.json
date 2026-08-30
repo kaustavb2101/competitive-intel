@@ -85,11 +85,11 @@
    }
   },
   "label": "MIXED, labelled per section. promos.new and ads.appeared are MEASURED from real per-item/per-creative first_seen/first_shown dates already in the source files. promos.disappeared, ads.disappeared and search_demand movement are all empty by design — none of this pipeline's inputs currently carry the second data point (last_seen, per-creative last_shown, or a prior share-of-search vintage) that an honest 'disappeared' or 'movement' figure requires.",
-  "newest_observation_date": "2026-08-29",
+  "newest_observation_date": "2026-08-30",
   "title": "Rival watch — what changed in the rival field since last time (obj #2)"
  },
  "promos": {
-  "as_of": "2026-08-29",
+  "as_of": "2026-08-30",
   "disappeared": [
    {
     "brand": "MTC",
