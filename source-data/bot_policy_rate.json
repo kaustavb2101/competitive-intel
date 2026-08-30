@@ -5,19 +5,19 @@
     "label": "MEASURED — Bank of Thailand (ธปท.), MPC (กนง.) decision history, republished as an XLSX after every meeting on BOT's own monetary-policy microsite. Supersedes the BOTWEBSTAT report table (reportID=223, FM_RT_001_S2), which is stuck at July 2025 (verified stale 2026-08-02) and not used here.",
     "source": "ธนาคารแห่งประเทศไทย (ธปท.) — ข้อมูลอัตราดอกเบี้ยนโยบายและผลการตัดสินนโยบายการเงินที่ผ่านมา",
     "source_page_url": "https://www.bot.or.th/th/our-roles/monetary-policy/mpc-publication/policy-interest-rate.html",
-    "source_file_url": "https://www.bot.or.th/content/dam/bot/documents/th/our-roles/monetary-policy/mpc-publication/policy-interest-rate/table-mpc-2569-3-NVHKxr00.xlsx",
+    "source_file_url": "https://www.bot.or.th/content/dam/bot/documents/th/our-roles/monetary-policy/mpc-publication/policy-interest-rate/table-mpc-2569-4-KsecaE98.xlsx",
     "definition": "The 1-day bilateral repurchase rate (อัตราดอกเบี้ยธุรกรรมซื้อคืนพันธบัตรแบบทวิภาคีระยะ 1 วัน) is BOT's policy rate since 17 Jan 2007; the 14-day repo rate was used from 23 May 2000 to 16 Jan 2007.",
-    "pulled": "2026-08-16",
-    "n_meetings": 203,
+    "pulled": "2026-08-30",
+    "n_meetings": 204,
     "period_range": {
       "min": "2000-05-23",
-      "max": "2026-06-24"
+      "max": "2026-08-26"
     },
     "acceptance_test": "4 spot-verified meeting dates (2000-05-23 .. 2026-06-24) checked against fixed anchors on every pull; a mismatch hard-fails rather than silently landing a different reading — see ANCHORS in pull_bot_policy_rate.py."
   },
   "latest": {
-    "meeting": "ครั้งที่ 3/2569",
-    "date": "2026-06-24",
+    "meeting": "ครั้งที่ 4/2569",
+    "date": "2026-08-26",
     "body": "MPC",
     "decision_th": "คง",
     "decision_en": "Hold",
@@ -1643,6 +1643,14 @@
     {
       "meeting": "ครั้งที่ 3/2569",
       "date": "2026-06-24",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.0
+    },
+    {
+      "meeting": "ครั้งที่ 4/2569",
+      "date": "2026-08-26",
       "body": "MPC",
       "decision_th": "คง",
       "decision_en": "Hold",
