@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-08-28",
+  "pulled_at": "2026-08-29",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -428,10 +428,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.77563,
-    "ratings": 1707,
-    "score_current_version": 3.77563,
-    "ratings_current_version": 1707,
+    "score": 3.77466,
+    "ratings": 1713,
+    "score_current_version": 3.77466,
+    "ratings_current_version": 1713,
     "version": "3.2.0",
     "app_updated": "2026-08-13",
     "released": "2020-04-30",
@@ -2312,10 +2312,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.45498,
-    "ratings": 422,
-    "score_current_version": 3.45498,
-    "ratings_current_version": 422,
+    "score": 3.45863,
+    "ratings": 423,
+    "score_current_version": 3.45863,
+    "ratings_current_version": 423,
     "version": "2.7.6",
     "app_updated": "2026-08-19",
     "released": "2017-12-09",
@@ -5711,10 +5711,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.46303,
-    "ratings": 568,
-    "score_current_version": 3.46303,
-    "ratings_current_version": 568,
+    "score": 3.46384,
+    "ratings": 567,
+    "score_current_version": 3.46384,
+    "ratings_current_version": 567,
     "version": "1.0.45",
     "app_updated": "2026-08-17",
     "released": "2024-07-09",
@@ -7445,10 +7445,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.39495,
-    "ratings": 1585,
-    "score_current_version": 3.39495,
-    "ratings_current_version": 1585,
+    "score": 3.39445,
+    "ratings": 1587,
+    "score_current_version": 3.39445,
+    "ratings_current_version": 1587,
     "version": "8.6.0",
     "app_updated": "2026-08-21",
     "released": "2020-03-03",
@@ -10526,16 +10526,34 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.82409,
-    "ratings": 173241,
-    "score_current_version": 4.82409,
-    "ratings_current_version": 173241,
+    "score": 4.82411,
+    "ratings": 173298,
+    "score_current_version": 4.82411,
+    "ratings_current_version": 173298,
     "version": "3.0.6",
     "app_updated": "2026-08-06",
     "released": "2021-04-20",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14482245724",
+     "at": null,
+     "score": 5,
+     "title": "แจ้งเพื่อทราบเพื่อความปลอดภัยของข้าพเจ้า",
+     "content": "เรียน เจ้าหน้าที่ ข้าพเจ้า ฟาเดียร์ บิ่ง ได้ทำการสมัครสินเชื่อ และกรอกข้อมูลส่วนตัวใน แอพลิเคชั่น \"ฟินนิก“เมื่อวันที่ 27 สิงหาคม 2569 และไม่ได้รับการอนุมัติสินเชื่อจากทางแอพลิเคชั่นแล้ว โดยมีชื่อ-นามสกุล เบอร์โทรศัพท์ เลขบัตรประจำตัวประชาชน ด้านหน้า รวมไปถึงชื่อและเลขบัญชีธนาคารกรุงเทพและชื่อ-นามสกุล เบอร์โทรศัพท์ บุคคลอ้างอิง 2 ท่านและการเข้าถึงรายชื่อ ติดต่อในโทรศัพท์ของข้าพเจ้า ทั้งนี้ถ้าหากทาง",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14481426376",
+     "at": null,
+     "score": 5,
+     "title": "โอนไว",
+     "content": "บริการดีมาก การยืนยันตัวต้นรัดกุมมาก มันใจ ปลอดภัย",
+     "version": "3.0.6",
+     "votes": 0
+    },
     {
      "id": "14469555585",
      "at": null,
@@ -15578,16 +15596,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.7042,
-    "ratings": 64066,
-    "score_current_version": 4.7042,
-    "ratings_current_version": 64066,
+    "score": 4.70425,
+    "ratings": 64138,
+    "score_current_version": 4.70425,
+    "ratings_current_version": 64138,
     "version": "7.7.0",
     "app_updated": "2026-08-24",
     "released": "2021-10-10",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14482252023",
+     "at": null,
+     "score": 5,
+     "title": "เพื่อความปลอดภัยและเป็นธรรมของข้าพเจ้า",
+     "content": "เรียน เจ้าหน้าที่ ข้าพเจ้า ฟาเดียร์ บิ่ง ได้ทำการสมัครสินเชื่อ และกรอกข้อมูลส่วนตัวใน แอพลิเคชั่น \"มันนี่ทันเดอร์\"เมื่อวันที่ 27 สิงหาคม 2569 และไม่ได้รับการอนุมัติสินเชื่อจากทางแอพลิเคชั่นแล้ว โดยมีชื่อ-นามสกุล เบอร์โทรศัพท์ เลขบัตรประจำตัวประชาชน ด้านหน้า รวมไปถึงชื่อและเลขบัญชีธนาคารกรุงเทพและชื่อ-นามสกุล เบอร์โทรศัพท์ บุคคลอ้างอิง 2 ท่านและการเข้าถึงรายชื่อ ติดต่อในโทรศัพท์ของข้าพเจ้า ทั้งนี้ถ",
+     "version": "7.7.0",
+     "votes": 0
+    },
     {
      "id": "14477691944",
      "at": null,
@@ -20360,10 +20387,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84391,
-    "ratings": 44332,
-    "score_current_version": 4.84391,
-    "ratings_current_version": 44332,
+    "score": 4.84388,
+    "ratings": 44414,
+    "score_current_version": 4.84388,
+    "ratings_current_version": 44414,
     "version": "3.1.3",
     "app_updated": "2026-08-27",
     "released": "2023-03-06",
@@ -20395,7 +20422,7 @@
      "title": "ดูยากนิดนึง",
      "content": "น่าจะมีให้ตรวจสอบว่าชำระไปเท่าไหร่แล้ว เหลือเท่าไหร่",
      "version": "3.1.1",
-     "votes": 0
+     "votes": 1
     },
     {
      "id": "14461558262",
@@ -25160,10 +25187,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.76998,
-    "ratings": 26915,
-    "score_current_version": 4.76998,
-    "ratings_current_version": 26915,
+    "score": 4.76978,
+    "ratings": 26935,
+    "score_current_version": 4.76978,
+    "ratings_current_version": 26935,
     "version": "1.8.7",
     "app_updated": "2026-08-07",
     "released": "2020-08-05",
@@ -26582,6 +26609,24 @@
      "content": "Superb!!!",
      "version": "1.0.5",
      "votes": 11
+    },
+    {
+     "id": "14480711446",
+     "at": null,
+     "score": 1,
+     "title": "ไม่ผ่านอนุมัติ",
+     "content": "ข้าพเจ้าจะไม่รับผิดชอบเกี่ยวกับเอกสารบัตร ลงท้าย-1600 และเอกสารการประกอบการสมัครทุกฉบับ",
+     "version": "1.8.7",
+     "votes": 0
+    },
+    {
+     "id": "14480192457",
+     "at": null,
+     "score": 5,
+     "title": "ขอบคุณAmoney",
+     "content": "ขอบคุณแอบดีๆ ที่ให้เราเป็นส่วนหนึง",
+     "version": "1.8.7",
+     "votes": 0
     },
     {
      "id": "14468998235",
@@ -29357,16 +29402,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.62547,
-    "ratings": 2112,
-    "score_current_version": 2.62547,
-    "ratings_current_version": 2112,
+    "score": 2.6247,
+    "ratings": 2113,
+    "score_current_version": 2.6247,
+    "ratings_current_version": 2113,
     "version": "3.4.0",
     "app_updated": "2026-08-20",
     "released": "2022-05-11",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14481527890",
+     "at": null,
+     "score": 1,
+     "title": "ยกเลิกสัญญาและไม่มีความเกี่ยวข้อง",
+     "content": "ข้าพเจ้า นางสาวพชรภัทร พันธ์เทียนใจ ได้ทำการสมัครสินเชื่อในแอพ Rabbit Cash ได้ทำการกรอกข้อมูลส่วนตัวในวันที่28 สิงหาคม 2569 และไม่ได้รับการอนุมัติ โดยมีข้อมูล ชื่อ-นามสกุลและเบอร์โทรศัพท์ส่วนตัว เลขบัตรประชาชนหน้าหลัง ทั้งนี้หากแอพ Rabbit Cash นำข้อมูลของข้าพเจ้าไปกระทำใดๆ ที่ผิดกฎหมายหรือคุกคามสิทธิของข้าพเจ้า ข้าพเจ้าจะดำเนินคลีตามกฎหมายและข้าพเจ้าจะไม่รับผิดชอบใดๆทั้งสิ้นในการกระทำและขอให้ลบข้อ",
+     "version": "3.4.0",
+     "votes": 0
+    },
     {
      "id": "14477009577",
      "at": null,
@@ -34130,16 +34184,34 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.55161,
-    "ratings": 2955,
-    "score_current_version": 2.55161,
-    "ratings_current_version": 2955,
+    "score": 2.55243,
+    "ratings": 2956,
+    "score_current_version": 2.55243,
+    "ratings_current_version": 2956,
     "version": "5.65",
     "app_updated": "2026-02-13",
     "released": "2021-08-03",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14482258231",
+     "at": null,
+     "score": 5,
+     "title": "สมัครไม่ผ่าน",
+     "content": "เรียน เจ้าหน้าที่ ข้าพเจ้า ฟาเดียร์ บิ่ง ได้ทำการสมัครสินเชื่อ และกรอกข้อมูลส่วนตัวใน แอพลิเคชั่น \"มันนี่ฮับ“เมื่อวันที่ 27 สิงหาคม 2569 และไม่ได้รับการอนุมัติสินเชื่อจากทางแอพลิเคชั่นแล้ว โดยมีชื่อ-นามสกุล เบอร์โทรศัพท์ เลขบัตรประจำตัวประชาชน ด้านหน้า รวมไปถึงชื่อและเลขบัญชีธนาคารกรุงเทพและชื่อ-นามสกุล เบอร์โทรศัพท์ บุคคลอ้างอิง 2 ท่านและการเข้าถึงรายชื่อ ติดต่อในโทรศัพท์ของข้าพเจ้า ทั้งนี้ถ้าหาก",
+     "version": "5.65",
+     "votes": 0
+    },
+    {
+     "id": "14476507497",
+     "at": null,
+     "score": 1,
+     "title": "ยกเลิกการสมัครทุกกรณี",
+     "content": "ข้าพเจ้าบัตรประชาชนลงท้าย 0429 ขอยกเลิกการสมัครสินเชื่อ มันนี่ฮับทุกกรณี เเละยังไม่ได้รับเงินทุกช่องทาง ห้ามนำข้อมูลส่วนตัวของข้าพเจ้า ไม่ว่าจะเป็นบัตรประชาชนทั้งด้านหน้าเเละด้านหลัง รูปภาพคู่กับบัตรประชาชน ข้อมูลส่วนตัวทุกๆข้อมูลห้ามนำไปเผยแพร่ หากนำไปใช้โดยที่ข้าพเจ้าไม่ยินยอม จะดำเนินคดีตามกฎหมาย อย่างถึงที่สุด เเละไม่มีการยอมความใดใดทัังสิ้น (หลอกเอาข้อมูลไปเเล้วไม่อนุมัติ)",
+     "version": "5.65",
+     "votes": 0
+    },
     {
      "id": "14468947873",
      "at": null,
