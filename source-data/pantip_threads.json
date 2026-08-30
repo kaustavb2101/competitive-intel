@@ -37946,7 +37946,7 @@
    "_CATEGORY"
   ],
   "coverage": "SEARCH IS CAPPED AT 10 THREADS PER TERM by Pantip itself — ?page=2+ repeats page 1 with last_page:true and the POST search API refuses limit>10. The reported totals in meta.reported_totals are what Pantip CLAIMS exists, not what is retrievable. Coverage widens only by adding query terms and by re-running as relevance ordering drifts, never by paging.",
-  "generated": "2026-08-29T21:50:17Z",
+  "generated": "2026-08-30T21:59:18Z",
   "measured": "Thread and comment COUNTS and TEXT are measured — read verbatim from Pantip.",
   "n_comments": 3808,
   "n_threads": 237,
