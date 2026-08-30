@@ -4856,6 +4856,27 @@ FRESHNESS_LAYERS = [
      "generous: a >21-day lag is ~21 missed daily swarm days, well past any quota cluster — an unambiguous "
      "'the YouTube pull is dead (revoked key / removed channel / script break)' signal, not a slow-upload "
      "week (the .pulled stamp is the PULL date, not an upload date, so an upload-free week still advances it)"),
+    ("data/social_themes.json", "as_of", 28,
+     "Say/hear reception board (the voice-of-customer synthesis on the Competition #acq tab — MEASURED "
+     "app-review + forum document counts read against the lenders' own promo messaging on one axis; obj#2) "
+     "— live-fetch()'d by the #acq say/hear render and preloaded in its Promise.all, refreshed by the "
+     "WEEKLY data-social-listening.yml cron (Tuesdays). Its two demand legs that ALWAYS run from any CI "
+     "runner are the any-IP, no-key Google Play (pull_app_reviews.py) + Apple RSS (pull_apple_reviews.py) "
+     "pulls, so unlike the Thai-IP-only legs this feed refreshes with no secret and no Thai network. "
+     "build_social_themes.py stamps meta.as_of as the NEWEST document (review) date IN THE DATA across the "
+     "~16 title-lender apps, never the wall clock, so it advances close to every successful weekly pull "
+     "and freezes the moment the build stops running — it CANNOT self-heal: a broken build leaves a "
+     "structurally valid (shape-probe-green: _shape_social_themes) but frozen theme board shipping forever "
+     "with no phone alert (the exact blind spot this list closes; SHAPE cannot see a stale-but-valid "
+     "vintage). TTL is generous because as_of is a document date, not a pull date: a >28-day lag is ~4 "
+     "missed Tuesday runs AND not one new review across any of the ~16 apps for a month — an unambiguous "
+     "'the social-listening cron stuck' signal, not a quiet-review week. DELIBERATELY EXCLUDED here, by "
+     "contrast, are this feed's two siblings on the SAME cron whose vintages ride Thai-IP-only pulls and "
+     "would false-alarm from CI: rival_pulse.json (its sentiment_anchor rides the same any-IP reviews, but "
+     "its promos_pulled_at leg is pull_rival_promos.py — THAI-IP-only, kept off this cron, the committed "
+     "promo snapshot reused as-is), and pantip_panel.json (.pulled rides pull_pantip.py, which exits 3 and "
+     "writes nothing from a datacenter IP) — only the app-review-anchored social_themes.as_of is a clean "
+     "CI-refreshed vintage, so only it is probed"),
 ]
 
 
