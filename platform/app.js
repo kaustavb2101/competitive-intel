@@ -13528,6 +13528,7 @@ function renderAssistBranchLens(){
     const top=ranked.slice(0,20);
     const topMeas=top.filter(b=>b.n_farm!=null);
     const topAcc=topMeas.reduce((a,b)=>a+(b.n_farm||0),0);
+    const topBook=topMeas.reduce((a,b)=>a+(b.os_farm_thb||0),0);
     const gaps=j.provinces.filter(p=>!(p.branches||[]).length);
 
     const rows=top.map(b=>`<tr>
@@ -13538,10 +13539,13 @@ function renderAssistBranchLens(){
         <td class="mono">${b.n_farm==null
             ? '<span class="sub" title="this branch’s farm cell did not clear the tape’s ≥30 floor, so no per-branch count is published — use the province total">—</span>'
             : '<b>'+N(b.n_farm)+'</b>'}</td>
+        <td class="mono">${b.os_farm_thb==null
+            ? '<span class="sub" title="no per-branch farm book is published where the account cell is under the tape’s ≥30 floor — use the province total">—</span>'
+            : '<b>'+aodTHB(b.os_farm_thb)+'</b>'}</td>
         <td class="mono sub">${b.early_pct==null?'—':b.early_pct+'%'}</td>
         <td class="mono sub">${N(b.provCX)}</td></tr>`).join('');
 
-    const lead=`<b style="color:var(--agri)">${N(m.n_branches_ranked)} branches</b> sit inside the ${N(m.n_provinces)} falling-crop provinces. The <b>20 most exposed</b> are below; <b>${N(topMeas.length)}</b> of them publish a farm-account count, <b>${N(topAcc)}</b> accounts between them. Start there — these borrowers are still <b>Current or X-bucket</b>, and the price that hits them is already announced.`;
+    const lead=`<b style="color:var(--agri)">${N(m.n_branches_ranked)} branches</b> sit inside the ${N(m.n_provinces)} falling-crop provinces. The <b>20 most exposed</b> are below; <b>${N(topMeas.length)}</b> of them publish a farm-account count, <b>${N(topAcc)}</b> accounts and <b>${aodTHB(topBook)}</b> of farm book between them. Start there — these borrowers are still <b>Current or X-bucket</b>, and the price that hits them is already announced.`;
 
     host.innerHTML=`<p class="lead" style="margin:0 0 10px">${lead}</p>
       <table class="tbl"><tr>
@@ -13549,6 +13553,7 @@ function renderAssistBranchLens(){
         <th scope="col" title="modelled hectares of the FALLING crop around this branch — the size of the farm economy taking the price cut. ESTIMATED (SPAM), ranks branches against each other">Exposed ha</th>
         <th scope="col" class="sub" title="that as a share of the branch&#39;s catchment cropland — concentration, not size: 48% of seven hectares is not a big exposure">Share of catchment</th>
         <th scope="col" title="MEASURED farm accounts at this branch — shown only where the tape&#39;s own cell cleared the ≥30 floor">Farm accounts here</th>
+        <th scope="col" title="MEASURED outstanding farm book (฿) behind those accounts at this branch — the book actually at stake; shown only where the tape&#39;s own cell cleared the ≥30 floor">Farm book here</th>
         <th scope="col" class="sub" title="X-bucket (pre-30dpd) share at this branch">X %</th>
         <th scope="col" class="sub" title="the whole province&#39;s Current + X farm accounts — the solid number to work">Province Current+X</th></tr>${rows}</table>
       ${gaps.length?`<p class="lead sub" style="margin:10px 0 0"><b>Not rankable:</b> ${gaps.map(p=>`<b>${p.th}</b>`).join(' · ')} — ${gaps[0].coverage_note||''}</p>`:''}
