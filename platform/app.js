@@ -835,8 +835,9 @@ function macxFactor(k){
    {meta:{drivers:{key:{label,yoy_pct,dir,…}},…}, branches:[[[key,score,dir,ctx]…]…], provinces:[…]}
    INDEX-ALIGNED to branches.json. ESTIMATED PROXY over measured inputs: real Pink Sheet price YoY
    (GLOBAL direction proxy) × measured OAE crop shares / rainfall / OSM gold shops, scaled by the
-   ESTIMATED branch segment scores (a/c). The app reads only `.branches`, to feed the one-line
-   "What moves this branch" popup. The `provinces` rollup is NOT read client-side (the Overview
+   ESTIMATED branch segment scores (a/c). The app reads `.branches` (the per-branch driver tuples)
+   and `.meta.drivers` (msensPhrase's driver-label / YoY lookup) to feed the one-line "What moves
+   this branch" popup. The `provinces` rollup is NOT read client-side (the Overview
    province macro-watchlist card grid it once fed was retired 2026-08-01) — but it is STILL emitted
    because pipeline/build_decision_queue.py consumes it at BUILD time (the exec decision queue's
    "Tighten new-loan LTV in <province>" macro-headwind row), so do not drop it from the build.
