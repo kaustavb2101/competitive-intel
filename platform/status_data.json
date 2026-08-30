@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-30T10:34:43+00:00",
-    "commit": "eb8fd64"
+    "generated_at": "2026-08-30T17:02:43+00:00",
+    "commit": "511f644"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,72 @@
   ],
   "activity": [
     {
+      "date": "2026-08-30T17:02:43+00:00",
+      "sha": "511f644",
+      "summary": "intel(service): retire dead msensProv read + fix stale loadMacroSens comment (#721)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-30T15:09:45+00:00",
+      "sha": "2f4ee49",
+      "summary": "data: market-pulse swarm refresh (run 33317027122) (#720)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-30T14:30:39+00:00",
+      "sha": "c1576fb",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-30T14:28:07+00:00",
+      "sha": "87209f1",
+      "summary": "docs: log ux-loop mobile scroll cue on .ic-scroll (PR #719, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-30T14:27:43+00:00",
+      "sha": "0d694bc",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-30T14:27:04+00:00",
+      "sha": "b7b99ac",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-30, run 33316822631)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-30T21:25:41+07:00",
+      "sha": "e25ee12",
+      "summary": "ux: mobile scroll cue on impact-card tables (.ic-scroll) (#719)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-30T12:38:29+00:00",
+      "sha": "f459361",
+      "summary": "test(guard): lock the raw investor-disclosure text out of a naive scrape",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-30T11:38:43+00:00",
+      "sha": "e6e9f90",
+      "summary": "data(census): refresh the Union Auction forward book (run 33304070621) (#716)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-30T11:15:27+00:00",
+      "sha": "8f28b62",
+      "summary": "data: market-pulse swarm refresh (run 33304058006) (#717)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-30T10:35:44+00:00",
+      "sha": "7ebd300",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after rival-rate-drift ship",
+      "pillar": "market"
+    },
+    {
       "date": "2026-08-30T10:34:43+00:00",
       "sha": "eb8fd64",
       "summary": "intel: put measured rival rate-drift on the command center thesis (#718)",
@@ -645,72 +711,6 @@
       "sha": "c85ca36",
       "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33278360381) (#697)",
       "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-30T01:37:31+00:00",
-      "sha": "79fab5a",
-      "summary": "intel(#overview): surface collateral peak-to-now drawdown the UVPI build dropped (#711)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-30T00:44:40+00:00",
-      "sha": "9966963",
-      "summary": "data: live fuel prices (2026-08-30, run 33283938421)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-30T00:29:36+00:00",
-      "sha": "27473ed",
-      "summary": "data: SET peer filings refresh (run 33264157736) (#703)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-29T23:26:42+00:00",
-      "sha": "8add87b",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-29, run 33280920215)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-29T23:07:21+00:00",
-      "sha": "14040a6",
-      "summary": "data: rival Facebook promo feed refresh (run 33231456273) (#691)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-29T22:44:29+00:00",
-      "sha": "62a40c5",
-      "summary": "intel(#home): Data room freshness — frozen-at-source layers stop reading as stale (#700)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-29T22:21:30+00:00",
-      "sha": "e532208",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after tourism-momentum ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-30T05:20:49+07:00",
-      "sha": "9d2d433",
-      "summary": "intel(#overview): surface tourism MOMENTUM the macro build dropped (YoY + trend) (#708)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-29T20:26:04+00:00",
-      "sha": "3563a2a",
-      "summary": "docs: log ux-loop SPA route-change focus (PR #706, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-30T03:23:10+07:00",
-      "sha": "0cc2bff",
-      "summary": "ux: move focus into the new view on SPA route change (WCAG 2.4.3) (#706)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-29T19:32:11+00:00",
-      "sha": "85f98ff",
-      "summary": "docs: dark-layer audit HEALTHY CLOSE-OUT — farmgate_prices leaf verified consumed (false positive)",
-      "pillar": "deployment"
     }
   ]
 }
