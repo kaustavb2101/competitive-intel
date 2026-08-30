@@ -11936,6 +11936,15 @@ function renderMacroBook(){
       +`<p class="lead sub mb-note"></p><div id="mb-drill"></div>`;
 
     const isan=R.Isan||{}, cen=R['Central&BKK']||{};
+    /* National borrower-base fragility (MEASURED, NSO SES 2019) — the affordability backdrop under the
+       whole book, orphaned in the layer until now: share with under-3-months cushion, share carrying
+       debt, and average monthly household income. Null-safe: absent → the sentence drops out. */
+    const cush=N.cushion_lt3mo_pct, hhd=N.hh_with_debt_pct, hhinc=N.income_hh_thb_month;
+    const natFrag=(cush!=null&&hhd!=null&&hhinc!=null)
+      ? `<b>The borrower base runs thin on buffer.</b> Nationally <b>${cush}% of households hold under three months `
+        +`of financial cushion</b> and ${hhd}% carry debt, on an average household income of ฿${num(Math.round(hhinc))}/month `
+        +`<span class="sub">(NSO socio-economic survey, measured)</span>. `
+      : '';
     const NOTE={
       labour:`<b>Headline unemployment does not discriminate — seasonal idle labour does.</b> `
         +`Nationally unemployment is ${N.unemployment_pct}%, and every region sits between 0.80% and 1.18%, `
@@ -11960,7 +11969,7 @@ function renderMacroBook(){
         +`${cen.new_biz_per_1k_lf} in Central &amp; Bangkok against ${isan.new_biz_per_1k_lf} in Isan — the small-business `
         +`borrower base is forming nearly three times faster where our merchant book already is. Read it beside our `
         +`ticket: formation is a demand backdrop for the merchant segment, not a branch action.`,
-      debt:`<b>Region is the only grain that exists for household debt — so this lens says so, then shows what we do own.</b> `
+      debt:natFrag+`<b>Region is the only grain that exists for household debt — so this lens says so, then shows what we do own.</b> `
         +`The BoT publishes no routine province table and the per-household figures trace to the NSO socio-economic `
         +`survey; only ${N.n_prov_with_debt} provinces have any province-grain row at all. `
         +`The backdrop still earns its place — the <b>South carries the highest household debt</b>, while Isan's `
