@@ -79,7 +79,7 @@ html[data-theme="light"] .st-track{background:#e3e8f1}
 .st-count.done .v{color:#5fd6c2}.st-count.prog .v{color:#f2cf78}.st-count.open .v{color:var(--mid)}
 
 /* pillar cards */
-.st-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.st-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))}
 .st-card{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:13px 14px;
   box-shadow:var(--elev-1)}
 .st-card-h{display:flex;align-items:center;gap:9px;margin-bottom:8px}
@@ -108,7 +108,7 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
   border-radius:5px;padding:1px 5px;text-transform:uppercase;letter-spacing:.3px}
 
 /* loops + activity */
-.st-two{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));margin-top:18px}
+.st-two{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));margin-top:18px}
 /* wrap the 3-part loop row (name · owns · cadence): in a narrow column the long cadence note
    can't share one line, so allow it to drop below instead of collapsing .ow to zero + overflowing */
 .st-loop{display:flex;align-items:baseline;flex-wrap:wrap;gap:3px 8px;padding:8px 0;border-bottom:1px dashed var(--line2)}
