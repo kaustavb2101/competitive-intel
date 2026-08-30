@@ -4644,6 +4644,14 @@ function renderRateObserved(){
     RATEOBS=j; roLoaded=true; drawRateObserved();
   }).catch(()=>{ RATEOBS=null; roLoaded=true; drawRateObserved(); });
 }
+// Home-boot loader for the same MEASURED rate-drift layer — returns a promise and warms the shared
+// RATEOBS cache (so the #acq drawRateObserved reuses it), without touching the #acq DOM. Null-safe.
+function loadRateObserved(){
+  if(roLoaded) return Promise.resolve(RATEOBS);
+  return fetch('data/rival_rate_observed.json').then(r=>r.ok?r.json():null).then(j=>{
+    RATEOBS=j; roLoaded=true; return RATEOBS;
+  }).catch(()=>{ RATEOBS=null; roLoaded=true; return null; });
+}
 function drawRateObserved(){
   const wrap=$('#rowrap'), box=$('#rodrift'), ro=$('#roreadout'), note=$('#ronote');
   if(!box) return;
@@ -13746,6 +13754,10 @@ function renderHome(){
     // obj#2 — the per-region density × service read (rival_threat_region.json) onto the front door:
     // which regions are hardest to defend, beside the portfolio-risk headline. Null-safe re-render.
     loadRivThreatRegion().then(()=>{ if(onHome()){ renderHomeDefend(); renderHomeThesis(); } });
+    // obj#2 — the only MEASURED PRICING dimension onto the front door: how many rival operators now
+    // post a rate off the hand-curated card we hold them to (rival_rate_observed.json, weekly re-read).
+    // Every other competitive clause is branch-count density; this is the sole rate signal. Null-safe.
+    loadRateObserved().then(()=>{ if(onHome()) renderHomeThesis(); });
     // obj#1 x obj#2 — the INTERSECTION clause: provinces both borrower-stressed AND rival-dominated
     // (province_pressure.json, a deterministic join of the two per-province axes). Null-safe re-render.
     loadProvincePressure().then(()=>{ if(onHome()){ renderHomeThesis(); renderHomeDoublePressure(); renderHomeAgriSqueeze(); renderHomeCollatSqueeze(); } });
@@ -13829,6 +13841,24 @@ function renderHomeThesis(){
       const names=hard.map(r=>r.region).join(' &amp; ');
       const rr=(typeof lead.rating_wavg==='number')?lead.rating_wavg.toFixed(2)+'★':'—';
       clauses.push(`the ground <b>hardest to defend</b> is <b>${names}</b> (rivals both densest and best-loved, up to ${rr}${lead.thin_rating_sample?', thin sample':''}, measured)`);
+    }
+  }
+  // obj#2 — the only MEASURED PRICING dimension on the front door. Every competitive clause above is
+  // branch-count density; this is the weekly re-read of each rival's OWN posted rate against the
+  // hand-curated card (rival_rate_observed.json). It is a rate-DRIFT watch — how many operators now
+  // quote outside the band we hold them to and which way — NOT a margin claim (a rival quoting HIGHER
+  // is not pressure on us), so the directional split is stated honestly. Null-safe; dropped until loaded.
+  const robMeta=(RATEOBS&&RATEOBS.meta)?RATEOBS.meta:null;
+  const robOps=(RATEOBS&&Array.isArray(RATEOBS.operators))?RATEOBS.operators:null;
+  if(robMeta&&robOps){
+    const robDrift=robOps.filter(o=>o.drift_lines&&o.drift_lines.length);
+    if(robDrift.length){
+      const above=robDrift.filter(o=>o.drift_lines.some(l=>l.direction==='above')).length;
+      const below=robDrift.filter(o=>o.drift_lines.some(l=>l.direction==='below')).length;
+      const bits=[]; if(above) bits.push(`${above} higher`); if(below) bits.push(`${below} lower`);
+      const split=bits.length?` (${bits.join(', ')})`:'';
+      const nD=robMeta.n_drift_operators||robDrift.length, nO=robMeta.n_operators||robOps.length;
+      clauses.push(`<b>${nD}</b> of ${nO} rivals now post a rate <b>off the card</b> we measure them against${split} (measured ${robMeta.pulled_at||'—'})`);
     }
   }
   // THE INTERSECTION (province_pressure.json) — the sharpest cross-objective clause: how many
