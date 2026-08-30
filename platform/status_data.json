@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-30T05:20:49+07:00",
-    "commit": "9d2d433"
+    "generated_at": "2026-08-30T11:15:04+07:00",
+    "commit": "d4b7e86"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,90 @@
   ],
   "activity": [
     {
+      "date": "2026-08-30T11:15:04+07:00",
+      "sha": "d4b7e86",
+      "summary": "intel(#acq): surface peer net-profit margin — leverage-independent rival-profitability read (#713)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-30T03:55:55+00:00",
+      "sha": "57ff77c",
+      "summary": "data: market-pulse swarm refresh (run 33258196881) (#702)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-30T03:15:13+00:00",
+      "sha": "573a448",
+      "summary": "data: rival Facebook promo feed refresh (run 33281970476) (#710)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-30T02:30:38+00:00",
+      "sha": "2747be2",
+      "summary": "docs: log ux-loop prefers-contrast rayong light-override (PR #712, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-30T02:27:57+00:00",
+      "sha": "87615b7",
+      "summary": "data: market-pulse swarm refresh (run 33247697269) (#698)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-30T09:26:10+07:00",
+      "sha": "dfef9e3",
+      "summary": "ux: theme-aware prefers-contrast:more on rayong-catchment.html (#712)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-30T02:05:32+00:00",
+      "sha": "c85ca36",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33278360381) (#697)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-30T01:37:31+00:00",
+      "sha": "79fab5a",
+      "summary": "intel(#overview): surface collateral peak-to-now drawdown the UVPI build dropped (#711)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-30T00:44:40+00:00",
+      "sha": "9966963",
+      "summary": "data: live fuel prices (2026-08-30, run 33283938421)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-30T00:29:36+00:00",
+      "sha": "27473ed",
+      "summary": "data: SET peer filings refresh (run 33264157736) (#703)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-29T23:26:42+00:00",
+      "sha": "8add87b",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-29, run 33280920215)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-29T23:07:21+00:00",
+      "sha": "14040a6",
+      "summary": "data: rival Facebook promo feed refresh (run 33231456273) (#691)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-29T22:44:29+00:00",
+      "sha": "62a40c5",
+      "summary": "intel(#home): Data room freshness — frozen-at-source layers stop reading as stale (#700)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-29T22:21:30+00:00",
+      "sha": "e532208",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after tourism-momentum ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-30T05:20:49+07:00",
       "sha": "9d2d433",
       "summary": "intel(#overview): surface tourism MOMENTUM the macro build dropped (YoY + trend) (#708)",
@@ -627,90 +711,6 @@
       "sha": "bb6bbe9",
       "summary": "test(gate): tripwire when the CI DLT vehicle census diverges from the collateral base",
       "pillar": "service"
-    },
-    {
-      "date": "2026-08-29T06:24:56+00:00",
-      "sha": "8faa169",
-      "summary": "data: market-pulse swarm refresh (run 33231018226) (#690)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-29T05:46:09+00:00",
-      "sha": "dc964b4",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33233634714) (#693)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-29T05:21:46+00:00",
-      "sha": "f708670",
-      "summary": "data: Thai-IP-only swarm refresh (run 33228378504) (#689)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-29T04:22:00+00:00",
-      "sha": "d07f95b",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after peer β ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-29T11:21:42+07:00",
-      "sha": "17506c2",
-      "summary": "intel(#acq): peer scoreboard gains share-price risk (β) — the SET beta already pulled but dropped by the build (#692)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-29T03:54:17+00:00",
-      "sha": "d76d6b1",
-      "summary": "data: live fuel prices (2026-08-29, run 33232448890)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-29T03:13:42+00:00",
-      "sha": "7d6c2e1",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-29, run 33230786455)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-29T02:54:58+00:00",
-      "sha": "9905692",
-      "summary": "data: NABC live prices (2026-08-29, run 33229890939)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-29T02:23:06+00:00",
-      "sha": "0c3abf4",
-      "summary": "docs: log ux-loop WHCM forced-colors merge+deploy+verify (PR #688)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-29T09:21:23+07:00",
-      "sha": "0c2e91d",
-      "summary": "ux: WHCM forced-colors opt-out for rayong-catchment legend swatches (#688)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-29T02:03:03+00:00",
-      "sha": "23a61c7",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33223777745) (#686)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-29T01:40:28+00:00",
-      "sha": "351b836",
-      "summary": "data: market-pulse swarm refresh (run 33210524696) (#683)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-29T00:55:30+00:00",
-      "sha": "a37b2c1",
-      "summary": "data: SET listed-peer scoreboard refresh (run 33212145756) (#684)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-29T00:31:14+00:00",
-      "sha": "aa69fb6",
-      "summary": "data(#acq): record PICO census confirmed-current + fix its CI-refresh provenance",
-      "pillar": "data-integration"
     }
   ]
 }
