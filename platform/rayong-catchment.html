@@ -49,9 +49,11 @@ html[data-theme="light"]{color-scheme:light}/* native scrollbars/selects/control
 /* prefers-contrast: more — the OS is set to increase contrast but keeps our colours. Lift only the
    deliberately-muted tiers — microcopy --dim/--mid and the quiet card hairline --cardln — toward their
    high-contrast neighbours. Mirrors the styles.css block (this page defines its own :root, so that
-   media query can't reach it). Token-only + inactive unless the OS requests more contrast, so default
-   rendering is byte-identical. */
-@media (prefers-contrast:more){:root{--dim:#BFC8D8;--mid:#CAD2E0;--cardln:#4A5878}}
+   media query can't reach it). The base lift (--dim:#BFC8D8) is a LIGHT grey for the dark base :root;
+   this page defaults to the LIGHT theme, where that would wash muted text out on the light ground, so
+   darken --dim/--mid for light too (matching province.html / branch-explorer.html). Token-only +
+   inactive unless the OS requests more contrast, so default rendering is byte-identical. */
+@media (prefers-contrast:more){:root{--dim:#BFC8D8;--mid:#CAD2E0;--cardln:#4A5878}html[data-theme="light"]{--dim:#3C4557;--mid:#3A445C}}
 /* Windows High Contrast Mode / forced-colors: the OS overrides every author background-fill with a
    system colour, so the legend swatches + proportion bars — whose ONLY encoding is that fill (each
    swatch is built to match its map layer / building-type colour) — collapse to uniform system-coloured
