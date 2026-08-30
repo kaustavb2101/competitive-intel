@@ -2,7 +2,7 @@
  "meta": {
   "title": "SET filings — MD&A narrative + Financial Statements/NOTES for the six SET-listed Thai title-loan peers (measured, autonomous pull)",
   "generated_by": "pipeline/pull_set_filings.py",
-  "generated_date": "2026-08-22",
+  "generated_date": "2026-08-29",
   "label": "MEASURED — Stock Exchange of Thailand (set.or.th) company disclosures. kind=mda: the Management Discussion & Analysis PDF (management's narrative). kind=fs: the Financial Statement ZIP, whose NOTES.DOCX carries the IFRS-9 Stage 1/2/3 ECL tables, allowance movement and receivables-by-collateral breakdowns, and whose FINANCIAL_STATEMENTS.XLSX carries the primary statements. Text extracted with pdfplumber / openpyxl / a zip+XML docx reader. Newest 4 of each kind per symbol.",
   "source": "Stock Exchange of Thailand · set.or.th news search + weblink.set.or.th attachments",
   "symbols": [
@@ -27,7 +27,7 @@
   ],
   "search_window": {
    "from": "01/01/2026",
-   "to": "22/08/2026"
+   "to": "29/08/2026"
   },
   "per_symbol": 4
  },
