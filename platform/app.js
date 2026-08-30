@@ -4055,6 +4055,7 @@ function drawPeerScore(){
     `<th scope="col" title="SET share beta — systematic (market-correlated) volatility vs the SET index. >1.0 amplifies market swings (more cyclically exposed); <1.0 is defensive. A market statistic on the rival's equity, not a loan-book fundamental.">β</th>`+
     `<th scope="col" title="return on equity, newest audited full fiscal year (SET quarter code Q9)">ROE</th>`+
     `<th scope="col" title="net profit, newest audited full fiscal year">Net profit/yr</th>`+
+    `<th scope="col" title="net profit margin — net profit as a share of total revenue, newest audited full fiscal year (MEASURED, SET). Isolates loan-book profitability per baht of revenue, independent of leverage — a cleaner margin-erosion read than ROE (which the D/E funding structure distorts).">Margin</th>`+
     `<th scope="col" title="loan-book growth — year-over-year change in total assets between the two most recent audited full years (SET quarter code Q9). Total assets ≈ the loan book for a title lender, so this reads as book expansion (green) vs retreat (red). Blank where no clean like-for-like prior year exists.">Book Δ</th>`+
     `<th scope="col" title="price / earnings">P/E</th>`+
     `<th scope="col" title="price / book value — the primary valuation multiple for an equity-heavy lender; below 1.0× = trading under book">P/BV</th>`+
@@ -4069,12 +4070,13 @@ function drawPeerScore(){
         <td class="mono sub">${(typeof p.beta==='number')?p.beta.toFixed(2)+(p.beta>1?` <span style="color:var(--gold)" title="above the market — amplifies cyclical swings">▲</span>`:''):'—'}</td>
         <td class="mono">${roeBar} <b>${p.roe}%</b></td>
         <td class="mono sub">฿${p.net_profit_bn}bn</td>
+        <td class="mono sub">${(typeof p.npm==='number')?`${p.npm.toFixed(1)}%${p.npm<5?` <span style="color:var(--agri)" title="margin collapse — near-zero net profitability of the loan book">▾</span>`:''}`:'—'}</td>
         <td class="mono" style="color:${yc(p.assets_yoy_pct)}"${(typeof p.revenue_yoy_pct==='number'||typeof p.net_profit_yoy_pct==='number')?` title="${p.growth_basis||''}${typeof p.revenue_yoy_pct==='number'?` · revenue ${p.revenue_yoy_pct>0?'+':''}${p.revenue_yoy_pct}%`:''}${typeof p.net_profit_yoy_pct==='number'?` · net profit ${p.net_profit_yoy_pct>0?'+':''}${p.net_profit_yoy_pct}%`:''}"`:''}>${(typeof p.assets_yoy_pct==='number')?`<b>${p.assets_yoy_pct>0?'+':''}${p.assets_yoy_pct}%</b>`:'<span class="sub">—</span>'}</td>
         <td class="mono sub">${p.pe}</td>
         <td class="mono sub">${(typeof p.pbv==='number')?p.pbv.toFixed(2)+'×'+(p.pbv<1?` <span class="sub" style="color:var(--gold)" title="trading below book value">·bk</span>`:''):'—'}</td>
         <td class="mono sub">${p.div_yield}%</td>
       </tr>`;}).join('')+
-    (tgt?`<tr style="border-top:1px dashed var(--line)"><td></td><td><b style="color:var(--gold)">AutoX target</b> <span class="sub">(unlisted)</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">${tgt}%</b> <span class="sub">ROE goal</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td></tr>`:'');
+    (tgt?`<tr style="border-top:1px dashed var(--line)"><td></td><td><b style="color:var(--gold)">AutoX target</b> <span class="sub">(unlisted)</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">${tgt}%</b> <span class="sub">ROE goal</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td></tr>`:'');
   if(ro){
     const byRoe=peers.filter(p=>typeof p.roe==='number');
     const below=byRoe.filter(p=>p.roe<tgt).map(p=>p.name), above=byRoe.filter(p=>p.roe>=tgt).map(p=>p.name);
@@ -4176,8 +4178,22 @@ function drawPeerScore(){
         : `${lo.name} grew its book least (${gs(lo.assets_yoy_pct)}, ${lo.growth_basis})`;
       growLine=` <b>Loan-book growth (YoY).</b> ${hi.name} is expanding its book fastest (${gs(hi.assets_yoy_pct)}, ${hi.growth_basis}); ${retreat}; ${up.length} of ${grow.length} listed rivals grew their book, ${down.length} shrank — the measured read of which rivals are expanding their book and which are pulling back (total assets ≈ the loan book; AutoX is unlisted, so it has no comparable audited YoY to rank against).`;
     }
+    // Net-profit-margin read (npm, MEASURED SET) — objective #2's rival margin-erosion signal. Margin =
+    // net profit / revenue, which (unlike ROE) is leverage-independent, so it isolates loan-book
+    // profitability per baht of revenue — a cleaner "whose margins are eroding" read than the ROE league
+    // the D/E column distorts. Fires with ≥3 comparable peers; every superlative is from the peers' own
+    // audited filings. HENG's company-only (⚠U) basis is flagged in-clause when it is the extreme.
+    const marg=peers.filter(p=>typeof p.npm==='number');
+    let marginLine='';
+    if(marg.length>=3){
+      const hi=marg.slice().sort((a,b)=>b.npm-a.npm)[0];
+      const lo=marg.slice().sort((a,b)=>a.npm-b.npm)[0];
+      const uflag=lo.fs_type==='U'?' (company-only filing)':'';
+      const collapse=(lo.npm<5)?` ${lo.name}'s margin has all but collapsed — near-zero net profit on the loan book.`:'';
+      marginLine=` <b>Net-profit margin (MEASURED, SET).</b> ${hi.name} keeps the most of each ฿ of revenue (${hi.npm.toFixed(1)}% net margin), ${lo.name} the least (${lo.npm.toFixed(1)}%${uflag}) — the leverage-independent read of loan-book profitability, a cleaner margin-erosion signal than ROE (which the D/E funding structure distorts).${collapse}`;
+    }
     ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
-      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+betaLine+growLine+
+      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+betaLine+growLine+marginLine+
       methodBox(m.roe_caveat||null,
         [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the newest audited full year'}.`,
          '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE target is a stated goal shown only as the reference line.',
