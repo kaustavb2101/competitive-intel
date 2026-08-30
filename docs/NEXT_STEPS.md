@@ -215,6 +215,22 @@ that review still open:
    `tests/run.sh baseline` after a deliberate review of each PNG, or retire the phase — as written it
    cannot tell a regression from the accumulated intended change.
 
+## 0e. Rival investor-disclosure corpus — the safe signals are distilled; distil the REST only per-figure-verified (objective #2)
+`source-data/investor_docs/` (the 56-1 One Report + SET Opportunity Day set for the six SET-listed peers,
+`pull_investor_docs.py`) is the ONLY in-repo document carrying a rival **product/collateral split**.
+Its SAFE signals are ALREADY distilled: `build_peer_oppday.py` → `platform/data/peer_oppday.json`
+(earnings-call calendar/recency from the structured `index.json`), and `build_competitor_coverage.py`'s
+`BRANCH_TRAJECTORY` (per-figure CITED rival branch counts, each with its verbatim source quote). What is
+**gate-locked** (by `tests/investor_docs_guard.py`, added 2026-08-30) is a naive scrape of the raw
+`investor_docs/text/*.txt`: the annual 56-1 text is a **multi-column PDF dump with columns interleaved
+line-by-line** (no reliable label↔value pairing), **5/6 annual PDFs are stale `download_failed`**, and the
+oppday figures are stated inconsistently across the six — so a regex mis-attributes and ships a WRONG figure
+labelled MEASURED, which the determinism gate cannot catch (see the 2026-08-30 PROGRESS_LOG Decision).
+**The safe path (this lifts the guard automatically):** land `source-data/investor_docs/verified_figures.json`
+— each figure hand-verified against its verbatim source line — then a deterministic, `--check`-gated
+`build_rival_disclosures.py` may distil the deeper split (product/collateral, NPL, yield) and surface it on
+`#acq`. Do **not** `open()`-and-regex the raw text into a MEASURED layer.
+
 ## 1. Deploy to Vercel and verify production  ⟶ do first
 - `cd platform && npx vercel --prod` (link to team "Kaustav Bagchi's projects"
   `team_pYNrbLMZobN80m4jD7WPWybD`; set Root Directory = current folder).

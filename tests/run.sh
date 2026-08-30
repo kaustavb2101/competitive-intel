@@ -685,6 +685,24 @@ INGESTS
     bad "amphoe_crops_zone_guard.py (a pipeline script folds the duplicate amphoe_crops_zone staging into the app — see report above)"
   fi
 
+  # provenance-honesty gate for the rival investor-disclosure TEXT corpus: source-data/investor_docs/ is
+  # the 56-1 One Report + SET Opportunity Day set for the six SET-listed peers. Its SAFE signals are
+  # already distilled — build_peer_oppday.py projects the structured index.json (earnings-call recency),
+  # and build_competitor_coverage.py's BRANCH_TRAJECTORY carries per-figure CITED branch counts — and
+  # both stay allowed. What is NOT safe is a naive scrape of the raw investor_docs/text/*.txt: the annual
+  # 56-1 text is a multi-column PDF dump with columns interleaved line-by-line (no reliable label<->value
+  # pairing), 5/6 annual PDFs are stale download_failures, and oppday figures are stated inconsistently
+  # across the six. The corpus is the #1 named integration backlog item, so the next autonomous run will
+  # be pointed at it; a determinism gate cannot catch a semantically-wrong-but-valid number, so this locks
+  # in "skip it, don't fake it": it FAILs if any pipeline script applies a READ primitive to the text dir.
+  # Self-lifting — landing source-data/investor_docs/verified_figures.json (each figure hand-verified
+  # against its source line) passes it automatically, so a real verified extraction is never blocked.
+  if python3 "$TESTS/investor_docs_guard.py"; then
+    ok "investor_docs_guard.py (raw investor-disclosure text stays unscraped until per-figure verified)"
+  else
+    bad "investor_docs_guard.py (a pipeline script is parsing the raw investor_docs text without a verification manifest — see report above)"
+  fi
+
   # stale-collateral-base tripwire for the DLT vehicle stock. The live collateral base
   # (source-data/vehicles_by_province.json, read by 10+ vehicle/collateral/province builders) can be
   # refreshed ONLY from Kaustav's Thai IP (ingest_gov.py's build_vehicles reads the raw dgt_out/ CSV,
