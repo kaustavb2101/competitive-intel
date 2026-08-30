@@ -154,6 +154,7 @@ main:focus{outline:none}
   --raised:#232E45;      /* hover / active / popups / selected */
   --line:#2C3650;        /* primary hairline — now catches light */
   --line2:#202A40;       /* quiet in-card divider */
+  --scrollcue:rgba(8,11,20,.55);  /* right-edge fade signalling a horizontal scroller has more columns off-screen (mobile) */
 
   /* ---- text contrast tiers (AA on every surface) ---- */
   --hi:#F1F4FA; --txt:#D2DAE8; --mid:#A6B0C4; --dim:#909CB2;  /* lifted muted text one step toward white — the low-contrast grey read "internal tool" */
@@ -663,6 +664,7 @@ html[data-theme="light"]{
   --bg:#F4F6FA; --bg-top:#FBFCFE;
   --panel2:#ECEFF5; --panel:#FFFFFF; --raised:#F7F9FD;
   --line:#DCE1EB; --line2:#EBEEF4;
+  --scrollcue:rgba(24,32,54,.13);  /* light-theme horizontal-scroll edge cue (subtle grey, not the dark base value) */
   --hi:#0F1420; --txt:#2A3346; --mid:#57627A; --dim:#5B6678;  /* --dim darkened from #7A8598 (≈3.4:1) to clear WCAG AA (≈5.4:1 on #F4F6FA) on microcopy */
   --accent:#4C6EF0; --accent-soft:rgba(76,110,240,.12); --accent-glow:rgba(76,110,240,.28);
   --agri:#C0392F; --merch:#0E7C68; --collat:#5B3FB3; --opp:#A67714; --gold:#A67714;
@@ -1448,6 +1450,16 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
    grid parent, `auto` min-width lets a child refuse to shrink below its content. .tblwrap has
    carried both since it was written; .ic-scroll was missed. */
 .ic-scroll{overflow-x:auto;max-width:100%;min-width:0;border:1px solid var(--line);border-radius:8px}
+/* Mobile horizontal-scroll affordance. On phones/small tablets the impact tables (min-width 760 /
+   960px for the drill) always overflow the viewport, and mobile browsers hide the scrollbar — so
+   off-screen columns (Crops, Rivals, Agri backdrop, DTI…) read as absent with no cue. A right-edge
+   fade painted BEHIND the transparent cells (text stays crisp on top) pins to the visible right edge
+   via the default `background-attachment:scroll` and signals "more columns →". Gated to ≤760px, where
+   these tables are guaranteed wider than the viewport, so it never shows a spurious fade on a table
+   that fits (desktop, >760px, is untouched). CSS-only, theme-aware via --scrollcue. */
+@media (max-width:760px){
+  .ic-scroll{background:linear-gradient(to left, var(--scrollcue), transparent) right center / 26px 100% no-repeat}
+}
 .ic-tbl{border-collapse:collapse;width:100%;font-size:12px;min-width:760px}
 .ic-tbl th,.ic-tbl td{text-align:left;padding:6px 9px;border-bottom:1px solid var(--line2);white-space:nowrap}
 .ic-tbl thead th{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
