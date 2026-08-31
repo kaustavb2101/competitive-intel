@@ -6262,7 +6262,7 @@ function drawPeerNpl(){
     (ax?`<tr style="border-top:2px solid var(--accent)">
         <td class="mono sub" title="not ranked among the reported peers — a different measurement basis">—</td>
         <td><b>${ax.name}</b> <span class="tag" style="color:var(--accent);border:1px solid var(--accent);font-size:10px">MEASURED · own tape</span></td>
-        <td>${barHTML(ax.npl_live_os_pct,'var(--accent)',axMax)} <span class="mono" style="color:var(--accent)"><b>${ax.npl_live_os_pct.toFixed(2)}%</b></span> <span class="sub" style="font-size:10px">live-book 90–179dpd, OS · strict 90+ ${ax.npl_90plus_os_pct.toFixed(1)}%</span></td>
+        <td>${barHTML(ax.npl_live_os_pct,'var(--accent)',axMax)} <span class="mono" style="color:var(--accent)"><b>${ax.npl_live_os_pct.toFixed(2)}%</b></span> <span class="sub" style="font-size:10px">live-book 90–179dpd, OS · strict 90+ ${ax.npl_90plus_os_pct.toFixed(1)}%${ax.legacy_180plus_os_pct!=null?` · 180+ legacy ${ax.legacy_180plus_os_pct.toFixed(1)}%`:''}</span></td>
         <td class="sub">${ax.collateral||'—'}</td>
         <td class="sub" style="font-size:11px">real loan tape (OS-weighted)</td>
       </tr>`:'');
@@ -6285,8 +6285,13 @@ function drawPeerNpl(){
       }
     }
     const axLine=ax?` <b>AutoX's own book — measured from the real tape — runs NPL-live (90–179dpd) at <span style="color:var(--accent)">${ax.npl_live_os_pct.toFixed(2)}% OS-weighted</span></b>, ${axPos}, consistent with its heavier motorcycle / pickup + land collateral mix.`:'';
+    // The 180+ legacy workout stock is held SEPARATELY from the live book (tape-pii-floor: report the two
+    // books apart, never blended). Surface its OS-weighted rate and compare to the live NPL — computed,
+    // not asserted, so the "larger/smaller than live" clause stays honest as the tape refreshes.
+    const lg=(ax&&typeof ax.legacy_180plus_os_pct==='number')?ax.legacy_180plus_os_pct:null;
+    const legLine=(lg!=null&&axv!=null)?` Held apart as late-stage collections inventory, its <b>180+ legacy workout stock runs <span style="color:var(--accent)">${lg.toFixed(1)}% OS-weighted</span> — ${lg>axv?'larger than the live NPL itself':'below the live NPL'} (${axv.toFixed(2)}%)</b>: the aged deep-delinquent tail the listed peers write off or provision out, which is why AutoX reads on a different basis than the reported ranks.`:'';
     ro.innerHTML=`<b>The listed title-lenders' reported loan quality spans ${(hi-lo).toFixed(1)}pp</b> — ${spread}. `+
-      `The gap is a <b>collateral story</b>: vehicle/gold books run the cleanest, land / heavy-vehicle / agri books the highest NPL.${axLine} ${TAG_M}`+
+      `The gap is a <b>collateral story</b>: vehicle/gold books run the cleanest, land / heavy-vehicle / agri books the highest NPL.${axLine}${legLine} ${TAG_M}`+
       methodBox(m.note||null,
         [`Peer figures are <b>reported by the companies themselves</b> (FY2025 / 2025 IR) — docs/RESEARCH_DIGEST.md §B. Vintage ${m.updated||'2026-06'}.`,
          list.some(p=>p.ticker==='HENG')?`<b>Heng's figure is a TFRS9 Stage-3 (credit-impaired) share</b>, not a bank-style 90+ NPL — the loan-quality metric a hire-purchase/leasing lender publishes, and the closest basis-match to AutoX's own tape-measured impaired share. It is the one <b>contracting</b> peer and the only reported peer that brackets AutoX's ~6% impaired share ("compliant" is not "thriving").`:'',
