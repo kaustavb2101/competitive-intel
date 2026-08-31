@@ -860,7 +860,11 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
 .cc-hero-card:focus-visible{outline:none;box-shadow:var(--ring)}
 .cc-hero-big{font-size:21px;font-weight:700;line-height:1.22;color:var(--hi);letter-spacing:-.3px;overflow-wrap:anywhere}
 .cc-hero-sub{font-size:12.5px;line-height:1.45;color:var(--mid);overflow-wrap:anywhere}
-.cc-hero-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:4px}
+/* both children (.cc-hero-tag pill + .cc-hero-cta) are white-space:nowrap, so on a single-column
+   narrow card (≤~360px, common Android width) they can't shrink and bled past the card's right edge
+   (ux-cc-hero-foot-narrow-wrap). flex-wrap lets the CTA drop to its own line when the two don't fit;
+   at any width where they fit it's inert, so wider renders are byte-identical. */
+.cc-hero-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 8px;margin-top:auto;padding-top:4px}
 /* .cc-hero-tag is a provenance chip too (text can be mixed "measured + estimated"), so it wears
    the same pill language as .prov / .cc-tag — mono 11px, leading dot, hairline border. Kept
    neutral-ink because the value may span both states. */
