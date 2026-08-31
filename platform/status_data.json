@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-31T11:17:43+07:00",
-    "commit": "1d1894a"
+    "generated_at": "2026-08-31T17:18:36+07:00",
+    "commit": "fabfbe3"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-08-31T17:18:36+07:00",
+      "sha": "fabfbe3",
+      "summary": "intel: surface the MEASURED 5★ advocacy pole on the rival sentiment ladder (#brand) (#738)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-31T09:55:17+00:00",
+      "sha": "787b013",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-31, run 33379874586)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-31T08:45:43+00:00",
+      "sha": "88a3b17",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-31T15:43:17+07:00",
+      "sha": "96521a9",
+      "summary": "docs: log the cc-grid mobile-bleed UX fix (PR #734 merged + deployed + verified) (#735)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-31T08:41:57+00:00",
+      "sha": "3c73df0",
+      "summary": "data: NABC live prices (2026-08-31, run 33373715092)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-31T15:35:27+07:00",
+      "sha": "4dd045d",
+      "summary": "ux: cc-grid pillar grid bleeds past its box on phones (#home) (#734)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-31T06:50:39+00:00",
+      "sha": "65679a0",
+      "summary": "intel: surface the MEASURED distressed-sale (p25) recovery on the collateral book-appraisal check (#733)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-31T05:21:37+00:00",
+      "sha": "a2d230f",
+      "summary": "data: market-pulse swarm refresh (run 33342609348) (#726)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-31T04:42:14+00:00",
+      "sha": "54d8e69",
+      "summary": "data: rival published rate pages re-read (run 33347294802) (#729)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-31T04:18:24+00:00",
+      "sha": "27286b3",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after legacy-NPL ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-31T11:17:43+07:00",
       "sha": "1d1894a",
       "summary": "intel: surface the MEASURED 180+ legacy workout-stock NPL on the peer-NPL benchmark (#732)",
@@ -651,66 +711,6 @@
       "sha": "c1576fb",
       "summary": "Merge remote-tracking branch 'origin/master'",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-30T14:28:07+00:00",
-      "sha": "87209f1",
-      "summary": "docs: log ux-loop mobile scroll cue on .ic-scroll (PR #719, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-30T14:27:43+00:00",
-      "sha": "0d694bc",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-30T14:27:04+00:00",
-      "sha": "b7b99ac",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-30, run 33316822631)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-30T21:25:41+07:00",
-      "sha": "e25ee12",
-      "summary": "ux: mobile scroll cue on impact-card tables (.ic-scroll) (#719)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-30T12:38:29+00:00",
-      "sha": "f459361",
-      "summary": "test(guard): lock the raw investor-disclosure text out of a naive scrape",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-30T11:38:43+00:00",
-      "sha": "e6e9f90",
-      "summary": "data(census): refresh the Union Auction forward book (run 33304070621) (#716)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-30T11:15:27+00:00",
-      "sha": "8f28b62",
-      "summary": "data: market-pulse swarm refresh (run 33304058006) (#717)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-30T10:35:44+00:00",
-      "sha": "7ebd300",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after rival-rate-drift ship",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-30T10:34:43+00:00",
-      "sha": "eb8fd64",
-      "summary": "intel: put measured rival rate-drift on the command center thesis (#718)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-30T09:21:52+00:00",
-      "sha": "3c689d1",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-30, run 33303784453)",
-      "pillar": "data-integration"
     }
   ]
 }

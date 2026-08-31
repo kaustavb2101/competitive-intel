@@ -5867,6 +5867,7 @@ function drawRivalPulse(){
       `<th scope="col" title="lifetime Google Play score (all ratings)">Play score</th>`+
       `<th scope="col" title="number of star ratings on the store page">Ratings</th>`+
       `<th scope="col" title="share of ALL ratings that are 1★ (lifetime histogram)">1★ share</th>`+
+      `<th scope="col" title="share of ALL ratings that are 5★ (lifetime histogram) — the pure-advocacy pole opposite the 1★ column; low = lukewarm reception, not just outright detractors">5★ share</th>`+
       `<th scope="col" title="average star of reviews in the last 90 days (from the stored newest reviews)">Last 90d</th>`+
       `<th scope="col" title="share of last-90-day reviews at 1–2★">90d 1–2★</th>`+
       `<th scope="col" title="share of stored reviews that got a developer reply — CX ops discipline">Dev reply</th>`+
@@ -5883,6 +5884,7 @@ function drawRivalPulse(){
           <td class="mono">${bar} <b>${sc}★</b></td>
           <td class="mono sub">${(s.ratings||0).toLocaleString()}</td>
           <td class="mono" style="color:${(s.detractor_pct||0)>=12?'var(--agri)':'var(--dim)'}">${s.detractor_pct!=null?s.detractor_pct+'%':'—'}</td>
+          <td class="mono" style="color:${s.promoter_pct==null?'var(--dim)':(s.promoter_pct<70?'var(--agri)':(s.promoter_pct>=80?'var(--merch)':'var(--dim)'))}">${s.promoter_pct!=null?s.promoter_pct+'%':'—'}</td>
           <td class="mono" style="color:${trendC}">${s.recent90&&s.recent90.avg!=null?s.recent90.avg.toFixed(2)+'★':'—'} <span class="sub">(${s.recent90?s.recent90.n:0})</span></td>
           <td class="mono" style="color:${(s.recent90&&s.recent90.low_share_pct>=25)?'var(--agri)':'var(--dim)'}">${s.recent90&&s.recent90.low_share_pct!=null?s.recent90.low_share_pct+'%':'—'}</td>
           <td class="mono sub">${s.reply_rate_pct!=null?s.reply_rate_pct+'%':'—'}</td>
@@ -5891,7 +5893,18 @@ function drawRivalPulse(){
     if(ro){
       const own=sent.find(s=>s.own);
       const q=(own&&own.quotes&&own.quotes.length)?`<div style="margin-top:6px">${own.quotes.map(x=>`<div class="sub" style="font-size:12px;margin-top:2px">“${x.text}” <span class="mono">— ${'★'.repeat(x.score)} · ${x.at||''}</span></div>`).join('')}</div>`:'';
-      ro.innerHTML=`${RIVPULSE.headline||''} ${TAG_M}`+q+
+      // Lead-with-it advocacy gap: our own 5★ (promoter) pole vs the rival median — COMPUTED, null-safe,
+      // and only shown when we actually trail, so it stays honest as the store histograms refresh.
+      let advLine='';
+      if(own&&own.promoter_pct!=null){
+        const pv=sent.filter(s=>!s.own&&s.promoter_pct!=null).map(s=>s.promoter_pct).sort((a,b)=>a-b);
+        if(pv.length){
+          const med=pv.length%2?pv[(pv.length-1)/2]:+(((pv[pv.length/2-1]+pv[pv.length/2])/2).toFixed(1));
+          const top=pv[pv.length-1], gap=+(med-own.promoter_pct).toFixed(1);
+          if(gap>0) advLine=`<div class="sub" style="margin-top:6px;color:var(--agri)"><b>Our own advocacy runs thin.</b> ${own.name} earns a top 5★ mark from just <b>${own.promoter_pct}%</b> of raters — ${gap}pt below the rival median (${med}%, best ${top}%), a wider gap than its mid-pack 1★ share (${own.detractor_pct!=null?own.detractor_pct+'%':'—'}) shows: reception softens across the non-top-marks band, not only among outright detractors.</div>`;
+        }
+      }
+      ro.innerHTML=`${RIVPULSE.headline||''} ${TAG_M}`+q+advLine+
         methodBox(null,
           [`<b>Measured</b> — Google Play store pages (th/th): lifetime score + star histogram, plus the newest stored reviews per app (dated, public). Sentiment anchor ${m.sentiment_anchor||'—'}.`,
            `<b>Our own app is on the ladder</b> — เงินไชโย (th.co.autox.chaiyo) is the only AutoX-owned number on this tab; everything else is the rivals'.`,
