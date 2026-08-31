@@ -4297,6 +4297,7 @@ function drawPeerAssetQuality(){
   // higher NPL = worse; colour the bar on the agri/red ramp so the eye reads "stress"
   tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Listed peer</th>`+
     `<th scope="col" title="Stage-3 (non-performing / credit-impaired) gross receivables as a share of total gross receivables — the peer's own NPL-equivalent">NPL (Stage 3)</th>`+
+    `<th scope="col" title="the Stage-3 (non-performing) book in absolute ฿bn — NPL share × gross book. Sizes the actual bad-book pile: a low NPL rate on a large book can be a bigger absolute stress than a high rate on a small one">NPL book</th>`+
     `<th scope="col" title="expected-credit-loss allowance held against the Stage-3 book, as a share of Stage-3 gross">S3 coverage</th>`+
     `<th scope="col" title="gross receivables book (loan + hire-purchase where reported separately)">Gross book</th>`+
     `<th scope="col" title="gross split between the secured loan book (title-loan / cash lending — AutoX's direct space) and the hire-purchase book (vehicle instalment / asset finance)">Book mix (loan · HP)</th>`+
@@ -4309,6 +4310,7 @@ function drawPeerAssetQuality(){
         <td class="mono sub">${i+1}</td>
         <td><b>${p.name||p.symbol}</b> <span class="sub mono">${p.symbol}</span></td>
         <td class="mono">${bar} <b>${p.npl_pct}%</b></td>
+        <td class="mono sub">${typeof p.nonperf_bn==='number'?'฿'+p.nonperf_bn.toFixed(2)+'bn':'—'}</td>
         <td class="mono sub">${p.s3_coverage_pct}%</td>
         <td class="mono sub">฿${p.gross_book_bn}bn${poci}</td>
         <td>${bookMixCell(p)}</td>
@@ -4360,12 +4362,30 @@ function drawPeerAssetQuality(){
       peeraqScoreFetch=true;
       fetch('data/peer_scoreboard.json').then(r=>r.ok?r.json():null).then(j=>{ if(j)PEERSCORE=j; drawPeerAssetQuality(); }).catch(()=>{});
     }
+    // Absolute bad-book read (MEASURED): the NPL RATE tells you book cleanliness, but a shakeout turns on the
+    // SIZE of the impaired pile in baht — a low rate on a huge book can outweigh a high rate on a small one.
+    // Null-safe; fires only with ≥2 peers carrying nonperf_bn. Contrasts the biggest baht pile against the
+    // highest-rate rival (worst) so the "rate ≠ size" point lands only when they genuinely differ.
+    let npLine='';
+    const withNP=peers.filter(p=>p&&typeof p.nonperf_bn==='number');
+    if(withNP.length>=2){
+      const topNP=withNP.slice().sort((a,b)=>b.nonperf_bn-a.nonperf_bn)[0];
+      const totNP=withNP.reduce((s,p)=>s+p.nonperf_bn,0);
+      npLine=` <b>By size, not rate:</b> the largest non-performing book in baht is <b>${topNP.name}</b> at ฿${topNP.nonperf_bn.toFixed(2)}bn`;
+      if(topNP.symbol!==worst.symbol){
+        npLine+=` — its ${topNP.npl_pct}% NPL rate is well shy of the field's worst, yet its ฿${topNP.gross_book_bn}bn book makes it the biggest bad-book stock among the six; a shakeout turns on the absolute size of the impaired book, not the headline rate.`;
+      } else {
+        npLine+=` — the highest-rate rival also carries the largest bad-book stock.`;
+      }
+      npLine+=` (฿${totNP.toFixed(1)}bn impaired across the six, measured.)`;
+    }
     ro.innerHTML=`<b>Rival non-performing (Stage-3) share, newest reviewed filings (as of ${m.as_of||'30 Jun 2026'}).</b> ${TAG_M} `+
       `<b>${best.name}</b> runs the cleanest book (${best.npl_pct}% NPL), <b>${worst.name}</b> the most stressed (${worst.npl_pct}%). `+
-      `The wider a rival's non-performing share and the thinner its coverage, the less margin headroom it has to keep pricing hard against the network we run.`+mixLine+covLine+
+      `The wider a rival's non-performing share and the thinner its coverage, the less margin headroom it has to keep pricing hard against the network we run.`+mixLine+covLine+npLine+
       methodBox(null,
         [`<b>Measured</b> — read directly from each peer's IFRS-9 credit-quality (Stage 1/2/3) tables in their reviewed financial-statement notes (${m.source||'Stock Exchange of Thailand · set.or.th'}).`,
          (m.npl_definition||'Stage-3 gross ÷ total gross receivables, combined loan + hire-purchase book.'),
+         '<b>NPL book (฿bn)</b> — the Stage-3 gross receivables in absolute baht (the same reviewed staging table, not a rate × book estimate), sizing the impaired pile rather than its rate.',
          '<b>Not a regulator NPL</b> — this is the IFRS-9 Stage-3 gross share the peer itself discloses; comparable across these six (same accounting basis), not identical to a bank 90-days-past-due ratio.',
          (covLine?'<b>S3 coverage × P/BV join</b> — the provisioning-premium read joins this layer\'s ECL-coverage column to the SET P/BV in <code>peer_scoreboard.json</code> (both MEASURED, joined by SET symbol; consolidated filers). It reads the PREMIUM against coverage, a separate question from the scoreboard\'s below-book-discount × NPL read.':null),
          '<b>Not an AutoX row</b> — AutoX is unlisted and files no SET statements.',
