@@ -184,6 +184,13 @@ def build():
             "n_ranked": p.get("n_ranked"),
             "n_districts": p.get("n_districts"),
             "n_outnumbered_districts": p.get("n_outnumbered_districts"),
+            # MEASURED sub-scale-competitor CONTEXT (FPO registry, carried verbatim from
+            # peer_province.json .pico): the licensed พิโกไฟแนนซ์ (PICO-finance) operator count for
+            # the province — a DISTINCT small-ticket rival class the big-4 contest_pctile does NOT
+            # count. Carried as context only (like the book columns), NEVER folded into the score,
+            # so a double-pressure province that ALSO sits atop a dense sub-scale field is visible.
+            # int / MEASURED-0 / null (registry absent or province unmatched) — inherited verbatim.
+            "pico": p.get("pico"),
             # MEASURED real-book context (tape_real.json; live-book NPL reported apart from 180+ legacy)
             "book_os": book_os,
             "book_npl_os_pct": book_npl_os_pct,
@@ -225,6 +232,18 @@ def build():
     dbl_book_npl_pct = (round(dbl_book_npl_num / dbl_book_os_with_npl, 2)
                         if dbl_book_os_with_npl else None)
 
+    # MEASURED sub-scale-competitor field carried by the double-pressure alert set — how many
+    # licensed PICO-finance operators cluster in the worst-pressured provinces. This is the
+    # DISTINCT rival class the big-4 contest_pctile does NOT count (the caveat's documented
+    # under-read), surfaced here as CONTEXT so a fragile+contested province that ALSO faces a
+    # dense sub-scale field is visible. Carried, never folded into the score.
+    dbl_pico_rows = [r for r in dbl_rows if isinstance(r.get("pico"), int)]
+    dbl_pico_total = sum(r["pico"] for r in dbl_pico_rows)
+    n_dbl_pico_present = sum(1 for r in dbl_pico_rows if r["pico"] > 0)
+    # PICO context available at all (any province carries an int count) — gates the surfacing.
+    pico_present_any = any(isinstance(r.get("pico"), int) for r in records)
+    peer_pico_src = (peer.get("meta") or {}).get("pico_source") or {}
+
     meta = {
         "generated_by": "pipeline/build_province_pressure.py",
         "label": "COMBINED PROVINCE PRESSURE — where the two objectives coincide: provinces that "
@@ -256,6 +275,13 @@ def build():
                               "directly comparable). `ratio` = big-4 rival branch count / AutoX "
                               "branch count, both MEASURED; the census is a LOWER BOUND (Google "
                               "caps ~60/query/province; Heng is a sample) — inherited caveat.",
+            "pico": "MEASURED CONTEXT (not an axis) — the province's licensed พิโกไฟแนนซ์ "
+                    "(PICO-finance) operator count, carried verbatim from peer_province.json .pico "
+                    "(FPO open-data registry). A DISTINCT small-ticket rival class the big-4 "
+                    "contest_pctile does NOT count. Carried so a double-pressure province that ALSO "
+                    "sits atop a dense sub-scale field is visible; deliberately NEVER folded into "
+                    "contest_pctile/both_min/double_pressure (mixing a province-count registry into "
+                    "the haversine big-4 ratio would be dishonest). int / MEASURED-0 / null.",
             "both_min": "COMPUTED — min(stress_pctile, contest_pctile). High ONLY when the weaker "
                         "axis is also high → the honest 'high on BOTH' score; cannot be inflated by "
                         "one strong axis alone. The board's primary sort key (desc).",
@@ -297,7 +323,10 @@ def build():
             "COMPUTED. The combined score is therefore MIXED — it inherits the ESTIMATED label. "
             "The competitor census is a LOWER BOUND (big-4 only; sub-scale local operators and the "
             "distinct PICO class are NOT in the ratio), so contest_pctile under-reads true local "
-            "competitive density, more so in provinces where small operators cluster.",
+            "competitive density, more so in provinces where small operators cluster. The MEASURED "
+            "per-province licensed-PICO count is now carried as a CONTEXT column (`pico`, NOT folded "
+            "into the score) so this under-read is visible per province — a double-pressure province "
+            "that also sits atop a dense sub-scale field can be read directly off the board.",
             "The equal weighting of the two axes (both_min / both_mean treat portfolio and "
             "competitive pressure as equally important) is an editorial choice, not an estimate. "
             "The raw percentiles are carried so a reader can weight them differently.",
@@ -318,11 +347,11 @@ def build():
         "thresholds": {"top_third_pctile": TOP_THIRD, "median_pctile": MEDIAN},
         "record_format": "{province_th, region, stress_pctile, debt_to_income, unemployment_rate, "
                          "contest_pctile, autox, rivals, ratio, leader, autox_rank, n_ranked, "
-                         "n_districts, n_outnumbered_districts, book_os, book_npl_os_pct, book_n, "
-                         "book_pctile, both_min, both_mean, quadrant, double_pressure}. provinces[] "
-                         "sorted by both_min desc (worst double pressure first); null-axis provinces "
-                         "sort last. The book_* columns are MEASURED context (tape_real.json), not a "
-                         "sort or alert axis.",
+                         "n_districts, n_outnumbered_districts, pico, book_os, book_npl_os_pct, "
+                         "book_n, book_pctile, both_min, both_mean, quadrant, double_pressure}. "
+                         "provinces[] sorted by both_min desc (worst double pressure first); "
+                         "null-axis provinces sort last. The pico and book_* columns are MEASURED "
+                         "context (peer_province.json / tape_real.json), not a sort or alert axis.",
         "n_provinces": len(records),
         "n_provinces_scored": len(scored),
         "n_double_pressure": len(dbl_rows),
@@ -364,6 +393,21 @@ def build():
             "book_os_total": dbl_book_os,
             "book_npl_os_pct": dbl_book_npl_pct,
         } if dbl_book_rows else None),
+        # MEASURED sub-scale-competitor context on the alert set: how many licensed PICO-finance
+        # operators cluster in the double-pressure provinces (the distinct class the big-4
+        # contest_pctile misses). Context only — never a third pressure axis. null when the FPO
+        # registry is absent from the sandbox.
+        "double_pressure_pico": ({
+            "n_provinces": len(dbl_pico_rows),
+            "pico_total": dbl_pico_total,
+            "n_provinces_pico_present": n_dbl_pico_present,
+        } if dbl_pico_rows else None),
+        "pico_source": ({
+            "layer": "platform/data/peer_province.json (.pico, from pico_census.json / FPO registry)",
+            "metric": "licensed PICO-finance operator count per province (MEASURED, distinct class)",
+            "vintage": peer_pico_src.get("vintage"),
+            "n_operators": peer_pico_src.get("n_operators"),
+        } if pico_present_any else None),
     }
     return {"meta": meta, "provinces": records}
 
@@ -409,6 +453,11 @@ def run(check=False):
     bs = m.get("book_source")
     if bs and bs.get("n_book_suppressed"):
         print("  book rows suppressed below MIN_CELL=%d: %d" % (MIN_CELL, bs["n_book_suppressed"]))
+    dpi = m.get("double_pressure_pico")
+    if dpi:
+        print("  MEASURED sub-scale (PICO) in the alert set: %d operators across %d of %d "
+              "double-pressure provinces (distinct class, context only)"
+              % (dpi["pico_total"], dpi["n_provinces_pico_present"], dpi["n_provinces"]))
     return 0
 
 
