@@ -373,9 +373,9 @@ Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_h
     P('Live feeds', feeds.length, daily + ' of them refresh daily') +
     '<div class="lb-p"><div class="lb-pk">Current</div><div class="lb-pv" style="color:var(--merch)">' +
       tally.lb_fresh + '</div><div class="lb-pn">within their own cadence</div></div>' +
-    '<div class="lb-p"><div class="lb-pk">Aging</div><div class="lb-pv" style="color:var(--opp)">' +
+    '<div class="lb-p"><div class="lb-pk">Aging</div><div class="lb-pv" style="color:' + (tally.lb_aging ? 'var(--opp)' : 'var(--dim)') + '">' +
       tally.lb_aging + '</div><div class="lb-pn">past due, still usable</div></div>' +
-    '<div class="lb-p"><div class="lb-pk">Stale</div><div class="lb-pv" style="color:var(--agri)">' +
+    '<div class="lb-p"><div class="lb-pk">Stale</div><div class="lb-pv" style="color:' + (tally.lb_stale ? 'var(--agri)' : 'var(--dim)') + '">' +
       tally.lb_stale + '</div><div class="lb-pn">needs a pull</div></div>' +
     '<div class="lb-p"><div class="lb-pk">Reference</div><div class="lb-pv" style="color:var(--dim)">' +
       tally.lb_ref + '</div><div class="lb-pn">no cadence or stamp — don\'t age</div></div>' +
