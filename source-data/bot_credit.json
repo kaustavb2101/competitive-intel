@@ -5,7 +5,7 @@
     "label": "MEASURED — Bank of Thailand. System non-performing-loan (NPL) level and household-debt backdrop: the real-world scale the ESTIMATED 0-100 branch-risk triage score sits against. System NPL + household-debt/GDP from the Financial Stability Report 2024 text layer (not OCR); total household debt and the vehicle hire-purchase share from BoT statistics report 984.",
     "source": "ธนาคารแห่งประเทศไทย (ธปท.) — Financial Stability Report 2024 (รายงานการประเมินเสถียรภาพระบบการเงินไทย 2567) + BoT statistics report 984",
     "provenance": "MEASURED. Every figure read directly from a BoT source and spot-verified against a fixed anchor. Nothing modelled.",
-    "pulled": "2026-08-18",
+    "pulled": "2026-08-30",
     "sources": {
       "fsr": {
         "url": "https://www.bot.or.th/content/dam/bot/documents/th/research-and-publications/reports/financial-stability-report/FSR2024.pdf",
