@@ -5,14 +5,14 @@
   "label": "MEASURED — the verbatim rate text found on each operator's own rate_url this run, PLUS what pipeline/rate_basis.py could read off the page about its basis/tenor/LTV. `basis` is null (and `effective_pct_year` is null) wherever the page does not itself state which convention it is quoting — never inferred. This file is NOT the rate board's input and NEVER overwrites source-data/rival_rate_card.json, which stays hand-curated; `drift` on each operator is this script's own comparison against that card, for a human to act on. Each drift line carries a `kind`: `drift` = the quote moved outside a band the card DOES publish in that unit (a real rate move); `gap` = the card carries no figure in that unit for the operator, so there is nothing to compare (a coverage gap in the card, NOT drift — counted in n_card_unit_gaps, never n_with_drift_vs_card); `in_band` = within tolerance.",
   "why": "rival_rate_card.json only moved when a human edited it by hand. This script is the scheduled eyes that re-visit every rate_url and say what changed, so the card (and everything measured against it, incl. build_promo_gap.py's undercut check) does not go stale without anyone noticing.",
   "scheduling": "Deliberately absent from tests/run.sh — this is a network puller, not a deterministic --check build, so it has nothing byte-exact to gate. It IS scheduled: .github/workflows/data-rival-rates.yml runs it weekly (cron 10 23 * * 0 — 06:10 Bangkok Monday) and opens a PR carrying the drift report below. Registered in pull_swarm.py as `rival_rates` (needs_browser), which is why it needs that dedicated workflow: data-swarm.yml runs --skip-browser and would never pick it up.",
-  "pulled_at": "2026-08-23",
+  "pulled_at": "2026-08-31",
   "n_operators_in_plan": 23,
   "n_read": 22,
   "n_error": 1,
-  "n_no_rate_found": 3,
-  "n_with_drift_vs_card": 5,
-  "n_card_unit_gaps": 3,
-  "summary": "22 of 23 pages read, 19 with a parseable rate, 5 showing drift vs the card, 3 quoting a unit the card does not cover",
+  "n_no_rate_found": 5,
+  "n_with_drift_vs_card": 6,
+  "n_card_unit_gaps": 2,
+  "summary": "22 of 23 pages read, 17 with a parseable rate, 6 showing drift vs the card, 2 quoting a unit the card does not cover",
   "rate_url_missing": [],
   "requested_keys_not_found": [],
   "drift_tolerance": {
@@ -26,59 +26,15 @@
    "name_th": "เงินไชโย",
    "rate_url": "https://chaiyo.co.th/product/detail/loan-car",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
-   "status": "ok",
+   "fetched_at": "2026-08-31",
+   "status": "no_rate_found",
    "error": null,
-   "n_chars": 2023,
-   "quotes": [
-    {
-     "value": 14.99,
-     "unit": "pct_per_year",
-     "quote_th": "เงื่อนไขเป็นไปตามบริษัทฯ กำหนด | บุคคลทั่วไป อัตราดอกเบี้ย 23.99% ต่อปี นิติบุคคล อัตราดอกเบี้ย 14.99% ต่อปี",
-     "basis": null,
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 23.99,
-     "unit": "pct_per_year",
-     "quote_th": "เงื่อนไขเป็นไปตามบริษัทฯ กำหนด | บุคคลทั่วไป อัตราดอกเบี้ย 23.99% ต่อปี นิติบุคคล อัตราดอกเบี้ย 14.99% ต่อปี",
-     "basis": null,
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    }
-   ],
+   "n_chars": 380,
+   "quotes": [],
    "quotes_truncated": false,
    "drift": {
     "in_card": true,
-    "lines": [
-     {
-      "observed": 14.99,
-      "unit": "pct_per_year",
-      "card_range": [
-       14.99,
-       14.99
-      ],
-      "card_field": "นิติบุคคล.quoted",
-      "delta": 0.0,
-      "drift": false,
-      "kind": "in_band"
-     },
-     {
-      "observed": 23.99,
-      "unit": "pct_per_year",
-      "card_range": [
-       23.99,
-       23.99
-      ],
-      "card_field": "บุคคลทั่วไป.quoted",
-      "delta": 0.0,
-      "drift": false,
-      "kind": "in_band"
-     }
-    ]
+    "lines": []
    }
   },
   {
@@ -86,7 +42,7 @@
    "name_th": "เมืองไทย แคปปิตอล",
    "rate_url": "https://muangthaicap.com/loan/car-pickup/",
    "fetched_via": "http",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
    "n_chars": 9995,
@@ -146,15 +102,15 @@
    "name_th": "เงินติดล้อ",
    "rate_url": "https://tidlor.com/th/loan/car",
    "fetched_via": "http",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
    "n_chars": 3815,
    "quotes": [
     {
-     "value": 10.0,
+     "value": 12.0,
      "unit": "pct_per_year",
-     "quote_th": "ดอกถูก เริ่มต้น 10% ต่อปี",
+     "quote_th": "ดอกถูก เริ่มต้น 12% ต่อปี",
      "basis": null,
      "tenor_months": null,
      "ltv_pct": null,
@@ -166,16 +122,16 @@
     "in_card": true,
     "lines": [
      {
-      "observed": 10.0,
+      "observed": 12.0,
       "unit": "pct_per_year",
       "card_range": [
        10.0,
        10.0
       ],
       "card_field": "โปรพิเศษ รีไฟแนนซ์ เก๋ง-กระบะ (live promo).lender_effective",
-      "delta": 0.0,
-      "drift": false,
-      "kind": "in_band"
+      "delta": 2.0,
+      "drift": true,
+      "kind": "drift"
      }
     ]
    }
@@ -185,7 +141,7 @@
    "name_th": "ศรีสวัสดิ์ เงินสดทันใจ",
    "rate_url": "https://www.sawad.co.th/loan_calculator/",
    "fetched_via": "http",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
    "n_chars": 5232,
@@ -302,7 +258,7 @@
    "name_th": "เงินเทอร์โบ",
    "rate_url": "https://www.turbo.co.th/loans/car",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "no_rate_found",
    "error": null,
    "n_chars": 13,
@@ -318,7 +274,7 @@
    "name_th": "เฮงลิสซิ่ง",
    "rate_url": "https://www.hengleasing.com/heng_hirepurchase/",
    "fetched_via": "http",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "error",
    "error": "HTTP Error 403: Forbidden",
    "n_chars": null,
@@ -333,7 +289,7 @@
    "name_th": "ศักดิ์สยามลิสซิ่ง",
    "rate_url": "https://saksiam.com/service/car",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
    "n_chars": 3108,
@@ -372,7 +328,7 @@
    "name_th": "ไมโครลิสซิ่ง",
    "rate_url": "https://microleasingplc.com/th/micro-products/truck-to-cash",
    "fetched_via": "http",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
    "n_chars": 6481,
@@ -432,7 +388,7 @@
    "name_th": "อะมานะฮ์ ลิสซิ่ง",
    "rate_url": "https://amanah.co.th/car-loan",
    "fetched_via": "http",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
    "n_chars": 12467,
@@ -576,10 +532,10 @@
    "name_th": "สมหวัง เงินสั่งได้",
    "rate_url": "https://www.somwang.co.th",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
-   "n_chars": 3170,
+   "n_chars": 3140,
    "quotes": [
     {
      "value": 16.95,
@@ -657,7 +613,7 @@
    "name_th": "เงินให้ใจ",
    "rate_url": "https://www.ngernhaijai.com/product/car-title-loan",
    "fetched_via": "http",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
    "n_chars": 5655,
@@ -780,7 +736,7 @@
    "name_th": "คาร์ ฟอร์ แคช",
    "rate_url": "https://www.car4cash.com/",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "no_rate_found",
    "error": null,
    "n_chars": 2247,
@@ -796,29 +752,11 @@
    "name_th": "KTC พี่เบิ้ม รถแลกเงิน",
    "rate_url": "https://ktc.co.th/ktc-p-berm",
    "fetched_via": "http",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
-   "n_chars": 5968,
+   "n_chars": 2427,
    "quotes": [
-    {
-     "value": 21.0,
-     "unit": "pct_per_year",
-     "quote_th": "ลูกค้าเบิกถอนเงินกู้ 25,000 บาท ในอัตราดอกเบี้ย 21% ต่อปี",
-     "basis": null,
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 21.5,
-     "unit": "pct_per_year",
-     "quote_th": "ลูกค้าเบิกถอนเงินกู้ 25,000 บาท ในอัตราดอกเบี้ย 21.5% ต่อปี",
-     "basis": null,
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
     {
      "value": 24.0,
      "unit": "pct_per_year",
@@ -833,30 +771,6 @@
    "drift": {
     "in_card": true,
     "lines": [
-     {
-      "observed": 21.0,
-      "unit": "pct_per_year",
-      "card_range": [
-       12.99,
-       24.0
-      ],
-      "card_field": "รถยนต์ รถกระบะ รถเก๋ง รถตู้.quoted",
-      "delta": 0.0,
-      "drift": false,
-      "kind": "in_band"
-     },
-     {
-      "observed": 21.5,
-      "unit": "pct_per_year",
-      "card_range": [
-       12.99,
-       24.0
-      ],
-      "card_field": "รถยนต์ รถกระบะ รถเก๋ง รถตู้.quoted",
-      "delta": 0.0,
-      "drift": false,
-      "kind": "in_band"
-     },
      {
       "observed": 24.0,
       "unit": "pct_per_year",
@@ -877,7 +791,7 @@
    "name_th": "เงินดีดี (Good Money by GSB)",
    "rate_url": "https://www.moneydd.co.th",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
    "n_chars": 4113,
@@ -979,10 +893,10 @@
    "name_th": "มีที่ มีเงิน",
    "rate_url": "https://meetee.co.th/mortgage/",
    "fetched_via": "http",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
-   "n_chars": 20202,
+   "n_chars": 20543,
    "quotes": [
     {
      "value": 6.75,
@@ -1165,10 +1079,10 @@
    "name_th": "ttb รถแลกเงิน (cash your car)",
    "rate_url": "https://www.ttbbank.com/th/personal/loans/hire-purchase/cash-your-car",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
-   "n_chars": 18327,
+   "n_chars": 18136,
    "quotes": [
     {
      "value": 0.27,
@@ -1465,7 +1379,7 @@
    "name_th": "KKP รถเรียกเงิน",
    "rate_url": "https://kkpauto.com/th/carquickcash",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "no_rate_found",
    "error": null,
    "n_chars": 0,
@@ -1481,7 +1395,7 @@
    "name_th": "คาร์ฟินน์ (CarFinn)",
    "rate_url": "https://www.carfinn.com/car-loan",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
    "n_chars": 3387,
@@ -1562,202 +1476,15 @@
    "name_th": "สินเชื่อรถคือเงิน My Car My Cash",
    "rate_url": "https://www.scb.co.th/th/personal-banking/loans/car-loans/my-car-my-cash.html",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
-   "status": "ok",
+   "fetched_at": "2026-08-31",
+   "status": "no_rate_found",
    "error": null,
-   "n_chars": 15611,
-   "quotes": [
-    {
-     "value": 0.25,
-     "unit": "pct_per_month",
-     "quote_th": "อัตราดอกเบี้ยเริ่มต้น 0.25% ต่อเดือน*",
-     "basis": null,
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 0.25,
-     "unit": "pct_per_month",
-     "quote_th": "อัตราดอกเบี้ยเริ่มต้น 0.25% ต่อเดือน คำนวณจากอัตราดอกเบี้ย 2.99% ต่อปี สำหรับรถยนต์ที่จดทะเบียนปี 2026-2024 ระยะเวลาการผ่อนไม่เกิน 60 เดือน (ทั้งนี้ อัตราดอกเบี้ยอาจเปลี่ยนแปลงได้ซึ่งไม่เกินตามที่ธนาคารประกาศกำหนด)",
-     "basis": null,
-     "tenor_months": 60,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 2.99,
-     "unit": "pct_per_year",
-     "quote_th": "อัตราดอกเบี้ยเริ่มต้น 0.25% ต่อเดือน คำนวณจากอัตราดอกเบี้ย 2.99% ต่อปี สำหรับรถยนต์ที่จดทะเบียนปี 2026-2024 ระยะเวลาการผ่อนไม่เกิน 60 เดือน (ทั้งนี้ อัตราดอกเบี้ยอาจเปลี่ยนแปลงได้ซึ่งไม่เกินตามที่ธนาคารประกาศกำหนด)",
-     "basis": null,
-     "tenor_months": 60,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 5.0,
-     "unit": "pct_per_year",
-     "quote_th": "สมมติฐานการคำนวณมาจากการกู้สินเชื่อที่ผ่อนชำระเป็นงวด จากเงินต้น 100,000 บาท ประเภทรถเก๋ง ปีที่จดทะเบียน 2024 อัตราดอกเบี้ยคงที่ 5% ต่อปี (อัตราดอกเบี้ยที่แท้จริง 8.97% ต่อปี) และระยะเวลาผ่อน 84 เดือน (7 ปี) ค่างวด (รวม VAT) 1,720 บาทต่อเดือน จำนวนดอกเบี้ยทั้งสัญญา 35,000 บาท",
-     "basis": "flat",
-     "tenor_months": 84,
-     "ltv_pct": null,
-     "effective_pct_year": 8.97
-    },
-    {
-     "value": 8.65,
-     "unit": "pct_per_year",
-     "quote_th": "อัตราดอกเบี้ยคงที่อยู่ระหว่าง 2.99% - 8.65% ต่อปี (อัตราดอกเบี้ยที่แท้จริงอยู่ระหว่าง 5.47% - 15% ต่อปี ตลอดอายุสัญญา) (อัตราดอกเบี้ยอาจมีการเปลี่ยนแปลงได้ซึ่งไม่เกินตามที่ธนาคารประกาศกำหนด)",
-     "basis": "flat",
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 8.65,
-     "unit": "pct_per_year",
-     "quote_th": "สินเชื่อรถคือเงิน อัตราดอกเบี้ยคงที่อยู่ระหว่าง 2.99%-8.65% ต่อปี (อัตราดอกเบี้ยที่แท้จริงอยู่ระหว่าง 5.47%-15% ต่อปี ตลอดอายุสัญญา) ทั้งนี้ อาจมีการเปลี่ยนแปลงได้ซึ่งไม่เกินตามที่ธนาคารประกาศกำหนด",
-     "basis": "flat",
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": null
-    },
-    {
-     "value": 8.97,
-     "unit": "pct_per_year",
-     "quote_th": "สมมติฐานการคำนวณมาจากการกู้สินเชื่อที่ผ่อนชำระเป็นงวด จากเงินต้น 100,000 บาท ประเภทรถเก๋ง ปีที่จดทะเบียน 2024 อัตราดอกเบี้ยคงที่ 5% ต่อปี (อัตราดอกเบี้ยที่แท้จริง 8.97% ต่อปี) และระยะเวลาผ่อน 84 เดือน (7 ปี) ค่างวด (รวม VAT) 1,720 บาทต่อเดือน จำนวนดอกเบี้ยทั้งสัญญา 35,000 บาท",
-     "basis": "effective",
-     "tenor_months": 84,
-     "ltv_pct": null,
-     "effective_pct_year": 8.97
-    },
-    {
-     "value": 15.0,
-     "unit": "pct_per_year",
-     "quote_th": "อัตราดอกเบี้ยคงที่อยู่ระหว่าง 2.99% - 8.65% ต่อปี (อัตราดอกเบี้ยที่แท้จริงอยู่ระหว่าง 5.47% - 15% ต่อปี ตลอดอายุสัญญา) (อัตราดอกเบี้ยอาจมีการเปลี่ยนแปลงได้ซึ่งไม่เกินตามที่ธนาคารประกาศกำหนด)",
-     "basis": "effective",
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": 15.0
-    },
-    {
-     "value": 15.0,
-     "unit": "pct_per_year",
-     "quote_th": "สินเชื่อรถคือเงิน อัตราดอกเบี้ยคงที่อยู่ระหว่าง 2.99%-8.65% ต่อปี (อัตราดอกเบี้ยที่แท้จริงอยู่ระหว่าง 5.47%-15% ต่อปี ตลอดอายุสัญญา) ทั้งนี้ อาจมีการเปลี่ยนแปลงได้ซึ่งไม่เกินตามที่ธนาคารประกาศกำหนด",
-     "basis": "effective",
-     "tenor_months": null,
-     "ltv_pct": null,
-     "effective_pct_year": 15.0
-    }
-   ],
+   "n_chars": 0,
+   "quotes": [],
    "quotes_truncated": false,
    "drift": {
     "in_card": true,
-    "lines": [
-     {
-      "observed": 0.25,
-      "unit": "pct_per_month",
-      "card_range": null,
-      "card_field": null,
-      "delta": null,
-      "drift": false,
-      "kind": "gap",
-      "note": "card has no figure in this unit for this operator"
-     },
-     {
-      "observed": 0.25,
-      "unit": "pct_per_month",
-      "card_range": null,
-      "card_field": null,
-      "delta": null,
-      "drift": false,
-      "kind": "gap",
-      "note": "card has no figure in this unit for this operator"
-     },
-     {
-      "observed": 2.99,
-      "unit": "pct_per_year",
-      "card_range": [
-       2.99,
-       6.25
-      ],
-      "card_field": "รถจดทะเบียนปี 2026–2021.quoted",
-      "delta": 0.0,
-      "drift": false,
-      "kind": "in_band"
-     },
-     {
-      "observed": 5.0,
-      "unit": "pct_per_year",
-      "card_range": [
-       2.99,
-       6.25
-      ],
-      "card_field": "รถจดทะเบียนปี 2026–2021.quoted",
-      "delta": 0.0,
-      "drift": false,
-      "kind": "in_band"
-     },
-     {
-      "observed": 8.65,
-      "unit": "pct_per_year",
-      "card_range": [
-       5.47,
-       10.98
-      ],
-      "card_field": "รถจดทะเบียนปี 2026–2021.lender_effective",
-      "delta": 0.0,
-      "drift": false,
-      "kind": "in_band"
-     },
-     {
-      "observed": 8.65,
-      "unit": "pct_per_year",
-      "card_range": [
-       5.47,
-       10.98
-      ],
-      "card_field": "รถจดทะเบียนปี 2026–2021.lender_effective",
-      "delta": 0.0,
-      "drift": false,
-      "kind": "in_band"
-     },
-     {
-      "observed": 8.97,
-      "unit": "pct_per_year",
-      "card_range": [
-       5.47,
-       10.98
-      ],
-      "card_field": "รถจดทะเบียนปี 2026–2021.lender_effective",
-      "delta": 0.0,
-      "drift": false,
-      "kind": "in_band"
-     },
-     {
-      "observed": 15.0,
-      "unit": "pct_per_year",
-      "card_range": [
-       10.0,
-       15.0
-      ],
-      "card_field": "รถจดทะเบียนปี 2015–2011.lender_effective",
-      "delta": 0.0,
-      "drift": false,
-      "kind": "in_band"
-     },
-     {
-      "observed": 15.0,
-      "unit": "pct_per_year",
-      "card_range": [
-       10.0,
-       15.0
-      ],
-      "card_field": "รถจดทะเบียนปี 2015–2011.lender_effective",
-      "delta": 0.0,
-      "drift": false,
-      "kind": "in_band"
-     }
-    ]
+    "lines": []
    }
   },
   {
@@ -1765,7 +1492,7 @@
    "name_th": "สินเชื่อทะเบียนรถยนต์ ยูโอบี Car2Cash",
    "rate_url": "https://www.uob.co.th/personal/loans/car-2-cash.page",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
    "n_chars": 9464,
@@ -1867,7 +1594,7 @@
    "name_th": "สินเชื่อทะเบียนรถยนต์ ทิสโก้ ออโต้แคช",
    "rate_url": "https://www.tisco.co.th/th/personal/loan/auto-loan.html",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
    "n_chars": 3851,
@@ -1969,7 +1696,7 @@
    "name_th": "สินเชื่อรถช่วยได้กสิกรไทย (จำนำทะเบียนรถ)",
    "rate_url": "https://www.kasikornbank.com/th/personal/autoloan/pages/car-to-cash/top-up.aspx",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
    "n_chars": 8522,
@@ -2008,7 +1735,7 @@
    "name_th": "สินเชื่อรถปลดล็อก ซีไอเอ็มบี ไทย ออโต้",
    "rate_url": "https://www.cimbthaiauto.com/product/autocash",
    "fetched_via": "browser",
-   "fetched_at": "2026-08-23",
+   "fetched_at": "2026-08-31",
    "status": "ok",
    "error": null,
    "n_chars": 5937,
