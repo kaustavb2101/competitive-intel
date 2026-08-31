@@ -6306,14 +6306,25 @@ function drawPeerNpl(){
     // The 180+ legacy workout stock is held SEPARATELY from the live book (tape-pii-floor: report the two
     // books apart, never blended). Surface its OS-weighted rate and compare to the live NPL — computed,
     // not asserted, so the "larger/smaller than live" clause stays honest as the tape refreshes.
+    // The headline AutoX bar is NPL-live on the LIVE book (6.06%); the listed peers report NPL on their
+    // WHOLE book, so the headline is NOT a like-for-like read (the row caveat says so). peer_npl carries
+    // the SAME 90–179dpd numerator over the FULL book (live + the held-apart legacy stock) — the apples-
+    // to-apples denominator matching how peers report — plus an account-weighted read. Surface both with a
+    // clear lead: full-book = the peer-comparable basis; OS-vs-account = whether the bad tickets are bigger
+    // than average. Every relation is COMPUTED (below/above/level), never hard-asserted, so it stays honest
+    // as the tape refreshes; drops silently on an older vintage that lacks either field.
+    const ft=(ax&&typeof ax.npl_live_of_total_os_pct==='number')?ax.npl_live_of_total_os_pct:null;
+    const acct=(ax&&typeof ax.npl_live_acct_pct==='number')?ax.npl_live_acct_pct:null;
+    const basisLine=(ft!=null&&axv!=null)?` <b>On a like-for-like basis</b> — the same 90–179dpd numerator taken over the <b>full book</b> (live + the held-apart legacy stock), the denominator the listed peers report on — that live-NPL reads <b style="color:var(--accent)">${ft.toFixed(2)}% OS-weighted</b>, <b>${ft<axv?'below':ft>axv?'above':'level with'} the ${axv.toFixed(2)}% live-book headline</b>, the fairer comparator to the reported ranks above.${acct!=null?` Account-weighted the live rate is <b>${acct.toFixed(2)}%</b>, ${acct<axv?`under the ${axv.toFixed(2)}% OS-weighted figure — the accounts going bad carry <b>above-average balances</b>, so the stress sits in the larger tickets`:acct>axv?`over the ${axv.toFixed(2)}% OS-weighted figure — the impaired tickets run smaller than average`:`level with the OS-weighted figure`}.`:''}`:'';
     const lg=(ax&&typeof ax.legacy_180plus_os_pct==='number')?ax.legacy_180plus_os_pct:null;
     const legLine=(lg!=null&&axv!=null)?` Held apart as late-stage collections inventory, its <b>180+ legacy workout stock runs <span style="color:var(--accent)">${lg.toFixed(1)}% OS-weighted</span> — ${lg>axv?'larger than the live NPL itself':'below the live NPL'} (${axv.toFixed(2)}%)</b>: the aged deep-delinquent tail the listed peers write off or provision out, which is why AutoX reads on a different basis than the reported ranks.`:'';
     ro.innerHTML=`<b>The listed title-lenders' reported loan quality spans ${(hi-lo).toFixed(1)}pp</b> — ${spread}. `+
-      `The gap is a <b>collateral story</b>: vehicle/gold books run the cleanest, land / heavy-vehicle / agri books the highest NPL.${axLine}${legLine} ${TAG_M}`+
+      `The gap is a <b>collateral story</b>: vehicle/gold books run the cleanest, land / heavy-vehicle / agri books the highest NPL.${axLine}${basisLine}${legLine} ${TAG_M}`+
       methodBox(m.note||null,
         [`Peer figures are <b>reported by the companies themselves</b> (FY2025 / 2025 IR) — docs/RESEARCH_DIGEST.md §B. Vintage ${m.updated||'2026-06'}.`,
          list.some(p=>p.ticker==='HENG')?`<b>Heng's figure is a TFRS9 Stage-3 (credit-impaired) share</b>, not a bank-style 90+ NPL — the loan-quality metric a hire-purchase/leasing lender publishes, and the closest basis-match to AutoX's own tape-measured impaired share. It is the one <b>contracting</b> peer and the only reported peer that brackets AutoX's ~6% impaired share ("compliant" is not "thriving").`:'',
          ax?`<b>The AutoX row is MEASURED</b> from the real loan tape (${ax.basis?ax.basis.replace('MEASURED — ',''):'OS-weighted'}), not reported. ${ax.caveat||''}`:'',
+         (ax&&ft!=null)?`AutoX carries three MEASURED cuts of the same live 90–179dpd stress from the tape: <b>live-book OS</b> (${axv.toFixed(2)}%, the internal collections view — the headline bar), <b>full-book OS</b> (${ft.toFixed(2)}%, the same numerator over live + legacy — the denominator the listed peers report on), and <b>account-weighted</b> (${acct!=null?acct.toFixed(2)+'%':'—'}, tickets not balances). The full-book cut is the like-for-like comparator; the others are shown so the basis is explicit, not blended.`:'',
          'The spread tracks collateral mix, not operator skill alone: a heavier land / agri / heavy-vehicle book carries structurally higher NPL than a vehicle/gold book at the same underwriting discipline.'].filter(Boolean));
   }
 }
