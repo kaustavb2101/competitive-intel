@@ -285,8 +285,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "37 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 37,
+    "note": "38 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 38,
     "series": "rain_max_mm"
    },
    "key": "thaiwater_rain",
@@ -309,8 +309,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "37 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 37,
+    "note": "38 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 38,
     "series": "flood_high"
    },
    "key": "thaiwater_flood",
@@ -321,7 +321,7 @@
    "stamp_iso": "2026-08-31",
    "stamp_kind": "pulled",
    "unit": "of 791",
-   "value": 133,
+   "value": 132,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -513,7 +513,7 @@
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
   "history_note": "A trend line is drawn only where a stored series exists. 11 of 24 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 314,
+  "history_points": 316,
   "missing_files": [],
   "n_feeds": 24,
   "n_with_history": 11,
