@@ -373,8 +373,20 @@ def build():
                 r["eval_vs_retail"] = round(ev / r["market_retail"], 3)
             if auc:
                 r["market_auction"] = round(st.median([x["median"] for x in auc]))
+                # The DOWNSIDE recovery a distressed / forced sale actually realises: the median
+                # auction price is the middle of the lot spread, but a repossessed title is sold
+                # under time pressure into the weak end of that spread. Each model-year cohort
+                # carries its own within-lot 25th percentile (_stats p25); aggregate them exactly
+                # as market_auction aggregates the medians (median-of-cohorts, deliberately NOT
+                # pooled — same non-pooling discipline the rest of this builder keeps), so the
+                # downside number is construction-parallel to the median beside it, not a differently
+                # derived statistic. eval_vs_auction_p25 is then the book-to-downside gap: how far
+                # the appraisal sits above what a forced sale of the same collateral clears.
+                r["market_auction_p25"] = round(st.median([x["p25"] for x in auc]))
                 r["auction_n"] = sum(x["n"] for x in auc)
                 r["eval_vs_auction"] = round(ev / r["market_auction"], 3)
+                if r["market_auction_p25"]:
+                    r["eval_vs_auction_p25"] = round(ev / r["market_auction_p25"], 3)
             book.append(r)
 
     doc = dict(

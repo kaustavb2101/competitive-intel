@@ -532,7 +532,9 @@
    "dpd30p_pct": 24.3,
    "eval_avg": 36151,
    "eval_vs_auction": 1.83,
+   "eval_vs_auction_p25": 2.472,
    "market_auction": 19750,
+   "market_auction_p25": 14625,
    "model_years": [
     2021,
     2022,
@@ -549,7 +551,9 @@
    "dpd30p_pct": 25.15,
    "eval_avg": 505703,
    "eval_vs_auction": 1.842,
+   "eval_vs_auction_p25": 3.112,
    "market_auction": 274500,
+   "market_auction_p25": 162500,
    "model_years": [
     2021
    ],
@@ -563,7 +567,9 @@
    "dpd30p_pct": 21.97,
    "eval_avg": 381774,
    "eval_vs_auction": 2.545,
+   "eval_vs_auction_p25": 2.823,
    "market_auction": 150000,
+   "market_auction_p25": 135250,
    "model_years": [
     2018
    ],
@@ -577,7 +583,9 @@
    "dpd30p_pct": 24.24,
    "eval_avg": 273526,
    "eval_vs_auction": 2.299,
+   "eval_vs_auction_p25": 3.747,
    "market_auction": 119000,
+   "market_auction_p25": 73000,
    "model_years": [
     2011
    ],
@@ -591,7 +599,9 @@
    "dpd30p_pct": 27.7,
    "eval_avg": 211577,
    "eval_vs_auction": 2.645,
+   "eval_vs_auction_p25": 3.795,
    "market_auction": 80000,
+   "market_auction_p25": 55750,
    "model_years": [
     2010
    ],
@@ -605,7 +615,9 @@
    "dpd30p_pct": 27.38,
    "eval_avg": 135424,
    "eval_vs_auction": 2.58,
+   "eval_vs_auction_p25": 3.611,
    "market_auction": 52500,
+   "market_auction_p25": 37500,
    "model_years": [
     2005
    ],
@@ -619,7 +631,9 @@
    "dpd30p_pct": 23.88,
    "eval_avg": 308945,
    "eval_vs_auction": 1.931,
+   "eval_vs_auction_p25": 3.169,
    "market_auction": 160000,
+   "market_auction_p25": 97500,
    "model_years": [
     2019
    ],
@@ -633,7 +647,9 @@
    "dpd30p_pct": 27.64,
    "eval_avg": 179815,
    "eval_vs_auction": 2.351,
+   "eval_vs_auction_p25": 4.671,
    "market_auction": 76500,
+   "market_auction_p25": 38500,
    "model_years": [
     2013
    ],
@@ -647,7 +663,9 @@
    "dpd30p_pct": 24.91,
    "eval_avg": 163503,
    "eval_vs_auction": 3.175,
+   "eval_vs_auction_p25": 8.959,
    "market_auction": 51500,
+   "market_auction_p25": 18250,
    "model_years": [
     2013
    ],
@@ -661,7 +679,9 @@
    "dpd30p_pct": 25.92,
    "eval_avg": 218955,
    "eval_vs_auction": 3.575,
+   "eval_vs_auction_p25": 4.907,
    "market_auction": 61250,
+   "market_auction_p25": 44625,
    "model_years": [
     2012,
     2013
@@ -676,7 +696,9 @@
    "dpd30p_pct": 26.82,
    "eval_avg": 181450,
    "eval_vs_auction": 4.426,
+   "eval_vs_auction_p25": 4.904,
    "market_auction": 41000,
+   "market_auction_p25": 37000,
    "model_years": [
     2008
    ],
@@ -690,7 +712,9 @@
    "dpd30p_pct": 24.69,
    "eval_avg": 258506,
    "eval_vs_auction": 2.228,
+   "eval_vs_auction_p25": 2.462,
    "market_auction": 116000,
+   "market_auction_p25": 105000,
    "model_years": [
     2013
    ],
@@ -704,7 +728,9 @@
    "dpd30p_pct": 24.67,
    "eval_avg": 46706,
    "eval_vs_auction": 2.365,
+   "eval_vs_auction_p25": 3.167,
    "market_auction": 19750,
+   "market_auction_p25": 14750,
    "model_years": [
     2021,
     2022,
@@ -721,7 +747,9 @@
    "dpd30p_pct": 27.33,
    "eval_avg": 28733,
    "eval_vs_auction": 1.69,
+   "eval_vs_auction_p25": 2.499,
    "market_auction": 17000,
+   "market_auction_p25": 11500,
    "model_years": [
     2016,
     2017,
