@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-30T22:20:19+00:00",
-    "commit": "f0fb20f"
+    "generated_at": "2026-08-31T11:17:43+07:00",
+    "commit": "1d1894a"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-30",
+    "eta_date": "2026-08-31",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-08-31T11:17:43+07:00",
+      "sha": "1d1894a",
+      "summary": "intel: surface the MEASURED 180+ legacy workout-stock NPL on the peer-NPL benchmark (#732)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-31T04:00:26+00:00",
+      "sha": "9e3d3d7",
+      "summary": "docs: log the cc-hero-foot narrow-wrap UX fix (PR #730 merged + deployed + verified) (#731)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-31T03:18:35+00:00",
+      "sha": "91aa247",
+      "summary": "data: rival Facebook promo feed refresh (run 33343798192) (#727)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-31T02:55:32+00:00",
+      "sha": "eed04de",
+      "summary": "ux: hero-card foot wraps on narrow cards instead of bleeding past the edge (#730)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-31T00:55:24+00:00",
+      "sha": "48ac017",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-31T00:53:26+00:00",
+      "sha": "344e968",
+      "summary": "intel: surface measured absolute rival NPL book (฿bn) on the peer asset-quality table (#728)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-31T00:51:44+00:00",
+      "sha": "e0e7b85",
+      "summary": "data: live fuel prices (2026-08-31, run 33345700620)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-30T23:37:11+00:00",
+      "sha": "10bb731",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-30, run 33342221801)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-30T22:56:21+00:00",
+      "sha": "fad9693",
+      "summary": "data: Thai-IP-only swarm refresh (run 33337687274) (#725)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-30T22:21:03+00:00",
+      "sha": "1f22f8f",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after social_themes freshness-probe",
+      "pillar": "uxui"
+    },
+    {
       "date": "2026-08-30T22:20:19+00:00",
       "sha": "f0fb20f",
       "summary": "intel(deploy-health): freshness-probe social_themes.json so a stuck weekly social-listening cron alerts instead of shipping a frozen board",
@@ -651,66 +711,6 @@
       "sha": "3c689d1",
       "summary": "data: ThaiWater flood + rain pulse (2026-08-30, run 33303784453)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-30T08:26:44+00:00",
-      "sha": "d487c15",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-30T08:23:00+00:00",
-      "sha": "6d0a915",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-30T08:22:47+00:00",
-      "sha": "72f1874",
-      "summary": "docs: log ux-loop provenance-note-pending-stale fix (PR #715, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-30T08:22:11+00:00",
-      "sha": "c3d98b0",
-      "summary": "data: NABC live prices (2026-08-30, run 33301188838)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-30T15:19:37+07:00",
-      "sha": "909e157",
-      "summary": "ux: fix stale \"pending data.go.th run\" provenance note (#715)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-30T06:42:04+00:00",
-      "sha": "ba1b844",
-      "summary": "intel(#assist): surface per-branch MEASURED farm book on the call list (#714)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-30T05:54:08+00:00",
-      "sha": "d039f27",
-      "summary": "data: Thai-IP-only swarm refresh (run 33276845705) (#707)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-30T05:31:36+00:00",
-      "sha": "39360ad",
-      "summary": "data(census): refresh the Union Auction forward book (run 33247729608) (#695)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-30T04:56:06+00:00",
-      "sha": "328712f",
-      "summary": "data: market-pulse swarm refresh (run 33281230416) (#709)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-30T04:15:35+00:00",
-      "sha": "75cf510",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after peer-margin ship",
-      "pillar": "peer"
     }
   ]
 }
