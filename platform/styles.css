@@ -365,7 +365,8 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 /* ---------- insight callout: tinted glass, segment-coded ---------- */
 .insight{background:linear-gradient(180deg,rgba(35,162,143,.10),var(--panel));
   border:1px solid var(--line);border-left:3px solid var(--merch);border-radius:var(--r);
-  padding:13px 15px;margin:var(--s3) 0;font-size:12.5px;color:var(--txt);box-shadow:var(--elev-1)}
+  padding:13px 15px;margin:var(--s3) 0;font-size:12.5px;color:var(--txt);box-shadow:var(--elev-1);
+  overflow-wrap:anywhere}
 .insight b{color:var(--hi)}
 .insight.risk{background:linear-gradient(180deg,rgba(224,87,79,.10),var(--panel));border-left-color:var(--agri)}
 .insight.opp{background:linear-gradient(180deg,rgba(230,180,80,.10),var(--panel));border-left-color:var(--gold)}
