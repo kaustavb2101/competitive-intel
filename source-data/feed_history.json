@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 632,
+  "n_points": 636,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -534,7 +534,7 @@
     128.0,
     138.0,
     128.0,
-    132.0
+    127.0
    ]
   },
   "fuel_diesel": {
@@ -786,11 +786,12 @@
     "2026-08-27",
     "2026-08-28",
     "2026-08-29",
-    "2026-08-30"
+    "2026-08-30",
+    "2026-08-31"
    ],
    "first_seen": "2026-07-05",
    "label": "Rice (Hom Mali) - NABC farm-gate",
-   "n": 38,
+   "n": 39,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/tonne",
@@ -826,6 +827,7 @@
     17905.0,
     17905.0,
     17905.0,
+    17700.0,
     17700.0,
     17700.0,
     17700.0,
@@ -875,11 +877,12 @@
     "2026-08-27",
     "2026-08-28",
     "2026-08-29",
-    "2026-08-30"
+    "2026-08-30",
+    "2026-08-31"
    ],
    "first_seen": "2026-07-05",
    "label": "Rubber (raw sheet) - NABC farm-gate",
-   "n": 38,
+   "n": 39,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/kg",
@@ -919,6 +922,7 @@
     81.25,
     80.14,
     80.14,
+    80.01,
     80.01,
     80.01,
     80.01
@@ -1008,7 +1012,7 @@
     22.0,
     33.0,
     30.0,
-    26.0
+    28.0
    ]
   },
   "rain_max_mm": {
@@ -1095,7 +1099,7 @@
     199.0,
     169.2,
     138.5,
-    121.5
+    135.5
    ]
   },
   "rival_ads_live": {
@@ -1313,11 +1317,12 @@
     "2026-08-25",
     "2026-08-27",
     "2026-08-28",
-    "2026-08-29"
+    "2026-08-29",
+    "2026-08-30"
    ],
    "first_seen": "2026-07-30",
    "label": "Rival YouTube brand channels · total views",
-   "n": 17,
+   "n": 18,
    "path": "platform/data/rival_youtube.json",
    "source": "YouTube Data API v3 (official) — public brand-channel statistics",
    "unit": "views",
@@ -1338,7 +1343,8 @@
     927410043.0,
     928885266.0,
     931272403.0,
-    933334351.0
+    933334351.0,
+    934976830.0
    ]
   },
   "search_share_autox": {
@@ -1625,11 +1631,12 @@
     "2026-08-24",
     "2026-08-25",
     "2026-08-27",
-    "2026-08-28"
+    "2026-08-28",
+    "2026-08-29"
    ],
    "first_seen": "2026-08-07",
    "label": "Social-listening corpus · total demand documents",
-   "n": 15,
+   "n": 16,
    "path": "platform/data/social_themes.json",
    "source": "app-store reviews + YouTube comments + Pantip threads (build_social_themes.py)",
    "unit": "documents",
@@ -1648,7 +1655,8 @@
     12611.0,
     12716.0,
     12769.0,
-    12807.0
+    12807.0,
+    12821.0
    ]
   }
  }
