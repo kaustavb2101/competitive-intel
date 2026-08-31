@@ -710,8 +710,14 @@ html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6f
 /* ===== Command center (Step 1) ===== */
 .cc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
 .cc-actions{display:flex;gap:8px;flex:none}
-.cc-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:8px}
-@media(max-width:340px){.cc-grid{grid-template-columns:1fr}}
+/* ux-cc-grid-minmax-mobile-bleed: the auto-fit min was a fixed 300px, so on a phone where the grid
+   content box is <300px (≈268px @360, ≈228px @320 after main padding) the 300px MIN track overflowed
+   the container — 32px @360, and at ≤340 the `1fr` (=minmax(auto,1fr)) fallback floored on a wide
+   card child's min-content and blew the column out to ~2010px (PAGEX). The canonical clamp
+   `min(300px,100%)` sets an explicit track min that collapses to the container width when narrower —
+   one full-width column, no overflow — and resolves to 300px at any width ≥300, so the ≥340/≥1000
+   multi-column layout is byte-identical (the old max-width:340 `1fr` guard is now subsumed). */
+.cc-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));margin-top:8px}
 /* Home focal hierarchy: on wide screens the two standing-objective cards own row 1, macro+movers
    sit on row 2 (supporting) — a clear primary->secondary read instead of four competing peers. */
 @media(min-width:1000px){.cc-grid{grid-template-columns:1fr 1fr}}
