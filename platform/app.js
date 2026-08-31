@@ -4303,7 +4303,8 @@ function drawPeerAssetQuality(){
   tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Listed peer</th>`+
     `<th scope="col" title="Stage-3 (non-performing / credit-impaired) gross receivables as a share of total gross receivables — the peer's own NPL-equivalent">NPL (Stage 3)</th>`+
     `<th scope="col" title="the Stage-3 (non-performing) book in absolute ฿bn — NPL share × gross book. Sizes the actual bad-book pile: a low NPL rate on a large book can be a bigger absolute stress than a high rate on a small one">NPL book</th>`+
-    `<th scope="col" title="expected-credit-loss allowance held against the Stage-3 book, as a share of Stage-3 gross">S3 coverage</th>`+
+    `<th scope="col" title="expected-credit-loss allowance held against the Stage-3 book, as a share of Stage-3 gross — how deeply the already-impaired loans are reserved">S3 coverage</th>`+
+    `<th scope="col" title="total ECL allowance as a share of the WHOLE gross book (Stage 1+2+3) — the buffer carried across the entire book, i.e. the cushion if stress spreads beyond today's NPLs. Distinct from S3 coverage, which reserves only the already-bad book">Whole-book cover</th>`+
     `<th scope="col" title="gross receivables book (loan + hire-purchase where reported separately)">Gross book</th>`+
     `<th scope="col" title="gross split between the secured loan book (title-loan / cash lending — AutoX's direct space) and the hire-purchase book (vehicle instalment / asset finance)">Book mix (loan · HP)</th>`+
     `<th scope="col" title="reporting basis">Basis</th></tr>`+
@@ -4317,6 +4318,7 @@ function drawPeerAssetQuality(){
         <td class="mono">${bar} <b>${p.npl_pct}%</b></td>
         <td class="mono sub">${typeof p.nonperf_bn==='number'?'฿'+p.nonperf_bn.toFixed(2)+'bn':'—'}</td>
         <td class="mono sub">${p.s3_coverage_pct}%</td>
+        <td class="mono sub">${typeof p.total_coverage_pct==='number'?p.total_coverage_pct.toFixed(1)+'%':'—'}</td>
         <td class="mono sub">฿${p.gross_book_bn}bn${poci}</td>
         <td>${bookMixCell(p)}</td>
         <td class="sub" style="font-size:11px">${basis}</td>
@@ -4384,13 +4386,32 @@ function drawPeerAssetQuality(){
       }
       npLine+=` (฿${totNP.toFixed(1)}bn impaired across the six, measured.)`;
     }
+    // Whole-book ECL cushion read (MEASURED, obj #2 — rival fragility). The two coverage columns answer
+    // DIFFERENT questions and the exec is led on which: S3 coverage reserves only the ALREADY-bad book;
+    // whole-book cover (total_coverage_pct = total ECL ÷ whole gross) is the buffer carried against the
+    // ENTIRE book — the cushion if stress spreads past today's NPLs. Leads with the field's THINNEST
+    // whole-book cushion (the least absorptive capacity in a broad downturn) and, only when it genuinely
+    // holds (COMPUTED, not asserted), the fact that that buffer sits below the same rival's own NPL rate.
+    // Null-safe; fires only with ≥2 peers carrying total_coverage_pct, so an older vintage drops it cleanly.
+    let tcLine='';
+    const withTC=peers.filter(p=>p&&typeof p.total_coverage_pct==='number');
+    if(withTC.length>=2){
+      const thin=withTC.slice().sort((a,b)=>a.total_coverage_pct-b.total_coverage_pct)[0];
+      const thick=withTC.slice().sort((a,b)=>b.total_coverage_pct-a.total_coverage_pct)[0];
+      tcLine=` <b>Two coverage lenses:</b> S3 coverage reserves only the already-impaired book; <b>whole-book cover</b> is the ECL buffer against the entire book — the cushion if stress spreads past today's NPLs. `+
+        `The thinnest whole-book cushion in the field is <b>${thin.name}</b> at ${thin.total_coverage_pct.toFixed(1)}%`;
+      tcLine+=(typeof thin.npl_pct==='number'&&thin.total_coverage_pct<thin.npl_pct)
+        ? ` — below its own ${thin.npl_pct}% NPL rate, so its total allowance would not fully cover even the loans already gone bad; the least absorptive capacity here if credit turns broadly.`
+        : ` — the least absorptive capacity here if credit turns broadly (vs ${thick.name}'s ${thick.total_coverage_pct.toFixed(1)}%).`;
+    }
     ro.innerHTML=`<b>Rival non-performing (Stage-3) share, newest reviewed filings (as of ${m.as_of||'30 Jun 2026'}).</b> ${TAG_M} `+
       `<b>${best.name}</b> runs the cleanest book (${best.npl_pct}% NPL), <b>${worst.name}</b> the most stressed (${worst.npl_pct}%). `+
-      `The wider a rival's non-performing share and the thinner its coverage, the less margin headroom it has to keep pricing hard against the network we run.`+mixLine+covLine+npLine+
+      `The wider a rival's non-performing share and the thinner its coverage, the less margin headroom it has to keep pricing hard against the network we run.`+mixLine+covLine+npLine+tcLine+
       methodBox(null,
         [`<b>Measured</b> — read directly from each peer's IFRS-9 credit-quality (Stage 1/2/3) tables in their reviewed financial-statement notes (${m.source||'Stock Exchange of Thailand · set.or.th'}).`,
          (m.npl_definition||'Stage-3 gross ÷ total gross receivables, combined loan + hire-purchase book.'),
          '<b>NPL book (฿bn)</b> — the Stage-3 gross receivables in absolute baht (the same reviewed staging table, not a rate × book estimate), sizing the impaired pile rather than its rate.',
+         (tcLine?'<b>S3 coverage vs whole-book cover</b> — S3 coverage is the ECL allowance ÷ Stage-3 gross (the already-bad book); whole-book cover is the TOTAL ECL allowance ÷ total gross (the whole book). Both read straight from the reviewed staging table; the pair separates how deeply the bad book is reserved from how thick the buffer is across the entire book.':null),
          '<b>Not a regulator NPL</b> — this is the IFRS-9 Stage-3 gross share the peer itself discloses; comparable across these six (same accounting basis), not identical to a bank 90-days-past-due ratio.',
          (covLine?'<b>S3 coverage × P/BV join</b> — the provisioning-premium read joins this layer\'s ECL-coverage column to the SET P/BV in <code>peer_scoreboard.json</code> (both MEASURED, joined by SET symbol; consolidated filers). It reads the PREMIUM against coverage, a separate question from the scoreboard\'s below-book-discount × NPL read.':null),
          '<b>Not an AutoX row</b> — AutoX is unlisted and files no SET statements.',
