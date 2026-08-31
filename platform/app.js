@@ -3170,10 +3170,15 @@ function renderDebtSource(){
           <svg width="92" height="9" viewBox="0 0 92 9" aria-hidden="true" style="vertical-align:middle;margin-left:6px"><rect x="0" y="1" width="${w.toFixed(1)}" height="7" rx="1.5" fill="${(r.informal_pct||0)>=3?'var(--agri)':'var(--line)'}"/></svg></td>
         <td class="mono sub">${r.agri_pct==null?'—':r.agri_pct+'%'}</td>
         <td class="mono">${cp==null?'—':`<span style="color:${cp>=45?'var(--agri)':'var(--dim)'}"><b>${Math.round(cp)}%</b></span>`}</td></tr>`;}).join('');
-    // National purpose mix (the average household's book) for the lead read.
-    const pn=(()=>{const t=n1.total||0,f=x=>t?Math.round((x||0)/t*100):0;
-      return {cons:f(n1.consumption_debt),agri:f(n1.agri_debt),bus:f(n1.business_debt)};})();
-    const prodNat=pn.agri+pn.bus, otherNat=Math.max(0,100-pn.cons-prodNat);
+    // National purpose mix (the average household's book) for the lead read. Computed for the first
+    // and latest wave so the block can carry the 12-year TREND, not just today's snapshot: the level
+    // read (how much) and the mix read (what for) answer different questions and move differently.
+    const mix=r=>{const t=r.total||0,f=x=>t?Math.round((x||0)/t*100):0;
+      return {cons:f(r.consumption_debt),agri:f(r.agri_debt),bus:f(r.business_debt)};};
+    const pn=mix(n1), pn0=mix(n0);
+    const prodNat=pn.agri+pn.bus, prod0=pn0.agri+pn0.bus, otherNat=Math.max(0,100-pn.cons-prodNat);
+    // Level growth over the full survey span — MEASURED, the same NSO baht-per-household means.
+    const lvlGrow=(n0.total&&n1.total)?Math.round((n1.total/n0.total-1)*100):null;
     const consVals=cls.map(r=>consPct(r)).filter(v=>v!=null);
     const consMax=consVals.length?Math.max(...consVals):null, consMin=consVals.length?Math.min(...consVals):null;
     const consMaxCls=consVals.length?cls[cls.map(consPct).indexOf(consMax)]:null;
@@ -3183,7 +3188,7 @@ function renderDebtSource(){
         <td class="sub mono">${(r.informal_series||[]).map(s=>s.informal_pct+'%').join(' → ')}</td></tr>`).join('');
     host.innerHTML=`<p class="lead" style="margin:0 0 10px"><b>Informal debt is not a place, it is a job.</b> Nationally it is only <b>${n1.informal_pct}%</b> of the average household's debt and it has <b>shrunk</b> from ${n0.informal_pct}% in ${n0.year_ce} to ${n1.informal_pct}% in ${n1.year_ce}. But it barely moves between regions (${(j.by_region||[]).length?Math.min(...j.by_region.map(r=>r.informal_pct))+'–'+Math.max(...j.by_region.map(r=>r.informal_pct))+'%':'—'}) and varies <b>${mult?mult.toFixed(1)+'×':''}</b> between occupations — the most exposed being <b style="color:var(--agri)">${top.cls_en} at ${top.informal_pct}%</b>, which is squarely this book's borrower.</p>
       <div class="cb-gap cb-assist" style="margin:0 0 10px"><b>Read the level as a floor.</b> ${M.under_reporting_caveat||''}</div>
-      <div class="cb-gap cb-assist" style="margin:0 0 10px"><b>What the debt is for is a risk read too.</b> <b style="color:var(--agri)">Consumption is ${pn.cons}%</b> of the average household's debt — more than the <b>${prodNat}%</b> borrowed productively (farming ${pn.agri}% + business ${pn.bus}%); most of the rest (${otherNat}%) is for housing, education and the like. Consumption is the slice with no income of its own to service it, and it runs <b>${consMin!=null?Math.round(consMin)+'–'+Math.round(consMax)+'%':'—'}</b> across these classes — heaviest among wage-labour households${consMaxCls?` (${consMaxCls.cls_en})`:''}, lightest where borrowing funds a farm or business.</div>
+      <div class="cb-gap cb-assist" style="margin:0 0 10px"><b>What the debt is for is a risk read too.</b> <b style="color:var(--agri)">Consumption is ${pn.cons}%</b> of the average household's debt — more than the <b>${prodNat}%</b> borrowed productively (farming ${pn.agri}% + business ${pn.bus}%); most of the rest (${otherNat}%) is for housing, education and the like. Consumption is the slice with no income of its own to service it, and it runs <b>${consMin!=null?Math.round(consMin)+'–'+Math.round(consMax)+'%':'—'}</b> across these classes — heaviest among wage-labour households${consMaxCls?` (${consMaxCls.cls_en})`:''}, lightest where borrowing funds a farm or business. Across the seven waves (<b>${n0.year_ce}→${n1.year_ce}</b>) the average household's debt grew <b style="color:var(--agri)">${lvlGrow!=null?(lvlGrow>=0?'+':'')+lvlGrow+'%':'—'}</b> (${B(n0.total)}→${B(n1.total)}), but the mix barely shifted — the <b>productive</b> slice (farm + business) actually slipped from <b>${prod0}%</b> to <b>${prodNat}%</b>, so the extra borrowing did not go into income-producing activity.</div>
       <table class="tbl"><tr><th scope="col">Household type (NSO class)</th><th scope="col">Debt / household</th><th scope="col">Outside the system</th><th scope="col">Share outside</th><th scope="col" class="sub" title="share of that household's debt borrowed for farming">For farming</th><th scope="col" class="sub" title="MEASURED — share of that household's debt borrowed to consume (not to farm or run a business): the slice with no income stream of its own to service it. NSO SES purpose split.">For consumption</th></tr>${rows}</table>
       <details style="margin-top:10px"><summary class="sub">By region — and how the informal share moved across the seven survey waves</summary>
         <table class="tbl" style="margin-top:8px"><tr><th scope="col">Region</th><th scope="col">Debt / household</th><th scope="col" class="sub">Outside</th><th scope="col">Share</th><th scope="col" class="sub">${(nat||[]).map(x=>x.year_ce).join(' → ')}</th></tr>${regs}</table></details>
