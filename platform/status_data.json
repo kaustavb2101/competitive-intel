@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-31T17:18:36+07:00",
-    "commit": "fabfbe3"
+    "generated_at": "2026-08-31T23:24:54+07:00",
+    "commit": "8eeb5a1"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,42 @@
   ],
   "activity": [
     {
+      "date": "2026-08-31T23:24:54+07:00",
+      "sha": "8eeb5a1",
+      "summary": "intel: surface the like-for-like (full-book) + account-weighted NPL denominators on the peer-NPL benchmark (#acq) (#741)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-31T21:44:04+07:00",
+      "sha": "caaa58f",
+      "summary": "ux: wrap arrow-joined figure tokens in #acq rival-fragility insight (mobile bleed) (#740)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-31T13:04:14+00:00",
+      "sha": "557a43d",
+      "summary": "intel: surface the MEASURED 12-year purpose-mix trend on the household-debt-source block (#acq) (#739)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-31T11:52:52+00:00",
+      "sha": "a3a3032",
+      "summary": "data(census): refresh the Union Auction forward book (run 33380612631) (#736)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-31T11:29:28+00:00",
+      "sha": "5fa9e4d",
+      "summary": "data: market-pulse swarm refresh (run 33380547651) (#737)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-31T10:20:42+00:00",
+      "sha": "15e976e",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after 5★ advocacy-pole ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-31T17:18:36+07:00",
       "sha": "fabfbe3",
       "summary": "intel: surface the MEASURED 5★ advocacy pole on the rival sentiment ladder (#brand) (#738)",
@@ -675,42 +711,6 @@
       "sha": "e49d3a5",
       "summary": "ux: clamp status.html auto-fit grid min-tracks so cards don't bleed at 390px (#724)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-30T18:44:42+00:00",
-      "sha": "5a8431b",
-      "summary": "intel: surface measured national borrower-base fragility on the debt lens (#722)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-30T18:40:42+00:00",
-      "sha": "922e611",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-30, run 33328663540)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-30T17:05:56+00:00",
-      "sha": "5ba2007",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after msensProv service fix",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-30T17:02:43+00:00",
-      "sha": "511f644",
-      "summary": "intel(service): retire dead msensProv read + fix stale loadMacroSens comment (#721)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-30T15:09:45+00:00",
-      "sha": "2f4ee49",
-      "summary": "data: market-pulse swarm refresh (run 33317027122) (#720)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-30T14:30:39+00:00",
-      "sha": "c1576fb",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
     }
   ]
 }
