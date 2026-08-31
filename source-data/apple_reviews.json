@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-08-30",
+  "pulled_at": "2026-08-31",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -33,8 +33,8 @@
     "ratings": 210,
     "score_current_version": 3.25714,
     "ratings_current_version": 210,
-    "version": "1.6.7",
-    "app_updated": "2026-07-17",
+    "version": "1.6.8",
+    "app_updated": "2026-08-31",
     "released": "2022-10-10",
     "genre": "Finance"
    },
@@ -428,10 +428,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.77843,
-    "ratings": 1715,
-    "score_current_version": 3.77843,
-    "ratings_current_version": 1715,
+    "score": 3.77894,
+    "ratings": 1719,
+    "score_current_version": 3.77894,
+    "ratings_current_version": 1719,
     "version": "3.2.0",
     "app_updated": "2026-08-13",
     "released": "2020-04-30",
@@ -1327,6 +1327,15 @@
      "title": "น่าสนใจ",
      "content": "ใช้งานง่าย และสะดวก",
      "version": "1.0.5",
+     "votes": 0
+    },
+    {
+     "id": "14488496497",
+     "at": null,
+     "score": 5,
+     "title": "ติดใจ",
+     "content": "ดีมากๆ",
+     "version": "3.2.0",
      "votes": 0
     },
     {
@@ -7445,10 +7454,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.39445,
-    "ratings": 1587,
-    "score_current_version": 3.39445,
-    "ratings_current_version": 1587,
+    "score": 3.39396,
+    "ratings": 1589,
+    "score_current_version": 3.39396,
+    "ratings_current_version": 1589,
     "version": "8.6.0",
     "app_updated": "2026-08-21",
     "released": "2020-03-03",
@@ -10526,16 +10535,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.82409,
-    "ratings": 173331,
-    "score_current_version": 4.82409,
-    "ratings_current_version": 173331,
+    "score": 4.82408,
+    "ratings": 173362,
+    "score_current_version": 4.82408,
+    "ratings_current_version": 173362,
     "version": "3.0.6",
     "app_updated": "2026-08-06",
     "released": "2021-04-20",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14489493690",
+     "at": null,
+     "score": 1,
+     "title": "ทำไมต้องของขอเข้าถึง Contact และ App ทุกตัวบนเครื่อง",
+     "content": "การขอเข้าถึง Contact หรือรายชื่อบุคคลอื่นๆไม่มีผลต่อการพิจารณาใดๆ มีต่อส่อเค้าขโมยข้อมูล และรวมถึงการเข้าถึงแอพต่างๆ ถ้าเข้าไปในโน้ตก็อาจจะ password ที่เก็บรวบรวมไว้ ยิ่งส่อเค้ามิจฉาชีพเข้าไปใหญ่ สรุปคือเป็นเป็นแอพที่ไม่น่าเชื่อถือมากๆ",
+     "version": "3.0.6",
+     "votes": 0
+    },
     {
      "id": "14482245724",
      "at": null,
@@ -15596,16 +15614,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.70432,
-    "ratings": 64187,
-    "score_current_version": 4.70432,
-    "ratings_current_version": 64187,
+    "score": 4.70437,
+    "ratings": 64239,
+    "score_current_version": 4.70437,
+    "ratings_current_version": 64239,
     "version": "7.7.0",
     "app_updated": "2026-08-24",
     "released": "2021-10-10",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14489682410",
+     "at": null,
+     "score": 1,
+     "title": "ไม่ผ่านการอนุมัติ",
+     "content": "ข้าพเจ้า นายวีระพงศ์ โชติกร ได้ทำการสมัครและลงข้อมูลส่วนตัวไว้ในแอฟ ลบข้อมูลเชิงลึกให้ข้าพเจ้าด้วย หากมีการนำข้อมูลของข้าพเจ้าไปใช่โดยไม่ได้รับอนุญาติ ข้าพเจ้าจะไม่รัยผิดชอบใดๆทั้งสิ้น และจะดำเนิดคดีทางกฎหมายอย่างถึงที่สุด",
+     "version": "7.7.0",
+     "votes": 0
+    },
     {
      "id": "14487278614",
      "at": null,
@@ -20414,16 +20441,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84406,
-    "ratings": 44480,
-    "score_current_version": 4.84406,
-    "ratings_current_version": 44480,
+    "score": 4.84417,
+    "ratings": 44544,
+    "score_current_version": 4.84417,
+    "ratings_current_version": 44544,
     "version": "3.1.3",
     "app_updated": "2026-08-27",
     "released": "2023-03-06",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14488322337",
+     "at": null,
+     "score": 5,
+     "title": "ดีเลย",
+     "content": "ดีมากครับ",
+     "version": "3.1.3",
+     "votes": 0
+    },
     {
      "id": "14484443244",
      "at": null,
@@ -25232,10 +25268,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.76973,
-    "ratings": 26943,
-    "score_current_version": 4.76973,
-    "ratings_current_version": 26943,
+    "score": 4.76977,
+    "ratings": 26947,
+    "score_current_version": 4.76977,
+    "ratings_current_version": 26947,
     "version": "1.8.7",
     "app_updated": "2026-08-07",
     "released": "2020-08-05",
@@ -29447,12 +29483,12 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.62429,
-    "ratings": 2116,
-    "score_current_version": 2.62429,
-    "ratings_current_version": 2116,
-    "version": "3.4.0",
-    "app_updated": "2026-08-20",
+    "score": 2.62352,
+    "ratings": 2117,
+    "score_current_version": 2.62352,
+    "ratings_current_version": 2117,
+    "version": "3.4.1",
+    "app_updated": "2026-08-31",
     "released": "2022-05-11",
     "genre": "Finance"
    },
@@ -34256,10 +34292,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.55326,
-    "ratings": 2957,
-    "score_current_version": 2.55326,
-    "ratings_current_version": 2957,
+    "score": 2.55409,
+    "ratings": 2958,
+    "score_current_version": 2.55409,
+    "ratings_current_version": 2958,
     "version": "5.65",
     "app_updated": "2026-02-13",
     "released": "2021-08-03",
@@ -35929,7 +35965,7 @@
      "title": "เอาข้อมูลไปหมด ไม่ผ่าน",
      "content": "เอาข้อมูลไปหมด สรุป ไม่ผ่านเกณฑ์ ละข้อมูลที่ได้ไปฟรีๆ ทำไง\nแย่จริง",
      "version": "5.62",
-     "votes": 1
+     "votes": 2
     },
     {
      "id": "12717721020",
