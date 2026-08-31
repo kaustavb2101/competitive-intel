@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-31T23:24:54+07:00",
-    "commit": "8eeb5a1"
+    "generated_at": "2026-09-01T05:20:00+07:00",
+    "commit": "ca42d06"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-31",
+    "eta_date": "2026-09-01",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-09-01T05:20:00+07:00",
+      "sha": "ca42d06",
+      "summary": "intel: surface the MEASURED whole-book ECL cover on the peer asset-quality table (#acq) (#749)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-31T20:53:35+00:00",
+      "sha": "5592384",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-31, run 33438286726)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-01T03:24:45+07:00",
+      "sha": "149f78f",
+      "summary": "docs: log the Live-board zero-alarm-colour UX fix (PR #746 merged + deployed + verified) (#747)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-01T03:17:55+07:00",
+      "sha": "755ed08",
+      "summary": "ux: neutral colour for a healthy zero on the Live board pulse KPI row (#746)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-31T19:11:48+00:00",
+      "sha": "bad04e4",
+      "summary": "intel: surface the MEASURED licensed-PICO field as a distinct-class context column on the command-center double-pressure board (#home) (#744)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-31T18:46:01+00:00",
+      "sha": "b63d04d",
+      "summary": "data: SET listed-peer scoreboard refresh (run 33422494055) (#743)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-31T18:22:48+00:00",
+      "sha": "4451754",
+      "summary": "data: market-pulse swarm refresh (run 33418297753) (#742)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-31T17:07:00+00:00",
+      "sha": "de23bcb",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-31, run 33417614177)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-31T16:25:29+00:00",
+      "sha": "de0f289",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after peer-NPL denominators ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-31T23:24:54+07:00",
       "sha": "8eeb5a1",
       "summary": "intel: surface the like-for-like (full-book) + account-weighted NPL denominators on the peer-NPL benchmark (#acq) (#741)",
@@ -657,60 +711,6 @@
       "sha": "48ac017",
       "summary": "Merge remote-tracking branch 'origin/master'",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-31T00:53:26+00:00",
-      "sha": "344e968",
-      "summary": "intel: surface measured absolute rival NPL book (฿bn) on the peer asset-quality table (#728)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-31T00:51:44+00:00",
-      "sha": "e0e7b85",
-      "summary": "data: live fuel prices (2026-08-31, run 33345700620)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-30T23:37:11+00:00",
-      "sha": "10bb731",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-30, run 33342221801)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-30T22:56:21+00:00",
-      "sha": "fad9693",
-      "summary": "data: Thai-IP-only swarm refresh (run 33337687274) (#725)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-30T22:21:03+00:00",
-      "sha": "1f22f8f",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after social_themes freshness-probe",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-30T22:20:19+00:00",
-      "sha": "f0fb20f",
-      "summary": "intel(deploy-health): freshness-probe social_themes.json so a stuck weekly social-listening cron alerts instead of shipping a frozen board",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-30T21:15:13+00:00",
-      "sha": "51e5224",
-      "summary": "data: market-pulse swarm refresh (run 33329013999) (#723)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-30T20:36:49+00:00",
-      "sha": "f28b941",
-      "summary": "docs: log status.html grid-minmax mobile-bleed fix (PR #724, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-31T03:31:19+07:00",
-      "sha": "e49d3a5",
-      "summary": "ux: clamp status.html auto-fit grid min-tracks so cards don't bleed at 390px (#724)",
-      "pillar": "uxui"
     }
   ]
 }
