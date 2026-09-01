@@ -8374,8 +8374,18 @@ function renderSimVerdict(baseHiP,baseHiBr,N,shocked,scenHiP,scenHiBr){
   }
   if(!shocked){
     const pct=N?((100*baseHiBr/N).toFixed(1)):'0.0';
-    box.innerHTML=`<div class="verdict-line">⚙️ <b>Baseline:</b> ${baseHiP} provinces in high agri-stress today — ${baseHiBr.toLocaleString()} branches (${pct}% of the network)</div>`+
-      `<div class="sub" style="margin-top:4px">Drag a slider to stress the book. ILLUSTRATIVE what-if (estimated proxy, no loan balances) — a direction, not a number. ${TAG_E}</div>`;
+    if(baseHiP===0){
+      // Today the book sits BELOW the ≥45/100 high-stress bar in every province, so a bare
+      // "0 provinces — 0 branches (0.0%)" headline reads as an empty/failed-to-load state rather than
+      // the real, reassuring reading. Frame the zero as a "clear today" result (with the bar named so
+      // the 0 is legible as "under a defined threshold", not "no data") and point at the sliders — the
+      // action that makes the tool move. A severe crop+drought shock does tip provinces over 45.
+      box.innerHTML=`<div class="verdict-line">⚙️ <b>Baseline: the book is clear today</b> — no province crosses the high agri-stress bar (agri-stress ≥45/100).</div>`+
+        `<div class="sub" style="margin-top:4px">Drag the crop-price and drought sliders to see which provinces tip in first. ILLUSTRATIVE what-if (estimated proxy, no loan balances) — a direction, not a number. ${TAG_E}</div>`;
+    } else {
+      box.innerHTML=`<div class="verdict-line">⚙️ <b>Baseline:</b> ${baseHiP} provinces in high agri-stress today — ${baseHiBr.toLocaleString()} branches (${pct}% of the network)</div>`+
+        `<div class="sub" style="margin-top:4px">Drag a slider to stress the book. ILLUSTRATIVE what-if (estimated proxy, no loan balances) — a direction, not a number. ${TAG_E}</div>`;
+    }
   } else {
     const dP=scenHiP-baseHiP, dBr=scenHiBr-baseHiBr; const s=v=>(v>0?'+':'')+v;
     box.innerHTML=`<div class="verdict-line">⚙️ <b>Under this shock:</b> high-stress provinces ${baseHiP} → ${scenHiP} (${s(dP)}) · exposed branches ${baseHiBr.toLocaleString()} → ${scenHiBr.toLocaleString()} (${s(dBr)})</div>`+
