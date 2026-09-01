@@ -1519,7 +1519,7 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 
 /* ---------- TMLI-convergence panels (2026-07-25): scenarios, commodities drill, product map ---- */
 /* scenario cards (Simulator) */
-.scn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin:8px 0 6px}
+.scn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:12px;margin:8px 0 6px}
 .scn-card{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 13px}
 .scn-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
 .scn-badge{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;
