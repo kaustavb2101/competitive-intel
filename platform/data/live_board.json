@@ -246,8 +246,8 @@
    "label": "Rice · Thai farm-gate",
    "measured": true,
    "source": "NABC Agricultural Data Service (agriapi.nabc.go.th) — daily market prices, national average across quoting markets, pulled by pipeline/pull_nabc_prices.py (REACHABLE from a Thai IP",
-   "stamp": "2026-08-31",
-   "stamp_iso": "2026-08-31",
+   "stamp": "2026-09-01",
+   "stamp_iso": "2026-09-01",
    "stamp_kind": "pulled",
    "unit": "฿/tonne",
    "value": 17700.0,
@@ -320,8 +320,8 @@
    "stamp": "2026-09-01",
    "stamp_iso": "2026-09-01",
    "stamp_kind": "pulled",
-   "unit": "of 792",
-   "value": 132,
+   "unit": "of 793",
+   "value": 133,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
