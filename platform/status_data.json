@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-01T15:11:10+00:00",
-    "commit": "173b6ab"
+    "generated_at": "2026-09-01T22:28:04+00:00",
+    "commit": "96000f6"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-09-01T22:28:04+00:00",
+      "sha": "96000f6",
+      "summary": "test(gate): add dangling-reference guard — every data layer the frontend fetches must exist",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-01T20:27:16+00:00",
+      "sha": "e10538c",
+      "summary": "docs(progress): log ux-loop mb-npl caption mobile-bleed fix — merge #765 + deploy-verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-02T03:23:34+07:00",
+      "sha": "decc6b5",
+      "summary": "ux: wrap system-NPL caption in #overview macro-book head (mobile bleed) (#765)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-01T20:22:35+00:00",
+      "sha": "1262931",
+      "summary": "data: market-pulse swarm refresh (run 33545576794) (#764)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-01T18:37:05+00:00",
+      "sha": "fb2ebd6",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-01, run 33544492703)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-01T18:26:20+00:00",
+      "sha": "e96f5e9",
+      "summary": "docs(progress): healthy close-out — CI-doable integration backlog verified exhausted",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-09-01T16:52:55+00:00",
+      "sha": "8230de6",
+      "summary": "data: SET listed-peer scoreboard refresh (run 33525825822) (#763)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-01T16:13:46+00:00",
+      "sha": "0c51308",
+      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (0779dd2→173b6ab)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-01T15:11:10+00:00",
       "sha": "173b6ab",
       "summary": "data: market-pulse swarm refresh (run 33518410783) (#761)",
@@ -663,54 +711,6 @@
       "sha": "d363811",
       "summary": "data: live fuel prices (2026-09-01, run 33458524548)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-01T00:41:52+00:00",
-      "sha": "7498994",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-01, run 33455684495)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-01T00:30:57+00:00",
-      "sha": "9116350",
-      "summary": "docs: retire three correctly-dark negative-space candidates (healthy close-out)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-31T23:04:25+00:00",
-      "sha": "216aa4f",
-      "summary": "data: market-pulse swarm refresh (run 33439190184) (#748)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-31T22:20:54+00:00",
-      "sha": "fea9af7",
-      "summary": "chore: refresh autonomy plan + status snapshot after peer whole-book-cover ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-01T05:20:00+07:00",
-      "sha": "ca42d06",
-      "summary": "intel: surface the MEASURED whole-book ECL cover on the peer asset-quality table (#acq) (#749)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-31T20:53:35+00:00",
-      "sha": "5592384",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-31, run 33438286726)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-01T03:24:45+07:00",
-      "sha": "149f78f",
-      "summary": "docs: log the Live-board zero-alarm-colour UX fix (PR #746 merged + deployed + verified) (#747)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-01T03:17:55+07:00",
-      "sha": "755ed08",
-      "summary": "ux: neutral colour for a healthy zero on the Live board pulse KPI row (#746)",
-      "pillar": "uxui"
     }
   ]
 }
