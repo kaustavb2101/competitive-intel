@@ -630,6 +630,16 @@ INGESTS
     bad "orphan_layers.py (a committed data layer has no consumer — see report above)"
   fi
 
+  # dangling-REFERENCE gate: the reverse of orphan_layers.py. Asserts every data/X.json the frontend
+  # FETCHES (fetch('data/X.json') / tmliFetch('X')) actually exists on disk — so a retired/renamed
+  # layer left behind as a live fetch becomes a red gate here, not a silent 404 on the Vercel deploy
+  # that only a human hand-audit ("0 broken references") ever caught.
+  if python3 "$TESTS/dangling_refs.py"; then
+    ok "dangling_refs.py (every data layer the frontend fetches exists on disk)"
+  else
+    bad "dangling_refs.py (the frontend fetches a data layer that is not committed — see report above)"
+  fi
+
   # data-integrity sub-check: assert platform/data/*.json is internally sane (offline, stdlib).
   # The determinism/syntax checks above don't look INSIDE the data; this does. Its own per-check
   # report is shown so a failure points at the exact integrity violation (an IPO-readiness gate).
