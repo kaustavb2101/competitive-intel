@@ -337,7 +337,11 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
    and nowrap then forbade it from wrapping inside that row, and the sentence ran straight out
    through the pill's right edge. The gloss has to opt back into normal wrapping explicitly, and a
    two-line chip is a card, not a pill, so the 999px radius comes down with it. */
-.mcell.has-gloss{flex-wrap:wrap;max-width:340px;border-radius:12px;align-items:center}
+/* max-width clamped with min(…,100%): on a narrow phone the content box is under 340px, so a fixed
+   340px pill overflowed the strip by ~15px at 360 (the co-pay chip). min() collapses the cap to the
+   container width when it's narrower (no bleed) and resolves to 340px wherever there's room, so the
+   desktop/tablet chip is byte-identical. */
+.mcell.has-gloss{flex-wrap:wrap;max-width:min(340px,100%);border-radius:12px;align-items:center}
 .mcell .mgl{flex-basis:100%;min-width:0;white-space:normal;overflow-wrap:anywhere;
   font-size:10px;line-height:1.4;color:var(--mid);margin-top:3px}
 /* `hidden` must beat the display rule on .grid.macro, or the container would still render. */
