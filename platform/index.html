@@ -1354,6 +1354,19 @@
         </div>
         <p class="lead" style="font-size:11px;margin-top:6px">Each cell = share of that occupation×income-band's accounts 90+ days past due (hover for account count); colour = severity, — = cell suppressed below the disclosure floor. Rows ranked by the occupation's own 90+dpd, riskiest first; the "All" row/column are account-weighted marginals. MEASURED · real loan tape.</p>
       </div>
+      <!-- Highest-risk segment concentrations: the worst province×occupation cells on the real loan
+           tape, ranked by the blended risk score (tape_real.json segments_hit.prov_x_occ). Answers
+           obj #1's sharpest question — which livelihood in which province carries the worst
+           delinquency, and how much O/S sits behind it — a read no other tape block gives: the
+           occupation×income axis is the heat-grid above, and the occupation×region axis is the
+           profitability frontier. Delinquency shares MEASURED; the composite ORDER is an ESTIMATED
+           ranking over them. Null-safe: absent segments_hit.prov_x_occ → block stays display:none. -->
+      <div id="expo-tape-provoccwrap" style="display:none;margin-top:4px">
+        <h3 class="compsub">Highest-risk segment concentrations · province × occupation</h3>
+        <p class="lead" id="expo-tape-provocc-lead" style="font-size:12px"></p>
+        <table class="tbl" id="expo-tape-provocc"></table>
+        <p class="lead" style="font-size:11px;margin-top:6px">The worst province×occupation cells (≥300 accounts) by a blend of 90+dpd severity, 30–89dpd roll and X-days slippage; bar = 90+dpd. Delinquency shares MEASURED · real loan tape; the composite score is an ESTIMATED ranking over those measured shares. Makes no open / close / expand recommendation.</p>
+      </div>
     </div>
 
     <!-- Product → segment → driver map (data/product_segments.json) — measured book economics per
