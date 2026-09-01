@@ -8,45 +8,6 @@
  },
  "runs": [
   {
-   "append_history_rc": 0,
-   "feeds": [
-    {
-     "bytes_after": 7111,
-     "bytes_before": 7111,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 4.5,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8968,
-     "bytes_before": 8968,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 23.7,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 3988,
-     "bytes_before": 3988,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 145.7,
-     "status": "ok"
-    }
-   ],
-   "finished": "2026-08-19T16:03:08Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 2,
-   "n_failed": 0,
-   "n_ok": 3,
-   "n_skipped": 0,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-19T16:00:42Z"
-  },
-  {
    "append_history_rc": null,
    "feeds": [
     {
@@ -3298,6 +3259,53 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-09-01T00:45:12Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7108,
+     "bytes_before": 7108,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 4.5,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8909,
+     "bytes_before": 8909,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 4.6,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 3990,
+     "bytes_before": 3990,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 132.0,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 1413051,
+     "bytes_before": 1413051,
+     "key": "google_ads",
+     "rc": 3,
+     "seconds": 369.0,
+     "status": "skipped"
+    }
+   ],
+   "finished": "2026-09-01T08:59:05Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 1,
+   "n_failed": 0,
+   "n_ok": 3,
+   "n_skipped": 1,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-09-01T08:52:56Z"
   }
  ]
 }
