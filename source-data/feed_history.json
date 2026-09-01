@@ -552,7 +552,7 @@
     138.0,
     128.0,
     133.0,
-    132.0
+    133.0
    ]
   },
   "fuel_diesel": {
@@ -809,11 +809,12 @@
     "2026-08-28",
     "2026-08-29",
     "2026-08-30",
-    "2026-08-31"
+    "2026-08-31",
+    "2026-09-01"
    ],
    "first_seen": "2026-07-05",
    "label": "Rice (Hom Mali) - NABC farm-gate",
-   "n": 39,
+   "n": 40,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/tonne",
@@ -849,6 +850,7 @@
     17905.0,
     17905.0,
     17905.0,
+    17700.0,
     17700.0,
     17700.0,
     17700.0,
@@ -900,11 +902,12 @@
     "2026-08-28",
     "2026-08-29",
     "2026-08-30",
-    "2026-08-31"
+    "2026-08-31",
+    "2026-09-01"
    ],
    "first_seen": "2026-07-05",
    "label": "Rubber (raw sheet) - NABC farm-gate",
-   "n": 39,
+   "n": 40,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/kg",
@@ -944,6 +947,7 @@
     81.25,
     80.14,
     80.14,
+    80.01,
     80.01,
     80.01,
     80.01,
