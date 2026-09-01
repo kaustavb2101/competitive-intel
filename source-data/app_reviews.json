@@ -3,7 +3,7 @@
   "title": "Title-lender app sentiment — Google Play ratings + newest reviews (incl. our own)",
   "generated_by": "pipeline/pull_app_reviews.py",
   "label": "MEASURED — Google Play store pages (th/th). Star histogram + dated public reviews; review store accumulates across pulls (dedup by reviewId, newest 1500 kept per app).",
-  "pulled_at": "2026-08-31"
+  "pulled_at": "2026-09-01"
  },
  "apps": {
   "AUTOX": {
@@ -11,21 +11,37 @@
    "name": "เงินไชโย (AutoX)",
    "own": true,
    "stats": {
-    "score": 4.0582523,
-    "ratings": 1034,
+    "score": 4.0288463,
+    "ratings": 1037,
     "reviews_total": 334,
     "installs": "500,000+",
     "histogram": [
-     150,
+     159,
      49,
      59,
      99,
-     672
+     667
     ],
     "app_updated": null,
     "version": "Varies with device"
    },
    "reviews_store": [
+    {
+     "id": "c837723e-94e8-46c0-a0e9-fdcde42357f8",
+     "at": "2026-08-31",
+     "score": 1,
+     "content": "ไม่อนุญาตให้นำเลขท้ายบัตรประจำตัว978ไปใช้โดยเด็ดขาด",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "4199a199-3309-499e-b739-d484c75bc585",
+     "at": "2026-08-31",
+     "score": 5,
+     "content": "ok",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "49f5a02a-617c-4965-9aed-4487244aaac7",
      "at": "2026-08-25",
@@ -248,14 +264,6 @@
      "score": 1,
      "content": "อัพเดทบ่อยเกิน แล้วตอนนี้แอพเข้าใช้งานไม่ได้อีก",
      "thumbs": 3,
-     "replied": false
-    },
-    {
-     "id": "4199a199-3309-499e-b739-d484c75bc585",
-     "at": "2026-02-18",
-     "score": 5,
-     "content": "ok.",
-     "thumbs": 0,
      "replied": false
     },
     {
@@ -1681,21 +1689,85 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.7172494,
-    "ratings": 16895,
-    "reviews_total": 5248,
+    "score": 4.711584,
+    "ratings": 16923,
+    "reviews_total": 5256,
     "installs": "1,000,000+",
     "histogram": [
-     530,
-     140,
-     450,
-     1331,
-     14441
+     539,
+     159,
+     449,
+     1339,
+     14432
     ],
     "app_updated": "2026-08-06",
     "version": "3.2.0"
    },
    "reviews_store": [
+    {
+     "id": "edf3d9c6-2c81-42b6-ac7f-4b378320aa7c",
+     "at": "2026-08-31",
+     "score": 1,
+     "content": "ฉันเข้าแแอปไม่ได้",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "c15ed847-e52e-4bd5-a1c7-05b0e7688fb4",
+     "at": "2026-08-31",
+     "score": 5,
+     "content": "ทำประกันผ่อนจ่ายได้",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "be70a960-35cd-4cfd-a6bf-da309150690c",
+     "at": "2026-08-31",
+     "score": 2,
+     "content": "ใช่ดีมากค่ะรวดเวทันใจค่ะ /",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "aa948ef9-42a7-43b4-8087-e35f400942d1",
+     "at": "2026-08-31",
+     "score": 2,
+     "content": "ควบอะไรอีก",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "41038205-bb2a-4382-bf74-bf944622b4b5",
+     "at": "2026-08-31",
+     "score": 5,
+     "content": "ดี",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "1d7ad0e5-f794-477e-a471-c8bc3f583a44",
+     "at": "2026-08-31",
+     "score": 1,
+     "content": "วันนี้ทำไมเปิดใช้งานไม่ได้",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "158f3acb-47f9-422f-adc4-6b2317a11457",
+     "at": "2026-08-31",
+     "score": 1,
+     "content": "เข้ารหัสผ่านแล้วเข้าระบบไม่ได้ให้ใส่รหัสยุนั่นละ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "0b29cf82-507a-40bc-bf71-6085793a0e66",
+     "at": "2026-08-31",
+     "score": 5,
+     "content": "ดี",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "e1417df4-97e8-4809-aa93-66f4671cabf2",
      "at": "2026-08-30",
@@ -5815,16 +5887,16 @@
    "name": "เมืองไทย แคปปิตอล",
    "own": false,
    "stats": {
-    "score": 4.693023,
-    "ratings": 6489,
+    "score": 4.680062,
+    "ratings": 6495,
     "reviews_total": 2152,
     "installs": "1,000,000+",
     "histogram": [
-     241,
-     70,
-     201,
-     412,
-     5563
+     260,
+     69,
+     200,
+     421,
+     5541
     ],
     "app_updated": "2026-08-18",
     "version": "2.5.114"
@@ -5923,7 +5995,7 @@
      "at": "2026-08-25",
      "score": 5,
      "content": "ตั้งแต่มาเป็นลูกค้าของเมืองไทยแคปปิตอลหมดกังวลไปเลย..ก่อนหน้านี้เคยไปติดต่อหลายที่คุยดีแต่กดราคา.. เมืองไทยคุยง่ายที่สุดล่ะ..จะรีไฟแนนก้อง่าย ไม่เรื่องมาก บริการดี ไม่ว่าต่อหน้าหรือคุยทางโทรศัพย์..ดอกไม่โหดด้วย..🥰🥰🥰🥰🥰🥰",
-     "thumbs": 1,
+     "thumbs": 2,
      "replied": false
     },
     {
@@ -7195,7 +7267,7 @@
      "at": "2025-10-01",
      "score": 5,
      "content": "แอปใช้งานง่าย ฟังชั่นพร้อมครบครัน รูปแบบดูดีน่ารัก กดใช้เลื่อนได้ดั่งใจ เปนแอปที่พัฒนามาดี เยี่ยมเลย สาขาบ้านใหม่ฯมะค่อยได้เรื่อง ทำเรื่องขอทะเบียนพรบ.ใหม่รอจนรากงอกมะเอามาให้สักที..",
-     "thumbs": 47,
+     "thumbs": 46,
      "replied": false
     },
     {
@@ -7291,7 +7363,7 @@
      "at": "2025-09-19",
      "score": 5,
      "content": "ทำไมอัพเดตแล้วถึงเข้าระบบไม่ได้คะ หงุดหงิดมาก",
-     "thumbs": 24,
+     "thumbs": 23,
      "replied": false
     },
     {
@@ -7379,7 +7451,7 @@
      "at": "2025-09-06",
      "score": 4,
      "content": "เบอร์เก่าใช้งานไม่ได้มันส่งรหัส OTP ไปที่เบอร์เก่า ลองสอบถามผ่านไลน์มีตรงให้กรอกและแนบเอกสาร ทำไปก็ยังไม่ได้เลยค่ะ ทำไงได้บ้างคะ พอดีต้องการเปลี่ยนเบอร์ใหม่ แอพเมืองไทยเองก็ยังใช้ไม่ได้เพราะติดที่เบอร์เก่าใช้งานไม่ได้ เพราะส่งรหัสไปเบอร์นั่นค่ะ",
-     "thumbs": 49,
+     "thumbs": 48,
      "replied": true
     },
     {
@@ -7765,16 +7837,16 @@
    "name": "ศรีสวัสดิ์",
    "own": false,
    "stats": {
-    "score": 4.5725193,
-    "ratings": 2445,
+    "score": 4.568182,
+    "ratings": 2446,
     "reviews_total": 863,
     "installs": "500,000+",
     "histogram": [
-     130,
+     129,
      37,
      74,
-     260,
-     1940
+     277,
+     1926
     ],
     "app_updated": "2026-07-01",
     "version": "1.0.60"
@@ -9835,21 +9907,29 @@
    "name": "เงินเทอร์โบ",
    "own": false,
    "stats": {
-    "score": 4.19,
-    "ratings": 835,
+    "score": 4.1666665,
+    "ratings": 837,
     "reviews_total": 263,
     "installs": "500,000+",
     "histogram": [
-     141,
+     147,
      8,
-     25,
-     33,
-     625
+     24,
+     32,
+     622
     ],
     "app_updated": "2026-08-07",
     "version": "1.0.61-ngernturbo"
    },
    "reviews_store": [
+    {
+     "id": "08e3d0d1-515d-4e4f-b35a-93066f2ead5f",
+     "at": "2026-08-31",
+     "score": 1,
+     "content": "กูไม่ได้และไม่อนุญาตไห้เอาข้อมูลไปใช้ทางอื่นที่ผิดกฎหมาย",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "2d2a0126-c3d0-4b2a-b858-71e3eb0e45a6",
      "at": "2026-08-30",
@@ -11482,7 +11562,7 @@
    "own": false,
    "stats": {
     "score": 4.19,
-    "ratings": 351,
+    "ratings": 350,
     "reviews_total": 136,
     "installs": "100,000+",
     "histogram": [
@@ -11490,7 +11570,7 @@
      7,
      24,
      31,
-     242
+     241
     ],
     "app_updated": "2026-07-20",
     "version": "1.12.0"
@@ -11525,7 +11605,7 @@
      "at": "2026-08-23",
      "score": 1,
      "content": "อัพเดทแล้วเข้าไม่ได้กากเชย",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": false
     },
     {
@@ -12917,21 +12997,45 @@
    "name": "Good Money เงินดีดี (GSB)",
    "own": false,
    "stats": {
-    "score": 3.8297215,
-    "ratings": 3231,
+    "score": 3.8109756,
+    "ratings": 3236,
     "reviews_total": 1420,
     "installs": "1,000,000+",
     "histogram": [
-     659,
-     189,
-     129,
-     309,
-     1939
+     680,
+     187,
+     128,
+     305,
+     1932
     ],
     "app_updated": "2026-08-11",
     "version": "1.0.45"
    },
    "reviews_store": [
+    {
+     "id": "dc0b7ed4-92bd-4f5d-837b-55331ed36e10",
+     "at": "2026-08-31",
+     "score": 5,
+     "content": "ดีที่สุดแล้ว ดอก 18 ต่อปี ไม่มีแอบแฝง",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "cfecab53-9c15-4e99-9b9f-4c0db60e3d47",
+     "at": "2026-08-31",
+     "score": 1,
+     "content": "ไม่อนุญาติให้นำบัตร ประชาชน ลงท้ายด้วย 189 ไปทำธุรกรรมใดๆ หากเกิดขึ้นจะดำเนินคดีให้ถึงที่สุด",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "9f9669ed-cfce-49a0-af19-78a5e922f730",
+     "at": "2026-08-31",
+     "score": 1,
+     "content": "ปกติเข้าได้ตลอด อยู่ๆก็เข้าไม่ได้ มันขึ้นข้อความ virtual tap has been found on your device แก้สารพัดแก้ก็ไม่หาย เปิดแอปไม่ได้แล้วจะใช้งานยังไง",
+     "thumbs": 2,
+     "replied": true
+    },
     {
      "id": "aa033612-49fd-44ed-8eea-2f40becab776",
      "at": "2026-08-30",
@@ -13705,7 +13809,7 @@
      "at": "2026-08-04",
      "score": 5,
      "content": "เป็น app ที่ดีมากๆทำสินเชื่อได้ง่ายเอกสารไม่ยุ่งยากเป็น app ถูกกฎหมายกู้เท่าที่จำเป็นชำระคืนให้ตรงต่อเวลาไม่มีปัญหาสมัครครั้งแรกก็ผ่านแล้วง่ายมากๆเมื่อชำระคืนแล้วยอดเก่าก็จะทบกลับมา",
-     "thumbs": 11,
+     "thumbs": 12,
      "replied": true
     },
     {
@@ -13786,14 +13890,6 @@
      "score": 1,
      "content": "ตอนนี้ไม่สามารถเข้าใช้งานแอปได้ทำอะไรไม่ได้เลยยืนยันตัวตนเสร็จก็ยังเข้าไม่ได้แก่ใจไห้หน่อยค่ะเพื่อการชำระที่สะดวกยิ่งขึ้น",
      "thumbs": 5,
-     "replied": true
-    },
-    {
-     "id": "9f9669ed-cfce-49a0-af19-78a5e922f730",
-     "at": "2026-08-01",
-     "score": 3,
-     "content": "ยื่นกับออมสินสี่ครั้งผ่านทุกครั้ง แต่ยืนที่นี่ไม่ผ่านสักครั้ง",
-     "thumbs": 2,
      "replied": true
     },
     {
@@ -15662,8 +15758,8 @@
      9,
      56
     ],
-    "app_updated": "2026-08-07",
-    "version": "1.7.5"
+    "app_updated": "2026-09-01",
+    "version": "1.7.6"
    },
    "reviews_store": [
     {
@@ -15905,21 +16001,45 @@
    "name": "GO by Krungsri Auto",
    "own": false,
    "stats": {
-    "score": 4.393709,
-    "ratings": 9304,
+    "score": 4.398488,
+    "ratings": 9313,
     "reviews_total": 3807,
     "installs": "1,000,000+",
     "histogram": [
-     726,
-     262,
-     524,
-     897,
-     6892
+     723,
+     261,
+     512,
+     894,
+     6919
     ],
     "app_updated": "2026-08-19",
     "version": "8.6.0"
    },
    "reviews_store": [
+    {
+     "id": "f8654d49-1c70-4d53-8ce2-0f837a401997",
+     "at": "2026-08-31",
+     "score": 5,
+     "content": "สะดวกสบายในการใช้งาน ได้รับการแจ้งเตือนข่าวสารต่างๆดี",
+     "thumbs": 0,
+     "replied": true
+    },
+    {
+     "id": "d96241df-cba3-4526-a41e-6d48838d5fe0",
+     "at": "2026-08-31",
+     "score": 5,
+     "content": "อัปเดตแล้วครับ แต่ยังค้างอยู่ เป็นแค่ช่วงเช้า ตอนนี้เข้าได้ปกติแล้วครับ",
+     "thumbs": 0,
+     "replied": true
+    },
+    {
+     "id": "a852c6da-fb7c-4490-a087-2356088cbb16",
+     "at": "2026-08-31",
+     "score": 5,
+     "content": "ใช้มากๆๆๆ",
+     "thumbs": 0,
+     "replied": true
+    },
     {
      "id": "5cdcd273-84fe-45e6-b632-faebc73f7c3f",
      "at": "2026-08-28",
