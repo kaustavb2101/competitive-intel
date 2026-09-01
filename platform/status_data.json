@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-01T08:47:39+00:00",
-    "commit": "0779dd2"
+    "generated_at": "2026-09-01T15:11:10+00:00",
+    "commit": "173b6ab"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-09-01T15:11:10+00:00",
+      "sha": "173b6ab",
+      "summary": "data: market-pulse swarm refresh (run 33518410783) (#761)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-01T14:37:51+00:00",
+      "sha": "12a8638",
+      "summary": "docs(progress): log ux-loop #sim zero-baseline reframe — merge #762 + deploy-verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-01T21:34:55+07:00",
+      "sha": "fecf56d",
+      "summary": "ux: reframe #sim zero-baseline verdict from empty-looking triple-zero to a clear 'book is clear today' answer (#762)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-01T14:11:27+00:00",
+      "sha": "e314adf",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-01, run 33517784731)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-01T13:03:30+00:00",
+      "sha": "d52ea24",
+      "summary": "intel(exposure): surface the real tape's dark province×occupation risk leaderboard (obj #1) (#760)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-09-01T11:01:51+00:00",
+      "sha": "85ff79e",
+      "summary": "data(census): refresh the Union Auction forward book (run 33489325456) (#758)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-01T10:38:20+00:00",
+      "sha": "a77c033",
+      "summary": "data: market-pulse swarm refresh (run 33489278359) (#759)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-01T10:15:48+00:00",
+      "sha": "c01ade4",
+      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (06ea4b1→0779dd2)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-01T08:47:39+00:00",
       "sha": "0779dd2",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-01, run 33488671893)",
@@ -663,54 +711,6 @@
       "sha": "755ed08",
       "summary": "ux: neutral colour for a healthy zero on the Live board pulse KPI row (#746)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-31T19:11:48+00:00",
-      "sha": "bad04e4",
-      "summary": "intel: surface the MEASURED licensed-PICO field as a distinct-class context column on the command-center double-pressure board (#home) (#744)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-31T18:46:01+00:00",
-      "sha": "b63d04d",
-      "summary": "data: SET listed-peer scoreboard refresh (run 33422494055) (#743)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-31T18:22:48+00:00",
-      "sha": "4451754",
-      "summary": "data: market-pulse swarm refresh (run 33418297753) (#742)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-31T17:07:00+00:00",
-      "sha": "de23bcb",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-31, run 33417614177)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-31T16:25:29+00:00",
-      "sha": "de0f289",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after peer-NPL denominators ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-31T23:24:54+07:00",
-      "sha": "8eeb5a1",
-      "summary": "intel: surface the like-for-like (full-book) + account-weighted NPL denominators on the peer-NPL benchmark (#acq) (#741)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-31T21:44:04+07:00",
-      "sha": "caaa58f",
-      "summary": "ux: wrap arrow-joined figure tokens in #acq rival-fragility insight (mobile bleed) (#740)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-31T13:04:14+00:00",
-      "sha": "557a43d",
-      "summary": "intel: surface the MEASURED 12-year purpose-mix trend on the household-debt-source block (#acq) (#739)",
-      "pillar": "service"
     }
   ]
 }
