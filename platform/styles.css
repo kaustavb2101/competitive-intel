@@ -355,7 +355,7 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 .mb-lens:hover{color:var(--hi);border-color:#3a4868}
 .mb-lens.on{color:var(--bg);background:var(--accent);border-color:var(--accent);font-weight:600}
 .mb-lens:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.mb-npl{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--mid);
+.mb-npl{display:flex;flex-wrap:wrap;align-items:center;gap:4px 7px;font-size:11.5px;color:var(--mid);
   font-variant-numeric:tabular-nums}
 .mb-npl b{color:var(--hi);font-family:var(--mono)}
 .mb-npl .sub{font-size:10px;color:var(--dim)}
