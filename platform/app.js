@@ -7506,6 +7506,35 @@ function renderExposureTape(){
           `<td class="mono" style="color:${sev(bookDpd)};text-align:center;font-weight:700" title="${N(bookN)} accounts">${bookDpd.toFixed(1)}</td></tr>`;
     }
   }
+  // --- highest-risk segment concentrations: the worst province×occupation cells (obj #1) ---
+  // From tape_real.json.segments_hit.prov_x_occ (real loan tape) — the sharpest concentration read:
+  // which livelihood in which province carries the worst blended delinquency, and the O/S behind it.
+  // Delinquency shares are MEASURED; the composite `score` is an ESTIMATED order over them (score_note:
+  // 90+% + ½·30–89% + ¼·X-days%, cells ≥300 accounts). occupation×income is the heat-grid above and
+  // occupation×region is the profitability frontier, so this prov×occ leaderboard adds a new read, not a
+  // duplicate. Null-safe: absent/older tape with no segments_hit.prov_x_occ → the block stays hidden.
+  const poW=$('#expo-tape-provoccwrap'), poT=$('#expo-tape-provocc'),
+        PO=(TAPE.segments_hit&&Array.isArray(TAPE.segments_hit.prov_x_occ))?TAPE.segments_hit.prov_x_occ:null;
+  if(poW&&poT&&PO){
+    const rows=PO.filter(c=>c&&c.dpd90p_pct!=null&&c.n).slice(0,15);
+    if(rows.length){
+      poW.style.display='';
+      const thb=v=>v>=1e9?'฿'+(v/1e9).toFixed(2)+'bn':'฿'+N(Math.round(v/1e6))+'m';
+      const top=rows[0], os=rows.reduce((s,c)=>s+(c.os_sum||0),0);
+      const lead=$('#expo-tape-provocc-lead');
+      if(lead) lead.innerHTML=`The sharpest concentration on the book is <b>${top.occupation}</b> in <b>${top.province}</b> — `+
+        `<b style="color:${sev(top.dpd90p_pct)}">${top.dpd90p_pct}%</b> at 90+dpd on ${thb(top.os_sum)} O/S (${N(top.n)} accounts). `+
+        `The ${rows.length} worst province×occupation cells below carry ${thb(os)} O/S between them — where one livelihood in one place blends 90+ severity, roll pressure and X-days slippage worst.`;
+      const worst=Math.max(...rows.map(c=>c.dpd90p_pct));
+      poT.innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th><th scope="col">Occupation</th><th scope="col">Accounts</th><th scope="col">OS</th><th scope="col" title="share of the cell's accounts 90+ days past due">90+dpd</th><th scope="col" title="30–89dpd roll rate">roll</th><th scope="col" title="X-days early slippage — the pre-emptive window">X-days</th><th scope="col" title="90+% + ½·roll% + ¼·X-days% — an ESTIMATED order over the MEASURED shares">score</th></tr>`+
+        rows.map((c,i)=>`<tr><td class="mono sub">${i+1}</td><td><b>${c.province}</b></td><td>${c.occupation}</td>
+          <td class="mono sub">${N(c.n)}</td><td class="mono sub">${thb(c.os_sum)}</td>
+          <td class="mono" style="color:${sev(c.dpd90p_pct)}">${barHTML(c.dpd90p_pct,'var(--agri)',worst)} <b>${c.dpd90p_pct}%</b></td>
+          <td class="mono sub">${c.roll_pct}%</td>
+          <td class="mono sub" style="color:var(--opp)">${c.early_pct}%</td>
+          <td class="mono"><b>${c.score}</b></td></tr>`).join('');
+    }
+  }
 }
 function renderExposure(){
   if(!DATA||!$('#expocards')||!$('#expotbl')) return;
