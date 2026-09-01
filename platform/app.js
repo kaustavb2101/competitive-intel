@@ -11125,10 +11125,19 @@ function renderImfWeo(){
       const gap=(t&&pr.val!=null)?Math.round((t.val-pr.val)*10)/10:null;
       const over=(gap!=null&&Math.abs(gap)>=0.5)
         ? ` <span class="s" style="color:var(--gold)" title="Already overtaken: the measured outturn for this same year is ${Math.abs(gap)} points ${gap>0?'above':'below'} the projection beside it.">measured ${Math.abs(gap)} ${gap>0?'higher':'lower'}</span>` : '';
+      // Youth (15–24) joblessness runs far above the near-zero national headline, and the title-loan
+      // base skews young + informal — so the benign LUR headline understates the labour risk on the
+      // borrower segment we actually lend to (obj #1). Surfaced as a magnitude on its OWN basis with an
+      // explicit vintage/definition tag — NOT a same-basis ratio to the NSO headline (they differ in
+      // source & period, and the provincial LFS cut carries no unemployed-by-age), so no cross-basis
+      // multiplier is asserted; the direction is robust on either basis. Degrades cleanly if absent.
+      const youthNote=(code==='LUR'&&un&&un.youth_15_24_rate_pct!=null)
+        ? ` <span class="s" style="color:var(--gold)" title="MEASURED · ILOSTAT annual mirror of NSO — youth (15–24) unemployment. A DIFFERENT vintage & definition than the ${un.as_of||''} NSO LFS national headline shown beside it (the provincial LFS cut carries employed-by-age but no unemployed-by-age, so no NSO youth rate is derivable). Read as a magnitude on its own basis, not a same-basis delta to the headline.">Youth 15–24 joblessness runs well above the near-zero headline — <b>${un.youth_15_24_rate_pct}%</b> (15–24, ILOSTAT annual); the title-loan base skews young &amp; informal.</span>`
+        : '';
       return `<tr><td><b>${v.label}</b> <span class="s">${v.unit}</span></td>
         <td class="n">${latest}</td>
         <td class="n" style="color:${imfCol(code,pr.val)}">${pr.val!=null?pr.val:'—'} <span class="s">${pr.year||''}</span>${over}</td>
-        <td class="s">${v.why||''}</td></tr>`;
+        <td class="s">${v.why||''}${youthNote}</td></tr>`;
     }).join('');
     const nTH=Object.keys(TH).length;
     // peer benchmark for the two headline indicators
