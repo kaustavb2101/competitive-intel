@@ -61,21 +61,35 @@
     "median": 75500,
     "n": 8,
     "p25": 57250,
-    "p75": 96750
+    "p75": 156750
    }
   },
   "HONDA|car|2013": {
    "auction": {
-    "median": 95000,
+    "median": 154000,
     "n": 11,
-    "p25": 79000,
-    "p75": 183000
+    "p25": 87000,
+    "p75": 200000
    },
    "km": {
-    "median": 243084,
+    "median": 191855,
     "n": 11,
     "p25": 149411,
-    "p75": 294612
+    "p75": 338367
+   }
+  },
+  "HONDA|car|2018": {
+   "auction": {
+    "median": 300000,
+    "n": 9,
+    "p25": 179500,
+    "p75": 415000
+   },
+   "km": {
+    "median": 220672,
+    "n": 9,
+    "p25": 66838,
+    "p75": 276796
    }
   },
   "HONDA|moto|2018": {
@@ -168,10 +182,18 @@
   },
   "ISUZU PU|car|2011": {
    "auction": {
-    "median": 119500,
+    "median": 105000,
     "n": 16,
-    "p25": 78750,
+    "p25": 76750,
     "p75": 130000
+   }
+  },
+  "ISUZU PU|car|2017": {
+   "auction": {
+    "median": 170000,
+    "n": 8,
+    "p25": 140250,
+    "p75": 286250
    }
   },
   "ISUZU PU|car|2018": {
@@ -182,44 +204,92 @@
     "p75": 252500
    }
   },
+  "ISUZU PU|car|2019": {
+   "auction": {
+    "median": 225000,
+    "n": 10,
+    "p25": 188000,
+    "p75": 367500
+   },
+   "km": {
+    "median": 213283,
+    "n": 8,
+    "p25": 149575,
+    "p75": 221579
+   }
+  },
   "ISUZU PU|car|2021": {
    "auction": {
-    "median": 274500,
+    "median": 259500,
     "n": 8,
     "p25": 162500,
     "p75": 300000
    }
   },
-  "TOYOTA|car|2010": {
+  "ISUZU PU|car|2022": {
    "auction": {
-    "median": 73000,
+    "median": 255000,
     "n": 8,
-    "p25": 61250,
-    "p75": 110000
+    "p25": 241250,
+    "p75": 326000
    }
   },
-  "TOYOTA|car|2013": {
+  "TOYOTA|car|2010": {
    "auction": {
-    "median": 60000,
-    "n": 9,
-    "p25": 48000,
-    "p75": 103000
+    "median": 120000,
+    "n": 12,
+    "p25": 70500,
+    "p75": 150000
+   },
+   "km": {
+    "median": 210294,
+    "n": 10,
+    "p25": 204887,
+    "p75": 265612
    }
   },
   "TOYOTA|car|2018": {
    "auction": {
-    "median": 170000,
+    "median": 235000,
+    "n": 8,
+    "p25": 148750,
+    "p75": 334000
+   }
+  },
+  "TOYOTA|car|2019": {
+   "auction": {
+    "median": 180000,
     "n": 9,
-    "p25": 147500,
-    "p75": 317000
+    "p25": 140000,
+    "p75": 395000
+   }
+  },
+  "TOYOTA|car|2021": {
+   "auction": {
+    "median": 290000,
+    "n": 9,
+    "p25": 290000,
+    "p75": 290000
+   },
+   "km": {
+    "median": 256502,
+    "n": 9,
+    "p25": 207593,
+    "p75": 272156
    }
   },
   "YAMAHA|moto|2016": {
    "auction": {
-    "median": 12500,
-    "n": 8,
+    "median": 13000,
+    "n": 9,
     "p25": 6000,
-    "p75": 24250
+    "p75": 21500
+   },
+   "km": {
+    "median": 65494,
+    "n": 8,
+    "p25": 42434,
+    "p75": 78683
    }
   },
   "YAMAHA|moto|2018": {
@@ -330,15 +400,15 @@
   }
  },
  "meta": {
-  "anchor_date": "2026-09-22",
+  "anchor_date": "2026-09-23",
   "generated_by": "pipeline/build_collateral_census.py --aggregate",
   "min_cell": 8,
   "note": "Stage-1 aggregate of the gitignored venue harvests. Committed so that stage 2 is reproducible from the repo alone; the ~500 MB of raw rows never enters git.",
   "observed_to": "",
-  "rows_priced": 890,
-  "rows_read": 3796,
+  "rows_priced": 907,
+  "rows_read": 4101,
   "venues": {
-   "auct": 3796
+   "auct": 4101
   }
  }
 }
