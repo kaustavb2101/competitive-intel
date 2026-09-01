@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-01T04:19:33+00:00",
-    "commit": "06ea4b1"
+    "generated_at": "2026-09-01T08:47:39+00:00",
+    "commit": "0779dd2"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,48 @@
   ],
   "activity": [
     {
+      "date": "2026-09-01T08:47:39+00:00",
+      "sha": "0779dd2",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-01, run 33488671893)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-01T08:28:32+00:00",
+      "sha": "cf12265",
+      "summary": "docs: log UX-loop run — #sim scenario-cards grid mobile clamp (PR #757, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-01T15:25:48+07:00",
+      "sha": "02fb348",
+      "summary": "ux: clamp #sim .scn-grid scenario cards to container width on mobile (#757)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-01T06:48:08+00:00",
+      "sha": "326f8b4",
+      "summary": "intel: surface MEASURED youth (15-24) unemployment on the macro Unemployment row (#overview) (#756)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-01T04:58:08+00:00",
+      "sha": "a8b584c",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33469929190) (#755)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-01T04:28:47+00:00",
+      "sha": "9e2d90e",
+      "summary": "docs: log the intelligence-loop service-honesty fix (forward-window freshness note, b349125)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-01T04:27:40+00:00",
+      "sha": "b349125",
+      "summary": "intel(service): disclose the forward-looking freshness anchor in provenance.json's own reference_note",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-01T04:19:33+00:00",
       "sha": "06ea4b1",
       "summary": "data: rival Facebook promo feed refresh (run 33456873084) (#753)",
@@ -669,48 +711,6 @@
       "sha": "557a43d",
       "summary": "intel: surface the MEASURED 12-year purpose-mix trend on the household-debt-source block (#acq) (#739)",
       "pillar": "service"
-    },
-    {
-      "date": "2026-08-31T11:52:52+00:00",
-      "sha": "a3a3032",
-      "summary": "data(census): refresh the Union Auction forward book (run 33380612631) (#736)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-31T11:29:28+00:00",
-      "sha": "5fa9e4d",
-      "summary": "data: market-pulse swarm refresh (run 33380547651) (#737)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-31T10:20:42+00:00",
-      "sha": "15e976e",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after 5★ advocacy-pole ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-31T17:18:36+07:00",
-      "sha": "fabfbe3",
-      "summary": "intel: surface the MEASURED 5★ advocacy pole on the rival sentiment ladder (#brand) (#738)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-31T09:55:17+00:00",
-      "sha": "787b013",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-31, run 33379874586)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-31T08:45:43+00:00",
-      "sha": "88a3b17",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-31T15:43:17+07:00",
-      "sha": "96521a9",
-      "summary": "docs: log the cc-grid mobile-bleed UX fix (PR #734 merged + deployed + verified) (#735)",
-      "pillar": "uxui"
     }
   ]
 }
