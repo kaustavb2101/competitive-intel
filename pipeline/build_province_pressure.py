@@ -41,6 +41,22 @@ MEASURED vs ESTIMATED (the data-mandate — stated explicitly, repeated in meta)
   double_pressure = stress_pctile >= 66.67 AND contest_pctile >= 66.67 (both in the top third).
                     The alert set. COMPUTED.
 
+SURFACED vs. CARRIED (so a negative-space sweep does not re-flag these as orphaned).
+  The command-centre double-pressure board (app.js renderHomeDoublePressure) and the National-map
+  `dblp` lens are the app consumers. They read `double_pressure` (the alert filter), `both_min` (the
+  rank), `stress_pctile`/`contest_pctile` (the two axes) and the MEASURED real-book context
+  (`book_os`, `book_npl_os_pct`, `pico`). The remaining computed fields are INTENTIONALLY carried
+  but NOT rendered, because a strictly-more-informative sibling is already on screen:
+    - `quadrant` (median-split HH/HL/LH/LL) — a coarse 2x2 label. Surfacing it beside the top-third
+      `double_pressure` set would put TWO different "high on both" thresholds (>=50 vs >=66.67) in
+      front of the exec at once; the continuous `both_min` already conveys severity without that
+      ambiguity. Kept for any external/analyst reuse of the full 77-province classification.
+    - `both_mean` — a smoother combined index; `both_min` is the honest floor already shown and the
+      board's primary sort, so `both_mean` rides only as the secondary tie-break, not a column.
+    - `book_pctile` — the book-size rank; the board shows the real ฿ (`book_os`) itself, which is
+      more concrete than its percentile, so the percentile stays a carried convenience.
+  These are correctly-dark by design, not neglected orphans (verdict recorded 2026-09-01).
+
 Both source axes are RELATIVE percentiles over the same 77 provinces, so the combined reads are
 rankings ("worse than most provinces on both"), NOT calibrated probabilities. Nothing here is a
 verdict; it is a place to look first.
