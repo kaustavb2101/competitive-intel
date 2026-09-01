@@ -528,7 +528,11 @@ def build():
         freshness = {
             "reference_date": ref.isoformat(),
             "reference_note": ("age = days behind the freshest dated layer in the committed tree "
-                               "(deterministic; no wall-clock read). null age = no machine-readable "
+                               "(deterministic; no wall-clock read). The freshest vintage can be a "
+                               "forward-looking observation window — e.g. collateral_census's "
+                               "anchor_date is the newest auction date IN the data, which may be a "
+                               "scheduled future auction — so a positive age means 'behind our newest "
+                               "data', not necessarily 'behind today'. null age = no machine-readable "
                                "ISO vintage — the honest undated state, never a coerced date."),
             "stale_over_days": STALE_DAYS,
             "n_dated": len(entries),
