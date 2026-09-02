@@ -315,7 +315,14 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
    below it, so nothing is lost — this is a summary, not a substitution. */
 .mstrip{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
 .mcell{display:flex;align-items:baseline;gap:6px;padding:5px 10px;background:var(--panel);
-  border:1px solid var(--line);border-radius:999px;white-space:nowrap;line-height:1.15}
+  border:1px solid var(--line);border-radius:999px;white-space:nowrap;line-height:1.15;
+  /* Non-gloss chips are single-line nowrap pills, but the widest (e.g. the USD/THB FX chip carrying
+     a value + delta + sparkline + period tag) can exceed a <340px phone strip and bleed ~15px past
+     the #macrostrip right edge at 360 — the same class of overbleed the .has-gloss cap fixed for
+     glossed chips. Cap to the container and let the trailing segment drop to a second line when (and
+     only when) the row can't fit: inert at any width where the chip already fits, so desktop/tablet
+     stay byte-identical (verified 390/768/1440). Segments keep their own nowrap. */
+  max-width:100%;flex-wrap:wrap}
 .mcell .mk{font-size:10px;color:var(--mid);text-transform:uppercase;letter-spacing:.4px}
 .mcell .mv{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--hi);
   font-variant-numeric:tabular-nums;letter-spacing:-.2px}
