@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-01T22:28:04+00:00",
-    "commit": "96000f6"
+    "generated_at": "2026-09-02T11:19:54+07:00",
+    "commit": "8721b3e"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-09-01",
+    "eta_date": "2026-09-02",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,78 @@
   ],
   "activity": [
     {
+      "date": "2026-09-02T11:19:54+07:00",
+      "sha": "8721b3e",
+      "summary": "fix(exposure): correct \"Truck net\" tooltip — net flow excludes transfers (#772)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-09-02T03:06:47+00:00",
+      "sha": "d9d5c3d",
+      "summary": "data: social listening refresh (run 33568027038) (#767)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-02T02:25:09+00:00",
+      "sha": "1bebf8b",
+      "summary": "docs(progress): log ux-loop macro-strip mcell mobile-bleed fix — merge #771 + deploy-verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-02T09:22:33+07:00",
+      "sha": "2d02903",
+      "summary": "ux: contain #overview macro-strip FX chip bleed at 360px (#771)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-02T02:01:12+00:00",
+      "sha": "fb1361e",
+      "summary": "data: rival Facebook promo feed refresh (run 33572455632) (#769)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-02T01:37:55+00:00",
+      "sha": "8545137",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33575611939) (#770)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-02T01:14:02+00:00",
+      "sha": "6d170f0",
+      "summary": "data: market-pulse swarm refresh (run 33571291133) (#768)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-02T00:34:16+00:00",
+      "sha": "65662e3",
+      "summary": "data: live fuel prices (2026-09-02, run 33575696500)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-02T00:30:21+00:00",
+      "sha": "6b77ec8",
+      "summary": "data(flood): carry MEASURED GISTDA flood-collateral context onto the double-pressure board",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-09-01T23:24:56+00:00",
+      "sha": "89abc83",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-01, run 33570765271)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-01T23:09:05+00:00",
+      "sha": "ce179a3",
+      "summary": "data: Thai-IP-only swarm refresh (run 33562967953) (#766)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-01T22:30:30+00:00",
+      "sha": "ad91fd9",
+      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (173b6ab->96000f6)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-01T22:28:04+00:00",
       "sha": "96000f6",
       "summary": "test(gate): add dangling-reference guard — every data layer the frontend fetches must exist",
@@ -639,78 +711,6 @@
       "sha": "cf12265",
       "summary": "docs: log UX-loop run — #sim scenario-cards grid mobile clamp (PR #757, merged+deployed+verified)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-01T15:25:48+07:00",
-      "sha": "02fb348",
-      "summary": "ux: clamp #sim .scn-grid scenario cards to container width on mobile (#757)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-01T06:48:08+00:00",
-      "sha": "326f8b4",
-      "summary": "intel: surface MEASURED youth (15-24) unemployment on the macro Unemployment row (#overview) (#756)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-01T04:58:08+00:00",
-      "sha": "a8b584c",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33469929190) (#755)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-01T04:28:47+00:00",
-      "sha": "9e2d90e",
-      "summary": "docs: log the intelligence-loop service-honesty fix (forward-window freshness note, b349125)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-01T04:27:40+00:00",
-      "sha": "b349125",
-      "summary": "intel(service): disclose the forward-looking freshness anchor in provenance.json's own reference_note",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-01T04:19:33+00:00",
-      "sha": "06ea4b1",
-      "summary": "data: rival Facebook promo feed refresh (run 33456873084) (#753)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-01T03:59:42+00:00",
-      "sha": "16ee247",
-      "summary": "data: Thai-IP-only swarm refresh (run 33449686362) (#750)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-01T03:20:24+00:00",
-      "sha": "7afa723",
-      "summary": "data: macro indicators (2026-09-01, run 33455753179) (#751)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-01T02:56:50+00:00",
-      "sha": "0e0aa5a",
-      "summary": "data: market-pulse swarm refresh (run 33455997606) (#752)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-01T02:16:47+00:00",
-      "sha": "6f5d1a2",
-      "summary": "docs: log UX-loop run — macro-strip gloss-chip mobile clamp (PR #754, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-01T09:13:45+07:00",
-      "sha": "46dcf3e",
-      "summary": "ux: clamp #overview macro-strip gloss chips to container width on mobile (#754)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-01T01:25:33+00:00",
-      "sha": "d363811",
-      "summary": "data: live fuel prices (2026-09-01, run 33458524548)",
-      "pillar": "data-integration"
     }
   ]
 }
