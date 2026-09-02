@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-02T17:19:56+07:00",
-    "commit": "33f12c8"
+    "generated_at": "2026-09-02T23:18:25+07:00",
+    "commit": "c75c309"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-09-02T23:18:25+07:00",
+      "sha": "c75c309",
+      "summary": "intel(overview): surface the collateral base's dark 6-year fleet trajectory + car class (obj #1) (#782)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-09-02T15:44:21+00:00",
+      "sha": "f066775",
+      "summary": "data: SET listed-peer scoreboard refresh (run 33646136437) (#781)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-02T15:24:41+00:00",
+      "sha": "a42a393",
+      "summary": "data: market-pulse swarm refresh (run 33638118839) (#778)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-02T21:49:45+07:00",
+      "sha": "167bf8b",
+      "summary": "docs(progress): log ux-loop #home cc-row sub-340 stack (#780)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-02T21:45:30+07:00",
+      "sha": "d9313a6",
+      "summary": "ux: stack #home command-center rows below 340px so labels don't bleed (#779)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-02T13:43:14+00:00",
+      "sha": "cf0fcc4",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-02, run 33637290863)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-02T12:38:14+00:00",
+      "sha": "addbaf0",
+      "summary": "docs(progress): log the orphan-gate comment-blindness fix + owner-review flag",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-09-02T12:37:44+00:00",
+      "sha": "100671f",
+      "summary": "test(gate): fix orphan-layer check's comment-blindness; ALLOW the two dormant expansion leaderboards",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-09-02T10:22:14+00:00",
+      "sha": "7c0ee23",
+      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (8721b3e->33f12c8)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-02T17:19:56+07:00",
       "sha": "33f12c8",
       "summary": "intel(home): surface dark MEASURED chronic-flood context on the double-pressure board (obj #1) (#777)",
@@ -657,60 +711,6 @@
       "sha": "ce179a3",
       "summary": "data: Thai-IP-only swarm refresh (run 33562967953) (#766)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-01T22:30:30+00:00",
-      "sha": "ad91fd9",
-      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (173b6ab->96000f6)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-01T22:28:04+00:00",
-      "sha": "96000f6",
-      "summary": "test(gate): add dangling-reference guard — every data layer the frontend fetches must exist",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-01T20:27:16+00:00",
-      "sha": "e10538c",
-      "summary": "docs(progress): log ux-loop mb-npl caption mobile-bleed fix — merge #765 + deploy-verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-02T03:23:34+07:00",
-      "sha": "decc6b5",
-      "summary": "ux: wrap system-NPL caption in #overview macro-book head (mobile bleed) (#765)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-01T20:22:35+00:00",
-      "sha": "1262931",
-      "summary": "data: market-pulse swarm refresh (run 33545576794) (#764)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-01T18:37:05+00:00",
-      "sha": "fb2ebd6",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-01, run 33544492703)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-01T18:26:20+00:00",
-      "sha": "e96f5e9",
-      "summary": "docs(progress): healthy close-out — CI-doable integration backlog verified exhausted",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-01T16:52:55+00:00",
-      "sha": "8230de6",
-      "summary": "data: SET listed-peer scoreboard refresh (run 33525825822) (#763)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-01T16:13:46+00:00",
-      "sha": "0c51308",
-      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (0779dd2→173b6ab)",
-      "pillar": "feature"
     }
   ]
 }
