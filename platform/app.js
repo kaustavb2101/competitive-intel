@@ -2645,12 +2645,40 @@ function renderCollatOutlook(){
   // above: it puts a real YoY number on the diesel-pickup / motorcycle collateral-pool direction.
   if(FLEET&&Array.isArray(FLEET.classes)){
     const yc=FLEET.latest_year_ce||(FLEET.meta&&FLEET.meta.latest_year_ce);
+    const wb=(FLEET.meta&&FLEET.meta.window_be)||FLEET.window_be||null;
     const byk={}; FLEET.classes.forEach(c=>byk[c.key]=c);
-    [['pickup','Pickup-title fleet'],['moto','Motorcycle-title fleet']].forEach(([k,lbl])=>{
+    // TIME dimension of the collateral base (the layer's own meta promises "a trailing 6-year series
+    // — is it expanding or contracting"): a compact sparkline of the BE-year-keyed FLEET.series plus
+    // the cumulative since_2563_pct. Both were built + committed but rendered by no page (dark). The
+    // sharp read a single-year YoY hides: pickup is -0.77% YoY AND only +1.49% across the whole
+    // window — the largest collateral class (38% of the book) has effectively peaked, while car
+    // (+19%) and moto (+8%) still grew. Null-safe: absent series/field ⇒ card degrades to YoY-only.
+    const ser=(FLEET.series&&typeof FLEET.series==='object'&&!Array.isArray(FLEET.series))?FLEET.series:null;
+    const years=ser?Object.keys(ser).sort():[];
+    const spark=(k)=>{
+      if(!ser||years.length<3) return '';
+      const vs=years.map(y=>+(ser[y]||{})[k]).filter(v=>isFinite(v));
+      if(vs.length<3) return '';
+      const mn=Math.min(...vs), mx=Math.max(...vs), rng=(mx-mn)||1, W=64, H=16, n=vs.length;
+      const pts=vs.map((v,i)=>[(i/(n-1))*W, H-2-((v-mn)/rng)*(H-4)]);
+      const dd=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+      const col=(vs[vs.length-1]>=vs[0])?'#1C8C7D':'#C8433B', last=pts[pts.length-1];
+      return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="vertical-align:middle;margin-left:6px" aria-hidden="true">`+
+        `<path d="${dd}" fill="none" stroke="${col}" stroke-width="1.3" stroke-linejoin="round"/>`+
+        `<circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="1.8" fill="${col}"/></svg>`;
+    };
+    // pickup · car · moto — ordered by AutoX outstanding share. car was previously dropped here (only
+    // its single-year YoY showed, on the #exposure collateral drill); the largest 4-wheel base belongs
+    // on the collateral-outlook cluster too.
+    [['pickup','Pickup-title fleet'],['car','Car-title fleet'],['moto','Motorcycle-title fleet']].forEach(([k,lbl])=>{
       const c=byk[k]; if(!c||c.yoy_pct==null) return;
       const up=c.yoy_pct>0, v=(up?'▲ +':'▼ ')+c.yoy_pct.toFixed(2)+'%';
-      cards.push({k:lbl+' (national)', v, d:c.latest.toLocaleString()+' regd', cls:up?'up':'down',
+      const cum=(c.since_2563_pct!=null&&isFinite(c.since_2563_pct))?c.since_2563_pct:null;
+      const wtxt=wb?(wb[0]+'→'+wb[1]):'2563→2568';
+      const cumStr=cum!=null?('6-yr '+(cum>=0?'+':'')+cum.toFixed(1)+'%'+spark(k)):'';
+      cards.push({k:lbl+' (national)', v, d:c.latest.toLocaleString()+' regd'+(cumStr?' · '+cumStr:''), cls:up?'up':'down',
         n:'MEASURED · DLT/MOT registered-vehicle stock, YoY to '+(yc||'latest')+'. '+
+          (cum!=null?('Cumulative '+(cum>=0?'+':'')+cum.toFixed(1)+'% across the '+wtxt+' BE registry series (sparkline in the line above) — the multi-year trajectory of the collateral BASE, not just this year\'s tick. '):'')+
           (up?'Collateral pool still growing (pace vs prior years).':'Collateral pool CONTRACTING — a shrinking resale/recovery base behind this slice of the book.')+
           ' Fleet SIZE, not resale value.'});
     });
