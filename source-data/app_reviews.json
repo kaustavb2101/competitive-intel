@@ -1689,16 +1689,16 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.711584,
-    "ratings": 16923,
+    "score": 4.7099056,
+    "ratings": 16927,
     "reviews_total": 5256,
     "installs": "1,000,000+",
     "histogram": [
-     539,
+     548,
      159,
-     449,
-     1339,
-     14432
+     448,
+     1336,
+     14431
     ],
     "app_updated": "2026-08-06",
     "version": "3.2.0"
@@ -1717,6 +1717,14 @@
      "at": "2026-08-31",
      "score": 5,
      "content": "ทำประกันผ่อนจ่ายได้",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "c0b9972b-752e-406a-b1a8-cfe1b7f68bf3",
+     "at": "2026-08-31",
+     "score": 5,
+     "content": "ดีคับ",
      "thumbs": 0,
      "replied": false
     },
@@ -16001,16 +16009,16 @@
    "name": "GO by Krungsri Auto",
    "own": false,
    "stats": {
-    "score": 4.398488,
-    "ratings": 9313,
+    "score": 4.399783,
+    "ratings": 9315,
     "reviews_total": 3807,
     "installs": "1,000,000+",
     "histogram": [
-     723,
-     261,
-     512,
-     894,
-     6919
+     726,
+     262,
+     504,
+     887,
+     6932
     ],
     "app_updated": "2026-08-19",
     "version": "8.6.0"
@@ -16039,6 +16047,14 @@
      "content": "ใช้มากๆๆๆ",
      "thumbs": 0,
      "replied": true
+    },
+    {
+     "id": "27c7ff13-09ea-412c-815a-4a34f4feca78",
+     "at": "2026-08-31",
+     "score": 5,
+     "content": "การเงินที่มั่นคงยามเราขัดสนช่วยได้",
+     "thumbs": 0,
+     "replied": false
     },
     {
      "id": "5cdcd273-84fe-45e6-b632-faebc73f7c3f",
