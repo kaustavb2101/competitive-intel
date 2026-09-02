@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-02T23:18:25+07:00",
-    "commit": "c75c309"
+    "generated_at": "2026-09-02T21:07:36+00:00",
+    "commit": "a7b83cc"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,36 @@
   ],
   "activity": [
     {
+      "date": "2026-09-02T21:07:36+00:00",
+      "sha": "a7b83cc",
+      "summary": "data: market-pulse swarm refresh (run 33670187316) (#783)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-02T20:32:50+00:00",
+      "sha": "e7cf295",
+      "summary": "docs(progress): log ux-loop #expo-occ 320px stack fix — merged (#784) + deployed + verified",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-03T03:28:07+07:00",
+      "sha": "cd87ce8",
+      "summary": "ux: stack #expo-occ borrower-base rows on very narrow phones (fix 320px bleed) (#784)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-02T18:47:18+00:00",
+      "sha": "53712d6",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-02, run 33669184898)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-02T16:18:52+00:00",
+      "sha": "456554f",
+      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (f066775->c75c309)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-02T23:18:25+07:00",
       "sha": "c75c309",
       "summary": "intel(overview): surface the collateral base's dark 6-year fleet trajectory + car class (obj #1) (#782)",
@@ -681,36 +711,6 @@
       "sha": "8545137",
       "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33575611939) (#770)",
       "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-02T01:14:02+00:00",
-      "sha": "6d170f0",
-      "summary": "data: market-pulse swarm refresh (run 33571291133) (#768)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-02T00:34:16+00:00",
-      "sha": "65662e3",
-      "summary": "data: live fuel prices (2026-09-02, run 33575696500)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-02T00:30:21+00:00",
-      "sha": "6b77ec8",
-      "summary": "data(flood): carry MEASURED GISTDA flood-collateral context onto the double-pressure board",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-09-01T23:24:56+00:00",
-      "sha": "89abc83",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-01, run 33570765271)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-01T23:09:05+00:00",
-      "sha": "ce179a3",
-      "summary": "data: Thai-IP-only swarm refresh (run 33562967953) (#766)",
-      "pillar": "data-integration"
     }
   ]
 }
