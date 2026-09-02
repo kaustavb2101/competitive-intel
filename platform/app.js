@@ -11352,6 +11352,14 @@ function renderHomeDoublePressure(){
   const hasPico=dp.some(r=>typeof r.pico==='number');
   const dpi=(m.double_pressure_pico&&typeof m.double_pressure_pico.pico_total==='number')?m.double_pressure_pico:null;
   const picoVin=(m.pico_source&&m.pico_source.vintage)?m.pico_source.vintage:null;
+  // MEASURED distinct-class CONTEXT: AutoX branches on chronic (≥7/12-yr) repeated-flood ground (GISTDA
+  // census × branch→amphoe→province crosswalk). A physical collateral/recovery hazard on the double-
+  // pressure book that neither the household-stress percentile nor the rival ratio can see. Context only
+  // (never folded into the score — same firm principle as book/PICO); gated so a pre-fold layer degrades
+  // cleanly to no column. Uses the app's established flood-hazard colour (#3E7CB1) for visual consistency.
+  const hasFlood=dp.some(r=>typeof r.flood_chronic_branches==='number');
+  const df=(m.double_pressure_flood&&typeof m.double_pressure_flood.chronic_branches_total==='number')?m.double_pressure_flood:null;
+  const floodVin=(m.flood_source&&m.flood_source.data_vintage)?m.flood_source.data_vintage:null;
   body.innerHTML=
     `<div class="tblwrap"><table class="tbl"><tr><th scope="col">Province</th>`+
       `<th scope="col" title="Portfolio-risk percentile (obj #1) — composite of MEASURED NSO debt-to-income + unemployment, expressed as a 0–100 rank across the 77 provinces. ESTIMATED (a percentile blend, not an absolute default level).">Stress ▲</th>`+
@@ -11360,22 +11368,26 @@ function renderHomeDoublePressure(){
       `<th scope="col" title="Share of the province's districts where the big-4 rivals outnumber AutoX (MEASURED, point-in-district).">Dist. lost</th>`+
       (hasBook?`<th scope="col" title="MEASURED real loan tape (tape_real.json) — the province's outstanding book (฿, combined) and its LIVE-book NPL (outstanding-weighted). The real-money scale behind the ranking; a percentile is not ฿. LIVE book only — 180+ legacy held apart.">Book ฿ · live NPL</th>`:'')+
       (hasPico?`<th scope="col" title="MEASURED — licensed พิโกไฟแนนซ์ (PICO-finance) operators registered in the province (FPO registry${picoVin?' '+picoVin:''}). A DISTINCT small-ticket rival class the Rival ◆ percentile does NOT count — so a province's competitive density can be under-read. Shown as context, never folded into the score.">PICO ◇</th>`:'')+
+      (hasFlood?`<th scope="col" title="MEASURED — AutoX branches in a CHRONIC repeated-flood district (flooded ≥7 of the 12 years 2005–2016; GISTDA 50k census${floodVin?', '+floodVin:''}). A physical collateral/recovery hazard on the book — seized vehicles are harder to recover and re-sell, and borrower cash-flow is hit — that neither the stress percentile nor the rival ratio can see. Frequency only (a hazard flag, no flooded-area or loss claimed). Context, never folded into the score.">Flood ⚑</th>`:'')+
       `</tr>`+
     dp.map(r=>{
       const distLost=(r.n_outnumbered_districts!=null&&r.n_districts)?`${r.n_outnumbered_districts}/${r.n_districts}`:'—';
       const bookCell=hasBook?`<td class="mono"><b>${baht(r.book_os)}</b> <span class="sub" style="font-weight:400">${r.book_npl_os_pct!=null?'· NPL '+nplp(r.book_npl_os_pct):''}</span></td>`:'';
       const picoCell=hasPico?`<td class="mono" style="color:${typeof r.pico==='number'&&r.pico>0?'var(--collat)':'var(--dim)'}">${typeof r.pico==='number'?r.pico.toLocaleString():'—'}</td>`:'';
+      const fc=r.flood_chronic_branches;
+      const floodCell=hasFlood?`<td class="mono" style="color:${typeof fc==='number'&&fc>0?'#3E7CB1':'var(--dim)'}"><b>${typeof fc==='number'?fc:'—'}</b>${typeof fc==='number'&&fc>0&&typeof r.flood_maxfreq==='number'?` <span class="sub" style="font-weight:400">· ${r.flood_maxfreq}/12 yr</span>`:''}</td>`:'';
       return `<tr>
         <td><b style="border-left:3px solid var(--agri);padding-left:7px">${r.province_th||'—'}</b> <span class="sub">${r.region||''}</span></td>
         <td class="mono" style="color:var(--agri)"><b>${pct(r.stress_pctile)}</b> <span class="sub" style="font-weight:400">DTI ${dti(r.debt_to_income)}${r.unemployment_rate!=null?' · unemp '+(+r.unemployment_rate).toFixed(1)+'%':''}</span></td>
         <td class="mono" style="color:var(--agri)"><b>${pct(r.contest_pctile)}</b></td>
         <td class="mono">${rat(r.ratio)} <span class="sub" style="font-weight:400">${r.leader?'· '+r.leader:''}</span></td>
         <td class="mono">${distLost}</td>
-        ${bookCell}${picoCell}
+        ${bookCell}${picoCell}${floodCell}
       </tr>`;}).join('')+`</table></div>`+
     (db?`<div class="sub" style="margin-top:6px;color:var(--txt)">These <b>${db.n_provinces}</b> provinces hold <b>${baht(db.book_os_total)}</b> of MEASURED outstanding book at a <b>${nplp(db.book_npl_os_pct)}</b> live NPL${mob?' (tape '+mob+')':''} — the real ฿ behind the ranking. A percentile rank is not a ฿ amount: a top-ranked province can still carry a small book, so read the ฿ column before acting.</div>`:'')+
     (dpi?`<div class="sub" style="margin-top:4px;color:var(--txt)">Behind the big-4 ratio, these provinces also carry <b style="color:var(--collat)">${dpi.pico_total.toLocaleString()}</b> licensed <b>PICO-finance</b> operators (MEASURED, FPO registry${picoVin?' '+picoVin:''}) — a DISTINCT sub-scale rival class the <b>Rival ◆</b> percentile does <b>not</b> count, so the true competitive squeeze on the double-pressure book runs deeper than the ratio alone shows.</div>`:'')+
-    `<div class="sub" style="margin-top:6px;color:var(--dim)"><b>${dp.length}</b> province${dp.length===1?'':'s'} sit top-third on <b>both</b> axes — a fragile book where margin defence is hardest. Where to look first, <b>not</b> a verdict or an action. Portfolio stress is <b>estimated</b> (percentile blend of MEASURED NSO debt-to-income + unemployment); rival ratio is <b>computed over MEASURED</b> census counts — so the combined read is a RANKING across the 77 provinces, not a probability. The <b>Book ฿ · live NPL</b> column is <b>MEASURED</b> real tape (live book; 180+ legacy apart)${hasPico?'; the <b>PICO ◇</b> column is a <b>MEASURED</b> count of licensed sub-scale rivals (FPO registry), carried as context and never in the score':''}. Full per-province board &amp; brand split → <a class="cc-link no-print" data-v="acq" href="#acq" style="display:inline">Competition</a>.</div>`;
+    (df&&df.chronic_branches_total>0?`<div class="sub" style="margin-top:4px;color:var(--txt)">On the ground, <b style="color:#3E7CB1">${df.chronic_branches_total}</b> AutoX branch${df.chronic_branches_total===1?'':'es'} across <b>${df.n_provinces_flood_present}</b> of these provinces sit in a <b>chronic repeated-flood</b> district (flooded ≥7 of 12 yrs; MEASURED, GISTDA${floodVin?' '+floodVin:''}) — a physical collateral/recovery hazard stacked on top of the household and rival pressure, one the percentile ranking cannot see. A hazard flag, not a loss estimate (no flooded area claimed); context, never in the score.</div>`:'')+
+    `<div class="sub" style="margin-top:6px;color:var(--dim)"><b>${dp.length}</b> province${dp.length===1?'':'s'} sit top-third on <b>both</b> axes — a fragile book where margin defence is hardest. Where to look first, <b>not</b> a verdict or an action. Portfolio stress is <b>estimated</b> (percentile blend of MEASURED NSO debt-to-income + unemployment); rival ratio is <b>computed over MEASURED</b> census counts — so the combined read is a RANKING across the 77 provinces, not a probability. The <b>Book ฿ · live NPL</b> column is <b>MEASURED</b> real tape (live book; 180+ legacy apart)${hasPico?'; the <b>PICO ◇</b> column is a <b>MEASURED</b> count of licensed sub-scale rivals (FPO registry), carried as context and never in the score':''}${hasFlood?'; the <b>Flood ⚑</b> column is a <b>MEASURED</b> count of branches on chronic repeated-flood ground (GISTDA), carried as context and never in the score':''}. Full per-province board &amp; brand split → <a class="cc-link no-print" data-v="acq" href="#acq" style="display:inline">Competition</a>.</div>`;
   wrapTables();   // this card mounts AFTER the PROVPRESS fetch resolves, past the boot-time wrapTables() — upgrade its inline .tblwrap to a keyboard-reachable, labelled scroll region (WCAG 2.1.1)
   wrap.style.display='';
 }
