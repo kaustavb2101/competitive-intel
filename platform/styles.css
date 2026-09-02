@@ -779,10 +779,16 @@ html[data-theme="light"] .pill-num{color:#fff}
    starve the label (.l) below its content floor — e.g. the 85px "measured"
    provenance badge in #cc-risk, or #cc-defend's .l crushed to ~7px — so the
    label bleeds past the card. Below 340px stack the pair (label over value) so
-   each gets the full card width. Inert ≥341px where the row already fits. */
+   each gets the full card width. Inert ≥341px where the row already fits.
+   #expo-occ (Borrower-base concentration bar rows) needs the same stack, but its
+   .r carries an inline min-width:230px + a 180px bar followed by a nowrap %
+   (app.js renderOccConcentration) that together exceed a ~228px phone card — so
+   also drop that min-width AND let the value column wrap, so the % share drops
+   below the bar instead of bleeding ~12px past the card's right edge. */
 @media (max-width:340px){
-  #v-home .cc-row{flex-direction:column;align-items:stretch;gap:2px}
-  #v-home .cc-row .r{text-align:left}
+  #v-home .cc-row,#v-exposure #expo-occ .cc-row{flex-direction:column;align-items:stretch;gap:2px}
+  #v-home .cc-row .r,#v-exposure #expo-occ .cc-row .r{text-align:left}
+  #v-exposure #expo-occ .cc-row .r{min-width:0!important;white-space:normal}
 }
 .cc-row .r .s{display:block;font-size:10px;font-weight:400;color:var(--dim)}
 /* .cc-tag shares ONE provenance visual language with .prov (leading dot, mono 11px,
