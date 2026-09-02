@@ -6393,6 +6393,42 @@ function drawRivRep(){
         <td class="mono sub">${b.n_rated||0}</td>
         <td class="mono sub">${(b.reviews||0).toLocaleString()}</td>
       </tr>`;}).join('');
+  // Regional cut (MEASURED, same weighted Google ratings, grouped by region) — a per-region read of
+  // rival SERVICE quality to sit next to the per-region rival-DENSITY lens: where the rival field is
+  // both dense and well-liked, share is hardest to take; a weak regional rating in a saturated
+  // region is a service opening. Own colour scale across the region spread. Null-safe: hidden if absent.
+  const reg=$('#rivrepregion');
+  if(reg){
+    const regs=(RIVREP&&Array.isArray(RIVREP.by_region))?RIVREP.by_region:[];
+    const rv=regs.map(r=>r.rating_wavg).filter(v=>typeof v==='number');
+    if(regs.length && rv.length){
+      const rlo=Math.min(...rv), rhi=Math.max(...rv);
+      const rcol=v=>{ if(rhi<=rlo) return 'var(--merch)'; const t=(v-rlo)/(rhi-rlo); return t>=0.67?'var(--merch)':t<=0.34?'var(--agri)':'var(--gold)'; };
+      const best=regs.reduce((a,b)=>(b.rating_wavg>(a?a.rating_wavg:-1)?b:a),null);
+      const worst=regs.reduce((a,b)=>(b.rating_wavg<(a?a.rating_wavg:99)?b:a),null);
+      const rrows=regs.slice().sort((a,b)=>(b.rating_wavg||0)-(a.rating_wavg||0)).map(r=>{
+        const v=(typeof r.rating_wavg==='number')?r.rating_wavg:null;
+        const c=v!=null?rcol(v):'var(--dim)';
+        const bar=v!=null?barHTML(v,c,5):'';
+        return `<tr>
+          <td><b>${r.region||'—'}</b></td>
+          <td>${bar} <span class="mono" style="color:${c}"><b>${v!=null?v.toFixed(2):'—'}</b></span></td>
+          <td class="mono sub">${r.rating_mean!=null?r.rating_mean.toFixed(2):'—'}</td>
+          <td class="mono sub">${r.n_rated||0}</td>
+          <td class="mono sub">${(r.reviews||0).toLocaleString()}</td>
+        </tr>`;}).join('');
+      reg.innerHTML=`<p class="lead sub" style="margin:12px 0 4px"><b>By region</b> — rival service quality is not flat across the map: it runs `+
+        `<b style="color:var(--merch)">${best?best.rating_wavg.toFixed(2)+'★ in '+best.region:'—'}</b> at its best-liked and `+
+        `<b style="color:var(--agri)">${worst?worst.rating_wavg.toFixed(2)+'★ in '+worst.region:'—'}</b> at its weakest. `+
+        `Where the rival field is well-liked, share is hardest to take; a weak regional rating is a service opening. `+
+        `<span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · sample</span></p>`+
+        `<table class="tbl"><tr><th scope="col">Region</th>`+
+        `<th scope="col" title="review-count-weighted mean Google rating across this region's located rival branches">Rating ★ (wtd)</th>`+
+        `<th scope="col" title="simple mean rating">Mean</th>`+
+        `<th scope="col" title="located rival branches carrying a Google rating">Rated br.</th>`+
+        `<th scope="col" title="total Google reviews across them">Reviews</th></tr>${rrows}</table>`;
+    } else { reg.innerHTML=''; }
+  }
   if(ro){
     const pre=m.n_rated?`<b>Across ${m.n_rated} rated rival branches (${(m.reviews||0).toLocaleString()} reviews).</b> `:'';
     ro.innerHTML=pre+(RIVREP.headline||'')+` ${TAG_M}`+
@@ -6401,6 +6437,7 @@ function drawRivRep(){
          '<b>A sample, not the full census</b> — only located rival branches that carry a Google rating; read the brand order, not hairline gaps.',
          '<b>Not an AutoX figure</b> — our own branches carry no Google ratings, so there is no comparable AutoX number here.']);
   }
+  wrapTables();   // mounts AFTER the rival_reputation fetch resolves, past the boot-time wrapTables() — wrap the brand + by-region tables so wide ones scroll on narrow columns (WCAG 2.1.1)
 }
 
 /* ---------- rival threat matrix · footprint × service quality per brand (obj #2, MIXED) ----------
