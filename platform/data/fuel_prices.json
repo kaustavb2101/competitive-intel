@@ -3,7 +3,7 @@
     "generated_by": "build_fuel_prices.py",
     "source": "Bangchak retail oil-price API (www.bangchak.co.th/api/oilprice) — daily Bangkok reference prices; free, no key, cloud-reachable (EPPO/PTT/data.go.th are geoblocked).",
     "label": "MEASURED — live Thai retail fuel prices (฿/litre, Bangkok reference)",
-    "pulled": "2026-09-01",
+    "pulled": "2026-09-02",
     "unit": "THB/litre",
     "n_fuels": 8,
     "provenance": "Verbatim projection of source-data/fuel_prices.json (pipeline/pull_fuel_prices.py, refreshed daily by .github/workflows/data-fuel-prices.yml). No recomputation — every price carried through unchanged.",
@@ -11,43 +11,43 @@
     "collateral_read": "Diesel = pickup/farm-vehicle title-loan borrowers; gasohol = motorcycle-title borrowers. Rising pump prices compress those borrowers' disposable income."
   },
   "headline": {
-    "diesel": 38.39,
+    "diesel": 39.14,
     "diesel_name": "Hi Diesel S",
-    "diesel_delta_tomorrow": 0.75,
-    "gasohol95": 37.69,
+    "diesel_delta_tomorrow": 0.0,
+    "gasohol95": 38.29,
     "gasohol95_name": "Gasohol 95 S EVO",
-    "gasohol95_delta_tomorrow": 0.6
+    "gasohol95_delta_tomorrow": 0.0
   },
   "fuels": {
     "DIESEL B20": {
-      "today": 33.39,
+      "today": 34.14,
       "tomorrow": 34.14,
-      "delta_tomorrow": 0.75
+      "delta_tomorrow": 0.0
     },
     "Gasohol 91 S EVO": {
-      "today": 37.32,
+      "today": 37.92,
       "tomorrow": 37.92,
-      "delta_tomorrow": 0.6
+      "delta_tomorrow": 0.0
     },
     "Gasohol 95 S EVO": {
-      "today": 37.69,
+      "today": 38.29,
       "tomorrow": 38.29,
-      "delta_tomorrow": 0.6
+      "delta_tomorrow": 0.0
     },
     "Gasohol E20 S EVO": {
-      "today": 32.69,
+      "today": 33.29,
       "tomorrow": 33.29,
-      "delta_tomorrow": 0.6
+      "delta_tomorrow": 0.0
     },
     "Gasohol E85 S EVO": {
-      "today": 28.63,
+      "today": 29.23,
       "tomorrow": 29.23,
-      "delta_tomorrow": 0.6
+      "delta_tomorrow": 0.0
     },
     "Hi Diesel S": {
-      "today": 38.39,
+      "today": 39.14,
       "tomorrow": 39.14,
-      "delta_tomorrow": 0.75
+      "delta_tomorrow": 0.0
     },
     "Hi Premium 98 Plus": {
       "today": 49.29,
