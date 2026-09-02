@@ -80,11 +80,23 @@ PEER = os.path.join(DATA, "peer_province.json")
 # MEASURED real-book axis (optional additive join). tape_real.json is gated + --check-reproducible;
 # its province aggregates are the real loan tape (382,735 accounts, no-PII, floored at MIN_CELL).
 TAPE = os.path.join(DATA, "tape_real.json")
+# MEASURED repeated-flood hazard (optional context join). flood_hazard.json (GISTDA 50k census, gated
+# + --check-reproducible) carries a per-branch flood_freq index-aligned to branches.json; amphoe.json
+# carries the branch->amphoe->province crosswalk. Together they yield, per province, how many of AutoX's
+# own branches sit on chronically-flooding ground — a MEASURED collateral-quality read, carried as
+# CONTEXT here exactly like the pico / book columns (NEVER folded into any pressure score).
+FLOOD = os.path.join(DATA, "flood_hazard.json")
+AMPHOE = os.path.join(DATA, "amphoe.json")
 OUT = os.path.join(DATA, "province_pressure.json")
 
 # Disclosure floor for the real tape (see .claude/skills/tape-pii-floor). tape_real.json is already
 # floored at ingest; we re-assert it here so a province book row is NEVER carried on < 30 accounts.
 MIN_CELL = 30
+
+# Repeated-flood band: a branch whose district flooded in >= this many of the 12 census years
+# (2005-2016) is "chronic". Matches build_flood_hazard.py's CHRONIC threshold so the count carried
+# here reproduces flood_hazard.json's own n_branches_chronic exactly.
+FLOOD_CHRONIC = 7
 
 # A percentile at or above this cut counts as "top third" for the double_pressure alert flag.
 # 100/3 = 33.3% of provinces sit above it on a single axis; requiring BOTH axes above it is a
@@ -109,6 +121,45 @@ def _percentile_rank(value, sorted_values):
     below = sum(1 for v in sorted_values if v < value)
     equal = sum(1 for v in sorted_values if v == value)
     return round(100.0 * (below + 0.5 * equal) / n, 2)
+
+
+def _flood_exposure():
+    """Per-province MEASURED flood-collateral exposure, or None when either input is absent.
+
+    Joins flood_hazard.json's per-branch flood_freq (index-aligned to branches.json) through
+    amphoe.json's branch_amphoe crosswalk to the branch's canonical province, and tallies, per
+    province: how many of AutoX's branches sit on ground that flooded in >= FLOOD_CHRONIC of the 12
+    census years (chronic), how many flooded at all (flagged >= 1 year), and the province's worst
+    branch flood_freq. Deterministic; the chronic total reproduces flood_hazard.json's own
+    n_branches_chronic. Returns {province_th: {chronic, flagged, maxfreq}} keyed only by provinces
+    that carry >= 1 AutoX branch (so a peer province absent from the map defaults to a MEASURED 0),
+    or None so the caller carries null flood context (an honest gap, never a guessed 0)."""
+    if not (os.path.exists(FLOOD) and os.path.exists(AMPHOE)):
+        return None
+    flood = _load(FLOOD)
+    amp_doc = _load(AMPHOE)
+    branch_freq = flood.get("branches")
+    amp = amp_doc.get("amphoe")
+    branch_amphoe = amp_doc.get("branch_amphoe")
+    if not (isinstance(branch_freq, list) and isinstance(amp, list)
+            and isinstance(branch_amphoe, list) and len(branch_freq) == len(branch_amphoe)):
+        return None
+    out = {}
+    for i, ai in enumerate(branch_amphoe):
+        if not (isinstance(ai, int) and 0 <= ai < len(amp)):
+            continue
+        prov = amp[ai].get("province_th")
+        if not prov:
+            continue
+        freq = branch_freq[i] if isinstance(branch_freq[i], int) else 0
+        rec = out.setdefault(prov, {"chronic": 0, "flagged": 0, "maxfreq": 0})
+        if freq >= 1:
+            rec["flagged"] += 1
+        if freq >= FLOOD_CHRONIC:
+            rec["chronic"] += 1
+        if freq > rec["maxfreq"]:
+            rec["maxfreq"] = freq
+    return out
 
 
 def build():
@@ -138,6 +189,11 @@ def build():
                 n_book_suppressed += 1          # never carry a book row below the disclosure floor
                 continue
             tape_pv[prov] = v
+
+    # MEASURED flood-collateral CONTEXT (optional): per-province count of AutoX branches on
+    # chronically-flooding ground (flood_hazard.json x amphoe.json crosswalk). None in a stripped
+    # sandbox missing either input → flood fields stay null (honest gap). Never folded into a score.
+    flood_pv = _flood_exposure()
 
     # competitive-risk axis: rival:AutoX ratio per province (null where autox == 0 → no footprint
     # to be outnumbered in; excluded from the percentile pool and never flagged double_pressure).
@@ -172,6 +228,16 @@ def build():
         book_n = tv.get("n") if tv else None
         book_pctile = (_percentile_rank(float(book_os), book_os_pool)
                        if book_os is not None and book_os_pool else None)
+
+        # MEASURED flood-collateral context for this province (null when the flood/amphoe inputs are
+        # absent; a MEASURED 0 when present but no AutoX branch here sits on flooded ground).
+        fv = flood_pv.get(prov) if flood_pv is not None else None
+        if flood_pv is None:
+            flood_chronic_branches = flood_flagged_branches = flood_maxfreq = None
+        else:
+            flood_chronic_branches = fv["chronic"] if fv else 0
+            flood_flagged_branches = fv["flagged"] if fv else 0
+            flood_maxfreq = fv["maxfreq"] if fv else 0
 
         if stress_pctile is not None and contest_pctile is not None:
             both_min = round(min(stress_pctile, contest_pctile), 2)
@@ -212,6 +278,17 @@ def build():
             "book_npl_os_pct": book_npl_os_pct,
             "book_n": book_n,
             "book_pctile": book_pctile,
+            # MEASURED flood-collateral CONTEXT (flood_hazard.json x amphoe.json — GISTDA 50k repeated-
+            # flood census x AutoX branch locations). How many of THIS province's branches sit on
+            # ground that floods chronically / at all, and the province's worst branch flood_freq. A
+            # portfolio-risk (objective #1) collateral-quality read for a vehicle-title lender: chronic
+            # flooding both destroys the pledged collateral and cuts the farm/SME cash-flow behind
+            # repayment. Carried as CONTEXT only (like pico / book_*), NEVER folded into stress_pctile /
+            # contest_pctile / both_min / double_pressure / the sort — mixing a hazard count into the
+            # percentile blend would be dishonest. int / MEASURED-0 / null (flood inputs absent).
+            "flood_chronic_branches": flood_chronic_branches,
+            "flood_flagged_branches": flood_flagged_branches,
+            "flood_maxfreq": flood_maxfreq,
             # combined
             "both_min": both_min,
             "both_mean": both_mean,
@@ -259,6 +336,15 @@ def build():
     # PICO context available at all (any province carries an int count) — gates the surfacing.
     pico_present_any = any(isinstance(r.get("pico"), int) for r in records)
     peer_pico_src = (peer.get("meta") or {}).get("pico_source") or {}
+
+    # MEASURED flood-collateral context carried by the double-pressure alert set — how many AutoX
+    # branches in the worst-pressured provinces sit on chronically-flooding ground. Context only
+    # (never a third axis); null when the flood inputs are absent from the sandbox.
+    flood_present_any = flood_pv is not None
+    dbl_flood_rows = [r for r in dbl_rows if isinstance(r.get("flood_chronic_branches"), int)]
+    dbl_flood_chronic = sum(r["flood_chronic_branches"] for r in dbl_flood_rows)
+    n_dbl_flood_present = sum(1 for r in dbl_flood_rows if r["flood_chronic_branches"] > 0)
+    flood_meta = _load(FLOOD).get("meta", {}) if (flood_present_any and os.path.exists(FLOOD)) else {}
 
     meta = {
         "generated_by": "pipeline/build_province_pressure.py",
@@ -328,6 +414,25 @@ def build():
                            "the provinces the peer board covers (same mid-rank-ties method as the two "
                            "pressure axes, so ฿-scale is directly comparable to stress/contest). "
                            "Lets the reader ask 'is this a big-book province too?' on one scale.",
+            "flood_chronic_branches": "MEASURED CONTEXT (not an axis) — count of THIS province's AutoX "
+                                      "branches whose district flooded in >= %d of the 12 census years "
+                                      "(2005-2016), from flood_hazard.json (GISTDA 50k repeated-flood "
+                                      "census, MAX flood_freq per district — overlap-immune, NO area "
+                                      "claimed) joined through amphoe.json's branch->amphoe->province "
+                                      "crosswalk. A portfolio-risk (objective #1) collateral-quality "
+                                      "read: chronic flooding destroys pledged vehicle collateral and "
+                                      "cuts the farm/SME cash-flow behind repayment. Carried so a "
+                                      "double-pressure province that ALSO sits on chronically-flooding "
+                                      "ground is visible; deliberately NEVER folded into any pressure "
+                                      "score (a hazard count is not a percentile). int / MEASURED-0 / "
+                                      "null (flood inputs absent)." % FLOOD_CHRONIC,
+            "flood_flagged_branches": "MEASURED CONTEXT — count of this province's AutoX branches whose "
+                                      "district flooded in >= 1 of the 12 census years (any repeated-"
+                                      "flood exposure, the wider net around flood_chronic_branches). "
+                                      "int / MEASURED-0 / null.",
+            "flood_maxfreq": "MEASURED CONTEXT — the worst branch flood_freq in the province (0-12; how "
+                             "many of the 12 years the most-exposed branch's ground flooded). int / "
+                             "MEASURED-0 / null.",
         },
         "caveats": [
             "Both axes are RELATIVE percentiles over the same 77 provinces, so every combined read "
@@ -359,15 +464,25 @@ def build():
             "the most real ฿ and the worst live NPL?' — so an abstract percentile ranking can be read "
             "in real money. book_npl_os_pct is the LIVE book only; the 180+ legacy book is held apart "
             "(see tape_real.json) and is never blended in here. book_os is the combined outstanding.",
+            "The MEASURED flood columns (flood_chronic_branches / flood_flagged_branches / "
+            "flood_maxfreq) are likewise CONTEXT, not a third axis: they do NOT change double_pressure, "
+            "both_min, both_mean or the sort. They answer 'of the double-pressure provinces, which also "
+            "carry AutoX branches on chronically-flooding ground?' — a collateral-quality overlay on "
+            "the same board. The count is a branch tally against a MEASURED government hazard census "
+            "(GISTDA 50k, MAX flood_freq per district — overlap-immune); NO flooded-AREA is claimed. "
+            "A branch's flood exposure inherits its district's max frequency, so it flags a hazard the "
+            "collateral is exposed to, not a realized loss.",
         ],
         "thresholds": {"top_third_pctile": TOP_THIRD, "median_pctile": MEDIAN},
         "record_format": "{province_th, region, stress_pctile, debt_to_income, unemployment_rate, "
                          "contest_pctile, autox, rivals, ratio, leader, autox_rank, n_ranked, "
                          "n_districts, n_outnumbered_districts, pico, book_os, book_npl_os_pct, "
-                         "book_n, book_pctile, both_min, both_mean, quadrant, double_pressure}. "
+                         "book_n, book_pctile, flood_chronic_branches, flood_flagged_branches, "
+                         "flood_maxfreq, both_min, both_mean, quadrant, double_pressure}. "
                          "provinces[] sorted by both_min desc (worst double pressure first); "
-                         "null-axis provinces sort last. The pico and book_* columns are MEASURED "
-                         "context (peer_province.json / tape_real.json), not a sort or alert axis.",
+                         "null-axis provinces sort last. The pico, book_* and flood_* columns are "
+                         "MEASURED context (peer_province.json / tape_real.json / flood_hazard.json), "
+                         "not a sort or alert axis.",
         "n_provinces": len(records),
         "n_provinces_scored": len(scored),
         "n_double_pressure": len(dbl_rows),
@@ -424,6 +539,24 @@ def build():
             "vintage": peer_pico_src.get("vintage"),
             "n_operators": peer_pico_src.get("n_operators"),
         } if pico_present_any else None),
+        # MEASURED flood-collateral context on the alert set: how many AutoX branches in the double-
+        # pressure provinces sit on chronically-flooding ground (the collateral-quality overlay).
+        # Context only — never a third pressure axis. null when the flood census is absent.
+        "double_pressure_flood": ({
+            "n_provinces": len(dbl_flood_rows),
+            "chronic_branches_total": dbl_flood_chronic,
+            "n_provinces_flood_present": n_dbl_flood_present,
+        } if dbl_flood_rows else None),
+        "flood_source": ({
+            "layer": "platform/data/flood_hazard.json x platform/data/amphoe.json",
+            "metric": "AutoX branches per province in a chronic (>= %d/12-yr) repeated-flood district "
+                      "(MEASURED, GISTDA 50k census x branch->amphoe->province crosswalk)" % FLOOD_CHRONIC,
+            "provenance": "MEASURED — GISTDA repeated-flood census (MAX flood_freq per district, "
+                          "overlap-immune, no area claimed) joined to AutoX branch locations.",
+            "data_vintage": flood_meta.get("data_vintage"),
+            "chronic_threshold": FLOOD_CHRONIC,
+            "n_branches_chronic_national": flood_meta.get("n_branches_chronic"),
+        } if flood_present_any else None),
     }
     return {"meta": meta, "provinces": records}
 
@@ -474,6 +607,11 @@ def run(check=False):
         print("  MEASURED sub-scale (PICO) in the alert set: %d operators across %d of %d "
               "double-pressure provinces (distinct class, context only)"
               % (dpi["pico_total"], dpi["n_provinces_pico_present"], dpi["n_provinces"]))
+    dpf = m.get("double_pressure_flood")
+    if dpf:
+        print("  MEASURED flood collateral in the alert set: %d AutoX branches on chronic-flood "
+              "ground across %d of %d double-pressure provinces (context only)"
+              % (dpf["chronic_branches_total"], dpf["n_provinces_flood_present"], dpf["n_provinces"]))
     return 0
 
 
