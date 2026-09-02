@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-02T11:19:54+07:00",
-    "commit": "8721b3e"
+    "generated_at": "2026-09-02T17:19:56+07:00",
+    "commit": "33f12c8"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-09-02T17:19:56+07:00",
+      "sha": "33f12c8",
+      "summary": "intel(home): surface dark MEASURED chronic-flood context on the double-pressure board (obj #1) (#777)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-02T09:27:44+00:00",
+      "sha": "8b10d9f",
+      "summary": "data(census): refresh the Union Auction forward book (run 33606974209) (#774)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-02T09:08:26+00:00",
+      "sha": "cbc05e6",
+      "summary": "data: market-pulse swarm refresh (run 33606924476) (#775)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-02T08:26:56+00:00",
+      "sha": "f2c3740",
+      "summary": "docs(progress): log ux-loop #home card-header 320px wrap fix — merge #776 + deploy-verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-02T15:22:26+07:00",
+      "sha": "beeaa22",
+      "summary": "ux: wrap #home card-header row so link doesn't bleed at 320px (#776)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-02T08:01:05+00:00",
+      "sha": "9c25925",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-02, run 33606332711)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-02T07:10:45+00:00",
+      "sha": "eb741be",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-02T07:09:55+00:00",
+      "sha": "cd1994d",
+      "summary": "data: NABC live prices (2026-09-02, run 33601773447)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-02T07:06:56+00:00",
+      "sha": "0012873",
+      "summary": "intel(acq): surface rival service reputation by region (obj #2) (#773)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-02T04:22:52+00:00",
+      "sha": "a4edc86",
+      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (8721b3e)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-02T11:19:54+07:00",
       "sha": "8721b3e",
       "summary": "fix(exposure): correct \"Truck net\" tooltip — net flow excludes transfers (#772)",
@@ -651,66 +711,6 @@
       "sha": "0c51308",
       "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (0779dd2→173b6ab)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-09-01T15:11:10+00:00",
-      "sha": "173b6ab",
-      "summary": "data: market-pulse swarm refresh (run 33518410783) (#761)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-01T14:37:51+00:00",
-      "sha": "12a8638",
-      "summary": "docs(progress): log ux-loop #sim zero-baseline reframe — merge #762 + deploy-verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-01T21:34:55+07:00",
-      "sha": "fecf56d",
-      "summary": "ux: reframe #sim zero-baseline verdict from empty-looking triple-zero to a clear 'book is clear today' answer (#762)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-01T14:11:27+00:00",
-      "sha": "e314adf",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-01, run 33517784731)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-01T13:03:30+00:00",
-      "sha": "d52ea24",
-      "summary": "intel(exposure): surface the real tape's dark province×occupation risk leaderboard (obj #1) (#760)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-09-01T11:01:51+00:00",
-      "sha": "85ff79e",
-      "summary": "data(census): refresh the Union Auction forward book (run 33489325456) (#758)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-01T10:38:20+00:00",
-      "sha": "a77c033",
-      "summary": "data: market-pulse swarm refresh (run 33489278359) (#759)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-01T10:15:48+00:00",
-      "sha": "c01ade4",
-      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (06ea4b1→0779dd2)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-01T08:47:39+00:00",
-      "sha": "0779dd2",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-01, run 33488671893)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-01T08:28:32+00:00",
-      "sha": "cf12265",
-      "summary": "docs: log UX-loop run — #sim scenario-cards grid mobile clamp (PR #757, merged+deployed+verified)",
-      "pillar": "uxui"
     }
   ]
 }
