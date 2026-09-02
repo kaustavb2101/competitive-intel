@@ -12534,7 +12534,7 @@ function renderCollateralBook(){
         {k:'ltv_proxy_pct',fmt:'pct',lab:'Lent vs value'},
         {k:'diesel_share_pct',fmt:'pct',lab:'Diesel % fleet',lev:'p',title:'MEASURED (DLT) — diesel share of the province car+pickup stock. All 77 provinces, not a top-ten list.'},
         {k:'electrified_pct',fmt:'pct',lab:'EV+hybrid %',lev:'p',title:'MEASURED (DLT) — BEV+PHEV+hybrid share of the province fleet. The leading indicator for used-value erosion on the diesel collateral we hold.'},
-        {k:'truck_net_flow',fmt:'num',lab:'Truck net',lev:'p',title:'MEASURED (DLT) — 12-month net truck flow (new + transfers − deregistrations) in this province. Trucks are a collateral class in our book, so this belongs here.'},
+        {k:'truck_net_flow',fmt:'num',lab:'Truck net',lev:'p',title:'MEASURED (DLT) — 12-month net truck flow (new registrations − deregistrations; excludes ownership transfers) in this province. Trucks are a collateral class in our book, so this belongs here.'},
         {k:'dpd90p_pct',fmt:'pct',lab:'90+'},
         {k:'current_pct',fmt:'pct',lab:'Current %',title:'DERIVED — accounts neither in the X-day watch bucket nor 30+ overdue'}
       ],
