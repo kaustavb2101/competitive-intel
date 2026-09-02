@@ -16,15 +16,22 @@ join). This is the missing sibling: an orphan-*data-layer* check. Together they 
 WHAT COUNTS AS CONSUMED
 -----------------------
 A top-level `platform/data/X.json` is consumed if EITHER:
-  - a page reads it — the base name `X` (as a whole token) appears in platform/app.js or any
-    platform/*.html (the app fetches via `tmliFetch('X')` / `fetch('data/X.json')` — no literal
-    `.json` suffix, which is why a naive filename grep gives false positives); OR
+  - a page reads it — via a real LOADER idiom in platform/app.js or any platform/*.html: the base
+    name quoted (`tmliFetch('X')`, or `'X'` in a `Promise.all([...])` batch) or the fetch path
+    `data/X.json`. A bare, unquoted MENTION does NOT count — a name that appears only inside a
+    comment (`// X removed`, `<!-- X.json remains on disk -->`) is prose, not a fetch, and used to
+    fool a naive whole-token grep into reporting a dead layer as "consumed" (the exact hole that
+    hid opportunity_score / expansion_plan below — see ALLOW). Requiring the quoted/path form is a
+    STRICTER test (every real page consumer uses one of these forms; comments do not), so it can
+    only surface a real orphan, never cry wolf over a genuinely-loaded layer; OR
   - a pipeline script reads it as INPUT — the base name appears in a pipeline/*.py that is NOT the
     script which WRITES X.json. The producer is identified structurally (it ties the "X.json"
     literal to an `open(..,'w')` / `.write_text` / json.dump sink), so a layer referenced ONLY by
     its own producer — the exact branch_density shape — is flagged, while a hand-authored INPUT
     read by a single builder (e.g. provenance_sidecar.json, read by build_provenance.py) is
-    correctly seen as consumed.
+    correctly seen as consumed. (The pipeline side still matches a whole token, so a layer named
+    only in a builder's docstring/comment still reads as consumed there — a narrower, rarer hole
+    than the page-comment one; ALLOW is the sanctioned escape hatch when it bites.)
 
 Producer detection failing OPEN is deliberate: if a writer idiom is ever missed, the producer's own
 reference reads as consumption and the layer looks used — a false NEGATIVE (a missed orphan), never
@@ -38,8 +45,11 @@ EXCLUSIONS
   guarded elsewhere (province index / nav). Excluded by suffix.
 - `provinces/*.json` live in a subdir (not matched by the top-level glob) and are slug-loaded too.
 - ALLOW: an explicit, reasoned allowlist for any layer intentionally committed without a consumer
-  (a dormant-by-design output retained for reversibility). Empty today — every committed leaf is
-  genuinely consumed. Adding an entry is a deliberate, reviewed act, exactly like LEGACY_ROUTES.
+  (a dormant-by-design output retained for reversibility). Carries the two strategy-pivot expansion
+  leaderboards (opportunity_score / expansion_plan) — generated, `--check`-gated for reproducibility,
+  but surfaced by no page since the network went consolidation-only (see CLAUDE.md, and each
+  builder's DORMANT docstring). Adding an entry is a deliberate, reviewed act, exactly like
+  LEGACY_ROUTES.
 
 Offline, stdlib only. Exit 0 = pass, 1 = fail.
 """
@@ -55,9 +65,15 @@ DATA = os.path.join(REPO, "platform", "data")
 FAMILY_SUFFIX = ("_catchment.json", "_places.json", "_roads.json", "_water.json", "_landuse.json")
 
 # Intentional exceptions: a committed layer with no consumer, retained on purpose. Each MUST carry a
-# reason. Empty today — do not add a row to silence a genuine orphan; wire the layer up instead.
+# reason. Do not add a row to silence a genuine orphan; wire the layer up instead.
 ALLOW = {
-    # "some_layer.json": "why it is committed without a consumer",
+    "opportunity_score.json": "DORMANT by design — the per-amphoe demand×gap growth leaderboard was "
+        "dropped in the consolidation strategy pivot (no where-to-open recommendation). Still built + "
+        "--check-gated for reproducibility/reversibility; surfaced by no page (all app refs are "
+        "comments). See build_opportunity_score.py docstring + CLAUDE.md.",
+    "expansion_plan.json": "DORMANT by design — the sequenced D'Hondt branch-placement plan, retained "
+        "but unrendered since the network is consolidating not growing. Still built + --check-gated; "
+        "no page consumes it. See build_expansion_plan.py docstring + CLAUDE.md.",
 }
 
 
@@ -77,6 +93,20 @@ def _is_writer(text, fname):
             return True
         if re.search(r"json\.dump\([^)\n]*,\s*" + v + r"\b", text):
             return True
+    return False
+
+
+def _page_consumes(app_text, base):
+    """True if a page LOADS platform/data/<base>.json via a real fetch idiom — the base name
+    quoted (tmliFetch('base') / 'base' in a Promise.all batch) or the fetch path data/base.json.
+    A bare, unquoted mention (a comment or prose) is NOT a load and does not count. Every real
+    page consumer uses one of these forms; comments do not — so this is strictly tighter than a
+    whole-token grep and cannot mis-flag a genuinely-loaded layer. See module docstring."""
+    b = re.escape(base)
+    if re.search(r"""['"`]""" + b + r"""['"`]""", app_text):   # quoted bare token
+        return True
+    if re.search(r"data/" + b + r"\.json", app_text):          # fetch path form
+        return True
     return False
 
 
@@ -105,7 +135,7 @@ def main():
         producers = {name for name, txt in pipe.items() if _is_writer(txt, f)}
         pipe_consumers = [name for name, txt in pipe.items()
                           if tok.search(txt) and name not in producers]
-        app_consumed = bool(tok.search(app_text))
+        app_consumed = _page_consumes(app_text, base)
         if not (app_consumed or pipe_consumers):
             orphans.append((f, sorted(producers)))
 
