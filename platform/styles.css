@@ -775,6 +775,15 @@ html[data-theme="light"] .pill-num{color:#fff}
 .cc-row .l{font-size:12.5px;color:var(--txt);flex:1;min-width:0;overflow-wrap:anywhere}
 .cc-row .l .s{display:block;font-size:10.5px;color:var(--dim);overflow-wrap:anywhere}
 .cc-row .r{font-family:var(--mono);font-size:13px;font-weight:600;white-space:nowrap;text-align:right}
+/* Very narrow phones (≤340px): the nowrap value column (.r) is wide enough to
+   starve the label (.l) below its content floor — e.g. the 85px "measured"
+   provenance badge in #cc-risk, or #cc-defend's .l crushed to ~7px — so the
+   label bleeds past the card. Below 340px stack the pair (label over value) so
+   each gets the full card width. Inert ≥341px where the row already fits. */
+@media (max-width:340px){
+  #v-home .cc-row{flex-direction:column;align-items:stretch;gap:2px}
+  #v-home .cc-row .r{text-align:left}
+}
 .cc-row .r .s{display:block;font-size:10px;font-weight:400;color:var(--dim)}
 /* .cc-tag shares ONE provenance visual language with .prov (leading dot, mono 11px,
    teal=measured / gold=estimated tint, hairline border). Colors resolve via .prov.m/.e below. */
