@@ -6,7 +6,7 @@
     "source": "https://catalogapi.nso.go.th/api/index?table=LFS_02_20545_18&format=csv",
     "dataset_table": "LFS_02_20545_18",
     "unit": "baht/month",
-    "pulled": "2026-09-01",
+    "pulled": "2026-09-02",
     "regions": [
       "กรุงเทพมหานคร",
       "ทั่วประเทศ",
