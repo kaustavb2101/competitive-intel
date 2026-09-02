@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 699,
+  "n_points": 707,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -35,11 +35,12 @@
     "2026-08-29",
     "2026-08-30",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-19",
    "label": "AutoX app · 1-star share",
-   "n": 23,
+   "n": 24,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (th.co.autox.chaiyo)",
    "unit": "%",
@@ -66,7 +67,8 @@
     14.5773,
     14.5773,
     14.5773,
-    15.3921
+    15.3921,
+    15.5556
    ]
   },
   "app_autox_score": {
@@ -94,11 +96,12 @@
     "2026-08-29",
     "2026-08-30",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-19",
    "label": "AutoX app (Ngern Chaiyo) - Play Store rating",
-   "n": 23,
+   "n": 24,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (th.co.autox.chaiyo)",
    "unit": "stars",
@@ -125,7 +128,8 @@
     4.0583,
     4.0583,
     4.0583,
-    4.0288
+    4.0288,
+    4.0194
    ]
   },
   "app_mtc_1star_pct": {
@@ -153,11 +157,12 @@
     "2026-08-29",
     "2026-08-30",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC app · 1-star share",
-   "n": 23,
+   "n": 24,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (co.th.muangthaileasing.mtls)",
    "unit": "%",
@@ -184,7 +189,8 @@
     3.8735,
     3.8711,
     3.7151,
-    4.0055
+    4.0055,
+    4.0179
    ]
   },
   "app_mtc_score": {
@@ -212,11 +218,12 @@
     "2026-08-29",
     "2026-08-30",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC app · Play Store rating",
-   "n": 23,
+   "n": 24,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (co.th.muangthaileasing.mtls)",
    "unit": "stars",
@@ -243,7 +250,8 @@
     4.6863,
     4.6868,
     4.693,
-    4.6801
+    4.6801,
+    4.678
    ]
   },
   "app_sawad_1star_pct": {
@@ -271,11 +279,12 @@
     "2026-08-29",
     "2026-08-30",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD app · 1-star share",
-   "n": 23,
+   "n": 24,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.srisawad.mobileApplications)",
    "unit": "%",
@@ -302,7 +311,8 @@
     5.4598,
     5.3667,
     5.3257,
-    5.2804
+    5.2804,
+    5.7213
    ]
   },
   "app_sawad_score": {
@@ -330,11 +340,12 @@
     "2026-08-29",
     "2026-08-30",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD app · Play Store rating",
-   "n": 23,
+   "n": 24,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.srisawad.mobileApplications)",
    "unit": "stars",
@@ -361,7 +372,8 @@
     4.582,
     4.5846,
     4.5725,
-    4.5682
+    4.5682,
+    4.5328
    ]
   },
   "app_tidlor_1star_pct": {
@@ -389,11 +401,12 @@
     "2026-08-29",
     "2026-08-30",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-19",
    "label": "Tidlor app · 1-star share",
-   "n": 23,
+   "n": 24,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.ntl.cxm_mobile)",
    "unit": "%",
@@ -420,7 +433,8 @@
     3.1313,
     3.1348,
     3.1376,
-    3.2384
+    3.2384,
+    3.0691
    ]
   },
   "app_tidlor_score": {
@@ -448,11 +462,12 @@
     "2026-08-29",
     "2026-08-30",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-19",
    "label": "Tidlor app · Play Store rating",
-   "n": 23,
+   "n": 24,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.ntl.cxm_mobile)",
    "unit": "stars",
@@ -479,7 +494,8 @@
     4.7186,
     4.7196,
     4.7172,
-    4.7099
+    4.7099,
+    4.7163
    ]
   },
   "flood_high": {
@@ -572,7 +588,7 @@
     133.0,
     138.0,
     139.0,
-    134.0
+    133.0
    ]
   },
   "fuel_diesel": {

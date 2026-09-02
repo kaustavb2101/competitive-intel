@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-09-01",
+  "pulled_at": "2026-09-02",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -428,10 +428,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.78389,
-    "ratings": 1726,
-    "score_current_version": 3.78389,
-    "ratings_current_version": 1726,
+    "score": 3.78399,
+    "ratings": 1736,
+    "score_current_version": 3.78399,
+    "ratings_current_version": 1736,
     "version": "3.2.0",
     "app_updated": "2026-08-13",
     "released": "2020-04-30",
@@ -2321,10 +2321,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.45863,
-    "ratings": 423,
-    "score_current_version": 3.45863,
-    "ratings_current_version": 423,
+    "score": 3.46226,
+    "ratings": 424,
+    "score_current_version": 3.46226,
+    "ratings_current_version": 424,
     "version": "2.7.6",
     "app_updated": "2026-08-19",
     "released": "2017-12-09",
@@ -7463,10 +7463,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.39434,
-    "ratings": 1590,
-    "score_current_version": 3.39434,
-    "ratings_current_version": 1590,
+    "score": 3.39736,
+    "ratings": 1593,
+    "score_current_version": 3.39736,
+    "ratings_current_version": 1593,
     "version": "8.6.0",
     "app_updated": "2026-08-21",
     "released": "2020-03-03",
@@ -10545,15 +10545,33 @@
    "own": false,
    "stats": {
     "score": 4.82405,
-    "ratings": 173409,
+    "ratings": 173448,
     "score_current_version": 4.82405,
-    "ratings_current_version": 173409,
+    "ratings_current_version": 173448,
     "version": "3.0.6",
     "app_updated": "2026-08-06",
     "released": "2021-04-20",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14498017472",
+     "at": null,
+     "score": 2,
+     "title": "เพื่อความเป็นธรรม ข้อมูลส่วนตัว",
+     "content": "ข้าพเจ้า นายธรรมรัตน์ ดารา\nได้ทำการสมัครสินเชื่อ และกรอกข้อมูลส่วนตัวลงไปในแอพฟินนิกซ์ ใน วันที่ 1 กันยายน 2569 ไม่ได้รับการอนุมัติวงเงิน มีชื่อ นามสกุล เลขบัตรประชาชน หน้าและหลัง ที่อยู่ เบอร์มือถือ ของบุคคลอ้างอิง 2 ท่าน ทั้งนี้ถ้าแอพฟินนิกซ์ได้นำข้อมูลของข้าพเจ้าไปปลอมแปลงในรูปแบบใดๆ ที่ผิดกฎหมาย คุกคาม หรือละเมิด สิทธิส่วนบุคคล ข้าพเจ้า นายธรรมรัตน์ ดารา และบุคคลอ้างอิง จะไม่ขอรับผิดชอบใดๆทั้ง",
+     "version": "3.0.6",
+     "votes": 0
+    },
+    {
+     "id": "14497034068",
+     "at": null,
+     "score": 5,
+     "title": "เพื่อความปลอดภัย",
+     "content": "เรียน เจ้าหน้าที่ ข้าพเจ้า นาย ธีณาภัช วรสิทธิกรได้ทำการสมัครและกรอกข้อมูลส่วนตัว\nใน แอปฟินนิกซ์ เมื่อวันที่ 1 กันยายน 2569\nได้รับการอนุมัติสินเชื่อ โดยมีชื่อ-นามสกุลเบอร์โทรศัพท์ เลขบัตรประจำตัวประชาชนทั้ง ด้านหน้าและด้านหลัง และรหัสผ่านเข้าแอปธนาคารกรุงไทย และชื่อ-นามสกุล เบอร์\nโทรศัพท์ บุคคลอ้างอิง 2 คน และการเข้าถึงราย ชื่อติดต่อในโทรศัพท์ของข้าพเจ้า ทั้งนี้ถ้าหากทาง แอปฟินนิกช์ ได้นำข้อมูลของ",
+     "version": "3.0.6",
+     "votes": 0
+    },
     {
      "id": "14489493690",
      "at": null,
@@ -15623,16 +15641,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.70462,
-    "ratings": 64345,
-    "score_current_version": 4.70462,
-    "ratings_current_version": 64345,
+    "score": 4.70497,
+    "ratings": 64451,
+    "score_current_version": 4.70497,
+    "ratings_current_version": 64451,
     "version": "7.7.0",
     "app_updated": "2026-08-24",
     "released": "2021-10-10",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14496457175",
+     "at": null,
+     "score": 5,
+     "title": "บริการดี",
+     "content": "สินเชื่อทันใจมากครับสะดวกรวดเร็ว",
+     "version": "7.7.0",
+     "votes": 0
+    },
     {
      "id": "14492262500",
      "at": null,
@@ -20468,16 +20495,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84378,
-    "ratings": 44662,
-    "score_current_version": 4.84378,
-    "ratings_current_version": 44662,
+    "score": 4.84349,
+    "ratings": 44795,
+    "score_current_version": 4.84349,
+    "ratings_current_version": 44795,
     "version": "3.1.3",
     "app_updated": "2026-08-27",
     "released": "2023-03-06",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14497835988",
+     "at": null,
+     "score": 5,
+     "title": "ตัวช่วยยามฉุกเฉิน",
+     "content": "บางครั้งความทุกข์ยากก็ผ่านได้ด้วย Promis",
+     "version": "3.1.3",
+     "votes": 0
+    },
     {
      "id": "14493197977",
      "at": null,
@@ -25322,10 +25358,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.76972,
-    "ratings": 26972,
-    "score_current_version": 4.76972,
-    "ratings_current_version": 26972,
+    "score": 4.76969,
+    "ratings": 27007,
+    "score_current_version": 4.76969,
+    "ratings_current_version": 27007,
     "version": "1.8.7",
     "app_updated": "2026-08-07",
     "released": "2020-08-05",
@@ -26744,6 +26780,15 @@
      "content": "Superb!!!",
      "version": "1.0.5",
      "votes": 11
+    },
+    {
+     "id": "14496874254",
+     "at": null,
+     "score": 5,
+     "title": "ช่วยค่าใช้จ่าย",
+     "content": "ดีเลยสำหรับนำเงินมาหมุนที่จำเป็น",
+     "version": "1.8.7",
+     "votes": 0
     },
     {
      "id": "14480711446",
@@ -29537,9 +29582,9 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.62388,
+    "score": 2.62341,
     "ratings": 2119,
-    "score_current_version": 2.62388,
+    "score_current_version": 2.62341,
     "ratings_current_version": 2119,
     "version": "3.4.1",
     "app_updated": "2026-08-31",
