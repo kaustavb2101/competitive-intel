@@ -8,61 +8,6 @@
  },
  "runs": [
   {
-   "append_history_rc": 0,
-   "feeds": [
-    {
-     "bytes_after": 1443,
-     "bytes_before": 1443,
-     "key": "fuel_prices",
-     "rc": 0,
-     "seconds": 1.5,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 7117,
-     "bytes_before": 7118,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 4.8,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8974,
-     "bytes_before": 8974,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 5.6,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 4003,
-     "bytes_before": 4003,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 124.6,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 1390946,
-     "bytes_before": 1390946,
-     "key": "google_ads",
-     "rc": 3,
-     "seconds": 367.7,
-     "status": "skipped"
-    }
-   ],
-   "finished": "2026-08-20T10:09:45Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 3,
-   "n_failed": 0,
-   "n_ok": 4,
-   "n_skipped": 1,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-20T10:03:37Z"
-  },
-  {
    "append_history_rc": null,
    "feeds": [
     {
@@ -3306,6 +3251,53 @@
    "n_timeout": 0,
    "rederive_drift_rc": null,
    "started": "2026-09-01T21:47:57Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7107,
+     "bytes_before": 7107,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 4.7,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 8909,
+     "bytes_before": 8909,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 13.8,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 3990,
+     "bytes_before": 3990,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 130.2,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 1413051,
+     "bytes_before": 1413051,
+     "key": "google_ads",
+     "rc": 3,
+     "seconds": 361.2,
+     "status": "skipped"
+    }
+   ],
+   "finished": "2026-09-01T23:36:29Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 0,
+   "n_failed": 0,
+   "n_ok": 3,
+   "n_skipped": 1,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-09-01T23:30:28Z"
   }
  ]
 }
