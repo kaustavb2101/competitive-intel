@@ -630,6 +630,17 @@ INGESTS
     bad "orphan_layers.py (a committed data layer has no consumer — see report above)"
   fi
 
+  # orphan-SOURCE gate: the sibling one layer UPSTREAM of orphan_layers.py. Asserts every git-tracked
+  # source-data/*.json INPUT is actually read by a builder, a committee member, or a guard — not just
+  # pulled/vendored once and left to age gate-green. Same branch_density failure, one step earlier,
+  # where orphan_layers.py (platform/data leaves only) cannot see it. Self-test runs first so a broken
+  # detector red-gates instead of passing vacuously.
+  if python3 "$TESTS/orphan_sources.py" --selftest && python3 "$TESTS/orphan_sources.py"; then
+    ok "orphan_sources.py (every committed source input is consumed by a builder/committee/guard)"
+  else
+    bad "orphan_sources.py (a committed source input has no consumer — see report above)"
+  fi
+
   # dangling-REFERENCE gate: the reverse of orphan_layers.py. Asserts every data/X.json the frontend
   # FETCHES (fetch('data/X.json') / tmliFetch('X')) actually exists on disk — so a retired/renamed
   # layer left behind as a live fetch becomes a red gate here, not a silent 404 on the Vercel deploy
