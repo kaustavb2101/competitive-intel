@@ -913,7 +913,7 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
   background:var(--dim);box-shadow:0 0 0 1px rgba(255,255,255,.06) inset}
 .cc-hero-cta{font-size:12px;font-weight:600;color:var(--hc,var(--accent));white-space:nowrap}
 /* demote the measured/estimated legend to one quiet line at the bottom (QW5). */
-.cc-provenance{margin-top:18px;font-size:11px;color:var(--dim);border-top:1px solid var(--line2);padding-top:10px}
+.cc-provenance{margin-top:18px;font-size:11px;color:var(--dim);border-top:1px solid var(--line2);padding-top:10px;overflow-wrap:anywhere}
 .cc-provenance b{color:var(--mid)}
 @media(max-width:640px){.cc-hero{grid-template-columns:1fr}.cc-hero-big{font-size:18px}}
 
