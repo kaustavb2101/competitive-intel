@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 732,
+  "n_points": 738,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -606,7 +606,7 @@
     138.0,
     139.0,
     133.0,
-    127.0
+    124.0
    ]
   },
   "fuel_diesel": {
@@ -1118,7 +1118,7 @@
     17.0,
     24.0,
     28.0,
-    33.0
+    32.0
    ]
   },
   "rain_max_mm": {
@@ -1213,7 +1213,7 @@
     65.5,
     104.5,
     121.8,
-    103.0
+    166.8
    ]
   },
   "rival_ads_live": {
@@ -1230,11 +1230,12 @@
     "2026-08-21",
     "2026-08-22",
     "2026-08-24",
-    "2026-08-27"
+    "2026-08-27",
+    "2026-09-03"
    ],
    "first_seen": "2026-07-30",
    "label": "Rival ad creatives running now",
-   "n": 12,
+   "n": 13,
    "path": "platform/data/rival_ads.json",
    "source": "Google Ads Transparency Center",
    "unit": "creatives",
@@ -1250,7 +1251,8 @@
     433.0,
     430.0,
     430.0,
-    415.0
+    415.0,
+    315.0
    ]
   },
   "rival_promo_live_mtc": {
@@ -1278,11 +1280,12 @@
     "2026-08-30",
     "2026-08-31",
     "2026-09-01",
-    "2026-09-02"
+    "2026-09-02",
+    "2026-09-03"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC · live promo/news items",
-   "n": 23,
+   "n": 24,
    "path": "source-data/rival_promos.json",
    "source": "muangthaicap.com (own-site pull)",
    "unit": "items",
@@ -1292,6 +1295,7 @@
     13.0,
     13.0,
     13.0,
+    11.0,
     11.0,
     11.0,
     11.0,
@@ -1337,15 +1341,17 @@
     "2026-08-30",
     "2026-08-31",
     "2026-09-01",
-    "2026-09-02"
+    "2026-09-02",
+    "2026-09-03"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD · live promo/news items",
-   "n": 23,
+   "n": 24,
    "path": "source-data/rival_promos.json",
    "source": "sawad.co.th (own-site pull)",
    "unit": "items",
    "values": [
+    5.0,
     5.0,
     5.0,
     5.0,
@@ -1396,15 +1402,17 @@
     "2026-08-30",
     "2026-08-31",
     "2026-09-01",
-    "2026-09-02"
+    "2026-09-02",
+    "2026-09-03"
    ],
    "first_seen": "2026-07-19",
    "label": "TIDLOR · live promo/news items",
-   "n": 23,
+   "n": 24,
    "path": "source-data/rival_promos.json",
    "source": "tidlor.com (own-site pull)",
    "unit": "items",
    "values": [
+    6.0,
     6.0,
     6.0,
     6.0,
@@ -1453,11 +1461,12 @@
     "2026-08-30",
     "2026-08-31",
     "2026-09-01",
-    "2026-09-02"
+    "2026-09-02",
+    "2026-09-03"
    ],
    "first_seen": "2026-07-30",
    "label": "Rival YouTube brand channels · total views",
-   "n": 21,
+   "n": 22,
    "path": "platform/data/rival_youtube.json",
    "source": "YouTube Data API v3 (official) — public brand-channel statistics",
    "unit": "views",
@@ -1482,7 +1491,8 @@
     934976830.0,
     936413835.0,
     937122750.0,
-    938605157.0
+    938605157.0,
+    939562783.0
    ]
   },
   "search_share_autox": {
@@ -1821,11 +1831,12 @@
     "2026-08-29",
     "2026-08-30",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-03"
    ],
    "first_seen": "2026-08-07",
    "label": "Social-listening corpus · total demand documents",
-   "n": 19,
+   "n": 20,
    "path": "platform/data/social_themes.json",
    "source": "app-store reviews + YouTube comments + Pantip threads (build_social_themes.py)",
    "unit": "documents",
@@ -1848,7 +1859,8 @@
     12821.0,
     12847.0,
     12887.0,
-    12954.0
+    12954.0,
+    12981.0
    ]
   }
  }
