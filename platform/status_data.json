@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-03T04:09:53+00:00",
-    "commit": "49fd582"
+    "generated_at": "2026-09-03T15:45:33+00:00",
+    "commit": "aa84dd3"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,84 @@
   ],
   "activity": [
     {
+      "date": "2026-09-03T15:45:33+00:00",
+      "sha": "aa84dd3",
+      "summary": "data: SET listed-peer scoreboard refresh (run 33769924344) (#795)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-03T15:12:36+00:00",
+      "sha": "46f8fba",
+      "summary": "data: market-pulse swarm refresh (run 33763309898) (#793)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-03T14:36:44+00:00",
+      "sha": "f28e736",
+      "summary": "docs: log UX-loop aria-hidden action-button fix (PR #794, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-03T21:32:48+07:00",
+      "sha": "f67eb2c",
+      "summary": "ux: aria-hidden decorative glyphs on static action buttons (#794)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-03T13:37:49+00:00",
+      "sha": "20fe694",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-03, run 33762040789)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-03T12:46:51+00:00",
+      "sha": "d47fed5",
+      "summary": "intel(data-book): surface MEASURED national per-person wage + affordability ratio (#792)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-03T09:42:34+00:00",
+      "sha": "e8f0a6f",
+      "summary": "data(census): refresh the Union Auction forward book (run 33732436574) (#789)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-03T09:21:50+00:00",
+      "sha": "93cc13c",
+      "summary": "data: market-pulse swarm refresh (run 33732372223) (#790)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-03T08:38:25+00:00",
+      "sha": "7e06f94",
+      "summary": "docs: log UX-loop rz-kv 360px bleed fix (PR #791, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-03T15:35:33+07:00",
+      "sha": "dba09e4",
+      "summary": "ux: rz-kv label column wraps so resilience table stops bleeding at 360px (#791)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-03T08:10:41+00:00",
+      "sha": "90069ec",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-03, run 33731771917)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-03T07:14:03+00:00",
+      "sha": "41fccb1",
+      "summary": "data: NABC live prices (2026-09-03, run 33726612698)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-03T04:22:20+00:00",
+      "sha": "77ef67e",
+      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (ac725b8->49fd582)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-03T04:09:53+00:00",
       "sha": "49fd582",
       "summary": "data: rival Facebook promo feed refresh (run 33696849784) (#787)",
@@ -633,84 +711,6 @@
       "sha": "a42a393",
       "summary": "data: market-pulse swarm refresh (run 33638118839) (#778)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-09-02T21:49:45+07:00",
-      "sha": "167bf8b",
-      "summary": "docs(progress): log ux-loop #home cc-row sub-340 stack (#780)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-02T21:45:30+07:00",
-      "sha": "d9313a6",
-      "summary": "ux: stack #home command-center rows below 340px so labels don't bleed (#779)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-02T13:43:14+00:00",
-      "sha": "cf0fcc4",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-02, run 33637290863)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-02T12:38:14+00:00",
-      "sha": "addbaf0",
-      "summary": "docs(progress): log the orphan-gate comment-blindness fix + owner-review flag",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-02T12:37:44+00:00",
-      "sha": "100671f",
-      "summary": "test(gate): fix orphan-layer check's comment-blindness; ALLOW the two dormant expansion leaderboards",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-02T10:22:14+00:00",
-      "sha": "7c0ee23",
-      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (8721b3e->33f12c8)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-02T17:19:56+07:00",
-      "sha": "33f12c8",
-      "summary": "intel(home): surface dark MEASURED chronic-flood context on the double-pressure board (obj #1) (#777)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-02T09:27:44+00:00",
-      "sha": "8b10d9f",
-      "summary": "data(census): refresh the Union Auction forward book (run 33606974209) (#774)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-02T09:08:26+00:00",
-      "sha": "cbc05e6",
-      "summary": "data: market-pulse swarm refresh (run 33606924476) (#775)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-02T08:26:56+00:00",
-      "sha": "f2c3740",
-      "summary": "docs(progress): log ux-loop #home card-header 320px wrap fix — merge #776 + deploy-verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-02T15:22:26+07:00",
-      "sha": "beeaa22",
-      "summary": "ux: wrap #home card-header row so link doesn't bleed at 320px (#776)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-02T08:01:05+00:00",
-      "sha": "9c25925",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-02, run 33606332711)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-02T07:10:45+00:00",
-      "sha": "eb741be",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
     }
   ]
 }
