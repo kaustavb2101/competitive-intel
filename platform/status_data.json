@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-02T21:07:36+00:00",
-    "commit": "a7b83cc"
+    "generated_at": "2026-09-03T00:12:01+00:00",
+    "commit": "ac725b8"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-09-02",
+    "eta_date": "2026-09-03",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,30 @@
   ],
   "activity": [
     {
+      "date": "2026-09-03T00:12:01+00:00",
+      "sha": "ac725b8",
+      "summary": "data: market-pulse swarm refresh (run 33695388397) (#786)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-02T23:23:57+00:00",
+      "sha": "853b130",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-02, run 33694775388)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-02T22:48:02+00:00",
+      "sha": "bb16727",
+      "summary": "data: Thai-IP-only swarm refresh (run 33687287627) (#785)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-02T22:15:07+00:00",
+      "sha": "ba771c0",
+      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (c75c309->a7b83cc)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-02T21:07:36+00:00",
       "sha": "a7b83cc",
       "summary": "data: market-pulse swarm refresh (run 33670187316) (#783)",
@@ -687,30 +711,6 @@
       "sha": "d9d5c3d",
       "summary": "data: social listening refresh (run 33568027038) (#767)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-02T02:25:09+00:00",
-      "sha": "1bebf8b",
-      "summary": "docs(progress): log ux-loop macro-strip mcell mobile-bleed fix — merge #771 + deploy-verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-02T09:22:33+07:00",
-      "sha": "2d02903",
-      "summary": "ux: contain #overview macro-strip FX chip bleed at 360px (#771)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-02T02:01:12+00:00",
-      "sha": "fb1361e",
-      "summary": "data: rival Facebook promo feed refresh (run 33572455632) (#769)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-02T01:37:55+00:00",
-      "sha": "8545137",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33575611939) (#770)",
-      "pillar": "3d-enrichment"
     }
   ]
 }
