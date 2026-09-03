@@ -4,25 +4,25 @@
    {
     "brand": "Srisawad",
     "key": "SAWAD",
-    "live_pct": 43.1,
-    "n_live": 154,
-    "n_new_30d": 35,
-    "share_of_volume_pct": 24.2
+    "live_pct": 34.1,
+    "n_live": 123,
+    "n_new_30d": 39,
+    "share_of_volume_pct": 24.3
    },
    {
     "brand": "Ngern Tid Lor",
     "key": "TIDLOR",
-    "live_pct": 21.2,
-    "n_live": 173,
-    "n_new_30d": 29,
+    "live_pct": 18.0,
+    "n_live": 148,
+    "n_new_30d": 28,
     "share_of_volume_pct": 55.2
    },
    {
     "brand": "Ngern Hai Jai",
     "key": "NGERNHAIJAI",
-    "live_pct": 43.9,
-    "n_live": 61,
-    "n_new_30d": 18,
+    "live_pct": 12.2,
+    "n_live": 17,
+    "n_new_30d": 17,
     "share_of_volume_pct": 9.4
    },
    {
@@ -31,7 +31,7 @@
     "live_pct": 21.0,
     "n_live": 26,
     "n_new_30d": 2,
-    "share_of_volume_pct": 8.4
+    "share_of_volume_pct": 8.3
    },
    {
     "brand": "MoneyDD",
@@ -42,7 +42,7 @@
     "share_of_volume_pct": 1.4
    }
   ],
-  "as_of": "2026-08-27",
+  "as_of": "2026-09-03",
   "disappeared": [],
   "label": "MEASURED — n_new_30d is Google Ads Transparency's own per-creative first_shown date, counted within 30 days of the pull date.",
   "live_total_series": {
@@ -85,7 +85,7 @@
    }
   },
   "label": "MIXED, labelled per section. promos.new and ads.appeared are MEASURED from real per-item/per-creative first_seen/first_shown dates already in the source files. promos.disappeared, ads.disappeared and search_demand movement are all empty by design — none of this pipeline's inputs currently carry the second data point (last_seen, per-creative last_shown, or a prior share-of-search vintage) that an honest 'disappeared' or 'movement' figure requires.",
-  "newest_observation_date": "2026-09-02",
+  "newest_observation_date": "2026-09-03",
   "title": "Rival watch — what changed in the rival field since last time (obj #2)"
  },
  "promos": {
