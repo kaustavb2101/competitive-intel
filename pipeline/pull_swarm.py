@@ -720,6 +720,20 @@ def summary_line(n_ok, n_changed, n_failed, n_skipped, n_timeout, total):
             % (n_ok, total, n_changed, n_ok - n_changed, n_failed, n_timeout, n_skipped))
 
 
+def _feed_record(r):
+    """The persisted per-feed row for the audit trail. A FAILED / TIMED-OUT feed also carries
+    `err_tail` -- a compact (<=400 char) tail of its captured stdout+stderr -- so the committed
+    trail records WHY it failed, not just that it did. Without it the diagnostic lived only in the
+    ephemeral CI console (printed once, then gone), so a broken feed aged in silence: swarm_runs.json
+    showed `status=failed rc=1` with no reason to root-cause from. Success/skip rows stay tail-free
+    to keep the file small."""
+    rec = {"key": r["key"], "rc": r["rc"], "status": r["status"], "seconds": r["seconds"],
+           "bytes_before": r["bytes_before"], "bytes_after": r["bytes_after"]}
+    if r["status"] in ("failed", "timeout") and r.get("out_tail"):
+        rec["err_tail"] = r["out_tail"][-400:]
+    return rec
+
+
 def save_run(record):
     store = {"meta": {}, "runs": []}
     if os.path.exists(RUNS_OUT):
@@ -742,7 +756,9 @@ def save_run(record):
         "label": "Each row is one swarm run: which feeds were pulled concurrently, whether each one "
                  "succeeded / changed its declared output file / failed / timed out / was skipped "
                  "(exit 3, the repo-wide SKIP convention), plus the rc of the append_history.py and "
-                 "rederive_drift.py steps that followed. This file makes the pulse observable.",
+                 "rederive_drift.py steps that followed. This file makes the pulse observable. A "
+                 "failed/timed-out feed also carries err_tail (a compact tail of its captured "
+                 "stdout+stderr) so the reason is recorded in the trail, not just in the CI console.",
         "max_runs": MAX_RUNS,
         "n_runs": len(runs),
     }
@@ -824,9 +840,7 @@ def main():
         "n_timeout": n_timeout, "n_skipped": n_skipped,
         "jobs": args.jobs, "include_thai": args.include_thai,
         "append_history_rc": append_rc, "rederive_drift_rc": derive_rc,
-        "feeds": [{"key": r["key"], "rc": r["rc"], "status": r["status"], "seconds": r["seconds"],
-                   "bytes_before": r["bytes_before"], "bytes_after": r["bytes_after"]}
-                  for r in results],
+        "feeds": [_feed_record(r) for r in results],
     }
     save_run(record)
 
