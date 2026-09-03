@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-03T00:12:01+00:00",
-    "commit": "ac725b8"
+    "generated_at": "2026-09-03T04:09:53+00:00",
+    "commit": "49fd582"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,36 @@
   ],
   "activity": [
     {
+      "date": "2026-09-03T04:09:53+00:00",
+      "sha": "49fd582",
+      "summary": "data: rival Facebook promo feed refresh (run 33696849784) (#787)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-03T02:45:21+00:00",
+      "sha": "a125076",
+      "summary": "docs: log UX-loop story-next narrow-width fix (PR #788, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-03T09:41:17+07:00",
+      "sha": "dfbcbd5",
+      "summary": "ux: story-next tab-footer label wraps instead of bleeding on narrow phones (#788)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-03T00:41:50+00:00",
+      "sha": "8021499",
+      "summary": "data: live fuel prices (2026-09-03, run 33700413252)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-03T00:30:30+00:00",
+      "sha": "b49bbca",
+      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (a7b83cc->ac725b8)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-03T00:12:01+00:00",
       "sha": "ac725b8",
       "summary": "data: market-pulse swarm refresh (run 33695388397) (#786)",
@@ -681,36 +711,6 @@
       "sha": "eb741be",
       "summary": "Merge remote-tracking branch 'origin/master'",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-09-02T07:09:55+00:00",
-      "sha": "cd1994d",
-      "summary": "data: NABC live prices (2026-09-02, run 33601773447)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-02T07:06:56+00:00",
-      "sha": "0012873",
-      "summary": "intel(acq): surface rival service reputation by region (obj #2) (#773)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-02T04:22:52+00:00",
-      "sha": "a4edc86",
-      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (8721b3e)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-02T11:19:54+07:00",
-      "sha": "8721b3e",
-      "summary": "fix(exposure): correct \"Truck net\" tooltip — net flow excludes transfers (#772)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-09-02T03:06:47+00:00",
-      "sha": "d9d5c3d",
-      "summary": "data: social listening refresh (run 33568027038) (#767)",
-      "pillar": "data-integration"
     }
   ]
 }
