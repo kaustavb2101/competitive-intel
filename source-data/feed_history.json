@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 715,
+  "n_points": 724,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -540,11 +540,12 @@
     "2026-08-31",
     "2026-09-01",
     "2026-09-02",
-    "2026-09-03"
+    "2026-09-03",
+    "2026-09-04"
    ],
    "first_seen": "2026-07-11",
    "label": "River stations above their high mark",
-   "n": 40,
+   "n": 41,
    "path": "platform/data/thaiwater_flood.json",
    "source": "ThaiWater live river/reservoir telemetry",
    "unit": "stations",
@@ -588,7 +589,8 @@
     133.0,
     138.0,
     139.0,
-    133.0
+    133.0,
+    127.0
    ]
   },
   "fuel_diesel": {
@@ -1050,11 +1052,12 @@
     "2026-08-31",
     "2026-09-01",
     "2026-09-02",
-    "2026-09-03"
+    "2026-09-03",
+    "2026-09-04"
    ],
    "first_seen": "2026-07-10",
    "label": "Provinces with heavy rain somewhere",
-   "n": 40,
+   "n": 41,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "provinces",
@@ -1098,7 +1101,8 @@
     32.0,
     17.0,
     24.0,
-    28.0
+    28.0,
+    33.0
    ]
   },
   "rain_max_mm": {
@@ -1143,11 +1147,12 @@
     "2026-08-31",
     "2026-09-01",
     "2026-09-02",
-    "2026-09-03"
+    "2026-09-03",
+    "2026-09-04"
    ],
    "first_seen": "2026-07-10",
    "label": "Heaviest 24h rainfall, any gauge",
-   "n": 40,
+   "n": 41,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "mm",
@@ -1191,7 +1196,8 @@
     133.5,
     65.5,
     104.5,
-    121.8
+    121.8,
+    103.0
    ]
   },
   "rival_ads_live": {
@@ -1503,11 +1509,12 @@
     "2026-08-27",
     "2026-08-28",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-17",
    "label": "MTC · market cap",
-   "n": 17,
+   "n": 18,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -1528,7 +1535,8 @@
     67.84,
     67.84,
     66.25,
-    64.13
+    64.13,
+    63.6
    ]
   },
   "set_mtc_pbv": {
@@ -1550,11 +1558,12 @@
     "2026-08-27",
     "2026-08-28",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-17",
    "label": "MTC · price/book",
-   "n": 17,
+   "n": 18,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -1575,7 +1584,8 @@
     1.47,
     1.47,
     1.44,
-    1.39
+    1.39,
+    1.38
    ]
   },
   "set_sawad_mcap": {
@@ -1597,11 +1607,12 @@
     "2026-08-27",
     "2026-08-28",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-17",
    "label": "SAWAD · market cap",
-   "n": 17,
+   "n": 18,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -1622,7 +1633,8 @@
     40.0423,
     39.8762,
     39.2116,
-    38.2147
+    38.2147,
+    37.3839
    ]
   },
   "set_sawad_pbv": {
@@ -1644,11 +1656,12 @@
     "2026-08-27",
     "2026-08-28",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-17",
    "label": "SAWAD · price/book",
-   "n": 17,
+   "n": 18,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -1669,7 +1682,8 @@
     1.01,
     1.0,
     0.99,
-    0.96
+    0.96,
+    0.94
    ]
   },
   "set_tidlor_mcap": {
@@ -1691,11 +1705,12 @@
     "2026-08-27",
     "2026-08-28",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-17",
    "label": "TIDLOR · market cap",
-   "n": 17,
+   "n": 18,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -1716,7 +1731,8 @@
     57.3394,
     57.3394,
     56.181,
-    55.0227
+    55.0227,
+    54.7331
    ]
   },
   "set_tidlor_pbv": {
@@ -1738,11 +1754,12 @@
     "2026-08-27",
     "2026-08-28",
     "2026-08-31",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-02"
    ],
    "first_seen": "2026-07-17",
    "label": "TIDLOR · price/book",
-   "n": 17,
+   "n": 18,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -1763,7 +1780,8 @@
     1.62,
     1.62,
     1.59,
-    1.56
+    1.56,
+    1.55
    ]
   },
   "social_corpus_docs": {
