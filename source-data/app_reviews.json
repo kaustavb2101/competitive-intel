@@ -3,7 +3,7 @@
   "title": "Title-lender app sentiment — Google Play ratings + newest reviews (incl. our own)",
   "generated_by": "pipeline/pull_app_reviews.py",
   "label": "MEASURED — Google Play store pages (th/th). Star histogram + dated public reviews; review store accumulates across pulls (dedup by reviewId, newest 1500 kept per app).",
-  "pulled_at": "2026-09-02"
+  "pulled_at": "2026-09-03"
  },
  "apps": {
   "AUTOX": {
@@ -11,16 +11,16 @@
    "name": "เงินไชโย (AutoX)",
    "own": true,
    "stats": {
-    "score": 4.0194173,
-    "ratings": 1038,
-    "reviews_total": 334,
+    "score": 4.0288463,
+    "ratings": 1037,
+    "reviews_total": 335,
     "installs": "500,000+",
     "histogram": [
-     161,
-     50,
-     60,
-     100,
-     664
+     159,
+     49,
+     59,
+     99,
+     667
     ],
     "app_updated": null,
     "version": "Varies with device"
@@ -1697,21 +1697,53 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.716312,
-    "ratings": 16947,
-    "reviews_total": 5259,
+    "score": 4.721437,
+    "ratings": 16962,
+    "reviews_total": 5262,
     "installs": "1,000,000+",
     "histogram": [
-     520,
-     170,
-     450,
-     1311,
-     14492
+     488,
+     179,
+     458,
+     1308,
+     14524
     ],
     "app_updated": "2026-08-06",
     "version": "3.2.0"
    },
    "reviews_store": [
+    {
+     "id": "e379c678-9e20-483f-9fec-86e346f88755",
+     "at": "2026-09-02",
+     "score": 2,
+     "content": "อัปเดตช้ามาก ครับ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "7b991005-4be0-498a-906a-410da4df0914",
+     "at": "2026-09-02",
+     "score": 5,
+     "content": "สะดวกง่ายต่อการทำธุระกรรมต่างๆดีมากค่ะ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "6c1205f0-f641-4c99-bc69-9d8a79bf2a4d",
+     "at": "2026-09-02",
+     "score": 5,
+     "content": "ดีมากๆครับ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "5b020b7b-0b2a-45fe-8c5e-84e64accae9a",
+     "at": "2026-09-02",
+     "score": 5,
+     "content": "ดีมาก",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "ffa5cda6-c628-4c11-997c-280ad17e774e",
      "at": "2026-09-01",
@@ -2269,7 +2301,7 @@
      "at": "2026-08-24",
      "score": 5,
      "content": "ใช้งานสะดวกมากครับ เช็คข้อมูลได้ละเอียดทุกอย่าง ดีมากครับ",
-     "thumbs": 1,
+     "thumbs": 2,
      "replied": false
     },
     {
@@ -2405,7 +2437,7 @@
      "at": "2026-08-22",
      "score": 5,
      "content": "เป็น app ที่ดีครับเข้าใจง่ายคอยติดตามอยู่ตลอดมีการอัพเดทอยู่เรื่อยๆ",
-     "thumbs": 3,
+     "thumbs": 4,
      "replied": false
     },
     {
@@ -2749,7 +2781,7 @@
      "at": "2026-08-21",
      "score": 1,
      "content": "พยายามเข้า app มา 3-4 วันแล้วเข้าไม่ได้เลยเข้าไปตั้งค่าแล้วก็แล้วอะไรก็แล้วก็ยังทำไม่ได้บอกว่า app ไม่สามารถใช้งานได้ชั่วคราวให้ดาวน์โหลดใหม่ทำแล้วก็ยังไม่ได้เหมือนเดิม",
-     "thumbs": 2,
+     "thumbs": 3,
      "replied": false
     },
     {
@@ -5968,7 +6000,7 @@
    "own": false,
    "stats": {
     "score": 4.6780186,
-    "ratings": 6499,
+    "ratings": 6503,
     "reviews_total": 2152,
     "installs": "1,000,000+",
     "histogram": [
@@ -5976,7 +6008,7 @@
      70,
      201,
      432,
-     5532
+     5535
     ],
     "app_updated": "2026-08-18",
     "version": "2.5.114"
@@ -6307,7 +6339,7 @@
      "at": "2026-07-21",
      "score": 3,
      "content": "ปรับสัญญาเพื่อรี ผ่านแอปไม่ได้เมื่อก่อนเคยทำได้ตอนนี้ต้องไปที่สาขาทำให้เสียเวลาไม่สะดวกเหมือนเมื่อก่อน",
-     "thumbs": 7,
+     "thumbs": 8,
      "replied": true
     },
     {
@@ -7917,21 +7949,37 @@
    "name": "ศรีสวัสดิ์",
    "own": false,
    "stats": {
-    "score": 4.532787,
-    "ratings": 2450,
-    "reviews_total": 865,
+    "score": 4.547619,
+    "ratings": 2458,
+    "reviews_total": 866,
     "installs": "500,000+",
     "histogram": [
-     140,
-     40,
-     80,
-     300,
-     1887
+     136,
+     38,
+     77,
+     292,
+     1911
     ],
     "app_updated": "2026-07-01",
     "version": "1.0.60"
    },
    "reviews_store": [
+    {
+     "id": "6cef9a5f-8c6d-49bf-96ab-f6278ee596cb",
+     "at": "2026-09-02",
+     "score": 5,
+     "content": "ใจดีให้วงเงินเพิ่มขอบคุนครับผม",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "3de8b3ad-ad00-483f-a69b-bd924b939551",
+     "at": "2026-09-02",
+     "score": 5,
+     "content": "ดีค่ะบริการดีไมมากเรืองค่ะ",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "9f2c3421-f437-44ad-89f2-11a5bd3a838b",
      "at": "2026-09-01",
@@ -8113,7 +8161,7 @@
      "at": "2026-08-11",
      "score": 5,
      "content": "ศรีสวัสดิ์ดีที่สุดครับดอกเบี้ยก็ถูกขั้นตอนก็ไม่ยุ่งยากครับok ครับไม่มีครับ",
-     "thumbs": 4,
+     "thumbs": 5,
      "replied": false
     },
     {
@@ -11651,7 +11699,7 @@
    "stats": {
     "score": 4.16,
     "ratings": 354,
-    "reviews_total": 136,
+    "reviews_total": 137,
     "installs": "100,000+",
     "histogram": [
      49,
@@ -11677,7 +11725,7 @@
      "at": "2026-08-29",
      "score": 3,
      "content": "แอพรวนๆ บางครั้งแอพเข้าไม่ได้บอกว่ามีหน้าจอทับซ้อน ทั้งๆที่ไม่มีแอพอะไรเปิดค้างไว้แล้ว ขนาดรีเครื่องแล้วยังเข้าไม่ได้ บางครั้งชำระเงินไปแล้วกว่าเงินจะอัพผ่านไป2วัน แถมยอดวันที่โอนดันไม่ใช่วันที่โอนเงินไปจิงๆอีก",
-     "thumbs": 1,
+     "thumbs": 2,
      "replied": false
     },
     {
@@ -11693,7 +11741,7 @@
      "at": "2026-08-29",
      "score": 2,
      "content": "ทำไมของผมมันเข้าไม่ได้ครับ",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": false
     },
     {
@@ -11709,7 +11757,7 @@
      "at": "2026-08-22",
      "score": 3,
      "content": "ระบบห่วยแตกเข้าใช้งานไม่ได้",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": false
     },
     {
@@ -11741,7 +11789,7 @@
      "at": "2026-08-06",
      "score": 1,
      "content": "จะดูสินเชื่อสวัสดิการพนักงานในแอป ว่ามีหนี้สินเหลือเท่าไร ทำไมข้อมูลไม่ขึ้น",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": false
     },
     {
@@ -11797,7 +11845,7 @@
      "at": "2026-05-17",
      "score": 1,
      "content": "แอพง่าบๆยังทำห่วย อัพเดทช้ากดอะไรก็ช้า",
-     "thumbs": 1,
+     "thumbs": 2,
      "replied": false
     },
     {
@@ -13085,21 +13133,37 @@
    "name": "Good Money เงินดีดี (GSB)",
    "own": false,
    "stats": {
-    "score": 3.803681,
+    "score": 3.7883437,
     "ratings": 3234,
-    "reviews_total": 1422,
+    "reviews_total": 1424,
     "installs": "1,000,000+",
     "histogram": [
-     683,
+     693,
      188,
-     128,
-     307,
-     1923
+     138,
+     297,
+     1913
     ],
     "app_updated": "2026-08-11",
     "version": "1.0.45"
    },
    "reviews_store": [
+    {
+     "id": "65458de3-2c60-4a09-9a32-47cc7c632e17",
+     "at": "2026-09-02",
+     "score": 1,
+     "content": "แอปปลอม",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "12e05269-1126-433d-83e8-542ab338508d",
+     "at": "2026-09-02",
+     "score": 3,
+     "content": "_ภพำภภพภำภพ",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "dc0b7ed4-92bd-4f5d-837b-55331ed36e10",
      "at": "2026-08-31",
@@ -13841,7 +13905,7 @@
      "at": "2026-08-04",
      "score": 5,
      "content": "เป็น app ที่ดีมากๆ ครับ ส่วนตัวผมถือว่าดีมากๆ ครับ เข้ามาในช่วงเวลาฉุกเฉินที่ผมจำเป็นต้องใช้เงินพอดี ดอกเบี้ยก็ถูก ผ่อนจ่ายสบายๆ สมกับเป็นชื่อ app (เงินดี ^_^ ตามชื่อเลยครับ...)",
-     "thumbs": 5,
+     "thumbs": 6,
      "replied": true
     },
     {
@@ -15863,7 +15927,7 @@
      "at": "2026-08-04",
      "score": 5,
      "content": "แอปทุกอย่างดีครับแต่ต้องปรับปรุงเรื่องเจ้าหน้าที่โทรช่วยติดตามลูกค้าด้วยหรือมีบรืการแชตออนไลได้ยิ่งดี ขอบคุณครับ",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": false
     },
     {
@@ -16089,16 +16153,16 @@
    "name": "GO by Krungsri Auto",
    "own": false,
    "stats": {
-    "score": 4.3980584,
-    "ratings": 9319,
+    "score": 4.4069266,
+    "ratings": 9322,
     "reviews_total": 3807,
     "installs": "1,000,000+",
     "histogram": [
-     733,
-     261,
-     502,
-     884,
-     6936
+     715,
+     252,
+     504,
+     897,
+     6950
     ],
     "app_updated": "2026-08-19",
     "version": "8.6.0"
@@ -16117,7 +16181,7 @@
      "at": "2026-08-31",
      "score": 5,
      "content": "อัปเดตแล้วครับ แต่ยังค้างอยู่ เป็นแค่ช่วงเช้า ตอนนี้เข้าได้ปกติแล้วครับ",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": true
     },
     {
