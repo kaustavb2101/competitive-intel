@@ -809,17 +809,33 @@ function occTable(inc,natOcc,provTh){
   var lab={Agriculture:'Agriculture',FactoryWorkers:'Factory',OfficeStaff:'Office / clerical',SMEOwners:'SME owner',Transport:'Transport'};
   // per-person individual figures (measured national / estimated province) — null-safe; keyed by Thai province name
   var pind=(OCCIND&&OCCIND.provinces&&provTh&&OCCIND.provinces[provTh])||null;
+  // MEASURED national per-person wage block (individual_national + individual/household ratio, ILOSTAT) —
+  // keyed by occupation; the measured basis the province individual_est is derived from. Null-safe.
+  var nind={}; if(OCCIND&&Array.isArray(OCCIND.national)) OCCIND.national.forEach(function(r){ if(r&&r.key) nind[r.key]=r; });
   var rows=keys.filter(function(k){return inc[k]!=null;}).map(function(k){
     var r=(natOcc[k]?inc[k]/natOcc[k]:null),v=vsNat(r);
     var ind='';
     if(k==='SMEOwners'){
       ind='<div class="db-row" style="grid-template-columns:1fr;padding:1px 0 5px"><div class="rl" style="color:var(--dim);font-size:10.5px">Individual: self-employed — no measured individual wage</div></div>';
-    }else if(pind&&pind[k]&&pind[k].individual_est!=null){
-      ind='<div class="db-row" style="grid-template-columns:1fr;padding:1px 0 5px"><div class="rl" style="color:var(--dim);font-size:10.5px">Individual ~'+baht(pind[k].individual_est)+'/mo <span style="color:var(--dim);font-weight:600;font-size:9px;letter-spacing:.04em">EST</span></div></div>';
+    }else{
+      // Lead with the MEASURED national per-person wage + its individual/household ratio (obj #1
+      // affordability: a title loan is serviced by ONE income, a fraction of the multi-earner household
+      // figure), then the ESTIMATED province line it is derived from. Both were dark on this page.
+      var nr=nind[k],parts='';
+      if(nr&&nr.individual_national!=null){
+        var rp=(nr.ratio_individual_to_household!=null)?' · '+Math.round(nr.ratio_individual_to_household*100)+'% of household':'';
+        parts='Individual (national) '+baht(nr.individual_national)+'/mo'+rp+' <span style="color:var(--dim);font-weight:600;font-size:9px;letter-spacing:.04em">MEAS</span>';
+      }
+      if(pind&&pind[k]&&pind[k].individual_est!=null){
+        parts+=(parts?' · ':'Individual ')+'~'+baht(pind[k].individual_est)+'/mo here <span style="color:var(--dim);font-weight:600;font-size:9px;letter-spacing:.04em">EST</span>';
+      }
+      if(parts) ind='<div class="db-row" style="grid-template-columns:1fr;padding:1px 0 5px"><div class="rl" style="color:var(--dim);font-size:10.5px;line-height:1.5">'+parts+'</div></div>';
     }
     return '<div class="db-row" style="grid-template-columns:1fr auto auto;gap:10px"><div class="rl">'+lab[k]+'</div><div class="rv" style="font-size:13.5px">'+baht(inc[k])+' <span style="color:var(--dim);font-weight:400;font-size:11px">household</span></div><div><span class="db-badge '+v.cls+'">'+v.txt+'</span></div></div>'+ind;
   }).join('');
-  var note=pind?'<div class="db-row" style="grid-template-columns:1fr;padding-top:5px"><div class="rl" style="color:var(--dim);font-size:10px;line-height:1.5">Household = NSO SES by occupation class (measured, multi-earner). Individual per-person: national MEASURED (ILOSTAT), province ESTIMATED. SME owners are self-employed — no measured individual wage.</div></div>':'';
+  var affr=(nind.Agriculture&&nind.Agriculture.ratio_individual_to_household!=null)?Math.round(nind.Agriculture.ratio_individual_to_household*100):null;
+  var lead=affr!=null?'<b>A title loan is serviced by one borrower</b>, but the measured national per-person wage runs well below the multi-earner household figure (agriculture ~'+affr+'% of it) — so household income overstates debt-service capacity. ':'';
+  var note=pind?'<div class="db-row" style="grid-template-columns:1fr;padding-top:5px"><div class="rl" style="color:var(--dim);font-size:10px;line-height:1.5">'+lead+'Household = NSO SES by occupation class (measured, multi-earner). Individual per-person: national MEASURED (ILOSTAT), province ESTIMATED. SME owners are self-employed — no measured individual wage.</div></div>':'';
   return '<div class="db-rows" style="margin:0"><div class="db-row" style="grid-template-columns:1fr;padding-bottom:4px"><div class="rl" style="color:var(--dim);font:600 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.05em">Household income by occupation class · ฿/mo · vs national</div></div>'+rows+note+'</div>';
 }
 function districtTable(d){
