@@ -1767,7 +1767,13 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .rz-spark svg{width:100%;height:34px;display:block}
 .rz-spark .s{display:block;color:var(--dim);font-size:10px;margin-top:2px}
 .rz-kv{width:100%;margin:7px 0 0;border-collapse:collapse}
-.rz-kv th{text-align:left;font-weight:400;font-size:11.5px;color:var(--mid);padding:3px 0;white-space:normal}
+/* The value column (td) is nowrap tabular numbers, so the label column (th) has to absorb the squeeze
+   on a narrow phone. `white-space:normal` wraps at spaces, but a long single label token could still
+   set a min-content wider than the ~240px panel content box at 360px — which pushed the whole table
+   ~3px past the panel's right edge (the passenger-car resilience panel, standing overflow audit @360).
+   `overflow-wrap:anywhere` lets such a token break as a last resort so the table shrinks to fit; inert
+   wherever the column already has room (byte-identical at 390/1440 — panels are single-column ≤880). */
+.rz-kv th{text-align:left;font-weight:400;font-size:11.5px;color:var(--mid);padding:3px 0;white-space:normal;overflow-wrap:anywhere}
 .rz-kv td{text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--txt);
   padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap}
 /* The seasonal cross-check (owner review 2026-08-02, point 12). It is a control on the trailing
