@@ -179,9 +179,10 @@ def main():
     print("   WHY: vehicle_census_province.json refreshes WEEKLY from CI (DLT department CKAN, any IP), "
           "but the base can be refreshed only from Kaustav's Thai IP (autox_dgt_ingest.py -> "
           "ingest_gov.py's build_vehicles, which reads the raw dgt_out/ CSV incl. the ev fuel column).")
-    print("   FIX: re-pull the vehicle stock from the Thai IP and re-run ingest_gov.py so the base "
-          "catches up (preserving per-province `ev`), OR migrate the base onto a CI census projection "
-          "as was done for factories_by_district.json. Do NOT silence this by editing the guard.")
+    print("   FIX (CI, no laptop): re-run `python3 pipeline/build_vehicle_base.py` — it projects the "
+          "fresh census onto the base's total/moto/pickup (preserving per-province car/ev) and commit "
+          "the refreshed base. (Or, for a fuller refresh incl. car/ev, re-pull from the Thai IP via "
+          "ingest_gov.py.) Do NOT silence this by editing the guard.")
     return 1
 
 
