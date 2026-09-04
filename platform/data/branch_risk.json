@@ -11323,11 +11323,11 @@
     },
     {
       "code": "@chaiyo20429",
-      "composite_risk": 24.7,
+      "composite_risk": 25.2,
       "components": {
         "household": 30.5,
         "agri": 5.0,
-        "occupation": 11.1,
+        "occupation": 13.9,
         "segment": 52.7
       },
       "top_driver": "household"
