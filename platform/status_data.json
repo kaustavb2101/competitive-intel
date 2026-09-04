@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-04T15:28:13+00:00",
-    "commit": "bfc8e87"
+    "generated_at": "2026-09-04T22:01:13+00:00",
+    "commit": "b769310"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,42 @@
   ],
   "activity": [
     {
+      "date": "2026-09-04T22:01:13+00:00",
+      "sha": "b769310",
+      "summary": "data: Thai-IP-only swarm refresh (run 33921365326) (#811)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-04T21:03:13+00:00",
+      "sha": "f71aa6d",
+      "summary": "data: market-pulse swarm refresh (run 33906437608) (#809)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-04T20:18:50+00:00",
+      "sha": "55274e0",
+      "summary": "docs(progress): log UX-loop bootReload ↻ aria-hidden fix (PR #810, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-05T03:15:27+07:00",
+      "sha": "08f5ee9",
+      "summary": "ux: aria-hidden the boot-error \"↻ Reload\" chip glyph (#810)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-04T18:29:48+00:00",
+      "sha": "57396d5",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-04, run 33906019024)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-04T16:16:10+00:00",
+      "sha": "830c53b",
+      "summary": "service: healthy close-out + CEO dashboard refresh to HEAD (2026-09-04 c)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-04T15:28:13+00:00",
       "sha": "bfc8e87",
       "summary": "data: SET listed-peer scoreboard refresh (run 33886530490) (#808)",
@@ -675,42 +711,6 @@
       "sha": "61ee331",
       "summary": "docs: log UX-loop exposure-provenance 320px bleed fix (PR #797, merged+deployed+verified)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-04T03:23:42+07:00",
-      "sha": "accb0bf",
-      "summary": "ux: cc-provenance wraps long tokens so exposure provenance stops bleeding at 320px (#797)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-03T18:44:34+00:00",
-      "sha": "29198d1",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-03, run 33792118857)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-03T18:41:17+00:00",
-      "sha": "c9ef95b",
-      "summary": "test(gate): add orphan_sources.py — every committed source-data input must be consumed",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-03T16:18:29+00:00",
-      "sha": "f32b0e3",
-      "summary": "service: record google_ads intermittent->persistent CI-throttle + refresh CEO dashboard to HEAD",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-03T15:45:33+00:00",
-      "sha": "aa84dd3",
-      "summary": "data: SET listed-peer scoreboard refresh (run 33769924344) (#795)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-03T15:12:36+00:00",
-      "sha": "46f8fba",
-      "summary": "data: market-pulse swarm refresh (run 33763309898) (#793)",
-      "pillar": "market"
     }
   ]
 }
