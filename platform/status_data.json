@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-03T15:45:33+00:00",
-    "commit": "aa84dd3"
+    "generated_at": "2026-09-04T02:19:56+00:00",
+    "commit": "233bb7a"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-09-03",
+    "eta_date": "2026-09-04",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,90 @@
   ],
   "activity": [
     {
+      "date": "2026-09-04T02:19:56+00:00",
+      "sha": "233bb7a",
+      "summary": "docs: log UX-loop #ov-imfweo h2 provenance-pill 320px bleed fix (PR #801, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-04T09:13:55+07:00",
+      "sha": "b24c87a",
+      "summary": "ux: wrap #ov-imfweo h2 provenance pill on narrow phones (#801)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-04T00:59:36+00:00",
+      "sha": "4a241f5",
+      "summary": "data: rival Facebook promo feed refresh (run 33818964228) (#800)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-04T00:36:49+00:00",
+      "sha": "7129758",
+      "summary": "feat(pipeline): CI census projection for the vehicle collateral base (build_vehicle_base.py)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-04T00:26:29+00:00",
+      "sha": "a67669f",
+      "summary": "data: live fuel prices (2026-09-04, run 33821636695)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-03T23:21:42+00:00",
+      "sha": "e50dc88",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-03, run 33817112714)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-03T22:56:09+00:00",
+      "sha": "c814495",
+      "summary": "data: Thai-IP-only swarm refresh (run 33809456431) (#798)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-04T05:16:31+07:00",
+      "sha": "656f758",
+      "summary": "service: swarm audit trail records why a feed fails (persist err_tail) (#799)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-03T21:07:47+00:00",
+      "sha": "bc259b2",
+      "summary": "data: market-pulse swarm refresh (run 33792903234) (#796)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-03T20:26:39+00:00",
+      "sha": "61ee331",
+      "summary": "docs: log UX-loop exposure-provenance 320px bleed fix (PR #797, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-04T03:23:42+07:00",
+      "sha": "accb0bf",
+      "summary": "ux: cc-provenance wraps long tokens so exposure provenance stops bleeding at 320px (#797)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-03T18:44:34+00:00",
+      "sha": "29198d1",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-03, run 33792118857)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-03T18:41:17+00:00",
+      "sha": "c9ef95b",
+      "summary": "test(gate): add orphan_sources.py — every committed source-data input must be consumed",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-03T16:18:29+00:00",
+      "sha": "f32b0e3",
+      "summary": "service: record google_ads intermittent->persistent CI-throttle + refresh CEO dashboard to HEAD",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-09-03T15:45:33+00:00",
       "sha": "aa84dd3",
       "summary": "data: SET listed-peer scoreboard refresh (run 33769924344) (#795)",
@@ -627,90 +711,6 @@
       "sha": "dfbcbd5",
       "summary": "ux: story-next tab-footer label wraps instead of bleeding on narrow phones (#788)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-03T00:41:50+00:00",
-      "sha": "8021499",
-      "summary": "data: live fuel prices (2026-09-03, run 33700413252)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-03T00:30:30+00:00",
-      "sha": "b49bbca",
-      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (a7b83cc->ac725b8)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-03T00:12:01+00:00",
-      "sha": "ac725b8",
-      "summary": "data: market-pulse swarm refresh (run 33695388397) (#786)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-02T23:23:57+00:00",
-      "sha": "853b130",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-02, run 33694775388)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-02T22:48:02+00:00",
-      "sha": "bb16727",
-      "summary": "data: Thai-IP-only swarm refresh (run 33687287627) (#785)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-02T22:15:07+00:00",
-      "sha": "ba771c0",
-      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (c75c309->a7b83cc)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-02T21:07:36+00:00",
-      "sha": "a7b83cc",
-      "summary": "data: market-pulse swarm refresh (run 33670187316) (#783)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-02T20:32:50+00:00",
-      "sha": "e7cf295",
-      "summary": "docs(progress): log ux-loop #expo-occ 320px stack fix — merged (#784) + deployed + verified",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-03T03:28:07+07:00",
-      "sha": "cd87ce8",
-      "summary": "ux: stack #expo-occ borrower-base rows on very narrow phones (fix 320px bleed) (#784)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-02T18:47:18+00:00",
-      "sha": "53712d6",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-02, run 33669184898)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-02T16:18:52+00:00",
-      "sha": "456554f",
-      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (f066775->c75c309)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-02T23:18:25+07:00",
-      "sha": "c75c309",
-      "summary": "intel(overview): surface the collateral base's dark 6-year fleet trajectory + car class (obj #1) (#782)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-09-02T15:44:21+00:00",
-      "sha": "f066775",
-      "summary": "data: SET listed-peer scoreboard refresh (run 33646136437) (#781)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-02T15:24:41+00:00",
-      "sha": "a42a393",
-      "summary": "data: market-pulse swarm refresh (run 33638118839) (#778)",
-      "pillar": "market"
     }
   ]
 }
