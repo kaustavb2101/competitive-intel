@@ -4603,7 +4603,7 @@ function drawRateBoard(){
       mk('type','title_loan','Title loan · ไม่โอนเล่ม','Keeps the registration book with the borrower — the AutoX-comparable product')+
       mk('type','hp_refinance','Hire purchase · โอนเล่ม','Registration book transfers to the lender — advertised flat')+
       mk('tier','bank','Banks')+mk('tier','nonbank','Non-bank')+
-      `<span class="chip" data-act="csv" title="Download this table as CSV">⬇ CSV</span>`;
+      `<span class="chip" data-act="csv" title="Download this table as CSV"><span aria-hidden="true">⬇</span> CSV</span>`;
     ctl.addEventListener('click',e=>{
       const c=e.target.closest('.chip'); if(!c) return;
       if(c.dataset.act==='csv'){ rbCSV(); return; }
@@ -5020,7 +5020,7 @@ function drawAdsFeed(){
         brands.map(b=>`<option value="${b.key}">${b.brand}</option>`).join('')+`</select>`+
       `<select class="chip" id="pulseadstheme" aria-label="Filter by condition" style="font-family:inherit"><option value="">Any condition</option>`+
         themes.map(t=>`<option value="${t}">${lab[t]||t}</option>`).join('')+`</select>`+
-      `<button class="chip" id="pulseadscsv" title="download the filtered rows as CSV">⬇ CSV</button>`;
+      `<button class="chip" id="pulseadscsv" title="download the filtered rows as CSV"><span aria-hidden="true">⬇</span> CSV</button>`;
     ctl.onclick=e=>{
       const b=e.target.closest('.chip'); if(!b||!b.dataset.k) return;
       if(b.dataset.k==='pricing'){ ADF.pricing=!ADF.pricing; }
