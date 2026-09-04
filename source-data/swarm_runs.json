@@ -15,53 +15,6 @@
      "bytes_before": 7113,
      "key": "thaiwater_flood",
      "rc": 0,
-     "seconds": 4.5,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8876,
-     "bytes_before": 8876,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 4.8,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 4003,
-     "bytes_before": 4003,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 135.6,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 6482,
-     "bytes_before": 6482,
-     "key": "oae_yield",
-     "rc": 1,
-     "seconds": 5.6,
-     "status": "failed"
-    }
-   ],
-   "finished": "2026-08-23T09:57:23Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 1,
-   "n_failed": 1,
-   "n_ok": 3,
-   "n_skipped": 0,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-23T09:55:08Z"
-  },
-  {
-   "append_history_rc": 0,
-   "feeds": [
-    {
-     "bytes_after": 7113,
-     "bytes_before": 7113,
-     "key": "thaiwater_flood",
-     "rc": 0,
      "seconds": 3.9,
      "status": "changed"
     },
@@ -3274,6 +3227,45 @@
    "n_timeout": 0,
    "rederive_drift_rc": null,
    "started": "2026-09-04T21:30:19Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7108,
+     "bytes_before": 7108,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 4.4,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8917,
+     "bytes_before": 8917,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 5.2,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 3990,
+     "bytes_before": 3990,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 162.4,
+     "status": "ok"
+    }
+   ],
+   "finished": "2026-09-04T23:15:38Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 2,
+   "n_failed": 0,
+   "n_ok": 3,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-09-04T23:12:56Z"
   }
  ]
 }
