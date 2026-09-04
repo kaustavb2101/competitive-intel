@@ -1,51 +1,12 @@
 {
  "meta": {
   "generated_by": "pipeline/pull_swarm.py",
-  "label": "Each row is one swarm run: which feeds were pulled concurrently, whether each one succeeded / changed its declared output file / failed / timed out / was skipped (exit 3, the repo-wide SKIP convention), plus the rc of the append_history.py and rederive_drift.py steps that followed. This file makes the pulse observable.",
+  "label": "Each row is one swarm run: which feeds were pulled concurrently, whether each one succeeded / changed its declared output file / failed / timed out / was skipped (exit 3, the repo-wide SKIP convention), plus the rc of the append_history.py and rederive_drift.py steps that followed. This file makes the pulse observable. A failed/timed-out feed also carries err_tail (a compact tail of its captured stdout+stderr) so the reason is recorded in the trail, not just in the CI console.",
   "max_runs": 60,
   "n_runs": 60,
   "title": "pull_swarm.py run history -- the swarm's own audit trail"
  },
  "runs": [
-  {
-   "append_history_rc": 0,
-   "feeds": [
-    {
-     "bytes_after": 7117,
-     "bytes_before": 7117,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 3.4,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8880,
-     "bytes_before": 8880,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 4.3,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 4003,
-     "bytes_before": 4003,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 125.9,
-     "status": "ok"
-    }
-   ],
-   "finished": "2026-08-22T15:52:39Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 1,
-   "n_failed": 0,
-   "n_ok": 3,
-   "n_skipped": 0,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-22T15:50:33Z"
-  },
   {
    "append_history_rc": null,
    "feeds": [
@@ -3314,6 +3275,53 @@
    "n_timeout": 0,
    "rederive_drift_rc": null,
    "started": "2026-09-03T21:43:41Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7110,
+     "bytes_before": 7110,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 4.5,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8935,
+     "bytes_before": 8935,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 5.2,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 3990,
+     "bytes_before": 3990,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 142.5,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 11476,
+     "bytes_before": 11476,
+     "key": "oae_napprang",
+     "rc": 0,
+     "seconds": 3.1,
+     "status": "changed"
+    }
+   ],
+   "finished": "2026-09-04T08:14:07Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 2,
+   "n_failed": 0,
+   "n_ok": 4,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-09-04T08:11:44Z"
   }
  ]
 }
