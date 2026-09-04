@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-04T02:19:56+00:00",
-    "commit": "233bb7a"
+    "generated_at": "2026-09-04T09:39:44+00:00",
+    "commit": "d82e816"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-09-04T09:39:44+00:00",
+      "sha": "d82e816",
+      "summary": "data(census): refresh the Union Auction forward book (run 33852287751) (#802)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-04T09:18:34+00:00",
+      "sha": "602e231",
+      "summary": "data: market-pulse swarm refresh (run 33852226701) (#803)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-04T08:35:23+00:00",
+      "sha": "57482d1",
+      "summary": "docs(progress): log UX-loop JS-CSV-chip aria-hidden fix (PR #804, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-04T15:34:07+07:00",
+      "sha": "51b3ccf",
+      "summary": "ux: aria-hidden the decorative ⬇ glyph on the JS-rendered CSV chips (#804)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-04T08:05:28+00:00",
+      "sha": "83df28c",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-04, run 33851610866)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-04T07:18:38+00:00",
+      "sha": "05ce264",
+      "summary": "data: NABC live prices (2026-09-04, run 33847666647)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-04T06:26:55+00:00",
+      "sha": "32d9549",
+      "summary": "docs(blocked-ledger): re-probe 2026-09-04 + correct GISTDA host row",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-04T04:14:57+00:00",
+      "sha": "05bd3ae",
+      "summary": "service: healthy close-out + CEO dashboard refresh to HEAD (2026-09-04)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-04T02:19:56+00:00",
       "sha": "233bb7a",
       "summary": "docs: log UX-loop #ov-imfweo h2 provenance-pill 320px bleed fix (PR #801, merged+deployed+verified)",
@@ -663,54 +711,6 @@
       "sha": "93cc13c",
       "summary": "data: market-pulse swarm refresh (run 33732372223) (#790)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-09-03T08:38:25+00:00",
-      "sha": "7e06f94",
-      "summary": "docs: log UX-loop rz-kv 360px bleed fix (PR #791, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-03T15:35:33+07:00",
-      "sha": "dba09e4",
-      "summary": "ux: rz-kv label column wraps so resilience table stops bleeding at 360px (#791)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-03T08:10:41+00:00",
-      "sha": "90069ec",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-03, run 33731771917)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-03T07:14:03+00:00",
-      "sha": "41fccb1",
-      "summary": "data: NABC live prices (2026-09-03, run 33726612698)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-03T04:22:20+00:00",
-      "sha": "77ef67e",
-      "summary": "chore(dashboard): refresh CEO autonomy plan + status snapshot to HEAD (ac725b8->49fd582)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-03T04:09:53+00:00",
-      "sha": "49fd582",
-      "summary": "data: rival Facebook promo feed refresh (run 33696849784) (#787)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-03T02:45:21+00:00",
-      "sha": "a125076",
-      "summary": "docs: log UX-loop story-next narrow-width fix (PR #788, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-03T09:41:17+07:00",
-      "sha": "dfbcbd5",
-      "summary": "ux: story-next tab-footer label wraps instead of bleeding on narrow phones (#788)",
-      "pillar": "uxui"
     }
   ]
 }
