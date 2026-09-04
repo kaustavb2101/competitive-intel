@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-09-03",
+  "pulled_at": "2026-09-04",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -5740,6 +5740,15 @@
    },
    "reviews_store": [
     {
+     "id": "14504976830",
+     "at": null,
+     "score": 3,
+     "title": "ยาก",
+     "content": "ไม่อนุญาติให้เลขบัตรประชาชนที่ลงท้ายด้วย 8344 ไปใช้โดยเด็ดขาดหากนำไปใช้จะดำเนินการทางกฎหมายอย่างถึงที่สุด",
+     "version": "1.0.45",
+     "votes": 0
+    },
+    {
      "id": "14500385021",
      "at": null,
      "score": 1,
@@ -7481,10 +7490,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.39736,
-    "ratings": 1593,
-    "score_current_version": 3.39736,
-    "ratings_current_version": 1593,
+    "score": 3.39687,
+    "ratings": 1595,
+    "score_current_version": 3.39687,
+    "ratings_current_version": 1595,
     "version": "8.6.0",
     "app_updated": "2026-08-21",
     "released": "2020-03-03",
@@ -9319,6 +9328,15 @@
      "votes": 0
     },
     {
+     "id": "14504114741",
+     "at": null,
+     "score": 1,
+     "title": "อับเดด",
+     "content": "วุ่นวายอับเดดทุกครั้ง",
+     "version": "8.6.0",
+     "votes": 0
+    },
+    {
      "id": "14413714161",
      "at": null,
      "score": 1,
@@ -10562,16 +10580,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.82405,
-    "ratings": 173448,
-    "score_current_version": 4.82405,
-    "ratings_current_version": 173448,
+    "score": 4.82407,
+    "ratings": 173482,
+    "score_current_version": 4.82407,
+    "ratings_current_version": 173482,
     "version": "3.0.6",
     "app_updated": "2026-08-06",
     "released": "2021-04-20",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14502190322",
+     "at": null,
+     "score": 4,
+     "title": "ช่วยลบข้อมูลและลบบัญชี",
+     "content": "ตามที่ข้าพเจ้าได้สมัครสินเชื่ิอวันที่2/9/69 ข้าพเจ้า นางสาวสโรชา กล่ำกลั่น ขอแจ้งยกเลิกการสมัครสินเชื่อ Finnix เนื่องจากไม่ได้รับการอนุมัติ และไม่มีความประสงค์จะดำเนินการสมัครต่อ\nขอให้ทางบริษัทดำเนินการยกเลิกคำขอสมัครของข้าพเจ้า และขอให้ลบข้อมูลส่วนบุคคลที่เกี่ยวข้องกับการสมัครสินเชื่อออกจากระบบ รวมถึงข้อมูลเลขบัตรประจำตัวประชาชนที่มีการบันทึกไว้ในแอปพลิเคชันและระบบของบริษัท ตลอดจนข้อมูลอื่น ๆ ที่",
+     "version": "3.0.6",
+     "votes": 0
+    },
     {
      "id": "14498017472",
      "at": null,
@@ -15660,15 +15687,33 @@
    "own": false,
    "stats": {
     "score": 4.7053,
-    "ratings": 64561,
+    "ratings": 64632,
     "score_current_version": 4.7053,
-    "ratings_current_version": 64561,
+    "ratings_current_version": 64632,
     "version": "7.7.0",
     "app_updated": "2026-08-24",
     "released": "2021-10-10",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14505168393",
+     "at": null,
+     "score": 1,
+     "title": "ห้ามนำไปใช้โดยเด็ดขาด",
+     "content": "ไม่อนุญาต นำข้อมูล ท้าย9692\nท้ายเบอร์ 3469 ไปทำเรื่องธุรกรรมอย่างอื่น",
+     "version": "7.7.0",
+     "votes": 0
+    },
+    {
+     "id": "14502387748",
+     "at": null,
+     "score": 1,
+     "title": "ไม่ผ่านสักที",
+     "content": "วงเงินดีดีทุกอย่างไม่ผ่านสักรอบห่วยแตกสัสๆ",
+     "version": "7.7.0",
+     "votes": 0
+    },
     {
      "id": "14500062195",
      "at": null,
@@ -20522,16 +20567,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84346,
-    "ratings": 44882,
-    "score_current_version": 4.84346,
-    "ratings_current_version": 44882,
+    "score": 4.84321,
+    "ratings": 44985,
+    "score_current_version": 4.84321,
+    "ratings_current_version": 44985,
     "version": "3.1.3",
     "app_updated": "2026-08-27",
     "released": "2023-03-06",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14505084297",
+     "at": null,
+     "score": 1,
+     "title": "อย่าติดต่อ",
+     "content": "เนื่องจากไม่สามารถสมัครได้เพราะเอกสารไม่คบและไม่สามารถหาดูย้อนหลังได้รบกวนหยุดติดต่อมาได้แล้วค่ะ",
+     "version": "3.1.3",
+     "votes": 0
+    },
     {
      "id": "14497835988",
      "at": null,
@@ -25385,10 +25439,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.76969,
-    "ratings": 27007,
-    "score_current_version": 4.76969,
-    "ratings_current_version": 27007,
+    "score": 4.76972,
+    "ratings": 27037,
+    "score_current_version": 4.76972,
+    "ratings_current_version": 27037,
     "version": "1.8.7",
     "app_updated": "2026-08-07",
     "released": "2020-08-05",
@@ -29609,16 +29663,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.66497,
-    "ratings": 2161,
-    "score_current_version": 2.66497,
-    "ratings_current_version": 2161,
+    "score": 2.6267,
+    "ratings": 2127,
+    "score_current_version": 2.6267,
+    "ratings_current_version": 2127,
     "version": "3.4.1",
     "app_updated": "2026-08-31",
     "released": "2022-05-11",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14504534900",
+     "at": null,
+     "score": 1,
+     "title": "ไม่มีส่วนเกี่ยวข้อง",
+     "content": "ข้าพเจ้า นายพฤทธิพล ชัยชนะ ได้ทำการกรอก\nข้อมูลบัตรประจำตัวประชาชน และทำการสมัครเข้า\nแอพลิเคชั่น แรบบิท แคช (บริษัท แรบบิม แคช จำกัด)และได้\nยืนขอสินเชื่อ แต่ไม่ได้รับการอนุมัติ ดังนั้นเอกสารที่\nแนบไปทั้งหมด ข้าพเจ้าไม่อนุญาตให้บริษัทนำไปใช้\nในด้านอื่นๆทั้งสิ้น และถ้าเกิดเหตุการณ์ใดๆขึ้น\nข้าพเจ้าจะไม่รับผิดชอบทุกๆกรณี แบะถ้าบริษัทมันนี่\nฮับนำข้อมูลที่ได้รับไปใช้ในทางที่ไม่ถูกต้อง ก่อให้\nเกิดความเสีย",
+     "version": "3.4.1",
+     "votes": 0
+    },
     {
      "id": "14484842243",
      "at": null,
@@ -34428,6 +34491,15 @@
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14504495474",
+     "at": null,
+     "score": 3,
+     "title": "ไม่มีส่วนเกี่ยวข้อง",
+     "content": "ข้าพเจ้า นายพฤทธิพล ชัยชนะ ได้ทำการกรอก\nข้อมูลบัตรประจำตัวประชาชน และทำการสมัครเข้า\nแอพลิเคชั่น มันนี่ฮับ เมื่อวันที่ 3/9/2569 และได้\nยืนขอสินเชื่อ แต่ไม่ได้รับการอนุมัติ ดังนั้นเอกสารที่\nแนบไปทั้งหมด ข้าพเจ้าไม่อนุญาตให้บริษัทนำไปใช้\nในด้านอื่นๆทั้งสิ้น และถ้าเกิดเหตุการณ์ใดๆขึ้น\nข้าพเจ้าจะไม่รับผิดชอบทุกๆกรณี แบะถ้าบริษัทมันนี่\nฮับนำข้อมูลที่ได้รับไปใช้ในทางที่ไม่ถูกต้อง ก่อให้\nเกิดความเสียหายใด",
+     "version": "5.65",
+     "votes": 0
+    },
     {
      "id": "14482258231",
      "at": null,
