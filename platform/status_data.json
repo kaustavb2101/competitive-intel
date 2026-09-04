@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-04T09:39:44+00:00",
-    "commit": "d82e816"
+    "generated_at": "2026-09-04T15:28:13+00:00",
+    "commit": "bfc8e87"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,42 @@
   ],
   "activity": [
     {
+      "date": "2026-09-04T15:28:13+00:00",
+      "sha": "bfc8e87",
+      "summary": "data: SET listed-peer scoreboard refresh (run 33886530490) (#808)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-04T15:08:25+00:00",
+      "sha": "fc631fc",
+      "summary": "data: market-pulse swarm refresh (run 33879637707) (#806)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-04T14:33:08+00:00",
+      "sha": "bff3c4e",
+      "summary": "docs(progress): log UX-loop Explore-nav-button aria-hidden fix (PR #807, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-04T21:24:44+07:00",
+      "sha": "9bd7abb",
+      "summary": "ux: hide decorative ▾ from \"Explore\" nav-button accessible name (#807)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-04T13:34:44+00:00",
+      "sha": "26e7c79",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-04, run 33878664601)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-04T17:15:46+07:00",
+      "sha": "fcf8f84",
+      "summary": "service: healthy close-out + CEO dashboard refresh to HEAD (2026-09-04 b) (#805)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-04T09:39:44+00:00",
       "sha": "d82e816",
       "summary": "data(census): refresh the Union Auction forward book (run 33852287751) (#802)",
@@ -674,42 +710,6 @@
       "date": "2026-09-03T15:12:36+00:00",
       "sha": "46f8fba",
       "summary": "data: market-pulse swarm refresh (run 33763309898) (#793)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-03T14:36:44+00:00",
-      "sha": "f28e736",
-      "summary": "docs: log UX-loop aria-hidden action-button fix (PR #794, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-03T21:32:48+07:00",
-      "sha": "f67eb2c",
-      "summary": "ux: aria-hidden decorative glyphs on static action buttons (#794)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-03T13:37:49+00:00",
-      "sha": "20fe694",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-03, run 33762040789)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-03T12:46:51+00:00",
-      "sha": "d47fed5",
-      "summary": "intel(data-book): surface MEASURED national per-person wage + affordability ratio (#792)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-03T09:42:34+00:00",
-      "sha": "e8f0a6f",
-      "summary": "data(census): refresh the Union Auction forward book (run 33732436574) (#789)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-03T09:21:50+00:00",
-      "sha": "93cc13c",
-      "summary": "data: market-pulse swarm refresh (run 33732372223) (#790)",
       "pillar": "market"
     }
   ]
