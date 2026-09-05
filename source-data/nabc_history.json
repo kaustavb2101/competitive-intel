@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_nabc_history.py",
   "source": "NABC Agricultural Data Service (agriapi.nabc.go.th) — the same daily-price endpoint pull_nabc_prices.py reads; this keeps the time and province dimensions that one discards.",
   "label": "MEASURED — no modelling, no interpolation. Monthly values are the plain mean of that month's quotes for the category's most-quoted product; months with fewer than 3 quotes are omitted rather than drawn from a thin sample.",
-  "pulled": "2026-08-29",
+  "pulled": "2026-09-05",
   "recent_window_days": 90,
   "province_note": "Province means cover the last 90 days of quotes, anchored on each category's own newest quote date — NOT on the wall clock, so the output is byte-reproducible. A province appears only where a market in it actually quotes the product; absence is silence, not zero.",
   "coverage_note": "History depth is bounded by how far back the API pages (~3000 records per category), so a heavily-quoted commodity reaches back fewer months than a thinly-quoted one. n_months and first_month state the real span per category instead of implying a uniform window.",
@@ -29,10 +29,10 @@
    "product": "กุ้งขาวแวนนาไม ขนาด 70 ตัว/กก.",
    "unit": "บาท/กก.",
    "first_month": "2025-01",
-   "last_month": "2026-08",
-   "n_months": 20,
-   "n_quotes": 737,
-   "latest_date": "2026-08-28",
+   "last_month": "2026-09",
+   "n_months": 21,
+   "n_quotes": 745,
+   "latest_date": "2026-09-03",
    "monthly": [
     {
      "month": "2025-01",
@@ -106,7 +106,7 @@
     },
     {
      "month": "2026-03",
-     "mean": 132.62,
+     "mean": 132.0,
      "n": 40
     },
     {
@@ -131,20 +131,25 @@
     },
     {
      "month": "2026-08",
-     "mean": 143.14,
-     "n": 35
+     "mean": 143.11,
+     "n": 37
+    },
+    {
+     "month": "2026-09",
+     "mean": 142.5,
+     "n": 6
     }
    ],
    "provinces": [
     {
      "province": "ฉะเชิงเทรา",
-     "mean": 137.04,
-     "n": 54
+     "mean": 138.04,
+     "n": 56
     },
     {
      "province": "สมุทรสาคร",
-     "mean": 130.0,
-     "n": 59
+     "mean": 131.33,
+     "n": 60
     }
    ],
    "n_provinces": 2,
@@ -154,10 +159,10 @@
    "product": "ข้าวเปลือกเจ้าหอมมะลิ 105",
    "unit": "บาท/ตัน",
    "first_month": "2025-01",
-   "last_month": "2026-08",
-   "n_months": 20,
-   "n_quotes": 2375,
-   "latest_date": "2026-08-28",
+   "last_month": "2026-09",
+   "n_months": 21,
+   "n_quotes": 2399,
+   "latest_date": "2026-09-03",
    "monthly": [
     {
      "month": "2025-01",
@@ -211,37 +216,37 @@
     },
     {
      "month": "2025-11",
-     "mean": 14939.01,
+     "mean": 14944.59,
      "n": 120
     },
     {
      "month": "2025-12",
-     "mean": 16165.26,
+     "mean": 16169.65,
      "n": 114
     },
     {
      "month": "2026-01",
-     "mean": 16395.83,
+     "mean": 16410.0,
      "n": 120
     },
     {
      "month": "2026-02",
-     "mean": 16489.27,
+     "mean": 16471.77,
      "n": 120
     },
     {
      "month": "2026-03",
-     "mean": 16783.59,
+     "mean": 16769.3,
      "n": 126
     },
     {
      "month": "2026-04",
-     "mean": 17031.8,
+     "mean": 17025.31,
      "n": 108
     },
     {
      "month": "2026-05",
-     "mean": 17433.36,
+     "mean": 17415.93,
      "n": 113
     },
     {
@@ -251,45 +256,50 @@
     },
     {
      "month": "2026-07",
-     "mean": 17712.5,
+     "mean": 17707.25,
      "n": 120
     },
     {
      "month": "2026-08",
-     "mean": 17763.33,
-     "n": 114
+     "mean": 17755.75,
+     "n": 120
+    },
+    {
+     "month": "2026-09",
+     "mean": 17494.44,
+     "n": 18
     }
    ],
    "provinces": [
     {
      "province": "อำนาจเจริญ",
-     "mean": 18751.19,
-     "n": 59
+     "mean": 18685.69,
+     "n": 58
     },
     {
      "province": "ขอนแก่น",
-     "mean": 18627.12,
-     "n": 59
+     "mean": 18585.25,
+     "n": 61
     },
     {
      "province": "บุรีรัมย์",
-     "mean": 18306.78,
-     "n": 59
+     "mean": 18290.16,
+     "n": 61
     },
     {
      "province": "ร้อยเอ็ด",
      "mean": 18000.0,
-     "n": 58
-    },
-    {
-     "province": "ศรีสะเกษ",
-     "mean": 17328.81,
      "n": 59
     },
     {
-     "province": "ยโสธร",
-     "mean": 15358.33,
+     "province": "ศรีสะเกษ",
+     "mean": 17423.33,
      "n": 60
+    },
+    {
+     "province": "ยโสธร",
+     "mean": 15326.23,
+     "n": 61
     }
    ],
    "n_provinces": 6,
@@ -299,10 +309,10 @@
    "product": "ข้าวโพดเลี้ยงสัตว์ ความชื้น 14.5%",
    "unit": "บาท/กก.",
    "first_month": "2025-01",
-   "last_month": "2026-08",
-   "n_months": 20,
-   "n_quotes": 1834,
-   "latest_date": "2026-08-28",
+   "last_month": "2026-09",
+   "n_months": 21,
+   "n_quotes": 1848,
+   "latest_date": "2026-09-03",
    "monthly": [
     {
      "month": "2025-01",
@@ -356,18 +366,18 @@
     },
     {
      "month": "2025-11",
-     "mean": 8.78,
-     "n": 101
+     "mean": 8.76,
+     "n": 100
     },
     {
      "month": "2025-12",
      "mean": 8.76,
-     "n": 92
+     "n": 93
     },
     {
      "month": "2026-01",
-     "mean": 8.83,
-     "n": 101
+     "mean": 8.81,
+     "n": 100
     },
     {
      "month": "2026-02",
@@ -376,8 +386,8 @@
     },
     {
      "month": "2026-03",
-     "mean": 9.1,
-     "n": 91
+     "mean": 9.08,
+     "n": 92
     },
     {
      "month": "2026-04",
@@ -386,50 +396,55 @@
     },
     {
      "month": "2026-05",
-     "mean": 10.63,
-     "n": 93
+     "mean": 10.61,
+     "n": 92
     },
     {
      "month": "2026-06",
-     "mean": 10.95,
+     "mean": 10.96,
      "n": 90
     },
     {
      "month": "2026-07",
-     "mean": 10.73,
+     "mean": 10.76,
      "n": 71
     },
     {
      "month": "2026-08",
-     "mean": 9.76,
-     "n": 50
+     "mean": 9.74,
+     "n": 53
+    },
+    {
+     "month": "2026-09",
+     "mean": 9.05,
+     "n": 12
     }
    ],
    "provinces": [
     {
      "province": "นครราชสีมา",
-     "mean": 11.68,
-     "n": 24
+     "mean": 11.7,
+     "n": 22
     },
     {
      "province": "พระนครศรีอยุธยา",
-     "mean": 11.32,
-     "n": 49
+     "mean": 11.07,
+     "n": 51
     },
     {
      "province": "เพชรบูรณ์",
-     "mean": 11.25,
+     "mean": 10.94,
      "n": 18
     },
     {
      "province": "น่าน",
-     "mean": 10.0,
+     "mean": 9.98,
      "n": 60
     },
     {
      "province": "แพร่",
-     "mean": 9.96,
-     "n": 60
+     "mean": 9.88,
+     "n": 59
     }
    ],
    "n_provinces": 5,
@@ -439,10 +454,10 @@
    "product": "ผลปาล์มน้ำมันทั้งทะลาย นน. > 15 กก. ขึ้นไป",
    "unit": "บาท/กก.",
    "first_month": "2025-01",
-   "last_month": "2026-08",
-   "n_months": 20,
-   "n_quotes": 2135,
-   "latest_date": "2026-08-28",
+   "last_month": "2026-09",
+   "n_months": 21,
+   "n_quotes": 2159,
+   "latest_date": "2026-09-03",
    "monthly": [
     {
      "month": "2025-01",
@@ -496,7 +511,7 @@
     },
     {
      "month": "2025-11",
-     "mean": 7.13,
+     "mean": 7.12,
      "n": 20
     },
     {
@@ -542,28 +557,33 @@
     {
      "month": "2026-08",
      "mean": 8.51,
-     "n": 104
+     "n": 110
+    },
+    {
+     "month": "2026-09",
+     "mean": 8.38,
+     "n": 18
     }
    ],
    "provinces": [
     {
      "province": "กระบี่",
-     "mean": 8.46,
-     "n": 111
+     "mean": 8.53,
+     "n": 113
     },
     {
      "province": "สุราษฎร์ธานี",
-     "mean": 8.24,
-     "n": 59
+     "mean": 8.28,
+     "n": 60
     },
     {
      "province": "ชุมพร",
-     "mean": 7.96,
-     "n": 107
+     "mean": 8.0,
+     "n": 110
     },
     {
      "province": "ชลบุรี",
-     "mean": 7.82,
+     "mean": 7.87,
      "n": 59
     }
    ],
@@ -574,10 +594,10 @@
    "product": "มะนาว ผลขนาดใหญ่พิเศษ",
    "unit": "บาท/ร้อยผล",
    "first_month": "2025-01",
-   "last_month": "2026-08",
-   "n_months": 20,
-   "n_quotes": 397,
-   "latest_date": "2026-08-28",
+   "last_month": "2026-09",
+   "n_months": 21,
+   "n_quotes": 401,
+   "latest_date": "2026-09-03",
    "monthly": [
     {
      "month": "2025-01",
@@ -676,15 +696,20 @@
     },
     {
      "month": "2026-08",
-     "mean": 146.32,
-     "n": 19
+     "mean": 151.5,
+     "n": 20
+    },
+    {
+     "month": "2026-09",
+     "mean": 250.0,
+     "n": 3
     }
    ],
    "provinces": [
     {
      "province": "เพชรบุรี",
-     "mean": 111.86,
-     "n": 59
+     "mean": 120.67,
+     "n": 60
     }
    ],
    "n_provinces": 1,
@@ -694,15 +719,15 @@
    "product": "มะพร้าวผลแห้ง ขนาดใหญ่",
    "unit": "บาท/ร้อยผล",
    "first_month": "2025-03",
-   "last_month": "2026-08",
-   "n_months": 18,
-   "n_quotes": 1663,
-   "latest_date": "2026-08-28",
+   "last_month": "2026-09",
+   "n_months": 19,
+   "n_quotes": 1661,
+   "latest_date": "2026-09-03",
    "monthly": [
     {
      "month": "2025-03",
-     "mean": 2336.84,
-     "n": 38
+     "mean": 2355.56,
+     "n": 18
     },
     {
      "month": "2025-04",
@@ -741,17 +766,17 @@
     },
     {
      "month": "2025-11",
-     "mean": 1864.0,
-     "n": 100
+     "mean": 1863.64,
+     "n": 99
     },
     {
      "month": "2025-12",
-     "mean": 1636.07,
-     "n": 61
+     "mean": 1633.87,
+     "n": 62
     },
     {
      "month": "2026-01",
-     "mean": 1316.0,
+     "mean": 1318.0,
      "n": 100
     },
     {
@@ -761,55 +786,60 @@
     },
     {
      "month": "2026-03",
-     "mean": 989.15,
-     "n": 106
+     "mean": 988.57,
+     "n": 105
     },
     {
      "month": "2026-04",
-     "mean": 825.58,
-     "n": 86
+     "mean": 823.86,
+     "n": 88
     },
     {
      "month": "2026-05",
-     "mean": 850.0,
-     "n": 94
+     "mean": 848.91,
+     "n": 92
     },
     {
      "month": "2026-06",
-     "mean": 606.57,
+     "mean": 605.05,
      "n": 99
     },
     {
      "month": "2026-07",
-     "mean": 550.98,
+     "mean": 550.0,
      "n": 102
     },
     {
      "month": "2026-08",
-     "mean": 596.84,
-     "n": 95
+     "mean": 596.97,
+     "n": 99
+    },
+    {
+     "month": "2026-09",
+     "mean": 580.0,
+     "n": 15
     }
    ],
    "provinces": [
     {
      "province": "สมุทรสงคราม",
-     "mean": 642.37,
+     "mean": 628.81,
      "n": 59
     },
     {
      "province": "ประจวบคีรีขันธ์",
-     "mean": 624.36,
-     "n": 117
+     "mean": 622.27,
+     "n": 119
     },
     {
      "province": "ชุมพร",
-     "mean": 615.0,
+     "mean": 608.33,
      "n": 60
     },
     {
      "province": "สุราษฏร์ธานี",
-     "mean": 418.33,
-     "n": 60
+     "mean": 409.68,
+     "n": 62
     }
    ],
    "n_provinces": 4,
@@ -819,10 +849,10 @@
    "product": "หัวมันสำปะหลังสด (แป้ง 25%)",
    "unit": "บาท/กก.",
    "first_month": "2025-01",
-   "last_month": "2026-08",
-   "n_months": 20,
-   "n_quotes": 1376,
-   "latest_date": "2026-08-28",
+   "last_month": "2026-09",
+   "n_months": 21,
+   "n_quotes": 1391,
+   "latest_date": "2026-09-03",
    "monthly": [
     {
      "month": "2025-01",
@@ -872,21 +902,21 @@
     {
      "month": "2025-10",
      "mean": 2.19,
-     "n": 63
+     "n": 62
     },
     {
      "month": "2025-11",
-     "mean": 2.24,
+     "mean": 2.25,
      "n": 73
     },
     {
      "month": "2025-12",
      "mean": 2.32,
-     "n": 66
+     "n": 70
     },
     {
      "month": "2026-01",
-     "mean": 2.43,
+     "mean": 2.42,
      "n": 80
     },
     {
@@ -897,49 +927,54 @@
     {
      "month": "2026-03",
      "mean": 2.66,
-     "n": 83
+     "n": 84
     },
     {
      "month": "2026-04",
      "mean": 2.91,
-     "n": 70
+     "n": 69
     },
     {
      "month": "2026-05",
      "mean": 3.11,
-     "n": 75
+     "n": 72
     },
     {
      "month": "2026-06",
      "mean": 3.36,
-     "n": 59
+     "n": 60
     },
     {
      "month": "2026-07",
-     "mean": 3.45,
+     "mean": 3.44,
      "n": 58
     },
     {
      "month": "2026-08",
      "mean": 3.81,
-     "n": 56
+     "n": 61
+    },
+    {
+     "month": "2026-09",
+     "mean": 3.92,
+     "n": 9
     }
    ],
    "provinces": [
     {
      "province": "นครราชสีมา",
-     "mean": 3.7,
-     "n": 116
+     "mean": 3.74,
+     "n": 122
     },
     {
      "province": "ชลบุรี",
      "mean": 3.65,
-     "n": 19
+     "n": 22
     },
     {
      "province": "กำแพงเพชร",
      "mean": 2.97,
-     "n": 38
+     "n": 35
     }
    ],
    "n_provinces": 3,
@@ -949,10 +984,10 @@
    "product": "ยางพาราแผ่นดิบ ชั้น 3",
    "unit": "บาท/กก.",
    "first_month": "2025-01",
-   "last_month": "2026-08",
-   "n_months": 20,
-   "n_quotes": 1324,
-   "latest_date": "2026-08-28",
+   "last_month": "2026-09",
+   "n_months": 21,
+   "n_quotes": 1334,
+   "latest_date": "2026-09-03",
    "monthly": [
     {
      "month": "2025-01",
@@ -1001,13 +1036,13 @@
     },
     {
      "month": "2025-10",
-     "mean": 54.87,
+     "mean": 54.9,
      "n": 73
     },
     {
      "month": "2025-11",
-     "mean": 56.02,
-     "n": 66
+     "mean": 56.05,
+     "n": 64
     },
     {
      "month": "2025-12",
@@ -1016,23 +1051,23 @@
     },
     {
      "month": "2026-01",
-     "mean": 56.75,
-     "n": 82
+     "mean": 56.72,
+     "n": 81
     },
     {
      "month": "2026-02",
-     "mean": 60.35,
-     "n": 70
+     "mean": 60.38,
+     "n": 69
     },
     {
      "month": "2026-03",
-     "mean": 68.11,
+     "mean": 68.05,
      "n": 64
     },
     {
      "month": "2026-04",
-     "mean": 74.94,
-     "n": 37
+     "mean": 74.8,
+     "n": 36
     },
     {
      "month": "2026-05",
@@ -1046,40 +1081,45 @@
     },
     {
      "month": "2026-07",
-     "mean": 84.47,
-     "n": 56
+     "mean": 84.39,
+     "n": 57
     },
     {
      "month": "2026-08",
-     "mean": 81.23,
-     "n": 67
+     "mean": 81.22,
+     "n": 70
+    },
+    {
+     "month": "2026-09",
+     "mean": 80.62,
+     "n": 11
     }
    ],
    "provinces": [
-    {
-     "province": "ระยอง",
-     "mean": 87.4,
-     "n": 26
-    },
     {
      "province": "บุรีรัมย์",
      "mean": 87.07,
      "n": 1
     },
     {
+     "province": "ระยอง",
+     "mean": 86.84,
+     "n": 30
+    },
+    {
      "province": "นครศรีธรรมราช",
-     "mean": 84.68,
-     "n": 22
+     "mean": 84.52,
+     "n": 23
     },
     {
      "province": "สงขลา",
-     "mean": 83.55,
-     "n": 20
+     "mean": 83.44,
+     "n": 21
     },
     {
      "province": "สุราษฎร์ธานี",
-     "mean": 82.24,
-     "n": 97
+     "mean": 82.03,
+     "n": 103
     }
    ],
    "n_provinces": 5,
@@ -1249,10 +1289,10 @@
    "product": "สุกรพันธุ์ผสม น้ำหนัก 100 กก. ขึ้นไป",
    "unit": "บาท/กก.",
    "first_month": "2025-01",
-   "last_month": "2026-08",
-   "n_months": 20,
-   "n_quotes": 627,
-   "latest_date": "2026-08-28",
+   "last_month": "2026-09",
+   "n_months": 21,
+   "n_quotes": 639,
+   "latest_date": "2026-09-03",
    "monthly": [
     {
      "month": "2025-01",
@@ -1336,7 +1376,7 @@
     },
     {
      "month": "2026-05",
-     "mean": 61.22,
+     "mean": 61.04,
      "n": 56
     },
     {
@@ -1346,30 +1386,35 @@
     },
     {
      "month": "2026-07",
-     "mean": 66.91,
+     "mean": 66.77,
      "n": 56
     },
     {
      "month": "2026-08",
-     "mean": 71.18,
-     "n": 57
+     "mean": 71.35,
+     "n": 60
+    },
+    {
+     "month": "2026-09",
+     "mean": 74.67,
+     "n": 9
     }
    ],
    "provinces": [
     {
      "province": "ชลบุรี",
-     "mean": 72.32,
-     "n": 56
+     "mean": 73.12,
+     "n": 57
     },
     {
      "province": "ฉะเชิงเทรา",
-     "mean": 67.06,
-     "n": 56
+     "mean": 67.72,
+     "n": 58
     },
     {
      "province": "นครปฐม",
-     "mean": 63.29,
-     "n": 58
+     "mean": 64.02,
+     "n": 60
     }
    ],
    "n_provinces": 3,
@@ -1379,10 +1424,10 @@
    "product": "ไก่รุ่นพันธุ์เนื้อ",
    "unit": "บาท/กก.",
    "first_month": "2025-01",
-   "last_month": "2026-08",
-   "n_months": 20,
-   "n_quotes": 779,
-   "latest_date": "2026-08-28",
+   "last_month": "2026-09",
+   "n_months": 21,
+   "n_quotes": 787,
+   "latest_date": "2026-09-03",
    "monthly": [
     {
      "month": "2025-01",
@@ -1471,7 +1516,7 @@
     },
     {
      "month": "2026-06",
-     "mean": 39.35,
+     "mean": 39.4,
      "n": 40
     },
     {
@@ -1481,20 +1526,25 @@
     },
     {
      "month": "2026-08",
-     "mean": 43.05,
-     "n": 38
+     "mean": 43.1,
+     "n": 40
+    },
+    {
+     "month": "2026-09",
+     "mean": 44.0,
+     "n": 6
     }
    ],
    "provinces": [
     {
      "province": "นครปฐม",
-     "mean": 42.38,
+     "mean": 42.92,
      "n": 60
     },
     {
      "province": "ชลบุรี",
-     "mean": 40.04,
-     "n": 55
+     "mean": 40.18,
+     "n": 57
     }
    ],
    "n_provinces": 2,
@@ -1504,10 +1554,10 @@
    "product": "ไข่ไก่สด",
    "unit": "บาท/ร้อยฟอง",
    "first_month": "2025-01",
-   "last_month": "2026-08",
-   "n_months": 20,
-   "n_quotes": 793,
-   "latest_date": "2026-08-28",
+   "last_month": "2026-09",
+   "n_months": 21,
+   "n_quotes": 801,
+   "latest_date": "2026-09-03",
    "monthly": [
     {
      "month": "2025-01",
@@ -1606,20 +1656,25 @@
     },
     {
      "month": "2026-08",
-     "mean": 350.53,
-     "n": 38
+     "mean": 351.0,
+     "n": 40
+    },
+    {
+     "month": "2026-09",
+     "mean": 360.0,
+     "n": 6
     }
    ],
    "provinces": [
     {
      "province": "ฉะเชิงเทรา",
-     "mean": 376.95,
-     "n": 59
+     "mean": 379.33,
+     "n": 60
     },
     {
      "province": "สุพรรณบุรี",
-     "mean": 296.27,
-     "n": 59
+     "mean": 297.67,
+     "n": 60
     }
    ],
    "n_provinces": 2,
