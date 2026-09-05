@@ -4,7 +4,7 @@
     "generated_by": "build_farmgate_platform.py",
     "source": "NABC Agricultural Data Service (agriapi.nabc.go.th) — daily market prices, national average across quoting markets, pulled by pipeline/pull_nabc_prices.py (REACHABLE from a Thai IP and from cloud runners; verified live 2026-07-12). Sugarcane only: OCSB announced cane price via pipeline/ingest_ocsb_cane.py — Thailand sets one national cane price per season, so cane is quoted by no market and cannot come from NABC.",
     "label": "MEASURED — Thai prices for RAW farm commodities in farm-gate product forms (paddy, fresh cassava root, whole palm bunch, raw rubber sheet, maize, coconut, cannery pineapple, cane). Nothing modelled. Every commodity carries its own `source`: all are daily market averages EXCEPT sugarcane, whose price is administered rather than quoted.",
-    "pulled": "2026-09-04",
+    "pulled": "2026-09-05",
     "vintage": "2026-09-03",
     "unit": "บาท/ตัน (THB/tonne)",
     "n_commodities": 8,
