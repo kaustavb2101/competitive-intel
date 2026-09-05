@@ -10,7 +10,7 @@
 #   source-data/vehicles_by_province.json   — THE LIVE BASE. Read by 10+ builders
 #       (build_vehicle_registry / build_vehicle_fleet / build_branch_vehicles / build_amphoe /
 #       build_province / build_collateral_outlook / build_impact_cards / build_peer_province /
-#       build_vehicle_flow / build_rayong). Produced ONLY by pipeline/ingest_gov.py's build_vehicles,
+#       build_vehicle_flow). Produced ONLY by pipeline/ingest_gov.py's build_vehicles,
 #       which reads the fine-grained raw DLT CSV (vehicles_dlt__dataset_1_1_04__*.csv) from the
 #       Thai-IP-only data.go.th pull (pipeline/dgt_out/, absent in CI). So it can be refreshed ONLY
 #       from Kaustav's Thai laptop — it CANNOT self-heal in CI. It uniquely carries per-province `ev`

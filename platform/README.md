@@ -16,7 +16,7 @@ app.js  styles.css  vercel.json
 data/
   branches.json        national (2,015 branches)
   meta.json            commodity board, macro, white-space
-  rayong_province.json districts + branches + competitors + POI
+  provinces/           per-province deep-dives (build_province.py; rayong.json = pilot)
   rayong_catchment.json buildings + branches + competitors + POI + landmarks
 ```
 
