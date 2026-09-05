@@ -5,7 +5,7 @@
     "label": "MEASURED — OAE commodity-economics compendium (Cai-up 2568). Per-crop farming HOUSEHOLD counts, area, yield, farm-gate price, cost and NET RETURN (ผลตอบแทนสุทธิ, บาท/ตัน — negative = a loss); plus farm-household income and year-end DEBT by region. Text-layer extraction (not OCR).",
     "source": "https://oae.go.th/uploads/files/public/media/Cai-up-2568.pdf",
     "source_th": "สำนักงานเศรษฐกิจการเกษตร (สศก.) — ภาวะเศรษฐกิจการเกษตร / Cai-up 2568",
-    "pulled": "2026-08-29",
+    "pulled": "2026-09-05",
     "crop_vintage": "2568 (crop year 2568/69, OAE forecast as of Mar 2569)",
     "household_vintage": "2567/68p (preliminary)",
     "crop_pages": {
