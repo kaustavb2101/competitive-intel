@@ -13,7 +13,7 @@ per-district factory layer the app already consumes (objective #1 merchant / col
   out: source-data/factories_by_district.json      {source, n_factories, districts{key:{fac,workers}},
                                                    provinces{prov:{fac,workers}}} — the exact shape
                                                    derive.py / build_amphoe.py / build_province.py /
-                                                   build_rayong.py / build_branch_labor.py read.
+                                                   build_branch_labor.py read.
 
 WHY THIS EXISTS. factories_by_district.json used to be built by ingest_gov.py's build_factories from
 pipeline/dgt_out/*.csv — the **data.go.th aggregator pull, which is geoblocked from every foreign /

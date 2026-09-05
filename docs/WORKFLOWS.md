@@ -87,7 +87,9 @@ to "street-network isochrone (foot-walking)".
 1. `pipeline/pull_wide.py` with the new urban bbox → building footprints (urban cores only).
 2. Rebuild district polygons + rollups (containment against `adm2` geoBoundaries; pattern in PROGRESS_LOG).
 3. `committee/scout.py --provinces <จังหวัด>` for rivals; DIW/DLT joins already national.
-4. Assemble pages via `pipeline/build_platform.py`; add nav links. Candidates: Chonburi (EEC sibling),
+4. Build the deep-dive via `pipeline/build_province.py` (writes `platform/data/provinces/<slug>.json`);
+   the 3D building scene (`rayong-catchment.html?city=<slug>`) and district view (`province.html?p=<slug>`)
+   already read it — no per-province HTML to assemble. Candidates: Chonburi (EEC sibling),
    Chiang Mai (top white-space lead).
 
 ## W10 · The Calibrator (when loan-book data arrives)
