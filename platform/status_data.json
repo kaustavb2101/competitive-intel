@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-05T03:25:41+00:00",
-    "commit": "bd6da75"
+    "generated_at": "2026-09-05T09:41:59+00:00",
+    "commit": "df00456"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-09-05T09:41:59+00:00",
+      "sha": "df00456",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33952594874) (#815)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-05T09:17:15+00:00",
+      "sha": "d22279e",
+      "summary": "data(census): refresh the Union Auction forward book (run 33953656351) (#816)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-05T08:51:53+00:00",
+      "sha": "6fc5e58",
+      "summary": "data: market-pulse swarm refresh (run 33953628454) (#817)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-05T08:17:09+00:00",
+      "sha": "2961024",
+      "summary": "docs(progress): UX loop — aria-hidden pill-foot → CTA arrow (PR #818) merged + deployed + verified",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-05T15:13:27+07:00",
+      "sha": "efee0d2",
+      "summary": "ux: pill-foot → arrow aria-hidden on command-center pillar cards (#818)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-05T07:46:01+00:00",
+      "sha": "8d7ef97",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-05, run 33953379063)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-05T06:59:58+00:00",
+      "sha": "caf329d",
+      "summary": "data: NABC live prices (2026-09-05, run 33951109093)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-05T06:21:36+00:00",
+      "sha": "8bfe132",
+      "summary": "docs(blocked-sources): record NSO own CKAN CI-reachable but staler than shipped SES 2566",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-09-05T04:10:54+00:00",
+      "sha": "a2c7b6b",
+      "summary": "service: freshness sweep (GREEN, no silent staleness) + CEO dashboard refresh to HEAD (2026-09-05)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-05T03:25:41+00:00",
       "sha": "bd6da75",
       "summary": "data: rival Facebook promo feed refresh (run 33930427627) (#813)",
@@ -657,60 +711,6 @@
       "sha": "26e7c79",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-04, run 33878664601)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-04T17:15:46+07:00",
-      "sha": "fcf8f84",
-      "summary": "service: healthy close-out + CEO dashboard refresh to HEAD (2026-09-04 b) (#805)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-04T09:39:44+00:00",
-      "sha": "d82e816",
-      "summary": "data(census): refresh the Union Auction forward book (run 33852287751) (#802)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-04T09:18:34+00:00",
-      "sha": "602e231",
-      "summary": "data: market-pulse swarm refresh (run 33852226701) (#803)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-04T08:35:23+00:00",
-      "sha": "57482d1",
-      "summary": "docs(progress): log UX-loop JS-CSV-chip aria-hidden fix (PR #804, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-04T15:34:07+07:00",
-      "sha": "51b3ccf",
-      "summary": "ux: aria-hidden the decorative ⬇ glyph on the JS-rendered CSV chips (#804)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-04T08:05:28+00:00",
-      "sha": "83df28c",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-04, run 33851610866)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-04T07:18:38+00:00",
-      "sha": "05ce264",
-      "summary": "data: NABC live prices (2026-09-04, run 33847666647)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-04T06:26:55+00:00",
-      "sha": "32d9549",
-      "summary": "docs(blocked-ledger): re-probe 2026-09-04 + correct GISTDA host row",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-04T04:14:57+00:00",
-      "sha": "05bd3ae",
-      "summary": "service: healthy close-out + CEO dashboard refresh to HEAD (2026-09-04)",
-      "pillar": "feature"
     }
   ]
 }
