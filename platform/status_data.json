@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-04T22:01:13+00:00",
-    "commit": "b769310"
+    "generated_at": "2026-09-05T03:25:41+00:00",
+    "commit": "bd6da75"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-09-04",
+    "eta_date": "2026-09-05",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-09-05T03:25:41+00:00",
+      "sha": "bd6da75",
+      "summary": "data: rival Facebook promo feed refresh (run 33930427627) (#813)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-05T02:51:01+00:00",
+      "sha": "d256f37",
+      "summary": "docs(progress): UX loop — aria-hidden pillar-card ordinal (PR #814) merged + deployed + verified",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-05T09:43:24+07:00",
+      "sha": "7f9e480",
+      "summary": "ux: aria-hide decorative pillar-card ordinal on command-center front door (#814)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-05T00:26:26+00:00",
+      "sha": "87cae8e",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-05T00:25:36+00:00",
+      "sha": "e3d7500",
+      "summary": "data: live fuel prices (2026-09-05, run 33932795924)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-05T00:25:08+00:00",
+      "sha": "ca06289",
+      "summary": "docs(progress): integration-loop re-verification — backlog saturated, record recheck triggers",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-05T00:09:42+00:00",
+      "sha": "1eb8c19",
+      "summary": "data: market-pulse swarm refresh (run 33928604483) (#812)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-04T23:06:21+00:00",
+      "sha": "a4853b8",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-04, run 33928085453)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-04T22:36:40+00:00",
+      "sha": "531c332",
+      "summary": "data: crude-oil baseline (2026-09-04, run 33926063249)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-04T22:10:40+00:00",
+      "sha": "86a0a25",
+      "summary": "service: broken-ref + catchment/heavy-JSON audit (GREEN) + CEO dashboard refresh to HEAD",
+      "pillar": "3d-enrichment"
+    },
+    {
       "date": "2026-09-04T22:01:13+00:00",
       "sha": "b769310",
       "summary": "data: Thai-IP-only swarm refresh (run 33921365326) (#811)",
@@ -651,66 +711,6 @@
       "sha": "05bd3ae",
       "summary": "service: healthy close-out + CEO dashboard refresh to HEAD (2026-09-04)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-09-04T02:19:56+00:00",
-      "sha": "233bb7a",
-      "summary": "docs: log UX-loop #ov-imfweo h2 provenance-pill 320px bleed fix (PR #801, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-04T09:13:55+07:00",
-      "sha": "b24c87a",
-      "summary": "ux: wrap #ov-imfweo h2 provenance pill on narrow phones (#801)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-04T00:59:36+00:00",
-      "sha": "4a241f5",
-      "summary": "data: rival Facebook promo feed refresh (run 33818964228) (#800)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-04T00:36:49+00:00",
-      "sha": "7129758",
-      "summary": "feat(pipeline): CI census projection for the vehicle collateral base (build_vehicle_base.py)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-04T00:26:29+00:00",
-      "sha": "a67669f",
-      "summary": "data: live fuel prices (2026-09-04, run 33821636695)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-03T23:21:42+00:00",
-      "sha": "e50dc88",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-03, run 33817112714)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-03T22:56:09+00:00",
-      "sha": "c814495",
-      "summary": "data: Thai-IP-only swarm refresh (run 33809456431) (#798)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-04T05:16:31+07:00",
-      "sha": "656f758",
-      "summary": "service: swarm audit trail records why a feed fails (persist err_tail) (#799)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-03T21:07:47+00:00",
-      "sha": "bc259b2",
-      "summary": "data: market-pulse swarm refresh (run 33792903234) (#796)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-03T20:26:39+00:00",
-      "sha": "61ee331",
-      "summary": "docs: log UX-loop exposure-provenance 320px bleed fix (PR #797, merged+deployed+verified)",
-      "pillar": "uxui"
     }
   ]
 }
