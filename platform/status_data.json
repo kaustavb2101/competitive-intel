@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-05T14:25:45+00:00",
-    "commit": "f96ffe8"
+    "generated_at": "2026-09-05T17:24:57+00:00",
+    "commit": "336d067"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,24 @@
   ],
   "activity": [
     {
+      "date": "2026-09-05T17:24:57+00:00",
+      "sha": "336d067",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-05, run 33980770030)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-05T17:03:25+00:00",
+      "sha": "e668a65",
+      "summary": "data: SET peer filings refresh (run 33975353838) (#822)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-05T23:22:28+07:00",
+      "sha": "780ec91",
+      "summary": "service: healthy close-out + deploy-integrity sweep + CEO dashboard refresh to HEAD (2026-09-05)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-09-05T14:25:45+00:00",
       "sha": "f96ffe8",
       "summary": "docs: log UX-loop run — rayong-province stub share metadata (PR #821, deployed + verified)",
@@ -693,24 +711,6 @@
       "sha": "f71aa6d",
       "summary": "data: market-pulse swarm refresh (run 33906437608) (#809)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-09-04T20:18:50+00:00",
-      "sha": "55274e0",
-      "summary": "docs(progress): log UX-loop bootReload ↻ aria-hidden fix (PR #810, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-05T03:15:27+07:00",
-      "sha": "08f5ee9",
-      "summary": "ux: aria-hidden the boot-error \"↻ Reload\" chip glyph (#810)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-04T18:29:48+00:00",
-      "sha": "57396d5",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-04, run 33906019024)",
-      "pillar": "data-integration"
     }
   ]
 }
