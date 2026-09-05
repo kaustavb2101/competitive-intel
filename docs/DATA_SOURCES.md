@@ -88,7 +88,9 @@ fresh_market 1965, supermarket 2344, pharmacy 1522, gold 769, restaurant 19409, 
   Srisawad / Muangthai / Tidlor / Krungsri.
 - `bldg_wide.json` — 3,633 raw OSM buildings for the Mueang Rayong urban box
   (lat 12.655–12.725, lng 101.155–101.310). Pulled via Overpass. **Factory zones have ~no OSM buildings.**
-- `platform/data/rayong_province.json` / `rayong_catchment.json` — the rendered payloads (derived).
+- `platform/data/provinces/<slug>.json` / `rayong_catchment.json` — the rendered payloads (derived).
+  (The standalone `rayong_province.json` was retired 2026-09-05; the per-province deep-dive is now
+  `provinces/<slug>.json` from `build_province.py`.)
 
 ## Caveats to always state
 - Reachable population in the catchment view = **dasymetric estimate** (floor-area × occupancy), not a

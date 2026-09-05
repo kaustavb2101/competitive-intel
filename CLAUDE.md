@@ -156,8 +156,9 @@ timeseries `--check` plus `node --check` on every page's JS.*
     trend anchored on newest review date IN the data, dev-reply rate, ESTIMATED Thai-lexicon
     detractor themes) + promo feed → `platform/data/rival_pulse.json`.
 - `save_competitors.py` — writes `rayong_competitors.json` (hand-curated Google Places list).
-- `pull_buildings.py`, `pull_wide.py` — Overpass building-footprint pulls. `build_platform.py` —
-  assembles the Rayong HTML pages from head + app + loader, wires the nav.
+- `pull_buildings.py`, `pull_wide.py` — Overpass building-footprint pulls. (The old
+  `build_platform.py` HTML assembler was retired 2026-09-05 — the pages are committed static and its
+  inputs no longer exist; the per-province deep-dive is now `build_province.py → provinces/<slug>.json`.)
 
 #### MEASURED layers shipped since this inventory was first written
 > This section was materially stale: the contract documented ~15 of 136 `build_*.py` scripts and none of
