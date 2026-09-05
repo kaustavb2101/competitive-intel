@@ -12,10 +12,13 @@
 > cloud sandbox on the date stamped. Re-verify any row in one paste with the probe block at the bottom —
 > a `403`/`000` that flips to `200` means the block lifted and the integration is now doable.
 
-_Last probed: **2026-09-04** (from the cloud runner). Prior probe 2026-07-17 (commit `4ca6321`) —
-every `403`/`000` status below is **unchanged** since (nothing flipped open, so no integration became
-CI-doable). The one refinement this pass: the GISTDA row was probing the *landing* host, not the API
-host the puller actually calls — corrected below._
+_Last probed: **2026-09-05** (from the cloud runner). Prior probe 2026-09-04 — every `403`/`000`
+status below is **unchanged** since (nothing flipped open, so no integration became CI-doable). The one
+refinement this pass: **NSO's own CKAN `catalog.nso.go.th` is CI-reachable (`200`)** — it was framed as
+"vendored" rather than a live department-CKAN path, so it now sits in the reachable-from-CI list below,
+**with the caveat that its household-debt vintage is staler than what the app already ships** (so it is
+reachable but not a refresh source — see that note). Earlier refinement (2026-09-04): the GISTDA row was
+probing the *landing* host, not the API host the puller actually calls._
 
 ## The one-screen summary
 
@@ -43,9 +46,23 @@ host the puller actually calls — corrected below._
 ## Reachable from CI (for contrast — all already integrated)
 
 `datagov.mot.go.th` (200), `catalog.oae.go.th`, `agriapi.nabc.go.th`, `thedocs.worldbank.org`,
-`stats.bis.org`, the Overpass mirror, DIW `diw-dataset.diw.go.th`, and the department CKANs behind the
-committed vehicle/factory/DBD/PICO layers. If a new run wants to _refresh_ these, note that most already
-have a scheduled workflow (NABC prices, fuel prices) — check `.github/workflows/` before pulling by hand.
+`stats.bis.org`, the Overpass mirror, DIW `diw-dataset.diw.go.th`, `catalog.nso.go.th` (200 — see the
+NSO note directly below), and the department CKANs behind the committed vehicle/factory/DBD/PICO layers.
+If a new run wants to _refresh_ these, note that most already have a scheduled workflow (NABC prices,
+fuel prices) — check `.github/workflows/` before pulling by hand.
+
+**NSO own CKAN `catalog.nso.go.th` — reachable from CI, but NOT a refresh source for household debt
+(verified 2026-09-05).** It returns real JSON (`success:true`) exactly like the DIW/MOT department CKANs
+— the "geo-blocked, Thai-IP-only" framing applied only to the `data.go.th` **aggregator**, not to NSO's
+own catalog, and `nso_unemployment` is already pulled from it in CI (`build_labour_context.py`). BUT the
+household-debt package `0705_08_0009` (`หนี้สินเฉลี่ยต่อครัวเรือน`) tops out at survey year **2564
+(2021)**, which is **older** than the **SES 2566 (2023)** figure the app already ships (vendored,
+`source-data/household_debt_by_province.json`, CKAN-citable via `nso-ses-debt-2566.json`). So re-pulling
+household debt from `catalog.nso.go.th` would *regress* the vintage — do not "refresh" off it. **Precise
+recheck trigger:** a per-province **SES 2566 or newer** (e.g. 2568) debt resource appearing on
+`catalog.nso.go.th` package `0705_08_0009` (or a sibling SES package) — only then is a CI-side refresh of
+the debt layer an actual improvement over the vendored file. Until then this is a live-but-staler
+mirror, logged so future runs stop treating NSO as a Thai-IP-only unlock.
 
 ## Re-verify in one paste
 
@@ -56,6 +73,7 @@ for u in \
   "https://catalog.excise.go.th/api/3/action/datastore_search?resource_id=a8d9115a-708d-420d-b796-e96b373ad1b8&limit=1" \
   "https://api.sphere.gistda.or.th/services/route/isochrone" \
   "https://opendata.nesdc.go.th/api/3/action/package_search?q=GPP&rows=1" \
+  "https://catalog.nso.go.th/api/3/action/package_show?id=0705_08_0009" \
   "https://datagov.mot.go.th/api/3/action/package_search?q=test&rows=1" ; do
   echo "$(curl -s -o /dev/null -w '%{http_code}' -m 8 -A 'Mozilla/5.0' "$u")  $u"
 done
