@@ -8,61 +8,6 @@
  },
  "runs": [
   {
-   "append_history_rc": 0,
-   "feeds": [
-    {
-     "bytes_after": 7113,
-     "bytes_before": 7113,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 3.9,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8872,
-     "bytes_before": 8872,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 4.7,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 4003,
-     "bytes_before": 4003,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 123.1,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 27439,
-     "bytes_before": 27439,
-     "key": "nabc_history",
-     "rc": 0,
-     "seconds": 125.9,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 6482,
-     "bytes_before": 6482,
-     "key": "oae_yield",
-     "rc": 1,
-     "seconds": 4.5,
-     "status": "failed"
-    }
-   ],
-   "finished": "2026-08-23T15:53:57Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 2,
-   "n_failed": 1,
-   "n_ok": 4,
-   "n_skipped": 0,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-23T15:51:51Z"
-  },
-  {
    "append_history_rc": null,
    "feeds": [
     {
@@ -3266,6 +3211,85 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-09-04T23:12:56Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7110,
+     "bytes_before": 7110,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 10.1,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 8911,
+     "bytes_before": 8911,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 5.2,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 3990,
+     "bytes_before": 3990,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 127.0,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 24189,
+     "bytes_before": 24189,
+     "key": "nabc_agri",
+     "rc": 0,
+     "seconds": 13.4,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 28213,
+     "bytes_before": 27442,
+     "key": "nabc_history",
+     "rc": 0,
+     "seconds": 129.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 1795,
+     "bytes_before": 3334,
+     "key": "macro",
+     "rc": 0,
+     "seconds": 2.3,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 7903,
+     "bytes_before": 7903,
+     "key": "oae_farm_economics",
+     "rc": 0,
+     "seconds": 14.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 79625,
+     "bytes_before": 79625,
+     "key": "place_ratings",
+     "rc": 0,
+     "seconds": 55.9,
+     "status": "ok"
+    }
+   ],
+   "finished": "2026-09-05T07:52:34Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 4,
+   "n_failed": 0,
+   "n_ok": 8,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-09-05T07:50:25Z"
   }
  ]
 }
