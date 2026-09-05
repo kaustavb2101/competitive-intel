@@ -6,8 +6,8 @@ THE QUESTION THIS ANSWERS
 -------------------------
 The 3D building scene (platform/rayong-catchment.html?city=<slug>) drops small colour-coded
 POI columns (vehicle shops, gold dealers, banks, fresh markets, …) between the buildings so a
-branch's commercial fabric is legible in 3D. Until now those pins were populated ONLY from the
-curated Rayong province file (rayong_province.json .poi) — so EVERY other province's scene
+branch's commercial fabric is legible in 3D. Those pins were once populated ONLY from a
+curated Rayong-only POI seed — so EVERY other province's scene
 (Bangkok, Chiang Mai, Phuket, …) rendered buildings but NO POI pins.
 
 This builder projects the committed national OSM POI pull into one bbox-filterable file the scene
