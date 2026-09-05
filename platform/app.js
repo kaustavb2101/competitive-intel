@@ -11567,7 +11567,7 @@ function pillCard(num,name,pc,tab,big,read,foot){
   const ext=/\.html?(\?|#|$)/.test(tab);
   const nav=ext?`href="${tab}"`:`data-v="${tab}" href="#${tab}"`;
   return `<a class="pill" style="--pc:${pc}" ${nav}>
-    <span class="pill-eyebrow"><span class="pill-num">${num}</span><span class="pill-name">${name}</span></span>
+    <span class="pill-eyebrow"><span class="pill-num" aria-hidden="true">${num}</span><span class="pill-name">${name}</span></span>
     <span class="pill-big">${big||'<small>loading…</small>'}</span>
     <span class="pill-read">${read||''}</span>
     <span class="pill-foot">${(foot||'').replace(/\s*→\s*$/,'')} →</span></a>`;
