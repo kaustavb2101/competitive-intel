@@ -18,6 +18,28 @@
      This stub keeps existing deep-links/bookmarks alive. Belt-and-suspenders with the vercel.json redirect. -->
 <meta http-equiv="refresh" content="0; url=/rayong-catchment">
 <link rel="canonical" href="/rayong-catchment">
+<!-- Share metadata: this retired stub is a real deep-link/bookmark target (its whole reason to exist),
+     but many link scrapers (Slack, LINE, Facebook) read the initial HTML head and do NOT follow the JS/
+     meta-refresh redirect — so without this block a shared /rayong-province link unfurled BARE while every
+     live route shows the branded card. Mirrors rayong-catchment.html's block (og:url points at the redirect
+     target so the unfurl consolidates onto the destination's OG object); the canonical above is reused, so
+     no second one here. -->
+<meta name="description" content="AutoX (เงินไชโย) 3D catchment — an Overture building scene for any province: reachable population and competitive pressure around the title-loan branches AutoX already runs. Numbers tagged measured or estimated.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AutoX · เงินไชโย">
+<meta property="og:title" content="3D catchment · AutoX · เงินไชโย">
+<meta property="og:url" content="https://competitive-intel-blue.vercel.app/rayong-catchment">
+<meta property="og:description" content="An Overture 3D building scene for any province — reachable population and rival pressure around the branches AutoX already runs. Numbers tagged measured or estimated.">
+<meta property="og:image" content="https://competitive-intel-blue.vercel.app/og-card.png"><!-- shared brand share-card (1200x630, static, same-origin — no CDN); absolute URL so scrapers that don't resolve relative paths still unfurl it -->
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AutoX · เงินไชโย — Credit Intelligence: competitive- and portfolio-risk across all 2,015 title-loan branches.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://competitive-intel-blue.vercel.app/og-card.png">
+<meta name="twitter:image:alt" content="AutoX · เงินไชโย — Credit Intelligence: competitive- and portfolio-risk across all 2,015 title-loan branches.">
+<meta name="twitter:title" content="3D catchment · AutoX · เงินไชโย">
+<meta name="twitter:description" content="Overture 3D building scene for any province — reachable population and competitive pressure around AutoX branches. Numbers tagged measured or estimated.">
 <style>
 html[data-theme="dark"]{background:#070a11;color:#c7cedd}
 html[data-theme="light"]{background:#f3f0ea;color:#11151f}
