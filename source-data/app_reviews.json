@@ -3,7 +3,7 @@
   "title": "Title-lender app sentiment — Google Play ratings + newest reviews (incl. our own)",
   "generated_by": "pipeline/pull_app_reviews.py",
   "label": "MEASURED — Google Play store pages (th/th). Star histogram + dated public reviews; review store accumulates across pulls (dedup by reviewId, newest 1500 kept per app).",
-  "pulled_at": "2026-09-04"
+  "pulled_at": "2026-09-05"
  },
  "apps": {
   "AUTOX": {
@@ -1705,21 +1705,29 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.7196703,
-    "ratings": 16976,
-    "reviews_total": 5263,
+    "score": 4.715715,
+    "ratings": 16988,
+    "reviews_total": 5265,
     "installs": "1,000,000+",
     "histogram": [
-     499,
+     519,
      169,
-     459,
-     1329,
-     14516
+     469,
+     1299,
+     14528
     ],
     "app_updated": "2026-08-06",
     "version": "3.2.0"
    },
    "reviews_store": [
+    {
+     "id": "82b2188f-9891-40fd-91a7-7f43c7139a5f",
+     "at": "2026-09-04",
+     "score": 5,
+     "content": "เป็นสินเชื่อไฟแนน ที่ดีแนะนำเลย",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "fe71c849-d37e-4cf0-9f4b-66aa60fe0a95",
      "at": "2026-09-03",
@@ -6031,21 +6039,29 @@
    "name": "เมืองไทย แคปปิตอล",
    "own": false,
    "stats": {
-    "score": 4.6785164,
-    "ratings": 6504,
-    "reviews_total": 2153,
+    "score": 4.6774693,
+    "ratings": 6507,
+    "reviews_total": 2155,
     "installs": "1,000,000+",
     "histogram": [
-     261,
-     70,
-     201,
-     432,
-     5538
+     260,
+     69,
+     200,
+     441,
+     5532
     ],
     "app_updated": "2026-08-18",
     "version": "2.5.114"
    },
    "reviews_store": [
+    {
+     "id": "3929d966-fb18-44da-b88d-f691b4f3ad4d",
+     "at": "2026-09-04",
+     "score": 5,
+     "content": "ดีมาก",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "85d0dbd1-2712-461d-9aae-2b74486b0724",
      "at": "2026-08-30",
@@ -7981,21 +7997,29 @@
    "name": "ศรีสวัสดิ์",
    "own": false,
    "stats": {
-    "score": 4.5390625,
-    "ratings": 2462,
-    "reviews_total": 867,
+    "score": 4.5271316,
+    "ratings": 2464,
+    "reviews_total": 868,
     "installs": "500,000+",
     "histogram": [
-     134,
-     48,
+     143,
+     47,
      76,
-     297,
-     1903
+     295,
+     1900
     ],
     "app_updated": "2026-07-01",
     "version": "1.0.60"
    },
    "reviews_store": [
+    {
+     "id": "1edaa279-2eb2-4eb3-9bad-4604a6a6ffc1",
+     "at": "2026-09-04",
+     "score": 1,
+     "content": "เอายอดดอกเบี้ย​ที่ค้างจากสัญญา​เดิมมาห้อย​สัญญา​นี้โดยไม่แจ้ง.ปิดยอดจะรีใหม่กลับกลายเป็นต้องชำระค่าปรับเพิ่มพนักงานสาขา... สุดๆระวังกันด้วนนะเตือนก่อนเลยขอสัญญาทุกครั้งที่ทำกับ​บ. นี้ถ่ายสำเนาก็ได้ไม่งั้นมีค่าปรับบวกมาไม่รู้ตัว...",
+     "thumbs": 0,
+     "replied": true
+    },
     {
      "id": "81897320-cc4f-4fc3-9fd8-f564cff4ea7d",
      "at": "2026-09-03",
@@ -10094,8 +10118,8 @@
      32,
      622
     ],
-    "app_updated": "2026-08-07",
-    "version": "1.0.61-ngernturbo"
+    "app_updated": "2026-08-24",
+    "version": "1.0.62-ngernturbo"
    },
    "reviews_store": [
     {
@@ -13181,21 +13205,45 @@
    "name": "Good Money เงินดีดี (GSB)",
    "own": false,
    "stats": {
-    "score": 3.7880597,
-    "ratings": 3243,
-    "reviews_total": 1427,
+    "score": 3.7730062,
+    "ratings": 3249,
+    "reviews_total": 1430,
     "installs": "1,000,000+",
     "histogram": [
-     696,
-     183,
-     145,
-     299,
-     1915
+     726,
+     169,
+     139,
+     288,
+     1922
     ],
     "app_updated": "2026-08-11",
     "version": "1.0.45"
    },
    "reviews_store": [
+    {
+     "id": "b6f0c054-69a8-429a-bee6-de5a598256f7",
+     "at": "2026-09-04",
+     "score": 5,
+     "content": "สมัครไม่ผ่านครับและไม่ให้หมายเลขบัตรประชาชนลงท้าย4หลักให้นำไปใช้ในทางที่ผิด ลงท้ายด้วย6700ถ้าเกิดอะไรขึ้นผมจะดำเนินคดีตามกฎหมาย",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "4f08209f-5455-41b1-9d69-88eef7019783",
+     "at": "2026-09-04",
+     "score": 2,
+     "content": "สมัครโครตยาก จะเอาโนันเอานี่พอหามาให้ ไม่ผ่าน สมัครไปหลายทีอัพสเตทเม้นท์ ไม่ได้อัพหมดแล้วบอกยังไม่หมด มั้วมาก",
+     "thumbs": 0,
+     "replied": true
+    },
+    {
+     "id": "498f3baa-d18b-4dcf-9687-9f943145f99b",
+     "at": "2026-09-04",
+     "score": 1,
+     "content": "ไม่อนุญาตให้นำเลขบัตรประชาชนที่ลงท้าย7070 ไปเผยแพร่หรือทำธุรกรรมอื่น",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "6c531a71-f011-4f4e-ab92-064d2212c5d4",
      "at": "2026-09-03",
@@ -16225,21 +16273,29 @@
    "name": "GO by Krungsri Auto",
    "own": false,
    "stats": {
-    "score": 4.405844,
-    "ratings": 9324,
-    "reviews_total": 3808,
+    "score": 4.403452,
+    "ratings": 9327,
+    "reviews_total": 3809,
     "installs": "1,000,000+",
     "histogram": [
-     715,
-     252,
-     504,
-     907,
+     723,
+     251,
+     502,
+     905,
      6942
     ],
     "app_updated": "2026-08-19",
     "version": "8.6.0"
    },
    "reviews_store": [
+    {
+     "id": "5c652a13-f305-4522-94c6-c7c7c22f237c",
+     "at": "2026-09-04",
+     "score": 1,
+     "content": "เปิดได้บ้างไม่ได้บ้าง",
+     "thumbs": 0,
+     "replied": true
+    },
     {
      "id": "f8654d49-1c70-4d53-8ce2-0f837a401997",
      "at": "2026-08-31",
@@ -16413,7 +16469,7 @@
      "at": "2026-07-18",
      "score": 4,
      "content": "บอกรายละเอียดของการทำธุรกรรมดี",
-     "thumbs": 7,
+     "thumbs": 8,
      "replied": true
     },
     {

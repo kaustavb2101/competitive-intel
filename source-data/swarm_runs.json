@@ -11,125 +11,6 @@
    "append_history_rc": 0,
    "feeds": [
     {
-     "bytes_after": 1443,
-     "bytes_before": 1443,
-     "key": "fuel_prices",
-     "rc": 0,
-     "seconds": 1.6,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 7109,
-     "bytes_before": 7109,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 3.7,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8869,
-     "bytes_before": 8869,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 4.0,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 4003,
-     "bytes_before": 4003,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 114.8,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 24189,
-     "bytes_before": 24189,
-     "key": "nabc_agri",
-     "rc": 0,
-     "seconds": 13.5,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 1797,
-     "bytes_before": 3237,
-     "key": "macro",
-     "rc": 0,
-     "seconds": 5.2,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 6482,
-     "bytes_before": 6482,
-     "key": "oae_yield",
-     "rc": 1,
-     "seconds": 4.9,
-     "status": "failed"
-    },
-    {
-     "bytes_after": 7903,
-     "bytes_before": 7903,
-     "key": "oae_farm_economics",
-     "rc": 0,
-     "seconds": 11.8,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 634173,
-     "bytes_before": 628473,
-     "key": "app_reviews",
-     "rc": 0,
-     "seconds": 5.6,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 2533987,
-     "bytes_before": 2526174,
-     "key": "apple_reviews",
-     "rc": 0,
-     "seconds": 142.8,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 498700,
-     "bytes_before": 498698,
-     "key": "rival_youtube",
-     "rc": 0,
-     "seconds": 31.5,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 1407014,
-     "bytes_before": 1407014,
-     "key": "google_ads",
-     "rc": 3,
-     "seconds": 334.0,
-     "status": "skipped"
-    },
-    {
-     "bytes_after": 79625,
-     "bytes_before": 79625,
-     "key": "place_ratings",
-     "rc": 0,
-     "seconds": 56.3,
-     "status": "ok"
-    }
-   ],
-   "finished": "2026-08-23T21:54:24Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 8,
-   "n_failed": 1,
-   "n_ok": 11,
-   "n_skipped": 1,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-23T21:48:40Z"
-  },
-  {
-   "append_history_rc": 0,
-   "feeds": [
-    {
      "bytes_after": 7108,
      "bytes_before": 7109,
      "key": "thaiwater_flood",
@@ -3282,6 +3163,69 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-09-05T13:00:18Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 1443,
+     "bytes_before": 1443,
+     "key": "fuel_prices",
+     "rc": 0,
+     "seconds": 1.5,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 6611,
+     "bytes_before": 6611,
+     "key": "oae_yield",
+     "rc": 0,
+     "seconds": 10.9,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 685687,
+     "bytes_before": 682810,
+     "key": "app_reviews",
+     "rc": 0,
+     "seconds": 5.0,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 2583151,
+     "bytes_before": 2581328,
+     "key": "apple_reviews",
+     "rc": 0,
+     "seconds": 118.6,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 500106,
+     "bytes_before": 500123,
+     "key": "rival_youtube",
+     "rc": 0,
+     "seconds": 29.9,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 1428529,
+     "bytes_before": 1425119,
+     "key": "google_ads",
+     "rc": 0,
+     "seconds": 322.1,
+     "status": "changed"
+    }
+   ],
+   "finished": "2026-09-05T17:37:46Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 5,
+   "n_failed": 0,
+   "n_ok": 6,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-09-05T17:32:24Z"
   }
  ]
 }
