@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-05T17:24:57+00:00",
-    "commit": "336d067"
+    "generated_at": "2026-09-05T20:14:43+00:00",
+    "commit": "c58b8dd"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,30 @@
   ],
   "activity": [
     {
+      "date": "2026-09-05T20:14:43+00:00",
+      "sha": "c58b8dd",
+      "summary": "docs: log UX-loop aria-hidden nav-arrow fix (PR #825, deploy-verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-06T03:11:48+07:00",
+      "sha": "285321b",
+      "summary": "ux: aria-hidden decorative → on command-center & story-next nav links (#825)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-05T19:08:29+00:00",
+      "sha": "7d005e9",
+      "summary": "data: market-pulse swarm refresh (run 33981252390) (#824)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-05T18:25:44+00:00",
+      "sha": "79aed4c",
+      "summary": "service: mechanical saturation proof + CEO dashboard refresh to HEAD (2026-09-05)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-05T17:24:57+00:00",
       "sha": "336d067",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-05, run 33980770030)",
@@ -687,30 +711,6 @@
       "sha": "a4853b8",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-04, run 33928085453)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-04T22:36:40+00:00",
-      "sha": "531c332",
-      "summary": "data: crude-oil baseline (2026-09-04, run 33926063249)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-04T22:10:40+00:00",
-      "sha": "86a0a25",
-      "summary": "service: broken-ref + catchment/heavy-JSON audit (GREEN) + CEO dashboard refresh to HEAD",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-04T22:01:13+00:00",
-      "sha": "b769310",
-      "summary": "data: Thai-IP-only swarm refresh (run 33921365326) (#811)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-04T21:03:13+00:00",
-      "sha": "f71aa6d",
-      "summary": "data: market-pulse swarm refresh (run 33906437608) (#809)",
-      "pillar": "market"
     }
   ]
 }
