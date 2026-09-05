@@ -11,61 +11,6 @@
    "append_history_rc": 0,
    "feeds": [
     {
-     "bytes_after": 7108,
-     "bytes_before": 7109,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 5.8,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8876,
-     "bytes_before": 8876,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 6.3,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 4003,
-     "bytes_before": 4003,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 143.3,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 6482,
-     "bytes_before": 6482,
-     "key": "oae_yield",
-     "rc": 1,
-     "seconds": 5.9,
-     "status": "failed"
-    },
-    {
-     "bytes_after": 1407014,
-     "bytes_before": 1407014,
-     "key": "google_ads",
-     "rc": 3,
-     "seconds": 329.3,
-     "status": "skipped"
-    }
-   ],
-   "finished": "2026-08-24T04:29:35Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 2,
-   "n_failed": 1,
-   "n_ok": 3,
-   "n_skipped": 1,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-24T04:24:06Z"
-  },
-  {
-   "append_history_rc": 0,
-   "feeds": [
-    {
      "bytes_after": 7110,
      "bytes_before": 7110,
      "key": "thaiwater_flood",
@@ -3226,6 +3171,45 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-09-05T17:32:24Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7107,
+     "bytes_before": 7107,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 4.2,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8922,
+     "bytes_before": 8922,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 4.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 3990,
+     "bytes_before": 3990,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 146.4,
+     "status": "ok"
+    }
+   ],
+   "finished": "2026-09-05T23:13:37Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 2,
+   "n_failed": 0,
+   "n_ok": 3,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-09-05T23:11:10Z"
   }
  ]
 }
