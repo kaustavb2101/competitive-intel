@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-05T09:41:59+00:00",
-    "commit": "df00456"
+    "generated_at": "2026-09-05T14:25:45+00:00",
+    "commit": "f96ffe8"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,42 @@
   ],
   "activity": [
     {
+      "date": "2026-09-05T14:25:45+00:00",
+      "sha": "f96ffe8",
+      "summary": "docs: log UX-loop run — rayong-province stub share metadata (PR #821, deployed + verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-05T21:23:08+07:00",
+      "sha": "b5044fa",
+      "summary": "ux: share-card metadata on the retired rayong-province stub (#821)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-05T13:52:20+00:00",
+      "sha": "9799931",
+      "summary": "data: market-pulse swarm refresh (run 33967607846) (#820)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-05T13:29:40+00:00",
+      "sha": "6451066",
+      "summary": "chore(pipeline): retire the rayong_province.json orphan + dead build_platform.py (#819)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-05T12:46:19+00:00",
+      "sha": "6207564",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-05, run 33966891929)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-05T10:10:53+00:00",
+      "sha": "e870c3c",
+      "summary": "service: healthy close-out + CEO dashboard refresh to HEAD (2026-09-05 d)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-05T09:41:59+00:00",
       "sha": "df00456",
       "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 33952594874) (#815)",
@@ -674,42 +710,6 @@
       "date": "2026-09-04T18:29:48+00:00",
       "sha": "57396d5",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-04, run 33906019024)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-04T16:16:10+00:00",
-      "sha": "830c53b",
-      "summary": "service: healthy close-out + CEO dashboard refresh to HEAD (2026-09-04 c)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-04T15:28:13+00:00",
-      "sha": "bfc8e87",
-      "summary": "data: SET listed-peer scoreboard refresh (run 33886530490) (#808)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-04T15:08:25+00:00",
-      "sha": "fc631fc",
-      "summary": "data: market-pulse swarm refresh (run 33879637707) (#806)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-04T14:33:08+00:00",
-      "sha": "bff3c4e",
-      "summary": "docs(progress): log UX-loop Explore-nav-button aria-hidden fix (PR #807, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-04T21:24:44+07:00",
-      "sha": "9bd7abb",
-      "summary": "ux: hide decorative ▾ from \"Explore\" nav-button accessible name (#807)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-04T13:34:44+00:00",
-      "sha": "26e7c79",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-04, run 33878664601)",
       "pillar": "data-integration"
     }
   ]
