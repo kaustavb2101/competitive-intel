@@ -18,15 +18,19 @@ committed inputs, so it covers all 2,015 branches with no optional-anchor skip p
   platform/data/crop_stress.json   per-province MEASURED components: OAE crop-mix
                                    planting-area shares, crop_dependence, drought (0..1
                                    from measured rain_3mo_anom), rain_pct_of_normal.
-  source-data/commodity_board.json REAL World Bank Pink Sheet price YoY (Rice, Rubber,
-                                   Palm oil, Gold) — GLOBAL direction proxy, NOT Thai
-                                   farm-gate.
+  source-data/farmgate_prices.json REAL MEASURED Thai FARM-GATE price YoY (paddy / raw
+                                   rubber sheet / fresh palm bunch) — NABC daily national
+                                   average, the price the farmer actually receives. This is
+                                   the PRIMARY price base (CLAUDE.md policy + build_crop_stress.py).
+  source-data/commodity_board.json REAL World Bank Pink Sheet price YoY — GLOBAL direction
+                                   proxy, used as FALLBACK only for a crop the farm-gate
+                                   feed does not price.
 
 MEASURED vs ESTIMATED (stated in meta + repeated in the UI chip)
 ----------------------------------------------------------------
-  MEASURED   price YoY signals (Pink Sheet, global proxy), province crop-mix shares +
-             crop_dependence (OAE planting area), drought / rain % of normal (rainfall),
-             gold shops ≤10km (OSM count).
+  MEASURED   price YoY signals (Thai farm-gate, NABC — GLOBAL Pink Sheet fallback only),
+             province crop-mix shares + crop_dependence (OAE planting area), drought / rain
+             % of normal (rainfall), gold shops ≤10km (OSM count).
   ESTIMATED  the branch relevance weights: segment scores `a` / `c` are themselves
              estimated 0-100 screens, and the driver formula that combines signal ×
              relevance is editorial credit judgement.
@@ -81,6 +85,9 @@ DATA = os.path.join(ROOT, "platform", "data")
 BRANCHES = os.path.join(DATA, "branches.json")
 CROP = os.path.join(DATA, "crop_stress.json")
 BOARD = os.path.join(ROOT, "source-data", "commodity_board.json")
+# The MEASURED Thai FARM-GATE price layer — PRIMARY over the GLOBAL Pink Sheet for the crops it
+# prices (paddy / raw rubber sheet / fresh palm bunch). Same file build_crop_stress.py prefers.
+FARMGATE = os.path.join(ROOT, "source-data", "farmgate_prices.json")
 OUT = os.path.join(DATA, "macro_sensitivity.json")
 sys.path.insert(0, HERE)
 from lib.regionmap import canonical
@@ -90,8 +97,10 @@ from lib.fingerprint import branches_fingerprint
 # NOTE: gold is deliberately excluded — AutoX lends against vehicle titles, not gold, so gold
 # price / gold-shop presence is NOT a driver of the book.
 DRIVER_ORDER = ("rice", "rubber", "palm", "drought")
-# Pink Sheet board row per price driver (source-data/commodity_board.json "lab").
+# Pink Sheet board row per price driver (source-data/commodity_board.json "lab") — FALLBACK base.
 BOARD_LAB = {"rice": "Rice", "rubber": "Rubber", "palm": "Palm oil"}
+# crop driver -> crop_yoy key in farmgate_prices.json (Thai farm-gate MEASURED, PRIMARY base).
+FARMGATE_KEY = {"rice": "rice", "rubber": "rubber", "palm": "oilpalm"}
 # crop_stress.json crop_mix crop name per crop driver.
 CROP_NAME = {"rice": "Rice", "rubber": "Rubber", "palm": "Oil palm"}
 # |YoY| of 25% == full severity 1.0 — same denominator as build_crop_stress.py price_term.
@@ -129,20 +138,50 @@ def build():
     vintages = sorted({r.get("stale") for r in board if r.get("stale")})
     price_vintage = vintages[-1] if vintages else None
 
-    # ── measured price signals per driver ───────────────────────────────────
+    # ── PREFER the dedicated MEASURED Thai FARM-GATE layer over the GLOBAL Pink Sheet proxy ──
+    # farmgate_prices.json.crop_yoy carries daily national-average Thai farm-gate YoY for the raw
+    # farm-commodity forms of exactly these crops (paddy / raw rubber sheet / fresh palm bunch).
+    # CLAUDE.md's stated policy — and build_crop_stress.py's price_stress — treat farm-gate as the
+    # PRIMARY price base and the World Bank GLOBAL Pink Sheet as fallback-only, for crops the
+    # farm-gate feed does not price. This builder now follows the same policy so both sibling
+    # agri-risk reads share ONE price base. Absent file => every driver falls back to the Pink
+    # Sheet, and the output is byte-identical to the pre-farmgate vintage (--check stays green).
+    farmgate = _load(FARMGATE) if os.path.exists(FARMGATE) else None
+    fg_yoy = ((farmgate or {}).get("crop_yoy") or {})
+    fg_vintage = ((farmgate or {}).get("meta") or {}).get("vintage")
+
+    # ── measured price signals per driver (Thai farm-gate first, GLOBAL Pink Sheet fallback) ──
     signals = {}
     for k, lab in BOARD_LAB.items():
-        row = by_lab[lab]
-        yoy = float(row["yoy"])
-        signals[k] = {
-            "label": DRIVER_LABELS[k],
-            "yoy_pct": yoy,
-            "dir": "t" if yoy > 0 else "h",   # price up = supports income/collateral
-            "vintage": row.get("stale"),
-            "source": "World Bank Pink Sheet via source-data/commodity_board.json ('%s')" % lab,
-            "provenance": "MEASURED — GLOBAL price YoY %, a direction proxy, NOT Thai farm-gate",
-            "ctx_label": CTX_LABELS[k],
-        }
+        fg = fg_yoy.get(FARMGATE_KEY[k])
+        if isinstance(fg, (int, float)):
+            yoy = float(fg)
+            signals[k] = {
+                "label": DRIVER_LABELS[k],
+                "yoy_pct": yoy,
+                "dir": "t" if yoy > 0 else "h",   # price up = supports income/collateral
+                "vintage": fg_vintage,
+                "basis": "farmgate",
+                "source": "Thai farm-gate daily national average via source-data/farmgate_prices.json "
+                          "crop_yoy['%s'] (NABC agriapi.nabc.go.th)" % FARMGATE_KEY[k],
+                "provenance": "MEASURED — Thai FARM-GATE price YoY %, the price the farmer receives",
+                "ctx_label": CTX_LABELS[k],
+            }
+        else:
+            row = by_lab[lab]
+            yoy = float(row["yoy"])
+            signals[k] = {
+                "label": DRIVER_LABELS[k],
+                "yoy_pct": yoy,
+                "dir": "t" if yoy > 0 else "h",   # price up = supports income/collateral
+                "vintage": row.get("stale"),
+                "basis": "global",
+                "source": "World Bank Pink Sheet via source-data/commodity_board.json ('%s') — "
+                          "fallback: this crop is absent from farmgate_prices.json" % lab,
+                "provenance": "MEASURED — GLOBAL price YoY %, a direction proxy, NOT Thai farm-gate "
+                              "(fallback base — no Thai farm-gate quote for this crop)",
+                "ctx_label": CTX_LABELS[k],
+            }
     signals["drought"] = {
         "label": DRIVER_LABELS["drought"],
         "dir": "h",  # rainfall deficit only ever hurts farm cash flow
@@ -237,14 +276,19 @@ def build():
         "generated_by": "pipeline/build_macro_sensitivity.py",
         "deterministic": True,
         "network_free": True,
-        "label": "ESTIMATED PROXY OVER MEASURED INPUTS — real Pink Sheet price YoY (GLOBAL direction "
-                 "proxy, not Thai farm-gate) and measured OAE crop shares / rainfall, combined through "
-                 "ESTIMATED branch relevance weights (segment score a is an estimated 0-100 screen). A "
-                 "ranking of which macro lever moves each branch's book — NOT a measured elasticity or "
-                 "default rate. Gold is excluded: AutoX lends against vehicle titles, not gold.",
+        "label": "ESTIMATED PROXY OVER MEASURED INPUTS — real MEASURED Thai farm-gate price YoY (NABC "
+                 "daily national average; World Bank Pink Sheet GLOBAL proxy is fallback only, for crops "
+                 "the farm-gate feed does not price) and measured OAE crop shares / rainfall, combined "
+                 "through ESTIMATED branch relevance weights (segment score a is an estimated 0-100 "
+                 "screen). A ranking of which macro lever moves each branch's book — NOT a measured "
+                 "elasticity or default rate. Gold is excluded: AutoX lends against vehicle titles, not gold.",
         "provenance": {
-            "price_signals": "MEASURED — World Bank Pink Sheet YoY via source-data/commodity_board.json "
-                             "(vintage %s). GLOBAL prices, a direction proxy, NOT Thai farm-gate." % price_vintage,
+            "price_signals": "MEASURED — Thai FARM-GATE price YoY (the price the farmer receives) via "
+                             "source-data/farmgate_prices.json crop_yoy (NABC, vintage %s), PRIMARY for "
+                             "rice/rubber/palm; World Bank Pink Sheet GLOBAL proxy "
+                             "(source-data/commodity_board.json, vintage %s) is fallback-only for a crop "
+                             "with no farm-gate quote. Each driver stamps its own basis "
+                             "(meta.drivers[k].basis = 'farmgate' | 'global')." % (fg_vintage, price_vintage),
             "crop_shares": "MEASURED — OAE planting-area shares per province (platform/data/crop_stress.json crop_mix)",
             "drought": "MEASURED PROXY — 3-month rainfall %% of normal (crop_stress.json components.rain_pct_of_normal)",
             "relevance_weights": "ESTIMATED — branch agri segment score (branches.json a, "
@@ -269,6 +313,7 @@ def build():
         "driver_keys": list(DRIVER_ORDER),
         "drivers": {k: signals[k] for k in DRIVER_ORDER},
         "price_vintage": price_vintage,
+        "farmgate_vintage": fg_vintage,
         "n_branches": len(out),
         "n_provinces": len(provinces),
         "branches_fingerprint": branches_fingerprint(branches),
