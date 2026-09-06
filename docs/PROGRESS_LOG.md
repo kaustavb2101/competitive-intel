@@ -4,6 +4,39 @@ Reverse-chronological. Most recent first. "Decision" entries explain *why* a pat
 don't re-litigate settled choices.
 
 ## 2026-09-05 (Intelligence loop / MARKET + SERVICE + PEER + DEPLOY-HEALTH + PLANNING — healthy close-out + CEO-dashboard refresh to HEAD) — Ran the full five-pillar sweep; **GREEN across all five, no CI-fixable data/app gap, so no forced fix shipped** (standing precedent: refuse to manufacture a marginal edit on a saturated tree). The one legitimate state change was the CEO-dashboard refresh to HEAD.
+
+## 2026-09-06 (Integration loop — NEW MEASURED LAYER: NSO 2023 Agricultural Census agri-holder debt & lender-source mix, per province; obj #1 + #2) — PR
+**What shipped:** a genuinely new MEASURED, all-77-province layer — `platform/data/nso_agri_debt.json`
+(`build_nso_agri_debt.py`, deterministic + `--check`-gated) — projected from a committed snapshot of the
+NSO Agricultural Census 2566/2023 (`source-data/nso/agri_debt_2566.json`, pulled by the new
+`pull_nso_agri_debt.py`). Per province it carries: agri-holder count, holders reporting/having debt,
+**debt incidence** (obj #1), and the full **lender-source mix** — BAAC vs cooperatives vs village funds
+vs other FIs vs high-cost informal (moneylenders + crop middlemen + private shops). Surfaced as the new
+National-map province lens **`agc` "Informal agri-credit reliance"** (mirrors the `hhdti`/`pstress`
+province-choropleth machinery), with a rich province popup showing the full mix + the debt-holder count
+`n` so the % is always read against its denominator.
+- **Why (both objectives):** where farm households lean on high-cost informal credit is simultaneously a
+  borrower-distress signal (portfolio risk) and the space a licensed non-bank lender competes in
+  (competitive risk) — a landscape read on the borrower base of the network we already run. It makes
+  **no** open/close/expand recommendation (mandate_guard green).
+- **Why it was open:** competitor/rival layers were rich, but nothing showed *where farmers actually
+  borrow*. The FPO PICO registry, DBD/vehicle/SFI distillations and per-branch cropland were all already
+  done; a negative-space sweep confirmed the CI-reachable data-pull backlog is otherwise exhausted
+  (GISTDA flood-AREA needs shapely + the portal is proxy-denied here; DLT still Feb-2026, no newer
+  vintage; excise/OSMEP/BAAC/smebank Thai-IP-blocked). The NSO datastore JSON API
+  (`catalogapi.nso.go.th`, browser-UA) IS reachable from CI, and its province names match the canonical
+  77 **exactly** (0 diff) — a clean, robust join.
+- **Provenance:** MEASURED (full-count census); every share is an exact ratio of two MEASURED counts.
+  Caveat surfaced in-app + in meta: holders may report several sources (shares don't sum to 100%);
+  peri-urban provinces with tiny farm populations are noisy — read the % with `n`. `build_provenance.py`
+  re-run (151 layers · 88 MEASURED / 63 ESTIMATED / 0 unlabelled); CLAUDE.md census sentence updated.
+- **Verify:** `bash tests/run.sh check` → **158 passed, 0 failed** (incl. `build_nso_agri_debt.py --check`
+  byte-exact, orphan_layers, dangling-reference, provenance, `check_provenance_doc`). Headless smoke test
+  (chromium) of `#map` and `?lens=agc#map`: page boots, lens pill present, legend renders
+  ("measured · NSO Ag Census 2566"), no console errors. Shipped as a PR (app-facing change).
+- **Next recommended integration:** surface the layer's second dimension — **agri debt INCIDENCE** (obj #1,
+  robust, large-n everywhere) — as its own province lens or an Exposure-tab readout; the JSON already
+  carries `debt_incidence` per province, so it's a pure app-surfacing follow-up (no new pull).
 - **PEER pillar re-confirmed exhaustively saturated (read the layer, not just asserted).** `peer_province.json` already carries, per all 77 provinces, the MEASURED AutoX branch count beside each big-4 rival brand separately (`by_brand{Heng/Muangthai/Srisawad/Tidlor}`), plus rival:AutoX ratio, leader, `autox_rank` of `n_ranked`, rival-concentration, the distinct MEASURED licensed-PICO class as its own column, DLT vehicle stock, and the `*_per_100k_veh` saturation reads with the Greater-Bangkok central-registration artifact flagged and excluded — every field labelled MEASURED/COMPUTED with the big-4-only census caveat. No honest peer field remains unshipped; `competitor_coverage.json` carries the national per-brand found-vs-expected roll-up.
 - **MARKET + SERVICE sweeps — GREEN.** New-layer audit `git diff --name-status 79aed4c..HEAD -- 'platform/data/*'` (3 commits) → **0 additions**; the 10 changed data files are all value refreshes (market-pulse `#824`, SET peer filings `#822`, ThaiWater flood/rain, live/rate boards, rival ads/pulse/universe/watch/youtube, social_themes, provenance) — none landed a new layer dark, so no surfacing or `build_provenance.py` re-run owed. **Freshness sweep:** the only layers ≥60d old are all upstream-vintage-by-design and documented — `vehicle_collateral`/`ev_penetration` (DLT 2026-02-28 registry snapshot), `pico_census`/`pico_district` (FPO 2026-05-22 registry snapshot), `peer_asset_quality` (SET 2026-06-30 quarterly filing), `competitors_census` (2026-07-04 scout/owner-side pull) — none CI-refreshable, nothing aged by neglect. **Catchment coverage:** 3 of 77 (bangkok / chiang-mai / rayong) — the documented owner-side gap (per-province Overture pulls from the desktop; the scene shows a CALM "not pulled yet" notice, never crashes), not CI-fixable; the 77-province deep-dive `provinces/<slug>.json` set is complete.
 - **Feed-health:** `source-data/swarm_runs.json` → last 5 runs `n_failed:0 / n_timeout:0` (latest 2026-09-05T17:32:24Z). **Provenance:** `--check`-gated within the determinism gate, reproduces exactly.

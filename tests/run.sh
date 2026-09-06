@@ -550,6 +550,7 @@ INGESTS
   fi
   ( cd "$PIPE" && python3 ingest_tmli.py --check >/dev/null 2>&1 ) && ok "ingest_tmli.py --check" || bad "ingest_tmli.py --check (TMLI measured province layers drifted from source-data/tmli/)"
   ( cd "$PIPE" && python3 build_household_risk.py --check >/dev/null 2>&1 ) && ok "build_household_risk.py --check" || bad "build_household_risk.py --check (household_risk_by_province.json drifted from source-data NSO SES layers)"
+  ( cd "$PIPE" && python3 build_nso_agri_debt.py --check >/dev/null 2>&1 ) && ok "build_nso_agri_debt.py --check" || bad "build_nso_agri_debt.py --check (nso_agri_debt.json drifted from source-data/nso/agri_debt_2566.json — run: python3 pipeline/build_nso_agri_debt.py)"
   ( cd "$PIPE" && python3 build_occupation_income.py --check >/dev/null 2>&1 ) && ok "build_occupation_income.py --check" || bad "build_occupation_income.py --check (occupation_income.json drifted from source-data/household_income_by_province.json)"
   ( cd "$PIPE" && python3 build_factory_income.py --check >/dev/null 2>&1 ) && ok "build_factory_income.py --check" || bad "build_factory_income.py --check (factory_income_by_province.json drifted from source-data/household_income_by_province.json)"
   ( cd "$PIPE" && python3 build_agri_income.py --check >/dev/null 2>&1 ) && ok "build_agri_income.py --check" || bad "build_agri_income.py --check (agri_income_by_province.json drifted from source-data/household_income_by_province.json)"
