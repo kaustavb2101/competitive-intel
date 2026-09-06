@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-05T20:14:43+00:00",
-    "commit": "c58b8dd"
+    "generated_at": "2026-09-06T09:19:31+07:00",
+    "commit": "e980ef4"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-09-05",
+    "eta_date": "2026-09-06",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-09-06T09:19:31+07:00",
+      "sha": "e980ef4",
+      "summary": "docs: PROGRESS_LOG entry for the data.html nav-arrow a11y fix (PR #829) (#830)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-06T09:15:04+07:00",
+      "sha": "12ce41d",
+      "summary": "ux: aria-hide decorative trailing → on data.html nav links (#829)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-06T01:50:07+00:00",
+      "sha": "f38d949",
+      "summary": "data: rival Facebook promo feed refresh (run 33998930005) (#827)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-06T01:25:03+00:00",
+      "sha": "2776dc6",
+      "summary": "data: NSO 2023 Agricultural Census — per-province agri-debt & lender-source mix (obj #1 + #2) (#828)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-06T00:14:28+00:00",
+      "sha": "1467179",
+      "summary": "data: live fuel prices (2026-09-06, run 34000658945)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-05T23:57:01+00:00",
+      "sha": "d34c569",
+      "summary": "data: market-pulse swarm refresh (run 33997960313) (#826)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-05T23:01:11+00:00",
+      "sha": "7f22512",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-05, run 33997420942)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-05T22:14:07+00:00",
+      "sha": "536017b",
+      "summary": "service: five-pillar healthy close-out + CEO dashboard refresh to HEAD (2026-09-05)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-05T20:14:43+00:00",
       "sha": "c58b8dd",
       "summary": "docs: log UX-loop aria-hidden nav-arrow fix (PR #825, deploy-verified)",
@@ -663,54 +711,6 @@
       "sha": "a2c7b6b",
       "summary": "service: freshness sweep (GREEN, no silent staleness) + CEO dashboard refresh to HEAD (2026-09-05)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-09-05T03:25:41+00:00",
-      "sha": "bd6da75",
-      "summary": "data: rival Facebook promo feed refresh (run 33930427627) (#813)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-05T02:51:01+00:00",
-      "sha": "d256f37",
-      "summary": "docs(progress): UX loop — aria-hidden pillar-card ordinal (PR #814) merged + deployed + verified",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-05T09:43:24+07:00",
-      "sha": "7f9e480",
-      "summary": "ux: aria-hide decorative pillar-card ordinal on command-center front door (#814)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-05T00:26:26+00:00",
-      "sha": "87cae8e",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-05T00:25:36+00:00",
-      "sha": "e3d7500",
-      "summary": "data: live fuel prices (2026-09-05, run 33932795924)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-05T00:25:08+00:00",
-      "sha": "ca06289",
-      "summary": "docs(progress): integration-loop re-verification — backlog saturated, record recheck triggers",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-05T00:09:42+00:00",
-      "sha": "1eb8c19",
-      "summary": "data: market-pulse swarm refresh (run 33928604483) (#812)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-04T23:06:21+00:00",
-      "sha": "a4853b8",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-04, run 33928085453)",
-      "pillar": "data-integration"
     }
   ]
 }
