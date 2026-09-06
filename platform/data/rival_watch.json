@@ -2,20 +2,20 @@
  "ads": {
   "appeared": [
    {
-    "brand": "Srisawad",
-    "key": "SAWAD",
-    "live_pct": 34.3,
-    "n_live": 128,
-    "n_new_30d": 25,
-    "share_of_volume_pct": 24.9
-   },
-   {
     "brand": "Ngern Tid Lor",
     "key": "TIDLOR",
     "live_pct": 17.0,
     "n_live": 140,
     "n_new_30d": 24,
     "share_of_volume_pct": 54.8
+   },
+   {
+    "brand": "Srisawad",
+    "key": "SAWAD",
+    "live_pct": 34.8,
+    "n_live": 130,
+    "n_new_30d": 21,
+    "share_of_volume_pct": 24.9
    },
    {
     "brand": "Ngern Hai Jai",
@@ -42,7 +42,7 @@
     "share_of_volume_pct": 1.4
    }
   ],
-  "as_of": "2026-09-05",
+  "as_of": "2026-09-06",
   "disappeared": [],
   "label": "MEASURED — n_new_30d is Google Ads Transparency's own per-creative first_shown date, counted within 30 days of the pull date.",
   "live_total_series": {
@@ -85,7 +85,7 @@
    }
   },
   "label": "MIXED, labelled per section. promos.new and ads.appeared are MEASURED from real per-item/per-creative first_seen/first_shown dates already in the source files. promos.disappeared, ads.disappeared and search_demand movement are all empty by design — none of this pipeline's inputs currently carry the second data point (last_seen, per-creative last_shown, or a prior share-of-search vintage) that an honest 'disappeared' or 'movement' figure requires.",
-  "newest_observation_date": "2026-09-05",
+  "newest_observation_date": "2026-09-06",
   "title": "Rival watch — what changed in the rival field since last time (obj #2)"
  },
  "promos": {
