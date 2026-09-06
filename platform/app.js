@@ -7652,9 +7652,65 @@ function renderExposureTape(){
     }
   }
 }
+/* ---------- Agri debt incidence × our agri book (obj #1) — the cross-layer join no single block
+   makes: NSO Ag-Census farm-household debt incidence (external, full-count MEASURED) beside the real
+   loan tape's own agri (เกษตร) outstanding & 90+dpd per province (MEASURED). Surfaces the intersection
+   — high debt incidence AND a large/rolling agri book — where a farm-cash shock reaches the most
+   balance sheets and we carry the most exposure. Both axes measured; the double-exposed flag is an
+   estimated triage cut (top-third thresholds). Null-safe: either layer absent → display:none. -------- */
+function renderAgriDoubleExposure(){
+  const wrap=document.getElementById('expo-agridti-wrap'); if(!wrap) return;
+  Promise.all([loadAgriCredit(), tmliFetch('tape_geo_occ')]).then(([,geo])=>{
+    if(!agcHasData()||!geo||!geo.provinces){ wrap.style.display='none'; return; }
+    const rows=[];
+    for(const prov in geo.provinces){
+      const cells=geo.provinces[prov]; if(!Array.isArray(cells)) continue;
+      const agri=cells.find(c=>c&&c.occupation==='เกษตร'&&c.basis==='measured'&&c.os_sum!=null);
+      if(!agri) continue;
+      const a=AGC[prov]; if(!a||a.debt_incidence==null) continue;
+      rows.push({prov,region:a.region||'',di:a.debt_incidence,os:agri.os_sum,n:agri.n||0,dpd:agri.dpd90p_pct});
+    }
+    if(rows.length<6){ wrap.style.display='none'; return; }
+    const t=Math.max(1,Math.floor(rows.length/3));
+    const diThr=rows.map(r=>r.di).sort((x,y)=>y-x)[t-1];   // top-third debt-incidence threshold
+    const osThr=rows.map(r=>r.os).sort((x,y)=>y-x)[t-1];   // top-third our-agri-O/S threshold
+    rows.forEach(r=>{r.dbl=(r.di>=diThr)&&(r.os>=osThr);});
+    const dbl=rows.filter(r=>r.dbl).sort((a,b)=>b.os-a.os);
+    rows.sort((a,b)=>(b.dbl-a.dbl)||(b.os-a.os));          // double-exposed first, then by our book
+    const N=n=>Number(n).toLocaleString('en-US');
+    const m=n=>'฿'+(n/1e6).toFixed(0)+'m';
+    const pct=x=>(Math.round(x*1000)/10).toFixed(1)+'%';
+    const sev=v=>v==null?'var(--dim)':v<8?'var(--merch)':v<14?'#9CB24E':v<20?'var(--opp)':v<26?'#D97A3A':'var(--agri)';
+    const maxdi=Math.max(...rows.map(r=>r.di));
+    const top=dbl[0];
+    const lead=document.getElementById('expo-agridti-lead');
+    if(lead){
+      lead.innerHTML=`In <b>${dbl.length}</b> of ${rows.length} provinces, farm-household debt incidence sits in the top third (≥${pct(diThr)} of agri holders in debt) <b>and</b> our measured agri book is in the top third (≥${m(osThr)} O/S) — where a farm-cash shock reaches the most balance sheets and we carry the most exposure. `
+        +(top?`Largest such book: <b>${top.prov}</b> (${m(top.os)} O/S across ${N(top.n)} farm accounts, ${pct(top.di)} of the province's holders in debt, our 90+dpd ${top.dpd}%). `:'')
+        +`They cluster in Isan — the crop-price + drought stress the crop board tracks lands there on a book that is both large and already indebted.`;
+    }
+    const tbl=document.getElementById('expo-agridti');
+    if(tbl){
+      tbl.innerHTML=`<tr><th scope="col">Province</th><th scope="col">Region</th>`
+        +`<th scope="col" title="Share of the province's agricultural holders carrying any debt — MEASURED, full-count NSO Ag Census 2566">Debt incidence ●</th>`
+        +`<th scope="col" title="Our own agri (เกษตร) outstanding book in the province — MEASURED, real loan tape">Our agri O/S ●</th>`
+        +`<th scope="col" title="Farm accounts on our book in the province — MEASURED">Farm a/c</th>`
+        +`<th scope="col" title="Our agri book's 90+ days-past-due share in the province — MEASURED">Our 90+dpd ●</th>`
+        +`<th scope="col" title="Double-exposed = top third on both axes (estimated triage cut over measured inputs)">◆</th></tr>`
+        +rows.slice(0,12).map(r=>
+          `<tr><td><b>${r.prov}</b></td><td class="sub">${r.region}</td>`
+          +`<td class="mono">${barHTML(r.di*100,'var(--agri)',maxdi*100)} ${pct(r.di)}</td>`
+          +`<td class="mono">${m(r.os)}</td><td class="mono sub">${N(r.n)}</td>`
+          +`<td class="mono" style="color:${sev(r.dpd)}">${r.dpd}%</td>`
+          +`<td class="mono">${r.dbl?'<span style="color:var(--agri)">◆</span>':'<span class="sub">·</span>'}</td></tr>`).join('');
+    }
+    wrap.style.display='';
+  });
+}
 function renderExposure(){
   if(!DATA||!$('#expocards')||!$('#expotbl')) return;
   loadTapeReal().then(renderExposureTape);
+  renderAgriDoubleExposure();
   const N=DATA.length;
   const pctS=n=>(100*n/N).toFixed(1)+'%';
   // 1) stressed-crop exposure: branches whose region's weakest crop is in price stress (YoY < -10%)
