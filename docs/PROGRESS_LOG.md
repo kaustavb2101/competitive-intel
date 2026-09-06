@@ -3,6 +3,83 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-09-06 (Integration loop — NEW #exposure block: agri debt incidence × our agri book, the double-exposed-province join; MEASURED both axes; obj #1) — PR
+**What shipped:** the cross-layer join the last integration run flagged as its own "next recommended
+integration" and that no single block made — pairing external farm-household **debt incidence** with our
+**own measured agri book** at the province level, on the Risk (`#exposure`) tab.
+- **The gap (obj #1 portfolio risk):** `nso_agri_debt.json` carries per-province `debt_incidence` (share
+  of a province's agricultural holders carrying ANY debt — MEASURED, full-count NSO Ag Census 2566) and
+  it was surfaced only as `#map` lenses (`agc`/`agdinc`). `tape_geo_occ.json` carries our own agri (เกษตร)
+  `os_sum` + `dpd90p_pct` per province (MEASURED, real loan tape) and it was surfaced only in the
+  data-book occupation drill. The signal that matters — provinces where **more farm balance sheets are
+  already indebted AND we carry the most book** — existed nowhere. A crop-price/drought shock reaches
+  proportionally more borrowers where debt incidence is high, and hits us hardest where our agri O/S is
+  large; the intersection is the sharp read, and it distinguishes (e.g.) Isan's big-book/high-incidence
+  provinces (นครราชสีมา ฿295m O/S · 77% in debt) from big-book/lower-incidence South (สุราษฎร์ธานี,
+  นครศรีธรรมราช ~50% in debt).
+- **How (pure app-side, no new data / no new pull):** a null-safe `renderAgriDoubleExposure()` in
+  `app.js` joins the two already-loadable layers on `province_th` (`loadAgriCredit` + `tmliFetch('tape_geo_occ')`),
+  computes the top-third threshold on each axis, flags **double-exposed** = top third on both, and renders
+  a computed lead + a 12-row table (double-exposed first, then by our book) into a new `#expo-agridti-wrap`
+  block in `index.html`. Reuses the existing `barHTML`/`sev` conventions; a local `sev` copy avoids the
+  function-scoped original. Hidden until both layers load (`<6` joined provinces → display:none).
+- **Provenance:** both axes **MEASURED** (full-count census debt incidence; real-tape agri O/S & 90+dpd,
+  ≥30-account cells); the ◆ double-exposed flag is an **ESTIMATED** triage cut (the top-third thresholds
+  are choices) — labelled inline. Makes **no** open / close / expand recommendation (mandate_guard green).
+  No `platform/data` file added or altered → no `build_provenance.py` re-run owed.
+- **Verify:** `bash tests/run.sh check` → **158 passed, 0 failed** (node --check app.js, data-integrity
+  455/455, orphan_layers, mandate_guard, provenance all green). Headless chromium render of
+  `index.html#exposure`: block visible, `data-errors="[]"` (no JS error), lead computes "15 of 75
+  provinces … Largest such book: นครราชสีมา (฿295m O/S across 2,536 farm accounts, 77.2% of the province's
+  holders in debt, our 90+dpd 11.16%)", table renders 12 rows with the ◆ flag on the double-exposed set.
+  Shipped as a PR (app-facing visual change).
+- **Next recommended integration:** a command-center callout of the top double-exposed agri provinces
+  (mirror this join into the exec front door), or the same debt-incidence × book cross for the informal-
+  reliance axis (`informal_share`). The CI-reachable data-pull backlog stays exhausted (GISTDA flood-AREA
+  needs a shapely dissolve and the server is connection-reset from CI; DLT still Feb-2026; BAAC/SME-bank
+  penetration Thai-IP-blocked; `GISTDA_SPHERE_KEY` not in CI).
+
+## 2026-09-06 (Intelligence loop / MARKET + SERVICE + PEER + DEPLOY-HEALTH + PLANNING — evidence-based five-pillar sweep; GREEN across all five; the one legitimate state change was the CEO-dashboard refresh to HEAD)
+Ran the full sweep by reading the layers, not asserting. No CI-fixable data/app gap in my pillars, so
+no forced fix shipped (standing precedent: refuse to manufacture a marginal edit on a saturated tree).
+- **DEPLOY health (live).** Public alias `competitive-intel-blue.vercel.app` → **200** on `/` and
+  `/data/meta.json`; master alias `…-git-master-…vercel.app/` → **302** (documented Vercel SSO
+  deployment-protection gate = up+gated, not an outage). `site-health.yml` already targets the correct
+  master alias — no fix owed.
+- **SERVICE — GREEN, incl. a fresh broken-reference audit.** `provenance.json` freshness block: **0
+  layers stale-by-neglect** (`stale:[]` over the 180d floor); oldest dated layer `vehicle_models.json`
+  (265d) is `upstream_capped` (DLT `2026-01` newest real monthly vintage), not neglect. The freshest
+  vintage `collateral_census.json` `2026-09-23` is a forward-looking Union-Auction anchor date (newest
+  auction IN the data), handled deterministically — not a wall-clock bug. **Verified 0 broken data
+  references**: swept every `data/*.json` string in `app.js`/`index.html`/`*.html`; the 6 apparent
+  misses (apple_reviews, bot_policy_rate, fuel_stations, perimeter_counts, rayong_trees, staging/nso_lfs)
+  are all inside **comments** citing `source-data/…` paths, not `fetch()` targets — no live reference is
+  dangling.
+- **MARKET re-confirmed saturated.** The commodities board already carries, per line, MEASURED level +
+  global YoY + Thai farm-gate local YoY + divergence + the ESTIMATED book-footprint exposure read — the
+  momentum dimension is surfaced, not just levels. Macro/live/fuel boards refreshing on the swarm cron.
+- **PEER re-confirmed saturated** (schema read, not claimed): `peer_province.json` carries per-brand
+  MEASURED counts beside each big-4 rival, rival:AutoX ratio, leader/rank, the PICO class column, DLT
+  vehicle stock + per-100k-veh saturation, and outnumbered-district counts. No honest unshipped field.
+- **The one legitimate state change: CEO dashboard refresh.** It had drifted **5 commits** (pointer
+  `e980ef4` → HEAD `802dd1f`; `plan_cycle.py --check` reported drifted); the committee-planner cron is
+  PAUSED, so a manual `plan_cycle.py` run is the only thing that keeps the exec front-door honest.
+  Refreshed it (pointer + activity feed rolled forward with the 5 intervening commits — all data/census
+  value refreshes + one data.html a11y fix, no new layer); item states correctly **unchanged**: 98% · 49
+  done / 0 in-progress / 1 open owner-side / 50. Re-verified byte-exact (`plan_cycle.py --check: OK`).
+- **Safeguards (all four passed).** (a) gate `bash tests/run.sh check` → **158 passed · 0 failed**; the
+  dashboard files (`platform/status_data.json`, `docs/AUTONOMY_PLAN.md`) are exempt from the provenance
+  census; (b) no secrets in diff; (c) diff = `docs/PROGRESS_LOG.md` + the CEO-dashboard regen, matches
+  intent (pointer + feed roll-forward, item states unchanged); (d) provenance/no-fabrication intact —
+  **no `platform/data` layer added or altered** → no `build_provenance.py` re-run owed; no invented
+  progress. No visual/app-behaviour change → self-mergeable per the safeguard protocol (no PR/headless
+  render), committed direct to master.
+- **Next recommended.** Five pillars stay saturated + healthy; the frontier is owner-side / Thai-IP (a
+  fresh loan-tape export, BAAC/SME-bank penetration, a DLT `2569_03+` vintage, the `data.go.th`
+  aggregator, `GISTDA_SPHERE_KEY` reaching CI, or the per-province desktop catchment pulls). A future run
+  should again audit for a genuinely-new MEASURED layer landing from the data crons and, absent one, take
+  a healthy close-out or dashboard refresh rather than manufacture a marginal edit.
+
 ## 2026-09-06 (Integration loop — NEW National-map lens: agri debt INCIDENCE, per province, MEASURED; obj #1) — PR
 **What shipped:** the app-surfacing follow-up the NSO-Ag-Census run (same day) explicitly flagged as its
 next recommended integration. `platform/data/nso_agri_debt.json` already carried `debt_incidence` per
