@@ -248,7 +248,11 @@ def build():
         detail = ""
         yoy = drv.get("yoy_pct")
         if yoy is not None:
-            detail = " (global price %s%s%% YoY, measured proxy)" % ("+" if yoy > 0 else "", _num(yoy))
+            # macro_sensitivity stamps each price driver's basis: Thai farm-gate (MEASURED, primary)
+            # or the World Bank GLOBAL Pink Sheet proxy (fallback). Label it honestly, not always "global".
+            pbase = ("Thai farm-gate price" if drv.get("basis") == "farmgate" else "global price")
+            pnote = ("measured" if drv.get("basis") == "farmgate" else "measured proxy")
+            detail = " (%s %s%s%% YoY, %s)" % (pbase, "+" if yoy > 0 else "", _num(yoy), pnote)
         elif head.get("driver") == "drought" and crop:
             row = next((c for c in (crop.get("provinces") or []) if c.get("th") == head.get("th")), None)
             rain = (row or {}).get("components", {}).get("rain_pct_of_normal")
