@@ -1,6 +1,6 @@
 {
  "meta": {
-  "asof_ads": "2026-09-05",
+  "asof_ads": "2026-09-06",
   "asof_card": "2026-08-16",
   "basis_note": "Every rate is restated to NOMINAL reducing-balance %/yr — monthly x 12, never compounded. That is AutoX's own accrual convention and the one Thai lenders publish (CIMB: '0.83% ต่อเดือน ... ลดต้นลดดอก 9.95% ต่อปี'; 0.83 x 12 = 9.96).",
   "cheapest_flat": {
@@ -20,8 +20,8 @@
   "n_ad_rows_dropped": 1,
   "n_ads_basis_stated": 2,
   "n_advertised": 10,
-  "n_creatives_basis_stated": 7,
-  "n_creatives_scanned": 765,
+  "n_creatives_basis_stated": 8,
+  "n_creatives_scanned": 766,
   "n_operators": 23,
   "n_published": 39,
   "n_rows": 49,
@@ -341,10 +341,10 @@
    "if_reducing": 5.52,
    "is_us": false,
    "key": "TIDLOR",
-   "last_seen": "2026-09-05",
+   "last_seen": "2026-09-06",
    "loan_type": "both",
    "ltv_pct": 160,
-   "n_ads_basis_stated": 4,
+   "n_ads_basis_stated": 5,
    "n_ads_priced": 23,
    "n_creatives": null,
    "n_offers": 7,
@@ -649,7 +649,7 @@
    "if_reducing": 7.92,
    "is_us": false,
    "key": "SAWAD",
-   "last_seen": "2026-09-05",
+   "last_seen": "2026-09-06",
    "loan_type": "title_loan",
    "ltv_pct": null,
    "n_ads_basis_stated": 3,
@@ -2382,7 +2382,7 @@
    "variant": "รถยนต์ใหม่ (new)"
   },
   {
-   "asof": "2026-09-05",
+   "asof": "2026-09-06",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2392,7 +2392,7 @@
    "effective_if_reducing": null,
    "effective_note": null,
    "key": "SAWAD",
-   "last_seen": "2026-09-05",
+   "last_seen": "2026-09-06",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": null,
@@ -2420,7 +2420,7 @@
    "variant": null
   },
   {
-   "asof": "2026-09-05",
+   "asof": "2026-09-06",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2430,7 +2430,7 @@
    "effective_if_reducing": null,
    "effective_note": null,
    "key": "SAWAD",
-   "last_seen": "2026-09-05",
+   "last_seen": "2026-09-06",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": null,
@@ -2458,7 +2458,7 @@
    "variant": null
   },
   {
-   "asof": "2026-09-05",
+   "asof": "2026-09-06",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2468,7 +2468,7 @@
    "effective_if_reducing": 7.92,
    "effective_note": null,
    "key": "SAWAD",
-   "last_seen": "2026-09-05",
+   "last_seen": "2026-09-06",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": null,
@@ -2477,7 +2477,7 @@
    "name_th": "ศรีสวัสดิ์ เงินสดทันใจ",
    "operator": "Srisawad",
    "owner": "SET:SAWAD",
-   "quote_th": "อาชีพไหนก็ขอได้ วงเงินจัดหนัก - ให้วงเงินสูงสุด ไม่จํากัด สินเชื่อบ้านแลกเงิน มีเงินใช้ทันใจ ดอกเบี้ยเริ่มตัน 0.66% ต่อเดือน ผ่อนนานสูงสุด 10 ปี",
+   "quote_th": "ล็ 2 ศรีสวัสดิ์ รู้ผลไว ต้องการเงินด่วน สินเชื่อบ้านแลกเงินศรีสวัสดิ์ให้วงเงินสูง ดอกเบี้ยเริ่ม ตัน 0.66% ต่อเดือน มีปัญหา สินเชื่อบ้านศรีสวัสดิ์ ช่วยได้...",
    "quoted": {
     "as_quoted": 0.66,
     "as_quoted_basis": "month",
@@ -2499,7 +2499,7 @@
    "variant": null
   },
   {
-   "asof": "2026-09-05",
+   "asof": "2026-09-06",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2509,7 +2509,7 @@
    "effective_if_reducing": 12.0,
    "effective_note": null,
    "key": "SAWAD",
-   "last_seen": "2026-09-05",
+   "last_seen": "2026-09-06",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": null,
@@ -2540,7 +2540,7 @@
    "variant": null
   },
   {
-   "asof": "2026-09-05",
+   "asof": "2026-09-06",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2550,7 +2550,7 @@
    "effective_if_reducing": 15.0,
    "effective_note": null,
    "key": "SAWAD",
-   "last_seen": "2026-09-05",
+   "last_seen": "2026-09-06",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": null,
@@ -2559,7 +2559,7 @@
    "name_th": "ศรีสวัสดิ์ เงินสดทันใจ",
    "operator": "Srisawad",
    "owner": "SET:SAWAD",
-   "quote_th": "สินเชื่อที่ดิน ร.,, 4 จ สฐ์ ร สินเชือโฉนดแลกเงิน ศรสวสด - วงเงนสูง ผ่อน ชําระ 12 งวด ต้องการเงินด่วน สินเชื่อบ้านแลกเงินศรีสวัสดิ์ให้ วงเงินสูง ดอกเบี้ยเริ่มต้น 1.25 % ต่อเดือน บริ",
+   "quote_th": "สินเชื่อโฉนดแลกเงิน ศรีสวัสดิ์ - สินเชื่อโฉนด แลกเงิน วงเงินสูง ต้องการเงินด่วน สินเชื่อบ้านแลกเงินศรีสวัสดิ์ให้ วงเงินสูง ดอกเบี้ยเริ่มต้น 1.25 % ต่อเดือน ศรีสวัสดิ์ เงินสดทันใจ..",
    "quoted": {
     "as_quoted": 1.25,
     "as_quoted_basis": "month",
@@ -2581,7 +2581,7 @@
    "variant": null
   },
   {
-   "asof": "2026-09-05",
+   "asof": "2026-09-06",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2597,7 +2597,7 @@
    "effective_if_reducing": null,
    "effective_note": null,
    "key": "TIDLOR",
-   "last_seen": "2026-09-05",
+   "last_seen": "2026-09-06",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": 160,
@@ -2625,7 +2625,7 @@
    "variant": null
   },
   {
-   "asof": "2026-09-05",
+   "asof": "2026-09-06",
    "carded": true,
    "citation": null,
    "collateral": null,
@@ -2641,7 +2641,7 @@
    "effective_if_reducing": null,
    "effective_note": null,
    "key": "TIDLOR",
-   "last_seen": "2026-09-05",
+   "last_seen": "2026-09-06",
    "loan_type": "title_loan",
    "ltv_note": null,
    "ltv_pct": 160,
