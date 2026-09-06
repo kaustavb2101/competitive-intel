@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-06T23:27:53+07:00",
-    "commit": "ab0c730"
+    "generated_at": "2026-09-06T21:26:00+00:00",
+    "commit": "b878f1f"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-09-06T21:26:00+00:00",
+      "sha": "b878f1f",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-06, run 34060979982)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-06T20:44:19+00:00",
+      "sha": "da5fe5e",
+      "summary": "docs(progress): log the rayong-catchment WCAG-AA microcopy fix (PR #844) + deploy-verify",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-06T20:40:03+00:00",
+      "sha": "f2fd8cf",
+      "summary": "ux: darken rayong-catchment light-theme muted microcopy to clear WCAG AA (#844)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-06T19:56:36+00:00",
+      "sha": "1494667",
+      "summary": "data: Thai-IP-only swarm refresh (run 34054643989) (#843)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-06T18:46:29+00:00",
+      "sha": "76f3767",
+      "summary": "feat(macro-sens): score ALL measured Thai farm-gate crops — headwind coconut/sugarcane/pineapple now surface (obj #1) (#842)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-09-06T17:42:54+00:00",
+      "sha": "d317cca",
+      "summary": "data: market-pulse swarm refresh (run 34042982182) (#839)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-06T17:17:08+00:00",
+      "sha": "394ce8f",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34045523534) (#841)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-06T16:29:51+00:00",
+      "sha": "175a3f2",
+      "summary": "chore(dashboard): refresh CEO autonomy dashboard to HEAD after the farm-gate macro merge (#840)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-09-06T23:27:53+07:00",
       "sha": "ab0c730",
       "summary": "feat(market): macro_sensitivity reads MEASURED Thai farm-gate prices as PRIMARY (obj #1) (#840)",
@@ -663,54 +711,6 @@
       "sha": "536017b",
       "summary": "service: five-pillar healthy close-out + CEO dashboard refresh to HEAD (2026-09-05)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-09-05T20:14:43+00:00",
-      "sha": "c58b8dd",
-      "summary": "docs: log UX-loop aria-hidden nav-arrow fix (PR #825, deploy-verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-06T03:11:48+07:00",
-      "sha": "285321b",
-      "summary": "ux: aria-hidden decorative → on command-center & story-next nav links (#825)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-05T19:08:29+00:00",
-      "sha": "7d005e9",
-      "summary": "data: market-pulse swarm refresh (run 33981252390) (#824)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-05T18:25:44+00:00",
-      "sha": "79aed4c",
-      "summary": "service: mechanical saturation proof + CEO dashboard refresh to HEAD (2026-09-05)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-05T17:24:57+00:00",
-      "sha": "336d067",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-05, run 33980770030)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-05T17:03:25+00:00",
-      "sha": "e668a65",
-      "summary": "data: SET peer filings refresh (run 33975353838) (#822)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-05T23:22:28+07:00",
-      "sha": "780ec91",
-      "summary": "service: healthy close-out + deploy-integrity sweep + CEO dashboard refresh to HEAD (2026-09-05)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-05T14:25:45+00:00",
-      "sha": "f96ffe8",
-      "summary": "docs: log UX-loop run — rayong-province stub share metadata (PR #821, deployed + verified)",
-      "pillar": "uxui"
     }
   ]
 }
