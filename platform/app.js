@@ -908,10 +908,14 @@ function msensRec(d){
   return (Array.isArray(t2)&&t2.length)?t2:null;
 }
 // ctx phrasing per driver — ctx is the MEASURED branch/province quantity behind the driver
-// (meta.drivers[key].ctx_label): crop share %, OSM gold-shop count, or rain % of normal.
+// (meta.drivers[key].ctx_label): crop share %, OSM gold-shop count, or rain % of normal. Every crop
+// driver (the majors rice/rubber/palm plus the widened set cassava/maize/coconut/sugarcane/pineapple)
+// reads as "% of province crop area"; a bare crop-area fallback covers any future farm-gate crop too.
+const _CROP_AREA_CTX=c=>c+'% of province crop area';
 const MSENS_CTX={
-  rice:c=>c+'% of province crop area', rubber:c=>c+'% of province crop area',
-  palm:c=>c+'% of province crop area',
+  rice:_CROP_AREA_CTX, rubber:_CROP_AREA_CTX, palm:_CROP_AREA_CTX,
+  cassava:_CROP_AREA_CTX, maize:_CROP_AREA_CTX, coconut:_CROP_AREA_CTX,
+  sugarcane:_CROP_AREA_CTX, pineapple:_CROP_AREA_CTX,
   gold:c=>c+' gold shop'+(c===1?'':'s')+' ≤10km',
   drought:c=>'rain '+c+'% of normal',
 };
@@ -924,7 +928,10 @@ function msensPhrase(t){
   const col=dir==='h'?'var(--agri)':'var(--merch)';
   const arrow=(typeof drv.yoy_pct==='number')?(drv.yoy_pct>0?'▲':'▼'):'▼';
   const yoy=(typeof drv.yoy_pct==='number')?((drv.yoy_pct>0?'+':'')+drv.yoy_pct+'% YoY'):'';
-  const ctxs=(ctx!=null&&MSENS_CTX[k])?MSENS_CTX[k](ctx):'';
+  // any crop driver reads as crop-area; the explicit map covers all current keys, the ctx_label
+  // check future-proofs a newly-added farm-gate crop so its share never renders label-less.
+  const ctxFn=MSENS_CTX[k]||(/planted area/.test(drv.ctx_label||'')?_CROP_AREA_CTX:null);
+  const ctxs=(ctx!=null&&ctxFn)?ctxFn(ctx):'';
   const join=k==='drought'?' — ':' × ';   // "Drought ▼ — rain 88% of normal" reads better than "×"
   return `<b style="color:${col}">${drv.label||k} ${arrow}${yoy?' '+yoy:''}</b>${ctxs?join+ctxs:''}`;
 }
@@ -10119,17 +10126,18 @@ function macxPopupHTML(d,sec){
     + `<div class="sub" style="margin:2px 0 0;font-size:10px">occupation mix MEASURED × sensitivity weights ESTIMATED × macro signals MEASURED — a relative ranking (chip order), not a measured default rate</div>`;
 }
 // ANSWER-FIRST §2b — "What moves this branch": ONE line naming the branch's top-2 macro drivers
-// with real numbers (macro_sensitivity.json) — e.g. "Rubber price ▲ +32.4% YoY × 93% of province
-// crop area · Gold price ▲ +26.1% YoY × 2 gold shops ≤10km". Prices are MEASURED (Pink Sheet
-// GLOBAL proxy); crop shares / gold-shop counts / rain are MEASURED; the ranking itself is an
-// ESTIMATED proxy (segment scores scale relevance) — the chip says so. Empty when absent.
+// with real numbers (macro_sensitivity.json) — e.g. "Rubber price ▲ +39.8% YoY × 13% of province
+// crop area · Coconut price ▼ -67.9% YoY × 8% of province crop area". Prices are MEASURED Thai
+// farm-gate YoY (NABC; the widened set now includes headwind crops coconut/sugarcane/pineapple);
+// crop shares / rain are MEASURED; the ranking itself is an ESTIMATED proxy (segment scores scale
+// relevance) — the chip says so. Empty when absent.
 function msensPopupHTML(d,sec){
   const t2=msensRec(d); if(!t2) return '';
   const line=t2.map(msensPhrase).filter(Boolean).join(' <span style="color:var(--dim)">·</span> ');
   if(!line) return '';
   return sec('What moves this branch — top macro drivers')
     + `<div style="font-size:11.5px;line-height:1.5">${line}</div>`
-    + `<div class="sub" style="margin:2px 0 0;font-size:10px">ESTIMATED proxy over measured inputs — global price YoY (not Thai farm-gate) × measured crop share / gold shops / rain, scaled by estimated segment scores. Rank, not elasticity.</div>`;
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">ESTIMATED proxy over measured inputs — Thai farm-gate price YoY (MEASURED, NABC; World Bank global Pink Sheet is a fallback only for crops it does not price) × measured crop share / rain, scaled by estimated segment scores. Rank, not elasticity.</div>`;
 }
 // "vs statistical twins" popup section — empty string when the peer layer is absent (no fabrication).
 function peerPopupHTML(d,sec,r){
