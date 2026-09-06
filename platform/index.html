@@ -1370,6 +1370,20 @@
       </div>
     </div>
 
+    <!-- Agri debt incidence × our agri book (data/nso_agri_debt.json × data/tape_geo_occ.json) — the
+         cross-layer join no other block makes: external MEASURED farm-household debt incidence (share of
+         a province's agricultural holders carrying ANY debt, NSO Ag Census 2566, full-count) beside our
+         OWN MEASURED agri (เกษตร) outstanding & 90+dpd per province (real loan tape, cells ≥30). The
+         signal is the intersection — provinces where a farm-cash shock reaches the most balance sheets
+         AND we carry the most book. Both axes measured; the double-exposed flag is an estimated triage
+         cut (top-third thresholds). Null-safe: either layer absent → display:none. No open/close call. -->
+    <div id="expo-agridti-wrap" style="display:none;margin-top:4px">
+      <h3 class="compsub" style="color:var(--agri)">Agri debt incidence × our agri book · double-exposed provinces <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED both axes</span></h3>
+      <p class="lead" id="expo-agridti-lead" style="font-size:12px"></p>
+      <table class="tbl" id="expo-agridti"></table>
+      <p class="lead" style="font-size:11px;margin-top:6px">Debt incidence = share of a province's agricultural holders carrying any debt (<b>MEASURED</b>, full-count NSO Agricultural Census 2566). Agri O/S &amp; 90+dpd = our own farm book in that province (<b>MEASURED</b>, real loan tape, เกษตร cells ≥30 accounts). ◆ = double-exposed: a province in the top third on <b>both</b> axes — the inputs are measured, the intersection is an <b>estimated</b> triage cut (the top-third thresholds are choices). Makes no open / close / expand recommendation.</p>
+    </div>
+
     <!-- Product → segment → driver map (data/product_segments.json) — measured book economics per
          collateral product with the curated transmission map to segments / income drivers /
          scenarios. Null-safe: absent file → nothing renders. -->
