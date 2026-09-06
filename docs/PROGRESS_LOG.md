@@ -3,6 +3,49 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-09-06 (Integration loop — macro_sensitivity widened to ALL MEASURED Thai farm-gate crops; the ignored HEADWIND crops coconut/sugarcane/pineapple now score; obj #1) — PR
+**What shipped:** the exact "next recommended integration" the prior macro_sensitivity run logged —
+`build_macro_sensitivity.py` ("what moves this branch", obj #1 portfolio risk) scored only rice /
+rubber / palm, so its crop-price drivers were **all tailwinds** under current data (rubber +39.8%,
+palm +23.1%, rice +13.4%) and the real MEASURED farm-gate **headwind** crops the same feed already
+prices — **coconut −67.9%, sugarcane −17.9%, pineapple −18.4%** — were invisible in the branch popup
+and the exec decision queue. A price-risk read that can only ever show tailwinds is a portfolio-risk
+blind spot.
+- **The gap (evidence, not asserted):** `farmgate_prices.json crop_yoy` (NABC, vintage 2026-09-03)
+  prices 8 crops; `crop_stress.json crop_mix` carries a province planting-area share for all 8. The
+  builder hard-coded only 3. So a coconut-heavy coastal province (Samut Sakhon/Songkhram) or a
+  sugarcane-heavy western one (Kanchanaburi) had its single biggest measured price move dropped.
+- **Fix (deterministic, network-free, `--check`-gated):** the crop driver set is now **data-driven**
+  over every farm-gate crop that has a crop_stress share — rice/rubber/palm (Pink Sheet fallback
+  retained) **plus cassava/maize/coconut/sugarcane/pineapple** (farm-gate only; a crop with neither a
+  farm-gate quote nor a Pink Sheet row is silently not scored, so the absent-farmgate path stays
+  byte-identical to the old rice/rubber/palm output — graceful degradation preserved). Same
+  share-diluted formula, same fixed-order tie-break (drought last), same fingerprint. `meta.drivers`
+  / `driver_keys` now emit only the drivers that actually carry a signal. **New headwind top-drivers
+  now surface**: Kanchanaburi → sugarcane (h), Samut Sakhon/Songkhram → coconut (h) — provinces the
+  old read filed under drought or a tailwind. `build_decision_queue.py` consumes the watchlist
+  generically (`drivers[k].label`/`.basis`), so its TIGHTEN row now names whichever farm-gate headwind
+  crop tops the watchlist, honestly labelled measured Thai farm-gate — no decision_queue edit needed.
+- **App (visual):** `app.js` `MSENS_CTX` extended to the 5 new crop keys (all read "% of province
+  crop area") via a shared `_CROP_AREA_CTX` formatter, with a `ctx_label`-based fallback so a future
+  farm-gate crop never renders label-less; the "What moves this branch" popup footnote, which still
+  said "global price YoY (not Thai farm-gate)", corrected to the accurate Thai-farm-gate-primary
+  provenance (it had gone stale at the 2026-09-06 farm-gate migration).
+- **Provenance:** all price signals stay **MEASURED** (farm-gate; global Pink Sheet fallback only);
+  the layer stays ESTIMATED-PROXY-over-measured-inputs (branch relevance weights are estimated).
+  `build_provenance.py` re-run → **151 layers · 88 measured / 63 estimated / 0 unlabelled** (unchanged;
+  no layer flipped). Makes **no** open/close/expand recommendation (mandate_guard green).
+- **Verify (all passed):** `bash tests/run.sh check` → **158 passed · 0 failed** (macro_sensitivity +
+  decision_queue + provenance `--check` reproduce byte-exact; `node --check app.js`; data-integrity;
+  orphan_layers; mandate_guard). Headless render of `index.html#map` (1400×900) → `data-errors="[]"`,
+  no JS error, drivers const resolves. Diff is exactly 2 builders-worth (1 builder) + app.js + the 2
+  regenerated data files (macro_sensitivity / provenance) + this log; no secrets.
+- **Recommend next:** mirror the widened headwind crops into `build_macro_exposure.py`'s occupation-
+  weighted view if it still reads the 3-major set, OR a command-center callout of the top farm-gate
+  price-headwind provinces (coconut/sugarcane) alongside the existing double-exposed agri join. The
+  CI-reachable data-pull backlog stays exhausted (DLT Feb-2026; BAAC/SME-bank Thai-IP-blocked;
+  GISTDA flood-AREA needs a shapely dissolve and is connection-reset from CI).
+
 ## 2026-09-06 (Intelligence loop / MARKET — macro_sensitivity now reads MEASURED Thai farm-gate prices as PRIMARY, retiring the GLOBAL Pink Sheet proxy for rice/rubber/palm; obj #1) — PR
 **What shipped:** `build_macro_sensitivity.py` (the "what moves this branch" driver layer, obj #1 portfolio risk) was reading the **World Bank Pink Sheet GLOBAL price YoY as the PRIMARY agri price driver** for rice/rubber/palm, while the repo already holds a fresher **MEASURED Thai farm-gate** source (`source-data/farmgate_prices.json` → `crop_yoy`, NABC daily national average, vintage **2026-09-03**) for exactly those three crops. CLAUDE.md's stated policy — and its sibling `build_crop_stress.py` (`price_stress`) — treat farm-gate as PRIMARY and the global Pink Sheet as **fallback-only for unpriced crops**; this builder was the one agri-risk read still using the fallback as primary. The two sibling reads now share ONE price base.
 - **The gap (evidence-based, verified not asserted):** the driver signals labelled every crop `"MEASURED — GLOBAL price YoY %, a direction proxy, NOT Thai farm-gate"`. The magnitudes materially differ and re-rank drivers: rice **+13.4%** farm-gate vs **+19.1%** global (severity 0.54 vs 0.76), rubber **+39.8%** vs **+24.7%** (clamps 1.0 either way), oil palm **+23.1%** vs **+12.8%** (severity 0.92 vs 0.51) — so palm-heavy provinces rise and rice-heavy soften in the branch/province watchlist. Directions are unchanged (all three are tailwinds under both bases; no `dir` flips). Downstream, `build_decision_queue.py` quoted these as `"(global price +X% YoY, measured proxy)"` on the exec front door.

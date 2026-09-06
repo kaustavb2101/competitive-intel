@@ -37,11 +37,16 @@ MEASURED vs ESTIMATED (stated in meta + repeated in the UI chip)
   → every published score/rank is an ESTIMATED PROXY OVER MEASURED INPUTS. It ranks
     which macro lever moves a branch's book; it is NOT a measured elasticity or PD.
 
-THE 5 DRIVERS (fixed order = tie-break + audit order)
------------------------------------------------------
-  rice / rubber / palm   crop price × province crop share × branch agri catchment
-  gold                   gold price × branch collateral score × measured gold-shop presence
+THE DRIVERS (fixed order = tie-break + audit order)
+---------------------------------------------------
+  crop prices            EVERY crop the MEASURED Thai farm-gate feed prices and crop_stress has a
+                         province share for — rice / rubber / palm (Pink Sheet fallback) plus
+                         cassava / maize / coconut / sugarcane / pineapple (farm-gate only). Each:
+                         crop price × province crop share × branch agri catchment. Scoring the
+                         widened set surfaces the real MEASURED headwind crops (coconut, sugarcane,
+                         pineapple) the old rice/rubber/palm-only read hid behind the tailwind majors.
   drought                rainfall deficit × branch agri catchment × province crop dependence
+  (gold is deliberately NOT a driver — AutoX lends against vehicle titles, not gold.)
 
 FORMULA (per branch, per driver — fully transparent)
 ----------------------------------------------------
@@ -93,16 +98,30 @@ sys.path.insert(0, HERE)
 from lib.regionmap import canonical
 from lib.fingerprint import branches_fingerprint
 
-# fixed driver order — tie-break for equal scores and the audit order in meta.
+# The crop price drivers, in fixed audit / tie-break order. This is EVERY crop the MEASURED Thai
+# farm-gate feed (farmgate_prices.json crop_yoy) prices AND that crop_stress.json carries a
+# province planting-area share for — so the layer scores the real MEASURED headwind crops it used
+# to ignore (coconut, sugarcane, pineapple), not just the tailwind majors rice/rubber/palm. A crop
+# with no farm-gate quote falls back to the World Bank Pink Sheet (rice/rubber/palm only); a crop
+# with neither is simply not scored (graceful degradation, byte-stable output).
+CROP_DRIVERS = ("rice", "rubber", "palm", "cassava", "maize", "coconut", "sugarcane", "pineapple")
+# fixed driver order — tie-break for equal scores and the audit order in meta. Drought last.
 # NOTE: gold is deliberately excluded — AutoX lends against vehicle titles, not gold, so gold
 # price / gold-shop presence is NOT a driver of the book.
-DRIVER_ORDER = ("rice", "rubber", "palm", "drought")
+DRIVER_ORDER = CROP_DRIVERS + ("drought",)
 # Pink Sheet board row per price driver (source-data/commodity_board.json "lab") — FALLBACK base.
+# Only the three majors have a Pink Sheet row; the widened crops are farm-gate-only (no fallback).
 BOARD_LAB = {"rice": "Rice", "rubber": "Rubber", "palm": "Palm oil"}
 # crop driver -> crop_yoy key in farmgate_prices.json (Thai farm-gate MEASURED, PRIMARY base).
-FARMGATE_KEY = {"rice": "rice", "rubber": "rubber", "palm": "oilpalm"}
+FARMGATE_KEY = {
+    "rice": "rice", "rubber": "rubber", "palm": "oilpalm", "cassava": "cassava",
+    "maize": "maize", "coconut": "coconut", "sugarcane": "sugarcane", "pineapple": "pineapple",
+}
 # crop_stress.json crop_mix crop name per crop driver.
-CROP_NAME = {"rice": "Rice", "rubber": "Rubber", "palm": "Oil palm"}
+CROP_NAME = {
+    "rice": "Rice", "rubber": "Rubber", "palm": "Oil palm", "cassava": "Cassava",
+    "maize": "Maize", "coconut": "Coconut", "sugarcane": "Sugarcane", "pineapple": "Pineapple",
+}
 # |YoY| of 25% == full severity 1.0 — same denominator as build_crop_stress.py price_term.
 PRICE_SEV_DEN = 25.0
 # Bueng Kan fallback drought formula denominator — same as build_crop_stress.py drought_term.
@@ -110,14 +129,13 @@ RAIN_DEN = 40.0
 
 DRIVER_LABELS = {
     "rice": "Rice price", "rubber": "Rubber price", "palm": "Palm-oil price",
+    "cassava": "Cassava price", "maize": "Maize price", "coconut": "Coconut price",
+    "sugarcane": "Sugarcane price", "pineapple": "Pineapple price",
     "drought": "Drought / rainfall",
 }
-CTX_LABELS = {
-    "rice": "% of province planted area (MEASURED, OAE)",
-    "rubber": "% of province planted area (MEASURED, OAE)",
-    "palm": "% of province planted area (MEASURED, OAE)",
-    "drought": "% of normal 3-month rain (MEASURED proxy)",
-}
+_CROP_CTX = "% of province planted area (MEASURED, OAE)"
+CTX_LABELS = dict({k: _CROP_CTX for k in CROP_DRIVERS},
+                  drought="% of normal 3-month rain (MEASURED proxy)")
 
 
 def _load(p):
@@ -150,9 +168,12 @@ def build():
     fg_yoy = ((farmgate or {}).get("crop_yoy") or {})
     fg_vintage = ((farmgate or {}).get("meta") or {}).get("vintage")
 
-    # ── measured price signals per driver (Thai farm-gate first, GLOBAL Pink Sheet fallback) ──
+    # ── measured price signals per crop driver (Thai farm-gate first, GLOBAL Pink Sheet fallback) ──
+    # Iterate every crop driver; keep the one with a real signal (farm-gate quote, else a Pink Sheet
+    # row for the majors). A crop with neither is silently dropped so it is never scored — this is
+    # what keeps the absent-farmgate path byte-identical to the pre-widening rice/rubber/palm output.
     signals = {}
-    for k, lab in BOARD_LAB.items():
+    for k in CROP_DRIVERS:
         fg = fg_yoy.get(FARMGATE_KEY[k])
         if isinstance(fg, (int, float)):
             yoy = float(fg)
@@ -167,7 +188,8 @@ def build():
                 "provenance": "MEASURED — Thai FARM-GATE price YoY %, the price the farmer receives",
                 "ctx_label": CTX_LABELS[k],
             }
-        else:
+        elif k in BOARD_LAB:
+            lab = BOARD_LAB[k]
             row = by_lab[lab]
             yoy = float(row["yoy"])
             signals[k] = {
@@ -182,6 +204,7 @@ def build():
                               "(fallback base — no Thai farm-gate quote for this crop)",
                 "ctx_label": CTX_LABELS[k],
             }
+        # else: no farm-gate quote and no Pink Sheet row -> this crop is not a scored driver.
     signals["drought"] = {
         "label": DRIVER_LABELS["drought"],
         "dir": "h",  # rainfall deficit only ever hurts farm cash flow
@@ -196,9 +219,7 @@ def build():
     for p in crop:
         shares = {c["crop"]: c["share"] for c in p.get("crop_mix", [])}
         prov[canonical(p["th"])] = {
-            "rice": shares.get("Rice", 0.0),
-            "rubber": shares.get("Rubber", 0.0),
-            "palm": shares.get("Oil palm", 0.0),
+            "shares": {k: shares.get(CROP_NAME[k], 0.0) for k in CROP_DRIVERS},
             "dep": p.get("crop_dependence") or 0.0,
             "drought": p.get("drought") or 0.0,
             "rain": (p.get("components") or {}).get("rain_pct_of_normal"),
@@ -216,8 +237,10 @@ def build():
         pv = prov.get(canonical(b.get("v") or ""))
 
         cand = []
-        for k in ("rice", "rubber", "palm"):
-            share = pv[k] if pv else 0.0
+        for k in CROP_DRIVERS:
+            if k not in signals:            # crop with no measured price signal — not scored
+                continue
+            share = pv["shares"][k] if pv else 0.0
             sev = _clamp01(abs(signals[k]["yoy_pct"]) / PRICE_SEV_DEN)
             score = int(round(100 * sev * share * a_rel))
             if score > 0:
@@ -310,8 +333,8 @@ def build():
                 "(%d branches). No fuel / used-vehicle / manufacturing price series exists in the offline "
                 "sources, so those levers are NOT scored — see build_macro_exposure.py for the occupation-"
                 "weighted view that models the manufacturing cycle editorially." % (int(RAIN_DEN), n_fallback),
-        "driver_keys": list(DRIVER_ORDER),
-        "drivers": {k: signals[k] for k in DRIVER_ORDER},
+        "driver_keys": [k for k in DRIVER_ORDER if k in signals],
+        "drivers": {k: signals[k] for k in DRIVER_ORDER if k in signals},
         "price_vintage": price_vintage,
         "farmgate_vintage": fg_vintage,
         "n_branches": len(out),
