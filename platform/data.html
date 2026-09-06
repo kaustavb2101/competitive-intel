@@ -217,7 +217,7 @@ table.db-tbl{border-collapse:collapse;width:100%;font-size:12.5px;min-width:640p
          level: national, region, province, branch and browse-all. -->
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · ③ of ⑤</span>
-      <a href="index.html#assist">Assistance — who needs help now, before accounts roll →</a>
+      <a href="index.html#assist">Assistance — who needs help now, before accounts roll <span aria-hidden="true">→</span></a>
     </div>
   </div>
 </main>
@@ -323,7 +323,7 @@ function renderNational(){
   // lens rankings — the National-map lenses as ranked, actionable lists (owner feedback 2026-07-20:
   // "the powerful data in the national map view is lost on me since it's not actionable")
   h+='<div class="db-sec"><span class="n">L</span> Lens rankings — the National-map signals as ranked lists <span class="db-badge" style="color:var(--gold,#e6b450)">ESTIMATED composites</span></div>';
-  h+='<p class="db-sub">The same per-branch and per-district lens scores the National map colors its dots with — ranked here so they are actionable. Scores are <b>estimated composites over measured inputs</b> (POI counts, factories, workers, rainfall, population are measured; the blend into one score is a model). Top 40 shown per lens — or <a href="?branches'+THEME_QS+'"><b>browse all '+num(n.branches)+' branches →</b></a> (sort/filter/search every feature, drill into any branch).</p>';
+  h+='<p class="db-sub">The same per-branch and per-district lens scores the National map colors its dots with — ranked here so they are actionable. Scores are <b>estimated composites over measured inputs</b> (POI counts, factories, workers, rainfall, population are measured; the blend into one score is a model). Top 40 shown per lens — or <a href="?branches'+THEME_QS+'"><b>browse all '+num(n.branches)+' branches <span aria-hidden="true">→</span></b></a> (sort/filter/search every feature, drill into any branch).</p>';
   h+='<div class="db-chiprow" id="blchips">'+BLENS.map(function(l,i){return '<button class="db-chip'+(i===0?' on':'')+'" data-bl="'+l.k+'">'+esc(l.t)+'</button>';}).join('')+'</div>';
   h+='<div id="lensbr" class="db-note">Loading branch lenses…</div>';
   h+='<div class="db-chiprow" style="margin-top:14px" id="alchips">'+ALENS.map(function(l,i){return '<button class="db-chip'+(i===0?' on':'')+'" data-al="'+l.k+'">'+esc(l.t)+'</button>';}).join('')+'</div>';
@@ -972,7 +972,7 @@ function renderBranch(idxStr){
   loadBranchLayers(function(){
     document.getElementById('db-loading').style.display='none';
     var d=BR2[idx];
-    if(!d){document.getElementById('db-root').innerHTML='<p class="db-note">Branch not found. <a href="?branches'+THEME_QS+'">Back to all branches →</a></p>';return;}
+    if(!d){document.getElementById('db-root').innerHTML='<p class="db-note">Branch not found. <a href="?branches'+THEME_QS+'">Back to all branches <span aria-hidden="true">→</span></a></p>';return;}
     var pv=BRPROV[d.v]||{}, slug=pv.slug;
     var L=BRLAYERS, at=function(o){return (o&&o.branches&&o.branches[idx])||null;};
     var risk=at(L.risk), peer=at(L.peers), recs=at(L.recs), dens=at(L.density);
@@ -1011,7 +1011,7 @@ function renderBranch(idxStr){
         h+='<div class="db-row" style="grid-template-columns:28px 1fr"><div class="rl" style="font-size:16px">'+(r.i||'•')+'</div><div class="rl" style="color:'+tc+'">'+esc(r.t)+'</div></div>';});
       h+='</div>';
     }
-    h+='<div class="db-3dlinks"><a href="branch-explorer.html?lat='+d.y+'&lng='+d.x+'&n=1'+THEME_QS+'">🏙 3D branch scene →</a>'+(slug?'<a href="rayong-catchment.html?city='+encodeURIComponent(slug)+THEME_QS+'">🏙 province buildings →</a>':'')+'<a href="?branches'+THEME_QS+'">← all branches</a></div>';
+    h+='<div class="db-3dlinks"><a href="branch-explorer.html?lat='+d.y+'&lng='+d.x+'&n=1'+THEME_QS+'">🏙 3D branch scene <span aria-hidden="true">→</span></a>'+(slug?'<a href="rayong-catchment.html?city='+encodeURIComponent(slug)+THEME_QS+'">🏙 province buildings <span aria-hidden="true">→</span></a>':'')+'<a href="?branches'+THEME_QS+'">← all branches</a></div>';
     h+='<p class="db-note" style="padding:14px 0 0;text-align:left">Lens scores &amp; composite risk are ESTIMATED 0–100 screens over measured inputs — not measured default rates. Population / workers / factories / buildings / POI counts are MEASURED.</p>';
     document.getElementById('db-root').innerHTML=h;
     fillBranchTape(d.n, slug);
