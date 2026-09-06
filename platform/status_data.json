@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-06T09:19:31+07:00",
-    "commit": "e980ef4"
+    "generated_at": "2026-09-06T09:20:56+00:00",
+    "commit": "802dd1f"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,48 @@
   ],
   "activity": [
     {
+      "date": "2026-09-06T09:20:56+00:00",
+      "sha": "802dd1f",
+      "summary": "data(census): refresh the Union Auction forward book (run 34020903189) (#832)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-06T08:58:34+00:00",
+      "sha": "399ac7c",
+      "summary": "data: market-pulse swarm refresh (run 34020876020) (#834)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-06T15:19:26+07:00",
+      "sha": "9e3a46a",
+      "summary": "ux: aria-hidden leading glyphs on data.html 3D-scene links (#835)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-06T08:00:41+00:00",
+      "sha": "4327aff",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-06, run 34020572272)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-06T07:11:20+00:00",
+      "sha": "e277f55",
+      "summary": "data: NABC live prices (2026-09-06, run 34018229153)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-06T06:40:03+00:00",
+      "sha": "6d121ec",
+      "summary": "feat: National-map agri debt-incidence province lens (MEASURED, NSO Ag Census; obj #1) (#831)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-06T04:10:13+00:00",
+      "sha": "9ecae47",
+      "summary": "service: five-pillar healthy close-out + CEO dashboard refresh to HEAD (2026-09-06)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-06T09:19:31+07:00",
       "sha": "e980ef4",
       "summary": "docs: PROGRESS_LOG entry for the data.html nav-arrow a11y fix (PR #829) (#830)",
@@ -669,48 +711,6 @@
       "sha": "d22279e",
       "summary": "data(census): refresh the Union Auction forward book (run 33953656351) (#816)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-05T08:51:53+00:00",
-      "sha": "6fc5e58",
-      "summary": "data: market-pulse swarm refresh (run 33953628454) (#817)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-05T08:17:09+00:00",
-      "sha": "2961024",
-      "summary": "docs(progress): UX loop — aria-hidden pill-foot → CTA arrow (PR #818) merged + deployed + verified",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-05T15:13:27+07:00",
-      "sha": "efee0d2",
-      "summary": "ux: pill-foot → arrow aria-hidden on command-center pillar cards (#818)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-05T07:46:01+00:00",
-      "sha": "8d7ef97",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-05, run 33953379063)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-05T06:59:58+00:00",
-      "sha": "caf329d",
-      "summary": "data: NABC live prices (2026-09-05, run 33951109093)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-05T06:21:36+00:00",
-      "sha": "8bfe132",
-      "summary": "docs(blocked-sources): record NSO own CKAN CI-reachable but staler than shipped SES 2566",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-05T04:10:54+00:00",
-      "sha": "a2c7b6b",
-      "summary": "service: freshness sweep (GREEN, no silent staleness) + CEO dashboard refresh to HEAD (2026-09-05)",
-      "pillar": "feature"
     }
   ]
 }

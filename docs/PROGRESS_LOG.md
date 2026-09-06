@@ -3,6 +3,47 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-09-06 (Intelligence loop / MARKET + SERVICE + PEER + DEPLOY-HEALTH + PLANNING — evidence-based five-pillar sweep; GREEN across all five; the one legitimate state change was the CEO-dashboard refresh to HEAD)
+Ran the full sweep by reading the layers, not asserting. No CI-fixable data/app gap in my pillars, so
+no forced fix shipped (standing precedent: refuse to manufacture a marginal edit on a saturated tree).
+- **DEPLOY health (live).** Public alias `competitive-intel-blue.vercel.app` → **200** on `/` and
+  `/data/meta.json`; master alias `…-git-master-…vercel.app/` → **302** (documented Vercel SSO
+  deployment-protection gate = up+gated, not an outage). `site-health.yml` already targets the correct
+  master alias — no fix owed.
+- **SERVICE — GREEN, incl. a fresh broken-reference audit.** `provenance.json` freshness block: **0
+  layers stale-by-neglect** (`stale:[]` over the 180d floor); oldest dated layer `vehicle_models.json`
+  (265d) is `upstream_capped` (DLT `2026-01` newest real monthly vintage), not neglect. The freshest
+  vintage `collateral_census.json` `2026-09-23` is a forward-looking Union-Auction anchor date (newest
+  auction IN the data), handled deterministically — not a wall-clock bug. **Verified 0 broken data
+  references**: swept every `data/*.json` string in `app.js`/`index.html`/`*.html`; the 6 apparent
+  misses (apple_reviews, bot_policy_rate, fuel_stations, perimeter_counts, rayong_trees, staging/nso_lfs)
+  are all inside **comments** citing `source-data/…` paths, not `fetch()` targets — no live reference is
+  dangling.
+- **MARKET re-confirmed saturated.** The commodities board already carries, per line, MEASURED level +
+  global YoY + Thai farm-gate local YoY + divergence + the ESTIMATED book-footprint exposure read — the
+  momentum dimension is surfaced, not just levels. Macro/live/fuel boards refreshing on the swarm cron.
+- **PEER re-confirmed saturated** (schema read, not claimed): `peer_province.json` carries per-brand
+  MEASURED counts beside each big-4 rival, rival:AutoX ratio, leader/rank, the PICO class column, DLT
+  vehicle stock + per-100k-veh saturation, and outnumbered-district counts. No honest unshipped field.
+- **The one legitimate state change: CEO dashboard refresh.** It had drifted **5 commits** (pointer
+  `e980ef4` → HEAD `802dd1f`; `plan_cycle.py --check` reported drifted); the committee-planner cron is
+  PAUSED, so a manual `plan_cycle.py` run is the only thing that keeps the exec front-door honest.
+  Refreshed it (pointer + activity feed rolled forward with the 5 intervening commits — all data/census
+  value refreshes + one data.html a11y fix, no new layer); item states correctly **unchanged**: 98% · 49
+  done / 0 in-progress / 1 open owner-side / 50. Re-verified byte-exact (`plan_cycle.py --check: OK`).
+- **Safeguards (all four passed).** (a) gate `bash tests/run.sh check` → **158 passed · 0 failed**; the
+  dashboard files (`platform/status_data.json`, `docs/AUTONOMY_PLAN.md`) are exempt from the provenance
+  census; (b) no secrets in diff; (c) diff = `docs/PROGRESS_LOG.md` + the CEO-dashboard regen, matches
+  intent (pointer + feed roll-forward, item states unchanged); (d) provenance/no-fabrication intact —
+  **no `platform/data` layer added or altered** → no `build_provenance.py` re-run owed; no invented
+  progress. No visual/app-behaviour change → self-mergeable per the safeguard protocol (no PR/headless
+  render), committed direct to master.
+- **Next recommended.** Five pillars stay saturated + healthy; the frontier is owner-side / Thai-IP (a
+  fresh loan-tape export, BAAC/SME-bank penetration, a DLT `2569_03+` vintage, the `data.go.th`
+  aggregator, `GISTDA_SPHERE_KEY` reaching CI, or the per-province desktop catchment pulls). A future run
+  should again audit for a genuinely-new MEASURED layer landing from the data crons and, absent one, take
+  a healthy close-out or dashboard refresh rather than manufacture a marginal edit.
+
 ## 2026-09-06 (Integration loop — NEW National-map lens: agri debt INCIDENCE, per province, MEASURED; obj #1) — PR
 **What shipped:** the app-surfacing follow-up the NSO-Ag-Census run (same day) explicitly flagged as its
 next recommended integration. `platform/data/nso_agri_debt.json` already carried `debt_incidence` per
