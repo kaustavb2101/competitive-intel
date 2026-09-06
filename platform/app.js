@@ -40,6 +40,7 @@ const LENS = {
   ddrought:{pill:'District drought', label:'District drought ▲ modelled', desc:"PORTFOLIO RISK · MODELLED (OAE SPEI, ERA5-Land reanalysis) — the branch's district drought intensity on OAE's Standardized Precipitation-Evapotranspiration Index, resolved to true district (อำเภอ) grain (0–100 index, drier = higher; lower SPEI = drier). An official model product — NOT station rainfall and NOT a disaster declaration. This resolves drought to the district, unlike the province-inherited agri-stress lens which every amphoe in a province shares: brighter = a drier local farm economy, so a drought shock reaches more of the book there (obj #1 portfolio risk). Kept SEPARATE from the estimated agri-stress proxy — this is the modelled OAE index, not our proxy, and does not modify it. Districts the source flags ambiguous or a grid-gap zero show 'n/a', never a guessed reading. Hidden until the district layer loads.", color:'#E6B450', unit:'drought (0–100, modelled SPEI)', amp:true, drought:true, est:true, tag:'e', val:d=>{const a=d&&d._amp; const s=a?a.spei:null; if(typeof s!=='number'||!isFinite(s)) return null; const dry=s<0?-s:0; /* -SPEI capped at 2.5 (exceptional drought) -> 0–100 for the ramp/popup; raw spei kept in the record + shown in the polygon popup */ return Math.round(Math.min(1,dry/2.5)*100);}},
   pstress:{pill:'Province stress', label:'Province structural stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — blends the branch's province household debt-to-income percentile (NSO SES) with its province unemployment percentile (NSO LFS) into ONE 'which provinces are structurally riskiest' read, equal-weighted. Both inputs are measured; the blend + weighting are an editorial triage ordering, not a measured default rate. Hidden until the layer loads.", color:'#C8433B', unit:'stress (0–100, est)', pstr:true, prov:true, est:true, tag:'e', val:d=>pstressVal(d)},
   agc:{pill:'Agri credit source', label:'Informal agri-credit reliance ●', desc:"COMPETITIVE + PORTFOLIO RISK · MEASURED (NSO Agricultural Census 2566/2023) — the share of a province's agri debt-holders who borrow from HIGH-COST INFORMAL lenders (moneylenders + crop middlemen + private shops). Brighter = more farm households leaning on informal credit: both a borrower-distress signal (portfolio) and the space a licensed non-bank lender competes in (competition). The province popup carries the full lender mix (BAAC vs cooperatives vs informal) and the debt-holder count n — read the % alongside n, as peri-urban provinces with tiny farm populations are noisy. A landscape read on the borrower base of the network we already run; makes NO open / close / expand recommendation. Hidden until the census layer loads.", color:'#E6B450', unit:'% of agri debt-holders (informal)', agc:true, prov:true, tag:'m', val:d=>agcVal(d), provPop:d=>agcProvPop(d)},
+  agdinc:{pill:'Agri debt incidence', label:'Agri debt incidence ●', desc:"PORTFOLIO RISK · MEASURED (NSO Agricultural Census 2566/2023) — the share of a province's agri holders who carry ANY debt (from any lender source). Brighter = a more indebted farm borrower base, so a crop-price or drought shock reaches proportionally more balance sheets there. This is the robust, large-n companion to the informal-reliance lens: debt INCIDENCE (how many farm households owe at all) is a full-count denominator in every province, whereas the informal-share split is noisier where farm populations are small. The province popup carries the full lender mix (BAAC vs cooperatives vs informal) and the debt-holder count n. A landscape read on the borrower base of the network we already run; makes NO open / close / expand recommendation. Hidden until the census layer loads.", color:'#C8433B', unit:'% of agri holders in debt', agdinc:true, prov:true, tag:'m', val:d=>agdincVal(d), provPop:d=>agcProvPop(d)},
   dblpress:{pill:'Double pressure', label:'Double pressure ▲◆ est', desc:"CROSS-OBJECTIVE · ESTIMATED ranking (0–100) — where the EXISTING network is BOTH borrower-stressed (obj #1) AND rival-outgunned (obj #2). Scored as the LOWER of the branch province's two axis percentiles over the same 77 provinces: portfolio-stress (NSO DTI + unemployment blend) and competitive-contest (MEASURED rival:AutoX census). A province only lights up when it ranks high on BOTH, so the brightest are the double-pressure watchlist the command centre names (worst: อุตรดิตถ์, สงขลา). A RELATIVE ranking of the footprint we run — NOT a probability, NOT a default rate, and makes NO open/close/expand call. Hidden until the join layer loads.", color:'#E0574F', unit:'combined pressure (0–100, est)', dblp:true, prov:true, est:true, tag:'e', val:d=>dblPressVal(d)},
   dsrch:{pill:'Search demand', label:'Title-loan search demand ▲ est', desc:"BRAND DEMAND · ESTIMATED (Google Trends relative index, 0–100) — how hard people in the branch's province search title-loan intent terms (จำนำทะเบียนรถ · สินเชื่อรถแลกเงิน). A demand/attention signal, NOT query volume or bookings. Hidden until the layer loads.", color:'#E6B450', unit:'search demand (0–100, est)', dsrch:true, prov:true, est:true, tag:'e', val:d=>sdemandVal(d)},
   peerdev:  {pill:'Vs twins', label:'Risk vs statistical twins ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how many points the branch's composite risk sits ABOVE its 15 statistical twins (branches with the most similar measured market elsewhere in the country, same household-leverage backdrop). Bright = the market alone doesn't explain the risk; something local is different. Audit these first.", color:'#E0574F', unit:'pts above twins (est)', est:true, peers:true, tag:'e', val:d=>peerDevVal(d)},
@@ -260,6 +261,10 @@ function agcHasData(){return !!(AGC&&Object.keys(AGC).length);}
 // MEASURED high-cost informal reliance (% of agri debt-holders, one decimal) for a branch's
 // province. 0 when unknown so the marker stays pale rather than erroring.
 function agcVal(d){const p=AGC&&AGC[d.v]; return p&&p.informal_share!=null?Math.round(p.informal_share*1000)/10:0;}
+// MEASURED agri debt incidence (% of a province's agri holders carrying any debt, one decimal) for a
+// branch's province. Shares the AGC store (loadAgriCredit) and the agcProvPop mix popup; 0 when
+// unknown so the marker stays pale rather than erroring.
+function agdincVal(d){const p=AGC&&AGC[d.v]; return p&&p.debt_incidence!=null?Math.round(p.debt_incidence*1000)/10:0;}
 // rich province-choropleth popup for the 'agc' lens: the full lender mix + the debt-holder count n,
 // so the informal % is always read against its denominator. '' when the province has no record.
 function agcProvPop(prov){
@@ -9015,6 +9020,7 @@ function lensAbsent(k){
   if(l.macx)  return macxDone && !macxHasData();
   if(l.floodhz) return floodhzLoaded && !floodhzHasData();
   if(l.agc)   return agcLoaded && !agcHasData();
+  if(l.agdinc) return agcLoaded && !agcHasData();  // shares the NSO Ag-Census store with the agc lens
   // compound agri-risk map lens: disable only once all three inputs have been ATTEMPTED and at least
   // one is genuinely absent (a partial funnel would mislead); still warm-loading → not absent.
   if(l.agristk) return agriStackProbed() && !agriStackReady();
@@ -9234,6 +9240,18 @@ function renderLegend(){
       ` <span class="sub" title="NSO Agricultural Census 2566 — share of a province's agri debt-holders borrowing from moneylenders / crop middlemen / private shops (high-cost informal). Read alongside the popup's debt-holder count n; peri-urban provinces with few farm households are noisy.">● measured · NSO Ag Census 2566</span>`;
     return;
   }
+  // Agri debt-incidence lens: MEASURED % of a province's agri holders carrying any debt (NSO Ag
+  // Census, full-count). Shares the AGC store with the informal-reliance lens; percentage scale.
+  if(l.agdinc){
+    if(!agcLoaded){ $('#maplegend').innerHTML='<span class="skel skel-line" style="display:inline-block;width:160px;vertical-align:middle" aria-hidden="true"></span> <span class="sub">agri debt incidence…</span>'; return; }
+    if(!agcHasData()){ $('#maplegend').innerHTML='<span class="sub" title="NSO agri-credit layer not loaded">Agri debt-incidence layer not present — run pipeline/build_nso_agri_debt.py.</span>'; return; }
+    $('#maplegend').innerHTML =
+      `<span><i style="background:${lensColor(.12,l.color)}"></i>${(mx*.12).toFixed(0)}%</span>`+
+      `<span><i style="background:${lensColor(.5,l.color)}"></i>${(mx*.5).toFixed(0)}%</span>`+
+      `<span><i style="background:${lensColor(1,l.color)}"></i>${mx.toFixed(0)}% in debt</span>`+
+      ` <span class="sub" title="NSO Agricultural Census 2566 — share of a province's agri holders carrying any debt (full-count denominator, robust in every province). The popup carries the full lender mix and the debt-holder count n.">● measured · NSO Ag Census 2566</span>`;
+    return;
+  }
   $('#maplegend').innerHTML =
     `<span><i style="background:${lensColor(.12,l.color)}"></i>~0</span>
      <span><i style="background:${lensColor(.5,l.color)}"></i>${fmtK(mx/2)}</span>
@@ -9302,7 +9320,7 @@ function initMap(){
   if(!vmixpLoaded) loadVehicleMixProv().then(()=>{ renderLenses(); if(mapReady){ drawProvinceChoropleth(); if(curLens==='pugap'){ renderLegend(); styleMarkers(); } } });
   // warm the MEASURED per-province agri-holder credit-source mix (NSO Ag Census) so the informal-
   // reliance lens un-disables + repaints the province choropleth once it lands (mirrors pugap). Null-safe.
-  if(!agcLoaded) loadAgriCredit().then(()=>{ renderLenses(); if(mapReady){ drawProvinceChoropleth(); if(curLens==='agc'){ renderLegend(); styleMarkers(); } } });
+  if(!agcLoaded) loadAgriCredit().then(()=>{ renderLenses(); if(mapReady){ drawProvinceChoropleth(); if(curLens==='agc'||curLens==='agdinc'){ renderLegend(); styleMarkers(); } } });
   // warm the ESTIMATED title-loan search-demand layer (Google Trends) so its lens hides itself when
   // absent. Absent file (build_search_demand.py not run) → SDEMAND empty, lens filtered out.
   if(!sdemandLoaded) loadSearchDemand().then(()=>{ renderLenses(); if(mapReady&&curLens==='dsrch'){ renderLegend(); styleMarkers(); } });

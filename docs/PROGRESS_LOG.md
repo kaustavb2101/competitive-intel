@@ -3,6 +3,38 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-09-06 (Integration loop — NEW National-map lens: agri debt INCIDENCE, per province, MEASURED; obj #1) — PR
+**What shipped:** the app-surfacing follow-up the NSO-Ag-Census run (same day) explicitly flagged as its
+next recommended integration. `platform/data/nso_agri_debt.json` already carried `debt_incidence` per
+province (share of a province's agri holders carrying ANY debt), but nothing **coloured** by it — it only
+appeared as one line inside the `agc` (informal-reliance) popup. Added a dedicated National-map province
+lens **`agdinc` "Agri debt incidence"** that paints the province choropleth by that measured share.
+- **Why (obj #1 portfolio risk):** debt incidence is the *robust, large-n* borrower-distress read — a
+  full-count denominator in every one of the 77 provinces (ranges 27%→86%, brightest across Isan:
+  ศรีสะเกษ 86%, กำแพงเพชร 85.6%, อำนาจเจริญ 85%). It is the companion to the existing `agc` informal-share
+  lens, which is noisier where farm populations are small. Where more farm households owe at all, a
+  crop-price or drought shock reaches proportionally more balance sheets. Makes **no** open/close/expand
+  call (mandate_guard green).
+- **How (pure app-surfacing, no new data / no new pull):** the lens reuses the already-loaded AGC store
+  (`loadAgriCredit`, `agcHasData`, `agcProvPop` mix popup) and the generic province-choropleth machinery.
+  Five surgical edits in `app.js`: the lens registry entry (measured `m` tag, agri-red `#C8433B`,
+  `prov:true`), a null-safe `agdincVal()` (percent of `debt_incidence`, 0 when unknown), the `lensAbsent`
+  dispatch clause, a dedicated legend block (percentage scale + "measured · NSO Ag Census 2566"), and the
+  warm-load repaint condition. Appears in the "More lenses ▾" dropdown and is deep-linkable via
+  `?lens=agdinc#map`. **No `platform/data` file added or altered → no `build_provenance.py` re-run owed.**
+- **Provenance:** MEASURED (full-count census); the popup carries the full lender mix + the debt-holder
+  count n so the % is always read against its denominator.
+- **Verify:** `bash tests/run.sh check` → **158 passed, 0 failed** (incl. `node --check` on app.js,
+  orphan_layers, mandate_guard, provenance). Headless chromium render of `?lens=agdinc#map`: lens pill
+  active, choropleth paints (Isan darkest as expected), `agdincVal('ศรีสะเกษ')`=86 matches the data,
+  legend renders "10% / 43% / 86% in debt ● measured · NSO Ag Census 2566", no JS pageerror (only
+  sandbox-blocked basemap-tile fetches). Shipped as a PR (app-facing visual change).
+- **Next recommended integration:** the informal-share and debt-incidence dimensions are now both
+  surfaced as lenses; a natural next slice is an Exposure-tab readout that pairs debt incidence with the
+  measured loan-tape agri exposure per province, or a command-center callout of the top debt-incidence
+  provinces. The CI-reachable data-pull backlog remains exhausted (GISTDA flood-AREA needs shapely;
+  DLT still Feb-2026; BAAC/SME-bank penetration Thai-IP-blocked; `GISTDA_SPHERE_KEY` not in CI).
+
 ## 2026-09-06 (Intelligence loop / MARKET + SERVICE + PEER + DEPLOY-HEALTH + PLANNING — healthy close-out + CEO-dashboard refresh to HEAD) — Ran the full five-pillar sweep on an evidence basis (read the layers, didn't just assert). **GREEN across all five, no CI-fixable data/app gap in my pillars, so no forced fix shipped** (standing precedent: refuse to manufacture a marginal edit on a saturated tree). The one legitimate state change was the CEO-dashboard refresh to HEAD.
 - **New-layer audit (standing check).** `git diff --name-status c58b8dd..HEAD -- 'platform/data/*'` (4 commits) → **1 addition**, `nso_agri_debt.json` (NSO Ag Census 2566 informal-agri-credit reliance) — and it is **already surfaced** by the integration loop as the `#map` `agc` province lens (PR #828), not landed dark. The other 9 changed data files are all value refreshes (fuel/live/macro boards, ThaiWater flood+rain, rival facebook/watch, feed_history, provenance) — none is a new layer, so no MARKET/SERVICE/PEER surfacing or `build_provenance.py` re-run owed by me. The integration loop's own flagged follow-up (surface the layer's debt-INCIDENCE dimension as a second lens/Exposure readout) is an **app-surfacing** task = integration/UX lane, not this loop's.
 - **PEER pillar re-confirmed saturated (read the schema, not just claimed).** `peer_province.json` carries, per all 77 provinces: MEASURED AutoX count beside each big-4 rival separately (`by_brand`), rival:AutoX `ratio`, `leader`, `autox_rank`/`n_ranked`, the distinct licensed-PICO class as its own column, DLT vehicle stock, `*_per_100k_veh` saturation reads with the Greater-Bangkok central-registration artifact flagged, and `n_outnumbered_districts`. No honest unshipped peer field remains; `competitor_coverage.json` carries the national per-brand found-vs-expected roll-up.
