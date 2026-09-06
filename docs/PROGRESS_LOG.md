@@ -3,6 +3,35 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-09-06 (Intelligence loop — freshness pulse now sees two MEASURED layers it was blind to; SERVICE)
+**What shipped:** a SERVICE-audit fix to the freshness monitor. `build_provenance.py`'s `_vintage_of`
+scans a priority list of vintage keys to give each layer an honest freshness age in the Data-room
+pulse. An audit of the 112 layers it reported as *undated* found two that in fact carry a clean,
+machine-readable ISO vintage under a key the scanner simply didn't list — so they showed BLANK
+despite being freshly MEASURED:
+- **`contested_mindshare.json`** → `search_vintage` = `2026-08-26T04:13Z` (the newest share-of-search
+  observation datetime IN the pulled data) — now age **28d**.
+- **`rival_rate_observed.json`** → `pulled_at` = `2026-08-31` (the rival rate-card read timestamp) —
+  now age **23d**.
+- **Fix (deterministic, `--check`-gated, purely additive):** added `search_vintage` (with the
+  data-observation keys, ahead of pull timestamps) and `pulled_at` (with `pulled_at_utc`/`pulled`) to
+  the scan. Verified no other populated layer carries either key and neither of these two has an
+  earlier-priority key, so the blast radius is exactly those two layers — nothing else moves.
+  Regenerated `provenance.json`: freshness `n_dated` **39 → 41**, `n_undated` 112 → 110, `stale` still
+  `[]` (both new ages are well under the 180-day line), and the measured/estimated/unlabelled counts
+  (88/63/0) are unchanged — no fabrication, no coercion (the three layers whose only date is a coarse
+  free-text `"2026M07…"` string were deliberately left undated, the honest state).
+- **Not a decision-queue or app-code change:** no frontend files touched; the Data-room freshness card
+  reads `provenance.json.freshness` and now reflects two more layers truthfully.
+- **Verify:** `bash tests/run.sh check` → **158 passed, 0 failed** (incl. `build_provenance.py --check`
+  byte-exact + `validate_data.py` 455/0). `committee/plan_cycle.py` re-run (dashboard still 98%).
+- **Next recommended intelligence task:** the shadowing case left open by design — `macro_sensitivity`
+  (`price_vintage="2026M07"` shadows a parseable `farmgate_vintage=2026-09-03`) and `napprang`
+  (`vintage="2025 (BE 2568)"` shadows `pulled=2026-09-04`) still show a coarse headline vintage with no
+  age. Deciding whether `_vintage_of` should prefer the first *parseable* key over the first *present*
+  one is a genuine judgement call (it changes the displayed vintage string, not just the age), so it
+  wants its own scoped run with a full before/after provenance diff.
+
 ## 2026-09-06 (Integration loop — macro_sensitivity widened to ALL MEASURED Thai farm-gate crops; the ignored HEADWIND crops coconut/sugarcane/pineapple now score; obj #1) — PR
 **What shipped:** the exact "next recommended integration" the prior macro_sensitivity run logged —
 `build_macro_sensitivity.py` ("what moves this branch", obj #1 portfolio risk) scored only rice /

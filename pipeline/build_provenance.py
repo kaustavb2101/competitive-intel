@@ -301,12 +301,20 @@ def _vintage_of(m):
     # false age) and — verified — leaves nso_wage_anchor / vehicle_registry unchanged, since each of
     # those already resolves via an earlier scanned key. Purely additive: no populated layer carries any
     # of these keys under an earlier priority, so only the previously-blank layers gain a vintage.
+    # search_vintage (contested_mindshare — the newest share-of-search observation datetime IN the pulled
+    # data, e.g. 2026-08-26T04:13Z) is a MEASURED data-observation vintage exactly like
+    # newest_observation_date, so it sits with the observation keys (ahead of any pull timestamp);
+    # pulled_at (rival_rate_observed — the rate-card read timestamp, e.g. 2026-08-31) is a pull
+    # timestamp exactly like pulled_at_utc / pulled, so it sits with them. Each is carried by ONLY its
+    # one layer and neither layer has an earlier-priority key, so both were BLANK/undated in the
+    # freshness pulse despite a strict-ISO vintage; adding them is purely additive — verified no other
+    # populated layer carries either key, so exactly those two layers gain an honest age.
     for k in ("updated", "vintage", "as_of", "updated_to",
               "observed_to", "price_vintage", "price_asof", "farmgate_vintage", "board_vintage",
               "asof_card", "anchor_date", "stock_asof", "latest_month", "mob_anchor",
-              "newest_observation_date",
+              "newest_observation_date", "search_vintage",
               "sentiment_anchor", "snapshot", "pico_vintage", "vintage_individual", "pulled_at_utc",
-              "pulled", "promos_pulled_at", "latest_year_ce", "vintage_ce", "span"):
+              "pulled_at", "pulled", "promos_pulled_at", "latest_year_ce", "vintage_ce", "span"):
         v = m.get(k)
         if isinstance(v, str) and v.strip():
             return _trunc(v, 24)
