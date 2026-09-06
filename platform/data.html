@@ -754,7 +754,7 @@ function provinceView(d,sum,reg,rank,total){
   h+='<div id="provbranches"><p class="db-note">Loading branches…</p></div>';
 
   // demoted 3D links
-  h+='<div class="db-3dlinks"><a href="rayong-catchment.html?city='+encodeURIComponent(sum?sum.slug:'')+THEME_QS+'">🏙 Open 3D building scene</a><a href="province.html?p='+encodeURIComponent(sum?sum.slug:'')+THEME_QS+'">▦ Open 3D district view</a></div>';
+  h+='<div class="db-3dlinks"><a href="rayong-catchment.html?city='+encodeURIComponent(sum?sum.slug:'')+THEME_QS+'"><span aria-hidden="true">🏙</span> Open 3D building scene</a><a href="province.html?p='+encodeURIComponent(sum?sum.slug:'')+THEME_QS+'"><span aria-hidden="true">▦</span> Open 3D district view</a></div>';
   h+=footer();
   document.getElementById('db-loading').style.display='none';
   document.getElementById('db-root').innerHTML=h;
@@ -1011,7 +1011,7 @@ function renderBranch(idxStr){
         h+='<div class="db-row" style="grid-template-columns:28px 1fr"><div class="rl" style="font-size:16px">'+(r.i||'•')+'</div><div class="rl" style="color:'+tc+'">'+esc(r.t)+'</div></div>';});
       h+='</div>';
     }
-    h+='<div class="db-3dlinks"><a href="branch-explorer.html?lat='+d.y+'&lng='+d.x+'&n=1'+THEME_QS+'">🏙 3D branch scene <span aria-hidden="true">→</span></a>'+(slug?'<a href="rayong-catchment.html?city='+encodeURIComponent(slug)+THEME_QS+'">🏙 province buildings <span aria-hidden="true">→</span></a>':'')+'<a href="?branches'+THEME_QS+'">← all branches</a></div>';
+    h+='<div class="db-3dlinks"><a href="branch-explorer.html?lat='+d.y+'&lng='+d.x+'&n=1'+THEME_QS+'"><span aria-hidden="true">🏙</span> 3D branch scene <span aria-hidden="true">→</span></a>'+(slug?'<a href="rayong-catchment.html?city='+encodeURIComponent(slug)+THEME_QS+'"><span aria-hidden="true">🏙</span> province buildings <span aria-hidden="true">→</span></a>':'')+'<a href="?branches'+THEME_QS+'"><span aria-hidden="true">←</span> all branches</a></div>';
     h+='<p class="db-note" style="padding:14px 0 0;text-align:left">Lens scores &amp; composite risk are ESTIMATED 0–100 screens over measured inputs — not measured default rates. Population / workers / factories / buildings / POI counts are MEASURED.</p>';
     document.getElementById('db-root').innerHTML=h;
     fillBranchTape(d.n, slug);
