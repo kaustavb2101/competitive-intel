@@ -2173,8 +2173,8 @@ function provDetailHTML(p){
   // deep-dive links
   const qs=(typeof themeQS==='function')?themeQS():'';
   const links=p.slug?`<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">`
-    +`<a href="rayong-catchment.html?city=${encodeURIComponent(p.slug)}${qs}" style="font:600 11px 'IBM Plex Sans Thai';color:var(--accent);text-decoration:none">🏙 3D scene →</a>`
-    +`<a href="province.html?p=${encodeURIComponent(p.slug)}${qs}" style="font:600 11px 'IBM Plex Sans Thai';color:var(--accent);text-decoration:none">▦ district view →</a>`
+    +`<a href="rayong-catchment.html?city=${encodeURIComponent(p.slug)}${qs}" style="font:600 11px 'IBM Plex Sans Thai';color:var(--accent);text-decoration:none"><span aria-hidden="true">🏙</span> 3D scene <span aria-hidden="true">→</span></a>`
+    +`<a href="province.html?p=${encodeURIComponent(p.slug)}${qs}" style="font:600 11px 'IBM Plex Sans Thai';color:var(--accent);text-decoration:none"><span aria-hidden="true">▦</span> district view <span aria-hidden="true">→</span></a>`
     +`</div>`:'';
   return `<div style="border-left:2px solid var(--line);padding:6px 0 6px 10px;margin:2px 0 4px">`
     +`<div style="display:flex;gap:18px;flex-wrap:wrap;font:500 11px 'IBM Plex Sans Thai'">${coll}${risk}</div>`
@@ -11202,7 +11202,7 @@ function renderCommoditiesBoard(){
                   ? `cover the staple mix rather than orchard fruit`
                   : `${c.seg.toLowerCase()} has none of`}`
         } — so the ${icN(exp.book_accounts)} accounts above are <b>standing exposure</b>, not a worked list.</div>`;
-        const assistLine=!ap?gapLine:`<div class="cb-assist"><b>Assistable now:</b> <b>${icN(ap.n_current_x)}</b> farm accounts across ${ap.n_provinces} provinces that depend on ${c.lab} are <b>Current or only X-bucket</b> — healthy today. ${ap.direction==='down'?`<b style="color:var(--agri)">This price is falling — that is the call list.</b>`:`Nothing to act on while the price is ${ap.direction} (${ap.yoy>0?'+':''}${ap.yoy}% farm-gate); this is the standing exposure if it turns.`} <a href="#assist" data-v="assist">Assistance →</a></div>`;
+        const assistLine=!ap?gapLine:`<div class="cb-assist"><b>Assistable now:</b> <b>${icN(ap.n_current_x)}</b> farm accounts across ${ap.n_provinces} provinces that depend on ${c.lab} are <b>Current or only X-bucket</b> — healthy today. ${ap.direction==='down'?`<b style="color:var(--agri)">This price is falling — that is the call list.</b>`:`Nothing to act on while the price is ${ap.direction} (${ap.yoy>0?'+':''}${ap.yoy}% farm-gate); this is the standing exposure if it turns.`} <a href="#assist" data-v="assist">Assistance <span aria-hidden="true">→</span></a></div>`;
         const apv=exp.area_provenance||'', modelled=apv==='MODELLED';
         const areaLine=!apv?'':`<div class="cb-areasrc"><span class="tag" style="color:${modelled?'var(--gold)':'var(--merch)'};border:1px solid ${modelled?'var(--gold)':'var(--merch)'}">${apv} area</span> <b>${exp.area_source||''}</b> — <span class="s">${exp.area_note||''}</span></div>`;
         const thaiLine=cbThaiHistory(THI,c.lab);
