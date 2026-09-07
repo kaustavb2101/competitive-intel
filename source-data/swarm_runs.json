@@ -12,45 +12,6 @@
    "feeds": [
     {
      "bytes_after": 7107,
-     "bytes_before": 7108,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 7.4,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8872,
-     "bytes_before": 8872,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 8.3,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 4004,
-     "bytes_before": 4004,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 140.0,
-     "status": "ok"
-    }
-   ],
-   "finished": "2026-08-25T04:13:43Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 1,
-   "n_failed": 0,
-   "n_ok": 3,
-   "n_skipped": 0,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-25T04:11:23Z"
-  },
-  {
-   "append_history_rc": 0,
-   "feeds": [
-    {
-     "bytes_after": 7107,
      "bytes_before": 7107,
      "key": "thaiwater_flood",
      "rc": 0,
@@ -3186,6 +3147,45 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-09-06T21:38:35Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7104,
+     "bytes_before": 7104,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 6.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8981,
+     "bytes_before": 8981,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 8.5,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 3991,
+     "bytes_before": 3991,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 142.6,
+     "status": "ok"
+    }
+   ],
+   "finished": "2026-09-07T03:49:12Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 1,
+   "n_failed": 0,
+   "n_ok": 3,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-09-07T03:46:50Z"
   }
  ]
 }
