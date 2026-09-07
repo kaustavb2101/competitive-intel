@@ -302,6 +302,31 @@ FEEDS = [
          label="DIW S-curve target-industry factory footprint per province (feeds ev_exposure)",
          cadence="monthly", ip="any", group="gov", out="source-data/scurve_by_province.json", timeout=600),
 
+    # A SECOND keyless any-IP gov puller (like diw_scurve) feeding a live layer that sat in NO
+    # scheduler, ageing in silence — the exact NEXT_STEPS §3 "widen pull_swarm's registry so no puller
+    # is left unscheduled to age in silence" item, same silent-stale failure mode as nabc_agri /
+    # diw_scurve above. Chain: pull_nso_agri_debt.py -> source-data/nso/agri_debt_2566.json (NSO 2566
+    # Agricultural Census: agri-holder base + debt incidence + lender-source mix, all 77 provinces) ->
+    # build_nso_agri_debt.py -> platform/data/nso_agri_debt.json, live on the National-map agri
+    # credit/debt-incidence lenses (platform/app.js). This is an objective-#1 (portfolio risk) AND
+    # objective-#2 (competitive) read: farm-holders on informal/high-cost credit are both a distress
+    # signal and the space a licensed non-bank title lender occupies. Its --check-gated builder
+    # (tests/run.sh L553; the committed snapshot is present, so it VERIFIES rather than rc=3-SKIPs)
+    # kept reproducing the same frozen census vintage. VERIFIED reachable + EXIT=0 from THIS cloud
+    # runner 2026-09-07 (income 847 / debt_incidence 231 / loan_source 845 rows off
+    # catalogapi.nso.go.th, browser-UA, keyless); stdlib+urllib only (no browser/openpyxl/pdfplumber,
+    # so no data-swarm.yml dep change needed). The live pull's ONLY diff vs the committed snapshot was
+    # meta.pulled_at — the measured rows were BYTE-IDENTICAL (the drift was reverted) — because the 2566
+    # census is a FROZEN full-count vintage that only moves when NSO publishes a new census year, so a
+    # re-pull is a no-op until then and the SCHEDULE is the improvement, not a data revision (same
+    # discipline as diw_scurve / fuel_stations above). QUARTERLY: a decadal census cannot drift inside
+    # a quarter, so the cheapest cadence that still auto-catches the next release is the right one
+    # (same reasoning as fuel_stations). rederive_drift.py discovers builders by parsing tests/run.sh,
+    # so it rebuilds nso_agri_debt.json automatically on the next fresh pull.
+    dict(key="nso_agri_debt", script="pull_nso_agri_debt.py", args=[],
+         label="NSO 2566 Agricultural Census agri-holder debt incidence + lender-source mix (obj #1/#2; feeds nso_agri_debt)",
+         cadence="quarterly", ip="any", group="gov", out="source-data/nso/agri_debt_2566.json", timeout=600),
+
     # The LAST keyless CI-reachable puller feeding a live layer that sat in NO scheduler, ageing in
     # silence (same silent-stale failure mode as nabc_agri / tpso_cpi / diw_scurve above; the exact
     # NEXT_STEPS §3 "widen pull_swarm's registry so no puller is left unscheduled to age in silence"
