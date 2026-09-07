@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-07T15:28:56+00:00",
-    "commit": "dec71d4"
+    "generated_at": "2026-09-08T05:58:49+07:00",
+    "commit": "dfe563f"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-09-07",
+    "eta_date": "2026-09-08",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -533,6 +533,102 @@
   ],
   "activity": [
     {
+      "date": "2026-09-08T05:58:49+07:00",
+      "sha": "dfe563f",
+      "summary": "peer: complete big-4 network-momentum read — surface Tidlor & Srisawad as unclassified (#865)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-07T22:55:23+00:00",
+      "sha": "2351f95",
+      "summary": "Merge remote-tracking branch 'origin/master' into intel/network-momentum-unclassified",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-07T22:47:36+00:00",
+      "sha": "100022b",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-07T22:47:02+00:00",
+      "sha": "939922b",
+      "summary": "Merge remote-tracking branch 'origin/master' into intel/network-momentum-unclassified",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-07T22:46:48+00:00",
+      "sha": "bafffae",
+      "summary": "data: live fuel prices (2026-09-07, run 34167683344)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-07T22:45:28+00:00",
+      "sha": "c61e8a9",
+      "summary": "data: SET listed-peer scoreboard refresh (run 34143204879) (#859)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-07T22:42:55+00:00",
+      "sha": "fef1d3c",
+      "summary": "peer: address Copilot review — date_precision + network_momentum gate lock",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-07T22:22:56+00:00",
+      "sha": "2a7f546",
+      "summary": "peer: complete big-4 network-momentum read — surface Tidlor & Srisawad as unclassified",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-07T22:16:10+00:00",
+      "sha": "4fde674",
+      "summary": "data: market-pulse swarm refresh (run 34107874462) (#857)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-07T21:27:57+00:00",
+      "sha": "4b2ef0d",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-07, run 34163119876)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-07T21:12:10+00:00",
+      "sha": "878e47e",
+      "summary": "data: Thai-IP-only swarm refresh (run 34155373232) (#861)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-07T20:22:52+00:00",
+      "sha": "837f1cb",
+      "summary": "docs(progress): log the SPA brand-wordmark home-link UX run (PR #862) + deploy-verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-08T03:20:12+07:00",
+      "sha": "165ab51",
+      "summary": "ux: make the SPA front-door brand wordmark a home link (#862)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-07T20:01:55+00:00",
+      "sha": "46846c4",
+      "summary": "a11y(branch-explorer): AA contrast for light-theme muted microcopy (#860)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-07T19:37:31+00:00",
+      "sha": "0698c92",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34091626473) (#854)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-07T16:28:01+00:00",
+      "sha": "614aaa3",
+      "summary": "service: empirical five-pillar close-out + CEO-dashboard refresh to HEAD",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-07T15:28:56+00:00",
       "sha": "dec71d4",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-07, run 34138405239)",
@@ -615,102 +711,6 @@
       "sha": "47affcf",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-07, run 34080155867)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-07T02:40:01+00:00",
-      "sha": "e773978",
-      "summary": "data: NABC live prices (2026-09-07, run 34076729716)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-07T02:12:39+00:00",
-      "sha": "709bea9",
-      "summary": "docs: log ux-contrast province.html AA-contrast fix (PR #850) + deploy-verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-07T09:10:52+07:00",
-      "sha": "a3390cc",
-      "summary": "ux: AA contrast for province.html light-theme microcopy (#850)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-07T01:49:36+00:00",
-      "sha": "eb59f8c",
-      "summary": "data: rival published rate pages re-read (run 34071358301) (#849)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-07T00:46:53+00:00",
-      "sha": "a3eb19b",
-      "summary": "feat(macro-exposure): read MEASURED Thai farm-gate prices as PRIMARY + widen to all 8 crops (obj #1) (#848)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-09-06T23:58:29+00:00",
-      "sha": "18f5d47",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34063910473) (#847)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-06T23:34:17+00:00",
-      "sha": "afbdc0d",
-      "summary": "data: market-pulse swarm refresh (run 34061676961) (#845)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-06T22:49:21+00:00",
-      "sha": "d0f1890",
-      "summary": "data: rival Facebook promo feed refresh (run 34063095251) (#846)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-06T22:23:58+00:00",
-      "sha": "68d8d34",
-      "summary": "service(provenance): freshness pulse recognizes search_vintage + pulled_at — 2 MEASURED layers un-blinded",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-06T21:26:00+00:00",
-      "sha": "b878f1f",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-06, run 34060979982)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-06T20:44:19+00:00",
-      "sha": "da5fe5e",
-      "summary": "docs(progress): log the rayong-catchment WCAG-AA microcopy fix (PR #844) + deploy-verify",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-06T20:40:03+00:00",
-      "sha": "f2fd8cf",
-      "summary": "ux: darken rayong-catchment light-theme muted microcopy to clear WCAG AA (#844)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-06T19:56:36+00:00",
-      "sha": "1494667",
-      "summary": "data: Thai-IP-only swarm refresh (run 34054643989) (#843)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-06T18:46:29+00:00",
-      "sha": "76f3767",
-      "summary": "feat(macro-sens): score ALL measured Thai farm-gate crops — headwind coconut/sugarcane/pineapple now surface (obj #1) (#842)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-09-06T17:42:54+00:00",
-      "sha": "d317cca",
-      "summary": "data: market-pulse swarm refresh (run 34042982182) (#839)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-06T17:17:08+00:00",
-      "sha": "394ce8f",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34045523534) (#841)",
-      "pillar": "3d-enrichment"
     }
   ]
 }
