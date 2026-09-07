@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-07T09:38:34+00:00",
-    "commit": "7ade0bf"
+    "generated_at": "2026-09-07T15:28:56+00:00",
+    "commit": "dec71d4"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,24 @@
   ],
   "activity": [
     {
+      "date": "2026-09-07T15:28:56+00:00",
+      "sha": "dec71d4",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-07, run 34138405239)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-07T12:31:28+00:00",
+      "sha": "f0184bd",
+      "summary": "feat(pipeline): schedule pull_nso_agri_debt into the swarm registry",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-07T10:21:23+00:00",
+      "sha": "d0ab966",
+      "summary": "service: healthy cross-pillar close-out + CEO-dashboard refresh to HEAD; composite-freshness read documented as a NON-fix",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-07T09:38:34+00:00",
       "sha": "7ade0bf",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-07, run 34106985214)",
@@ -693,24 +711,6 @@
       "sha": "394ce8f",
       "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34045523534) (#841)",
       "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-06T16:29:51+00:00",
-      "sha": "175a3f2",
-      "summary": "chore(dashboard): refresh CEO autonomy dashboard to HEAD after the farm-gate macro merge (#840)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-06T23:27:53+07:00",
-      "sha": "ab0c730",
-      "summary": "feat(market): macro_sensitivity reads MEASURED Thai farm-gate prices as PRIMARY (obj #1) (#840)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-06T15:26:13+00:00",
-      "sha": "5b4581d",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-06, run 34042200291)",
-      "pillar": "data-integration"
     }
   ]
 }
