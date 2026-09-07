@@ -3515,8 +3515,12 @@ function drawCompCoverage(){
           const pct=(o.pct!=null)?` <span class="mono">${o.pct>0?'+':''}${o.pct}%</span>`:'';
           return `<span style="color:${col(o.direction)}">${arrow(o.direction)} <b>${o.brand}</b> ${o.direction}</span> ${pts}${pct}`;
         }).join(' &nbsp;·&nbsp; ');
-        nstxt+=`<div style="margin-top:6px"><b>Network momentum — which rivals are growing vs shrinking</b> (obj #2): ${mchain}. ${TAG_E} `+
-          `<span class="sub">${nm.insight||''} Each point is a <b>cited</b> public figure (company IR / SET filings / official locator); only rivals with ≥2 cited dated counts are classified. Reported network trajectory, not market share — pair with the per-district rival mix for local pressure.</span></div>`;
+        // Disclose the single-cited-point rivals so the read accounts for all four big-4 rivals
+        // (two classified, two insufficient-data) rather than silently dropping them. Null-safe.
+        const uncl=Array.isArray(nm.unclassified)?nm.unclassified.map(u=>u.brand):[];
+        const uncltxt=uncl.length?` &nbsp;·&nbsp; <span style="color:var(--dim)">▬ <b>${uncl.join(', ')}</b> not classified</span> (one cited count only — no prior period)`:'';
+        nstxt+=`<div style="margin-top:6px"><b>Network momentum — which rivals are growing vs shrinking</b> (obj #2): ${mchain}${uncltxt}. ${TAG_E} `+
+          `<span class="sub">${nm.insight||''} Each point is a <b>cited</b> public figure (company IR / SET filings / official locator); only rivals with ≥2 cited dated counts are classified — the rest are shown as insufficient-data rather than back-computed. Reported network trajectory, not market share — pair with the per-district rival mix for local pressure.</span></div>`;
       }
       // MEASURED-footprint reframe: rivals' full store-locator networks can outrank AutoX on
       // points-on-the-ground even when it leads on cited listed-entity counts. All-measured, null-safe.
