@@ -10361,7 +10361,10 @@ function setLens(k){
 function renderBranchSort(){
   const opts=[['risk','Portfolio risk ▲ est'],['dwork','Factory workers'],['ind','Factories ≤10km'],['w','AutoX nearby']];
   $('#sortchips').setAttribute('role','group'); $('#sortchips').setAttribute('aria-label','Sort branches by');
-  $('#sortchips').innerHTML = opts.map(([k,t])=>`<button class="chip ${k===branchSort?'on':''}" data-s="${k}" aria-pressed="${k===branchSort}">${t}</button>`).join('');
+  // visible "Sort" affordance so sighted users can tell these pills SORT the table (the sibling
+  // Provinces/Market chip rows below their search FILTER by region — identical styling). aria-hidden
+  // because the group already carries aria-label="Sort branches by" for screen readers.
+  $('#sortchips').innerHTML = `<span class="sortlabel" aria-hidden="true">Sort</span>`+opts.map(([k,t])=>`<button class="chip ${k===branchSort?'on':''}" data-s="${k}" aria-pressed="${k===branchSort}">${t}</button>`).join('');
   $('#sortchips').onclick=e=>{const b=e.target.closest('.chip'); if(!b)return; branchSort=b.dataset.s;
     $('#sortchips').querySelectorAll('.chip').forEach(c=>{const on=c===b;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));}); renderBranches();};
   $('#search').oninput=()=>renderBranches();
