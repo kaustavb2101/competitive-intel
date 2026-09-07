@@ -146,9 +146,23 @@ BRANCH_TRAJECTORY = {
         {"date": "2025-12-31", "branches": 8673,
          "src": "MTC FY2025 — 8,673 total branches (company IR / kaohoon)."},
     ],
-    # Tidlor / Srisawad: only ONE cited dated branch count each (1,873 / 1,138) — no cited prior period,
-    # so they carry no trajectory here and are simply omitted from the momentum read rather than assigned
-    # a fabricated direction. (A brand present here with a single point would surface under `unclassified`.)
+    # Tidlor / Srisawad: only ONE cited dated branch count each (1,873 / 1,138 — the same listed-entity
+    # FY2025 figures the EXPECTED ranking uses, so no basis mismatch) — no cited PRIOR period exists in
+    # the repo to measure a direction against, so each carries a single point here and surfaces honestly
+    # under `unclassified` (never a back-computed / fabricated direction). This completes the big-4
+    # momentum read: all four rivals are accounted for — two classified, two disclosed-as-insufficient —
+    # rather than the two single-point brands being silently dropped.
+    "Tidlor": [
+        {"date": "2025-12-31", "branches": 1873,
+         "src": "Ngern Tid Lor FY2025 — 1,873 branches (company IR / thaipr; docs/RESEARCH_DIGEST.md "
+                "§B). Single cited dated count — no cited prior period, so no direction is computed."},
+    ],
+    "Srisawad": [
+        {"date": "2025-12-31", "branches": 1138,
+         "src": "Srisawad (SAWAD) ~late-2025 — ~1,138 listed-entity branches (IR oppday deck; "
+                "docs/RESEARCH_DIGEST.md §B). Single cited dated count — no cited prior period, so no "
+                "direction is computed."},
+    ],
 }
 
 
