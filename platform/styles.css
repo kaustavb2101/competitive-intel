@@ -584,6 +584,13 @@ html[data-theme="light"] .lens-more-menu{background:rgba(255,255,255,.98)}
 .chip:hover{color:var(--txt);border-color:#3a4868}
 .chip.on{background:linear-gradient(180deg,var(--accent),#3f5fe0);color:#fff;border-color:var(--accent);
   box-shadow:0 4px 14px -4px var(--accent-glow)}
+/* quiet "Sort" affordance before the #branches sort chips: those pills SORT the table, whereas the
+   sibling Provinces / Market chip rows below their own search FILTER by region — identical pill
+   styling, so a small visible label tells a sighted user which the row is. The #sortchips group
+   already carries aria-label="Sort branches by" for screen readers, so the label is aria-hidden to
+   avoid a double announce. */
+#sortchips .sortlabel{align-self:center;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
+  letter-spacing:.5px;color:var(--dim);margin-right:1px;user-select:none}
 button.btn,.ctl button,.cbtn{font-family:var(--sans);cursor:pointer}
 
 /* ---------- note / loading / a11y ---------- */
