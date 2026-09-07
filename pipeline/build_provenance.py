@@ -309,12 +309,25 @@ def _vintage_of(m):
     # one layer and neither layer has an earlier-priority key, so both were BLANK/undated in the
     # freshness pulse despite a strict-ISO vintage; adding them is purely additive — verified no other
     # populated layer carries either key, so exactly those two layers gain an honest age.
+    # retrieved (amphoe_crops / region_debt — OAE amphoe crop-area + NSO region household-debt pulls),
+    # cost_ingested (crop_margin — the OAE cost-of-production ingest) and verified (rival_universe — the
+    # rival-brand registry cross-check date) are all PULL/INGEST-side timestamps — the moment the source
+    # was fetched or last checked, NOT an observation window IN the data. Each of those four layers stamps
+    # freshness ONLY under one of these keys and carries NO data-observation vintage, so each showed BLANK
+    # in the Data-room card despite a real strict-ISO pull date. They are placed DEAD LAST (after every
+    # data-observation key, incl. the coarse int-year / span data-vintages) so any true data vintage
+    # always wins over a pull timestamp: this keeps the three OTHER layers carrying `retrieved` untouched
+    # — province_lfs (→ `vintage`), drought_district (→ `snapshot`) and, critically, oae_agstats, whose
+    # crop-year data-vintage `vintage_ce`=2024 must keep winning (surfacing its recent PULL date would
+    # falsely imply the 2024 crop-year data is days-fresh). Purely additive — exactly the four
+    # previously-blank pull-only layers gain an honest freshness age; no already-dated layer moves.
     for k in ("updated", "vintage", "as_of", "updated_to",
               "observed_to", "price_vintage", "price_asof", "farmgate_vintage", "board_vintage",
               "asof_card", "anchor_date", "stock_asof", "latest_month", "mob_anchor",
               "newest_observation_date", "search_vintage",
               "sentiment_anchor", "snapshot", "pico_vintage", "vintage_individual", "pulled_at_utc",
-              "pulled_at", "pulled", "promos_pulled_at", "latest_year_ce", "vintage_ce", "span"):
+              "pulled_at", "pulled", "promos_pulled_at", "latest_year_ce", "vintage_ce", "span",
+              "retrieved", "cost_ingested", "verified"):
         v = m.get(k)
         if isinstance(v, str) and v.strip():
             return _trunc(v, 24)
