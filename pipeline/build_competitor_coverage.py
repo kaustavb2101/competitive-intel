@@ -121,47 +121,57 @@ PEER_FINANCIALS_SOURCES = {
 # competitive pressure is RISING vs RECEDING on the districts AutoX already runs — a rival opening
 # branches into our catchments erodes margin; a rival vacating them frees ground. Every point is a
 # CITED public figure (each carries its own `src`); only rivals with ≥2 cited dated points get a
-# direction — the rest stay honestly unclassified rather than back-computed. Dates are the figures'
-# own observation dates (never wall-clock); the span is computed from those dates only, so the whole
-# derivation is deterministic. This is REPORTED-from-public-reports (same basis as `expected`), NOT a
-# measured census of the rivals' own sites.
+# direction — the rest stay honestly unclassified rather than back-computed. Each point states its
+# `date_precision`: "day" (an exact as-of date the source publishes), "fiscal-year-end" (an FYxxxx IR
+# figure, as-of that fiscal year-end), or "approximate" (the source cites only a period, e.g. "late
+# 2025", with no exact day — the `date` then carries a placeholder day, NEVER treated as a cited
+# observation day). Direction/span/pace arithmetic runs ONLY over exact points (day / fiscal-year-end);
+# an approximate point never enters date arithmetic (guarded in _network_momentum), so no false
+# precision can leak into a computed trajectory. The span is computed from the exact points' dates
+# only, so the whole derivation is deterministic. This is REPORTED-from-public-reports (same basis as
+# `expected`), NOT a measured census of the rivals' own sites.
 BRANCH_TRAJECTORY = {
     "Heng": [
-        {"date": "2024-12-31", "branches": 1018,
+        {"date": "2024-12-31", "date_precision": "day", "branches": 1018,
          "src": "Heng annual report 2025 — network built to 1,018 branches by 2024 (the peak; "
                 "'plans to ... increase the number of branches to 1,018 branches by 2024'). "
                 "source-data/investor_docs/text/HENG_annual_2025_en.txt"},
-        {"date": "2025-12-31", "branches": 743,
+        {"date": "2025-12-31", "date_precision": "day", "branches": 743,
          "src": "Heng annual report 2025 — 'As of December 31, 2025, the Company provides services "
                 "to retail customers through 743 branch offices'. "
                 "source-data/investor_docs/text/HENG_annual_2025_en.txt"},
-        {"date": "2026-06-30", "branches": 450,
+        {"date": "2026-06-30", "date_precision": "day", "branches": 450,
          "src": "Heng SET filings, H1-2026 (docs/RESEARCH_DIGEST.md §B); confirmed by the official "
                 "hengleasing.com locator = 450 measured points (competitors_census.json)."},
     ],
     "Muangthai": [
-        {"date": "2024-12-31", "branches": 8155,
-         "src": "MTC FY2025 8,673 total − 518 opened in 2025 = 8,155 prior-year (arithmetic on cited "
-                "figures; company IR / kaohoon)."},
-        {"date": "2025-12-31", "branches": 8673,
-         "src": "MTC FY2025 — 8,673 total branches (company IR / kaohoon)."},
+        {"date": "2024-12-31", "date_precision": "fiscal-year-end", "branches": 8155,
+         "src": "MTC FY2025 8,673 total − 518 opened in 2025 = 8,155 as-of FY2024 year-end (arithmetic "
+                "on cited figures; company IR / kaohoon)."},
+        {"date": "2025-12-31", "date_precision": "fiscal-year-end", "branches": 8673,
+         "src": "MTC FY2025 — 8,673 total branches, as-of FY2025 year-end (company IR / kaohoon)."},
     ],
     # Tidlor / Srisawad: only ONE cited dated branch count each (1,873 / 1,138 — the same listed-entity
-    # FY2025 figures the EXPECTED ranking uses, so no basis mismatch) — no cited PRIOR period exists in
-    # the repo to measure a direction against, so each carries a single point here and surfaces honestly
+    # figures the EXPECTED ranking uses, so no basis mismatch) — no cited PRIOR period exists in the
+    # repo to measure a direction against, so each carries a single point here and surfaces honestly
     # under `unclassified` (never a back-computed / fabricated direction). This completes the big-4
     # momentum read: all four rivals are accounted for — two classified, two disclosed-as-insufficient —
-    # rather than the two single-point brands being silently dropped.
+    # rather than the two single-point brands being silently dropped. Tidlor's point is a FY2025 IR
+    # figure (fiscal-year-end precision); Srisawad's source cites only "late 2025" with no exact day,
+    # so it is flagged approximate and excluded from all date arithmetic.
     "Tidlor": [
-        {"date": "2025-12-31", "branches": 1873,
-         "src": "Ngern Tid Lor FY2025 — 1,873 branches (company IR / thaipr; docs/RESEARCH_DIGEST.md "
-                "§B). Single cited dated count — no cited prior period, so no direction is computed."},
-    ],
-    "Srisawad": [
-        {"date": "2025-12-31", "branches": 1138,
-         "src": "Srisawad (SAWAD) ~late-2025 — ~1,138 listed-entity branches (IR oppday deck; "
+        {"date": "2025-12-31", "date_precision": "fiscal-year-end", "branches": 1873,
+         "src": "Ngern Tid Lor FY2025 — 1,873 branches, as-of FY2025 year-end (company IR / thaipr; "
                 "docs/RESEARCH_DIGEST.md §B). Single cited dated count — no cited prior period, so no "
                 "direction is computed."},
+    ],
+    "Srisawad": [
+        {"date": "2025-12-31", "date_precision": "approximate", "branches": 1138,
+         "src": "Srisawad (SAWAD) — ~1,138 listed-entity branches, cited only as '~late 2025' with no "
+                "exact day published (IR oppday deck; docs/RESEARCH_DIGEST.md §B). The day shown is a "
+                "placeholder, NOT a cited observation day; this point is APPROXIMATE and excluded from "
+                "all date arithmetic. Single cited count — no cited prior period, so no direction is "
+                "computed."},
     ],
 }
 
@@ -445,6 +455,16 @@ def _network_momentum():
         net = last["branches"] - first["branches"]
         return round(net / (days / 365.25), 1)
 
+    # A point only enters direction/span/pace arithmetic if its date is an EXACT as-of date — an exact
+    # published day or a fiscal-year-end. A point flagged "approximate" (the source cites only a period,
+    # e.g. "late 2025", so its `date` day is a placeholder) is never used to compute a direction, so no
+    # false precision can leak into a trajectory. A brand left with <2 exact points is disclosed as
+    # unclassified rather than back-computed.
+    EXACT_PRECISION = {"day", "fiscal-year-end"}
+
+    def _is_exact(p):
+        return p.get("date_precision", "day") in EXACT_PRECISION
+
     classified, unclassified = [], []
     for b in BRANDS:
         pts = BRANCH_TRAJECTORY.get(b)
@@ -453,11 +473,18 @@ def _network_momentum():
         # keep the cited order (chronological as authored); guard with an explicit date sort so the
         # first/last are unambiguous regardless of dict authoring order.
         pts = sorted(pts, key=lambda p: p["date"])
-        if len(pts) < 2:
+        exact = [p for p in pts if _is_exact(p)]
+        if len(exact) < 2:
+            approx_note = ("" if all(_is_exact(p) for p in pts)
+                           else " (its cited count is approximate — a period without an exact day — so "
+                                "it is never used to compute a direction)")
             unclassified.append({"brand": b, "reason": "only one cited dated branch count — no prior "
-                                 "period to measure direction against; not back-computed",
+                                 "period to measure direction against; not back-computed" + approx_note,
                                  "points": pts})
             continue
+        # arithmetic runs over the EXACT points only (approximate points, if any, are carried on the
+        # brand's `points` for disclosure but excluded from first/last/net/span/pace).
+        pts = exact
         first, last = pts[0], pts[-1]
         net = last["branches"] - first["branches"]
         pct = round(100.0 * net / first["branches"], 1) if first["branches"] else None
@@ -497,8 +524,11 @@ def _network_momentum():
         "label": "NETWORK MOMENTUM — cited period-over-period branch counts per rival: the DIRECTION of "
                  "each network (objective #2 — where competitive pressure is rising vs receding on the "
                  "districts AutoX already runs). Each point is a CITED public figure (company IR / SET "
-                 "filings / official locator, see each point's src); only rivals with ≥2 cited dated "
-                 "points are classified — the rest stay unclassified rather than back-computed.",
+                 "filings / official locator, see each point's src) carrying its date_precision (day / "
+                 "fiscal-year-end / approximate); only rivals with ≥2 EXACT-dated points (day or "
+                 "fiscal-year-end) are classified, and direction/span/pace are computed from those exact "
+                 "points alone — an approximate point (a period cited without an exact day) is disclosed "
+                 "but never enters date arithmetic. The rest stay unclassified rather than back-computed.",
         "brands": classified,
         "expanding": expanding,
         "contracting": contracting,
