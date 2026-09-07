@@ -18,8 +18,10 @@ SENSITIVITY MATRIX, and publishes each branch's top-3 macro exposures + the domi
 MEASURED vs ESTIMATED (the data-mandate — stated explicitly, repeated in meta)
 ------------------------------------------------------------------------------
   MEASURED   occupation SHARES per branch (Overture Places, a sample/lower bound).
-  MEASURED   price signals (World Bank Pink Sheet YoY via source-data/commodity_board.json —
-             GLOBAL prices, a direction proxy, NOT Thai farm-gate).
+  MEASURED   crop price signals — Thai FARM-GATE YoY as PRIMARY (source-data/farmgate_prices.json,
+             NABC) for rice/rubber/palm/cassava/maize/coconut/sugarcane/pineapple; the World Bank
+             GLOBAL Pink Sheet (source-data/commodity_board.json) is fallback-only for a crop
+             farm-gate does not price, and the base for gold + livestock (no farm-gate equivalent).
   MEASURED   province crop mix + drought proxy (crop_stress.json: OAE planting area,
              rain_3mo_anom % of normal).
   MEASURED   province household debt-to-income (NSO SES 2566 via household_risk_by_province.json);
@@ -75,15 +77,36 @@ BRANCHES = os.path.join(DATA, "branches.json")
 CROP = os.path.join(DATA, "crop_stress.json")
 HH = os.path.join(DATA, "household_risk_by_province.json")
 BOARD = os.path.join(ROOT, "source-data", "commodity_board.json")
+# MEASURED Thai FARM-GATE price layer — PRIMARY over the GLOBAL Pink Sheet for the crops it prices.
+FARMGATE = os.path.join(ROOT, "source-data", "farmgate_prices.json")
 META = os.path.join(DATA, "meta.json")
 OUT = os.path.join(DATA, "macro_exposure.json")
 sys.path.insert(0, HERE)
 from lib.regionmap import canonical
 
-# ── the macro-factor set (6-8, only what the offline data actually supports) ─
+# ── the macro-factor set (only what the offline data actually supports) ─
 # Order is FIXED — it is the tie-break for the dominant factor and the index space of the
-# compact vector. Keys are short on purpose (payload); labels live in meta.
-FACTOR_ORDER = ("rice", "rubber", "palm", "gold", "livestock", "drought", "leverage", "mfg")
+# compact vector. Keys are short on purpose (payload); labels live in meta. The crop factors are
+# grouped at the front: the three Pink-Sheet-backed majors (rice/rubber/palm) then the five
+# farm-gate-only crops that widen the read to the MEASURED headwind crops (coconut/sugarcane/
+# pineapple — negative Thai farm-gate YoY — plus cassava/maize), each scaled by its own province
+# planting-area share so it only ever bites where that crop is actually farmed.
+FACTOR_ORDER = ("rice", "rubber", "palm", "cassava", "maize", "coconut", "sugarcane", "pineapple",
+                "gold", "livestock", "drought", "leverage", "mfg")
+# The crop factors, in the same fixed front-of-order. A crop scores only when it carries a price
+# signal (farm-gate quote, else a Pink Sheet row for the three majors) AND the branch province has a
+# measured planting-area share for it — otherwise the cell contributes nothing (graceful absence).
+CROP_FACTORS = ("rice", "rubber", "palm", "cassava", "maize", "coconut", "sugarcane", "pineapple")
+# crop factor -> crop_yoy key in farmgate_prices.json (Thai farm-gate MEASURED, PRIMARY base).
+FARMGATE_KEY = {
+    "rice": "rice", "rubber": "rubber", "palm": "oilpalm", "cassava": "cassava",
+    "maize": "maize", "coconut": "coconut", "sugarcane": "sugarcane", "pineapple": "pineapple",
+}
+# crop factor -> crop_stress.json crop_mix crop name (the MEASURED province planting-area share).
+CROP_NAME = {
+    "rice": "Rice", "rubber": "Rubber", "palm": "Oil palm", "cassava": "Cassava",
+    "maize": "Maize", "coconut": "Coconut", "sugarcane": "Sugarcane", "pineapple": "Pineapple",
+}
 
 # Pink Sheet YoY denominator: |yoy| of 25% == full severity 100. Same denominator
 # build_crop_stress.py uses for its price_term (clamp(-price/25)) — kept consistent.
@@ -101,6 +124,18 @@ MFG_STRESS = 0.5
 #   rice_share / rubber_share / palm_share  — crop_stress.json crop_mix planting-area share
 #   crop_dependence                          — crop_stress.json crop_dependence (0..1)
 _PT = "farm-price passthrough: in crop provinces local trade cash flow follows farm income (scaled by the province's measured crop share)"
+_AGRI_WHY = "farmers' income IS the crop price, weighted by the province's measured planting-area share for this crop"
+
+
+# Expand a single per-bucket crop weight into one scaled cell per MEASURED crop factor, each scaled
+# by THAT crop's own province planting share (`<crop>_share`). This applies the identical
+# farm-price-passthrough credit judgement uniformly to every crop the farm-gate feed prices — it is
+# the same editorial weight generalized, NOT a new per-crop judgement, so no crop is privileged and
+# a headwind crop (coconut/sugarcane/pineapple) bites exactly where it is actually farmed.
+def _crop_cells(w, why):
+    return {c: {"w": w, "scale": "%s_share" % c, "why": why} for c in CROP_FACTORS}
+
+
 MATRIX = {
     "factory": {
         "mfg":      {"w": 0.90, "why": "production jobs and overtime move directly with the manufacturing cycle"},
@@ -111,16 +146,12 @@ MATRIX = {
         "leverage": {"w": 0.30, "why": "big-ticket vehicle purchases are the first spend leveraged households defer"},
     },
     "retail": {
-        "rice":     {"w": 0.45, "scale": "rice_share", "why": _PT},
-        "rubber":   {"w": 0.45, "scale": "rubber_share", "why": _PT},
-        "palm":     {"w": 0.45, "scale": "palm_share", "why": _PT},
+        **_crop_cells(0.45, _PT),
         "drought":  {"w": 0.30, "scale": "crop_dependence", "why": "drought cuts farm cash that market vendors live off, where the province actually farms at scale"},
         "leverage": {"w": 0.35, "why": "informal vendor income falls when leveraged households squeeze daily spending"},
     },
     "food": {
-        "rice":     {"w": 0.30, "scale": "rice_share", "why": _PT},
-        "rubber":   {"w": 0.30, "scale": "rubber_share", "why": _PT},
-        "palm":     {"w": 0.30, "scale": "palm_share", "why": _PT},
+        **_crop_cells(0.30, _PT),
         "drought":  {"w": 0.20, "scale": "crop_dependence", "why": "eating out is an early cut when farm cash dries up in crop-dependent provinces"},
         "leverage": {"w": 0.30, "why": "food service is discretionary spend — squeezed households eat out less"},
     },
@@ -145,17 +176,13 @@ MATRIX = {
         "leverage": {"w": 0.15, "why": "salaried professionals carry debt but income is comparatively stable"},
     },
     "agriculture": {
-        "rice":     {"w": 1.00, "scale": "rice_share", "why": "rice farmers' income IS the rice price, weighted by the province's measured rice planting share"},
-        "rubber":   {"w": 1.00, "scale": "rubber_share", "why": "rubber tappers' income IS the rubber price, weighted by the province's measured rubber share"},
-        "palm":     {"w": 1.00, "scale": "palm_share", "why": "oil-palm growers' income IS the palm price, weighted by the province's measured palm share"},
+        **_crop_cells(1.00, _AGRI_WHY),
         "livestock": {"w": 0.30, "why": "livestock (chicken/beef) income lever; kept low because the crop-vs-livestock split is NOT measured per province"},
         "drought":  {"w": 0.90, "why": "rainfall failure hits farm yield and farm cash flow directly"},
         "leverage": {"w": 0.25, "why": "farm households carry high seasonal input debt on top of consumer debt"},
     },
     "personal": {
-        "rice":     {"w": 0.25, "scale": "rice_share", "why": _PT},
-        "rubber":   {"w": 0.25, "scale": "rubber_share", "why": _PT},
-        "palm":     {"w": 0.25, "scale": "palm_share", "why": _PT},
+        **_crop_cells(0.25, _PT),
         "leverage": {"w": 0.30, "why": "personal services (salons, repair, laundry) are the first spend cut by squeezed households"},
     },
     "logistics": {
@@ -174,6 +201,8 @@ _LIVESTOCK_LABS = ("Chicken", "Beef")
 
 FACTOR_LABELS = {
     "rice": "Rice price", "rubber": "Rubber price", "palm": "Palm-oil price",
+    "cassava": "Cassava price", "maize": "Maize price", "coconut": "Coconut price",
+    "sugarcane": "Sugarcane price", "pineapple": "Pineapple price",
     "gold": "Gold price", "livestock": "Livestock prices (chicken/beef)",
     "drought": "Drought / rainfall", "leverage": "Household leverage (DTI)",
     "mfg": "Manufacturing cycle",
@@ -216,17 +245,60 @@ def build():
     vintages = sorted({r.get("stale") for r in board if r.get("stale")})
     price_vintage = vintages[-1] if vintages else None
 
+    # ── PREFER the dedicated MEASURED Thai FARM-GATE layer over the GLOBAL Pink Sheet proxy ──
+    # farmgate_prices.json.crop_yoy carries daily national-average Thai farm-gate YoY for the raw
+    # farm-commodity forms of these crops (paddy / raw rubber sheet / fresh palm bunch / cassava root
+    # / cane / whole coconut / cannery pineapple / maize). CLAUDE.md's stated policy — and
+    # build_crop_stress.py's price_stress + the sibling build_macro_sensitivity.py — treat farm-gate
+    # as the PRIMARY price base and the World Bank GLOBAL Pink Sheet as fallback-only, for crops the
+    # farm-gate feed does not price. This builder now follows the same policy so all three sibling
+    # agri-risk reads share ONE price base. Absent file => the three majors fall back to the Pink
+    # Sheet and the five farm-gate-only crops simply do not score (graceful absence).
+    farmgate = _load(FARMGATE) if os.path.exists(FARMGATE) else None
+    fg_yoy = ((farmgate or {}).get("crop_yoy") or {})
+    fg_vintage = ((farmgate or {}).get("meta") or {}).get("vintage")
+
+    # ── measured crop price signals (Thai farm-gate first, GLOBAL Pink Sheet fallback for majors) ──
+    # A crop is a scored factor only when it carries a real signal here; a crop with neither a
+    # farm-gate quote nor a Pink Sheet row is dropped and never referenced by the scoring loop.
     signals = {}
-    for f, lab in _BOARD_LAB.items():
-        row = by_lab[lab]
-        yoy = float(row["yoy"])
-        signals[f] = {
-            "yoy_pct": yoy,
-            "vintage": row.get("stale"),
-            "source": "World Bank Pink Sheet via source-data/commodity_board.json ('%s')" % lab,
-            "provenance": "MEASURED — GLOBAL price YoY %, a direction proxy, NOT Thai farm-gate",
-            "note": row.get("note"),
-        }
+    for f in CROP_FACTORS:
+        fg = fg_yoy.get(FARMGATE_KEY[f])
+        if isinstance(fg, (int, float)):
+            yoy = float(fg)
+            signals[f] = {
+                "yoy_pct": yoy,
+                "vintage": fg_vintage,
+                "basis": "farmgate",
+                "source": "Thai farm-gate daily national average via source-data/farmgate_prices.json "
+                          "crop_yoy['%s'] (NABC agriapi.nabc.go.th)" % FARMGATE_KEY[f],
+                "provenance": "MEASURED — Thai FARM-GATE price YoY %, the price the farmer receives",
+            }
+        elif f in _BOARD_LAB:
+            lab = _BOARD_LAB[f]
+            row = by_lab[lab]
+            yoy = float(row["yoy"])
+            signals[f] = {
+                "yoy_pct": yoy,
+                "vintage": row.get("stale"),
+                "basis": "global",
+                "source": "World Bank Pink Sheet via source-data/commodity_board.json ('%s') — "
+                          "fallback: this crop is absent from farmgate_prices.json" % lab,
+                "provenance": "MEASURED — GLOBAL price YoY %, a direction proxy, NOT Thai farm-gate "
+                              "(fallback base — no Thai farm-gate quote for this crop)",
+                "note": row.get("note"),
+            }
+        # else: no farm-gate quote and no Pink Sheet row -> this crop is not a scored factor.
+    # gold — no Thai farm-gate equivalent; stays on the World Bank Pink Sheet (collateral/pawn price).
+    gold_row = by_lab[_BOARD_LAB["gold"]]
+    signals["gold"] = {
+        "yoy_pct": float(gold_row["yoy"]),
+        "vintage": gold_row.get("stale"),
+        "basis": "global",
+        "source": "World Bank Pink Sheet via source-data/commodity_board.json ('Gold')",
+        "provenance": "MEASURED — GLOBAL price YoY %, a direction proxy (no Thai farm-gate equivalent)",
+        "note": gold_row.get("note"),
+    }
     lv_rows = [by_lab[l] for l in _LIVESTOCK_LABS]
     lv_yoy = round(sum(float(r["yoy"]) for r in lv_rows) / len(lv_rows), 1)
     signals["livestock"] = {
@@ -241,13 +313,10 @@ def build():
     prov = {}
     for p in crop:
         shares = {c["crop"]: c["share"] for c in p.get("crop_mix", [])}
-        prov[canonical(p["th"])] = {
-            "rice_share": shares.get("Rice", 0.0),
-            "rubber_share": shares.get("Rubber", 0.0),
-            "palm_share": shares.get("Oil palm", 0.0),
-            "crop_dependence": p.get("crop_dependence") or 0.0,
-            "drought": p.get("drought") or 0.0,
-        }
+        rec = {"%s_share" % f: shares.get(CROP_NAME[f], 0.0) for f in CROP_FACTORS}
+        rec["crop_dependence"] = p.get("crop_dependence") or 0.0
+        rec["drought"] = p.get("drought") or 0.0
+        prov[canonical(p["th"])] = rec
     dti_sev = {}
     dti_val = {}
     for p in hh:
@@ -281,10 +350,13 @@ def build():
                       "industrial-cycle series exists in the offline sources (honest gap)",
     }
 
-    # national severity + direction per factor (price factors; province factors resolve per branch)
+    # national severity + direction per factor (price factors; province factors resolve per branch).
+    # Only crop factors that actually carry a price signal (farm-gate or Pink Sheet fallback) score —
+    # a crop absent from `signals` is skipped here and guarded out of the per-branch loop below.
+    active_crops = [f for f in CROP_FACTORS if f in signals]
     nat_sev = {}
     direction = {}
-    for f in ("rice", "rubber", "palm", "gold", "livestock"):
+    for f in active_crops + ["gold", "livestock"]:
         yoy = signals[f]["yoy_pct"]
         nat_sev[f] = round(_clamp01(abs(yoy) / PRICE_SEV_DEN) * 100, 1)
         direction[f] = "tailwind" if yoy > 0 else "headwind"
@@ -308,8 +380,9 @@ def build():
             # drought from the branch's own measured rain field (same formula).
             rain = br.get("rain")
             dr = _clamp01((100.0 - rain) / 40.0) if isinstance(rain, (int, float)) else 0.0
-            pp = {"rice_share": 0.0, "rubber_share": 0.0, "palm_share": 0.0,
-                  "crop_dependence": 0.0, "drought": dr}
+            pp = {"%s_share" % f: 0.0 for f in CROP_FACTORS}
+            pp["crop_dependence"] = 0.0
+            pp["drought"] = dr
             n_fallback_rain += 1
         sev = dict(nat_sev)
         sev["drought"] = round(pp["drought"] * 100, 1)
@@ -322,6 +395,8 @@ def build():
                 if share <= 0:
                     continue
                 for f, cell in MATRIX.get(bk, {}).items():
+                    if f not in sev:
+                        continue  # crop factor with no price signal this vintage — never scored
                     w = cell["w"]
                     sc = cell.get("scale")
                     if sc:
@@ -344,6 +419,8 @@ def build():
 
     factors = []
     for f in FACTOR_ORDER:
+        if f not in signals:
+            continue  # crop factor with no price signal this vintage — omitted (never scored)
         factors.append({
             "key": f,
             "label": FACTOR_LABELS[f],
@@ -364,8 +441,12 @@ def build():
         "provenance": {
             "occupation_shares": "MEASURED — Overture Maps Places establishment mix ≤10km "
                                  "(platform/data/branch_occupations.json; a sample/lower bound, not a registry)",
-            "price_signals": "MEASURED — World Bank Pink Sheet YoY (source-data/commodity_board.json, "
-                             "vintage %s). GLOBAL prices, a direction proxy, NOT Thai farm-gate." % price_vintage,
+            "price_signals": "MEASURED — Thai FARM-GATE crop price YoY as PRIMARY (source-data/"
+                             "farmgate_prices.json crop_yoy, NABC, vintage %s) for rice/rubber/palm plus the "
+                             "widened set cassava/maize/coconut/sugarcane/pineapple; World Bank GLOBAL Pink "
+                             "Sheet (source-data/commodity_board.json, vintage %s) is fallback-only for a crop "
+                             "farm-gate does not price, and the base for gold and livestock. Each factor's "
+                             "signal.basis is 'farmgate' | 'global'." % (fg_vintage, price_vintage),
             "drought_signal": "MEASURED PROXY — 3-month rainfall vs normal per province (crop_stress.json)",
             "leverage_signal": "MEASURED — NSO SES 2566 household debt-to-income per province; severity is "
                                "its ESTIMATED percentile rank (household_risk_by_province.json stress_index)",
@@ -377,7 +458,8 @@ def build():
                                 "crop_stress.json (OAE) scale the crop/drought cells marked 'scale'",
         },
         "vintages": {
-            "prices": price_vintage,
+            "farmgate_prices": fg_vintage,
+            "pink_sheet_prices": price_vintage,
             "drought": app_meta.get("updated"),
             "household_dti": "NSO SES 2566 (2023 CE)",
         },
