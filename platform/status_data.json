@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-07T04:16:49+00:00",
-    "commit": "e96ae04"
+    "generated_at": "2026-09-07T09:38:34+00:00",
+    "commit": "7ade0bf"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-09-07T09:38:34+00:00",
+      "sha": "7ade0bf",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-07, run 34106985214)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-07T08:41:19+00:00",
+      "sha": "3958c03",
+      "summary": "data: NABC live prices (2026-09-07, run 34101440598)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-07T08:26:44+00:00",
+      "sha": "c43bd64",
+      "summary": "docs(progress): log the #branches sort-chip label UX run (PR #856)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-07T15:23:53+07:00",
+      "sha": "42857b9",
+      "summary": "ux: label the #branches sort-chip row so it reads as Sort, not Filter (#856)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-07T06:36:48+00:00",
+      "sha": "baf121f",
+      "summary": "service(provenance): freshness pulse reads new_window_months array — vehicle_brands un-blinded (last freshness-blind layer)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-07T05:59:08+00:00",
+      "sha": "de30423",
+      "summary": "data(census): refresh the Union Auction forward book (run 34080833251) (#851)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-07T05:28:51+00:00",
+      "sha": "73a4a3f",
+      "summary": "data: market-pulse swarm refresh (run 34080773570) (#852)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-07T05:07:01+00:00",
+      "sha": "5c9c136",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34082508439) (#853)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-07T04:17:11+00:00",
+      "sha": "eaf7828",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD after the freshness-pulse fix",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-07T04:16:49+00:00",
       "sha": "e96ae04",
       "summary": "service(provenance): freshness pulse recognizes 3 pull-side timestamp keys — 4 MEASURED layers un-blinded",
@@ -656,60 +710,6 @@
       "date": "2026-09-06T15:26:13+00:00",
       "sha": "5b4581d",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-06, run 34042200291)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-06T14:15:31+00:00",
-      "sha": "2b07c14",
-      "summary": "docs: log ux-spa-render-arrow-decorative-aria-hidden merge+deploy+verify (PR #838)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-06T21:12:00+07:00",
-      "sha": "9aef3f7",
-      "summary": "ux: aria-hidden decorative arrows in app.js SPA render-string links (#838)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-06T12:55:47+00:00",
-      "sha": "164145f",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-06, run 34034463086)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-06T12:49:17+00:00",
-      "sha": "946affe",
-      "summary": "feat(exposure): agri debt incidence × our agri book — double-exposed-province join (MEASURED both axes, obj #1) (#837)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-09-06T10:10:08+00:00",
-      "sha": "f4d8f22",
-      "summary": "service: evidence-based five-pillar sweep — GREEN; CEO dashboard refresh to HEAD (2026-09-06)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-06T09:20:56+00:00",
-      "sha": "802dd1f",
-      "summary": "data(census): refresh the Union Auction forward book (run 34020903189) (#832)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-06T08:58:34+00:00",
-      "sha": "399ac7c",
-      "summary": "data: market-pulse swarm refresh (run 34020876020) (#834)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-06T15:19:26+07:00",
-      "sha": "9e3a46a",
-      "summary": "ux: aria-hidden leading glyphs on data.html 3D-scene links (#835)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-06T08:00:41+00:00",
-      "sha": "4327aff",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-06, run 34020572272)",
       "pillar": "data-integration"
     }
   ]
