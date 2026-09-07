@@ -87,6 +87,14 @@ UPSTREAM_CAPPED = {
     # for the same reason as its DLT siblings, not stale by neglect. Re-arms the day a >stub 2569_03+
     # monthly file lands (the window end advances → this key no longer matches, staleness re-arms).
     ("collateral_flow.json", "2026-02"): "DLT dataset_stat_1_008 newest complete monthly release (sttt_car_tax_mm_2569_02 = Feb 2569 = 2026-02); no 2569_03+ file published upstream (verified via gdcatalog CKAN, HTTP 200 any-IP, 2026-08-18)",
+    # vehicle_brands.json is the ESTIMATED national-brand-mix x province-volume extrapolation, built from
+    # the SAME DLT monthly releases as its siblings: its trailing-12-month new-registration window is the
+    # newest 12 months common to dataset_stat_1_008 (flow) AND stat_1_1_01 (brand), ending Feb 2569
+    # (2026-02, newly surfaced by the _vintage_of new_window_months array read). DLT publishes no 2569_03+
+    # monthly file, so 2026-02 is the newest complete window upstream — capped for the same reason as
+    # vehicle_mix / collateral_flow, not stale by neglect. Re-arms the day a 2569_03+ file lands (the
+    # window end advances -> the vintage string changes -> this key no longer matches, staleness re-arms).
+    ("vehicle_brands.json", "2026-02"): "DLT trailing-12mo new-reg window (dataset_stat_1_008 x stat_1_1_01) ends Feb 2569 (2026-02); no 2569_03+ monthly file published upstream — same cap as vehicle_mix / collateral_flow",
 }
 
 
@@ -333,17 +341,21 @@ def _vintage_of(m):
             return _trunc(v, 24)
         if isinstance(v, int) and k in ("latest_year_ce", "vintage_ce"):
             return str(v)
-    # window (collateral_flow — the DLT car-law registration-flow / used-collateral pulse): this
-    # layer stamps its data-observation vintage ONLY as a two-element [start, end] month array
-    # (meta.window, e.g. ["2025-03","2026-02"]), never a scalar key, so the scan above never saw it
-    # and the layer showed BLANK in the Data-room card despite carrying a real MEASURED observation
-    # vintage. The trailing-12-month window END is the freshness date (the newest month IN the
-    # series) — a strict ISO month that reads like observed_to. Placed last so any scalar/ISO key
-    # above always wins; verified only collateral_flow carries a window array with no scalar vintage
-    # key, so this is purely additive — no populated layer moves.
-    w = m.get("window")
-    if isinstance(w, (list, tuple)) and len(w) >= 2 and isinstance(w[-1], str) and w[-1].strip():
-        return _trunc(w[-1], 24)
+    # window (collateral_flow — the DLT car-law registration-flow / used-collateral pulse) and
+    # new_window_months (vehicle_brands — the ESTIMATED brand x province new-registration extrapolation):
+    # each stamps its data-observation vintage ONLY as an ascending month array (collateral_flow as a
+    # two-element [start, end] meta.window e.g. ["2025-03","2026-02"]; vehicle_brands as the full
+    # trailing-12-month meta.new_window_months e.g. [...,"2026-02"]), never a scalar key, so the scan
+    # above never saw it and the layer showed BLANK in the Data-room card despite a real MEASURED
+    # observation window. The window END (the newest month IN the series, array[-1]) is the freshness
+    # date — a strict ISO month that reads like observed_to. Placed last so any scalar/ISO key above
+    # always wins; verified vehicle_mix (which ALSO carries new_window_months) already resolves via its
+    # earlier scalar stock_asof key and is UNTOUCHED, and no other populated layer carries either array
+    # with no earlier scalar vintage key, so this is purely additive — only vehicle_brands gains a date.
+    for wk in ("window", "new_window_months"):
+        w = m.get(wk)
+        if isinstance(w, (list, tuple)) and len(w) >= 2 and isinstance(w[-1], str) and w[-1].strip():
+            return _trunc(w[-1], 24)
     return ""
 
 
