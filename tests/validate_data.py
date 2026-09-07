@@ -2298,6 +2298,63 @@ def check_competitor_coverage():
     else:
         ok("competitor_coverage entries sane (found measured, expected cited-or-null, coverage consistent)")
 
+    # NETWORK MOMENTUM regression lock (build_competitor_coverage._network_momentum). The top-level
+    # brand rows above never touch meta.national_standing.network_momentum, so without this a silent
+    # regression — dropping the single-point rivals back out of `unclassified`, or letting an
+    # approximate-dated point drive a computed direction (false precision) — would still pass --check.
+    # Assert the honest big-4 shape: the classified rivals carry a direction computed only from
+    # EXACT-dated points, and every insufficient-data rival (one cited count only) is DISCLOSED under
+    # `unclassified` with a single point and NO computed direction — never silently omitted.
+    EXACT_PREC = {"day", "fiscal-year-end"}
+    nm = (meta.get("national_standing") or {}).get("network_momentum") if isinstance(meta, dict) else None
+    if not isinstance(nm, dict):
+        fail("network_momentum present under meta.national_standing", "missing or not an object")
+    else:
+        mbad = []
+        cls = nm.get("brands") if isinstance(nm.get("brands"), list) else []
+        uncls = nm.get("unclassified") if isinstance(nm.get("unclassified"), list) else []
+        cls_names = {o.get("brand") for o in cls if isinstance(o, dict)}
+        uncls_names = {o.get("brand") for o in uncls if isinstance(o, dict)}
+        # classified rivals: a direction, and arithmetic over EXACT-dated points only (no false precision)
+        for o in cls:
+            if not isinstance(o, dict):
+                mbad.append("non-object classified entry %r" % o); continue
+            nm_b = o.get("brand")
+            if o.get("direction") not in ("expanding", "contracting", "flat"):
+                mbad.append("classified %s has no valid direction (%r)" % (nm_b, o.get("direction")))
+            pts = o.get("points") if isinstance(o.get("points"), list) else []
+            if len(pts) < 2:
+                mbad.append("classified %s has <2 points (%d)" % (nm_b, len(pts)))
+            for p in pts:
+                if isinstance(p, dict) and p.get("date_precision", "day") not in EXACT_PREC:
+                    mbad.append("classified %s uses a non-exact-dated point in its trajectory "
+                                "(date_precision=%r) — false precision" % (nm_b, p.get("date_precision")))
+        # the single-point rivals MUST be disclosed as unclassified with exactly one point + no direction
+        for want in ("Tidlor", "Srisawad"):
+            if want not in uncls_names:
+                mbad.append("%s not disclosed under network_momentum.unclassified (silent drop regressed)"
+                            % want)
+        for o in uncls:
+            if not isinstance(o, dict):
+                mbad.append("non-object unclassified entry %r" % o); continue
+            nm_b = o.get("brand")
+            if "direction" in o:
+                mbad.append("unclassified %s must NOT carry a computed direction" % nm_b)
+            pts = o.get("points") if isinstance(o.get("points"), list) else []
+            if len(pts) != 1:
+                mbad.append("unclassified %s must carry exactly one cited point (got %d)" % (nm_b, len(pts)))
+        # a brand can't be both classified and unclassified
+        both = cls_names & uncls_names
+        if both:
+            mbad.append("brand(s) both classified and unclassified: %s" % ", ".join(sorted(map(str, both))))
+        if mbad:
+            fail("network_momentum big-4 shape (classified carry exact-dated directions; single-point "
+                 "rivals disclosed as unclassified, one point, no direction)", first_n(mbad, 8))
+        else:
+            ok("network_momentum big-4 shape sound (%d classified w/ exact-dated directions; "
+               "%d disclosed unclassified incl. Tidlor+Srisawad, no back-computed direction)"
+               % (len(cls), len(uncls)))
+
 
 # ---------------------------------------------------------------------------
 def check_opportunity_score():
