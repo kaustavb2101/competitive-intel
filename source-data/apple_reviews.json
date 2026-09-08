@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-09-07",
+  "pulled_at": "2026-09-08",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -428,10 +428,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.78971,
-    "ratings": 1750,
-    "score_current_version": 3.78971,
-    "ratings_current_version": 1750,
+    "score": 3.79041,
+    "ratings": 1751,
+    "score_current_version": 3.79041,
+    "ratings_current_version": 1751,
     "version": "3.2.0",
     "app_updated": "2026-08-13",
     "released": "2020-04-30",
@@ -5036,10 +5036,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.53309,
-    "ratings": 272,
-    "score_current_version": 3.53309,
-    "ratings_current_version": 272,
+    "score": 3.53846,
+    "ratings": 273,
+    "score_current_version": 3.53846,
+    "ratings_current_version": 273,
     "version": "1.0.50",
     "app_updated": "2026-09-05",
     "released": "2022-11-25",
@@ -5162,6 +5162,15 @@
      "content": "ใช้งานง่าย จะเช็คยอด ดูใบเสร็จสะดวกๆมากครับ",
      "version": "1.0.3",
      "votes": 3
+    },
+    {
+     "id": "14516611199",
+     "at": null,
+     "score": 2,
+     "title": "ชำระแล้ว กินดอกเยอะเนอะ",
+     "content": "ขำระถึงหมื่นแต่ พอไปดู 3 พัน งง",
+     "version": "1.0.50",
+     "votes": 0
     },
     {
      "id": "14320336925",
@@ -5444,16 +5453,25 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 2,
-    "ratings": 5,
-    "score_current_version": 2,
-    "ratings_current_version": 5,
+    "score": 1.83333,
+    "ratings": 6,
+    "score_current_version": 1.83333,
+    "ratings_current_version": 6,
     "version": "1.12.0",
     "app_updated": "2026-08-10",
     "released": "2025-01-09",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14520514041",
+     "at": null,
+     "score": 1,
+     "title": "อัพเดตยอดชำระค่างวดช้า",
+     "content": "อัพเดตยอดชำระช้ามาก ควรปรับปรุงค่ะเป็นอย่างยิ่งค่ะ",
+     "version": "1.12.0",
+     "votes": 0
+    },
     {
      "id": "14292677624",
      "at": null,
@@ -5738,10 +5756,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.4547,
-    "ratings": 574,
-    "score_current_version": 3.4547,
-    "ratings_current_version": 574,
+    "score": 3.46007,
+    "ratings": 576,
+    "score_current_version": 3.46007,
+    "ratings_current_version": 576,
     "version": "1.0.45",
     "app_updated": "2026-08-17",
     "released": "2024-07-09",
@@ -7469,10 +7487,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 4.66667,
-    "ratings": 9,
-    "score_current_version": 4.66667,
-    "ratings_current_version": 9,
+    "score": 4.7,
+    "ratings": 10,
+    "score_current_version": 4.7,
+    "ratings_current_version": 10,
     "version": "1.7.6",
     "app_updated": "2026-09-01",
     "released": "2025-09-28",
@@ -7499,10 +7517,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.39787,
-    "ratings": 1596,
-    "score_current_version": 3.39787,
-    "ratings_current_version": 1596,
+    "score": 3.39887,
+    "ratings": 1597,
+    "score_current_version": 3.39887,
+    "ratings_current_version": 1597,
     "version": "8.6.0",
     "app_updated": "2026-08-21",
     "released": "2020-03-03",
@@ -10589,16 +10607,34 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.82407,
-    "ratings": 173607,
-    "score_current_version": 4.82407,
-    "ratings_current_version": 173607,
+    "score": 4.82408,
+    "ratings": 173628,
+    "score_current_version": 4.82408,
+    "ratings_current_version": 173628,
     "version": "3.0.8",
     "app_updated": "2026-09-03",
     "released": "2021-04-20",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14519996993",
+     "at": null,
+     "score": 3,
+     "title": "รีวิว",
+     "content": "ข้าพเจ้านางสาว ฉัตรนภา คำสอน เคยสมัครและฟินิกซ์ไว้แต่ไม่ผ่านโดยมีทั้งชื่อนามสกุลวันเดือนปีเกิดบัตรประชาชนทั้งหน้าและหลัง เบอร์โทรศัพท์ของ บุคคลอื่นอีกสองท่านหากแอป ฟินิกซ์นำไปปลอมแปลงเอกสารจะขอดำเนินเรื่องทางกฎหมายต่อไป",
+     "version": "3.0.8",
+     "votes": 0
+    },
+    {
+     "id": "14516184961",
+     "at": null,
+     "score": 4,
+     "title": "บริการ",
+     "content": "ดี",
+     "version": "3.0.8",
+     "votes": 0
+    },
     {
      "id": "14502190322",
      "at": null,
@@ -15695,16 +15731,34 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.7058,
-    "ratings": 64869,
-    "score_current_version": 4.7058,
-    "ratings_current_version": 64869,
+    "score": 4.70596,
+    "ratings": 64968,
+    "score_current_version": 4.70596,
+    "ratings_current_version": 64968,
     "version": "7.8.0",
     "app_updated": "2026-09-07",
     "released": "2021-10-10",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14520005652",
+     "at": null,
+     "score": 4,
+     "title": "รีวิว",
+     "content": "ข้าพเจ้านางสาว ฉัตรนภา คำสอน สมัครแอปนี้เมื่อวันที่ 7 กันยายนพ.ศ. 2569 โดยการสมัครใช้เลขบัตรประชาชนทั้งหน้าและหลังวันเดือนปีเกิดและบุคคลอ้างอิงอีกหนึ่งท่านโดยมีเบอร์โทรศัพท์ด้วยทั้งนี้หากแอปได้นำข้อมูลไปปลอมแปลงเอกสารนางสาว ฉัตรนภา คำสอน จะไม่รับผิดชอบใดใดทั้งสิ้นและจะดำเนินตามกฏหมายต่อไป",
+     "version": "7.8.0",
+     "votes": 0
+    },
+    {
+     "id": "14519964907",
+     "at": null,
+     "score": 5,
+     "title": "ขอบคุณครับ",
+     "content": "ขอบคุณครับ",
+     "version": "7.7.0",
+     "votes": 0
+    },
     {
      "id": "14516758142",
      "at": null,
@@ -20630,16 +20684,34 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84323,
-    "ratings": 45239,
-    "score_current_version": 4.84323,
-    "ratings_current_version": 45239,
+    "score": 4.843,
+    "ratings": 45314,
+    "score_current_version": 4.843,
+    "ratings_current_version": 45314,
     "version": "3.1.4",
     "app_updated": "2026-09-07",
     "released": "2023-03-06",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14520391838",
+     "at": null,
+     "score": 5,
+     "title": "การบริการของพนักงาน",
+     "content": "ยอดเยี่ยมมากค่ะ",
+     "version": "3.1.4",
+     "votes": 0
+    },
+    {
+     "id": "14517102685",
+     "at": null,
+     "score": 5,
+     "title": "สินเชื่อ",
+     "content": "ดีมากเลยครับ ช่วยยามฉุกเฉินได้",
+     "version": "3.1.3",
+     "votes": 0
+    },
     {
      "id": "14512258767",
      "at": null,
@@ -25511,10 +25583,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.76921,
-    "ratings": 27116,
-    "score_current_version": 4.76921,
-    "ratings_current_version": 27116,
+    "score": 4.76909,
+    "ratings": 27132,
+    "score_current_version": 4.76909,
+    "ratings_current_version": 27132,
     "version": "1.8.8",
     "app_updated": "2026-09-07",
     "released": "2020-08-05",
@@ -29735,10 +29807,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.62512,
-    "ratings": 2134,
-    "score_current_version": 2.62512,
-    "ratings_current_version": 2134,
+    "score": 2.62576,
+    "ratings": 2135,
+    "score_current_version": 2.62576,
+    "ratings_current_version": 2135,
     "version": "3.4.1",
     "app_updated": "2026-08-31",
     "released": "2022-05-11",
@@ -34598,16 +34670,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.55387,
-    "ratings": 2961,
-    "score_current_version": 2.55387,
-    "ratings_current_version": 2961,
+    "score": 2.55436,
+    "ratings": 2962,
+    "score_current_version": 2.55436,
+    "ratings_current_version": 2962,
     "version": "5.65",
     "app_updated": "2026-02-13",
     "released": "2021-08-03",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14516240700",
+     "at": null,
+     "score": 1,
+     "title": "ยกเลิกการยินยอมให้ใช้เอกสารทั้งหมด",
+     "content": "ข้าพเจ้า น.ส.ณัฐธยาน์ ดวงไทย ขอยกเลิกการยิมยอมการใช้ข้อมูลหรือเอกสารทั้งหมดที่เคยให้แก่ทางแอพมันนี่ฮับ ลงวันที่ 06/09/69",
+     "version": "5.65",
+     "votes": 0
+    },
     {
      "id": "14512016591",
      "at": null,
