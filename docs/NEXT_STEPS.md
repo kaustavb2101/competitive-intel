@@ -46,6 +46,19 @@ MAX(flood_freq) group-by (joined onto `amphoe.json` via Thai/English name, NOT `
 amphoe identity is name-keyed) shipped 2026-08-02 as `build_flood_hazard.py`. **Area is still left
 for a later pass that dissolves geometry** (shapely over the downloaded polygons per district).
 
+> **⚠ REACHABILITY IS NETWORK-POLICY-DEPENDENT — the "open from this machine" line above is NOT true
+> from every session (empirically re-verified 2026-09-08).** The `gistdaportal.gistda.or.th` host is
+> **CONNECT-denied under the interactive Claude-Code-on-web / autonomous-loop network policy** this
+> session runs behind: the agent proxy answers `502` to the CONNECT (policy denial, not a transient
+> upstream failure — repeated across timestamps; `opendata.sme.go.th` and the excise CKANs are denied
+> the same way). So the last successful hazard pull (`source-data/gistda_flood_hazard.json`,
+> `pulled: 2026-08-21`) ran from a **permissive-policy context** (owner-side, or a CI runner whose
+> environment allows GISTDA — the same class as `data-gov-census.yml`), NOT from this loop. **Net for
+> the flood-AREA dissolve:** it is **not an interactive/autonomous-loop task** — the loop can neither
+> pull the geometry nor verify the dissolve here. It must be structured as a permissive-policy CI
+> workflow (pull + `--check`-gated `build_flood_area.py`) or run owner-side. Do not re-probe GISTDA
+> from a policy-restricted loop session expecting the 2026-08-01 "open from this machine" result.
+
 ## 0a. Fold the MEASURED TMLI province layers into the risk read  ⟶ NOW UNBLOCKED (objective #1)
 The data.go.th / NSO / NESDC datasets that the sandbox is BLOCKED from pulling are now vendored
 (measured, from the Thai-network TMLI platform) and projected into clean province-keyed layers — no
