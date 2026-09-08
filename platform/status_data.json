@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-08T15:32:25+00:00",
-    "commit": "013a0b2"
+    "generated_at": "2026-09-08T21:27:24+00:00",
+    "commit": "75c6506"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,42 @@
   ],
   "activity": [
     {
+      "date": "2026-09-08T21:27:24+00:00",
+      "sha": "75c6506",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-08, run 34280488041)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-08T20:13:58+00:00",
+      "sha": "40f90f3",
+      "summary": "docs(progress): log ux status.html brand-wordmark home link (PR #877) — merged + deployed + verified LIVE",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-09T03:10:25+07:00",
+      "sha": "5f4a3a9",
+      "summary": "ux: make status.html brand wordmark a home link (#877)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-08T19:55:07+00:00",
+      "sha": "21df9b4",
+      "summary": "data: Thai-IP-only swarm refresh (run 34268745328) (#876)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-08T16:58:54+00:00",
+      "sha": "581b39e",
+      "summary": "data: market-pulse swarm refresh (run 34246420838) (#875)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-08T16:29:56+00:00",
+      "sha": "f84574b",
+      "summary": "service: healthy MARKET/SERVICE/PEER close-out + CEO-dashboard refresh to HEAD (6-commit drift)",
+      "pillar": "market"
+    },
+    {
       "date": "2026-09-08T15:32:25+00:00",
       "sha": "013a0b2",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-08, run 34245111386)",
@@ -675,42 +711,6 @@
       "sha": "40d108e",
       "summary": "docs(progress): healthy close-out — two audit candidates run down to documented NON-fixes",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-09-07T23:05:08+00:00",
-      "sha": "5710068",
-      "summary": "chore(dashboard): refresh CEO autonomy dashboard after #865 (plan_cycle)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-08T05:58:49+07:00",
-      "sha": "dfe563f",
-      "summary": "peer: complete big-4 network-momentum read — surface Tidlor & Srisawad as unclassified (#865)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-07T22:55:23+00:00",
-      "sha": "2351f95",
-      "summary": "Merge remote-tracking branch 'origin/master' into intel/network-momentum-unclassified",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-07T22:47:36+00:00",
-      "sha": "100022b",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-07T22:47:02+00:00",
-      "sha": "939922b",
-      "summary": "Merge remote-tracking branch 'origin/master' into intel/network-momentum-unclassified",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-07T22:46:48+00:00",
-      "sha": "bafffae",
-      "summary": "data: live fuel prices (2026-09-07, run 34167683344)",
-      "pillar": "data-integration"
     }
   ]
 }
