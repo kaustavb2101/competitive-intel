@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-08T03:35:05+00:00",
-    "commit": "7b32a9d"
+    "generated_at": "2026-09-08T09:32:43+00:00",
+    "commit": "ffb157d"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-09-08T09:32:43+00:00",
+      "sha": "ffb157d",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-08, run 34210399650)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-08T08:25:38+00:00",
+      "sha": "79a4f3b",
+      "summary": "docs(progress): log ux province brand-wordmark home link (PR #871) — merged + deployed + verified live",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-08T15:22:23+07:00",
+      "sha": "b993d09",
+      "summary": "ux: province.html nav brand wordmark → home link (#871)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-08T06:46:46+00:00",
+      "sha": "5ded618",
+      "summary": "docs: correct stale \"GISTDA open from this machine\" claim — host is network-policy-blocked from the autonomous loop",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-08T05:52:16+00:00",
+      "sha": "ef5e35e",
+      "summary": "data: market-pulse swarm refresh (run 34184510772) (#870)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-08T05:25:10+00:00",
+      "sha": "929ad82",
+      "summary": "data(census): refresh the Union Auction forward book (run 34184591857) (#869)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-08T04:41:43+00:00",
+      "sha": "e82f725",
+      "summary": "data: macro indicators (2026-09-07, run 34170624903) (#867)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-08T04:17:43+00:00",
+      "sha": "63d76d3",
+      "summary": "chore(dashboard): refresh CEO autonomy dashboard to HEAD (7b32a9d)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-08T03:35:05+00:00",
       "sha": "7b32a9d",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-08, run 34183909660)",
@@ -663,54 +711,6 @@
       "sha": "878e47e",
       "summary": "data: Thai-IP-only swarm refresh (run 34155373232) (#861)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-07T20:22:52+00:00",
-      "sha": "837f1cb",
-      "summary": "docs(progress): log the SPA brand-wordmark home-link UX run (PR #862) + deploy-verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-08T03:20:12+07:00",
-      "sha": "165ab51",
-      "summary": "ux: make the SPA front-door brand wordmark a home link (#862)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-07T20:01:55+00:00",
-      "sha": "46846c4",
-      "summary": "a11y(branch-explorer): AA contrast for light-theme muted microcopy (#860)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-07T19:37:31+00:00",
-      "sha": "0698c92",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34091626473) (#854)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-07T16:28:01+00:00",
-      "sha": "614aaa3",
-      "summary": "service: empirical five-pillar close-out + CEO-dashboard refresh to HEAD",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-07T15:28:56+00:00",
-      "sha": "dec71d4",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-07, run 34138405239)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-07T12:31:28+00:00",
-      "sha": "f0184bd",
-      "summary": "feat(pipeline): schedule pull_nso_agri_debt into the swarm registry",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-07T10:21:23+00:00",
-      "sha": "d0ab966",
-      "summary": "service: healthy cross-pillar close-out + CEO-dashboard refresh to HEAD; composite-freshness read documented as a NON-fix",
-      "pillar": "feature"
     }
   ]
 }
