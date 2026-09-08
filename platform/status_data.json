@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-08T09:32:43+00:00",
-    "commit": "ffb157d"
+    "generated_at": "2026-09-08T15:32:25+00:00",
+    "commit": "013a0b2"
   },
   "overall": {
     "progress_pct": 98,
@@ -533,6 +533,42 @@
   ],
   "activity": [
     {
+      "date": "2026-09-08T15:32:25+00:00",
+      "sha": "013a0b2",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-08, run 34245111386)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-08T14:28:19+00:00",
+      "sha": "4e5c776",
+      "summary": "docs(progress): log ux branch-explorer brand-wordmark home link (PR #874) — merged + deployed + verified live",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-08T21:25:28+07:00",
+      "sha": "a33a5ef",
+      "summary": "ux: brand wordmark home link on branch-explorer.html (#874)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-08T11:55:00+00:00",
+      "sha": "2d82879",
+      "summary": "data: SET listed-peer scoreboard refresh (run 34220270777) (#873)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-08T10:51:57+00:00",
+      "sha": "cdecdc5",
+      "summary": "data: market-pulse swarm refresh (run 34211458638) (#872)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-08T10:21:49+00:00",
+      "sha": "fdc0018",
+      "summary": "service: healthy MARKET/SERVICE/PEER close-out + CEO-dashboard refresh to HEAD",
+      "pillar": "market"
+    },
+    {
       "date": "2026-09-08T09:32:43+00:00",
       "sha": "ffb157d",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-08, run 34210399650)",
@@ -674,42 +710,6 @@
       "date": "2026-09-07T22:46:48+00:00",
       "sha": "bafffae",
       "summary": "data: live fuel prices (2026-09-07, run 34167683344)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-07T22:45:28+00:00",
-      "sha": "c61e8a9",
-      "summary": "data: SET listed-peer scoreboard refresh (run 34143204879) (#859)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-07T22:42:55+00:00",
-      "sha": "fef1d3c",
-      "summary": "peer: address Copilot review — date_precision + network_momentum gate lock",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-07T22:22:56+00:00",
-      "sha": "2a7f546",
-      "summary": "peer: complete big-4 network-momentum read — surface Tidlor & Srisawad as unclassified",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-07T22:16:10+00:00",
-      "sha": "4fde674",
-      "summary": "data: market-pulse swarm refresh (run 34107874462) (#857)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-07T21:27:57+00:00",
-      "sha": "4b2ef0d",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-07, run 34163119876)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-07T21:12:10+00:00",
-      "sha": "878e47e",
-      "summary": "data: Thai-IP-only swarm refresh (run 34155373232) (#861)",
       "pillar": "data-integration"
     }
   ]
