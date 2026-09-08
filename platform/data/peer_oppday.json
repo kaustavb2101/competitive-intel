@@ -1,7 +1,7 @@
 {
  "meta": {
   "as_of": "2026-08-20",
-  "corpus_generated": "2026-08-26",
+  "corpus_generated": "2026-09-08",
   "generated_by": "pipeline/build_peer_oppday.py",
   "headline": "All 6 SET-listed peers' latest disclosure is the Q2/2026 earnings call (2026-08-13–2026-08-20) — the peer boards above read the newest public quarter.",
   "label": "MEASURED — the six SET-listed title-loan peers' own SET Opportunity Day quarterly earnings-call filings (round, meeting date, video + snapshot links, page count). CALENDAR / RECENCY ONLY: no figure is parsed out of the call transcripts — the boards above carry the measured peer financials.",
@@ -86,7 +86,7 @@
   {
    "first_date": "2025-11-13",
    "first_round": "Q3/2025",
-   "has_summary": false,
+   "has_summary": true,
    "latest_date": "2026-08-13",
    "latest_round": "Q2/2026",
    "n_calls": 7,
