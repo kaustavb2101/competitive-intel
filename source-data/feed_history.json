@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 877,
+  "n_points": 884,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -658,11 +658,12 @@
     "2026-09-06",
     "2026-09-07",
     "2026-09-08",
-    "2026-09-09"
+    "2026-09-09",
+    "2026-09-10"
    ],
    "first_seen": "2026-07-11",
    "label": "River stations above their high mark",
-   "n": 46,
+   "n": 47,
    "path": "platform/data/thaiwater_flood.json",
    "source": "ThaiWater live river/reservoir telemetry",
    "unit": "stations",
@@ -712,7 +713,8 @@
     133.0,
     140.0,
     136.0,
-    139.0
+    139.0,
+    138.0
    ]
   },
   "fuel_diesel": {
@@ -1232,11 +1234,12 @@
     "2026-09-06",
     "2026-09-07",
     "2026-09-08",
-    "2026-09-09"
+    "2026-09-09",
+    "2026-09-10"
    ],
    "first_seen": "2026-07-10",
    "label": "Provinces with heavy rain somewhere",
-   "n": 46,
+   "n": 47,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "provinces",
@@ -1286,7 +1289,8 @@
     39.0,
     36.0,
     35.0,
-    39.0
+    39.0,
+    40.0
    ]
   },
   "rain_max_mm": {
@@ -1337,11 +1341,12 @@
     "2026-09-06",
     "2026-09-07",
     "2026-09-08",
-    "2026-09-09"
+    "2026-09-09",
+    "2026-09-10"
    ],
    "first_seen": "2026-07-10",
    "label": "Heaviest 24h rainfall, any gauge",
-   "n": 46,
+   "n": 47,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "mm",
@@ -1391,7 +1396,8 @@
     174.4,
     185.5,
     111.6,
-    147.0
+    147.0,
+    165.0
    ]
   },
   "rival_ads_live": {
@@ -1469,11 +1475,12 @@
     "2026-09-04",
     "2026-09-06",
     "2026-09-07",
-    "2026-09-08"
+    "2026-09-08",
+    "2026-09-09"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC · live promo/news items",
-   "n": 28,
+   "n": 29,
    "path": "source-data/rival_promos.json",
    "source": "muangthaicap.com (own-site pull)",
    "unit": "items",
@@ -1483,6 +1490,7 @@
     13.0,
     13.0,
     13.0,
+    11.0,
     11.0,
     11.0,
     11.0,
@@ -1538,15 +1546,17 @@
     "2026-09-04",
     "2026-09-06",
     "2026-09-07",
-    "2026-09-08"
+    "2026-09-08",
+    "2026-09-09"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD · live promo/news items",
-   "n": 28,
+   "n": 29,
    "path": "source-data/rival_promos.json",
    "source": "sawad.co.th (own-site pull)",
    "unit": "items",
    "values": [
+    5.0,
     5.0,
     5.0,
     5.0,
@@ -1607,15 +1617,17 @@
     "2026-09-04",
     "2026-09-06",
     "2026-09-07",
-    "2026-09-08"
+    "2026-09-08",
+    "2026-09-09"
    ],
    "first_seen": "2026-07-19",
    "label": "TIDLOR · live promo/news items",
-   "n": 28,
+   "n": 29,
    "path": "source-data/rival_promos.json",
    "source": "tidlor.com (own-site pull)",
    "unit": "items",
    "values": [
+    6.0,
     6.0,
     6.0,
     6.0,
@@ -1675,11 +1687,12 @@
     "2026-09-05",
     "2026-09-06",
     "2026-09-07",
-    "2026-09-08"
+    "2026-09-08",
+    "2026-09-09"
    ],
    "first_seen": "2026-07-30",
    "label": "Rival YouTube brand channels · total views",
-   "n": 27,
+   "n": 28,
    "path": "platform/data/rival_youtube.json",
    "source": "YouTube Data API v3 (official) — public brand-channel statistics",
    "unit": "views",
@@ -1710,7 +1723,8 @@
     942428619.0,
     943047780.0,
     944408944.0,
-    945805919.0
+    945805919.0,
+    945906303.0
    ]
   },
   "search_share_autox": {
@@ -2138,7 +2152,7 @@
     13019.0,
     13079.0,
     13115.0,
-    13154.0
+    13179.0
    ]
   }
  }
