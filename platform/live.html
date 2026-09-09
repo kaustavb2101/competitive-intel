@@ -121,6 +121,22 @@ html[data-theme="light"] .lb-aging{color:#8A6210}
    handset. Bump them ONLY below 520px (where the scale drops under ~0.5), so the tablet band + desktop
    are byte-identical; headroom is ample (x-labels are ~6 apart, so no collision at these sizes). */
 @media(max-width:520px){.lb-axl{font-size:18px}.lb-lastv{font-size:19px}.lb-bandl{font-size:15px}}
+
+/* per-series freshness of the accumulators — the on-page twin of the build gate's freshness tripwire.
+   State is carried by a state word (" · overdue" / " · dead") and the left-border shape as well as hue,
+   so it survives a mono screen (same principle as the freshness pills above). */
+.lb-fh-sum{font:500 12px/1.55 var(--sans);color:var(--dim);margin:0 0 12px;max-width:90ch}
+.lb-fh-sum b{color:var(--ink,inherit);font-weight:600}
+.lb-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:7px;margin:0 0 30px}
+.lb-chip{display:flex;justify-content:space-between;align-items:baseline;gap:8px;background:var(--panel);
+  border:1px solid var(--line);border-left:3px solid var(--dim);border-radius:9px;padding:7px 10px;min-width:0}
+.lb-chip .lb-cl{font:600 11.5px/1.3 var(--sans);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-chip .lb-cg{font:600 11px/1 var(--mono);white-space:nowrap;font-variant-numeric:tabular-nums;flex:none}
+.lb-chip.cur{border-left-color:var(--merch)} .lb-chip.cur .lb-cg{color:var(--merch)}
+.lb-chip.watch{border-left-color:var(--opp)} .lb-chip.watch .lb-cg{color:var(--opp)}
+/* same light-theme gold darken the "aging" pill uses (small 11px text needs 4.5:1; #8A6210 ≈ 5.1:1) */
+html[data-theme="light"] .lb-chip.watch .lb-cg{color:#8A6210}
+.lb-chip.dead{border-left-color:var(--agri)} .lb-chip.dead .lb-cg{color:var(--agri)}
 </style>
 </head>
 <body>
@@ -171,6 +187,18 @@ html[data-theme="light"] .lb-aging{color:#8A6210}
   <p class="lb-note" id="lb-note"></p>
 
   <div class="lb-charts" id="lb-charts"></div>
+
+  <h2 class="opp" style="font:700 16px var(--sans);margin:0 0 4px">Are the accumulators still being fed?</h2>
+  <p class="lb-sub" style="margin-bottom:10px">The trend lines above exist only because every pull
+    appends a dated row. If one puller quietly stops, its series simply stops growing — the file stays
+    valid and nothing errors, so a dead feed can rot unseen. The feed table below ages each whole
+    <b>source file</b> against your clock; this ages each accumulated <b>series</b> against the
+    <b>newest observation across all of them</b> (the data's own leading edge, never the clock) — the
+    only way to catch a single series going dark inside a file its siblings are still writing.
+    <b>Dead</b> uses the same cadence-aware bound as the build gate's freshness tripwire, so this page
+    and the gate raise the alarm together.</p>
+  <p class="lb-fh-sum" id="lb-fhsum"></p>
+  <div class="lb-chips" id="lb-fhfresh" role="list" aria-label="Per-series freshness of the accumulated feeds"></div>
 
   <h2 class="opp" style="font:700 16px var(--sans);margin:0 0 4px">Every feed</h2>
   <p class="lb-sub" style="margin-bottom:12px">Grouped by what it moves in the book. Age is computed
@@ -505,6 +533,62 @@ Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_h
           }, drawn[0]));
         },
         src: (FH.meta || {}).note || '' });
+    }
+  }
+
+  /* ---- per-series freshness of the accumulators — the on-page twin of tests/feed_freshness.py.
+     The feed table below ages each SOURCE FILE against the reader's clock; this ages each accumulated
+     SERIES against the data's own leading edge (the newest observation across all of them), which is
+     the only way to see a single series go dark inside a file its siblings are still writing. "Dead"
+     reuses the identical cadence-aware bound as the gate tripwire (DEAD_BOUND_DAYS), so the page and
+     the gate agree on the alarm; "overdue" is a gentler on-page early-warning band, never a gate
+     concept. Never wall-clock: Date.parse is used only to compare dates to each other, not to now. */
+  if (FH && FH.order && FH.order.length) {
+    var FH_DEAD = { daily: 45, weekly: 60 };   // == tests/feed_freshness.py DEAD_BOUND_DAYS
+    var FH_DEAD_DEF = 120;                       // == DEFAULT_BOUND_DAYS (unknown/irregular cadence)
+    var FH_WATCH = { daily: 10, weekly: 21, monthly: 45, quarterly: 130, annual: 430 };
+    var parseDay = function (d) { var t = Date.parse(String(d || '').slice(0, 10) + 'T00:00:00Z'); return isNaN(t) ? null : t; };
+    var fhLast = {}, fhEdge = null;
+    FH.order.forEach(function (k) {
+      var ds = ((FH.series[k] || {}).dates || []).map(parseDay).filter(function (t) { return t != null; });
+      if (ds.length) { var m = Math.max.apply(null, ds); fhLast[k] = m; if (fhEdge == null || m > fhEdge) fhEdge = m; }
+    });
+    if (fhEdge != null) {
+      var toISO = function (ts) { return new Date(ts).toISOString().slice(0, 10); };
+      var fhRows = FH.order.filter(function (k) { return fhLast[k] != null; }).map(function (k) {
+        var s = FH.series[k], lag = Math.round((fhEdge - fhLast[k]) / 86400000);
+        var dead = FH_DEAD[s.cadence] != null ? FH_DEAD[s.cadence] : FH_DEAD_DEF;
+        var watch = FH_WATCH[s.cadence] != null ? FH_WATCH[s.cadence] : 30;
+        return { label: s.label || k, cadence: s.cadence || '—', lag: lag, last: toISO(fhLast[k]),
+                 state: lag > dead ? 'dead' : lag > watch ? 'watch' : 'cur' };
+      }).sort(function (a, b) { return b.lag - a.lag; });   // most-behind first, so a problem floats up
+      var fhDead = fhRows.filter(function (r) { return r.state === 'dead'; });
+      var fhWatch = fhRows.filter(function (r) { return r.state === 'watch'; });
+      var edgeISO = toISO(fhEdge);
+      var word = { cur: '', watch: ' · overdue', dead: ' · dead' };
+      document.getElementById('lb-fhfresh').innerHTML = fhRows.map(function (r) {
+        var gap = (r.lag === 0 ? 'live' : r.lag + 'd behind') + word[r.state];
+        return '<div class="lb-chip ' + r.state + '" role="listitem" title="' +
+          esc(r.label + ' — last observation ' + r.last + ', ' + r.lag + ' days behind the ' + edgeISO +
+              ' leading edge · ' + r.cadence + ' cadence') + '">' +
+          '<span class="lb-cl">' + esc(r.label) + '</span>' +
+          '<span class="lb-cg">' + esc(gap) + '</span></div>';
+      }).join('');
+      var sum;
+      if (fhDead.length) {
+        sum = '<b style="color:var(--agri)">' + fhDead.length + ' feed' + (fhDead.length === 1 ? '' : 's') +
+          ' look' + (fhDead.length === 1 ? 's' : '') + ' dead</b> — ' +
+          fhDead.map(function (r) { return esc(r.label) + ' (' + r.lag + 'd)'; }).join(', ') +
+          '. Re-run that puller (.github/workflows/data-*.yml) or, if the source retired, document it in the layer’s provenance.';
+      } else if (fhWatch.length) {
+        sum = '<b>' + fhWatch.length + '</b> feed' + (fhWatch.length === 1 ? ' is' : 's are') +
+          ' running overdue but inside their dead-bound; the other <b>' + (fhRows.length - fhWatch.length) +
+          '</b> are current. Leading edge <b>' + esc(edgeISO) + '</b>.';
+      } else {
+        sum = 'All <b>' + fhRows.length + '</b> accumulators are current within their own cadence — none has fallen behind the ' +
+          '<b>' + esc(edgeISO) + '</b> leading edge. The day one goes dark it turns amber here, then red at the gate.';
+      }
+      document.getElementById('lb-fhsum').innerHTML = sum;
     }
   }
 
