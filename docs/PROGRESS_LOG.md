@@ -3,6 +3,33 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-09-09 (Integration loop / BACKLOG HYGIENE — corrected two verifiably-stale claims in NEXT_STEPS §0c social-listening, removing a phantom owner action) — committed to master (docs-only, gate unaffected)
+**What & why.** The integration cycle opened with a full backlog + negative-space audit. All four
+high-value backlog items are confirmed **done or owner-side-blocked**: (1) the FPO PICO registry is
+fully wired (`pico_census.json` → `pico_district`/`branch_pico`/`pico_competitors`, all consumed as
+pipeline intermediates + surfaced on `#acq`); (2) `branch_cropland.json` is built, `--check`-gated in
+`tests/run.sh`, and consumed in `app.js`; (3) the remaining data.go.th distillations (`baac_credit`,
+`smebank_credit`, excise tax) are Thai-IP-only — the raw cache is gitignored and the aggregator is 403
+from CI, so they are not CI-doable; (4) GISTDA 40m is CONNECT-denied under this loop's network policy.
+A `negative-space` sweep found **no CI-doable, offline improvement that advances either objective** —
+the data tree is saturated, and the `vehicle_base_staleness_guard` confirms the DLT collateral base is
+already kept in sync by CI, so DLT freshness is handled. Baseline gate green (158 passed / 0 failed).
+- **The one honest, verified fix shipped: backlog accuracy.** `docs/NEXT_STEPS.md` §0c carried two
+  stale claims that would misdirect the owner and future loop cycles:
+  - **YouTube:** "`YOUTUBE_API_KEY` … ← still unset; this is the one owner action left here." **False** —
+    the secret is set and the pull is live: `source-data/youtube_comments.json` (2026-09-08 CI refresh)
+    holds **2,526 measured comments across 13 brands**, 610 API calls that run, `meta.measured: true`.
+    Left uncorrected, this advertises a phantom owner action (asking Kaustav to set a key that is
+    already set) — exactly the kind of wasted-effort misdirection the honesty mandate exists to prevent.
+  - **Pantip:** the standing open question "whether it works from a GitHub runner" is now **answered —
+    it does**: `source-data/pantip_threads.json` (2026-09-08 CI run) carries **241 measured threads /
+    3,918 comments across 15 brands**. Recorded so future cycles don't re-investigate.
+- **Decision — no forced data edit.** Consistent with the 2026-09-04 precedent (refuse to manufacture a
+  marginal edit on a saturated tree). The remaining genuine unlocks are all owner-side: a DLT
+  derived-layer refresh once newer files land (recheck trigger in §2), a loan-tape re-export, and the
+  Thai-IP-only social/promo + Sabuy-Cash id pulls. Docs-only change; determinism gate unaffected and
+  re-verified green.
+
 ## 2026-09-09 (Market & service intelligence loop / PEER COMPARISON — SHIPPED: completed the #acq reported-NPL board from 4 to all 6 SET-listed title-loan peers, adding Saksiam + Ngern Turbo from committed data, no network) — PR
 
 **What shipped (PEER COMPARISON, objective #2):** `platform/data/peer_npl.json` (via `pipeline/build_peer_npl.py`) now carries **all six** SET-listed title-loan peers, not four — added **Saksiam (SAK) 2.7%** and **Ngern Turbo (TURBO) 3.5%** beside the existing Tidlor/MTC/Srisawad/Heng, plus AutoX's MEASURED tape anchor. The `#acq` NPL board (`renderPeerNpl`, app.js) sat next to its sibling `peer_asset_quality.json` board — which already carried all six — and silently dropped two listed rivals; that inconsistency is now closed. The dynamic renderer (which already sorts and re-computes AutoX's band position "above N of M peers" — designed to absorb added peers) picks the two new rows up with no rendering-logic change; the column tooltip was extended to name the mixed basis.

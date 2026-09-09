@@ -153,11 +153,17 @@ The voice-of-customer corpus behind `#acq` (`social_themes.json`, `rival_pulse.j
 - Google Play reviews (`pull_app_reviews.py`) — any IP, no key. 10 apps.
 - Apple App Store reviews (`pull_apple_reviews.py`) — any IP, no key. 10 apps.
 - YouTube comments (`pull_youtube_comments.py`) — any IP, **needs the `YOUTUBE_API_KEY` repo secret**;
-  the job warns loudly and skips without it. **← still unset; this is the one owner action left here.**
-- Pantip forum threads (`pull_pantip.py`) — proven from a Thai residential IP. Whether it works from a
-  GitHub runner is answered automatically by the first scheduled run (the job captures the exit code
-  into the PR body). Exits 3 and writes nothing when the response is not the Thai-IP response, so a
-  block can never be laundered into "the market went quiet".
+  the job warns loudly and skips without it. **✅ The secret IS set and the pull is live — there is NO
+  outstanding owner action here** (verified 2026-09-09 against the 2026-09-08 CI refresh:
+  `source-data/youtube_comments.json` carries 2,526 measured comments across 13 brands, 610 API calls
+  that run, `meta.measured: true`). The earlier "still unset — the one owner action left here" note was
+  stale and is corrected.
+- Pantip forum threads (`pull_pantip.py`) — proven from a Thai residential IP; the standing open
+  question was whether it ALSO works from a GitHub runner. **✅ Answered: it does** (verified 2026-09-09
+  — `source-data/pantip_threads.json` from the 2026-09-08 CI run carries 241 measured threads / 3,918
+  comments across 15 brands, `meta.measured` describing verbatim thread+comment text). The exit-3 guard
+  still holds: the job captures the exit code into the PR body and writes nothing when the response is
+  not the Thai-IP response, so a block can never be laundered into "the market went quiet".
 - The rivals' own promo pages (`pull_rival_promos.py`) — **THAI IP ONLY**, deliberately excluded from
   CI; Cloudflare blocks datacenter IPs. Run from the laptop; the committed snapshot is reused meanwhile.
 
