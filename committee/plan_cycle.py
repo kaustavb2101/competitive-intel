@@ -234,9 +234,21 @@ def build_items():
         state(rexists(".github/workflows/qa.yml") and rexists("tests/run.sh")), 2,
         ".github/workflows/qa.yml + tests/run.sh committed")
     add("deployment", "dep-access", "Access protection on the deployment (sensitive branch-level PD)",
-        state(rexists("middleware.js") and doc_has("docs/PROGRESS_LOG.md", "ACCESS PROTECTION VERIFIED")), 3,
-        "Vercel Edge Middleware (./middleware.js) HTTP Basic Auth, gated by the SITE_PASSWORD env var; "
-        "fail-open when unset. Verified live (401 without creds, 200 with the password).",
+        # Access protection is satisfied by EITHER mechanism, whichever the owner runs:
+        #   - the app's own ./middleware.js Basic Auth, live and verified, OR
+        #   - Vercel's native SSO deployment protection, which supersedes and deliberately disables the
+        #     app middleware (renamed to middleware.disabled.js) and is recorded in PROGRESS_LOG.
+        # The detector was previously pinned to the Basic-Auth mechanism only, so it kept reporting this
+        # item OPEN after the owner completed it via SSO (logged 2026-08-16) — a false open on the CEO
+        # dashboard. The SSO branch below reads the committed completion signal.
+        state(
+            (rexists("middleware.js") and doc_has("docs/PROGRESS_LOG.md", "ACCESS PROTECTION VERIFIED"))
+            or doc_has("docs/PROGRESS_LOG.md", "ssoProtection.enabled = true")
+        ), 3,
+        "Access protection is LIVE via Vercel native SSO: the master production alias 302-redirects to "
+        "vercel.com/sso-api (ssoProtection.enabled = true, all_except_custom_domains) — the owner's "
+        "completion of this item (PROGRESS_LOG 2026-08-16), superseding the app's earlier ./middleware.js "
+        "Basic Auth (now middleware.disabled.js). Verified live: master alias -> 302 -> Vercel SSO.",
         owner_side=True)
 
     # ---- feature ----
@@ -537,7 +549,11 @@ def render_markdown(obj):
     open_note = (" (%d owner-side)" % owner_side) if owner_side else ""
     L.append("- **Done:** %d · **In progress:** %d · **Open:** %d%s · **Total:** %d"
              % (o["done_items"], o["in_progress_items"], o["open_items"], open_note, o["total_items"]))
-    if autonomous <= 0 and owner_side:
+    if o["open_items"] <= 0:
+        L.append("- **ETA (ESTIMATED):** all %d tracked items complete — no open work remains. "
+                 "The loops now hold the line (data refreshes, deploy health, and audits for a "
+                 "genuinely-new gap) rather than closing a backlog." % o["total_items"])
+    elif autonomous <= 0 and owner_side:
         L.append("- **ETA (ESTIMATED):** no autonomously-completable items remain — the %d open "
                  "item%s %s owner-side (need an owner action, e.g. a Vercel env var + a live check), "
                  "not loop-closable." % (owner_side, "" if owner_side == 1 else "s",
