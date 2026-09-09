@@ -368,6 +368,21 @@ FEEDS = [
          label="World Bank Pink Sheet crude-oil baseline (income-engine fuel driver; feeds income_impact)",
          cadence="monthly", ip="any", group="macro", out="source-data/energy_prices.json", timeout=600),
 
+    #   DELIBERATELY NOT wired: pull_pinksheet.py (the OTHER World Bank Pink Sheet feed — rolls
+    #   source-data/commodit{ies,ies_protein,y_board}.json, the board's Thai crop/protein/gold rows,
+    #   objective #1). It is any-IP and reachable (same thedocs.worldbank.org host energy_prices above
+    #   uses), so a scheduler-coverage audit naturally flags it as "an unscheduled puller ageing in
+    #   silence" — but it is NOT unscheduled: it has its OWN dedicated monthly workflow,
+    #   .github/workflows/data-pinksheet.yml (cron "0 6 6 * *"), and belongs there rather than here.
+    #   The reason it cannot live in this swarm: a Pink Sheet vintage roll is not a plain re-derivation.
+    #   It bumps meta.updated and MUST capture a NEW time-dimension snapshot via timeseries.py — which
+    #   this swarm never runs and rederive_drift.py DELIBERATELY refuses to run unattended ("captures a
+    #   new snapshot — a side effect, not a re-derivation", rederive_drift.py). It also changes visible
+    #   MEASURED numbers on Overview / Command center / Risk-trend, so its workflow opens a DRAFT PR for a
+    #   human glance instead of the unattended master push the swarm does. Wiring it here would either
+    #   skip the snapshot (freezing Risk-trend) or force a snapshot the drift-gate forbids — so the
+    #   dedicated workflow is the correct home. Do not add a `pinksheet` entry to this registry.
+
     dict(key="google_trends", script="pull_google_trends.py", args=[],
          label="Google Trends demand + brand share-of-search (ESTIMATED)", cadence="monthly",
          ip="any", group="competitive", out="source-data/google_trends.json", timeout=1200),
