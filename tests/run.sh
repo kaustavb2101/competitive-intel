@@ -679,6 +679,16 @@ INGESTS
     bad "mandate_guard.py (forbidden branch-expansion recommendation language is live — see report above)"
   fi
 
+  # feed-freshness tripwire: byte-exact --check proves feed_history.json is a faithful projection of
+  # the accumulator, but a puller that dies leaves a self-consistent accumulator that still passes
+  # --check while its series rots (CLAUDE.md §3: "no puller left to age in silence"). This flags a
+  # feed that has fallen far behind its siblings' leading edge (data-relative, never wall-clock).
+  python3 "$TESTS/feed_freshness.py"; rc=$?
+  if [ "$rc" -eq 0 ]; then ok "feed_freshness.py (no feed-history series aging in silence)"
+  elif [ "$rc" -eq 3 ]; then skip "feed_freshness.py (feed_history.json absent — run: python3 pipeline/build_feed_history.py)"
+  else bad "feed_freshness.py (a feed-history series has aged past its cadence bound — see report above)"
+  fi
+
   # provenance-honesty gate for the unverified GPP knowledge base: source-data/gpp_by_province.json
   # looks like an official NESDC pull but only 1 of 77 provinces is CKAN-verified — the other 76 are
   # round-number estimates. NEXT_STEPS §0a + the file's own meta.provenance: do NOT surface it as
