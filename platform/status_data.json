@@ -2,18 +2,18 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-08T21:27:24+00:00",
-    "commit": "75c6506"
+    "generated_at": "2026-09-09T03:35:20+00:00",
+    "commit": "0fd55a7"
   },
   "overall": {
-    "progress_pct": 98,
+    "progress_pct": 100,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-09-08",
-    "done_items": 49,
+    "eta_date": "2026-09-09",
+    "done_items": 50,
     "in_progress_items": 0,
-    "open_items": 1,
-    "open_owner_side": 1,
+    "open_items": 0,
+    "open_owner_side": 0,
     "open_autonomous": 0,
     "total_items": 50
   },
@@ -111,8 +111,8 @@
     {
       "key": "deployment",
       "label": "Deployment & autonomy",
-      "progress_pct": 83,
-      "done": 5,
+      "progress_pct": 100,
+      "done": 6,
       "total": 6,
       "status": "on-track",
       "items": [
@@ -159,9 +159,9 @@
         {
           "id": "dep-access",
           "title": "Access protection on the deployment (sensitive branch-level PD)",
-          "state": "open",
+          "state": "done",
           "priority": 3,
-          "evidence": "Vercel Edge Middleware (./middleware.js) HTTP Basic Auth, gated by the SITE_PASSWORD env var; fail-open when unset. Verified live (401 without creds, 200 with the password).",
+          "evidence": "Access protection is LIVE via Vercel native SSO: the master production alias 302-redirects to vercel.com/sso-api (ssoProtection.enabled = true, all_except_custom_domains) — the owner's completion of this item (PROGRESS_LOG 2026-08-16), superseding the app's earlier ./middleware.js Basic Auth (now middleware.disabled.js). Verified live: master alias -> 302 -> Vercel SSO.",
           "owner_side": true
         }
       ]
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-09-09T03:35:20+00:00",
+      "sha": "0fd55a7",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-09, run 34307589531)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-09T02:55:38+00:00",
+      "sha": "b065cb6",
+      "summary": "docs(progress): 2026-09-09 UX loop — nav-chevron aria-hidden a11y fix shipped (#881), deploy verified",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-09T09:52:55+07:00",
+      "sha": "4b34bba",
+      "summary": "ux: hide decorative \"Explore ▾\" nav chevron from screen readers (4 pages) (#881)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-09T02:38:03+00:00",
+      "sha": "acf1d55",
+      "summary": "data: NABC live prices (2026-09-09, run 34303620799)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-09T00:33:22+00:00",
+      "sha": "541a9ae",
+      "summary": "docs(progress): 2026-09-09 integration-loop backlog-exhaustion audit — healthy close-out",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-09T00:28:15+00:00",
+      "sha": "3723452",
+      "summary": "data: market-pulse swarm refresh (run 34281813554) (#878)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-08T23:55:14+00:00",
+      "sha": "87b2b7d",
+      "summary": "data: rival Facebook promo feed refresh (run 34284357837) (#879)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-08T23:32:11+00:00",
+      "sha": "d8d802e",
+      "summary": "data: social listening refresh (run 34288369361) (#880)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-08T22:46:46+00:00",
+      "sha": "49aa4ca",
+      "summary": "data: live fuel prices (2026-09-08, run 34287378856)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-08T22:14:28+00:00",
+      "sha": "82befbb",
+      "summary": "service: deep deploy-health sweep GREEN + CEO-dashboard refresh to HEAD (6-commit drift)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-09-08T21:27:24+00:00",
       "sha": "75c6506",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-08, run 34280488041)",
@@ -650,66 +710,6 @@
       "date": "2026-09-08T04:17:43+00:00",
       "sha": "63d76d3",
       "summary": "chore(dashboard): refresh CEO autonomy dashboard to HEAD (7b32a9d)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-08T03:35:05+00:00",
-      "sha": "7b32a9d",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-08, run 34183909660)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-08T02:38:36+00:00",
-      "sha": "0d11a63",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-08T02:37:46+00:00",
-      "sha": "b80249f",
-      "summary": "data: NABC live prices (2026-09-08, run 34180387534)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-08T02:34:42+00:00",
-      "sha": "40faa09",
-      "summary": "docs(progress): log ux brand-wordmark home link (rayong-catchment) — merged + deployed + verified live",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-08T09:31:16+07:00",
-      "sha": "ee3ecd9",
-      "summary": "ux: rayong-catchment brand wordmark → home link (#868)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-08T02:01:10+00:00",
-      "sha": "fdd0dd7",
-      "summary": "data: market-pulse swarm refresh (run 34139489166) (#858)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-08T01:33:43+00:00",
-      "sha": "fafb858",
-      "summary": "data: DIW factory + DLT vehicle census (cloud CKAN, run 34095835458) (#855)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-08T00:49:02+00:00",
-      "sha": "ed803c6",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34168480058) (#866)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-08T00:24:21+00:00",
-      "sha": "81c14d4",
-      "summary": "data: rival Facebook promo feed refresh (run 34165641731) (#864)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-08T00:22:54+00:00",
-      "sha": "40d108e",
-      "summary": "docs(progress): healthy close-out — two audit candidates run down to documented NON-fixes",
       "pillar": "feature"
     }
   ]

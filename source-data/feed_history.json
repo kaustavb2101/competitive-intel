@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 858,
+  "n_points": 861,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -226,7 +226,7 @@
     3.9988,
     3.9969,
     3.8562,
-    3.8532
+    3.8385
    ]
   },
   "app_mtc_score": {
@@ -299,7 +299,7 @@
     4.6775,
     4.6785,
     4.6847,
-    4.6852
+    4.6857
    ]
   },
   "app_sawad_1star_pct": {
@@ -696,7 +696,7 @@
     133.0,
     140.0,
     136.0,
-    128.0
+    124.0
    ]
   },
   "fuel_diesel": {
@@ -995,11 +995,12 @@
     "2026-09-05",
     "2026-09-06",
     "2026-09-07",
-    "2026-09-08"
+    "2026-09-08",
+    "2026-09-09"
    ],
    "first_seen": "2026-07-05",
    "label": "Rice (Hom Mali) - NABC farm-gate",
-   "n": 47,
+   "n": 48,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/tonne",
@@ -1046,6 +1047,7 @@
     17700.0,
     17650.0,
     17650.0,
+    17416.67,
     17416.67,
     17416.67,
     17416.67,
@@ -1102,11 +1104,12 @@
     "2026-09-05",
     "2026-09-06",
     "2026-09-07",
-    "2026-09-08"
+    "2026-09-08",
+    "2026-09-09"
    ],
    "first_seen": "2026-07-05",
    "label": "Rubber (raw sheet) - NABC farm-gate",
-   "n": 47,
+   "n": 48,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/kg",
@@ -1156,6 +1159,7 @@
     80.6,
     80.6,
     80.6,
+    81.3,
     81.3,
     81.3
    ]
@@ -1262,7 +1266,7 @@
     39.0,
     36.0,
     35.0,
-    36.0
+    35.0
    ]
   },
   "rain_max_mm": {
@@ -1367,7 +1371,7 @@
     174.4,
     185.5,
     111.6,
-    137.0
+    150.0
    ]
   },
   "rival_ads_live": {
@@ -2068,11 +2072,12 @@
     "2026-09-04",
     "2026-09-05",
     "2026-09-06",
-    "2026-09-07"
+    "2026-09-07",
+    "2026-09-08"
    ],
    "first_seen": "2026-08-07",
    "label": "Social-listening corpus · total demand documents",
-   "n": 24,
+   "n": 25,
    "path": "platform/data/social_themes.json",
    "source": "app-store reviews + YouTube comments + Pantip threads (build_social_themes.py)",
    "unit": "documents",
@@ -2100,7 +2105,8 @@
     13010.0,
     13019.0,
     13079.0,
-    13115.0
+    13115.0,
+    13154.0
    ]
   }
  }
