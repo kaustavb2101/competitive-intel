@@ -11,53 +11,6 @@
    "append_history_rc": 0,
    "feeds": [
     {
-     "bytes_after": 7106,
-     "bytes_before": 7106,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 3.5,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8879,
-     "bytes_before": 8879,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 4.7,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 3990,
-     "bytes_before": 3990,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 144.2,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 1413051,
-     "bytes_before": 1410265,
-     "key": "google_ads",
-     "rc": 0,
-     "seconds": 356.9,
-     "status": "changed"
-    }
-   ],
-   "finished": "2026-08-27T14:39:33Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 3,
-   "n_failed": 0,
-   "n_ok": 4,
-   "n_skipped": 0,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-27T14:33:36Z"
-  },
-  {
-   "append_history_rc": 0,
-   "feeds": [
-    {
      "bytes_after": 7107,
      "bytes_before": 7107,
      "key": "thaiwater_flood",
@@ -3194,6 +3147,61 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-09-09T03:44:26Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7107,
+     "bytes_before": 7107,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 4.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8947,
+     "bytes_before": 8947,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 5.4,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 4007,
+     "bytes_before": 4007,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 155.5,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 178222,
+     "bytes_before": 178201,
+     "key": "fuel_stations",
+     "rc": 0,
+     "seconds": 16.3,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 1429597,
+     "bytes_before": 1429597,
+     "key": "google_ads",
+     "rc": 3,
+     "seconds": 327.6,
+     "status": "skipped"
+    }
+   ],
+   "finished": "2026-09-09T09:48:14Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 2,
+   "n_failed": 0,
+   "n_ok": 4,
+   "n_skipped": 1,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-09-09T09:42:46Z"
   }
  ]
 }
