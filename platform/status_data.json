@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-09T16:16:44+00:00",
-    "commit": "941b642"
+    "generated_at": "2026-09-09T21:28:10+00:00",
+    "commit": "5c00d2f"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,48 @@
   ],
   "activity": [
     {
+      "date": "2026-09-09T21:28:10+00:00",
+      "sha": "5c00d2f",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-09, run 34406906209)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-09T20:32:00+00:00",
+      "sha": "463f569",
+      "summary": "docs(progress): log UX-loop PWA manifest theme-color fix (PR #893, merged+deployed+verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-10T03:24:16+07:00",
+      "sha": "b8e593a",
+      "summary": "ux: align PWA manifest theme_color/background_color to the light default (#893)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-09T19:56:27+00:00",
+      "sha": "f7b407e",
+      "summary": "data: Thai-IP-only swarm refresh (run 34394749195) (#892)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-09T18:42:25+00:00",
+      "sha": "c5f281a",
+      "summary": "feat(live): per-series feed-freshness pulse on the Live board (#891)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-09T16:58:32+00:00",
+      "sha": "436983e",
+      "summary": "data: market-pulse swarm refresh (run 34371958588) (#890)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-09T16:17:02+00:00",
+      "sha": "31b2f8c",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (feed-freshness tripwire)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-09T16:16:44+00:00",
       "sha": "941b642",
       "summary": "test(gate): feed-freshness tripwire — catch a puller that ages in silence",
@@ -668,48 +710,6 @@
       "date": "2026-09-09T02:38:03+00:00",
       "sha": "acf1d55",
       "summary": "data: NABC live prices (2026-09-09, run 34303620799)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-09T00:33:22+00:00",
-      "sha": "541a9ae",
-      "summary": "docs(progress): 2026-09-09 integration-loop backlog-exhaustion audit — healthy close-out",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-09T00:28:15+00:00",
-      "sha": "3723452",
-      "summary": "data: market-pulse swarm refresh (run 34281813554) (#878)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-08T23:55:14+00:00",
-      "sha": "87b2b7d",
-      "summary": "data: rival Facebook promo feed refresh (run 34284357837) (#879)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-08T23:32:11+00:00",
-      "sha": "d8d802e",
-      "summary": "data: social listening refresh (run 34288369361) (#880)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-08T22:46:46+00:00",
-      "sha": "49aa4ca",
-      "summary": "data: live fuel prices (2026-09-08, run 34287378856)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-08T22:14:28+00:00",
-      "sha": "82befbb",
-      "summary": "service: deep deploy-health sweep GREEN + CEO-dashboard refresh to HEAD (6-commit drift)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-08T21:27:24+00:00",
-      "sha": "75c6506",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-08, run 34280488041)",
       "pillar": "data-integration"
     }
   ]
