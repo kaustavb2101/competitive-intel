@@ -6371,7 +6371,7 @@ function drawPeerNpl(){
   const ax=(PEERNPL&&PEERNPL.autox)?PEERNPL.autox:null;
   const axMax=ax?Math.max(hi,ax.npl_live_os_pct||0,4):Math.max(hi,4);
   tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Peer</th>`+
-    `<th scope="col" title="the operator's own reported loan-quality ratio — headline NPL (FY2025 / 2025 IR), or for Heng its H1-2026 TFRS9 Stage-3 credit-impaired share">Reported NPL</th>`+
+    `<th scope="col" title="the operator's own reported loan-quality ratio — Tidlor/MTC/Srisawad on their headline NPL (FY2025 / 2025 IR); Heng/Saksiam/Ngern Turbo on their Q2/2026 SET-filed TFRS9 Stage-3 credit-impaired share (loan-quality analog)">Reported NPL</th>`+
     `<th scope="col" title="the collateral mix that drives the NPL level">Collateral book</th>`+
     `<th scope="col">Source</th></tr>`+
     list.map((p,i)=>{

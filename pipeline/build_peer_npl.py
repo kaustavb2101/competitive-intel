@@ -3,12 +3,14 @@
 
 Assembles platform/data/peer_npl.json from two committed, in-repo sources — no network:
 
-  1. The listed title-lender peers' OWN reported NPL ratios — hand-curated from
-     docs/RESEARCH_DIGEST.md §B (each company's FY2025 / 2025 IR figure; Heng's is its
-     H1-2026 SET-filed Stage-3 credit-impaired share, the loan-quality analog for a TFRS9
-     hire-purchase/leasing lender), carried as cited constants below. They are the source of
-     truth (they change ~yearly and are published, not pulled), so hard-coding them here —
-     with their citation — is honest.
+  1. The listed title-lender peers' OWN reported NPL ratios — hand-curated as cited constants
+     below. Tidlor / MTC / Srisawad carry each company's FY2025 / 2025 IR headline figure
+     (docs/RESEARCH_DIGEST.md §B). Heng, Saksiam and Ngern Turbo publish no comparable headline
+     NPL, so they carry their Q2/2026 SET-filed TFRS9 Stage-3 credit-impaired share — the
+     loan-quality analog for a hire-purchase/leasing lender — the same committed, cited figures
+     already in platform/data/peer_asset_quality.json (as-of 30 Jun 2026; no network). They are
+     the source of truth (published, not pulled), so hard-coding them here — with their citation,
+     and the mixed basis disclosed per-row and in meta.note — is honest.
 
   2. AutoX / Ngern Chaiyo's OWN book quality — MEASURED, computed live from the real
      loan tape (platform/data/tape_real.json `bucket_ladder`), so the anchor always
@@ -82,6 +84,32 @@ PEERS = [
         "source": "Heng SET filing, H1-2026 — Stage 3 credit-impaired 6.78% of gross book "
                   "(฿542.8m/฿8,002.8m), 30 Jun 2026; TFRS9/IFRS-9 basis (loan-quality analog)",
     },
+    {
+        # Two more SET-listed title-loan peers whose loan-quality figure is NOT a hand-curated
+        # FY2025 IR headline NPL (they publish none), so — exactly as for Heng above — they are
+        # carried on their Q2/2026 SET-filed TFRS9 Stage-3 credit-impaired share, the loan-quality
+        # analog. The figures are the COMMITTED, cited ones already in platform/data/
+        # peer_asset_quality.json (built by build_peer_asset_quality.py from the same SET reviewed
+        # financial-statement NOTES, as-of 30 Jun 2026) — no network, no new source. Adding them
+        # closes a gap where the #acq NPL board silently dropped two listed rivals that the
+        # sibling asset-quality board already carries; the mixed basis is disclosed per-row, in
+        # the meta.note, and in the app's method box, consistent with the layer's standing
+        # "NOT a like-for-like league table" framing.
+        "ticker": "SAK",
+        "name": "Saksiam Leasing",
+        "npl": 2.7,
+        "collateral": "motorcycle / car / land title + hire-purchase (Isan-focused)",
+        "source": "Saksiam SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired 2.7% of gross "
+                  "receivables, 30 Jun 2026 (loan-quality analog; see peer_asset_quality.json)",
+    },
+    {
+        "ticker": "TURBO",
+        "name": "Ngern Turbo (NTL)",
+        "npl": 3.5,
+        "collateral": "car / motorcycle title (hire-purchase + title loan)",
+        "source": "Ngern Turbo SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired 3.5% of gross "
+                  "receivables, 30 Jun 2026 (loan-quality analog; see peer_asset_quality.json)",
+    },
 ]
 
 # Buckets in tape_real.json's ladder that are 90+ days past due (the strict BoT NPL
@@ -135,11 +163,12 @@ def build():
     return {
         "meta": {
             "title": "Peer NPL benchmark (reported) + AutoX measured anchor",
-            "note": ("Listed title-loan peers' reported NPL ratios (their own FY2025 / 2025 IR "
-                     "figures; Heng's is its H1-2026 SET-filed TFRS9 Stage-3 credit-impaired "
-                     "share — the loan-quality metric a hire-purchase/leasing lender publishes in "
-                     "place of a bank-style 90+ NPL, and the closest basis-match to AutoX's own "
-                     "impaired-share read) shown next to AutoX/Ngern Chaiyo's OWN book quality, "
+            "note": ("Listed title-loan peers' reported NPL ratios (Tidlor / MTC / Srisawad on "
+                     "their own FY2025 / 2025 IR headline figures; Heng, Saksiam and Ngern Turbo "
+                     "on their Q2/2026 SET-filed TFRS9 Stage-3 credit-impaired share — the "
+                     "loan-quality metric a hire-purchase/leasing lender publishes in place of a "
+                     "bank-style 90+ NPL, and the closest basis-match to AutoX's own impaired-share "
+                     "read) shown next to AutoX/Ngern Chaiyo's OWN book quality, "
                      "MEASURED from the real loan tape. NOT a like-for-like league table — peers "
                      "report on their own bases and write off / provision out deep-delinquent stock "
                      "that AutoX carries SEPARATELY as 180+ legacy workout inventory — so AutoX is a "
@@ -149,7 +178,9 @@ def build():
                      "collateral mix: gold/vehicle books run lower NPL, land/agri/heavy-vehicle "
                      "books higher."),
             "measured": "peers = reported by the companies; AutoX = measured from the real loan tape",
-            "source": "peers: docs/RESEARCH_DIGEST.md §B (FY2025 / 2025 IR); AutoX: platform/data/tape_real.json",
+            "source": "peers: docs/RESEARCH_DIGEST.md §B (Tidlor/MTC/Srisawad, FY2025 / 2025 IR) + "
+                      "platform/data/peer_asset_quality.json (Heng/Saksiam/Ngern Turbo, SET Q2/2026 "
+                      "TFRS9 Stage-3, as-of 30 Jun 2026); AutoX: platform/data/tape_real.json",
             "generated_by": "pipeline/build_peer_npl.py",
             "updated": "2026-06",
         },
