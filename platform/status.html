@@ -131,7 +131,13 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
   text-align:center;color:var(--mid);font-size:13px;line-height:1.6;margin:18px 0}
 .st-notice b{color:var(--txt)}
 .st-foot{font-size:10.5px;color:var(--dim);margin:22px 0 4px;line-height:1.6}
-@media(max-width:600px){.st-pct{font-size:34px}.st-eta{margin-left:0;text-align:left;width:100%}}
+@media(max-width:600px){.st-pct{font-size:34px}.st-eta{margin-left:0;text-align:left;width:100%}
+  /* Recent-activity rows: on a narrow phone card the fixed date·sha·pillar tokens + gaps consume the
+     whole row, collapsing the flex:1 summary to a few px so its own text overflows its box (illegible).
+     Wrap the row and drop the summary to its own full-width line beneath the meta tokens. */
+  .st-act{flex-wrap:wrap}
+  .st-act .pc{order:1}
+  .st-act .sm{order:2;flex-basis:100%}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
