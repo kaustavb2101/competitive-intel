@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 893,
+  "n_points": 903,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -43,11 +43,12 @@
     "2026-09-06",
     "2026-09-07",
     "2026-09-08",
-    "2026-09-09"
+    "2026-09-09",
+    "2026-09-10"
    ],
    "first_seen": "2026-07-19",
    "label": "AutoX app · 1-star share",
-   "n": 31,
+   "n": 32,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (th.co.autox.chaiyo)",
    "unit": "%",
@@ -81,6 +82,7 @@
     15.5556,
     15.5556,
     15.5405,
+    16.3285,
     16.3285,
     16.3285
    ]
@@ -118,11 +120,12 @@
     "2026-09-06",
     "2026-09-07",
     "2026-09-08",
-    "2026-09-09"
+    "2026-09-09",
+    "2026-09-10"
    ],
    "first_seen": "2026-07-19",
    "label": "AutoX app (Ngern Chaiyo) - Play Store rating",
-   "n": 31,
+   "n": 32,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (th.co.autox.chaiyo)",
    "unit": "stars",
@@ -156,6 +159,7 @@
     4.0,
     4.0,
     4.0,
+    3.9712,
     3.9712,
     3.9712
    ]
@@ -193,11 +197,12 @@
     "2026-09-06",
     "2026-09-07",
     "2026-09-08",
-    "2026-09-09"
+    "2026-09-09",
+    "2026-09-10"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC app · 1-star share",
-   "n": 31,
+   "n": 32,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (co.th.muangthaileasing.mtls)",
    "unit": "%",
@@ -232,6 +237,7 @@
     3.9969,
     3.8562,
     3.8385,
+    3.6975,
     3.6975
    ]
   },
@@ -268,11 +274,12 @@
     "2026-09-06",
     "2026-09-07",
     "2026-09-08",
-    "2026-09-09"
+    "2026-09-09",
+    "2026-09-10"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC app · Play Store rating",
-   "n": 31,
+   "n": 32,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (co.th.muangthaileasing.mtls)",
    "unit": "stars",
@@ -307,6 +314,7 @@
     4.6785,
     4.6847,
     4.6857,
+    4.6944,
     4.6944
    ]
   },
@@ -343,11 +351,12 @@
     "2026-09-06",
     "2026-09-07",
     "2026-09-08",
-    "2026-09-09"
+    "2026-09-09",
+    "2026-09-10"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD app · 1-star share",
-   "n": 31,
+   "n": 32,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.srisawad.mobileApplications)",
    "unit": "%",
@@ -382,7 +391,8 @@
     5.6795,
     6.0495,
     5.5958,
-    5.1745
+    5.1745,
+    5.1703
    ]
   },
   "app_sawad_score": {
@@ -418,11 +428,12 @@
     "2026-09-06",
     "2026-09-07",
     "2026-09-08",
-    "2026-09-09"
+    "2026-09-09",
+    "2026-09-10"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD app · Play Store rating",
-   "n": 31,
+   "n": 32,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.srisawad.mobileApplications)",
    "unit": "stars",
@@ -457,7 +468,8 @@
     4.5244,
     4.5101,
     4.528,
-    4.548
+    4.548,
+    4.5498
    ]
   },
   "app_tidlor_1star_pct": {
@@ -493,11 +505,12 @@
     "2026-09-06",
     "2026-09-07",
     "2026-09-08",
-    "2026-09-09"
+    "2026-09-09",
+    "2026-09-10"
    ],
    "first_seen": "2026-07-19",
    "label": "Tidlor app · 1-star share",
-   "n": 31,
+   "n": 32,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.ntl.cxm_mobile)",
    "unit": "%",
@@ -532,7 +545,8 @@
     3.0538,
     2.9927,
     3.1125,
-    3.2688
+    3.2688,
+    3.2131
    ]
   },
   "app_tidlor_score": {
@@ -568,11 +582,12 @@
     "2026-09-06",
     "2026-09-07",
     "2026-09-08",
-    "2026-09-09"
+    "2026-09-09",
+    "2026-09-10"
    ],
    "first_seen": "2026-07-19",
    "label": "Tidlor app · Play Store rating",
-   "n": 31,
+   "n": 32,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.ntl.cxm_mobile)",
    "unit": "stars",
@@ -607,7 +622,8 @@
     4.7165,
     4.7182,
     4.7113,
-    4.7035
+    4.7035,
+    4.7053
    ]
   },
   "flood_high": {
@@ -714,7 +730,7 @@
     140.0,
     136.0,
     139.0,
-    148.0
+    147.0
    ]
   },
   "fuel_diesel": {
@@ -767,11 +783,12 @@
     "2026-09-06",
     "2026-09-07",
     "2026-09-08",
-    "2026-09-09"
+    "2026-09-09",
+    "2026-09-10"
    ],
    "first_seen": "2026-07-05",
    "label": "Diesel · retail pump",
-   "n": 48,
+   "n": 49,
    "path": "source-data/fuel_prices.json",
    "source": "Bangchak retail oil-price API",
    "unit": "฿/L",
@@ -822,6 +839,7 @@
     39.14,
     39.14,
     39.14,
+    39.84,
     39.84,
     39.84
    ]
@@ -876,11 +894,12 @@
     "2026-09-06",
     "2026-09-07",
     "2026-09-08",
-    "2026-09-09"
+    "2026-09-09",
+    "2026-09-10"
    ],
    "first_seen": "2026-07-05",
    "label": "Gasohol 95 · retail pump",
-   "n": 48,
+   "n": 49,
    "path": "source-data/fuel_prices.json",
    "source": "Bangchak retail oil-price API",
    "unit": "฿/L",
@@ -931,6 +950,7 @@
     38.29,
     38.29,
     38.29,
+    39.09,
     39.09,
     39.09
    ]

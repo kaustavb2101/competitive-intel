@@ -8,101 +8,6 @@
  },
  "runs": [
   {
-   "append_history_rc": 0,
-   "feeds": [
-    {
-     "bytes_after": 1443,
-     "bytes_before": 1443,
-     "key": "fuel_prices",
-     "rc": 0,
-     "seconds": 1.9,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 7107,
-     "bytes_before": 7106,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 4.4,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 8930,
-     "bytes_before": 8928,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 5.3,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 3990,
-     "bytes_before": 3990,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 144.1,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 7534,
-     "bytes_before": 7534,
-     "key": "tpso_cpi",
-     "rc": 0,
-     "seconds": 2.5,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 58434,
-     "bytes_before": 58434,
-     "key": "ilostat_labour",
-     "rc": 0,
-     "seconds": 4.1,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 660076,
-     "bytes_before": 655418,
-     "key": "app_reviews",
-     "rc": 0,
-     "seconds": 3.7,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 2551898,
-     "bytes_before": 2549205,
-     "key": "apple_reviews",
-     "rc": 0,
-     "seconds": 127.6,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 499431,
-     "bytes_before": 498916,
-     "key": "rival_youtube",
-     "rc": 0,
-     "seconds": 30.8,
-     "status": "changed"
-    },
-    {
-     "bytes_after": 1413051,
-     "bytes_before": 1413051,
-     "key": "google_ads",
-     "rc": 3,
-     "seconds": 233.9,
-     "status": "skipped"
-    }
-   ],
-   "finished": "2026-08-28T21:02:58Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 7,
-   "n_failed": 0,
-   "n_ok": 9,
-   "n_skipped": 1,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-08-28T20:59:00Z"
-  },
-  {
    "append_history_rc": null,
    "feeds": [
     {
@@ -3250,6 +3155,93 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-09-10T09:42:57Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 1443,
+     "bytes_before": 1443,
+     "key": "fuel_prices",
+     "rc": 0,
+     "seconds": 1.7,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 7111,
+     "bytes_before": 7111,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 4.8,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 9004,
+     "bytes_before": 9004,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 5.2,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 4007,
+     "bytes_before": 4007,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 202.3,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 747,
+     "bytes_before": 747,
+     "key": "energy_prices",
+     "rc": 0,
+     "seconds": 0.9,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 703502,
+     "bytes_before": 701142,
+     "key": "app_reviews",
+     "rc": 0,
+     "seconds": 3.7,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 2600733,
+     "bytes_before": 2600256,
+     "key": "apple_reviews",
+     "rc": 0,
+     "seconds": 143.2,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 500987,
+     "bytes_before": 500411,
+     "key": "rival_youtube",
+     "rc": 0,
+     "seconds": 31.7,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 1429597,
+     "bytes_before": 1429597,
+     "key": "google_ads",
+     "rc": 3,
+     "seconds": 338.6,
+     "status": "skipped"
+    }
+   ],
+   "finished": "2026-09-10T15:46:51Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 5,
+   "n_failed": 0,
+   "n_ok": 8,
+   "n_skipped": 1,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-09-10T15:41:08Z"
   }
  ]
 }
