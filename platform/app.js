@@ -10435,7 +10435,7 @@ function renderBranches(){
   const total=rows.length, CAP=150;   // silent-cap guard: the table renders only the top CAP; surface the count so the ~1,865 unshown branches aren't hidden without a cue
   setSearchStatus(q ? `${total.toLocaleString()} ${total===1?'branch':'branches'} match “${q}”.` : '');
   rows=rows.slice(0,CAP);
-  $('#branches').innerHTML = `<tr><th class="no-print" scope="col"></th><th class="h-agri" scope="col" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th scope="col">Branch</th><th scope="col">Prov</th><th class="h-opp" scope="col" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th scope="col">Pickups (prov)</th><th scope="col">Informal (prov)</th><th scope="col">AutoX</th><th class="no-print" scope="col">3D</th></tr>`+
+  $('#branches').innerHTML = `<tr><th class="no-print" scope="col"><span class="sr-only">Watchlist</span></th><th class="h-agri" scope="col" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th scope="col">Branch</th><th scope="col">Prov</th><th class="h-opp" scope="col" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th scope="col">Pickups (prov)</th><th scope="col">Informal (prov)</th><th scope="col">AutoX</th><th class="no-print" scope="col">3D</th></tr>`+
     (rows.length ? rows.map(d=>{const pl=PLOOK[d.v]||{}; const rk=riskVal(d); const rc=rk>=60?'var(--agri)':rk>=40?'var(--gold)':'var(--merch)';
       const id=`branch:${d.n}|${d.v}`;
       const wItem={id,label:d.n,sub:`${d.v} · ${d.r}`,val:`▲ ${rk}`,valSub:'risk · est',col:rc,prov:d.v};
@@ -10482,7 +10482,7 @@ function drawProv(){
     (!q || p.th.includes(q) || (p.en||'').toLowerCase().includes(q) || p.slug.includes(q)))
     .sort((a,b)=>b.branches-a.branches);
   setSearchStatus(q ? `${rows.length} ${rows.length===1?'province':'provinces'} match “${q}”${provRegion==='all'?'':` in ${provRegion}`}.` : '');
-  $('#provtbl').innerHTML=`<tr><th class="no-print" scope="col"></th><th scope="col">Province</th><th scope="col">Region</th><th scope="col">Br</th><th scope="col">Distr</th><th scope="col">Factories</th><th scope="col">Vehicles</th><th scope="col">Fac/br</th><th class="no-print" scope="col">View</th></tr>`+
+  $('#provtbl').innerHTML=`<tr><th class="no-print" scope="col"><span class="sr-only">Watchlist</span></th><th scope="col">Province</th><th scope="col">Region</th><th scope="col">Br</th><th scope="col">Distr</th><th scope="col">Factories</th><th scope="col">Vehicles</th><th scope="col">Fac/br</th><th class="no-print" scope="col">View</th></tr>`+
    (rows.length ? rows.map(p=>{const id=`prov:${p.th}`;
      const wItem={id,label:p.th,sub:`${p.region} · ${p.branches} branches`,val:`${(p.factories||0).toLocaleString()}`,valSub:'factories · measured',col:'var(--gold)',prov:p.th};
      return `<tr onclick="location.href='${bldgURL(p.slug)}'" tabindex="0" role="link" style="cursor:pointer">
