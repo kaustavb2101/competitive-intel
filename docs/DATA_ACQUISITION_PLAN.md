@@ -59,7 +59,7 @@ and could not be executed — full log in §2.
 ## 1. Ranked inventory — every ESTIMATED / proxy field shipped in `platform/data/`
 
 Ranking = impact on the two standing objectives ÷ effort to land. "Impact" names the objective it
-sharpens (**#1 portfolio risk**, **#2 where to expand**).
+sharpens (**#1 portfolio risk**, **#2 competitive risk on the existing network**).
 
 ### Summary ladder (top → bottom)
 

@@ -61,7 +61,7 @@ web Schedule feature above is the real standing loop.
 - **CI** (`.github/workflows/qa.yml`, pinned Python 3.11) re-runs the gate on every push; a red gate
   blocks the change.
 - **Backlog rules** (top of `IMPROVEMENT_BACKLOG.md`): sandbox-only, graceful-degrade, no fabrication,
-  shared-tree safety, honest provenance, serve the two objectives (portfolio risk · where to expand).
+  shared-tree safety, honest provenance, serve the two objectives (portfolio risk · competitive risk on the existing network).
 
 ## Desktop-only items the loop CANNOT do (kept out on purpose)
 Anything needing a Thai-IP / desktop pull lives in `docs/TONIGHT_CHECKLIST.md` and must be run by

@@ -22,7 +22,7 @@
 - **Never** commit secrets or synthetic/generated geographic data; **only** push `claude/new-session-wto26j`.
 - **Scope discipline.** Large/architectural/ambiguous ideas → write them here as a recommendation
   instead of building them. Prefer high-impact / low-effort.
-- Serve the two standing objectives: **(1) portfolio risk**, **(2) where to expand**.
+- Serve the two standing objectives: **(1) portfolio risk**, **(2) competitive risk on the existing network** (per CLAUDE.md — a risk lens on the footprint AutoX already runs: rival density, contested-market concentration, per-branch / per-province competitor counts; it makes **no** open / close / where-to-open recommendations, which `tests/mandate_guard.py` enforces).
 
 ## Queue — UX / polish (from the UX committee; goal: beat DataProteins)
 > Ranked by the committee. NOTE: some are IN FLIGHT in dedicated workflows — do not duplicate:
