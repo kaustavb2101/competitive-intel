@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-10T17:28:20+07:00",
-    "commit": "f6cbf59"
+    "generated_at": "2026-09-10T15:30:21+00:00",
+    "commit": "5a76c8d"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-09-10T15:30:21+00:00",
+      "sha": "5a76c8d",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-10, run 34495849253)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-10T14:44:53+00:00",
+      "sha": "37430b4",
+      "summary": "docs(progress): log watchlist-column a11y ship (PR #907, 65e2e23) + deploy-verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-10T21:38:20+07:00",
+      "sha": "65e2e23",
+      "summary": "ux: name the watchlist-★ column on the #branches and #provinces tables (a11y) (#907)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-10T12:54:55+00:00",
+      "sha": "b4ff2d9",
+      "summary": "intel(peer): weight the 52-week de-rating readout by the dark equity_bn book-equity base (#906)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-10T12:19:28+00:00",
+      "sha": "7c07ac4",
+      "summary": "data: SET listed-peer scoreboard refresh (run 34470879348) (#905)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-10T11:53:19+00:00",
+      "sha": "21cfb70",
+      "summary": "data: market-pulse swarm refresh (run 34462102974) (#902)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-10T11:22:07+00:00",
+      "sha": "36b6d8f",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34466227813) (#904)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-10T10:31:04+00:00",
+      "sha": "c3250fa",
+      "summary": "docs(progress): log peer 52-week de-rating ship (PR #903, f6cbf59) + refresh CEO dashboard",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-09-10T17:28:20+07:00",
       "sha": "f6cbf59",
       "summary": "intel(peer): surface the peer scoreboard's dark 52-week equity de-rating (#903)",
@@ -663,54 +711,6 @@
       "sha": "c5f281a",
       "summary": "feat(live): per-series feed-freshness pulse on the Live board (#891)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-09-09T16:58:32+00:00",
-      "sha": "436983e",
-      "summary": "data: market-pulse swarm refresh (run 34371958588) (#890)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-09T16:17:02+00:00",
-      "sha": "31b2f8c",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (feed-freshness tripwire)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-09T16:16:44+00:00",
-      "sha": "941b642",
-      "summary": "test(gate): feed-freshness tripwire — catch a puller that ages in silence",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-09T15:29:46+00:00",
-      "sha": "7b0f57b",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-09, run 34370442892)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-09T14:35:53+00:00",
-      "sha": "b045da9",
-      "summary": "docs(progress): log UX loop status.html mobile activity-row fix (PR #889)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-09T21:32:34+07:00",
-      "sha": "103995a",
-      "summary": "ux: wrap status.html recent-activity rows on mobile so summaries stay readable (#889)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-09T12:26:44+00:00",
-      "sha": "17a4e2b",
-      "summary": "docs(backlog): correct two stale NEXT_STEPS §0c social-listening claims",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-09T12:03:36+00:00",
-      "sha": "d2d94e5",
-      "summary": "data: SET listed-peer scoreboard refresh (run 34345165892) (#888)",
-      "pillar": "peer"
     }
   ]
 }

@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 887,
+  "n_points": 893,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -714,7 +714,7 @@
     140.0,
     136.0,
     139.0,
-    146.0
+    148.0
    ]
   },
   "fuel_diesel": {
@@ -1294,7 +1294,7 @@
     36.0,
     35.0,
     39.0,
-    51.0
+    60.0
    ]
   },
   "rain_max_mm": {
@@ -1401,7 +1401,7 @@
     185.5,
     111.6,
     147.0,
-    148.8
+    141.3
    ]
   },
   "rival_ads_live": {
@@ -1780,11 +1780,12 @@
     "2026-09-03",
     "2026-09-04",
     "2026-09-07",
-    "2026-09-08"
+    "2026-09-08",
+    "2026-09-09"
    ],
    "first_seen": "2026-07-17",
    "label": "MTC · market cap",
-   "n": 22,
+   "n": 23,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -1810,7 +1811,8 @@
     63.6,
     64.13,
     64.13,
-    64.13
+    64.13,
+    63.6
    ]
   },
   "set_mtc_pbv": {
@@ -1837,11 +1839,12 @@
     "2026-09-03",
     "2026-09-04",
     "2026-09-07",
-    "2026-09-08"
+    "2026-09-08",
+    "2026-09-09"
    ],
    "first_seen": "2026-07-17",
    "label": "MTC · price/book",
-   "n": 22,
+   "n": 23,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -1867,7 +1870,8 @@
     1.38,
     1.39,
     1.39,
-    1.39
+    1.39,
+    1.38
    ]
   },
   "set_sawad_mcap": {
@@ -1894,11 +1898,12 @@
     "2026-09-03",
     "2026-09-04",
     "2026-09-07",
-    "2026-09-08"
+    "2026-09-08",
+    "2026-09-09"
    ],
    "first_seen": "2026-07-17",
    "label": "SAWAD · market cap",
-   "n": 22,
+   "n": 23,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -1924,7 +1929,8 @@
     37.5501,
     38.3808,
     38.0485,
-    38.0485
+    38.0485,
+    37.5501
    ]
   },
   "set_sawad_pbv": {
@@ -1951,11 +1957,12 @@
     "2026-09-03",
     "2026-09-04",
     "2026-09-07",
-    "2026-09-08"
+    "2026-09-08",
+    "2026-09-09"
    ],
    "first_seen": "2026-07-17",
    "label": "SAWAD · price/book",
-   "n": 22,
+   "n": 23,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -1981,7 +1988,8 @@
     0.95,
     0.97,
     0.96,
-    0.96
+    0.96,
+    0.95
    ]
   },
   "set_tidlor_mcap": {
@@ -2008,11 +2016,12 @@
     "2026-09-03",
     "2026-09-04",
     "2026-09-07",
-    "2026-09-08"
+    "2026-09-08",
+    "2026-09-09"
    ],
    "first_seen": "2026-07-17",
    "label": "TIDLOR · market cap",
-   "n": 22,
+   "n": 23,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -2038,7 +2047,8 @@
     54.7331,
     55.0227,
     54.4435,
-    54.1539
+    54.1539,
+    52.7059
    ]
   },
   "set_tidlor_pbv": {
@@ -2065,11 +2075,12 @@
     "2026-09-03",
     "2026-09-04",
     "2026-09-07",
-    "2026-09-08"
+    "2026-09-08",
+    "2026-09-09"
    ],
    "first_seen": "2026-07-17",
    "label": "TIDLOR · price/book",
-   "n": 22,
+   "n": 23,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -2095,7 +2106,8 @@
     1.55,
     1.56,
     1.54,
-    1.53
+    1.53,
+    1.49
    ]
   },
   "social_corpus_docs": {
