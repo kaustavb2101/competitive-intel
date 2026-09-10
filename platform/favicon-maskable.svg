@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="AutoX">
+  <!-- Maskable PWA icon: FULL-BLEED background (no rounded corners / edge border — the Android
+       adaptive-icon launcher applies its own mask and would crop any of that), with the "AX"
+       monogram kept well inside the central 80% safe zone (a circle of radius ~205px on this
+       512 canvas). Companion to favicon.svg (the purpose:"any" icon, which keeps the rounded
+       square + accent border for browser tabs where nothing is masked). -->
+  <rect width="512" height="512" fill="#11182A"/>
+  <text x="256" y="256" text-anchor="middle" dominant-baseline="central" fill="#5B7CFA"
+        font-family="'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace"
+        font-size="210" font-weight="700" letter-spacing="-12">AX</text>
+</svg>
