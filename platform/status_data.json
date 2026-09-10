@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-10T15:30:21+00:00",
-    "commit": "5a76c8d"
+    "generated_at": "2026-09-10T21:26:48+00:00",
+    "commit": "9501b12"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,48 @@
   ],
   "activity": [
     {
+      "date": "2026-09-10T21:26:48+00:00",
+      "sha": "9501b12",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-10, run 34532086526)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-10T20:22:14+00:00",
+      "sha": "a0d59c8",
+      "summary": "docs: log UX-loop run — accessible names for primary search tables (PR #910)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-11T03:20:43+07:00",
+      "sha": "a4ea94f",
+      "summary": "ux: accessible names for the three primary search tables (#910)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-10T19:59:43+00:00",
+      "sha": "24cf951",
+      "summary": "data: Thai-IP-only swarm refresh (run 34519941754) (#909)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-10T18:30:25+00:00",
+      "sha": "1944488",
+      "summary": "docs(mandate): correct objective #2 from retired \"where to expand\" to competitive-risk lens",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-09-10T16:43:18+00:00",
+      "sha": "04a8a69",
+      "summary": "data: market-pulse swarm refresh (run 34497206615) (#908)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-10T16:18:33+00:00",
+      "sha": "bc71480",
+      "summary": "intel: healthy close-out — refresh CEO dashboard to HEAD; record dark peer field as reasoned non-ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-09-10T15:30:21+00:00",
       "sha": "5a76c8d",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-10, run 34495849253)",
@@ -669,48 +711,6 @@
       "sha": "689f473",
       "summary": "data: rival Facebook promo feed refresh (run 34410618749) (#895)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-09-09T22:35:14+00:00",
-      "sha": "ce929c7",
-      "summary": "data: market-pulse swarm refresh (run 34408114388) (#894)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-09T22:32:44+00:00",
-      "sha": "86d8f64",
-      "summary": "service: healthy close-out + CEO dashboard refresh to HEAD (2026-09-09)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-09T21:28:10+00:00",
-      "sha": "5c00d2f",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-09, run 34406906209)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-09T20:32:00+00:00",
-      "sha": "463f569",
-      "summary": "docs(progress): log UX-loop PWA manifest theme-color fix (PR #893, merged+deployed+verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-10T03:24:16+07:00",
-      "sha": "b8e593a",
-      "summary": "ux: align PWA manifest theme_color/background_color to the light default (#893)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-09T19:56:27+00:00",
-      "sha": "f7b407e",
-      "summary": "data: Thai-IP-only swarm refresh (run 34394749195) (#892)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-09T18:42:25+00:00",
-      "sha": "c5f281a",
-      "summary": "feat(live): per-series feed-freshness pulse on the Live board (#891)",
-      "pillar": "feature"
     }
   ]
 }
