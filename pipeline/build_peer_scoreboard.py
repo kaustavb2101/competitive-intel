@@ -131,6 +131,19 @@ def build():
         np_yoy = _yoy(src.get("netProfit"), base.get("netProfit")) if comparable else None
         growth_basis = ("FY%s→FY%s" % (base["year"], src["year"])) if comparable else None
 
+        # Derived last price + 52-week de-rating (objective #2: the listed rival whose equity has
+        # de-rated hardest from its 52-week high faces the tightest / costliest access to fresh
+        # equity capital). Price is recovered from the SET market cap ÷ listed shares — SET computes
+        # marketCap = last price × listedShare, so this recovers the last price behind the same
+        # price_asof — then off_high_pct / range_pos_pct are pure arithmetic on the SET-reported
+        # yearHigh/yearLow. All null-guarded (missing cap/shares/range -> None, never a false 0).
+        mc_raw, ls_raw = p.get("marketCap"), p.get("listedShare")
+        yr_hi, yr_lo = p.get("yearHigh"), p.get("yearLow")
+        price = (mc_raw / ls_raw) if (mc_raw and ls_raw) else None
+        off_high_pct = round(100.0 * (price - yr_hi) / yr_hi, 1) if (price is not None and yr_hi) else None
+        range_pos_pct = (round(100.0 * (price - yr_lo) / (yr_hi - yr_lo))
+                         if (price is not None and yr_hi is not None and yr_lo is not None and yr_hi != yr_lo) else None)
+
         rec = {
             "symbol": p["symbol"],
             "name": SHORT.get(p["symbol"], p.get("name")),
@@ -143,6 +156,9 @@ def build():
             "beta": p.get("beta"),
             "ytd_pct": round(p["ytdPercentChange"], 1) if p.get("ytdPercentChange") is not None else None,
             "year_high": p.get("yearHigh"), "year_low": p.get("yearLow"),
+            "price": round(price, 2) if price is not None else None,
+            "off_high_pct": off_high_pct,
+            "range_pos_pct": range_pos_pct,
             "free_float_pct": round(p["percentFreeFloat"], 1) if p.get("percentFreeFloat") is not None else None,
             "roe": round(src["roe"], 1) if src.get("roe") is not None else None,
             "roa": round(src["roa"], 1) if src.get("roa") is not None else None,
@@ -230,6 +246,13 @@ def build():
                              "carries no consolidated P&L and predates the 2025-05-15 restructure, so no "
                              "clean like-for-like base exists). HENG's growth is on an unconsolidated (U) "
                              "basis; AutoX (unlisted) has no row.",
+            "derate_caveat": "price is the SET last price recovered from market cap / listed shares "
+                             "(SET marketCap = last price x listedShare), as of the same price_asof; "
+                             "off_high_pct = price vs the 52-week high, range_pos_pct = position in the "
+                             "52-week high-low band (0% = at the low, 100% = at the high). MEASURED — SET "
+                             "yearHigh/yearLow. A rival trading deep below its 52-week high faces tighter, "
+                             "costlier access to fresh equity capital — an objective-#2 competitive-pressure "
+                             "read on the listed field; AutoX (unlisted) has no market price.",
             "units": "market_cap/assets/profit/revenue/equity in ฿bn; ratios in %",
         },
         "headline": headline,

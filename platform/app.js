@@ -4290,8 +4290,23 @@ function drawPeerScore(){
       const collapse=(lo.npm<5)?` ${lo.name}'s margin has all but collapsed — near-zero net profit on the loan book.`:'';
       marginLine=` <b>Net-profit margin (MEASURED, SET).</b> ${hi.name} keeps the most of each ฿ of revenue (${hi.npm.toFixed(1)}% net margin), ${lo.name} the least (${lo.npm.toFixed(1)}%${uflag}) — the leverage-independent read of loan-book profitability, a cleaner margin-erosion signal than ROE (which the D/E funding structure distorts).${collapse}`;
     }
+    // 52-week equity de-rating read (off_high_pct, MEASURED — SET last price recovered from market
+    // cap / listed shares, vs the SET-reported 52-week high). Objective #2: a listed rival trading
+    // deep below its 52-week high faces tighter, costlier access to fresh equity capital — a
+    // competitive-pressure read on the listed field that the ROE/margin lines don't give. Fires with
+    // >=3 peers carrying the field; every superlative is the peers' own numbers, null-guarded, so a
+    // pre-fold peer_scoreboard.json (no off_high_pct) degrades to no line.
+    const der=peers.filter(p=>typeof p.off_high_pct==='number');
+    let derateLine='';
+    if(der.length>=3){
+      const worst=der.slice().sort((a,b)=>a.off_high_pct-b.off_high_pct)[0];
+      const belowHi=der.filter(p=>p.off_high_pct<0);
+      const breadth=(belowHi.length===der.length)?`All ${der.length} listed rivals`:`${belowHi.length} of ${der.length} listed rivals`;
+      const posClause=(typeof worst.range_pos_pct==='number')?` (at ${worst.range_pos_pct}% of its 52-week range)`:'';
+      derateLine=` <b>Equity de-rating (52-week).</b> ${breadth} trade below their 52-week high; ${worst.name} has de-rated hardest, ${Math.abs(worst.off_high_pct).toFixed(1)}% below its high${posClause} — the market marking down the listed title-lender field, so fresh equity capital runs tighter and costlier for rivals (AutoX is unlisted, so it has no market price to mark against).`;
+    }
     ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
-      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+betaLine+growLine+marginLine+
+      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+betaLine+growLine+marginLine+derateLine+
       methodBox(m.roe_caveat||null,
         [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the newest audited full year'}.`,
          '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE target is a stated goal shown only as the reference line.',
@@ -4300,6 +4315,7 @@ function drawPeerScore(){
          m.fs_type_caveat||null,
          m.beta_caveat||null,
          m.growth_caveat||null,
+         (derateLine?(m.derate_caveat||null):null),
          aqNote]);
   }
 }
