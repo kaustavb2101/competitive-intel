@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-09T23:54:34+00:00",
-    "commit": "343ed4f"
+    "generated_at": "2026-09-10T03:35:26+00:00",
+    "commit": "cdf7dbe"
   },
   "overall": {
     "progress_pct": 100,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-09-09",
+    "eta_date": "2026-09-10",
     "done_items": 50,
     "in_progress_items": 0,
     "open_items": 0,
@@ -533,6 +533,36 @@
   ],
   "activity": [
     {
+      "date": "2026-09-10T03:35:26+00:00",
+      "sha": "cdf7dbe",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-10, run 34433785381)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-10T02:37:51+00:00",
+      "sha": "8c44a9a",
+      "summary": "data: NABC live prices (2026-09-10, run 34429836396)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-10T02:24:34+00:00",
+      "sha": "efcbcf3",
+      "summary": "docs(progress): log maskable PWA icon ship + deploy-verify (PR #897)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-09-10T09:21:55+07:00",
+      "sha": "393b284",
+      "summary": "ux: maskable PWA icon for Android adaptive-icon launchers (#897)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-10T00:24:46+00:00",
+      "sha": "9c0e4da",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (343ed4f) — 4 commits stale",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-09T23:54:34+00:00",
       "sha": "343ed4f",
       "summary": "data: Google Trends brand share-of-search refresh (run 34416618385) (#896)",
@@ -681,36 +711,6 @@
       "sha": "32a3fb5",
       "summary": "docs(progress): record ux-theme-color-prepaint-flash merge + deploy-verify (PR #884)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-09T15:30:25+07:00",
-      "sha": "198b96c",
-      "summary": "ux: stamp theme-color before paint so persisted-dark load doesn't flash light chrome (#884)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-09T06:30:44+00:00",
-      "sha": "db11e01",
-      "summary": "docs(swarm): record why pull_pinksheet.py is deliberately not in the swarm registry",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-09T05:17:05+00:00",
-      "sha": "f4159f1",
-      "summary": "data(census): refresh the Union Auction forward book (run 34308342696) (#882)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-09T04:52:40+00:00",
-      "sha": "230bd7f",
-      "summary": "data: market-pulse swarm refresh (run 34308253059) (#883)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-09T04:27:28+00:00",
-      "sha": "e65ce66",
-      "summary": "planning: fix stale dep-access detector → CEO dashboard reads 100% (0 open), not false 98%/1-open",
-      "pillar": "feature"
     }
   ]
 }
