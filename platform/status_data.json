@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-10T03:35:26+00:00",
-    "commit": "cdf7dbe"
+    "generated_at": "2026-09-10T17:28:20+07:00",
+    "commit": "f6cbf59"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-09-10T17:28:20+07:00",
+      "sha": "f6cbf59",
+      "summary": "intel(peer): surface the peer scoreboard's dark 52-week equity de-rating (#903)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-10T09:32:37+00:00",
+      "sha": "f9f1494",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-10, run 34461020856)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-10T08:25:53+00:00",
+      "sha": "134046a",
+      "summary": "docs(progress): log ux plain-language 3D-scene load-failure card (PR #901) — merged + deployed + verified LIVE",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-10T15:24:27+07:00",
+      "sha": "0222a6b",
+      "summary": "ux: plain-language 3D-scene load-failure card (drop dev jargon) (#901)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-10T06:44:17+00:00",
+      "sha": "a9e1b30",
+      "summary": "docs(blocked-sources): correct DBD/PICO as Thai-IP pulls, not CI-reachable (fresh 2026-09-10 probes) (#900)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-10T05:18:53+00:00",
+      "sha": "2ba7f2c",
+      "summary": "data(census): refresh the Union Auction forward book (run 34434534495) (#898)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-10T04:52:29+00:00",
+      "sha": "8b33231",
+      "summary": "data: market-pulse swarm refresh (run 34434437322) (#899)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-10T04:11:55+00:00",
+      "sha": "9f4d6fb",
+      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (cdf7dbe) — 2 commits stale",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-10T03:35:26+00:00",
       "sha": "cdf7dbe",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-10, run 34433785381)",
@@ -663,54 +711,6 @@
       "sha": "d2d94e5",
       "summary": "data: SET listed-peer scoreboard refresh (run 34345165892) (#888)",
       "pillar": "peer"
-    },
-    {
-      "date": "2026-09-09T11:40:31+00:00",
-      "sha": "3ca95a1",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34339974852) (#887)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-09T11:05:25+00:00",
-      "sha": "f4a081b",
-      "summary": "data: market-pulse swarm refresh (run 34336206567) (#885)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-09T10:26:10+00:00",
-      "sha": "dcca829",
-      "summary": "chore(dashboard): refresh CEO autonomy dashboard to HEAD after peer_npl six-peer completion (#886)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-09T17:23:40+07:00",
-      "sha": "033fe4f",
-      "summary": "peer: complete #acq reported-NPL board to all 6 SET-listed title-loan peers (#886)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-09T09:33:06+00:00",
-      "sha": "04cf7fd",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-09, run 34335148374)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-09T08:37:53+00:00",
-      "sha": "e53ad73",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-09T08:37:04+00:00",
-      "sha": "3038d48",
-      "summary": "data: NABC live prices (2026-09-09, run 34329574907)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-09T08:32:47+00:00",
-      "sha": "32a3fb5",
-      "summary": "docs(progress): record ux-theme-color-prepaint-flash merge + deploy-verify (PR #884)",
-      "pillar": "uxui"
     }
   ]
 }
