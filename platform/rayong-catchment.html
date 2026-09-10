@@ -2867,8 +2867,8 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    var head=served?('The 3D scene for '+prettyP+' didn’t load')
                   :('3D buildings for '+prettyP+' haven’t been pulled yet');
    var body=served
-     ? ('The manifest lists '+prettyP+' as served, so this is a network or CDN failure, not a missing '+
-        'pull — reloading usually fixes it. The district view works either way.')
+     ? ('This scene is available — the connection just dropped while loading it, which a reload usually '+
+        'fixes. The district view works either way.')
      : ('The Overture building scene is pulled per province from the desktop. Until then, the '+
         'district view has '+prettyP+'’s branches, districts, POIs and 10&nbsp;km reach.');
    // Exec-facing microcopy: the reader here is the owner/board, not a developer, so the footnote
