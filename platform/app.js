@@ -4303,7 +4303,15 @@ function drawPeerScore(){
       const belowHi=der.filter(p=>p.off_high_pct<0);
       const breadth=(belowHi.length===der.length)?`All ${der.length} listed rivals`:`${belowHi.length} of ${der.length} listed rivals`;
       const posClause=(typeof worst.range_pos_pct==='number')?` (at ${worst.range_pos_pct}% of its 52-week range)`:'';
-      derateLine=` <b>Equity de-rating (52-week).</b> ${breadth} trade below their 52-week high; ${worst.name} has de-rated hardest, ${Math.abs(worst.off_high_pct).toFixed(1)}% below its high${posClause} — the market marking down the listed title-lender field, so fresh equity capital runs tighter and costlier for rivals (AutoX is unlisted, so it has no market price to mark against).`;
+      // Weight the de-rating by the equity base it moves against (equity_bn, MEASURED — SET book /
+      // shareholders' equity, the capital a title lender lends against). Sizes how much rival capital
+      // is under market-repricing pressure: a ฿43bn base de-rating 31% is a bigger capital-access
+      // constraint than a ฿4bn one. Both clauses null-guard equity_bn — the cohort total shows only
+      // when every de-rated peer carries the field, so no total is implied that omits a null-equity peer.
+      const eqBelow=belowHi.filter(p=>typeof p.equity_bn==='number');
+      const eqClause=(eqBelow.length===belowHi.length&&eqBelow.length)?` (฿${eqBelow.reduce((a,p)=>a+p.equity_bn,0).toFixed(0)}bn of book equity between them)`:'';
+      const worstEq=(typeof worst.equity_bn==='number')?` (฿${worst.equity_bn}bn book equity)`:'';
+      derateLine=` <b>Equity de-rating (52-week).</b> ${breadth} trade below their 52-week high${eqClause}; ${worst.name}${worstEq} has de-rated hardest, ${Math.abs(worst.off_high_pct).toFixed(1)}% below its high${posClause} — the market marking down the listed title-lender field, so fresh equity capital runs tighter and costlier for rivals (AutoX is unlisted, so it has no market price to mark against).`;
     }
     ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
       (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+betaLine+growLine+marginLine+derateLine+
@@ -4316,6 +4324,7 @@ function drawPeerScore(){
          m.beta_caveat||null,
          m.growth_caveat||null,
          (derateLine?(m.derate_caveat||null):null),
+         (derateLine?'<b>Book equity ≠ market cap</b> — the ฿bn equity figures are each peer’s SET-reported shareholders’ (book) equity, the capital base it lends against; the de-rating % is the separate market-price move against the 52-week high (both MEASURED, SET).':null),
          aqNote]);
   }
 }
@@ -10426,7 +10435,7 @@ function renderBranches(){
   const total=rows.length, CAP=150;   // silent-cap guard: the table renders only the top CAP; surface the count so the ~1,865 unshown branches aren't hidden without a cue
   setSearchStatus(q ? `${total.toLocaleString()} ${total===1?'branch':'branches'} match “${q}”.` : '');
   rows=rows.slice(0,CAP);
-  $('#branches').innerHTML = `<tr><th class="no-print" scope="col"></th><th class="h-agri" scope="col" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th scope="col">Branch</th><th scope="col">Prov</th><th class="h-opp" scope="col" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th scope="col">Pickups (prov)</th><th scope="col">Informal (prov)</th><th scope="col">AutoX</th><th class="no-print" scope="col">3D</th></tr>`+
+  $('#branches').innerHTML = `<tr><th class="no-print" scope="col"><span class="sr-only">Watchlist</span></th><th class="h-agri" scope="col" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th scope="col">Branch</th><th scope="col">Prov</th><th class="h-opp" scope="col" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th scope="col">Pickups (prov)</th><th scope="col">Informal (prov)</th><th scope="col">AutoX</th><th class="no-print" scope="col">3D</th></tr>`+
     (rows.length ? rows.map(d=>{const pl=PLOOK[d.v]||{}; const rk=riskVal(d); const rc=rk>=60?'var(--agri)':rk>=40?'var(--gold)':'var(--merch)';
       const id=`branch:${d.n}|${d.v}`;
       const wItem={id,label:d.n,sub:`${d.v} · ${d.r}`,val:`▲ ${rk}`,valSub:'risk · est',col:rc,prov:d.v};
@@ -10473,7 +10482,7 @@ function drawProv(){
     (!q || p.th.includes(q) || (p.en||'').toLowerCase().includes(q) || p.slug.includes(q)))
     .sort((a,b)=>b.branches-a.branches);
   setSearchStatus(q ? `${rows.length} ${rows.length===1?'province':'provinces'} match “${q}”${provRegion==='all'?'':` in ${provRegion}`}.` : '');
-  $('#provtbl').innerHTML=`<tr><th class="no-print" scope="col"></th><th scope="col">Province</th><th scope="col">Region</th><th scope="col">Br</th><th scope="col">Distr</th><th scope="col">Factories</th><th scope="col">Vehicles</th><th scope="col">Fac/br</th><th class="no-print" scope="col">View</th></tr>`+
+  $('#provtbl').innerHTML=`<tr><th class="no-print" scope="col"><span class="sr-only">Watchlist</span></th><th scope="col">Province</th><th scope="col">Region</th><th scope="col">Br</th><th scope="col">Distr</th><th scope="col">Factories</th><th scope="col">Vehicles</th><th scope="col">Fac/br</th><th class="no-print" scope="col">View</th></tr>`+
    (rows.length ? rows.map(p=>{const id=`prov:${p.th}`;
      const wItem={id,label:p.th,sub:`${p.region} · ${p.branches} branches`,val:`${(p.factories||0).toLocaleString()}`,valSub:'factories · measured',col:'var(--gold)',prov:p.th};
      return `<tr onclick="location.href='${bldgURL(p.slug)}'" tabindex="0" role="link" style="cursor:pointer">
