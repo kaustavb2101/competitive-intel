@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-09T21:28:10+00:00",
-    "commit": "5c00d2f"
+    "generated_at": "2026-09-09T23:54:34+00:00",
+    "commit": "343ed4f"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,30 @@
   ],
   "activity": [
     {
+      "date": "2026-09-09T23:54:34+00:00",
+      "sha": "343ed4f",
+      "summary": "data: Google Trends brand share-of-search refresh (run 34416618385) (#896)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-09T23:12:13+00:00",
+      "sha": "689f473",
+      "summary": "data: rival Facebook promo feed refresh (run 34410618749) (#895)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-09T22:35:14+00:00",
+      "sha": "ce929c7",
+      "summary": "data: market-pulse swarm refresh (run 34408114388) (#894)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-09T22:32:44+00:00",
+      "sha": "86d8f64",
+      "summary": "service: healthy close-out + CEO dashboard refresh to HEAD (2026-09-09)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-09T21:28:10+00:00",
       "sha": "5c00d2f",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-09, run 34406906209)",
@@ -687,30 +711,6 @@
       "sha": "e65ce66",
       "summary": "planning: fix stale dep-access detector → CEO dashboard reads 100% (0 open), not false 98%/1-open",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-09-09T03:35:20+00:00",
-      "sha": "0fd55a7",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-09, run 34307589531)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-09T02:55:38+00:00",
-      "sha": "b065cb6",
-      "summary": "docs(progress): 2026-09-09 UX loop — nav-chevron aria-hidden a11y fix shipped (#881), deploy verified",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-09T09:52:55+07:00",
-      "sha": "4b34bba",
-      "summary": "ux: hide decorative \"Explore ▾\" nav chevron from screen readers (4 pages) (#881)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-09T02:38:03+00:00",
-      "sha": "acf1d55",
-      "summary": "data: NABC live prices (2026-09-09, run 34303620799)",
-      "pillar": "data-integration"
     }
   ]
 }
