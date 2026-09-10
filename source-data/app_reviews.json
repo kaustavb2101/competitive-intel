@@ -3,7 +3,7 @@
   "title": "Title-lender app sentiment — Google Play ratings + newest reviews (incl. our own)",
   "generated_by": "pipeline/pull_app_reviews.py",
   "label": "MEASURED — Google Play store pages (th/th). Star histogram + dated public reviews; review store accumulates across pulls (dedup by reviewId, newest 1500 kept per app).",
-  "pulled_at": "2026-09-09"
+  "pulled_at": "2026-09-10"
  },
  "apps": {
   "AUTOX": {
@@ -1713,21 +1713,69 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.703509,
-    "ratings": 17044,
-    "reviews_total": 5285,
+    "score": 4.705263,
+    "ratings": 17058,
+    "reviews_total": 5289,
     "installs": "1,000,000+",
     "histogram": [
-     557,
-     179,
-     467,
-     1345,
-     14492
+     548,
+     189,
+     468,
+     1326,
+     14524
     ],
     "app_updated": "2026-08-06",
     "version": "3.2.0"
    },
    "reviews_store": [
+    {
+     "id": "ca19b1da-50fd-4a90-8a5e-b5f675cafaa2",
+     "at": "2026-09-09",
+     "score": 5,
+     "content": "ขอบคุณครับ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "b88befa0-396b-4f28-a048-35825eae6fcf",
+     "at": "2026-09-09",
+     "score": 5,
+     "content": "ดีครับ ไว้ใจได้",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "b3095f71-ad9a-4e20-bbc5-71165e6525ba",
+     "at": "2026-09-09",
+     "score": 2,
+     "content": "แอปเข้าไม่ได้อัพเดตแล้วก้เข้าไม่ได้",
+     "thumbs": 1,
+     "replied": false
+    },
+    {
+     "id": "9d57ef34-2a2f-4307-bb1e-a5461ca817d2",
+     "at": "2026-09-09",
+     "score": 5,
+     "content": "👍👍👍👍👍👍👍👍👍",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "719c81f9-fd77-44ae-8ecb-83ef2061b020",
+     "at": "2026-09-09",
+     "score": 4,
+     "content": "ก็ดีครับ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "27dad7e5-c751-4b19-854c-304bfc577ea3",
+     "at": "2026-09-09",
+     "score": 5,
+     "content": "ดีมากเลยครับ บัตรก็มีกด เงินสดก็มีใช้ ไม่ต้องไปรีไฟแนนซ์ที่สาขาให้เสียเวลา",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "e9088d94-1417-4cde-9b79-e481ffd226cc",
      "at": "2026-09-08",
@@ -1745,11 +1793,19 @@
      "replied": false
     },
     {
+     "id": "8a6d0a19-7b7f-4978-aca8-66d6d7d08eef",
+     "at": "2026-09-08",
+     "score": 5,
+     "content": "ดี",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
      "id": "85459d09-d84e-405d-835d-c07f2d41b10a",
      "at": "2026-09-08",
      "score": 1,
      "content": "เปิดไม่ได้",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": false
     },
     {
@@ -1877,7 +1933,7 @@
      "at": "2026-09-03",
      "score": 1,
      "content": "แอปแย่มาก เข้าไม่ได้เลย ไม่ได้ขึ้นอัปเดท แต่เข้าไม่ได้ จะมีแอปไว้ทำมัยถ้าไม่สะดวก",
-     "thumbs": 1,
+     "thumbs": 2,
      "replied": false
     },
     {
@@ -2373,7 +2429,7 @@
      "at": "2026-08-24",
      "score": 5,
      "content": "ใช้ดี ใช้ง่าย เบิกถอนง่าย แต่ให้อัพเดทบ่อยไปนิดค่ะ",
-     "thumbs": 1,
+     "thumbs": 2,
      "replied": false
     },
     {
@@ -3037,7 +3093,7 @@
      "at": "2026-08-20",
      "score": 5,
      "content": "ดีมากๆครับแถมมีบัตรกดยอดเงินที่ผ่อนไปแล้วมาใช้ใด้ด้วยเมื่อจำเป็นสะดวกไม่ต้องไปรีไฟฯที่เงินติดล้อแค่กดเงินได้ที่ตู้atmง่ายๆมากแนะนำครับดอกก็ถูกมาก",
-     "thumbs": 7,
+     "thumbs": 8,
      "replied": false
     },
     {
@@ -6177,7 +6233,7 @@
    "stats": {
     "score": 4.6944447,
     "ratings": 6522,
-    "reviews_total": 2157,
+    "reviews_total": 2158,
     "installs": "1,000,000+",
     "histogram": [
      241,
@@ -6243,7 +6299,7 @@
      "at": "2026-08-28",
      "score": 5,
      "content": "ใครที่กำลังหาสินเชื่ออยู่ขอแนะนำเลยค่ะเมืองไทยแคปปิตอลรับรองไม่ผิดหวังค่ะเป็นลูกค้ามาเกือบ10ปีแล้วค่ะ กู้ง่ายไม่ยุ่งยากถ้าเราชำระดีสินเชื่ออี่นก็จะตามมาค่ะ",
-     "thumbs": 3,
+     "thumbs": 4,
      "replied": false
     },
     {
@@ -6283,7 +6339,7 @@
      "at": "2026-08-27",
      "score": 5,
      "content": "บริการมดีมากค่ะ ไม่ทำให้ลูกค้าเครียด แนะทางออกที่ดีมาก พนักงานสุภาพ ทุกสาขา ที่กาฬสินธุ์ค่ะ",
-     "thumbs": 4,
+     "thumbs": 5,
      "replied": false
     },
     {
@@ -8165,16 +8221,16 @@
    "name": "ศรีสวัสดิ์",
    "own": false,
    "stats": {
-    "score": 4.548,
-    "ratings": 2497,
-    "reviews_total": 877,
+    "score": 4.549801,
+    "ratings": 2498,
+    "reviews_total": 879,
     "installs": "500,000+",
     "histogram": [
      129,
      49,
      89,
-     279,
-     1947
+     278,
+     1950
     ],
     "app_updated": "2026-07-01",
     "version": "1.0.60"
@@ -10363,16 +10419,16 @@
    "name": "เงินเทอร์โบ",
    "own": false,
    "stats": {
-    "score": 4.27,
-    "ratings": 842,
+    "score": 4.31,
+    "ratings": 843,
     "reviews_total": 265,
     "installs": "500,000+",
     "histogram": [
-     126,
+     117,
      8,
      25,
      33,
-     647
+     656
     ],
     "app_updated": "2026-08-24",
     "version": "1.0.62-ngernturbo"
@@ -12033,16 +12089,16 @@
    "name": "สมหวัง เงินสั่งได้ (TISCO)",
    "own": false,
    "stats": {
-    "score": 4.16,
-    "ratings": 359,
+    "score": 4.18,
+    "ratings": 358,
     "reviews_total": 138,
     "installs": "100,000+",
     "histogram": [
-     50,
-     7,
-     25,
-     28,
-     247
+     49,
+     6,
+     20,
+     27,
+     250
     ],
     "app_updated": "2026-07-20",
     "version": "1.12.0"
@@ -13485,21 +13541,29 @@
    "name": "Good Money เงินดีดี (GSB)",
    "own": false,
    "stats": {
-    "score": 3.7039275,
-    "ratings": 3269,
-    "reviews_total": 1440,
+    "score": 3.6957831,
+    "ratings": 3270,
+    "reviews_total": 1444,
     "installs": "1,000,000+",
     "histogram": [
-     779,
+     787,
      177,
-     148,
-     286,
-     1875
+     147,
+     285,
+     1870
     ],
     "app_updated": "2026-08-11",
     "version": "1.0.45"
    },
    "reviews_store": [
+    {
+     "id": "2dae1d94-1837-4017-a7a2-413e3886adfa",
+     "at": "2026-09-09",
+     "score": 1,
+     "content": "แอปห่วยแตกรอพิจารณา14วัน ทักไปถามทางไลน์บอกว่ารอพิจารณา พอทักไปถามเสือกบอกไม่ผ่าน ไม่ต้องไปใช้บริการเสียเวลา",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "29886444-63f7-422c-bd5e-cd3060e16276",
      "at": "2026-09-08",
@@ -14401,7 +14465,7 @@
      "at": "2026-08-04",
      "score": 5,
      "content": "เป็น app ที่ดีมากๆ ครับ ส่วนตัวผมถือว่าดีมากๆ ครับ เข้ามาในช่วงเวลาฉุกเฉินที่ผมจำเป็นต้องใช้เงินพอดี ดอกเบี้ยก็ถูก ผ่อนจ่ายสบายๆ สมกับเป็นชื่อ app (เงินดี ^_^ ตามชื่อเลยครับ...)",
-     "thumbs": 6,
+     "thumbs": 7,
      "replied": true
     },
     {
@@ -16396,7 +16460,7 @@
    "own": false,
    "stats": {
     "score": 3.73,
-    "ratings": 101,
+    "ratings": 100,
     "reviews_total": 29,
     "installs": "50,000+",
     "histogram": [
@@ -16665,6 +16729,14 @@
    },
    "reviews_store": [
     {
+     "id": "d648dc1d-0c52-4d0a-bd0c-08aa7935ae5f",
+     "at": "2026-09-08",
+     "score": 5,
+     "content": "ดีมากๆเวลาเข้าแอปไม่มีติดขัดคะ",
+     "thumbs": 0,
+     "replied": true
+    },
+    {
      "id": "ed8ed308-daa1-4ed8-b227-a06a16b82853",
      "at": "2026-09-07",
      "score": 5,
@@ -16693,7 +16765,7 @@
      "at": "2026-08-31",
      "score": 5,
      "content": "สะดวกสบายในการใช้งาน ได้รับการแจ้งเตือนข่าวสารต่างๆดี",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": true
     },
     {
