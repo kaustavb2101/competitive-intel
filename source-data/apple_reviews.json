@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-09-10",
+  "pulled_at": "2026-09-11",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -428,10 +428,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.791,
-    "ratings": 1756,
-    "score_current_version": 3.791,
-    "ratings_current_version": 1756,
+    "score": 3.79067,
+    "ratings": 1758,
+    "score_current_version": 3.79067,
+    "ratings_current_version": 1758,
     "version": "3.2.0",
     "app_updated": "2026-08-13",
     "released": "2020-04-30",
@@ -2330,10 +2330,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.46714,
-    "ratings": 426,
-    "score_current_version": 3.46714,
-    "ratings_current_version": 426,
+    "score": 3.46729,
+    "ratings": 428,
+    "score_current_version": 3.46729,
+    "ratings_current_version": 428,
     "version": "2.7.6",
     "app_updated": "2026-08-19",
     "released": "2017-12-09",
@@ -7517,10 +7517,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.39962,
-    "ratings": 1599,
-    "score_current_version": 3.39962,
-    "ratings_current_version": 1599,
+    "score": 3.39813,
+    "ratings": 1600,
+    "score_current_version": 3.39813,
+    "ratings_current_version": 1600,
     "version": "8.6.0",
     "app_updated": "2026-08-21",
     "released": "2020-03-03",
@@ -15767,16 +15767,52 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.70632,
-    "ratings": 65184,
-    "score_current_version": 4.70632,
-    "ratings_current_version": 65184,
+    "score": 4.7064,
+    "ratings": 65268,
+    "score_current_version": 4.7064,
+    "ratings_current_version": 65268,
     "version": "7.8.0",
     "app_updated": "2026-09-07",
     "released": "2021-10-10",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14532323006",
+     "at": null,
+     "score": 3,
+     "title": "ไม่ผ่านอนุมัติสินเชื่อ",
+     "content": "ข้าพเจ้า นาย ปัณณวิชญ์ เขาจารี ได้ทำการสมัครสินเชื่อกับ มันนี่ทันเด\nอร์เมื่อวันที่ 10/09/26ไม่ผ่านอนุมัติ\nอยากให้ทางแอปลบข้อมูลส่วน\nบุคคลที่ได้ทำการสมัครมีเลขที่บัตรประชาชนและรูปถ่ายบัตรประชาชน ทั้งหน้าและหลังบัตร เบอร์โทรศัพท์แบะบุคคล อ้างอิงทั้ง 2 คนด้วยถ้า\nหากทางแอปนำข้อมูลของ ข้าพเจ้า\nไปใช้โดยไม่ได้รับอนุญาต ข้าพเจ้าจะไม่รับผิดชอบใดๆทั้งสิ้นและ\nดำเนินคดีตามกฎหมาย",
+     "version": "7.8.0",
+     "votes": 0
+    },
+    {
+     "id": "14531973236",
+     "at": null,
+     "score": 5,
+     "title": "ยอดฮิต",
+     "content": "เยี่ยม",
+     "version": "7.8.0",
+     "votes": 0
+    },
+    {
+     "id": "14531872435",
+     "at": null,
+     "score": 5,
+     "title": "ลบข้อมูลให้ด้วยนะคะ",
+     "content": "ข้าพเจ้านางสาวพัชรพรรณ นิลเพ็ชร ได้สมัครลงทะเบียนกับแอพmoneythunder ในวันที่ 10 กันยายน พ.ศ. 2569โดยมีข้อมูลสำคัญ ไม่ว่าจะเป็น ชื่อ-สกุล วันเดือนปีเกิด เลขบัตรประชาชนด้านหน้าหลัง และ เบอร์โทร ข้าพเจ้าขอให้ทางแอฟ เงินทันเด้อ ลบข้อมูล ของข้าพเจ้าออก หากข้อมูลถูกเผยแพร่ออกไปในทางที่ผิดกฎหมายหรือหลอกลวงคนอื่นจนได้รับความเสียหาย ข้าพเจ้า นางสาวพัชรพรรณ นิลเพ็ชร ขอไม่รับผิดชอบ ไม่ว่าจะกรณีอะไรทั้งสิ้น แ",
+     "version": "7.8.0",
+     "votes": 0
+    },
+    {
+     "id": "14531731005",
+     "at": null,
+     "score": 5,
+     "title": "ดีมาก",
+     "content": "ช่วยในยามลำบากได้มากเลยค่ะ ใครสมัครผ่านก็มีวินัยนะคะ",
+     "version": "7.8.0",
+     "votes": 0
+    },
     {
      "id": "14524798740",
      "at": null,
@@ -20747,16 +20783,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.8427,
-    "ratings": 45485,
-    "score_current_version": 4.8427,
-    "ratings_current_version": 45485,
+    "score": 4.84286,
+    "ratings": 45577,
+    "score_current_version": 4.84286,
+    "ratings_current_version": 45577,
     "version": "3.1.4",
     "app_updated": "2026-09-07",
     "released": "2023-03-06",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14532821821",
+     "at": null,
+     "score": 5,
+     "title": "ดี",
+     "content": "เป็นแอพที่ดีมากๆสมัครง่าย",
+     "version": "3.1.4",
+     "votes": 0
+    },
     {
      "id": "14527933422",
      "at": null,
@@ -25664,10 +25709,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.76901,
-    "ratings": 27170,
-    "score_current_version": 4.76901,
-    "ratings_current_version": 27170,
+    "score": 4.76902,
+    "ratings": 27188,
+    "score_current_version": 4.76902,
+    "ratings_current_version": 27188,
     "version": "1.8.8",
     "app_updated": "2026-09-07",
     "released": "2020-08-05",
@@ -27086,6 +27131,15 @@
      "content": "Superb!!!",
      "version": "1.0.5",
      "votes": 11
+    },
+    {
+     "id": "14532062282",
+     "at": null,
+     "score": 1,
+     "title": "โกง",
+     "content": "ห้ามนำหมายเลขบัตรประชาชนทีลงท้าย 3346 ไปทำธุระกรรมใดๆๆทั้งสินหากทราบว่านำข้อมูลส่วนตัวไปเผื่อแพ่จะดำเนินคีดให้ถึงทีสุด",
+     "version": "1.8.8",
+     "votes": 0
     },
     {
      "id": "14496874254",
@@ -29898,6 +29952,15 @@
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14532078618",
+     "at": null,
+     "score": 1,
+     "title": "สินเชื่อ",
+     "content": "ข้าพเจ้านางสาวศิริลักษณ์ หนูหอม ไม่ผ่านการอนุมัติสินเชื่อขอยกเลิกการให้ข้อมูลและไม่อนุญาตให้นำข้อมูลส่วนตัวและข้อมูลเกี่ยวกับ ผู้เกี่ยวข้องทั้งหมดไปใช้ในทางที่ผิดกฎหมายหากมีการนำไปใช้โดยไม่ได้รับอนุญาตข้าพเจ้าจะไม่รับผิดชอบใดใดทั้งสิ้น",
+     "version": "3.4.1",
+     "votes": 0
+    },
     {
      "id": "14524372461",
      "at": null,
