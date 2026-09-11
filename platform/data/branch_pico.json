@@ -1,6 +1,7 @@
 {
   "meta": {
     "generated_by": "build_branch_pico.py",
+    "vintage": "2026-05-22",
     "label": "MEASURED — licensed PICO-finance (พิโกไฟแนนซ์) operators registered in each branch's OWN district (อำเภอ). A distinct small-ticket non-bank rival class, counted per branch for the first time; the per-branch big-4 census (rival_pressure.json) does not include PICO operators.",
     "source": "MEASURED — FPO (Fiscal Policy Office) licensed-operator registry via pico_district.json (build_pico_district.py), joined to each branch by amphoe.json's branch_amphoe[] point-in-polygon district assignment.",
     "join": "branch i -> amphoe.json branch_amphoe[i] -> amphoe[]['province_th'|'name'] -> pico_district.by_district['province_th|amphoe']. A district absent from by_district is an HONEST ZERO (both sides share amphoe.json's 928-district identity — a miss is a real zero, never a name mismatch).",
