@@ -3,6 +3,8 @@
   {
    "aging_days": 550,
    "cadence": "annual",
+   "capped": true,
+   "capped_reason": "DLT dataset_1_1_04 newest complete vintage (28 Feb 2569); no newer CSV published upstream",
    "file": "ev_penetration.json",
    "fresh_days": 400,
    "group": "Collateral",
@@ -512,10 +514,12 @@
  "meta": {
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
+  "held_note": "A feed flagged `capped` is frozen at its newest genuinely-complete upstream vintage (the same freshness.upstream_capped certification provenance.json carries); it is shown 'held', not aged, so a source that has stopped publishing does not read as neglect.",
   "history_note": "A trend line is drawn only where a stored series exists. 11 of 24 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
   "history_points": 364,
   "missing_files": [],
   "n_feeds": 24,
+  "n_held": 1,
   "n_with_history": 11,
   "source": "Per-feed stamps read from each platform/data layer's own meta block (pulled / as_of / vintage / updated). No value is re-derived here."
  }
