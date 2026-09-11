@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-10T21:26:48+00:00",
-    "commit": "9501b12"
+    "generated_at": "2026-09-11T03:35:00+00:00",
+    "commit": "fdb6252"
   },
   "overall": {
     "progress_pct": 100,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-09-10",
+    "eta_date": "2026-09-11",
     "done_items": 50,
     "in_progress_items": 0,
     "open_items": 0,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-09-11T03:35:00+00:00",
+      "sha": "fdb6252",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-11, run 34558888681)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-11T02:38:18+00:00",
+      "sha": "94e6cb4",
+      "summary": "data: NABC live prices (2026-09-11, run 34555030484)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-11T02:20:42+00:00",
+      "sha": "5655c6b",
+      "summary": "docs: log UX loop run — command-center hero link accessible name (PR #914)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-11T09:17:52+07:00",
+      "sha": "1e8c20e",
+      "summary": "ux: drop bare decorative → from command-center hero link accessible name (#914)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-11T01:02:57+00:00",
+      "sha": "2d9c8ed",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34546658719) (#913)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-11T00:28:42+00:00",
+      "sha": "9a99bea",
+      "summary": "provenance: stamp FPO PICO registry vintage on branch_pico.json",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-10T23:20:04+00:00",
+      "sha": "0f2b120",
+      "summary": "data: rival Facebook promo feed refresh (run 34535856084) (#912)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-10T22:53:07+00:00",
+      "sha": "0a6b684",
+      "summary": "data: market-pulse swarm refresh (run 34533376574) (#911)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-10T22:13:42+00:00",
+      "sha": "28dc95c",
+      "summary": "intel: healthy close-out — deploy-health + reference + peer-coverage sweep green; refresh CEO dashboard to HEAD",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-09-10T21:26:48+00:00",
       "sha": "9501b12",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-10, run 34532086526)",
@@ -657,60 +711,6 @@
       "sha": "2ba7f2c",
       "summary": "data(census): refresh the Union Auction forward book (run 34434534495) (#898)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-10T04:52:29+00:00",
-      "sha": "8b33231",
-      "summary": "data: market-pulse swarm refresh (run 34434437322) (#899)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-10T04:11:55+00:00",
-      "sha": "9f4d6fb",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (cdf7dbe) — 2 commits stale",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-10T03:35:26+00:00",
-      "sha": "cdf7dbe",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-10, run 34433785381)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-10T02:37:51+00:00",
-      "sha": "8c44a9a",
-      "summary": "data: NABC live prices (2026-09-10, run 34429836396)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-10T02:24:34+00:00",
-      "sha": "efcbcf3",
-      "summary": "docs(progress): log maskable PWA icon ship + deploy-verify (PR #897)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-10T09:21:55+07:00",
-      "sha": "393b284",
-      "summary": "ux: maskable PWA icon for Android adaptive-icon launchers (#897)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-10T00:24:46+00:00",
-      "sha": "9c0e4da",
-      "summary": "chore(dashboard): refresh CEO autonomy plan to HEAD (343ed4f) — 4 commits stale",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-09T23:54:34+00:00",
-      "sha": "343ed4f",
-      "summary": "data: Google Trends brand share-of-search refresh (run 34416618385) (#896)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-09T23:12:13+00:00",
-      "sha": "689f473",
-      "summary": "data: rival Facebook promo feed refresh (run 34410618749) (#895)",
-      "pillar": "market"
     }
   ]
 }
