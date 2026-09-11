@@ -14325,7 +14325,7 @@ function renderHomeHero(){
       subBits.push(`${cs.th}: price ${cs.price_stress!=null?(cs.price_stress>0?'+':'')+Math.round(cs.price_stress)+'%':'—'}${cs.drought!=null?' · drought '+Math.round(cs.drought*100)+'%':''}${cs.double_stress?' (rice/rubber + drought)':''}`);
     }
     heroes.push({tone:'risk',v:hh?'map':'overview',big,sub:subBits.join(' · '),
-      tag:hh?'measured + estimated':'estimated', cta:hh?'Map view →':'Macro →'});
+      tag:hh?'measured + estimated':'estimated', cta:hh?'Map view':'Macro'});
   }
   if(!heroes.length){ box.innerHTML=''; return; }
   box.innerHTML=heroes.map(h=>{
@@ -14337,7 +14337,7 @@ function renderHomeHero(){
     return `<a class="cc-hero-card ${h.tone}" data-v="${h.v}" href="#${h.v}" style="--hc:${col}">`+
       `<div class="cc-hero-big">${h.big}</div>`+
       `<div class="cc-hero-sub">${h.sub}</div>`+
-      `<div class="cc-hero-foot"><span class="cc-hero-tag">${h.tag}</span><span class="cc-hero-cta">${h.cta}</span></div>`+
+      `<div class="cc-hero-foot"><span class="cc-hero-tag">${h.tag}</span><span class="cc-hero-cta">${h.cta} <span aria-hidden="true">→</span></span></div>`+
       `</a>`;
   }).join('');
 }
