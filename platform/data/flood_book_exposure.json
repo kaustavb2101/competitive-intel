@@ -1,0 +1,195 @@
+{
+ "meta": {
+  "generated_by": "build_flood_book_exposure.py",
+  "label": "MEASURED × MEASURED — real outstanding loan book (tape_geo_occ.json, 2026-07-21) weighted onto the GISTDA repeated-flood hazard (flood_hazard.json, 2005-2016). Baht-weighted concentration of a latent recovery/collateral hazard, not a claim any collateral flooded, and no open/close/expand recommendation.",
+  "method": "Each matched branch's whole outstanding book (os_sum) and account count are bucketed by its district repeated-flood MAX(flood_freq), 0-12. dpd90p_pct and early_pct are account-weighted (Σ pct·n / Σ n) across the band; dpd90p_pct is the tape's WHOLE-BOOK 90+ (incl. 180+ legacy), re-aggregated exactly as published, not a new blended NPL. Chronic band = flood_freq ≥ 7 (mirrors flood_hazard).",
+  "caveats": [
+   "flood_freq is a district STRUCTURAL hazard (does the ground repeatedly flood 2005-2016), NOT a claim this branch's collateral flooded; no flooded AREA is claimed.",
+   "dpd90p_pct is WHOLE-BOOK 90+ incl. the 180+ legacy — the geo layer carries no per-branch live/legacy split, so it is labelled whole-book, never re-derived.",
+   "96.9% of tape branches / 97.1% of outstanding are matched; the excluded residual is name variance and is disclosed in coverage (count, baht, samples).",
+   "Every published band clears the ≥30-account tape floor; band os/accounts sum exactly to the matched totals (both asserted at build)."
+  ],
+  "min_cell": 30,
+  "chronic_threshold": 7,
+  "bands_vocab": [
+   "chronic (10-12/12 yrs)",
+   "frequent (7-9/12 yrs)",
+   "recurrent (4-6/12 yrs)",
+   "occasional (1-3/12 yrs)",
+   "none on record"
+  ],
+  "tape_source": "MEASURED — real-tape occupation cells (>=30 floor) at region and province level. Branch level: MEASURED cells where the branch x occupation cell clears the floor; the thin residual of each branch's book is ESTIMATED — allocated over its province occupation mix, inheriting that cell's delinquency rates. basis labelled per cell.",
+  "tape_n_accounts": 382735,
+  "tape_mob_anchor": "2026-07",
+  "flood_source": "GISTDA Repeated Flooding 2005-2016 (FL_RepeatedFlooding_GISTDA_50k_Y2005_Y2016) FeatureServer — server-side MAX(flood_freq) grouped by district (amphoe).",
+  "flood_service": "https://gistdaportal.gistda.or.th/data/rest/services/FL_Flood/FL_RepeatedFlooding_GISTDA_50k_Y2005_Y2016/FeatureServer/0",
+  "matched_n_accounts": 371513,
+  "matched_os_sum": 45195275209.0,
+  "any_flood": {
+   "n_accounts": 340809,
+   "os_sum": 41881161837.0,
+   "pct_book": 92.67
+  },
+  "branches_fingerprint": "e25867ab0c76d8889774a91b4c6bb9a890acd7929ca737dbbb36ff46bf9be786"
+ },
+ "bands": [
+  {
+   "band": "chronic (10-12/12 yrs)",
+   "freq_lo": 10,
+   "freq_hi": 12,
+   "n_branches": 207,
+   "n_accounts": 36509,
+   "os_sum": 4766980057.0,
+   "pct_book": 10.55,
+   "dpd90p_pct": 16.12,
+   "early_pct": 22.3
+  },
+  {
+   "band": "frequent (7-9/12 yrs)",
+   "freq_lo": 7,
+   "freq_hi": 9,
+   "n_branches": 446,
+   "n_accounts": 86029,
+   "os_sum": 10537000295.0,
+   "pct_book": 23.31,
+   "dpd90p_pct": 14.4,
+   "early_pct": 21.46
+  },
+  {
+   "band": "recurrent (4-6/12 yrs)",
+   "freq_lo": 4,
+   "freq_hi": 6,
+   "n_branches": 465,
+   "n_accounts": 91903,
+   "os_sum": 11179629260.0,
+   "pct_book": 24.74,
+   "dpd90p_pct": 14.31,
+   "early_pct": 20.97
+  },
+  {
+   "band": "occasional (1-3/12 yrs)",
+   "freq_lo": 1,
+   "freq_hi": 3,
+   "n_branches": 640,
+   "n_accounts": 126368,
+   "os_sum": 15397552225.0,
+   "pct_book": 34.07,
+   "dpd90p_pct": 15.19,
+   "early_pct": 20.14
+  },
+  {
+   "band": "none on record",
+   "freq_lo": 0,
+   "freq_hi": 0,
+   "n_branches": 155,
+   "n_accounts": 30704,
+   "os_sum": 3314113372.0,
+   "pct_book": 7.33,
+   "dpd90p_pct": 14.93,
+   "early_pct": 19.27
+  }
+ ],
+ "chronic_rollup": {
+  "threshold": 7,
+  "label": "chronic repeat-flood districts (flooded ≥7 of 12 yrs 2005-2016)",
+  "n_branches": 653,
+  "n_accounts": 122538,
+  "os_sum": 15303980352.0,
+  "pct_book": 33.86,
+  "dpd90p_pct": 14.91,
+  "early_pct": 21.71
+ },
+ "coverage": {
+  "tape_branches": 1974,
+  "matched": 1913,
+  "unmatched": 60,
+  "ambiguous_dropped": 1,
+  "pct_branches_matched": 96.91,
+  "pct_outstanding_matched": 97.06,
+  "pct_accounts_matched": 97.08,
+  "unmatched_os_sum": 1370725241.0,
+  "unmatched_samples": [
+   {
+    "branch": "ฝ่ายบริหารความสัมพันธ์กับธุรกิจ",
+    "prov": null
+   },
+   {
+    "branch": "สาขาทุ่งสนุ่น(บึงสามัคคี)",
+    "prov": null
+   },
+   {
+    "branch": "สาขาวังวิเศษ",
+    "prov": null
+   },
+   {
+    "branch": "สาขาสรรพาวุธ",
+    "prov": null
+   },
+   {
+    "branch": "สาขาหน้ารพ.อุทัยธานี",
+    "prov": null
+   },
+   {
+    "branch": "สาขาตลาดฝั่งโขง ดอนเมือง",
+    "prov": "กรุงเทพมหานคร"
+   },
+   {
+    "branch": "สาขาตลาดโอ๋เอ๋ พระราม2",
+    "prov": "กรุงเทพมหานคร"
+   },
+   {
+    "branch": "สาขาถนนบางขุนเทียน ชายทะเล",
+    "prov": "กรุงเทพมหานคร"
+   },
+   {
+    "branch": "สาขาถนนพระราม4 พระโขนง",
+    "prov": "กรุงเทพมหานคร"
+   },
+   {
+    "branch": "สาขาถนนเพชรเกษม 50_1",
+    "prov": "กรุงเทพมหานคร"
+   },
+   {
+    "branch": "สาขาถนนเลียบคลองทวีวัฒนา ซอย 9",
+    "prov": "กรุงเทพมหานคร"
+   },
+   {
+    "branch": "สาขานิคมอุตสาหกรรมลาดกระบัง",
+    "prov": "กรุงเทพมหานคร"
+   },
+   {
+    "branch": "สาขาบรมราชชนนี",
+    "prov": "กรุงเทพมหานคร"
+   },
+   {
+    "branch": "สาขาประชาอุทิศ ซอย 60 1",
+    "prov": "กรุงเทพมหานคร"
+   },
+   {
+    "branch": "สาขามิตรไมตรี หนองจอก",
+    "prov": "กรุงเทพมหานคร"
+   },
+   {
+    "branch": "สาขารามคำแหง 30_1",
+    "prov": "กรุงเทพมหานคร"
+   },
+   {
+    "branch": "สาขาเลียบคลองภาษีเจริญฝั่งใต้",
+    "prov": "กรุงเทพมหานคร"
+   },
+   {
+    "branch": "สาขาถนนประเวสไพรวัน พรานกระต่าย",
+    "prov": "กำแพงเพชร"
+   },
+   {
+    "branch": "สาขาแมคโคร กำแพงเพชร",
+    "prov": "กำแพงเพชร"
+   },
+   {
+    "branch": "สาขามิตรภาพ ตลาดสำราญ",
+    "prov": "ขอนแก่น"
+   }
+  ],
+  "note": "Exact-key crosswalk (tape branch name+prov → master → flood_freq); ambiguous keys dropped, unmatched excluded and disclosed here, never force-matched. The excluded residual is name variance, not a flood signal."
+ }
+}

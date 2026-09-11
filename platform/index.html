@@ -1386,6 +1386,20 @@
       <p class="lead" style="font-size:11px;margin-top:6px">Debt incidence = share of a province's agricultural holders carrying any debt (<b>MEASURED</b>, full-count NSO Agricultural Census 2566). Agri O/S &amp; 90+dpd = our own farm book in that province (<b>MEASURED</b>, real loan tape, เกษตร cells ≥30 accounts). ◆ = double-exposed: a province in the top third on <b>both</b> axes — the inputs are measured, the intersection is an <b>estimated</b> triage cut (the top-third thresholds are choices). Makes no open / close / expand recommendation.</p>
     </div>
 
+    <!-- Real loan book × repeated-flood hazard (data/flood_book_exposure.json) — baht-weighted flood
+         exposure: how much MEASURED outstanding book sits on MEASURED repeatedly-flooded ground
+         (GISTDA 2005-2016), by hazard band. Re-weights the branch-count flood flag by real ฿. The
+         join no other block makes: the real tape's per-branch outstanding × the branch's district
+         repeat-flood frequency. flood_freq is a DISTRICT structural hazard, NOT a claim the
+         collateral flooded; no flooded AREA is claimed. dpd90p is the tape's whole-book 90+.
+         Null-safe: absent file → display:none. No open/close/expand recommendation. -->
+    <div id="expo-flood-wrap" style="display:none;margin-top:4px">
+      <h3 class="compsub">Book on repeatedly-flooded ground · measured × measured <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED both axes</span></h3>
+      <p class="lead" id="expo-flood-lead" style="font-size:12px"></p>
+      <table class="tbl" id="expo-flood"></table>
+      <p class="lead" id="expo-flood-foot" style="font-size:11px;margin-top:6px"></p>
+    </div>
+
     <!-- Product → segment → driver map (data/product_segments.json) — measured book economics per
          collateral product with the curated transmission map to segments / income drivers /
          scenarios. Null-safe: absent file → nothing renders. -->

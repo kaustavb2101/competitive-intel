@@ -138,6 +138,12 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_flood_hazard.py --check (source-data/gistda_flood_hazard.json or an input layer absent — not data drift)"
   else bad "build_flood_hazard.py --check (flood_hazard.json drifted from gistda_flood_hazard.json/amphoe.json/branches.json)"
   fi
+  # Real loan book (tape_geo_occ) × repeated-flood hazard (flood_hazard) — baht-weighted flood exposure.
+  ( cd "$PIPE" && python3 build_flood_book_exposure.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_flood_book_exposure.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_flood_book_exposure.py --check (tape_geo_occ/flood_hazard/branches absent — not data drift)"
+  else bad "build_flood_book_exposure.py --check (flood_book_exposure.json drifted from tape_geo_occ.json/flood_hazard.json/branches.json)"
+  fi
   ( cd "$PIPE" && python3 build_pico_census.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_pico_census.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_pico_census.py --check (source-data/datagoth/fpo_pico.csv absent — Thai-IP pull, not committed)"
