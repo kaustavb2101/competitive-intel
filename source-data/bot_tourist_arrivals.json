@@ -6,10 +6,10 @@
     "source_url": "https://app.bot.or.th/BTWS_STAT/statistics/BOTWEBSTAT.aspx?reportID=875&language=TH",
     "unit": "thousand persons",
     "frequency": "monthly",
-    "pulled": "2026-08-29",
+    "pulled": "2026-09-11",
     "period_range": {
       "min": "2015-01",
-      "max": "2026-06"
+      "max": "2026-07"
     },
     "preliminary_periods": [
       "2025-01",
@@ -29,16 +29,16 @@
       "2026-03",
       "2026-04",
       "2026-05",
-      "2026-06"
+      "2026-06",
+      "2026-07"
     ],
     "preliminary_note": "BoT marks recent months in the default window 'p' (ข้อมูลเบื้องต้น, preliminary) — subject to revision on the next release.",
     "latest": {
-      "period": "2026-06",
-      "foreign_arrivals_thousand": 1841.55
+      "period": "2026-07",
+      "foreign_arrivals_thousand": 2545.62
     },
     "trailing_12m": {
       "periods": [
-        "2025-07",
         "2025-08",
         "2025-09",
         "2025-10",
@@ -49,14 +49,16 @@
         "2026-03",
         "2026-04",
         "2026-05",
-        "2026-06"
+        "2026-06",
+        "2026-07"
       ],
-      "sum_thousand": 32163.06
+      "sum_thousand": 32098.309999999998
     },
     "acceptance_test": "4 spot-verified months (2026-03..2026-06, all flagged preliminary at pull time) checked against fixed anchors on every pull; a mismatch hard-fails rather than silently landing changed history — see ANCHORS in pull_bot_tourist_arrivals.py."
   },
   "series": {
     "foreign_arrivals_thousand": {
+      "2026-07": 2545.62,
       "2026-06": 1841.55,
       "2026-05": 2346.85,
       "2026-04": 2368.9,
