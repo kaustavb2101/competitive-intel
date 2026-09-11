@@ -321,7 +321,7 @@
    "stamp_iso": "2026-09-11",
    "stamp_kind": "pulled",
    "unit": "of 788",
-   "value": 143,
+   "value": 144,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -378,8 +378,8 @@
    "label": "Household debt",
    "measured": true,
    "source": "BIS Statistics (stats.bis.org, household debt) + BOT (ธปท./กนง.) MPC decision history (policy rate) + World Bank (api.worldbank.org, CPI + lending rate) + ECB daily reference rates",
-   "stamp": "2026-09-07",
-   "stamp_iso": "2026-09-07",
+   "stamp": "2026-09-11",
+   "stamp_iso": "2026-09-11",
    "stamp_kind": "pulled",
    "unit": "% GDP",
    "value": 87.5,
