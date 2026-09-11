@@ -1735,7 +1735,7 @@ function showTab(v,moveFocus){
   if(v==='map') initMap();
   if(v==='provinces') renderProvinces();
   if(v==='market') renderMarket();
-  if(v==='exposure'){ renderExposure(); renderProducts(); }
+  if(v==='exposure'){ renderExposure(); renderProducts(); renderFloodBook(); }
   if(v==='sim'){ renderSim(); renderScenarios(); }
   if(v==='trend') renderTrend();
   if(v==='acq'){ loadAmphoe(); renderAcqAnswerBand(); renderRivalBookImpact(); showOvPanel(PANEL_MEM.compswitch,{wrap:'compswitch',nav:'compjump'}); }
@@ -7694,6 +7694,46 @@ function renderExposureTape(){
    — high debt incidence AND a large/rolling agri book — where a farm-cash shock reaches the most
    balance sheets and we carry the most exposure. Both axes measured; the double-exposed flag is an
    estimated triage cut (top-third thresholds). Null-safe: either layer absent → display:none. -------- */
+/* ---------- REAL loan book × repeated-flood hazard (data/flood_book_exposure.json) ----------------
+   Objective #1: baht-weighted flood exposure — how much MEASURED outstanding book sits on MEASURED
+   repeatedly-flooded ground (GISTDA 2005-2016), by hazard band. flood_freq is a DISTRICT structural
+   hazard (does the ground repeatedly flood), NOT a claim the collateral flooded; dpd90p is the tape's
+   whole-book 90+ (incl. 180+ legacy), account-weighted. Lazy + null-safe: an absent file leaves the
+   block hidden, never a broken card. Built by pipeline/build_flood_book_exposure.py. --------------- */
+let FLOODBOOK=null, floodBookLoaded=false;
+function renderFloodBook(){
+  const wrap=$('#expo-flood-wrap'); if(!wrap) return;
+  if(FLOODBOOK){ paintFloodBook(); return; }
+  if(floodBookLoaded) return;
+  floodBookLoaded=true;
+  fetch('data/flood_book_exposure.json').then(r=>r.ok?r.json():null).then(j=>{
+    if(j&&Array.isArray(j.bands)&&j.bands.length){ FLOODBOOK=j; paintFloodBook(); }
+  }).catch(()=>{});
+}
+function paintFloodBook(){
+  const wrap=$('#expo-flood-wrap'), tb=$('#expo-flood'); if(!wrap||!tb||!FLOODBOOK) return;
+  const j=FLOODBOOK, C=j.chronic_rollup||{}, cov=j.coverage||{};
+  const none=(j.bands||[]).find(b=>b.freq_hi===0)||{};
+  const N=n=>Number(Math.round(n)).toLocaleString('en-US');
+  const bn=n=>'฿'+(n/1e9).toFixed(2)+'bn';
+  const sev=v=>v==null?'var(--dim)':v<8?'var(--merch)':v<14?'#9CB24E':v<20?'var(--opp)':v<26?'#D97A3A':'var(--agri)';
+  wrap.style.display='';
+  const lead=$('#expo-flood-lead');
+  if(lead) lead.innerHTML=`<b>${bn(C.os_sum)}</b> — <b>${C.pct_book}%</b> of the matched book, across <b>${N(C.n_branches)}</b> branches — sits in <b>chronic repeat-flood districts</b> (ground that flooded in ≥${C.threshold} of the 12 years 2005-2016). It is a <b>latent</b> collateral / recovery hazard: 90+dpd there barely differs from never-flooded ground (<b>${C.dpd90p_pct}%</b> vs ${none.dpd90p_pct}%), while the &lt;30-day watch share climbs with flood frequency (${none.early_pct}% → <b>${C.early_pct}%</b>). A concentration to watch, not a realised-loss one.`;
+  const worst=Math.max(...j.bands.map(b=>b.dpd90p_pct||0));
+  tb.innerHTML=`<tr><th scope="col">Repeat-flood band</th><th scope="col">Branches</th><th scope="col">Accounts</th><th scope="col">O/S ฿bn</th><th scope="col" title="share of matched outstanding book">% book</th><th scope="col" title="whole-book 90+dpd incl. 180+ legacy, account-weighted">90+dpd</th><th scope="col" title="&lt;30dpd watch share, account-weighted">early</th></tr>`+
+    j.bands.map(b=>`<tr><td><b>${b.band}</b></td>
+      <td class="mono sub">${N(b.n_branches)}</td>
+      <td class="mono sub">${N(b.n_accounts)}</td>
+      <td class="mono sub">${(b.os_sum/1e9).toFixed(2)}</td>
+      <td class="mono sub">${b.pct_book}%</td>
+      <td class="mono" style="color:${sev(b.dpd90p_pct)}">${barHTML(b.dpd90p_pct,'var(--agri)',worst)} <b>${b.dpd90p_pct}%</b></td>
+      <td class="mono sub">${b.early_pct}%</td></tr>`).join('');
+  const foot=$('#expo-flood-foot');
+  const excl=(cov.unmatched||0)+(cov.ambiguous_dropped||0);
+  if(foot) foot.innerHTML=`Each branch's whole outstanding book is bucketed by its <b>district</b> repeated-flood MAX(flood_freq) — a structural hazard (does the ground repeatedly flood 2005-2016), <b>not</b> a claim the collateral flooded, and no flooded <i>area</i> is claimed. 90+dpd is the tape's <b>whole-book</b> 90+ (incl. the 180+ legacy stock), account-weighted, re-aggregated as published. <b>MEASURED</b> real book × <b>MEASURED</b> GISTDA hazard; matched <b>${cov.pct_branches_matched}%</b> of tape branches / <b>${cov.pct_outstanding_matched}%</b> of outstanding (${N(excl)} branches excluded on name variance, disclosed in the layer). Makes no open / close / expand recommendation.`;
+}
+
 function renderAgriDoubleExposure(){
   const wrap=document.getElementById('expo-agridti-wrap'); if(!wrap) return;
   Promise.all([loadAgriCredit(), tmliFetch('tape_geo_occ')]).then(([,geo])=>{
