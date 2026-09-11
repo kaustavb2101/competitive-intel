@@ -12004,7 +12004,7 @@ function aodRenderLevel(mount){
     mount.innerHTML=icCrumb([{label:'All regions',lvl:'regions'},{label:st.region}])+
       aodSummary(cells)+aodOccTable(cells,aodIncomeMap(inc,geo,(p,rec)=>provReg[p]===st.region))+
       `<div class="ic-drill-h" style="margin-top:10px"><b>${st.region}</b> — ${provs.length} provinces, biggest pre-emptive workload first · press a province for its occupation mix + branches</div>`+
-      `<div class="tbl-wrap"><table class="tbl"><tr><th scope="col">Province</th><th scope="col">Accounts</th><th scope="col">Top occupation</th><th scope="col">X-days · assist</th><th scope="col">At risk 90+</th><th scope="col"></th></tr>`+
+      `<div class="tbl-wrap"><table class="tbl"><tr><th scope="col">Province</th><th scope="col">Accounts</th><th scope="col">Top occupation</th><th scope="col">X-days · assist</th><th scope="col">At risk 90+</th><th scope="col"><span class="sr-only">Drill in</span></th></tr>`+
       provs.map(r=>`<tr class="aod-row" data-p="${r.p}" tabindex="0" role="link">
         <td><b>${r.p}</b></td><td class="mono">${icN(r.n)}</td><td>${r.top}</td>
         <td class="mono" style="color:var(--gold)"><b>${icN(r.w)}</b></td>
@@ -12022,7 +12022,7 @@ function aodRenderLevel(mount){
     mount.innerHTML=icCrumb([{label:'All regions',lvl:'regions'},{label:provReg[st.province]||'—',lvl:'province'},{label:st.province}])+
       aodSummary(cells)+aodOccTable(cells,aodIncomeMap(inc,geo,p=>p===st.province))+
       `<div class="ic-drill-h" style="margin-top:10px"><b>${st.province}</b> — ${brs.length} branches on the tape (n ≥ 30), biggest pre-emptive workload first · press a branch for its occupation split</div>`+
-      `<div class="tbl-wrap"><table class="tbl"><tr><th scope="col">Branch</th><th scope="col">Accounts</th><th scope="col" title="occupation cells: measured ≥30 / estimated from the province mix">Split basis</th><th scope="col">X-days · assist</th><th scope="col">At risk 90+</th><th scope="col"></th></tr>`+
+      `<div class="tbl-wrap"><table class="tbl"><tr><th scope="col">Branch</th><th scope="col">Accounts</th><th scope="col" title="occupation cells: measured ≥30 / estimated from the province mix">Split basis</th><th scope="col">X-days · assist</th><th scope="col">At risk 90+</th><th scope="col"><span class="sr-only">Drill in</span></th></tr>`+
       brs.map(x=>`<tr class="aod-row" data-b="${x.b.branch}" tabindex="0" role="link">
         <td><b>${x.b.branch}</b></td><td class="mono">${icN(x.b.n)}</td>
         <td class="n">${x.meas} measured${x.est?` · <span style="color:var(--gold)">${x.est} est</span>`:''}</td>
