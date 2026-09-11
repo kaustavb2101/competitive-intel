@@ -57,10 +57,19 @@ def build():
         out.append({"n10": n})
 
     vals = sorted(x["n10"] for x in out)
+    # Inherit the data-vintage from the direct input (fuel_stations.json meta.pulled — the OSM
+    # Overpass pull date). This layer is a pure per-branch projection of that pull, so its
+    # data-vintage IS the pull's. It was already embedded in the `source` string below, but only
+    # as prose; stamping it as a machine-readable top-level `vintage` key lets build_provenance.py's
+    # freshness lens age this MEASURED, page-consumed layer instead of reading it as perpetually
+    # undated. Nothing fabricated — the same real date, surfaced where the lens can see it; it
+    # refreshes automatically the day a newer fuel-station pull lands.
+    fuel_vintage = src["meta"].get("pulled")
     return {
         "meta": {
             "title": "Fuel stations within 10 km of each branch (OSM, measured)",
             "generated_by": "pipeline/build_branch_fuel.py",
+            "vintage": fuel_vintage,
             "label": "MEASURED — OSM amenity=fuel count ≤10 km per branch (vehicle-economy / rural-reach signal). "
                      "Coverage caveat: OSM completeness varies by area; treat as a floor, not a census.",
             "source": "source-data/fuel_stations.json (pull_fuel_stations.py — Overpass; pulled %s, %d stations)" % (
