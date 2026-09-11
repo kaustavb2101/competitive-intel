@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-11T15:29:40+00:00",
-    "commit": "87768bd"
+    "generated_at": "2026-09-11T21:27:14+00:00",
+    "commit": "5ea3a0c"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-09-11T21:27:14+00:00",
+      "sha": "5ea3a0c",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-11, run 34649292649)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-11T20:17:31+00:00",
+      "sha": "5d35f3e",
+      "summary": "docs: log UX loop run — assist-occ drill-chevron column header named (PR #928)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-12T03:14:33+07:00",
+      "sha": "a14b3b7",
+      "summary": "ux: name empty drill-chevron <th> in assistance-occupation tables (#928)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-11T19:57:05+00:00",
+      "sha": "45890e1",
+      "summary": "data: Thai-IP-only swarm refresh (run 34638600767) (#927)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-11T18:49:40+00:00",
+      "sha": "495f333",
+      "summary": "feat(live): Live board learns the frozen-at-source (held) feed state (#926)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-11T17:10:41+00:00",
+      "sha": "bab27a3",
+      "summary": "data: market-pulse swarm refresh (run 34617532959) (#924)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-11T16:46:01+00:00",
+      "sha": "063ae15",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34620928561) (#925)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-11T16:13:47+00:00",
+      "sha": "7d925e6",
+      "summary": "provenance: surface flood_book_exposure's real tape vintage in the freshness scanner",
+      "pillar": "service"
+    },
+    {
       "date": "2026-09-11T15:29:40+00:00",
       "sha": "87768bd",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-11, run 34616249130)",
@@ -663,54 +711,6 @@
       "sha": "9a99bea",
       "summary": "provenance: stamp FPO PICO registry vintage on branch_pico.json",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-09-10T23:20:04+00:00",
-      "sha": "0f2b120",
-      "summary": "data: rival Facebook promo feed refresh (run 34535856084) (#912)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-10T22:53:07+00:00",
-      "sha": "0a6b684",
-      "summary": "data: market-pulse swarm refresh (run 34533376574) (#911)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-10T22:13:42+00:00",
-      "sha": "28dc95c",
-      "summary": "intel: healthy close-out — deploy-health + reference + peer-coverage sweep green; refresh CEO dashboard to HEAD",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-10T21:26:48+00:00",
-      "sha": "9501b12",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-10, run 34532086526)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-10T20:22:14+00:00",
-      "sha": "a0d59c8",
-      "summary": "docs: log UX-loop run — accessible names for primary search tables (PR #910)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-11T03:20:43+07:00",
-      "sha": "a4ea94f",
-      "summary": "ux: accessible names for the three primary search tables (#910)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-10T19:59:43+00:00",
-      "sha": "24cf951",
-      "summary": "data: Thai-IP-only swarm refresh (run 34519941754) (#909)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-10T18:30:25+00:00",
-      "sha": "1944488",
-      "summary": "docs(mandate): correct objective #2 from retired \"where to expand\" to competitive-risk lens",
-      "pillar": "service"
     }
   ]
 }
