@@ -47,6 +47,17 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "..", "platform", "data")
 OUT = os.path.join(DATA, "live_board.json")
 
+# The provenance gate's authoritative frozen-at-source registry: {(file, vintage): reason}. A feed
+# whose committed vintage still EQUALS its known upstream-max is HELD (the publisher stopped here),
+# not stale-by-neglect — so the board must show it "held" rather than let it pulse aging/stale as it
+# ages, which would cry wolf against a state the builder already certifies. Imported straight from
+# build_provenance so there is ONE source of truth: it self-corrects the day a newer pull changes a
+# vintage string (the key no longer matches). Read-only — nothing here reads provenance.json's own
+# byte-recorded output, so there is no build-time coupling between the two layers, only a shared
+# constant. The sibling honesty read already ships on #home's Data room (PR #700).
+sys.path.insert(0, HERE)
+from build_provenance import UPSTREAM_CAPPED  # noqa: E402  (needs HERE on sys.path first)
+
 # The newest year the IMF WEO vintage carries as an OUTTURN rather than a projection. The WEO
 # publishes actuals through the year before the release and projects onward; this pull is the
 # 2025 vintage, so 2025 is the last actual. Kept as a named constant because it must move when
@@ -446,6 +457,11 @@ def build():
             missing.append(spec["file"])
             continue
         stamp, stamp_kind = stamp_of(doc, spec.get("stamp_path"))
+        # Frozen-at-source? A feed is HELD only while its stamp still equals the capped vintage in the
+        # authoritative registry — a re-pull that advances the stamp naturally un-holds it. Matches on
+        # the picked stamp (which for these DLT layers IS the vintage; they carry no pull date), so a
+        # feed re-pulled with a newer `pulled` date reads fresh again rather than staying held.
+        capped_reason = UPSTREAM_CAPPED.get((spec["file"], stamp))
         try:
             value, unit = spec["pick"](doc)
         except Exception:
@@ -473,6 +489,11 @@ def build():
             # cannot be under-reported by a literal that nobody remembered to bump.
             "history": spec["history"]() if callable(spec.get("history")) else spec.get("history"),
         }
+        # Only capped feeds carry the two keys — an absent key reads falsy on the page, so the schema
+        # stays minimal (no `"capped": false` noise on the ~24 feeds that age normally).
+        if capped_reason:
+            row["capped"] = True
+            row["capped_reason"] = capped_reason
         # A feed with an accumulated series gets a real history block — same shape as the ones
         # whose publisher ships history, because by this point it IS the same thing: dated
         # observations we can draw. Until it clears the chartable bar it keeps its no-history line,
@@ -519,6 +540,11 @@ def build():
                             "point-in-time pulls that overwrite on each run and say so.",
             "forecast_note": f"IMF WEO years after {WEO_ACTUAL_THROUGH} are PROJECTIONS and are "
                              "rendered distinctly from measured history.",
+            "held_note": "A feed flagged `capped` is frozen at its newest genuinely-complete upstream "
+                         "vintage (the same freshness.upstream_capped certification provenance.json "
+                         "carries); it is shown 'held', not aged, so a source that has stopped "
+                         "publishing does not read as neglect.",
+            "n_held": sum(1 for f in feeds if f.get("capped")),
         },
         "feeds": feeds,
     }
