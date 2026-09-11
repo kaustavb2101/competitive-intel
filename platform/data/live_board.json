@@ -287,8 +287,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "48 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 48,
+    "note": "49 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 49,
     "series": "rain_max_mm"
    },
    "key": "thaiwater_rain",
@@ -299,7 +299,7 @@
    "stamp_iso": "2026-09-11",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4499,
+   "value": 4480,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -311,8 +311,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "48 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 48,
+    "note": "49 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 49,
     "series": "flood_high"
    },
    "key": "thaiwater_flood",
@@ -516,7 +516,7 @@
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
   "held_note": "A feed flagged `capped` is frozen at its newest genuinely-complete upstream vintage (the same freshness.upstream_capped certification provenance.json carries); it is shown 'held', not aged, so a source that has stopped publishing does not read as neglect.",
   "history_note": "A trend line is drawn only where a stored series exists. 11 of 24 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 364,
+  "history_points": 366,
   "missing_files": [],
   "n_feeds": 24,
   "n_held": 1,
