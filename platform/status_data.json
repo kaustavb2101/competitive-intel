@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-11T03:35:00+00:00",
-    "commit": "fdb6252"
+    "generated_at": "2026-09-11T09:31:25+00:00",
+    "commit": "e6b05a0"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-09-11T09:31:25+00:00",
+      "sha": "e6b05a0",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-11, run 34584480125)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-11T08:37:25+00:00",
+      "sha": "cb909d5",
+      "summary": "data: NABC live prices (2026-09-11, run 34579635217)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-11T08:23:03+00:00",
+      "sha": "f8e1268",
+      "summary": "docs: log UX loop run — decision-queue open-arrow a11y fix (PR #918, merged+live)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-11T15:18:51+07:00",
+      "sha": "d78c78a",
+      "summary": "ux: decision-queue \"open →\" link — wrap decorative arrow aria-hidden (#918)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-11T07:13:57+00:00",
+      "sha": "9bff1fe",
+      "summary": "feat(exposure): baht-weight repeated-flood hazard by the real loan book (#917)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-09-11T05:25:12+00:00",
+      "sha": "caa43cc",
+      "summary": "data(census): refresh the Union Auction forward book (run 34559644040) (#915)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-11T05:01:51+00:00",
+      "sha": "3ff8fde",
+      "summary": "data: market-pulse swarm refresh (run 34559549995) (#916)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-11T04:19:23+00:00",
+      "sha": "34d014c",
+      "summary": "intel: healthy five-pillar close-out — refresh CEO autonomy dashboard to HEAD",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-11T03:35:00+00:00",
       "sha": "fdb6252",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-11, run 34558888681)",
@@ -663,54 +711,6 @@
       "sha": "21cfb70",
       "summary": "data: market-pulse swarm refresh (run 34462102974) (#902)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-09-10T11:22:07+00:00",
-      "sha": "36b6d8f",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34466227813) (#904)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-10T10:31:04+00:00",
-      "sha": "c3250fa",
-      "summary": "docs(progress): log peer 52-week de-rating ship (PR #903, f6cbf59) + refresh CEO dashboard",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-10T17:28:20+07:00",
-      "sha": "f6cbf59",
-      "summary": "intel(peer): surface the peer scoreboard's dark 52-week equity de-rating (#903)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-10T09:32:37+00:00",
-      "sha": "f9f1494",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-10, run 34461020856)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-10T08:25:53+00:00",
-      "sha": "134046a",
-      "summary": "docs(progress): log ux plain-language 3D-scene load-failure card (PR #901) — merged + deployed + verified LIVE",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-10T15:24:27+07:00",
-      "sha": "0222a6b",
-      "summary": "ux: plain-language 3D-scene load-failure card (drop dev jargon) (#901)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-10T06:44:17+00:00",
-      "sha": "a9e1b30",
-      "summary": "docs(blocked-sources): correct DBD/PICO as Thai-IP pulls, not CI-reachable (fresh 2026-09-10 probes) (#900)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-10T05:18:53+00:00",
-      "sha": "2ba7f2c",
-      "summary": "data(census): refresh the Union Auction forward book (run 34434534495) (#898)",
-      "pillar": "data-integration"
     }
   ]
 }
