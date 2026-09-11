@@ -329,9 +329,18 @@ def _vintage_of(m):
     # crop-year data-vintage `vintage_ce`=2024 must keep winning (surfacing its recent PULL date would
     # falsely imply the 2024 crop-year data is days-fresh). Purely additive — exactly the four
     # previously-blank pull-only layers gain an honest freshness age; no already-dated layer moves.
+    # tape_mob_anchor (flood_book_exposure — the ฿-weighted flood-hazard × real-loan-book join) is the
+    # SAME months-on-book anchor as mob_anchor (the newest disbursement month IN the real tape, e.g.
+    # 2026-07), just under a tape-prefixed key name to disambiguate it from the layer's flood side. This
+    # is the layer's fresher, decision-relevant input (the loan book; the GISTDA flood hazard it weights
+    # is a static 2005-2016 structural read), so it is the honest freshness date — exactly the tape-family
+    # precedent (tape_real / tape_geo_occ / collateral_book all resolve via mob_anchor). It is a strict
+    # ISO month, so it sits with the other data-observation keys, right beside mob_anchor. Verified: only
+    # flood_book_exposure carries this key and it has no earlier-priority vintage, so this is purely
+    # additive — exactly that one previously-blank MEASURED layer gains an honest age; no other layer moves.
     for k in ("updated", "vintage", "as_of", "updated_to",
               "observed_to", "price_vintage", "price_asof", "farmgate_vintage", "board_vintage",
-              "asof_card", "anchor_date", "stock_asof", "latest_month", "mob_anchor",
+              "asof_card", "anchor_date", "stock_asof", "latest_month", "mob_anchor", "tape_mob_anchor",
               "newest_observation_date", "search_vintage",
               "sentiment_anchor", "snapshot", "pico_vintage", "vintage_individual", "pulled_at_utc",
               "pulled_at", "pulled", "promos_pulled_at", "latest_year_ce", "vintage_ce", "span",
