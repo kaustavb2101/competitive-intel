@@ -79,7 +79,14 @@ def build():
     amp = _load(AMPHOE)
     amphoe = amp.get("amphoe") or []
     branch_amphoe = amp.get("branch_amphoe") or []
-    by_district = (_load(PICO_DISTRICT) or {}).get("by_district") or {}
+    pico_district = _load(PICO_DISTRICT) or {}
+    by_district = pico_district.get("by_district") or {}
+    # Inherit the FPO registry snapshot date from the direct input (pico_district.json ->
+    # pico_census.json, e.g. "2026-05-22"). This layer is a pure per-branch projection of that
+    # registry, so its data-vintage IS the registry's — surfacing it (not fabricating one) lets
+    # build_provenance.py's freshness lens age this MEASURED layer instead of it reading as
+    # perpetually undated. Refreshes automatically the day a newer pico registry lands.
+    pico_vintage = (pico_district.get("meta") or {}).get("vintage")
 
     n = len(branches)
 
@@ -142,6 +149,7 @@ def build():
     return {
         "meta": {
             "generated_by": "build_branch_pico.py",
+            "vintage": pico_vintage,
             "label": ("MEASURED — licensed PICO-finance (พิโกไฟแนนซ์) operators registered in each "
                       "branch's OWN district (อำเภอ). A distinct small-ticket non-bank rival class, "
                       "counted per branch for the first time; the per-branch big-4 census "
