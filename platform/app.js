@@ -11107,7 +11107,7 @@ function renderScenarios(){
       return `<div class="scn-card">
         <div class="scn-h"><span class="scn-badge" style="color:${col};border-color:${col}">${lab}</span>
           <span class="scn-vint">${s.vintage||''}</span></div>
-        <h4>${s.title}</h4>
+        <h3>${s.title}</h3>
         <p class="scn-head">${s.headline}</p>
         <p class="scn-prov">${s.provenance||''}</p></div>`;
     }).join('');
