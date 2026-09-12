@@ -64,11 +64,14 @@
   padding:3px 6px;border-radius:5px;border:1px solid currentColor;white-space:nowrap}
 .lb-fresh{color:var(--merch)} .lb-aging{color:var(--opp)} .lb-stale{color:var(--agri)}
 .lb-ref{color:var(--dim)} .lb-nostamp{color:var(--dim);opacity:.75}
+/* held = frozen at source (upstream_capped): amber like #home's Data-room cap marker, distinguished
+   from "aging" by the ⤒ glyph + text, so it never reads as a feed we forgot to pull. */
+.lb-capped{color:var(--opp)}
 /* --opp gold (#A67714 in light) clears WCAG AA as a 3:1 non-text fill / large-text count, but the
    9.5px "aging" pill is SMALL text needing 4.5:1 and lands at ~3.7:1 on the light canvas. Darken this
    pill's TEXT in light theme only (dark-theme's bright #E6B450 already passes ~8:1) to a gold that
    clears 4.5:1 (#8A6210 ≈ 5.1:1) — scoped so no other --opp surface shifts. */
-html[data-theme="light"] .lb-aging{color:#8A6210}
+html[data-theme="light"] .lb-aging,html[data-theme="light"] .lb-capped{color:#8A6210}
 
 /* charts */
 .lb-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));gap:16px;margin:0 0 30px}
@@ -284,6 +287,11 @@ function ageDays(iso) {
   return Math.max(0, Math.floor((Date.now() - t) / 86400000));
 }
 function freshness(f) {
+  // A feed the provenance gate certifies as frozen at source (held at its newest genuinely-complete
+  // upstream vintage) must not pulse "aging"/"stale" as it ages — that cries wolf against a state the
+  // builder already knows is a hold, not neglect. It shows a distinct "held" pill (the per-file reason
+  // rides the row's tooltip). Checked first so it wins over cadence, mirroring #home's Data room (PR #700).
+  if (f.capped) return { cls: 'lb-capped', txt: '⤒ held', rank: 3 };
   if (f.fresh_days == null) return { cls: 'lb-ref', txt: 'reference', rank: 3 };
   var a = ageDays(f.stamp_iso);
   if (a == null) return { cls: 'lb-nostamp', txt: 'no stamp', rank: 4 };
@@ -383,14 +391,15 @@ Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_h
   var feeds = LB.feeds, M = LB.meta || {};
 
   // ---- pulse strip
-  var tally = { lb_fresh: 0, lb_aging: 0, lb_stale: 0, lb_ref: 0 };
+  var tally = { lb_fresh: 0, lb_aging: 0, lb_stale: 0, lb_ref: 0, lb_capped: 0 };
   feeds.forEach(function (f) {
     var s = freshness(f);
     if (s.cls === 'lb-fresh') tally.lb_fresh++;
     else if (s.cls === 'lb-aging') tally.lb_aging++;
     else if (s.cls === 'lb-stale') tally.lb_stale++;
-    // reference (no cadence) + no-stamp feeds don't age — count them so the four
-    // freshness buckets reconcile against Live feeds rather than silently under-summing.
+    else if (s.cls === 'lb-capped') tally.lb_capped++;
+    // reference (no cadence) + no-stamp feeds don't age — count them so the freshness
+    // buckets reconcile against Live feeds rather than silently under-summing.
     else tally.lb_ref++;
   });
   var daily = feeds.filter(function (f) { return f.cadence === 'daily'; }).length;
@@ -409,6 +418,8 @@ Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_h
       tally.lb_stale + '</div><div class="lb-pn">needs a pull</div></div>' +
     '<div class="lb-p"><div class="lb-pk">Reference</div><div class="lb-pv" style="color:var(--dim)">' +
       tally.lb_ref + '</div><div class="lb-pn">no cadence or stamp — don\'t age</div></div>' +
+    '<div class="lb-p"><div class="lb-pk">Held</div><div class="lb-pv" style="color:' + (tally.lb_capped ? 'var(--opp)' : 'var(--dim)') + '">' +
+      tally.lb_capped + '</div><div class="lb-pn">frozen at source — newest upstream vintage</div></div>' +
     P('Trend lines', M.n_with_history || 0, 'feeds with stored history') +
     P('Stored points', (M.history_points || 0).toLocaleString('en-US'), 'real observations on file');
 
@@ -611,7 +622,7 @@ Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_h
     rows.push('<tr><td><span class="lb-lab">' + esc(f.label) + '</span>' +
       '<span class="lb-what">' + esc(f.what) + '</span></td>' +
       '<td class="lb-num">' + esc(fmtNum(f.value)) + ' <span class="lb-u">' + esc(f.unit || '') + '</span></td>' +
-      '<td><span class="lb-pill ' + s.cls + '">' + esc(s.txt) + '</span></td>' +
+      '<td><span class="lb-pill ' + s.cls + '"' + (f.capped ? ' title="' + esc(f.capped_reason) + '"' : '') + '>' + esc(s.txt) + '</span></td>' +
       '<td class="lb-age">' + esc(ageTxt(f)) + '</td>' +
       '<td class="lb-age">' + esc(f.stamp || '—') + '<br><span style="opacity:.7">' + esc(f.cadence) + '</span></td>' +
       '<td>' + (f.history

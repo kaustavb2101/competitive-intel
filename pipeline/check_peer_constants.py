@@ -5,7 +5,13 @@ WHY THIS EXISTS
     The listed title-lender peers' branch counts, loan books, NPL ratios and MTC's
     branch-add pace are the backbone of the objective-#2 competitive read. They are
     hand-carried as CITED constants in two builders:
-        pipeline/build_peer_npl.py            — PEERS[].npl  (the reported NPL ladder)
+        pipeline/build_peer_npl.py            — PEER_META[].headline_npl (the big-three's
+                                                FY2025 / 2025-IR self-reported headline NPL,
+                                                preserved; the DISPLAYED loan-quality figure is
+                                                now the Q2/2026 Stage-3 share read from
+                                                peer_asset_quality.json, itself gate-checked by
+                                                build_peer_asset_quality --check, so only the
+                                                hand-carried headline needs a digest tripwire)
         pipeline/build_competitor_coverage.py — EXPECTED[] branch counts + PEER_FINANCIALS[]
                                                 books / net-adds / growth target / YoY
     Their single source of truth is docs/RESEARCH_DIGEST.md §B ("Competitors — listed
@@ -98,7 +104,10 @@ def _checks():
     fields such as prior_year_branches are excluded — they are back-computed, not cited)."""
     exp = bcc.EXPECTED
     fin = bcc.PEER_FINANCIALS
-    peers = {p["ticker"]: p for p in build_peer_npl.PEERS}
+    # The big-three's hand-carried FY2025 / 2025-IR self-reported headline NPL, preserved as
+    # context in PEER_META[].headline_npl (the displayed figure is now the gate-checked Q2/2026
+    # Stage-3 share from peer_asset_quality.json). This tripwire guards those preserved headlines.
+    hl = {m["ticker"]: m["headline_npl"] for m in build_peer_npl.PEER_META if m.get("headline_npl")}
     return [
         # build_competitor_coverage.EXPECTED — nationwide branch counts
         ("MTC", "EXPECTED[Muangthai] branches", _thousands(exp["Muangthai"])),
@@ -111,11 +120,11 @@ def _checks():
         ("MTC", "PEER_FINANCIALS[Muangthai] net branch adds", str(fin["Muangthai"]["net_adds_yr"])),
         ("MTC", "PEER_FINANCIALS[Muangthai] growth target %", str(fin["Muangthai"]["growth_target_pct"])),
         ("TIDLOR", "PEER_FINANCIALS[Tidlor] book YoY %", f'{fin["Tidlor"]["book_yoy_pct"]}%'),
-        # build_peer_npl.PEERS — the reported NPL ladder
-        ("TIDLOR", "PEERS[TIDLOR] NPL %", f'{peers["TIDLOR"]["npl"]}%'),
-        ("MTC", "PEERS[MTC] NPL %", f'{peers["MTC"]["npl"]}%'),
-        # SAWAD carries a range label ("3.5–3.6"); assert the label the app shows, not the midpoint.
-        ("SAWAD", "PEERS[SAWAD] NPL range label", str(peers["SAWAD"]["npl_label"])),
+        # build_peer_npl.PEER_META — the preserved FY2025 / 2025-IR self-reported headline NPL
+        ("TIDLOR", "PEER_META[TIDLOR] headline NPL %", f'{hl["TIDLOR"]["pct"]}%'),
+        ("MTC", "PEER_META[MTC] headline NPL %", f'{hl["MTC"]["pct"]}%'),
+        # SAWAD's headline is a guidance range ("3.5–3.6"); assert the cited label, not the midpoint.
+        ("SAWAD", "PEER_META[SAWAD] headline NPL range label", str(hl["SAWAD"]["label"])),
     ]
 
 
