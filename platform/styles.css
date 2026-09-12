@@ -1510,6 +1510,20 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 @media (max-width:760px){
   .ic-scroll{background:linear-gradient(to left, var(--scrollcue), transparent) right center / 26px 100% no-repeat}
 }
+/* Same right-edge fade for the THREE primary SPA search tables (Branches / Provinces / Market). Each
+   is 7–8 columns wide and always overflows a phone/small-tablet viewport, so the trailing columns —
+   on #branches the "3D" + "explorer" links, i.e. the branch's 3D scene the lead line explicitly
+   promises ("open any branch's 3D scene") — scroll off the right edge with no scrollbar on mobile,
+   reading as absent. The auto-wrapper puts each in a generic .tblwrap, so scope with :has() to these
+   three (all guaranteed wider than the viewport and painted on the page background, so no spurious
+   fade and no card-colour mismatch); other .tblwrap tables are untouched. Behind the transparent
+   body cells, text stays crisp on top. Theme-aware via --scrollcue; :has()-less engines just skip it
+   (no cue, same as before). Gated to ≤760px like .ic-scroll above. */
+@media (max-width:760px){
+  .tblwrap:has(#branches),
+  .tblwrap:has(#provtbl),
+  .tblwrap:has(#mkttbl){background:linear-gradient(to left, var(--scrollcue), transparent) right center / 26px 100% no-repeat}
+}
 .ic-tbl{border-collapse:collapse;width:100%;font-size:12px;min-width:760px}
 .ic-tbl th,.ic-tbl td{text-align:left;padding:6px 9px;border-bottom:1px solid var(--line2);white-space:nowrap}
 .ic-tbl thead th{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
