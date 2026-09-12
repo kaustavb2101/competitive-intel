@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-12T11:14:05+00:00",
-    "commit": "44cedc9"
+    "generated_at": "2026-09-12T23:18:31+07:00",
+    "commit": "4f28243"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,42 @@
   ],
   "activity": [
     {
+      "date": "2026-09-12T23:18:31+07:00",
+      "sha": "4f28243",
+      "summary": "intel(peer): stamp competitor-census as-of vintage through the rival layers + surface it on the peer board (#945)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-12T15:26:12+00:00",
+      "sha": "99028cd",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-12, run 34702139240)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-12T14:20:57+00:00",
+      "sha": "deb6cc4",
+      "summary": "docs(progress-log): record ux-loop #942 merge + deploy-verify result",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-12T21:17:55+07:00",
+      "sha": "9ccdcfb",
+      "summary": "ux: name the last two empty table-header columns (closes ux-table-empty-th-sweep) (#942)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-12T13:19:57+00:00",
+      "sha": "655728a",
+      "summary": "fix(risk): household-debt input from authoritative NSO CKAN SES-2566 — the vendored file was wrong for 73/77 provinces (#941)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-09-12T11:16:32+00:00",
+      "sha": "82377d5",
+      "summary": "chore(dashboard): re-run plan_cycle after #940 ship — refresh CEO autonomy dashboard to HEAD",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-12T11:14:05+00:00",
       "sha": "44cedc9",
       "summary": "peer: put the loan-quality league on one like-for-like Q2/2026 Stage-3 basis (#940)",
@@ -675,42 +711,6 @@
       "sha": "45890e1",
       "summary": "data: Thai-IP-only swarm refresh (run 34638600767) (#927)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-11T18:49:40+00:00",
-      "sha": "495f333",
-      "summary": "feat(live): Live board learns the frozen-at-source (held) feed state (#926)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-11T17:10:41+00:00",
-      "sha": "bab27a3",
-      "summary": "data: market-pulse swarm refresh (run 34617532959) (#924)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-11T16:46:01+00:00",
-      "sha": "063ae15",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34620928561) (#925)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-11T16:13:47+00:00",
-      "sha": "7d925e6",
-      "summary": "provenance: surface flood_book_exposure's real tape vintage in the freshness scanner",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-09-11T15:29:40+00:00",
-      "sha": "87768bd",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-11, run 34616249130)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-11T14:37:38+00:00",
-      "sha": "7e04781",
-      "summary": "docs: log UX loop run — #sim scenario-card heading order h4→h3 (PR #923, merged+live)",
-      "pillar": "uxui"
     }
   ]
 }
