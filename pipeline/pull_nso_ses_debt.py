@@ -65,6 +65,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 OUT = os.path.join(ROOT, "source-data", "nso_ses_debt_2566.json")
 
+# canonical 77 Thai province names — the same set build_household_risk.py joins on
+sys.path.insert(0, HERE)
+from lib.regionmap import REGION  # noqa: E402
+
 PACKAGE = "0705_08_0009"
 RESOURCE = "SFD_SPB0806"
 RESOURCE_ID = "89cc71ae-f596-4307-b38f-10d61d084801"
@@ -75,6 +79,10 @@ AS_OF = "2566"                    # SES survey round (2023 CE)
 # the two row selectors we need from the (purpose x source x socio) cube
 HH_COUNT = "จำนวนครัวเรือนทั้งสิ้น"          # total households in the leaf group
 AVG_DEBT = "จำนวนหนี้สินเฉลี่ยต่อครัวเรือน"  # average debt per household in the leaf group
+
+# the source's fixed structure: this many mutually-exclusive socioeconomic leaves per province
+# (soc_eco_class1 x soc_eco_class2). Enforced so a truncated pull can't silently drop a stratum.
+LEAVES_PER_PROVINCE = 10
 
 # integrity anchor: NSO's published SES 2566 national headline (all-household mean debt, THB)
 NATIONAL_HEADLINE = 197255
@@ -116,18 +124,31 @@ def distil(csv_text):
     nat_num = 0.0
     nat_den = 0.0
     for p, leaves in prov.items():
+        # The source contract is exactly LEAVES_PER_PROVINCE mutually-exclusive socioeconomic
+        # leaves per province, each carrying BOTH a household count and an average-debt figure.
+        # Enforce it: a truncated response that drops one small leaf could otherwise still leave
+        # 77 provinces and keep the national mean within tolerance while silently changing one
+        # province's published debt. Any shortfall means the pull is incomplete — refuse it.
+        if len(leaves) != LEAVES_PER_PROVINCE:
+            sys.exit("pull_nso_ses_debt: province %r has %d socioeconomic leaves, expected %d — "
+                     "incomplete pull; refusing to write" % (p, len(leaves), LEAVES_PER_PROVINCE))
         num = 0.0
         den = 0.0
-        for g in leaves.values():
+        for leaf, g in leaves.items():
             nhh = g.get("nhh")
             debt = g.get("debt")
-            if nhh and debt is not None:
-                num += debt * nhh
-                den += nhh
-        if den > 0:
-            out[p] = int(round(num / den))
-            nat_num += num
-            nat_den += den
+            if nhh is None or debt is None:
+                sys.exit("pull_nso_ses_debt: province %r leaf %r missing %s — incomplete pull; "
+                         "refusing to write"
+                         % (p, leaf, "nhh" if nhh is None else "debt"))
+            # a 0-household leaf legitimately contributes 0 weight (e.g. Bangkok agriculture)
+            num += debt * nhh
+            den += nhh
+        if den <= 0:
+            sys.exit("pull_nso_ses_debt: province %r has 0 total households — refusing to write" % p)
+        out[p] = int(round(num / den))
+        nat_num += num
+        nat_den += den
 
     national = int(round(nat_num / nat_den)) if nat_den else None
     return out, national
@@ -137,9 +158,17 @@ def build():
     csv_text = _fetch_csv(URL)
     provinces, national = distil(csv_text)
 
-    if len(provinces) != 77:
-        sys.exit("pull_nso_ses_debt: got %d provinces, expected 77 — refusing to write"
-                 % len(provinces))
+    # exact-identity check, not just a count: the downstream join
+    # (build_household_risk.py) intersects on province NAME, so a single renamed/mismatched key
+    # would silently drop a province and recompute every percentile over 76 rows while the count
+    # still reads 77. Require the key set to equal the canonical 77 Thai names exactly.
+    canonical = set(REGION)
+    got = set(provinces)
+    if got != canonical:
+        missing = sorted(canonical - got)
+        unexpected = sorted(got - canonical)
+        sys.exit("pull_nso_ses_debt: province key set != canonical regionmap.REGION — "
+                 "missing=%s unexpected=%s; refusing to write" % (missing, unexpected))
     if national is None or abs(national - NATIONAL_HEADLINE) > NATIONAL_TOL:
         sys.exit("pull_nso_ses_debt: national reconstruction %s != NSO headline %d (tol %d) — "
                  "the table's schema likely changed; refusing to write a suspect layer"
