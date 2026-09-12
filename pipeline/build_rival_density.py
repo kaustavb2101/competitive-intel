@@ -126,6 +126,12 @@ def build():
     amp = _load(AMPHOE)["amphoe"]
     census = _load(CENSUS)
     items = census.get("items", [])
+    # carry the competitor-census vintage forward so every downstream consumer (and the service
+    # freshness audit) can read HOW OLD the rival data is without re-opening the census. The census
+    # is the operators' OWN official store-locators, which CANNOT auto-refresh from CI (competitor
+    # sites are geo-blocked), so its age is a first-class provenance fact, not an incidental. A
+    # literal read from the source meta — no wall clock, keeps the builder byte-exact / --check-safe.
+    census_vintage = (census.get("meta") or {}).get("vintage")
     features = _load(GEO)["features"]
 
     # fixed, deterministic brand order (alphabetical over the brands actually in the census)
@@ -215,6 +221,7 @@ def build():
                        "byte-identical to the committed AutoX join.",
         "index_note": "records[] is INDEX-ALIGNED to platform/data/amphoe.json .amphoe "
                       "(record i <-> amphoe i, same .id) — join by position or by id.",
+        "census_vintage": census_vintage,
         "dense_thresh": DENSE_THRESH,
         "brands": brands,
         "record_format": "{id, name, province_th, region, autox, rivals, by_brand{brand:count}, "

@@ -592,7 +592,14 @@ def build():
             "n_districts": rd_meta.get("n_districts"),
             "total_autox": rd_meta.get("total_autox"),
             "total_rivals": rd_meta.get("total_rivals"),
+            "census_vintage": rd_meta.get("census_vintage"),
         },
+        # The vintage of the competitor census every rival count on this board rolls up from
+        # (rival_density -> competitors_census .meta.vintage). Surfaced top-level so the peer board
+        # can stamp an "as-of" freshness line: this census is the four brands' OWN official
+        # store-locators, which CANNOT auto-refresh from CI (their sites are geo-blocked), so how
+        # old it is is a provenance fact the reader needs, not a detail. Inherited verbatim.
+        "census_vintage": rd_meta.get("census_vintage"),
         "pico_source": {
             "layer": "platform/data/pico_census.json",
             "vintage": pico_meta.get("vintage"),
