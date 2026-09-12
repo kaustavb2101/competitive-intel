@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-12T23:18:31+07:00",
-    "commit": "4f28243"
+    "generated_at": "2026-09-13T05:20:02+07:00",
+    "commit": "c032074"
   },
   "overall": {
     "progress_pct": 100,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-09-12",
+    "eta_date": "2026-09-13",
     "done_items": 50,
     "in_progress_items": 0,
     "open_items": 0,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-09-13T05:20:02+07:00",
+      "sha": "c032074",
+      "summary": "service: wire census_vintage into the freshness reader so rival_density + peer_province surface their real as-of (#952)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-12T21:28:15+00:00",
+      "sha": "52e4361",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-12, run 34719954215)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-12T20:29:59+00:00",
+      "sha": "631caaa",
+      "summary": "docs: log the mobile scroll-cue UX loop (PR #949, merged + deployed + verified)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-13T03:26:46+07:00",
+      "sha": "6a06cdb",
+      "summary": "ux: mobile scroll-cue on the primary search tables (Branches/Provinces/Market) (#949)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-12T19:55:55+00:00",
+      "sha": "dda8012",
+      "summary": "data: Thai-IP-only swarm refresh (run 34713983258) (#948)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-12T18:59:26+00:00",
+      "sha": "d04ba32",
+      "summary": "risk: authoritative NSO-CKAN income denominator for the household-DTI lens (objective #1) (#947)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-09-12T17:55:06+00:00",
+      "sha": "ce6d255",
+      "summary": "data: market-pulse swarm refresh (run 34702883281) (#943)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-12T17:27:31+00:00",
+      "sha": "b7098e3",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34704828269) (#946)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-12T16:57:45+00:00",
+      "sha": "3003067",
+      "summary": "data: SET peer filings refresh (run 34703529264) (#944)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-12T16:19:10+00:00",
+      "sha": "5a5474c",
+      "summary": "chore(dashboard): re-run plan_cycle after #945 ship — refresh CEO autonomy dashboard to HEAD",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-12T23:18:31+07:00",
       "sha": "4f28243",
       "summary": "intel(peer): stamp competitor-census as-of vintage through the rival layers + surface it on the peer board (#945)",
@@ -651,66 +711,6 @@
       "sha": "069415e",
       "summary": "docs: log the 2026-09-12 UX-loop data-book ladder empty-th fix (PR #932)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-12T09:12:32+07:00",
-      "sha": "471dc02",
-      "summary": "ux: name empty th over the data-book ladder bar columns (a11y) (#932)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-12T01:01:47+00:00",
-      "sha": "07d7724",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34661997426) (#931)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-12T00:32:43+00:00",
-      "sha": "4423dd8",
-      "summary": "provenance: reverify FPO PICO competitor registry byte-exact from CI (advance last-confirmed-live date)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-11T23:08:40+00:00",
-      "sha": "1a94716",
-      "summary": "data: market-pulse swarm refresh (run 34650368668) (#929)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-11T22:43:34+00:00",
-      "sha": "acce476",
-      "summary": "data: rival Facebook promo feed refresh (run 34652661258) (#930)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-11T22:16:02+00:00",
-      "sha": "43430b7",
-      "summary": "intel: healthy five-pillar close-out — refresh CEO autonomy dashboard to HEAD",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-11T21:27:14+00:00",
-      "sha": "5ea3a0c",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-11, run 34649292649)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-11T20:17:31+00:00",
-      "sha": "5d35f3e",
-      "summary": "docs: log UX loop run — assist-occ drill-chevron column header named (PR #928)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-12T03:14:33+07:00",
-      "sha": "a14b3b7",
-      "summary": "ux: name empty drill-chevron <th> in assistance-occupation tables (#928)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-11T19:57:05+00:00",
-      "sha": "45890e1",
-      "summary": "data: Thai-IP-only swarm refresh (run 34638600767) (#927)",
-      "pillar": "data-integration"
     }
   ]
 }
