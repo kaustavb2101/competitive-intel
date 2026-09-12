@@ -3495,7 +3495,12 @@ function drawCompCoverage(){
         const bookChain=scaled.map(o=>{
           const yoy=(o.book_yoy_pct!=null)?` (+${o.book_yoy_pct}% YoY)`:'';
           const adds=(o.net_adds_yr!=null)?` <span style="color:var(--agri)">+${o.net_adds_yr.toLocaleString()} branches${o.net_adds_year?'/'+o.net_adds_year:''}</span>`:'';
-          return `${o.operator==='AutoX'?'<b style="color:var(--accent)">AutoX</b>':o.operator} ฿${o.loan_book_bn.toLocaleString()}bn${yoy}${adds}`;
+          // Forward book-growth GUIDANCE where the operator disclosed one (a stated TARGET, not a
+          // measured outcome) — the DIRECTION the count/book can't show yet. Objective #2: the #1
+          // rival guiding double-digit book growth INTO the districts we already run is escalating,
+          // not receding, pressure. Only MTC discloses one; fully null-safe.
+          const tgt=(o.growth_target_pct!=null)?` <span style="color:var(--opp)" title="Company-stated forward book-growth guidance — a TARGET for the year ahead, not a measured result. REPORTED from ${o.operator} IR.">→ guides ${o.growth_target_pct}% book growth</span>`:'';
+          return `${o.operator==='AutoX'?'<b style="color:var(--accent)">AutoX</b>':o.operator} ฿${o.loan_book_bn.toLocaleString()}bn${yoy}${adds}${tgt}`;
         }).join(' &rsaquo; ');
         nstxt+=`<div style="margin-top:6px"><b>Expansion pace &amp; book scale</b> — ${bookChain}. ${TAG_E} `+
           `<span class="sub">${ns.expansion_note||''}</span></div>`;
