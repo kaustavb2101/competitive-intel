@@ -1,25 +1,36 @@
 #!/usr/bin/env python3
-"""build_peer_npl.py — Peer NPL benchmark + MEASURED AutoX self-anchor.
+"""build_peer_npl.py — Peer loan-quality league (like-for-like) + MEASURED AutoX self-anchor.
 
 Assembles platform/data/peer_npl.json from two committed, in-repo sources — no network:
 
-  1. The listed title-lender peers' OWN reported NPL ratios — hand-curated as cited constants
-     below. Tidlor / MTC / Srisawad carry each company's FY2025 / 2025 IR headline figure
-     (docs/RESEARCH_DIGEST.md §B). Heng, Saksiam and Ngern Turbo publish no comparable headline
-     NPL, so they carry their Q2/2026 SET-filed TFRS9 Stage-3 credit-impaired share — the
-     loan-quality analog for a hire-purchase/leasing lender — the same committed, cited figures
-     already in platform/data/peer_asset_quality.json (as-of 30 Jun 2026; no network). They are
-     the source of truth (published, not pulled), so hard-coding them here — with their citation,
-     and the mixed basis disclosed per-row and in meta.note — is honest.
+  1. The six SET-listed title-lender peers' loan quality — ALL on ONE like-for-like basis:
+     each peer's Q2/2026 SET-filed TFRS9 Stage-3 (credit-impaired) gross share, as-of
+     30 Jun 2026. These are NOT re-typed here — they are READ from the committed, cited
+     platform/data/peer_asset_quality.json (built by build_peer_asset_quality.py from the same
+     SET reviewed financial-statement NOTES), the single source of truth for the rivals' loan
+     quality, so this layer can never silently drift from its sibling board and refreshes the day
+     a newer filing lands. Only the editorial descriptors (each peer's collateral book, and — for
+     the big-three that ALSO publish one — their prior FY2025 self-reported headline NPL, kept as
+     context, not erased) are carried as constants here.
+
+     WHY ONE BASIS (the freshness + honesty change, 2026-09-12): this board previously mixed
+     bases — Tidlor / MTC / Srisawad on their ~9-month-stale FY2025 / 2025 IR self-reported
+     headline NPL, and only Heng / Saksiam / Ngern Turbo on the current Q2/2026 Stage-3 share —
+     so the "peer NPL league" was not like-for-like across its own rows, even though a fresher,
+     consistent Q2/2026 Stage-3 figure for ALL six already sat in peer_asset_quality.json (whose
+     own note states the six ARE comparable, because all report on the same IFRS-9 basis). Putting
+     every peer on that one basis makes the league genuinely comparable AND advances the big-three
+     from FY2025 to Q2/2026. The self-reported headline is preserved per-row as `headline_npl` /
+     in the source string, so nothing is lost. (AutoX remains a DISTINCT MEASURED anchor — see below.)
 
   2. AutoX / Ngern Chaiyo's OWN book quality — MEASURED, computed live from the real
      loan tape (platform/data/tape_real.json `bucket_ladder`), so the anchor always
      tracks the committed tape and is never hand-typed.
 
 WHY AN ANCHOR, NOT A RANKED ROW (the honesty crux): the peer figures are each company's
-reported NPL on its own basis; the AutoX figure is measured OS-weighted from the real
-tape. They are NOT a like-for-like league table — listed peers write off / provision out
-deep-delinquent stock, whereas the AutoX tape carries a 180+ bucket SEPARATELY as legacy
+reported IFRS-9 Stage-3 share; the AutoX figure is measured OS-weighted from the real
+tape. They are NOT a like-for-like league table WITH AutoX — listed peers write off / provision
+out deep-delinquent stock, whereas the AutoX tape carries a 180+ bucket SEPARATELY as legacy
 workout inventory (the tape's own framing: "late-stage collections inventory, not fresh
 risk"). So AutoX is surfaced as a distinct MEASURED anchor beside the reported-peer band,
 NOT sorted into the peers' ranking. Every AutoX number below is derived from the tape's
@@ -27,8 +38,8 @@ committed measured buckets; nothing is invented. No open/close/expand framing �
 loan-quality read.
 
 Deterministic + network-free + --check byte-reproduce (the AutoX inputs come from the
-committed tape, the peers from the constants here, so the output is a pure function of the
-committed tree). Added to the determinism gate.
+committed tape, the peers from the committed peer_asset_quality.json + the constants here, so
+the output is a pure function of the committed tree). Added to the determinism gate.
 
   python3 pipeline/build_peer_npl.py            # regenerate platform/data/peer_npl.json
   python3 pipeline/build_peer_npl.py --check    # byte-exact verify (exit 1 on drift)
@@ -40,77 +51,96 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TAPE = os.path.join(ROOT, "platform", "data", "tape_real.json")
+ASSET_QUALITY = os.path.join(ROOT, "platform", "data", "peer_asset_quality.json")
 OUT = os.path.join(ROOT, "platform", "data", "peer_npl.json")
 
-# --- (1) Listed title-lender peers' OWN reported NPL — docs/RESEARCH_DIGEST.md §B ---
-# Reported by the companies themselves (FY2025 / 2025 IR). Order preserved from the
-# hand-curated source; the app re-sorts by NPL for display.
-PEERS = [
+# --- (1) Editorial descriptors per peer (NOT the NPL number — that is READ from
+# peer_asset_quality.json so the loan-quality figure has ONE source of truth). Display order;
+# the app re-sorts by NPL. `collateral` is an editorial book descriptor; `headline_npl` (big-3
+# only) preserves each company's own prior FY2025 / 2025 IR self-reported headline NPL as
+# context so unifying the board onto the current Q2/2026 Stage-3 basis erases nothing. ---
+PEER_META = [
     {
         "ticker": "TIDLOR",
-        "name": "Ngern Tid Lor",
-        "npl": 1.5,
         "collateral": "vehicle title (best-in-class)",
-        "source": "FY2025 company / thaipr — NPL 1.5%",
+        "headline_npl": {"pct": 1.5, "cite": "FY2025 company / thaipr — headline NPL 1.5%"},
     },
     {
         "ticker": "MTC",
-        "name": "Muangthai Capital",
-        "npl": 2.53,
         "collateral": "vehicle / motorcycle title",
-        "source": "FY2025 company IR / kaohoon — NPL 2.53% (target <2.7%)",
+        "headline_npl": {"pct": 2.53, "cite": "FY2025 company IR / kaohoon — headline NPL 2.53% (target <2.7%)"},
     },
     {
         "ticker": "SAWAD",
-        "name": "Srisawad",
-        "npl": 3.55,
-        "npl_label": "3.5–3.6",
         "collateral": "cars/pickups/heavy-vehicle + land/house/condo",
-        "source": "2025 IR oppday deck — NPL guidance 3.5–3.6%",
+        # SAWAD's self-reported headline is a guidance RANGE; `label` carries it verbatim (the
+        # exact cited string), `pct` its midpoint for any numeric use.
+        "headline_npl": {"pct": 3.55, "label": "3.5–3.6", "cite": "2025 IR oppday deck — headline NPL guidance 3.5–3.6%"},
+        # Stage-3 excludes the purchased/originated credit-impaired (bought distressed-debt) book,
+        # reported separately as poci_bn in peer_asset_quality.json — carried in the source string.
+        "stage3_note": "excludes the separately-reported purchased credit-impaired (POCI) book",
     },
     {
         # The one CONTRACTING listed peer, and the only reported peer whose loan-quality figure
         # brackets AutoX's own ~6% tape-measured impaired share (objective #2: "compliant" is not
-        # "thriving"). Heng is a hire-purchase / leasing lender, so it reports a TFRS9/IFRS-9
-        # Stage-3 (credit-impaired) share rather than a bank-style 90+ NPL — the loan-quality
-        # analog for its accounting basis, and arguably a CLOSER basis-match to AutoX's own
-        # impaired-share read than the other peers' headline NPLs. The mixed basis is disclosed
-        # in the row source, the meta.note, and the app's method box — this stays consistent with
-        # the layer's standing "NOT a like-for-like league table" framing.
+        # "thriving").
         "ticker": "HENG",
-        "name": "Heng Leasing & Capital",
-        "npl": 6.78,
         "collateral": "motorcycle / car / land title + hire-purchase (contracting)",
-        "source": "Heng SET filing, H1-2026 — Stage 3 credit-impaired 6.78% of gross book "
-                  "(฿542.8m/฿8,002.8m), 30 Jun 2026; TFRS9/IFRS-9 basis (loan-quality analog)",
     },
     {
-        # Two more SET-listed title-loan peers whose loan-quality figure is NOT a hand-curated
-        # FY2025 IR headline NPL (they publish none), so — exactly as for Heng above — they are
-        # carried on their Q2/2026 SET-filed TFRS9 Stage-3 credit-impaired share, the loan-quality
-        # analog. The figures are the COMMITTED, cited ones already in platform/data/
-        # peer_asset_quality.json (built by build_peer_asset_quality.py from the same SET reviewed
-        # financial-statement NOTES, as-of 30 Jun 2026) — no network, no new source. Adding them
-        # closes a gap where the #acq NPL board silently dropped two listed rivals that the
-        # sibling asset-quality board already carries; the mixed basis is disclosed per-row, in
-        # the meta.note, and in the app's method box, consistent with the layer's standing
-        # "NOT a like-for-like league table" framing.
         "ticker": "SAK",
-        "name": "Saksiam Leasing",
-        "npl": 2.7,
         "collateral": "motorcycle / car / land title + hire-purchase (Isan-focused)",
-        "source": "Saksiam SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired 2.7% of gross "
-                  "receivables, 30 Jun 2026 (loan-quality analog; see peer_asset_quality.json)",
     },
     {
         "ticker": "TURBO",
-        "name": "Ngern Turbo (NTL)",
-        "npl": 3.5,
         "collateral": "car / motorcycle title (hire-purchase + title loan)",
-        "source": "Ngern Turbo SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired 3.5% of gross "
-                  "receivables, 30 Jun 2026 (loan-quality analog; see peer_asset_quality.json)",
     },
 ]
+
+
+def _peers_from_asset_quality():
+    """Build the six peer rows on ONE like-for-like basis — each peer's Q2/2026 SET-filed
+    TFRS9 Stage-3 credit-impaired gross share — READ from the committed peer_asset_quality.json
+    (the single source of truth for rival loan quality), not re-typed. Editorial descriptors and
+    the preserved FY2025 self-reported headline come from PEER_META above."""
+    with open(ASSET_QUALITY, encoding="utf-8") as f:
+        aq = json.load(f)
+    by_sym = {p["symbol"]: p for p in aq.get("peers", [])}
+    as_of = aq.get("meta", {}).get("as_of", "2026-06-30")
+    peers = []
+    for meta in PEER_META:
+        sym = meta["ticker"]
+        row = by_sym.get(sym)
+        if not row:
+            # Peer absent from the sibling board — skip rather than fabricate a figure.
+            continue
+        npl = row["npl_pct"]
+        name = row.get("name", sym)
+        src = ("%s SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired %s%% of gross receivables, "
+               "%s (like-for-like loan-quality basis; from peer_asset_quality.json)"
+               % (name, _fmt(npl), as_of))
+        if meta.get("stage3_note"):
+            src += " — %s" % meta["stage3_note"]
+        hl = meta.get("headline_npl")
+        if hl:
+            src += " · cf. self-reported %s" % hl["cite"]
+        out = {
+            "ticker": sym,
+            "name": name,
+            "npl": npl,
+            "collateral": meta["collateral"],
+            "source": src,
+        }
+        if hl:
+            out["headline_npl"] = hl["pct"]
+            out["headline_source"] = hl["cite"]
+        peers.append(out)
+    return peers, as_of
+
+
+def _fmt(v):
+    """Format an NPL % the way it is carried (drop a trailing .0 so 6.8 not 6.80)."""
+    return ("%g" % v)
 
 # Buckets in tape_real.json's ladder that are 90+ days past due (the strict BoT NPL
 # definition: overdue >90 days, INCLUDING the 180+ legacy stock).
@@ -160,31 +190,33 @@ def _measured_autox_anchor():
 
 def build():
     autox = _measured_autox_anchor()
+    peers, as_of = _peers_from_asset_quality()
     return {
         "meta": {
-            "title": "Peer NPL benchmark (reported) + AutoX measured anchor",
-            "note": ("Listed title-loan peers' reported NPL ratios (Tidlor / MTC / Srisawad on "
-                     "their own FY2025 / 2025 IR headline figures; Heng, Saksiam and Ngern Turbo "
-                     "on their Q2/2026 SET-filed TFRS9 Stage-3 credit-impaired share — the "
-                     "loan-quality metric a hire-purchase/leasing lender publishes in place of a "
-                     "bank-style 90+ NPL, and the closest basis-match to AutoX's own impaired-share "
-                     "read) shown next to AutoX/Ngern Chaiyo's OWN book quality, "
-                     "MEASURED from the real loan tape. NOT a like-for-like league table — peers "
-                     "report on their own bases and write off / provision out deep-delinquent stock "
-                     "that AutoX carries SEPARATELY as 180+ legacy workout inventory — so AutoX is a "
-                     "distinct MEASURED anchor, not ranked inside the reported-peer list. Heng is "
-                     "the one CONTRACTING peer and the only reported peer whose figure brackets "
-                     "AutoX's own impaired share ('compliant' is not 'thriving'). The spread tracks "
-                     "collateral mix: gold/vehicle books run lower NPL, land/agri/heavy-vehicle "
-                     "books higher."),
-            "measured": "peers = reported by the companies; AutoX = measured from the real loan tape",
-            "source": "peers: docs/RESEARCH_DIGEST.md §B (Tidlor/MTC/Srisawad, FY2025 / 2025 IR) + "
-                      "platform/data/peer_asset_quality.json (Heng/Saksiam/Ngern Turbo, SET Q2/2026 "
-                      "TFRS9 Stage-3, as-of 30 Jun 2026); AutoX: platform/data/tape_real.json",
+            "title": "Peer loan-quality league (like-for-like) + AutoX measured anchor",
+            "note": ("Six SET-listed title-loan peers on ONE like-for-like loan-quality basis — "
+                     "each peer's Q2/2026 SET-filed TFRS9/IFRS-9 Stage-3 (credit-impaired) gross "
+                     "share, as-of 30 Jun 2026, READ from platform/data/peer_asset_quality.json "
+                     "(the single source of truth for rival loan quality; comparable across the six "
+                     "because all report on the same IFRS-9 basis) — shown next to AutoX/Ngern "
+                     "Chaiyo's OWN book quality, MEASURED from the real loan tape. The big-three's "
+                     "prior FY2025 / 2025 IR self-reported headline NPL is preserved per-row as "
+                     "context (headline_npl), not erased. AutoX is NOT ranked inside the peer list: "
+                     "listed peers write off / provision out deep-delinquent stock that AutoX carries "
+                     "SEPARATELY as 180+ legacy workout inventory, so AutoX is a distinct MEASURED "
+                     "anchor beside the reported-peer band. Heng is the one CONTRACTING peer and the "
+                     "only reported peer whose Stage-3 share brackets AutoX's own impaired share "
+                     "('compliant' is not 'thriving'). The spread tracks collateral mix: gold/vehicle "
+                     "books run lower Stage-3, land/agri/heavy-vehicle books higher."),
+            "measured": "peers = SET-filed IFRS-9 Stage-3 share (reported); AutoX = measured from the real loan tape",
+            "source": ("peers: platform/data/peer_asset_quality.json (all six, SET Q2/2026 reviewed "
+                       "financial-statement NOTES, TFRS9 Stage-3, as-of 30 Jun 2026); big-three "
+                       "self-reported headline context: docs/RESEARCH_DIGEST.md §B; "
+                       "AutoX: platform/data/tape_real.json"),
             "generated_by": "pipeline/build_peer_npl.py",
-            "updated": "2026-06",
+            "updated": as_of,
         },
-        "peers": PEERS,
+        "peers": peers,
         "autox": autox,
     }
 
@@ -215,9 +247,11 @@ def main():
 
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(payload)
-    a = build()["autox"]
-    print("wrote %s — %d peers + AutoX anchor (NPL-live %.2f%% OS · 90+%.2f%% OS)"
-          % (OUT, len(PEERS), a["npl_live_os_pct"], a["npl_90plus_os_pct"]))
+    b = build()
+    a = b["autox"]
+    print("wrote %s — %d peers (like-for-like Q2/2026 Stage-3) + AutoX anchor "
+          "(NPL-live %.2f%% OS · 90+%.2f%% OS)"
+          % (OUT, len(b["peers"]), a["npl_live_os_pct"], a["npl_90plus_os_pct"]))
 
 
 if __name__ == "__main__":
