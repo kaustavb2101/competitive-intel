@@ -35,6 +35,7 @@ const LENS = {
   unemp:{pill:'Unemployment', label:'District unemployment ▲', desc:"PORTFOLIO RISK · MEASURED (NSO Labour Force Survey, province-inherited) — the branch's district unemployment rate, shown raw rather than blended into the composite district-risk proxy above. Brighter = a higher local jobless rate.", color:'#C8433B', unit:'% unemployment', amp:true, unemp:true, tag:'m', val:d=>d._amp?(d._amp.unemployment_rate||0):0},
   dpico:{pill:'PICO rivals', label:'District PICO rivals ◆', desc:"COMPETITIVE PRESSURE · MEASURED (FPO registry) — licensed พิโกไฟแนนซ์ (PICO-finance) operators, a DISTINCT small-ticket rival class, registered in the branch's own district (อำเภอ). Brighter = more sub-scale rivals clustered in the same district. Kept separate from the district-risk lens (this is competition, obj #2 — not portfolio risk). Hidden until the district layer loads.", color:'#7A4FE0', unit:'PICO operators (district)', amp:true, pico:true, tag:'m', val:d=>d._amp?(d._amp.pico||0):0},
   doutnum:{pill:'Outnumbered', label:'PICO rivals per branch ◆', desc:"COMPETITIVE PRESSURE · MEASURED (FPO registry ÷ AutoX footprint) — licensed พิโกไฟแนนซ์ (PICO-finance) operators PER AutoX branch in the same district. Unlike raw PICO density, this weighs the rival field against how many branches we run there: brighter = the existing footprint is more heavily outnumbered street-by-street (obj #2 — pressure on the network we run, not a where-to-open cue). Defined only where AutoX operates; coverage-gap districts are the white-space lens's story. Kept separate from portfolio risk. Hidden until the district layer loads.", color:'#7A4FE0', unit:'PICO rivals / AutoX branch', amp:true, pico:true, tag:'m', val:d=>(d._amp&&d._amp.pico_ratio!=null)?d._amp.pico_ratio:null},
+  dpiconew:{pill:'New PICO rivals', label:'Newly-licensed PICO rivals ◆', desc:"COMPETITIVE PRESSURE · MEASURED (FPO registry, licence recency) — of the licensed พิโกไฟแนนซ์ (PICO-finance) operators in the branch's own district (อำเภอ), how many were licensed in the registry's most-recent window. Where the two standing PICO lenses read how DENSE the sub-scale rival field is, this isolates fresh ENTRY — where the small-ticket rival class is still GROWING around the network we run (obj #2). Brighter = more newly-licensed rivals in the same district; 0 where the district saw no recent registrations. A rising-entry signal is distinct from standing density (a dense district may have added none; a thinner one may be filling in fast). Kept separate from portfolio risk; makes no open / close / expand call. Hidden until the per-branch PICO layer loads.", color:'#7A4FE0', unit:'newly-licensed PICO (district)', piconew:true, tag:'m', val:d=>{const e=picoBrRec(d); return (e&&typeof e.recent==='number')?e.recent:null;}},
   crop: {pill:'Crop mix', label:'Dominant crop ◇ est', desc:"AGRI EXPOSURE · ESTIMATED (model-allocated crop areas) — each district coloured by its DOMINANT credit-relevant crop (rice / cassava / maize / sugarcane / oil palm) from SPAM 2010, a modeled spatial disaggregation of measured subnational statistics onto a ~9km grid. Shows which crop a district's borrower base depends on, so a macro move against that crop maps to exposure. Rubber is absent from SPAM (a known blind spot for the rubber belt).", color:'#4E9A6B', unit:'dominant crop', amp:true, cat:true, tag:'e', est:true, val:d=>0},
   dfarm:{pill:'Farmland share', label:'District farmland share ◆', desc:"AGRI EXPOSURE · MEASURED (NABC/OAE official district data, 2568/2025) — the share of each district that is agricultural land, at true district (อำเภอ) grain. This is the amphoe-MEASURED counterpart to the estimated crop-mix and province-inherited agri-stress lenses: brighter = a more farm-dependent local borrower base, so a crop-price or drought shock reaches more of the book there (obj #1 portfolio risk). Districts the source carries no value for (most of Bangkok, some remote / island districts) show 'n/a', not zero. A few intensively multi-cropped districts are capped at 100%.", color:'#4E9A6B', unit:'% farmland (measured)', amp:true, dfarm:true, tag:'m', val:d=>(d._amp&&d._amp.agri_land_share!=null)?Math.round(d._amp.agri_land_share*100):null},
   ddrought:{pill:'District drought', label:'District drought ▲ modelled', desc:"PORTFOLIO RISK · MODELLED (OAE SPEI, ERA5-Land reanalysis) — the branch's district drought intensity on OAE's Standardized Precipitation-Evapotranspiration Index, resolved to true district (อำเภอ) grain (0–100 index, drier = higher; lower SPEI = drier). An official model product — NOT station rainfall and NOT a disaster declaration. This resolves drought to the district, unlike the province-inherited agri-stress lens which every amphoe in a province shares: brighter = a drier local farm economy, so a drought shock reaches more of the book there (obj #1 portfolio risk). Kept SEPARATE from the estimated agri-stress proxy — this is the modelled OAE index, not our proxy, and does not modify it. Districts the source flags ambiguous or a grid-gap zero show 'n/a', never a guessed reading. Hidden until the district layer loads.", color:'#E6B450', unit:'drought (0–100, modelled SPEI)', amp:true, drought:true, est:true, tag:'e', val:d=>{const a=d&&d._amp; const s=a?a.spei:null; if(typeof s!=='number'||!isFinite(s)) return null; const dry=s<0?-s:0; /* -SPEI capped at 2.5 (exceptional drought) -> 0–100 for the ramp/popup; raw spei kept in the record + shown in the polygon popup */ return Math.round(Math.min(1,dry/2.5)*100);}},
@@ -1268,6 +1269,9 @@ function picoBrRec(d){
   if(!PICOBR) return null;
   const i=idxOf(d); return (i>=0&&i<PICOBR.length)?PICOBR[i]:null;
 }
+// true once the per-branch PICO layer is loaded AND carries the licence-recency field — so an older
+// branch_pico.json (pre-`recent`) or an absent file degrades the "Newly-licensed PICO" lens gracefully.
+function picobrHasData(){ return !!(PICOBR&&PICOBR.some(e=>e&&typeof e.recent==='number')); }
 // MEASURED rival branches within CATCH_RADIUS_KM of a branch (client-side haversine over the merged
 // census). Computed only for the one open popup (≤4,384 haversines), so no precompute needed. Returns
 // null when the census is absent so the popup omits the line rather than show a fabricated 0.
@@ -7433,7 +7437,7 @@ function renderExposureTape(){
   if(lad&&TAPE.bucket_ladder){
     const LBL={'1.Current':'Current','2.X_Days':'X-days','3.30_dpd':'30 dpd','4.60_dpd':'60 dpd','5.90_dpd':'90 dpd','6.120_dpd':'120 dpd','7.150_dpd':'150 dpd','8.180+_dpd':'180+ legacy'};
     const L=TAPE.bucket_ladder.ladder, maxN=Math.max(...L.map(x=>x.n));
-    lad.innerHTML=`<tr><th scope="col">Bucket</th><th scope="col">Accounts</th><th scope="col">OS ฿bn</th><th scope="col"></th></tr>`+
+    lad.innerHTML=`<tr><th scope="col">Bucket</th><th scope="col">Accounts</th><th scope="col">OS ฿bn</th><th scope="col"><span class="sr-only">Distribution</span></th></tr>`+
       L.map(x=>{const lg=x.bucket[0]==='8';
         return `<tr><td class="mono">${LBL[x.bucket]||x.bucket}</td><td class="mono sub">${N(x.n)}</td>
           <td class="mono sub">${(x.os_sum/1e9).toFixed(2)}</td>
@@ -9165,6 +9169,9 @@ function lensAbsent(k){
   // pico district-rival lens: hide only once the district layer is loaded AND it predates the
   // pico fold (no record carries a pico field) — so an older amphoe.json degrades gracefully.
   if(l.pico)  return !!(AMP&&AMP.length)&&!AMP.some(a=>a&&a.pico!=null);
+  // newly-licensed PICO lens (per-branch licence recency): hide once the per-branch layer has been
+  // loaded but carries no `recent` field (older file) or is absent — mirrors the floodhz gate.
+  if(l.piconew) return picobrLoaded && !picobrHasData();
   // district-drought lens: hide once the district layer is loaded AND it predates the
   // drought fold (no record carries a spei field) — so an older amphoe.json degrades gracefully.
   if(l.drought) return !!(AMP&&AMP.length)&&!AMP.some(a=>a&&a.spei!=null);
@@ -9487,7 +9494,10 @@ function initMap(){
   if(!cbrfLoaded) loadClusterBrief();
   if(!occlLoaded) loadOccLeads();
   if(!rivpLoaded) loadRivalPressure();
-  if(!picobrLoaded) loadBranchPico();
+  // warm the per-branch PICO layer — feeds both the branch popup line AND the "Newly-licensed PICO
+  // rivals" map lens. Chain a repaint so a direct ?lens=dpiconew open un-disables + colours in once
+  // the layer lands (mirrors the floodhz warm-load); otherwise the markers would stay pale 0s.
+  if(!picobrLoaded) loadBranchPico().then(()=>{ renderLenses(); if(mapReady&&curLens==='dpiconew'){ renderLegend(); styleMarkers(); } });
   // warm the MEASURED lead-site coordinates (OSM points behind each branch's lead board) so the
   // pins draw on the first branch tap. Optional + null-safe: absent file → LSITES stays null,
   // selectBranch simply draws nothing.
