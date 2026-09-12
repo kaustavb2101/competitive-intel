@@ -3994,10 +3994,16 @@ function drawPeerProvince(){
       const hidStr=hidden.length?` The province rank can mask ground contest — AutoX ranks top-2 yet is outnumbered in most of its own districts in <b style="color:var(--agri)">${hidden.length}</b> province${hidden.length>1?'s':''} (worst: <b>${hidden[0].province_th}</b>, ${hidden[0].n_outnumbered_districts}/${hidden[0].n_districts}).`:'';
       distStr=` Zooming to districts, the big-4 outnumber AutoX in <b style="color:var(--agri)">${lostD.toLocaleString()}</b> of ${totD.toLocaleString()} districts nationwide (${totD?Math.round(100*lostD/totD):0}%).${hidStr}`;
     }
+    // Competitor-census AS-OF stamp (MEASURED). The whole board rolls up the four brands' OWN
+    // official store-locators, which CANNOT auto-refresh from CI (their sites are geo-blocked), so
+    // the reader needs to know how current the rival counts are before acting on "outnumbered 16:1".
+    // Null-safe: a pre-fold peer_province.json without the vintage degrades to no stamp.
+    const cv=m.census_vintage||((m.rival_density_source||{}).census_vintage);
+    const censusAsOf=cv?` <span class="sub">Competitor census as-of <b>${cv}</b> — MEASURED official store-locators; it cannot auto-refresh from CI (rival sites are geo-blocked), so treat rival counts as a snapshot of that date.</span>`:'';
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> of 77 provinces.</b>${rankStr} `+
       `Against the full official-locator census (${(m.total_rivals||0).toLocaleString()} rival branches vs `+
       `${(m.total_autox||0).toLocaleString()} AutoX), ${leadStr}.${distLeadStr}${regionStr}${concStr} `+
-      `National rival footprint: ${brandStr}.${picoStr}${satStr}${outStr}${distStr} ${TAG_M}`+
+      `National rival footprint: ${brandStr}.${picoStr}${satStr}${outStr}${distStr}${censusAsOf} ${TAG_M}`+
       methodBox(null,
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
          'The <b>per-100k-vehicle</b> saturation reads title-lender branches against <b>MEASURED</b> DLT registered-vehicle stock (the vehicle collateral base) — a crowding read the raw count can’t give. The three Greater-Bangkok inner-ring provinces are <b>excluded</b> from the most-crowded headline: they register most vehicles centrally at the Bangkok DLT office (a MEASURED NSO labour-force cross-check flags them), which would inflate their density. National saturation is unaffected (vehicle stock is sum-conserved).',
