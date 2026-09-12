@@ -6,19 +6,23 @@ Network-free, deterministic. Joins two LOCAL, MEASURED source-data files:
 
   nso_ses_debt_2566.json             debt (THB, NSO SES 2566) — AUTHORITATIVE, pulled from NSO's
                                      own CKAN (pull_nso_ses_debt.py); the only debt source.
-  household_income_by_province.json  avg_monthly_income (THB/month, NSO SES 2566, MEASURED)
+  nso_ses_income_2566.json           avg monthly household income (THB, NSO SES 2566) —
+                                     AUTHORITATIVE, from NSO's own CKAN (pull_nso_ses_income.py);
+                                     the only income source.
 
-DEBT PROVENANCE (corrected 2026-09-12). The debt side used to come from the vendored TMLI file
-household_debt_by_province.json, whose meta claimed its debt_per_household was "MEASURED (NSO SES
-2566)". An audit against NSO's own CKAN (table SFD_SPB0806, package 0705_08_0009) found that claim
-false: only 4 of 77 provinces matched the authoritative figure and the rest diverged by up to
-~4.5x (Khon Kaen 280,791 vs 62,884; Bangkok 88,856 vs 161,050), so the shipped household-DTI risk
-ranking was materially wrong. The debt input is now the authoritative NSO CKAN layer
-(source-data/nso_ses_debt_2566.json), and it is the ONLY debt source — there is deliberately no
-vendored fallback, because silently reverting to a file wrong for 73/77 provinces would republish a
-bad ranking; if the authoritative layer is missing the builder emits the honest absent-state.
-Income is still the vendored NSO SES layer pending its own authoritative CKAN verification (a
-documented follow-up).
+PROVENANCE (both sides corrected 2026-09-12). Both inputs used to come from vendored TMLI files
+whose meta claimed "MEASURED (NSO SES 2566)". Audits against NSO's own CKAN found both false:
+  - DEBT (household_debt_by_province.json): only 4 of 77 provinces matched the authoritative
+    figure (table SFD_SPB0806, package 0705_08_0009); the rest diverged up to ~4.5x (Khon Kaen
+    280,791 vs 62,884; Bangkok 88,856 vs 161,050).
+  - INCOME (household_income_by_province.json): its avg_monthly_income is not a household income
+    at all but an UNWEIGHTED mean across five occupation rows; against NSO's own CKAN (table
+    SFD_SPB0802_66, package 0705_08_0007) it diverged up to ~1.3x (Sisaket 25,597 vs the
+    authoritative 19,858) and re-ranked 67 of 77 provinces on DTI.
+Both inputs are now the authoritative NSO CKAN layers, and each is the ONLY source for its side —
+there is deliberately no vendored fallback, because silently reverting to a wrong file while the
+ranking and meta still read as authoritative would republish a materially incorrect risk map; if
+either authoritative layer is missing the builder emits the honest absent-state.
 
 It computes, PER PROVINCE:
   debt              average household debt, THB.                       [MEASURED · NSO SES]
@@ -54,7 +58,7 @@ SRC = os.path.join(ROOT, "source-data")
 OUT = os.path.join(ROOT, "platform", "data", "household_risk_by_province.json")
 
 AUTH_DEBT_FILE = "nso_ses_debt_2566.json"          # authoritative NSO CKAN — the ONLY debt source
-INCOME_FILE = "household_income_by_province.json"
+AUTH_INCOME_FILE = "nso_ses_income_2566.json"      # authoritative NSO CKAN — the ONLY income source
 
 MONTHS = 12  # annualize the MEASURED monthly income before forming the debt/income ratio
 
@@ -101,29 +105,59 @@ def _load_debt():
     citation = {
         "which": "authoritative",
         "source": "NSO SES 2566 household debt — AUTHORITATIVE, from NSO's own CKAN "
-                  "(%s); income from the NSO SES vendored layer (pending its own CKAN "
-                  "verification)." % am.get("source", "catalogapi.nso.go.th"),
+                  "(%s)." % am.get("source", "catalogapi.nso.go.th"),
         "provenance": "debt = MEASURED NSO SES 2566 (2023 CE), CKAN package %s / resource %s, "
                       "reconstructed to the province level (household-weighted mean over "
                       "socioeconomic strata; national mean reproduces NSO's published "
-                      "headline %s THB). See pipeline/pull_nso_ses_debt.py. income = "
-                      "avg_monthly_income*12 from the vendored NSO SES layer "
-                      "(source-data/%s), still to be verified against its own CKAN table."
+                      "headline %s THB). See pipeline/pull_nso_ses_debt.py."
                       % (am.get("package", "0705_08_0009"),
                          am.get("resource", "SFD_SPB0806"),
-                         am.get("national_avg_debt_per_household", "197255"),
-                         INCOME_FILE),
+                         am.get("national_avg_debt_per_household", "197255")),
     }
     return dprov, citation
 
 
+def _load_income():
+    """Income source: the authoritative NSO CKAN layer (pull_nso_ses_income.py).
+
+    Returns (iprov, citation) where iprov maps province -> int monthly household income (THB), or
+    (None, None) if the authoritative file is absent. `citation` carries the provenance strings.
+
+    Like the debt side, there is deliberately NO vendored fallback. The vendored TMLI income file
+    (household_income_by_province.json) carried, as its `avg_monthly_income`, an UNWEIGHTED mean
+    across five occupation rows — not a household income — from the same source whose debt figures
+    were wrong for 73/77 provinces; audited against NSO's own CKAN it diverged by up to ~1.3x and
+    re-ranked 67/77 provinces on DTI. Silently reverting to it — while the ranking and meta still
+    read as authoritative — would republish a materially incorrect risk map. If the authoritative
+    layer is missing, the caller emits the honest absent-state instead (run
+    pipeline/pull_nso_ses_income.py to restore it)."""
+    auth = _load(AUTH_INCOME_FILE)
+    if auth is None:
+        return None, None
+    am = auth.get("meta", {})
+    iprov = {p: v for p, v in auth.get("provinces", {}).items() if v is not None}
+    citation = {
+        "source": "NSO SES 2566 average monthly household income — AUTHORITATIVE, from NSO's own "
+                  "CKAN (%s)." % am.get("source", "catalogapi.nso.go.th"),
+        "provenance": "income = MEASURED NSO SES 2566 (2023 CE), CKAN package %s / resource %s, "
+                      "reconstructed to the province level (household-weighted mean of each "
+                      "socioeconomic leaf's total monthly income, weighted by the leaf's "
+                      "household count; national mean reproduces NSO's published headline %s "
+                      "THB/month). See pipeline/pull_nso_ses_income.py."
+                      % (am.get("package", "0705_08_0007"),
+                         am.get("resource", "SFD_SPB0802_66"),
+                         am.get("national_avg_monthly_income", "29030")),
+    }
+    return iprov, citation
+
+
 def build():
     dprov, debt_cite = _load_debt()
-    income = _load(INCOME_FILE)
+    iprov, income_cite = _load_income()
 
     # --- graceful degrade: a missing source still ships a clear absent-state ---
-    if dprov is None or income is None:
-        missing = [n for n, d in ((AUTH_DEBT_FILE, dprov), (INCOME_FILE, income)) if d is None]
+    if dprov is None or iprov is None:
+        missing = [n for n, d in ((AUTH_DEBT_FILE, dprov), (AUTH_INCOME_FILE, iprov)) if d is None]
         meta = {
             "title": "Per-province household debt-to-income risk (portfolio risk, objective #1)",
             "generated_by": "pipeline/build_household_risk.py",
@@ -131,14 +165,13 @@ def build():
             "network_free": True,
             "absent": True,
             "absent_reason": "missing source file(s): %s" % ", ".join(missing),
-            "source": "NSO SES 2566 via the TMLI bridge (ingest_tmli.py) — NOT FOUND",
-            "provenance": "ABSENT — run pipeline/ingest_tmli.py to land the MEASURED NSO SES "
+            "source": "NSO SES 2566 authoritative CKAN layers — NOT FOUND",
+            "provenance": "ABSENT — run pipeline/pull_nso_ses_debt.py and "
+                          "pipeline/pull_nso_ses_income.py to land the MEASURED NSO SES "
                           "household debt/income layers, then re-run this builder.",
             "n_provinces": 0,
         }
         return {"meta": meta, "provinces": []}
-
-    iprov = income.get("provinces", {})
 
     # only provinces present in BOTH MEASURED layers (clean join; both already 77-canonical)
     common = sorted(set(dprov.keys()) & set(iprov.keys()))
@@ -146,9 +179,8 @@ def build():
     rows = []
     for prov in common:
         d = dprov[prov]
-        i = iprov[prov]
         debt_thb = d.get("debt_per_household")
-        monthly = i.get("avg_monthly_income")
+        monthly = iprov[prov]
         if debt_thb is None or monthly is None:
             continue
         annual = float(monthly) * MONTHS
@@ -187,15 +219,15 @@ def build():
         "absent": False,
         "n_provinces": len(rows),
         "sort": "worst-first by debt_to_income (desc)",
-        "source": debt_cite["source"],
-        "provenance": debt_cite["provenance"],
-        "debt_source": debt_cite["which"],  # 'authoritative' (NSO CKAN) or 'vendored-fallback'
+        "source": debt_cite["source"] + " " + income_cite["source"],
+        "provenance": debt_cite["provenance"] + " " + income_cite["provenance"],
+        "debt_source": debt_cite["which"],  # 'authoritative' (NSO CKAN)
+        "income_source": "authoritative",   # NSO CKAN (SFD_SPB0802_66)
         "fields": {
             "debt": "MEASURED · NSO SES 2566 (authoritative NSO CKAN, SFD_SPB0806) — average "
                     "household debt, THB, all households.",
-            "income": "MEASURED · NSO SES — average ANNUAL household income, THB "
-                      "(avg_monthly_income * 12). Still vendored (TMLI), pending its own CKAN "
-                      "verification.",
+            "income": "MEASURED · NSO SES 2566 (authoritative NSO CKAN, SFD_SPB0802_66) — average "
+                      "ANNUAL household income, THB (household-weighted monthly income * 12).",
             "debt_to_income": "MEASURED ratio — debt / income (household debt as a multiple of "
                               "annual income). None when income is non-positive.",
             "stress_index": "ESTIMATED — 0..100 PERCENTILE RANK of debt_to_income across the "
@@ -214,8 +246,9 @@ def build():
             "household balance-sheet pressure, not realized portfolio default.",
             "stress_index is a relative rank across the 77 provinces — it shifts if the province "
             "set changes; it is a triage ordering, not an absolute risk level.",
-            "debt is now the authoritative NSO CKAN figure (2026-09-12 fix); income is still the "
-            "vendored NSO SES layer, not yet re-verified against its own CKAN table.",
+            "both debt and income are now the authoritative NSO CKAN figures (debt fix "
+            "2026-09-12; income fix 2026-09-12, SFD_SPB0802_66). The prior income denominator was "
+            "an unweighted mean across five occupation rows, which re-ranked 67/77 provinces.",
         ],
     }
 

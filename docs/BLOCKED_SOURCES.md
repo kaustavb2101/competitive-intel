@@ -90,11 +90,24 @@ and `SFD_SPB0807` (indebted-only). That is exactly the documented trigger, so it
   authoritative 62,884; Bangkok 88,856 vs 161,050), and the two vendored files did not agree with each
   other either. So the shipped household-DTI risk ranking was materially wrong (75/77 provinces
   changed rank; the most-stressed province flipped from Khon Kaen to Amnat Charoen; Phuket rose #67→#5).
-- **Income is NOT yet fixed** — `household_income_by_province.json` is still the vendored NSO SES
-  layer. The DTI numerator is now authoritative; the denominator still needs its own CKAN
-  verification. **Next recheck / follow-up:** find the matching per-province SES-2566 *income* table
-  on `catalog.nso.go.th` (sibling `SFD_*`/`SES_*` resource under an income package) and give it the
-  same puller-plus-parity-check treatment, then rewire the income side of `build_household_risk.py`.
+- **Income is now fixed too (2026-09-12).** The DTI denominator no longer uses the vendored
+  `household_income_by_province.json` — whose `avg_monthly_income` was not a household income at all
+  but an UNWEIGHTED mean across five occupation rows. `pipeline/pull_nso_ses_income.py` pulls the
+  authoritative per-province average monthly household income from NSO's own CKAN (package
+  `0705_08_0007`, table `SFD_SPB0802_66`, the income sibling of the debt package), reconstructs the
+  province average by the SAME household-weighted method as the debt puller (weighting each
+  socioeconomic leaf's total monthly income by that leaf's household count from `SFD_SPB0806`), and
+  commits `source-data/nso_ses_income_2566.json`. Its built-in correctness proof: the national
+  household-weighted mean it reconstructs is **29,030 THB/month, exactly NSO's published SES-2566
+  national headline**; the puller refuses to write if that drifts. `build_household_risk.py` now
+  consumes it (no vendored fallback, same discipline as the debt side). The correction re-ranked
+  **67 of 77 provinces** on DTI and flipped the most-stressed province (Amnat Charoen → Surin);
+  e.g. Sisaket's income was overstated 1.29x by the occupation mean (25,597 vs the authoritative
+  19,858), hiding a DTI that is actually ~1.0. The vendored income file is retained only for the
+  occupation-level income breakdowns that still legitimately read it (agri/factory/SME/occupation
+  income builders). **Residual follow-up (lower priority):** the province-card `avg_monthly_income`
+  surfaced by `build_province.py` / `build_regions.py` / `province.html` still shows the vendored
+  occupation mean, not the authoritative household-weighted figure — a separate, larger rewire.
 
 ## Re-verify in one paste
 
