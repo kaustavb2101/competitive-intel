@@ -7,11 +7,12 @@
     "absent": false,
     "n_provinces": 77,
     "sort": "worst-first by debt_to_income (desc)",
-    "source": "NSO SES 2566 (household debt + income), via data.go.th / TMLI bridge (pipeline/ingest_tmli.py).",
-    "provenance": "MEASURED inputs. debt = debt_per_household and income = avg_monthly_income*12, both from NSO SES 2566 (2023 CE) via the vendored TMLI layers (kaustavb2101/watcher). See source-data/tmli/PROVENANCE.md.",
+    "source": "NSO SES 2566 household debt — AUTHORITATIVE, from NSO's own CKAN (NSO (สำนักงานสถิติแห่งชาติ), กองสถิติสังคม — CKAN package 0705_08_0009, resource SFD_SPB0806 (89cc71ae-f596-4307-b38f-10d61d084801).); income from the NSO SES vendored layer (pending its own CKAN verification).",
+    "provenance": "debt = MEASURED NSO SES 2566 (2023 CE), CKAN package 0705_08_0009 / resource SFD_SPB0806, reconstructed to the province level (household-weighted mean over socioeconomic strata; national mean reproduces NSO's published headline 197255 THB). See pipeline/pull_nso_ses_debt.py. income = avg_monthly_income*12 from the vendored NSO SES layer (source-data/household_income_by_province.json), still to be verified against its own CKAN table.",
+    "debt_source": "authoritative",
     "fields": {
-      "debt": "MEASURED · NSO SES — average household debt, THB.",
-      "income": "MEASURED · NSO SES — average ANNUAL household income, THB (avg_monthly_income * 12).",
+      "debt": "MEASURED · NSO SES 2566 (authoritative NSO CKAN, SFD_SPB0806) — average household debt, THB, all households.",
+      "income": "MEASURED · NSO SES — average ANNUAL household income, THB (avg_monthly_income * 12). Still vendored (TMLI), pending its own CKAN verification.",
       "debt_to_income": "MEASURED ratio — debt / income (household debt as a multiple of annual income). None when income is non-positive.",
       "stress_index": "ESTIMATED — 0..100 PERCENTILE RANK of debt_to_income across the provinces (mid-rank for ties). A relative triage score, NOT a measured default rate. None when debt_to_income is None."
     },
@@ -23,201 +24,178 @@
     "measured_vs_estimated": "debt + income + debt_to_income are MEASURED (NSO SES). stress_index is an ESTIMATED percentile rank (relative ordering).",
     "caveats": [
       "NSO SES debt/income are province AVERAGES, not the AutoX borrower book; they read household balance-sheet pressure, not realized portfolio default.",
-      "stress_index is a relative rank across the 77 provinces — it shifts if the province set changes; it is a triage ordering, not an absolute risk level."
+      "stress_index is a relative rank across the 77 provinces — it shifts if the province set changes; it is a triage ordering, not an absolute risk level.",
+      "debt is now the authoritative NSO CKAN figure (2026-09-12 fix); income is still the vendored NSO SES layer, not yet re-verified against its own CKAN table."
     ]
   },
   "provinces": [
     {
-      "province": "ขอนแก่น",
+      "province": "อำนาจเจริญ",
       "region": "Isan",
-      "debt": 280791,
-      "income": 244692,
-      "debt_to_income": 1.15,
+      "debt": 337610,
+      "income": 324756,
+      "debt_to_income": 1.04,
       "stress_index": 99.35
     },
     {
-      "province": "อำนาจเจริญ",
+      "province": "มุกดาหาร",
       "region": "Isan",
-      "debt": 369739,
-      "income": 324756,
-      "debt_to_income": 1.14,
+      "debt": 285175,
+      "income": 277980,
+      "debt_to_income": 1.03,
       "stress_index": 98.05
-    },
-    {
-      "province": "อุดรธานี",
-      "region": "Isan",
-      "debt": 289031,
-      "income": 275328,
-      "debt_to_income": 1.05,
-      "stress_index": 96.75
-    },
-    {
-      "province": "อุบลราชธานี",
-      "region": "Isan",
-      "debt": 268498,
-      "income": 269064,
-      "debt_to_income": 1.0,
-      "stress_index": 95.45
-    },
-    {
-      "province": "มหาสารคาม",
-      "region": "Isan",
-      "debt": 285706,
-      "income": 289896,
-      "debt_to_income": 0.99,
-      "stress_index": 93.51
-    },
-    {
-      "province": "หนองบัวลำภู",
-      "region": "Isan",
-      "debt": 310867,
-      "income": 312816,
-      "debt_to_income": 0.99,
-      "stress_index": 93.51
-    },
-    {
-      "province": "กาฬสินธุ์",
-      "region": "Isan",
-      "debt": 276654,
-      "income": 284148,
-      "debt_to_income": 0.97,
-      "stress_index": 91.56
-    },
-    {
-      "province": "ยโสธร",
-      "region": "Isan",
-      "debt": 314516,
-      "income": 326568,
-      "debt_to_income": 0.96,
-      "stress_index": 89.61
-    },
-    {
-      "province": "ร้อยเอ็ด",
-      "region": "Isan",
-      "debt": 293244,
-      "income": 306360,
-      "debt_to_income": 0.96,
-      "stress_index": 89.61
-    },
-    {
-      "province": "ศรีสะเกษ",
-      "region": "Isan",
-      "debt": 281430,
-      "income": 307164,
-      "debt_to_income": 0.92,
-      "stress_index": 87.66
-    },
-    {
-      "province": "นครพนม",
-      "region": "Isan",
-      "debt": 247476,
-      "income": 272796,
-      "debt_to_income": 0.91,
-      "stress_index": 85.71
-    },
-    {
-      "province": "นครราชสีมา",
-      "region": "Isan",
-      "debt": 322819,
-      "income": 354480,
-      "debt_to_income": 0.91,
-      "stress_index": 85.71
-    },
-    {
-      "province": "เชียงราย",
-      "region": "North",
-      "debt": 193540,
-      "income": 214308,
-      "debt_to_income": 0.9,
-      "stress_index": 83.77
-    },
-    {
-      "province": "สกลนคร",
-      "region": "Isan",
-      "debt": 246684,
-      "income": 276684,
-      "debt_to_income": 0.89,
-      "stress_index": 82.47
-    },
-    {
-      "province": "สงขลา",
-      "region": "South",
-      "debt": 253523,
-      "income": 292704,
-      "debt_to_income": 0.87,
-      "stress_index": 79.22
-    },
-    {
-      "province": "อุตรดิตถ์",
-      "region": "North",
-      "debt": 268683,
-      "income": 308052,
-      "debt_to_income": 0.87,
-      "stress_index": 79.22
-    },
-    {
-      "province": "อุทัยธานี",
-      "region": "North",
-      "debt": 226261,
-      "income": 258672,
-      "debt_to_income": 0.87,
-      "stress_index": 79.22
-    },
-    {
-      "province": "เลย",
-      "region": "Isan",
-      "debt": 281620,
-      "income": 323628,
-      "debt_to_income": 0.87,
-      "stress_index": 79.22
     },
     {
       "province": "สุรินทร์",
       "region": "Isan",
-      "debt": 248843,
+      "debt": 290151,
       "income": 295896,
-      "debt_to_income": 0.84,
-      "stress_index": 75.97
+      "debt_to_income": 0.98,
+      "stress_index": 96.75
     },
     {
-      "province": "กำแพงเพชร",
+      "province": "กระบี่",
+      "region": "South",
+      "debt": 314718,
+      "income": 324288,
+      "debt_to_income": 0.97,
+      "stress_index": 95.45
+    },
+    {
+      "province": "ภูเก็ต",
+      "region": "South",
+      "debt": 424978,
+      "income": 444804,
+      "debt_to_income": 0.96,
+      "stress_index": 94.16
+    },
+    {
+      "province": "เพชรบูรณ์",
       "region": "North",
-      "debt": 247710,
-      "income": 297276,
+      "debt": 309224,
+      "income": 335472,
+      "debt_to_income": 0.92,
+      "stress_index": 92.86
+    },
+    {
+      "province": "พิจิตร",
+      "region": "North",
+      "debt": 254948,
+      "income": 283656,
+      "debt_to_income": 0.9,
+      "stress_index": 91.56
+    },
+    {
+      "province": "อุตรดิตถ์",
+      "region": "North",
+      "debt": 268684,
+      "income": 308052,
+      "debt_to_income": 0.87,
+      "stress_index": 89.61
+    },
+    {
+      "province": "แพร่",
+      "region": "North",
+      "debt": 244067,
+      "income": 279372,
+      "debt_to_income": 0.87,
+      "stress_index": 89.61
+    },
+    {
+      "province": "นครราชสีมา",
+      "region": "Isan",
+      "debt": 303258,
+      "income": 354480,
+      "debt_to_income": 0.86,
+      "stress_index": 87.66
+    },
+    {
+      "province": "พิษณุโลก",
+      "region": "North",
+      "debt": 258481,
+      "income": 304584,
+      "debt_to_income": 0.85,
+      "stress_index": 86.36
+    },
+    {
+      "province": "ราชบุรี",
+      "region": "Central&BKK",
+      "debt": 314966,
+      "income": 381012,
       "debt_to_income": 0.83,
-      "stress_index": 74.68
+      "stress_index": 84.42
     },
     {
-      "province": "พะเยา",
-      "region": "North",
-      "debt": 184252,
-      "income": 231588,
-      "debt_to_income": 0.8,
-      "stress_index": 72.73
+      "province": "หนองบัวลำภู",
+      "region": "Isan",
+      "debt": 260061,
+      "income": 312816,
+      "debt_to_income": 0.83,
+      "stress_index": 84.42
     },
     {
-      "province": "ลำปาง",
-      "region": "North",
-      "debt": 238044,
-      "income": 296400,
+      "province": "พัทลุง",
+      "region": "South",
+      "debt": 254471,
+      "income": 311520,
+      "debt_to_income": 0.82,
+      "stress_index": 82.47
+    },
+    {
+      "province": "สกลนคร",
+      "region": "Isan",
+      "debt": 221537,
+      "income": 276684,
       "debt_to_income": 0.8,
-      "stress_index": 72.73
+      "stress_index": 80.52
+    },
+    {
+      "province": "เลย",
+      "region": "Isan",
+      "debt": 257886,
+      "income": 323628,
+      "debt_to_income": 0.8,
+      "stress_index": 80.52
+    },
+    {
+      "province": "นนทบุรี",
+      "region": "Central&BKK",
+      "debt": 267543,
+      "income": 339876,
+      "debt_to_income": 0.79,
+      "stress_index": 78.57
+    },
+    {
+      "province": "ศรีสะเกษ",
+      "region": "Isan",
+      "debt": 238414,
+      "income": 307164,
+      "debt_to_income": 0.78,
+      "stress_index": 76.62
+    },
+    {
+      "province": "สงขลา",
+      "region": "South",
+      "debt": 227079,
+      "income": 292704,
+      "debt_to_income": 0.78,
+      "stress_index": 76.62
+    },
+    {
+      "province": "ปทุมธานี",
+      "region": "Central&BKK",
+      "debt": 362493,
+      "income": 473940,
+      "debt_to_income": 0.76,
+      "stress_index": 74.03
     },
     {
       "province": "สุโขทัย",
       "region": "North",
-      "debt": 248399,
+      "debt": 243901,
       "income": 322260,
-      "debt_to_income": 0.77,
-      "stress_index": 70.78
-    },
-    {
-      "province": "บุรีรัมย์",
-      "region": "Isan",
-      "debt": 216500,
-      "income": 286380,
       "debt_to_income": 0.76,
-      "stress_index": 69.48
+      "stress_index": 74.03
     },
     {
       "province": "ชัยนาท",
@@ -225,231 +203,167 @@
       "debt": 246575,
       "income": 328668,
       "debt_to_income": 0.75,
-      "stress_index": 66.88
+      "stress_index": 71.43
     },
     {
-      "province": "ตราด",
-      "region": "East",
-      "debt": 248163,
-      "income": 329616,
+      "province": "อุบลราชธานี",
+      "region": "Isan",
+      "debt": 202805,
+      "income": 269064,
       "debt_to_income": 0.75,
-      "stress_index": 66.88
+      "stress_index": 71.43
     },
     {
-      "province": "มุกดาหาร",
+      "province": "นครพนม",
       "region": "Isan",
-      "debt": 207694,
-      "income": 277980,
-      "debt_to_income": 0.75,
-      "stress_index": 66.88
-    },
-    {
-      "province": "ชัยภูมิ",
-      "region": "Isan",
-      "debt": 234837,
-      "income": 317556,
-      "debt_to_income": 0.74,
-      "stress_index": 62.99
-    },
-    {
-      "province": "นราธิวาส",
-      "region": "South",
-      "debt": 161015,
-      "income": 216720,
-      "debt_to_income": 0.74,
-      "stress_index": 62.99
-    },
-    {
-      "province": "สตูล",
-      "region": "South",
-      "debt": 207773,
-      "income": 279180,
-      "debt_to_income": 0.74,
-      "stress_index": 62.99
-    },
-    {
-      "province": "หนองคาย",
-      "region": "Isan",
-      "debt": 233625,
-      "income": 324816,
-      "debt_to_income": 0.72,
-      "stress_index": 60.39
-    },
-    {
-      "province": "พิจิตร",
-      "region": "North",
-      "debt": 201817,
-      "income": 283656,
+      "debt": 193930,
+      "income": 272796,
       "debt_to_income": 0.71,
-      "stress_index": 59.09
-    },
-    {
-      "province": "กระบี่",
-      "region": "South",
-      "debt": 226547,
-      "income": 324288,
-      "debt_to_income": 0.7,
-      "stress_index": 57.14
-    },
-    {
-      "province": "ปัตตานี",
-      "region": "South",
-      "debt": 167014,
-      "income": 240252,
-      "debt_to_income": 0.7,
-      "stress_index": 57.14
+      "stress_index": 68.83
     },
     {
       "province": "น่าน",
       "region": "North",
-      "debt": 181434,
+      "debt": 186395,
       "income": 263208,
-      "debt_to_income": 0.69,
-      "stress_index": 54.55
-    },
-    {
-      "province": "ระยอง",
-      "region": "East",
-      "debt": 269028,
-      "income": 392280,
-      "debt_to_income": 0.69,
-      "stress_index": 54.55
-    },
-    {
-      "province": "นครสวรรค์",
-      "region": "North",
-      "debt": 198261,
-      "income": 289980,
-      "debt_to_income": 0.68,
-      "stress_index": 52.6
-    },
-    {
-      "province": "แพร่",
-      "region": "North",
-      "debt": 188038,
-      "income": 279372,
-      "debt_to_income": 0.67,
-      "stress_index": 51.3
+      "debt_to_income": 0.71,
+      "stress_index": 68.83
     },
     {
       "province": "ชลบุรี",
       "region": "East",
-      "debt": 282402,
+      "debt": 282403,
       "income": 430356,
       "debt_to_income": 0.66,
-      "stress_index": 48.05
+      "stress_index": 65.58
     },
     {
-      "province": "ชุมพร",
+      "province": "นครศรีธรรมราช",
       "region": "South",
-      "debt": 242083,
-      "income": 368220,
+      "debt": 268957,
+      "income": 408960,
       "debt_to_income": 0.66,
-      "stress_index": 48.05
+      "stress_index": 65.58
     },
     {
-      "province": "พิษณุโลก",
+      "province": "อุทัยธานี",
       "region": "North",
-      "debt": 199561,
-      "income": 304584,
+      "debt": 171056,
+      "income": 258672,
       "debt_to_income": 0.66,
-      "stress_index": 48.05
+      "stress_index": 65.58
     },
     {
-      "province": "สุพรรณบุรี",
-      "region": "Central&BKK",
-      "debt": 191020,
-      "income": 287388,
-      "debt_to_income": 0.66,
-      "stress_index": 48.05
-    },
-    {
-      "province": "เพชรบูรณ์",
-      "region": "North",
-      "debt": 218063,
-      "income": 335472,
-      "debt_to_income": 0.65,
-      "stress_index": 44.81
-    },
-    {
-      "province": "ประจวบคีรีขันธ์",
-      "region": "Central&BKK",
-      "debt": 188786,
-      "income": 297288,
+      "province": "ชัยภูมิ",
+      "region": "Isan",
+      "debt": 203221,
+      "income": 317556,
       "debt_to_income": 0.64,
-      "stress_index": 42.86
+      "stress_index": 61.69
     },
     {
       "province": "ลำพูน",
       "region": "North",
-      "debt": 217019,
+      "debt": 217443,
       "income": 338160,
       "debt_to_income": 0.64,
-      "stress_index": 42.86
+      "stress_index": 61.69
     },
     {
-      "province": "พัทลุง",
-      "region": "South",
-      "debt": 195011,
-      "income": 311520,
-      "debt_to_income": 0.63,
-      "stress_index": 40.91
-    },
-    {
-      "province": "สระแก้ว",
-      "region": "East",
-      "debt": 169673,
-      "income": 275388,
-      "debt_to_income": 0.62,
-      "stress_index": 39.61
-    },
-    {
-      "province": "ลพบุรี",
-      "region": "Central&BKK",
-      "debt": 187476,
-      "income": 312864,
-      "debt_to_income": 0.6,
-      "stress_index": 38.31
-    },
-    {
-      "province": "ตาก",
+      "province": "แม่ฮ่องสอน",
       "region": "North",
-      "debt": 162027,
-      "income": 272400,
-      "debt_to_income": 0.59,
-      "stress_index": 35.71
-    },
-    {
-      "province": "นครนายก",
-      "region": "Central&BKK",
-      "debt": 176869,
-      "income": 301428,
-      "debt_to_income": 0.59,
-      "stress_index": 35.71
+      "debt": 170823,
+      "income": 267672,
+      "debt_to_income": 0.64,
+      "stress_index": 61.69
     },
     {
       "province": "สุราษฎร์ธานี",
       "region": "South",
-      "debt": 210855,
+      "debt": 225020,
       "income": 357528,
-      "debt_to_income": 0.59,
-      "stress_index": 35.71
+      "debt_to_income": 0.63,
+      "stress_index": 59.09
     },
     {
-      "province": "เชียงใหม่",
-      "region": "North",
-      "debt": 215821,
-      "income": 374256,
-      "debt_to_income": 0.58,
-      "stress_index": 33.12
+      "province": "บุรีรัมย์",
+      "region": "Isan",
+      "debt": 177744,
+      "income": 286380,
+      "debt_to_income": 0.62,
+      "stress_index": 57.79
+    },
+    {
+      "province": "สระบุรี",
+      "region": "Central&BKK",
+      "debt": 254307,
+      "income": 414276,
+      "debt_to_income": 0.61,
+      "stress_index": 55.84
+    },
+    {
+      "province": "สระแก้ว",
+      "region": "East",
+      "debt": 167713,
+      "income": 275388,
+      "debt_to_income": 0.61,
+      "stress_index": 55.84
     },
     {
       "province": "ตรัง",
       "region": "South",
-      "debt": 188551,
+      "debt": 198008,
       "income": 328548,
+      "debt_to_income": 0.6,
+      "stress_index": 52.6
+    },
+    {
+      "province": "สตูล",
+      "region": "South",
+      "debt": 166941,
+      "income": 279180,
+      "debt_to_income": 0.6,
+      "stress_index": 52.6
+    },
+    {
+      "province": "หนองคาย",
+      "region": "Isan",
+      "debt": 193442,
+      "income": 324816,
+      "debt_to_income": 0.6,
+      "stress_index": 52.6
+    },
+    {
+      "province": "สมุทรปราการ",
+      "region": "Central&BKK",
+      "debt": 211962,
+      "income": 357468,
+      "debt_to_income": 0.59,
+      "stress_index": 50.0
+    },
+    {
+      "province": "กาญจนบุรี",
+      "region": "Central&BKK",
+      "debt": 183408,
+      "income": 314856,
+      "debt_to_income": 0.58,
+      "stress_index": 48.05
+    },
+    {
+      "province": "กาฬสินธุ์",
+      "region": "Isan",
+      "debt": 164052,
+      "income": 284148,
+      "debt_to_income": 0.58,
+      "stress_index": 48.05
+    },
+    {
+      "province": "กำแพงเพชร",
+      "region": "North",
+      "debt": 168275,
+      "income": 297276,
       "debt_to_income": 0.57,
-      "stress_index": 30.52
+      "stress_index": 45.45
     },
     {
       "province": "บึงกาฬ",
@@ -457,190 +371,278 @@
       "debt": 189021,
       "income": 331776,
       "debt_to_income": 0.57,
-      "stress_index": 30.52
-    },
-    {
-      "province": "ราชบุรี",
-      "region": "Central&BKK",
-      "debt": 217625,
-      "income": 381012,
-      "debt_to_income": 0.57,
-      "stress_index": 30.52
-    },
-    {
-      "province": "ปราจีนบุรี",
-      "region": "East",
-      "debt": 161050,
-      "income": 288924,
-      "debt_to_income": 0.56,
-      "stress_index": 27.92
-    },
-    {
-      "province": "ยะลา",
-      "region": "South",
-      "debt": 175213,
-      "income": 319164,
-      "debt_to_income": 0.55,
-      "stress_index": 26.62
-    },
-    {
-      "province": "กาญจนบุรี",
-      "region": "Central&BKK",
-      "debt": 166875,
-      "income": 314856,
-      "debt_to_income": 0.53,
-      "stress_index": 24.68
-    },
-    {
-      "province": "พังงา",
-      "region": "South",
-      "debt": 156498,
-      "income": 293340,
-      "debt_to_income": 0.53,
-      "stress_index": 24.68
-    },
-    {
-      "province": "ระนอง",
-      "region": "South",
-      "debt": 155028,
-      "income": 318636,
-      "debt_to_income": 0.49,
-      "stress_index": 21.43
-    },
-    {
-      "province": "สระบุรี",
-      "region": "Central&BKK",
-      "debt": 203462,
-      "income": 414276,
-      "debt_to_income": 0.49,
-      "stress_index": 21.43
-    },
-    {
-      "province": "แม่ฮ่องสอน",
-      "region": "North",
-      "debt": 131705,
-      "income": 267672,
-      "debt_to_income": 0.49,
-      "stress_index": 21.43
-    },
-    {
-      "province": "นครศรีธรรมราช",
-      "region": "South",
-      "debt": 197765,
-      "income": 408960,
-      "debt_to_income": 0.48,
-      "stress_index": 18.83
-    },
-    {
-      "province": "นครปฐม",
-      "region": "Central&BKK",
-      "debt": 185534,
-      "income": 394380,
-      "debt_to_income": 0.47,
-      "stress_index": 16.23
-    },
-    {
-      "province": "พระนครศรีอยุธยา",
-      "region": "Central&BKK",
-      "debt": 199073,
-      "income": 421656,
-      "debt_to_income": 0.47,
-      "stress_index": 16.23
-    },
-    {
-      "province": "สิงห์บุรี",
-      "region": "Central&BKK",
-      "debt": 170810,
-      "income": 362748,
-      "debt_to_income": 0.47,
-      "stress_index": 16.23
-    },
-    {
-      "province": "ภูเก็ต",
-      "region": "South",
-      "debt": 199498,
-      "income": 444804,
-      "debt_to_income": 0.45,
-      "stress_index": 13.64
-    },
-    {
-      "province": "ปทุมธานี",
-      "region": "Central&BKK",
-      "debt": 193100,
-      "income": 473940,
-      "debt_to_income": 0.41,
-      "stress_index": 11.69
+      "stress_index": 45.45
     },
     {
       "province": "เพชรบุรี",
       "region": "Central&BKK",
-      "debt": 138782,
+      "debt": 190745,
       "income": 339924,
-      "debt_to_income": 0.41,
-      "stress_index": 11.69
+      "debt_to_income": 0.56,
+      "stress_index": 43.51
     },
     {
-      "province": "อ่างทอง",
+      "province": "พระนครศรีอยุธยา",
       "region": "Central&BKK",
-      "debt": 128630,
-      "income": 328608,
-      "debt_to_income": 0.39,
-      "stress_index": 9.74
+      "debt": 231845,
+      "income": 421656,
+      "debt_to_income": 0.55,
+      "stress_index": 42.21
     },
     {
-      "province": "สมุทรปราการ",
-      "region": "Central&BKK",
-      "debt": 137015,
-      "income": 357468,
-      "debt_to_income": 0.38,
-      "stress_index": 8.44
+      "province": "นครสวรรค์",
+      "region": "North",
+      "debt": 152664,
+      "income": 289980,
+      "debt_to_income": 0.53,
+      "stress_index": 38.31
+    },
+    {
+      "province": "ปราจีนบุรี",
+      "region": "East",
+      "debt": 151926,
+      "income": 288924,
+      "debt_to_income": 0.53,
+      "stress_index": 38.31
+    },
+    {
+      "province": "พะเยา",
+      "region": "North",
+      "debt": 123865,
+      "income": 231588,
+      "debt_to_income": 0.53,
+      "stress_index": 38.31
+    },
+    {
+      "province": "มหาสารคาม",
+      "region": "Isan",
+      "debt": 154313,
+      "income": 289896,
+      "debt_to_income": 0.53,
+      "stress_index": 38.31
+    },
+    {
+      "province": "ร้อยเอ็ด",
+      "region": "Isan",
+      "debt": 161511,
+      "income": 306360,
+      "debt_to_income": 0.53,
+      "stress_index": 38.31
+    },
+    {
+      "province": "ยโสธร",
+      "region": "Isan",
+      "debt": 167340,
+      "income": 326568,
+      "debt_to_income": 0.51,
+      "stress_index": 34.42
+    },
+    {
+      "province": "ตราด",
+      "region": "East",
+      "debt": 165967,
+      "income": 329616,
+      "debt_to_income": 0.5,
+      "stress_index": 32.47
+    },
+    {
+      "province": "ปัตตานี",
+      "region": "South",
+      "debt": 120446,
+      "income": 240252,
+      "debt_to_income": 0.5,
+      "stress_index": 32.47
     },
     {
       "province": "จันทบุรี",
       "region": "East",
-      "debt": 191578,
+      "debt": 248279,
       "income": 519876,
-      "debt_to_income": 0.37,
-      "stress_index": 7.14
+      "debt_to_income": 0.48,
+      "stress_index": 29.87
     },
     {
-      "province": "สมุทรสงคราม",
-      "region": "Central&BKK",
-      "debt": 115680,
-      "income": 328452,
-      "debt_to_income": 0.35,
-      "stress_index": 5.84
+      "province": "ตาก",
+      "region": "North",
+      "debt": 131753,
+      "income": 272400,
+      "debt_to_income": 0.48,
+      "stress_index": 29.87
     },
     {
-      "province": "นนทบุรี",
-      "region": "Central&BKK",
-      "debt": 113566,
-      "income": 339876,
-      "debt_to_income": 0.33,
-      "stress_index": 3.9
+      "province": "ระยอง",
+      "region": "East",
+      "debt": 183633,
+      "income": 392280,
+      "debt_to_income": 0.47,
+      "stress_index": 27.92
     },
     {
-      "province": "สมุทรสาคร",
+      "province": "ระนอง",
+      "region": "South",
+      "debt": 146795,
+      "income": 318636,
+      "debt_to_income": 0.46,
+      "stress_index": 26.62
+    },
+    {
+      "province": "ประจวบคีรีขันธ์",
       "region": "Central&BKK",
-      "debt": 118060,
-      "income": 362952,
-      "debt_to_income": 0.33,
-      "stress_index": 3.9
+      "debt": 132585,
+      "income": 297288,
+      "debt_to_income": 0.45,
+      "stress_index": 24.68
+    },
+    {
+      "province": "ลำปาง",
+      "region": "North",
+      "debt": 132738,
+      "income": 296400,
+      "debt_to_income": 0.45,
+      "stress_index": 24.68
+    },
+    {
+      "province": "นครนายก",
+      "region": "Central&BKK",
+      "debt": 133831,
+      "income": 301428,
+      "debt_to_income": 0.44,
+      "stress_index": 22.08
+    },
+    {
+      "province": "อ่างทอง",
+      "region": "Central&BKK",
+      "debt": 144233,
+      "income": 328608,
+      "debt_to_income": 0.44,
+      "stress_index": 22.08
+    },
+    {
+      "province": "นครปฐม",
+      "region": "Central&BKK",
+      "debt": 168026,
+      "income": 394380,
+      "debt_to_income": 0.43,
+      "stress_index": 19.48
+    },
+    {
+      "province": "ลพบุรี",
+      "region": "Central&BKK",
+      "debt": 135397,
+      "income": 312864,
+      "debt_to_income": 0.43,
+      "stress_index": 19.48
+    },
+    {
+      "province": "พังงา",
+      "region": "South",
+      "debt": 121817,
+      "income": 293340,
+      "debt_to_income": 0.42,
+      "stress_index": 16.88
+    },
+    {
+      "province": "ยะลา",
+      "region": "South",
+      "debt": 133722,
+      "income": 319164,
+      "debt_to_income": 0.42,
+      "stress_index": 16.88
+    },
+    {
+      "province": "สิงห์บุรี",
+      "region": "Central&BKK",
+      "debt": 150159,
+      "income": 362748,
+      "debt_to_income": 0.41,
+      "stress_index": 14.94
     },
     {
       "province": "กรุงเทพมหานคร",
       "region": "Central&BKK",
-      "debt": 88856,
+      "debt": 161050,
       "income": 404904,
-      "debt_to_income": 0.22,
-      "stress_index": 1.95
+      "debt_to_income": 0.4,
+      "stress_index": 13.64
+    },
+    {
+      "province": "อุดรธานี",
+      "region": "Isan",
+      "debt": 105265,
+      "income": 275328,
+      "debt_to_income": 0.38,
+      "stress_index": 11.69
+    },
+    {
+      "province": "เชียงใหม่",
+      "region": "North",
+      "debt": 144064,
+      "income": 374256,
+      "debt_to_income": 0.38,
+      "stress_index": 11.69
+    },
+    {
+      "province": "ชุมพร",
+      "region": "South",
+      "debt": 135501,
+      "income": 368220,
+      "debt_to_income": 0.37,
+      "stress_index": 9.74
+    },
+    {
+      "province": "สมุทรสงคราม",
+      "region": "Central&BKK",
+      "debt": 111051,
+      "income": 328452,
+      "debt_to_income": 0.34,
+      "stress_index": 8.44
+    },
+    {
+      "province": "นราธิวาส",
+      "region": "South",
+      "debt": 68281,
+      "income": 216720,
+      "debt_to_income": 0.32,
+      "stress_index": 7.14
+    },
+    {
+      "province": "เชียงราย",
+      "region": "North",
+      "debt": 60071,
+      "income": 214308,
+      "debt_to_income": 0.28,
+      "stress_index": 5.84
+    },
+    {
+      "province": "ขอนแก่น",
+      "region": "Isan",
+      "debt": 62884,
+      "income": 244692,
+      "debt_to_income": 0.26,
+      "stress_index": 4.55
+    },
+    {
+      "province": "สมุทรสาคร",
+      "region": "Central&BKK",
+      "debt": 82663,
+      "income": 362952,
+      "debt_to_income": 0.23,
+      "stress_index": 3.25
     },
     {
       "province": "ฉะเชิงเทรา",
       "region": "East",
-      "debt": 73913,
+      "debt": 78872,
       "income": 384180,
-      "debt_to_income": 0.19,
+      "debt_to_income": 0.21,
+      "stress_index": 1.95
+    },
+    {
+      "province": "สุพรรณบุรี",
+      "region": "Central&BKK",
+      "debt": 48152,
+      "income": 287388,
+      "debt_to_income": 0.17,
       "stress_index": 0.65
     }
   ]

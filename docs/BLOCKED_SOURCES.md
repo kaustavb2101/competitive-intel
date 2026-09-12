@@ -66,18 +66,35 @@ NSO note directly below), and the department CKANs behind the committed vehicle/
 DBD frontier row.) If a new run wants to _refresh_ these, note that most already have a scheduled
 workflow (NABC prices, fuel prices) — check `.github/workflows/` before pulling by hand.
 
-**NSO own CKAN `catalog.nso.go.th` — reachable from CI, but NOT a refresh source for household debt
-(verified 2026-09-05).** It returns real JSON (`success:true`) exactly like the DIW/MOT department CKANs
-— the "geo-blocked, Thai-IP-only" framing applied only to the `data.go.th` **aggregator**, not to NSO's
-own catalog, and `nso_unemployment` is already pulled from it in CI (`build_labour_context.py`). BUT the
-household-debt package `0705_08_0009` (`หนี้สินเฉลี่ยต่อครัวเรือน`) tops out at survey year **2564
-(2021)**, which is **older** than the **SES 2566 (2023)** figure the app already ships (vendored,
-`source-data/household_debt_by_province.json`, CKAN-citable via `nso-ses-debt-2566.json`). So re-pulling
-household debt from `catalog.nso.go.th` would *regress* the vintage — do not "refresh" off it. **Precise
-recheck trigger:** a per-province **SES 2566 or newer** (e.g. 2568) debt resource appearing on
-`catalog.nso.go.th` package `0705_08_0009` (or a sibling SES package) — only then is a CI-side refresh of
-the debt layer an actual improvement over the vendored file. Until then this is a live-but-staler
-mirror, logged so future runs stop treating NSO as a Thai-IP-only unlock.
+**NSO own CKAN `catalog.nso.go.th` — reachable from CI. ✅ RECHECK TRIGGER MET & ACTED ON
+2026-09-12: household debt now pulls the authoritative SES-2566 per-province table from CI, and
+doing so exposed that the vendored file it replaced was WRONG for 73 of 77 provinces.** NSO's own
+catalog returns real JSON (`success:true`) exactly like the DIW/MOT department CKANs — the
+"geo-blocked, Thai-IP-only" framing applied only to the `data.go.th` **aggregator**. The 2026-09-05
+note said package `0705_08_0009` (`หนี้สินเฉลี่ยต่อครัวเรือน`) topped out at survey year **2564
+(2021)**; since then NSO added two **SES 2566 (2023)** per-province resources (both `created`
+2026-02-27): **`SFD_SPB0806`** (all households, resource id `89cc71ae-f596-4307-b38f-10d61d084801`)
+and `SFD_SPB0807` (indebted-only). That is exactly the documented trigger, so it is now CI-doable.
+- **`pipeline/pull_nso_ses_debt.py`** pulls `SFD_SPB0806` and reconstructs each province's average
+  household debt (household-weighted mean over the 10 socioeconomic strata — the table has no
+  pre-aggregated "all households" row). Its built-in correctness proof: the national weighted mean
+  it produces is **197,255 THB, exactly NSO's published SES-2566 national headline**; the puller
+  refuses to write if that drifts. Output committed to `source-data/nso_ses_debt_2566.json`.
+- **`build_household_risk.py`** now consumes that authoritative layer (vendored file kept as a
+  graceful-degrade fallback). This is the debt input to the `hhdti` / `pstress` National-map risk
+  lenses and the whole province risk ranking.
+- **The finding that made this more than a refresh:** the prior debt source
+  (`source-data/household_debt_by_province.json`, TMLI-vendored) *claimed* in its own meta to be
+  "MEASURED (NSO SES 2566), matches nso-ses-debt-2566.json". Audited against the authoritative CKAN,
+  only **4 / 77** provinces matched; the rest diverged up to ~4.5x (Khon Kaen shipped 280,791 vs the
+  authoritative 62,884; Bangkok 88,856 vs 161,050), and the two vendored files did not agree with each
+  other either. So the shipped household-DTI risk ranking was materially wrong (75/77 provinces
+  changed rank; the most-stressed province flipped from Khon Kaen to Amnat Charoen; Phuket rose #67→#5).
+- **Income is NOT yet fixed** — `household_income_by_province.json` is still the vendored NSO SES
+  layer. The DTI numerator is now authoritative; the denominator still needs its own CKAN
+  verification. **Next recheck / follow-up:** find the matching per-province SES-2566 *income* table
+  on `catalog.nso.go.th` (sibling `SFD_*`/`SES_*` resource under an income package) and give it the
+  same puller-plus-parity-check treatment, then rewire the income side of `build_household_risk.py`.
 
 ## Re-verify in one paste
 
