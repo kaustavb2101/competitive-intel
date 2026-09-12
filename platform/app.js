@@ -7437,7 +7437,7 @@ function renderExposureTape(){
   if(lad&&TAPE.bucket_ladder){
     const LBL={'1.Current':'Current','2.X_Days':'X-days','3.30_dpd':'30 dpd','4.60_dpd':'60 dpd','5.90_dpd':'90 dpd','6.120_dpd':'120 dpd','7.150_dpd':'150 dpd','8.180+_dpd':'180+ legacy'};
     const L=TAPE.bucket_ladder.ladder, maxN=Math.max(...L.map(x=>x.n));
-    lad.innerHTML=`<tr><th scope="col">Bucket</th><th scope="col">Accounts</th><th scope="col">OS ฿bn</th><th scope="col"></th></tr>`+
+    lad.innerHTML=`<tr><th scope="col">Bucket</th><th scope="col">Accounts</th><th scope="col">OS ฿bn</th><th scope="col"><span class="sr-only">Distribution</span></th></tr>`+
       L.map(x=>{const lg=x.bucket[0]==='8';
         return `<tr><td class="mono">${LBL[x.bucket]||x.bucket}</td><td class="mono sub">${N(x.n)}</td>
           <td class="mono sub">${(x.os_sum/1e9).toFixed(2)}</td>
