@@ -1,55 +1,62 @@
 {
   "meta": {
-    "title": "Peer NPL benchmark (reported) + AutoX measured anchor",
-    "note": "Listed title-loan peers' reported NPL ratios (Tidlor / MTC / Srisawad on their own FY2025 / 2025 IR headline figures; Heng, Saksiam and Ngern Turbo on their Q2/2026 SET-filed TFRS9 Stage-3 credit-impaired share — the loan-quality metric a hire-purchase/leasing lender publishes in place of a bank-style 90+ NPL, and the closest basis-match to AutoX's own impaired-share read) shown next to AutoX/Ngern Chaiyo's OWN book quality, MEASURED from the real loan tape. NOT a like-for-like league table — peers report on their own bases and write off / provision out deep-delinquent stock that AutoX carries SEPARATELY as 180+ legacy workout inventory — so AutoX is a distinct MEASURED anchor, not ranked inside the reported-peer list. Heng is the one CONTRACTING peer and the only reported peer whose figure brackets AutoX's own impaired share ('compliant' is not 'thriving'). The spread tracks collateral mix: gold/vehicle books run lower NPL, land/agri/heavy-vehicle books higher.",
-    "measured": "peers = reported by the companies; AutoX = measured from the real loan tape",
-    "source": "peers: docs/RESEARCH_DIGEST.md §B (Tidlor/MTC/Srisawad, FY2025 / 2025 IR) + platform/data/peer_asset_quality.json (Heng/Saksiam/Ngern Turbo, SET Q2/2026 TFRS9 Stage-3, as-of 30 Jun 2026); AutoX: platform/data/tape_real.json",
+    "title": "Peer loan-quality league (like-for-like) + AutoX measured anchor",
+    "note": "Six SET-listed title-loan peers on ONE like-for-like loan-quality basis — each peer's Q2/2026 SET-filed TFRS9/IFRS-9 Stage-3 (credit-impaired) gross share, as-of 30 Jun 2026, READ from platform/data/peer_asset_quality.json (the single source of truth for rival loan quality; comparable across the six because all report on the same IFRS-9 basis) — shown next to AutoX/Ngern Chaiyo's OWN book quality, MEASURED from the real loan tape. This board FOLLOWS that sibling layer: values, dates and period labels here are read from it, so they advance the day it is refreshed with a newer filing (that sibling's as_of is refreshed owner-side — SET is bot-blocked from CI — not on a schedule). The big-three's prior FY2025 / 2025 IR self-reported headline NPL is preserved per-row as context (headline_npl), not erased. AutoX is NOT ranked inside the peer list: listed peers write off / provision out deep-delinquent stock that AutoX carries SEPARATELY as 180+ legacy workout inventory, so AutoX is a distinct MEASURED anchor beside the reported-peer band. Heng is the one CONTRACTING peer and the only reported peer whose Stage-3 share brackets AutoX's own impaired share ('compliant' is not 'thriving'). The spread tracks collateral mix: gold/vehicle books run lower Stage-3, land/agri/heavy-vehicle books higher.",
+    "measured": "peers = SET-filed IFRS-9 Stage-3 share (reported); AutoX = measured from the real loan tape",
+    "source": "peers: platform/data/peer_asset_quality.json (all six, SET Q2/2026 reviewed financial-statement NOTES, TFRS9 Stage-3, as-of 30 Jun 2026); big-three self-reported headline context: docs/RESEARCH_DIGEST.md §B; AutoX: platform/data/tape_real.json",
     "generated_by": "pipeline/build_peer_npl.py",
-    "updated": "2026-06"
+    "updated": "2026-06-30",
+    "period_label": "Q2/2026",
+    "as_of_label": "30 Jun 2026"
   },
   "peers": [
     {
       "ticker": "TIDLOR",
-      "name": "Ngern Tid Lor",
+      "name": "Ngern Tid Lor (Tidlor Holdings)",
       "npl": 1.5,
       "collateral": "vehicle title (best-in-class)",
-      "source": "FY2025 company / thaipr — NPL 1.5%"
+      "source": "Ngern Tid Lor (Tidlor Holdings) SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired 1.5% of gross receivables, 30 Jun 2026 (like-for-like loan-quality basis; from peer_asset_quality.json) · cf. self-reported FY2025 company / thaipr — headline NPL 1.5%",
+      "headline_npl": 1.5,
+      "headline_source": "FY2025 company / thaipr — headline NPL 1.5%"
     },
     {
       "ticker": "MTC",
       "name": "Muangthai Capital",
-      "npl": 2.53,
+      "npl": 2.6,
       "collateral": "vehicle / motorcycle title",
-      "source": "FY2025 company IR / kaohoon — NPL 2.53% (target <2.7%)"
+      "source": "Muangthai Capital SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired 2.6% of gross receivables, 30 Jun 2026 (like-for-like loan-quality basis; from peer_asset_quality.json) · cf. self-reported FY2025 company IR / kaohoon — headline NPL 2.53% (target <2.7%)",
+      "headline_npl": 2.53,
+      "headline_source": "FY2025 company IR / kaohoon — headline NPL 2.53% (target <2.7%)"
     },
     {
       "ticker": "SAWAD",
       "name": "Srisawad",
-      "npl": 3.55,
-      "npl_label": "3.5–3.6",
+      "npl": 3.9,
       "collateral": "cars/pickups/heavy-vehicle + land/house/condo",
-      "source": "2025 IR oppday deck — NPL guidance 3.5–3.6%"
+      "source": "Srisawad SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired 3.9% of gross receivables, 30 Jun 2026 (like-for-like loan-quality basis; from peer_asset_quality.json) — excludes the separately-reported purchased credit-impaired (POCI) book · cf. self-reported 2025 IR oppday deck — headline NPL guidance 3.5–3.6%",
+      "headline_npl": 3.55,
+      "headline_source": "2025 IR oppday deck — headline NPL guidance 3.5–3.6%"
     },
     {
       "ticker": "HENG",
       "name": "Heng Leasing & Capital",
-      "npl": 6.78,
+      "npl": 6.8,
       "collateral": "motorcycle / car / land title + hire-purchase (contracting)",
-      "source": "Heng SET filing, H1-2026 — Stage 3 credit-impaired 6.78% of gross book (฿542.8m/฿8,002.8m), 30 Jun 2026; TFRS9/IFRS-9 basis (loan-quality analog)"
+      "source": "Heng Leasing & Capital SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired 6.8% of gross receivables, 30 Jun 2026 (like-for-like loan-quality basis; from peer_asset_quality.json)"
     },
     {
       "ticker": "SAK",
       "name": "Saksiam Leasing",
       "npl": 2.7,
       "collateral": "motorcycle / car / land title + hire-purchase (Isan-focused)",
-      "source": "Saksiam SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired 2.7% of gross receivables, 30 Jun 2026 (loan-quality analog; see peer_asset_quality.json)"
+      "source": "Saksiam Leasing SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired 2.7% of gross receivables, 30 Jun 2026 (like-for-like loan-quality basis; from peer_asset_quality.json)"
     },
     {
       "ticker": "TURBO",
       "name": "Ngern Turbo (NTL)",
       "npl": 3.5,
       "collateral": "car / motorcycle title (hire-purchase + title loan)",
-      "source": "Ngern Turbo SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired 3.5% of gross receivables, 30 Jun 2026 (loan-quality analog; see peer_asset_quality.json)"
+      "source": "Ngern Turbo (NTL) SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired 3.5% of gross receivables, 30 Jun 2026 (like-for-like loan-quality basis; from peer_asset_quality.json)"
     }
   ],
   "autox": {

@@ -6405,7 +6405,7 @@ function drawPeerNpl(){
   const ax=(PEERNPL&&PEERNPL.autox)?PEERNPL.autox:null;
   const axMax=ax?Math.max(hi,ax.npl_live_os_pct||0,4):Math.max(hi,4);
   tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Peer</th>`+
-    `<th scope="col" title="the operator's own reported loan-quality ratio — Tidlor/MTC/Srisawad on their headline NPL (FY2025 / 2025 IR); Heng/Saksiam/Ngern Turbo on their Q2/2026 SET-filed TFRS9 Stage-3 credit-impaired share (loan-quality analog)">Reported NPL</th>`+
+    `<th scope="col" title="each listed peer's ${m.period_label||'Q2/2026'} SET-filed TFRS9 Stage-3 (credit-impaired) gross share, as-of ${m.as_of_label||'30 Jun 2026'} — ONE like-for-like loan-quality basis across all six; the big-three's prior FY2025 self-reported headline NPL is preserved in the Source cell">Stage-3 NPL (${m.period_label||'Q2/2026'})</th>`+
     `<th scope="col" title="the collateral mix that drives the NPL level">Collateral book</th>`+
     `<th scope="col">Source</th></tr>`+
     list.map((p,i)=>{
@@ -6464,8 +6464,8 @@ function drawPeerNpl(){
     ro.innerHTML=`<b>The listed title-lenders' reported loan quality spans ${(hi-lo).toFixed(1)}pp</b> — ${spread}. `+
       `The gap is a <b>collateral story</b>: vehicle/gold books run the cleanest, land / heavy-vehicle / agri books the highest NPL.${axLine}${basisLine}${legLine} ${TAG_M}`+
       methodBox(m.note||null,
-        [`Peer figures are <b>reported by the companies themselves</b> (FY2025 / 2025 IR) — docs/RESEARCH_DIGEST.md §B. Vintage ${m.updated||'2026-06'}.`,
-         list.some(p=>p.ticker==='HENG')?`<b>Heng's figure is a TFRS9 Stage-3 (credit-impaired) share</b>, not a bank-style 90+ NPL — the loan-quality metric a hire-purchase/leasing lender publishes, and the closest basis-match to AutoX's own tape-measured impaired share. It is the one <b>contracting</b> peer and the only reported peer that brackets AutoX's ~6% impaired share ("compliant" is not "thriving").`:'',
+        [`All six peers are on <b>ONE like-for-like basis</b> — each operator's <b>${m.period_label||'Q2/2026'} SET-filed TFRS9 Stage-3 (credit-impaired) gross share</b>, as-of ${m.as_of_label||'30 Jun 2026'}, read from the sibling asset-quality board (peer_asset_quality.json). Vintage ${m.updated||'2026-06-30'}. The big-three's prior FY2025 / 2025 IR self-reported headline NPL is <b>preserved per-row</b> as context (in the Source cell), not erased.`,
+         list.some(p=>p.ticker==='HENG')?`<b>Heng is the one contracting peer</b> and the only reported peer whose Stage-3 share brackets AutoX's ~6% tape-measured impaired share ("compliant" is not "thriving").`:'',
          ax?`<b>The AutoX row is MEASURED</b> from the real loan tape (${ax.basis?ax.basis.replace('MEASURED — ',''):'OS-weighted'}), not reported. ${ax.caveat||''}`:'',
          (ax&&ft!=null)?`AutoX carries three MEASURED cuts of the same live 90–179dpd stress from the tape: <b>live-book OS</b> (${axv.toFixed(2)}%, the internal collections view — the headline bar), <b>full-book OS</b> (${ft.toFixed(2)}%, the same numerator over live + legacy — the denominator the listed peers report on), and <b>account-weighted</b> (${acct!=null?acct.toFixed(2)+'%':'—'}, tickets not balances). The full-book cut is the like-for-like comparator; the others are shown so the basis is explicit, not blended.`:'',
          'The spread tracks collateral mix, not operator skill alone: a heavier land / agri / heavy-vehicle book carries structurally higher NPL than a vehicle/gold book at the same underwriting discipline.'].filter(Boolean));
