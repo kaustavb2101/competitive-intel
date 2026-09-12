@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-11T21:27:14+00:00",
-    "commit": "5ea3a0c"
+    "generated_at": "2026-09-12T11:18:08+07:00",
+    "commit": "cf2bf11"
   },
   "overall": {
     "progress_pct": 100,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-09-11",
+    "eta_date": "2026-09-12",
     "done_items": 50,
     "in_progress_items": 0,
     "open_items": 0,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-09-12T11:18:08+07:00",
+      "sha": "cf2bf11",
+      "summary": "intel(acq): surface MTC's cited forward book-growth guidance in expansion-pace readout (#935)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-12T03:33:59+00:00",
+      "sha": "72b9404",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-12, run 34670635039)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-12T02:37:04+00:00",
+      "sha": "795ee09",
+      "summary": "data: NABC live prices (2026-09-12, run 34667899609)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-12T02:14:58+00:00",
+      "sha": "069415e",
+      "summary": "docs: log the 2026-09-12 UX-loop data-book ladder empty-th fix (PR #932)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-12T09:12:32+07:00",
+      "sha": "471dc02",
+      "summary": "ux: name empty th over the data-book ladder bar columns (a11y) (#932)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-12T01:01:47+00:00",
+      "sha": "07d7724",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34661997426) (#931)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-12T00:32:43+00:00",
+      "sha": "4423dd8",
+      "summary": "provenance: reverify FPO PICO competitor registry byte-exact from CI (advance last-confirmed-live date)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-11T23:08:40+00:00",
+      "sha": "1a94716",
+      "summary": "data: market-pulse swarm refresh (run 34650368668) (#929)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-11T22:43:34+00:00",
+      "sha": "acce476",
+      "summary": "data: rival Facebook promo feed refresh (run 34652661258) (#930)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-11T22:16:02+00:00",
+      "sha": "43430b7",
+      "summary": "intel: healthy five-pillar close-out — refresh CEO autonomy dashboard to HEAD",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-11T21:27:14+00:00",
       "sha": "5ea3a0c",
       "summary": "data: ThaiWater flood + rain pulse (2026-09-11, run 34649292649)",
@@ -651,66 +711,6 @@
       "sha": "d78c78a",
       "summary": "ux: decision-queue \"open →\" link — wrap decorative arrow aria-hidden (#918)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-11T07:13:57+00:00",
-      "sha": "9bff1fe",
-      "summary": "feat(exposure): baht-weight repeated-flood hazard by the real loan book (#917)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-09-11T05:25:12+00:00",
-      "sha": "caa43cc",
-      "summary": "data(census): refresh the Union Auction forward book (run 34559644040) (#915)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-11T05:01:51+00:00",
-      "sha": "3ff8fde",
-      "summary": "data: market-pulse swarm refresh (run 34559549995) (#916)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-11T04:19:23+00:00",
-      "sha": "34d014c",
-      "summary": "intel: healthy five-pillar close-out — refresh CEO autonomy dashboard to HEAD",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-11T03:35:00+00:00",
-      "sha": "fdb6252",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-11, run 34558888681)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-11T02:38:18+00:00",
-      "sha": "94e6cb4",
-      "summary": "data: NABC live prices (2026-09-11, run 34555030484)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-11T02:20:42+00:00",
-      "sha": "5655c6b",
-      "summary": "docs: log UX loop run — command-center hero link accessible name (PR #914)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-11T09:17:52+07:00",
-      "sha": "1e8c20e",
-      "summary": "ux: drop bare decorative → from command-center hero link accessible name (#914)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-11T01:02:57+00:00",
-      "sha": "2d9c8ed",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34546658719) (#913)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-11T00:28:42+00:00",
-      "sha": "9a99bea",
-      "summary": "provenance: stamp FPO PICO registry vintage on branch_pico.json",
-      "pillar": "feature"
     }
   ]
 }
