@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-12T11:18:08+07:00",
-    "commit": "cf2bf11"
+    "generated_at": "2026-09-12T11:14:05+00:00",
+    "commit": "44cedc9"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-09-12T11:14:05+00:00",
+      "sha": "44cedc9",
+      "summary": "peer: put the loan-quality league on one like-for-like Q2/2026 Stage-3 basis (#940)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-12T10:32:50+00:00",
+      "sha": "fae1fad",
+      "summary": "data: market-pulse swarm refresh (run 34686411216) (#939)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-12T09:28:45+00:00",
+      "sha": "ad5ae5c",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-12, run 34685866852)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-12T09:18:04+00:00",
+      "sha": "03f5c3a",
+      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34681465996) (#937)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-12T08:37:10+00:00",
+      "sha": "942cd04",
+      "summary": "docs: log the 2026-09-12 UX-loop #exposure tape-ladder empty-th fix (PR #938)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-12T15:30:22+07:00",
+      "sha": "fca0b60",
+      "summary": "ux: name empty th over the #exposure tape-ladder bar column (a11y) (#938)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-12T07:01:00+00:00",
+      "sha": "d4a169f",
+      "summary": "feat(map): National-map lens for newly-licensed PICO rivals (#936)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-12T05:39:00+00:00",
+      "sha": "67ca044",
+      "summary": "data: market-pulse swarm refresh (run 34671087016) (#934)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-12T05:13:19+00:00",
+      "sha": "283b497",
+      "summary": "data(census): refresh the Union Auction forward book (run 34671178999) (#933)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-12T04:19:18+00:00",
+      "sha": "8c3f2f3",
+      "summary": "chore(dashboard): re-run plan_cycle after #935 ship — refresh CEO autonomy dashboard to HEAD",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-12T11:18:08+07:00",
       "sha": "cf2bf11",
       "summary": "intel(acq): surface MTC's cited forward book-growth guidance in expansion-pace readout (#935)",
@@ -650,66 +710,6 @@
       "date": "2026-09-11T14:37:38+00:00",
       "sha": "7e04781",
       "summary": "docs: log UX loop run — #sim scenario-card heading order h4→h3 (PR #923, merged+live)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-11T21:34:11+07:00",
-      "sha": "4e58f30",
-      "summary": "ux: fix #sim scenario-card heading order (h4→h3, WCAG 1.3.1) (#923)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-11T13:16:48+00:00",
-      "sha": "2d30041",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34598503032) (#921)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-11T12:21:22+00:00",
-      "sha": "10e3a47",
-      "summary": "data: stamp branch_fuel.json vintage from its fuel-station pull date",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-11T11:53:58+00:00",
-      "sha": "099463a",
-      "summary": "data: SET listed-peer scoreboard refresh (run 34593608260) (#920)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-11T10:52:20+00:00",
-      "sha": "4758818",
-      "summary": "data: market-pulse swarm refresh (run 34585509064) (#919)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-11T10:16:53+00:00",
-      "sha": "29bf5cc",
-      "summary": "intel: healthy five-pillar close-out — refresh CEO autonomy dashboard to HEAD",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-11T09:31:25+00:00",
-      "sha": "e6b05a0",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-11, run 34584480125)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-11T08:37:25+00:00",
-      "sha": "cb909d5",
-      "summary": "data: NABC live prices (2026-09-11, run 34579635217)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-11T08:23:03+00:00",
-      "sha": "f8e1268",
-      "summary": "docs: log UX loop run — decision-queue open-arrow a11y fix (PR #918, merged+live)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-11T15:18:51+07:00",
-      "sha": "d78c78a",
-      "summary": "ux: decision-queue \"open →\" link — wrap decorative arrow aria-hidden (#918)",
       "pillar": "uxui"
     }
   ]
