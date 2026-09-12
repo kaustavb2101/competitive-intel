@@ -468,7 +468,7 @@ function loadLoanBook(){
     var LBL={'1.Current':'Current','2.X_Days':'X-days','3.30_dpd':'30 dpd','4.60_dpd':'60 dpd','5.90_dpd':'90 dpd','6.120_dpd':'120 dpd','7.150_dpd':'150 dpd','8.180+_dpd':'180+ dpd'};
     var lad=T.bucket_ladder.ladder, maxN=lad.reduce(function(m,x){return Math.max(m,x.n);},0);
     h+='<div class="db-sec2">Bucket ladder — Current → NPL → legacy</div>';
-    h+='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Bucket</th><th>Accounts</th><th>Share</th><th>Outstanding</th><th></th></tr></thead><tbody>';
+    h+='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Bucket</th><th>Accounts</th><th>Share</th><th>Outstanding</th><th><span class="sr-only">Distribution</span></th></tr></thead><tbody>';
     lad.forEach(function(x){var legacy=x.bucket.charAt(0)==='8';
       h+='<tr><td class="name">'+esc(LBL[x.bucket]||x.bucket)+(legacy?' <span class="th">legacy</span>':'')+'</td>'+
          '<td>'+num(x.n)+'</td><td>'+(x.n*100/bt.n).toFixed(1)+'%</td><td>'+bnf(x.os_sum)+'</td>'+
@@ -500,7 +500,7 @@ function loadLoanBook(){
     function gradTable(obj,label,keymap){
       if(!obj)return '';
       var keys=Object.keys(obj).sort();
-      var g='<div class="db-sec2">'+esc(label)+'</div><div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Band</th><th>Accounts</th><th>90+</th><th>NPL-live</th><th></th></tr></thead><tbody>';
+      var g='<div class="db-sec2">'+esc(label)+'</div><div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Band</th><th>Accounts</th><th>90+</th><th>NPL-live</th><th><span class="sr-only">Severity</span></th></tr></thead><tbody>';
       keys.forEach(function(k){var v=obj[k];
         g+='<tr><td class="name">'+esc(keymap?(keymap[k]||k):k)+'</td><td>'+num(v.n)+'</td>'+
            '<td style="color:'+sevColor(v.dpd90p_pct)+';font-weight:600">'+v.dpd90p_pct+'%</td>'+
