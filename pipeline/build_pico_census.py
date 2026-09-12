@@ -55,9 +55,12 @@ SNAPSHOT_VINTAGE = "2026-05-22"  # from the resource filename (DDMMYYYY)
 # from a cloud/CI IP (catalog.fpo.go.th package_show → HTTP 200; NOT Thai-IP-gated). A fresh CI re-pull on
 # the date below reproduced this builder's committed output BYTE-EXACT, so the registry CONTENT is confirmed
 # unchanged since the committed snapshot even though the filename-derived vintage reads older. Pinned
-# constants (never wall-clock) so --check stays byte-stable; bump them only when a re-pull actually drifts.
+# constants (never wall-clock) so --check stays byte-stable. CONTENT_LAST_MODIFIED + SNAPSHOT_VINTAGE
+# change ONLY on an actual content drift; CONTENT_VERIFIED_CI is advanced on EACH successful CI re-pull
+# that reproduces this output byte-exact (drift or not), so the "last confirmed live" date stays honest
+# as the filename vintage ages.
 CONTENT_LAST_MODIFIED = "2026-06-22"  # FPO CKAN resource last_modified / package metadata_modified
-CONTENT_VERIFIED_CI = "2026-08-29"    # date a CI re-pull reproduced the committed output byte-exact
+CONTENT_VERIFIED_CI = "2026-09-12"    # date a CI re-pull reproduced the committed output byte-exact
 
 COL_TYPE = "ประเภทสำนักงาน"        # office type: สำนักงานใหญ่ (head) / สำนักสาขา (branch)
 COL_PROV = "จังหวัดที่ให้บริการ"    # province of service
