@@ -4,14 +4,17 @@
 Assembles platform/data/peer_npl.json from two committed, in-repo sources — no network:
 
   1. The six SET-listed title-lender peers' loan quality — ALL on ONE like-for-like basis:
-     each peer's Q2/2026 SET-filed TFRS9 Stage-3 (credit-impaired) gross share, as-of
-     30 Jun 2026. These are NOT re-typed here — they are READ from the committed, cited
-     platform/data/peer_asset_quality.json (built by build_peer_asset_quality.py from the same
-     SET reviewed financial-statement NOTES), the single source of truth for the rivals' loan
-     quality, so this layer can never silently drift from its sibling board and refreshes the day
-     a newer filing lands. Only the editorial descriptors (each peer's collateral book, and — for
-     the big-three that ALSO publish one — their prior FY2025 self-reported headline NPL, kept as
-     context, not erased) are carried as constants here.
+     each peer's SET-filed TFRS9 Stage-3 (credit-impaired) gross share, at the reporting period
+     declared by the sibling layer's own meta.as_of. These are NOT re-typed here — they are READ
+     from the committed, cited platform/data/peer_asset_quality.json (built by
+     build_peer_asset_quality.py from the same SET reviewed financial-statement NOTES), the single
+     source of truth for the rivals' loan quality, so this layer can never silently drift from its
+     sibling board. It FOLLOWS that sibling: the values, dates AND period labels (Q2/2026, as-of
+     date) are derived from its meta.as_of, so the day peer_asset_quality is refreshed with a newer
+     filing this board advances with it — no separate edit here (that sibling's as_of is refreshed
+     owner-side, since SET is Akamai/bot-blocked from CI, not on a CI schedule). Only the editorial
+     descriptors (each peer's collateral book, and — for the big-three that ALSO publish one — their
+     prior FY2025 self-reported headline NPL, kept as context, not erased) are carried as constants.
 
      WHY ONE BASIS (the freshness + honesty change, 2026-09-12): this board previously mixed
      bases — Tidlor / MTC / Srisawad on their ~9-month-stale FY2025 / 2025 IR self-reported
@@ -98,27 +101,51 @@ PEER_META = [
 ]
 
 
+_MONTHS = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+
+def _period_labels(as_of):
+    """Derive the reporting-period labels FROM the upstream as-of date so the copy stays
+    internally consistent when the filing advances — never a hard-coded "Q2/2026". From an ISO
+    "YYYY-MM-DD" return (quarter_label, asof_label) e.g. ("Q2/2026", "30 Jun 2026)."""
+    y, m, d = (int(x) for x in as_of.split("-")[:3])
+    q = (m - 1) // 3 + 1
+    return "Q%d/%d" % (q, y), "%d %s %d" % (d, _MONTHS[m], y)
+
+
 def _peers_from_asset_quality():
-    """Build the six peer rows on ONE like-for-like basis — each peer's Q2/2026 SET-filed
-    TFRS9 Stage-3 credit-impaired gross share — READ from the committed peer_asset_quality.json
-    (the single source of truth for rival loan quality), not re-typed. Editorial descriptors and
-    the preserved FY2025 self-reported headline come from PEER_META above."""
+    """Build the six peer rows on ONE like-for-like basis — each peer's SET-filed TFRS9 Stage-3
+    credit-impaired gross share, at the reporting period declared by peer_asset_quality.json's own
+    meta.as_of — READ from that committed layer (the single source of truth for rival loan quality),
+    not re-typed. So this board always FOLLOWS the sibling: the day peer_asset_quality is refreshed
+    with a newer SET filing, the values, dates and period labels here advance with it (SET is
+    Akamai/bot-blocked from CI, so that sibling's as_of is itself refreshed owner-side, not on a
+    schedule). Editorial descriptors + the preserved FY2025 self-reported headline come from
+    PEER_META. A PEER_META ticker MISSING from the sibling board is a hard build failure — never a
+    silently shorter league than the six the meta/UI advertise."""
     with open(ASSET_QUALITY, encoding="utf-8") as f:
         aq = json.load(f)
     by_sym = {p["symbol"]: p for p in aq.get("peers", [])}
     as_of = aq.get("meta", {}).get("as_of", "2026-06-30")
+    period, asof_label = _period_labels(as_of)
     peers = []
     for meta in PEER_META:
         sym = meta["ticker"]
         row = by_sym.get(sym)
         if not row:
-            # Peer absent from the sibling board — skip rather than fabricate a figure.
-            continue
+            # A required peer is absent from the sibling board — FAIL, never silently ship a
+            # shorter league. (A symbol rename or a partial upstream build must break the gate,
+            # not pass by the "non-empty list" validator.)
+            raise SystemExit(
+                "FATAL build_peer_npl: required peer %r not found in peer_asset_quality.json "
+                "(has %s). Reconcile PEER_META with the sibling board before building."
+                % (sym, sorted(by_sym)))
         npl = row["npl_pct"]
         name = row.get("name", sym)
-        src = ("%s SET filing, Q2/2026 — TFRS9 Stage-3 credit-impaired %s%% of gross receivables, "
+        src = ("%s SET filing, %s — TFRS9 Stage-3 credit-impaired %s%% of gross receivables, "
                "%s (like-for-like loan-quality basis; from peer_asset_quality.json)"
-               % (name, _fmt(npl), as_of))
+               % (name, period, _fmt(npl), asof_label))
         if meta.get("stage3_note"):
             src += " — %s" % meta["stage3_note"]
         hl = meta.get("headline_npl")
@@ -135,7 +162,7 @@ def _peers_from_asset_quality():
             out["headline_npl"] = hl["pct"]
             out["headline_source"] = hl["cite"]
         peers.append(out)
-    return peers, as_of
+    return peers, as_of, period, asof_label
 
 
 def _fmt(v):
@@ -190,31 +217,37 @@ def _measured_autox_anchor():
 
 def build():
     autox = _measured_autox_anchor()
-    peers, as_of = _peers_from_asset_quality()
+    peers, as_of, period, asof_label = _peers_from_asset_quality()
     return {
         "meta": {
             "title": "Peer loan-quality league (like-for-like) + AutoX measured anchor",
             "note": ("Six SET-listed title-loan peers on ONE like-for-like loan-quality basis — "
-                     "each peer's Q2/2026 SET-filed TFRS9/IFRS-9 Stage-3 (credit-impaired) gross "
-                     "share, as-of 30 Jun 2026, READ from platform/data/peer_asset_quality.json "
+                     "each peer's %s SET-filed TFRS9/IFRS-9 Stage-3 (credit-impaired) gross "
+                     "share, as-of %s, READ from platform/data/peer_asset_quality.json "
                      "(the single source of truth for rival loan quality; comparable across the six "
                      "because all report on the same IFRS-9 basis) — shown next to AutoX/Ngern "
-                     "Chaiyo's OWN book quality, MEASURED from the real loan tape. The big-three's "
-                     "prior FY2025 / 2025 IR self-reported headline NPL is preserved per-row as "
-                     "context (headline_npl), not erased. AutoX is NOT ranked inside the peer list: "
-                     "listed peers write off / provision out deep-delinquent stock that AutoX carries "
-                     "SEPARATELY as 180+ legacy workout inventory, so AutoX is a distinct MEASURED "
-                     "anchor beside the reported-peer band. Heng is the one CONTRACTING peer and the "
-                     "only reported peer whose Stage-3 share brackets AutoX's own impaired share "
-                     "('compliant' is not 'thriving'). The spread tracks collateral mix: gold/vehicle "
-                     "books run lower Stage-3, land/agri/heavy-vehicle books higher."),
+                     "Chaiyo's OWN book quality, MEASURED from the real loan tape. This board FOLLOWS "
+                     "that sibling layer: values, dates and period labels here are read from it, so "
+                     "they advance the day it is refreshed with a newer filing (that sibling's as_of "
+                     "is refreshed owner-side — SET is bot-blocked from CI — not on a schedule). The "
+                     "big-three's prior FY2025 / 2025 IR self-reported headline NPL is preserved "
+                     "per-row as context (headline_npl), not erased. AutoX is NOT ranked inside the "
+                     "peer list: listed peers write off / provision out deep-delinquent stock that "
+                     "AutoX carries SEPARATELY as 180+ legacy workout inventory, so AutoX is a "
+                     "distinct MEASURED anchor beside the reported-peer band. Heng is the one "
+                     "CONTRACTING peer and the only reported peer whose Stage-3 share brackets "
+                     "AutoX's own impaired share ('compliant' is not 'thriving'). The spread tracks "
+                     "collateral mix: gold/vehicle books run lower Stage-3, land/agri/heavy-vehicle "
+                     "books higher.") % (period, asof_label),
             "measured": "peers = SET-filed IFRS-9 Stage-3 share (reported); AutoX = measured from the real loan tape",
-            "source": ("peers: platform/data/peer_asset_quality.json (all six, SET Q2/2026 reviewed "
-                       "financial-statement NOTES, TFRS9 Stage-3, as-of 30 Jun 2026); big-three "
+            "source": ("peers: platform/data/peer_asset_quality.json (all six, SET %s reviewed "
+                       "financial-statement NOTES, TFRS9 Stage-3, as-of %s); big-three "
                        "self-reported headline context: docs/RESEARCH_DIGEST.md §B; "
-                       "AutoX: platform/data/tape_real.json"),
+                       "AutoX: platform/data/tape_real.json") % (period, asof_label),
             "generated_by": "pipeline/build_peer_npl.py",
             "updated": as_of,
+            "period_label": period,
+            "as_of_label": asof_label,
         },
         "peers": peers,
         "autox": autox,
