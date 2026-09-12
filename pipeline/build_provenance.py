@@ -338,10 +338,20 @@ def _vintage_of(m):
     # ISO month, so it sits with the other data-observation keys, right beside mob_anchor. Verified: only
     # flood_book_exposure carries this key and it has no earlier-priority vintage, so this is purely
     # additive — exactly that one previously-blank MEASURED layer gains an honest age; no other layer moves.
+    # census_vintage (peer_province — the per-province AutoX-vs-big-4 peer scoreboard; rival_density — the
+    # per-district rival:AutoX density read) is the competitor-census SNAPSHOT date (e.g. 2026-07-04) that
+    # both layers' rival counts are measured from — the same date competitors_census.json itself carries as
+    # its `vintage`. It is a strict-ISO data-observation vintage exactly like newest_observation_date /
+    # search_vintage, so it sits with the observation keys, ahead of any pull timestamp; it is precisely how
+    # an exec sees how current the rival-count freshness is (the census cannot auto-refresh — competitor
+    # sites are geo-blocked from CI). Verified: ONLY these two layers carry the key and each carries NO
+    # earlier-priority vintage key, so both were BLANK/undated in the freshness pulse despite a real strict-
+    # ISO vintage; adding it is purely additive — exactly those two competitive-risk layers gain an honest
+    # age and no already-dated layer moves (competitors_census resolves via its own `vintage`, untouched).
     for k in ("updated", "vintage", "as_of", "updated_to",
               "observed_to", "price_vintage", "price_asof", "farmgate_vintage", "board_vintage",
               "asof_card", "anchor_date", "stock_asof", "latest_month", "mob_anchor", "tape_mob_anchor",
-              "newest_observation_date", "search_vintage",
+              "newest_observation_date", "search_vintage", "census_vintage",
               "sentiment_anchor", "snapshot", "pico_vintage", "vintage_individual", "pulled_at_utc",
               "pulled_at", "pulled", "promos_pulled_at", "latest_year_ce", "vintage_ce", "span",
               "retrieved", "cost_ingested", "verified"):
