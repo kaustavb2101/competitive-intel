@@ -419,6 +419,20 @@ def build():
            lb["npl_live_pct"], lb["npl_live_os_pct"], "{:,}".format(lb["xdays_n"]),
            "{:,}".format(lg["n"]), lg["os_sum"] / 1e9, lg["acct_share_pct"]))
 
+    # --- FINE occupation cut (obj #1): the ungrouped real-tape occupation the coarse 11-bucket
+    # "occupations" tab flattens. That coarse tab merges e.g. street-vendors, couriers, motorcycle-
+    # taxi and general labour into broad buckets that hide a ~2x 90+dpd spread; this is the same
+    # MEASURED tape cells, ungrouped, so it exposes NO new cross — only finer resolution on an axis
+    # already published. Each row carries the no-PII disclosure floor (n >= min_cell); any cell below
+    # it is suppressed and the count disclosed in meta. Staging already floors at min_cell, so this is
+    # a belt-and-braces re-assertion at the projection boundary, not expected to drop rows.
+    min_cell = tmeta.get("min_cell", 30)
+    occ_fine_raw = tabs.get("occ_fine", {})
+    occupations_fine = {k: v for k, v in occ_fine_raw.items()
+                        if k != "(blank)" and (v.get("n") or 0) >= min_cell}
+    occ_fine_suppressed = sum(1 for k, v in occ_fine_raw.items()
+                              if k != "(blank)" and (v.get("n") or 0) < min_cell)
+
     return {
         "meta": {
             "title": "Real loan tape — measured portfolio truth (objective #1)",
@@ -426,6 +440,13 @@ def build():
             "label": "MEASURED — real AutoX loan-tape aggregates (no-PII, cells n>=30; raw stays "
                      "on the owner's disk) x MEASURED OAE drought + amphoe crops. The radar "
                      "priority ORDER is an ESTIMATED ranking over those measured inputs.",
+            "occupations_fine_note": (
+                "occupations_fine is the ungrouped tape occupation (%d rows), the fine counterpart "
+                "to the coarse %d-bucket 'occupations' cut — same MEASURED cells, ungrouped. Each "
+                "row clears the no-PII disclosure floor (n >= %d accounts); %d row(s) suppressed "
+                "below it."
+                % (len(occupations_fine), len(tabs.get("occupation", {})), min_cell,
+                   occ_fine_suppressed)),
             "source": tmeta.get("source"),
             "n_accounts": tmeta.get("n_accounts"),
             "branch_join_pct": (tmeta.get("branch_join") or {}).get("pct"),
@@ -444,6 +465,7 @@ def build():
         "ltv_ladder": tabs.get("ltv_range", {}),
         "vintage_curve": tabs.get("vintage_curve", {}),
         "occupations": tabs.get("occupation", {}),
+        "occupations_fine": occupations_fine,
         "occ_x_income": tabs.get("occ_x_income", {}),
         "provinces": tabs.get("province", {}),
         # geographic tape rollups for the data-book drill-down (region cards / province / branch).
