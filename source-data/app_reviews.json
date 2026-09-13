@@ -3,7 +3,7 @@
   "title": "Title-lender app sentiment — Google Play ratings + newest reviews (incl. our own)",
   "generated_by": "pipeline/pull_app_reviews.py",
   "label": "MEASURED — Google Play store pages (th/th). Star histogram + dated public reviews; review store accumulates across pulls (dedup by reviewId, newest 1500 kept per app).",
-  "pulled_at": "2026-09-12"
+  "pulled_at": "2026-09-13"
  },
  "apps": {
   "AUTOX": {
@@ -11,16 +11,16 @@
    "name": "เงินไชโย (AutoX)",
    "own": true,
    "stats": {
-    "score": 3.9711537,
-    "ratings": 1039,
+    "score": 4,
+    "ratings": 1040,
     "reviews_total": 336,
     "installs": "500,000+",
     "histogram": [
-     169,
-     49,
-     69,
-     99,
-     649
+     161,
+     50,
+     70,
+     100,
+     655
     ],
     "app_updated": null,
     "version": "Varies with device"
@@ -1713,26 +1713,58 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.7005253,
-    "ratings": 17085,
+    "score": 4.698781,
+    "ratings": 17095,
     "reviews_total": 5293,
     "installs": "1,000,000+",
     "histogram": [
-     567,
-     189,
-     488,
-     1296,
-     14541
+     574,
+     188,
+     485,
+     1309,
+     14535
     ],
     "app_updated": "2026-08-06",
     "version": "3.2.0"
    },
    "reviews_store": [
     {
+     "id": "893af6fa-8a18-4f3f-a951-0e72db60a609",
+     "at": "2026-09-12",
+     "score": 5,
+     "content": "ใช้ดีบริการดี",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "22cb4d39-c813-47b8-81ea-e866e8636068",
+     "at": "2026-09-12",
+     "score": 1,
+     "content": "เข้าแอปยากมาก",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
      "id": "f886fedc-339c-4a63-9d0b-bd5524097ffa",
      "at": "2026-09-11",
      "score": 5,
      "content": "บริการเร็วท้นใจ",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "9a0b6856-2c6c-4d7e-be35-bb250eb13a0f",
+     "at": "2026-09-11",
+     "score": 5,
+     "content": "ดี",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "9279a21c-1fc5-4b72-abfa-7da882a65397",
+     "at": "2026-09-11",
+     "score": 4,
+     "content": "สะดวกดีค่ะ",
      "thumbs": 0,
      "replied": false
     },
@@ -1989,7 +2021,7 @@
      "at": "2026-09-03",
      "score": 1,
      "content": "แอปแย่มาก เข้าไม่ได้เลย ไม่ได้ขึ้นอัปเดท แต่เข้าไม่ได้ จะมีแอปไว้ทำมัยถ้าไม่สะดวก",
-     "thumbs": 2,
+     "thumbs": 3,
      "replied": false
     },
     {
@@ -6279,8 +6311,8 @@
    "name": "เมืองไทย แคปปิตอล",
    "own": false,
    "stats": {
-    "score": 4.690769,
-    "ratings": 6531,
+    "score": 4.691244,
+    "ratings": 6532,
     "reviews_total": 2159,
     "installs": "1,000,000+",
     "histogram": [
@@ -6288,7 +6320,7 @@
      59,
      200,
      431,
-     5586
+     5588
     ],
     "app_updated": "2026-08-18",
     "version": "2.5.114"
@@ -8285,21 +8317,37 @@
    "name": "ศรีสวัสดิ์",
    "own": false,
    "stats": {
-    "score": 4.547244,
-    "ratings": 2506,
-    "reviews_total": 881,
+    "score": 4.5387597,
+    "ratings": 2510,
+    "reviews_total": 882,
     "installs": "500,000+",
     "histogram": [
-     128,
-     49,
-     98,
-     275,
-     1953
+     126,
+     58,
+     97,
+     281,
+     1945
     ],
     "app_updated": "2026-07-01",
     "version": "1.0.60"
    },
    "reviews_store": [
+    {
+     "id": "394e8aab-58bb-4b98-8cbc-e579bf70bf3f",
+     "at": "2026-09-12",
+     "score": 2,
+     "content": "เป็นแอ๊ปที่เข้ายากมาก จะเข้ามาจ่ายเงินแต่ละครั้งกว่าจะเข้าได้ ควรปรับปรุงแอ๊ป เข้าแอ๊ปตั้งแต่ 8 โมงเช้า จนเวลานี้ 11 โมงยังเข้าไม่ได้ แอ๊ปนี้ควรปรับปรุง",
+     "thumbs": 0,
+     "replied": true
+    },
+    {
+     "id": "ff4c7578-a2c3-4d55-9428-e9e5befbd1ed",
+     "at": "2026-09-11",
+     "score": 5,
+     "content": "เราเป็นลูกค้าศรีสวัสดิ์ มีแอปนี้ไว้เช็คดูยอดที่ส่งค่างวดรถ ก็ดีครับ",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "8ce63d7d-f5f0-4504-8a36-ec7d5420c494",
      "at": "2026-09-10",
@@ -8849,7 +8897,7 @@
      "at": "2026-07-22",
      "score": 5,
      "content": "เข้าถึงง่าย สดวก ใช้งานง่าย ปรับปรุงแล้วโอเคค่ะ",
-     "thumbs": 7,
+     "thumbs": 8,
      "replied": true
     },
     {
@@ -9129,7 +9177,7 @@
      "at": "2026-07-04",
      "score": 5,
      "content": "พนักงานบริการดีมากครับ",
-     "thumbs": 3,
+     "thumbs": 4,
      "replied": false
     },
     {
@@ -10500,7 +10548,7 @@
    "own": false,
    "stats": {
     "score": 4.31,
-    "ratings": 844,
+    "ratings": 845,
     "reviews_total": 265,
     "installs": "500,000+",
     "histogram": [
@@ -10508,7 +10556,7 @@
      8,
      25,
      33,
-     657
+     658
     ],
     "app_updated": "2026-08-24",
     "version": "1.0.62-ngernturbo"
@@ -12169,8 +12217,8 @@
    "name": "สมหวัง เงินสั่งได้ (TISCO)",
    "own": false,
    "stats": {
-    "score": 4.14,
-    "ratings": 359,
+    "score": 4.1485147,
+    "ratings": 360,
     "reviews_total": 138,
     "installs": "100,000+",
     "histogram": [
@@ -12178,7 +12226,7 @@
      7,
      21,
      28,
-     247
+     249
     ],
     "app_updated": "2026-07-20",
     "version": "1.12.0"
@@ -13621,21 +13669,37 @@
    "name": "Good Money เงินดีดี (GSB)",
    "own": false,
    "stats": {
-    "score": 3.692073,
-    "ratings": 3283,
-    "reviews_total": 1447,
+    "score": 3.7112463,
+    "ratings": 3292,
+    "reviews_total": 1449,
     "installs": "1,000,000+",
     "histogram": [
-     800,
-     160,
-     160,
-     290,
-     1871
+     799,
+     149,
+     159,
+     269,
+     1910
     ],
     "app_updated": "2026-08-11",
     "version": "1.0.45"
    },
    "reviews_store": [
+    {
+     "id": "986920b5-4e96-4570-9171-90a364b6f265",
+     "at": "2026-09-12",
+     "score": 5,
+     "content": "เป็นแอปที่กู้ง่ายแระผ่อนถูกมาก",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "794fa1a6-a674-4289-8756-5e0c7f33fdce",
+     "at": "2026-09-12",
+     "score": 1,
+     "content": "ไป",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "82a5b925-b634-43be-8dca-2ac74ac13393",
      "at": "2026-09-10",
@@ -14633,7 +14697,7 @@
      "at": "2026-08-04",
      "score": 5,
      "content": "เป็น app ที่ดีมากๆทำสินเชื่อได้ง่ายเอกสารไม่ยุ่งยากเป็น app ถูกกฎหมายกู้เท่าที่จำเป็นชำระคืนให้ตรงต่อเวลาไม่มีปัญหาสมัครครั้งแรกก็ผ่านแล้วง่ายมากๆเมื่อชำระคืนแล้วยอดเก่าก็จะทบกลับมา",
-     "thumbs": 15,
+     "thumbs": 16,
      "replied": true
     },
     {
@@ -16825,21 +16889,29 @@
    "name": "GO by Krungsri Auto",
    "own": false,
    "stats": {
-    "score": 4.4058127,
-    "ratings": 9346,
+    "score": 4.40625,
+    "ratings": 9352,
     "reviews_total": 3812,
     "installs": "1,000,000+",
     "histogram": [
-     723,
-     240,
-     502,
-     924,
-     6951
+     724,
+     251,
+     482,
+     926,
+     6963
     ],
     "app_updated": "2026-08-19",
     "version": "8.6.0"
    },
    "reviews_store": [
+    {
+     "id": "0db1ed6a-d0ad-485c-8c88-16522366702e",
+     "at": "2026-09-12",
+     "score": 2,
+     "content": "เข้าไม่ได้",
+     "thumbs": 0,
+     "replied": true
+    },
     {
      "id": "58c978ac-c3dd-4077-a1d5-f0ff4d9509c6",
      "at": "2026-09-10",
