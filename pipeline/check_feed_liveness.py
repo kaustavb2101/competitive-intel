@@ -73,9 +73,29 @@ FROZEN_WINDOW_OVERRIDE = {
     # the daily cadence, so a puller that STOPS is caught within 7 days regardless; only TEST B's
     # value-movement horizon is widened here, to ~2.7x the longest observed legitimate hold.
     "fuel_gasohol95": 35,
+    # The two NABC Thai farm-gate price series (pull_nabc_prices.py, polled DAILY) are the SAME step-
+    # function shape as retail fuel: a national-average farm-gate quote that legitimately holds flat
+    # for one-to-two-plus weeks between moves, so the 7-day 'daily' window cries wolf on a normal
+    # plateau. Observed directly from source-data/feed_history.json, not assumed — both clearly move
+    # (they carry many distinct values across their life), so this RE-CALIBRATES rather than exempts:
+    #   * nabc_rice_price  — 10 distinct values over its 52-reading life; longest legitimate hold was
+    #     ฿17,738.33/t held for 17 calendar days (2026-07-18 .. 2026-08-04) while the puller ran on
+    #     schedule, then it stepped. On 2026-09-13 the 7-day window fired FROZEN on the ฿17,416.67
+    #     plateau it has held since 2026-09-04 — a false alarm on a normal step. Window → 45 (~2.6x
+    #     the 17-day longest hold).
+    #   * nabc_rubber_price — 20 distinct values (it steps every few days); longest hold was ฿84.08/kg
+    #     for 9 calendar days (2026-07-24 .. 2026-08-02). Not yet false-firing, but any 8-day-plus hold
+    #     would trip the 7-day window; same puller, same mechanism. Window → 25 (~2.8x the 9-day hold).
+    # TEST A (stale stamp) still watches pull_nabc_prices.py on its daily cadence, so a puller that
+    # STOPS is caught within 7 days regardless; only TEST B's value-movement horizon is widened, so a
+    # genuinely dead NABC upstream (stamp advancing, value frozen) still fires past these windows.
+    "nabc_rice_price": 45,
+    "nabc_rubber_price": 25,
 }
 FROZEN_MIN_POINTS_OVERRIDE = {
     "fuel_gasohol95": 15,   # ~a month of daily pulls must accumulate before a flat run is judged
+    "nabc_rice_price": 15,   # ~a month of daily pulls inside the 45-day window before a flat run counts
+    "nabc_rubber_price": 12,  # ~2.5 weeks of daily pulls inside the 25-day window before it counts
 }
 
 # Series that are legitimately allowed to sit flat, with the reason. A checker that cries wolf gets
