@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Peer loan-quality league (like-for-like) + AutoX measured anchor",
-    "note": "Six SET-listed title-loan peers on ONE like-for-like loan-quality basis — each peer's Q2/2026 SET-filed TFRS9/IFRS-9 Stage-3 (credit-impaired) gross share, as-of 30 Jun 2026, READ from platform/data/peer_asset_quality.json (the single source of truth for rival loan quality; comparable across the six because all report on the same IFRS-9 basis) — shown next to AutoX/Ngern Chaiyo's OWN book quality, MEASURED from the real loan tape. This board FOLLOWS that sibling layer: values, dates and period labels here are read from it, so they advance the day it is refreshed with a newer filing (that sibling's as_of is refreshed owner-side — SET is bot-blocked from CI — not on a schedule). The big-three's prior FY2025 / 2025 IR self-reported headline NPL is preserved per-row as context (headline_npl), not erased. AutoX is NOT ranked inside the peer list: listed peers write off / provision out deep-delinquent stock that AutoX carries SEPARATELY as 180+ legacy workout inventory, so AutoX is a distinct MEASURED anchor beside the reported-peer band. Heng is the one CONTRACTING peer and the only reported peer whose Stage-3 share brackets AutoX's own impaired share ('compliant' is not 'thriving'). The spread tracks collateral mix: gold/vehicle books run lower Stage-3, land/agri/heavy-vehicle books higher.",
+    "note": "Six SET-listed title-loan peers on ONE like-for-like loan-quality basis — each peer's Q2/2026 SET-filed TFRS9/IFRS-9 Stage-3 (credit-impaired) gross share, as-of 30 Jun 2026, READ from platform/data/peer_asset_quality.json (the single source of truth for rival loan quality; comparable across the six because all report on the same IFRS-9 basis) — shown next to AutoX/Ngern Chaiyo's OWN book quality, MEASURED from the real loan tape. This board FOLLOWS that sibling layer: values, dates and period labels here are read from it, so they advance the day it is refreshed with a newer filing (that sibling's as_of is refreshed owner-side — SET is bot-blocked from CI — not on a schedule). The big-three's prior FY2025 / 2025 IR self-reported headline NPL is preserved per-row as context (headline_npl), not erased. AutoX is NOT ranked inside the peer list: listed peers write off / provision out deep-delinquent stock that AutoX carries SEPARATELY as 180+ legacy workout inventory, so AutoX is a distinct MEASURED anchor beside the reported-peer band. Heng is the one CONTRACTING peer and the only reported peer whose Stage-3 share brackets AutoX's own impaired share ('compliant' is not 'thriving'). The spread tracks collateral mix: gold/vehicle books run lower Stage-3, land/agri/heavy-vehicle books higher. The autox_province_npl block carries AutoX's OWN live-book NPL MEASURED per province (the same live-book basis as the anchor), so the single national 6.06% figure's distribution is visible; the reported-peer band there is an orientation ruler only, NOT a per-province peer read.",
     "measured": "peers = SET-filed IFRS-9 Stage-3 share (reported); AutoX = measured from the real loan tape",
     "source": "peers: platform/data/peer_asset_quality.json (all six, SET Q2/2026 reviewed financial-statement NOTES, TFRS9 Stage-3, as-of 30 Jun 2026); big-three self-reported headline context: docs/RESEARCH_DIGEST.md §B; AutoX: platform/data/tape_real.json",
     "generated_by": "pipeline/build_peer_npl.py",
@@ -71,5 +71,639 @@
     "collateral": "motorcycle / pickup / car title + land (mixed, heavier tail)",
     "source": "MEASURED — platform/data/tape_real.json (real loan-tape aggregates, obj #1)",
     "caveat": "NOT a like-for-like rank vs the reported peers: the headline 90-179dpd NPL-live is a share of the LIVE book, while a strict BoT 90+ (incl. the ฿3.05bn 180+ legacy workout stock the tape holds SEPARATELY as late-stage collections inventory) on the full book is higher — and listed peers write off / provision out that deep-delinquent stock, so their reported NPL sits on a different basis. Read the direction, not a precise league position."
+  },
+  "autox_province_npl": {
+    "provinces": [
+      {
+        "province_th": "มหาสารคาม",
+        "region": "Isan",
+        "npl_live_os_pct": 10.43,
+        "n": 7082,
+        "os_thb": 1144098931,
+        "live_os_thb": 1030197722
+      },
+      {
+        "province_th": "เลย",
+        "region": "Isan",
+        "npl_live_os_pct": 9.91,
+        "n": 3434,
+        "os_thb": 575605488,
+        "live_os_thb": 516212695
+      },
+      {
+        "province_th": "ร้อยเอ็ด",
+        "region": "Isan",
+        "npl_live_os_pct": 9.42,
+        "n": 6894,
+        "os_thb": 1005499012,
+        "live_os_thb": 916294023
+      },
+      {
+        "province_th": "ชัยนาท",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 9.03,
+        "n": 2231,
+        "os_thb": 278379287,
+        "live_os_thb": 248347290
+      },
+      {
+        "province_th": "นครสวรรค์",
+        "region": "North",
+        "npl_live_os_pct": 8.97,
+        "n": 4888,
+        "os_thb": 679640411,
+        "live_os_thb": 622867711
+      },
+      {
+        "province_th": "ยโสธร",
+        "region": "Isan",
+        "npl_live_os_pct": 8.96,
+        "n": 3205,
+        "os_thb": 448354024,
+        "live_os_thb": 403988055
+      },
+      {
+        "province_th": "กาฬสินธุ์",
+        "region": "Isan",
+        "npl_live_os_pct": 8.84,
+        "n": 6513,
+        "os_thb": 850239289,
+        "live_os_thb": 777459977
+      },
+      {
+        "province_th": "นครนายก",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 8.63,
+        "n": 860,
+        "os_thb": 110919677,
+        "live_os_thb": 95125490
+      },
+      {
+        "province_th": "เพชรบูรณ์",
+        "region": "North",
+        "npl_live_os_pct": 8.45,
+        "n": 2899,
+        "os_thb": 382933259,
+        "live_os_thb": 354034795
+      },
+      {
+        "province_th": "กาญจนบุรี",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 8.28,
+        "n": 6091,
+        "os_thb": 640593845,
+        "live_os_thb": 588512490
+      },
+      {
+        "province_th": "อุตรดิตถ์",
+        "region": "North",
+        "npl_live_os_pct": 8.13,
+        "n": 1496,
+        "os_thb": 158612275,
+        "live_os_thb": 144719899
+      },
+      {
+        "province_th": "สระบุรี",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 8.01,
+        "n": 4188,
+        "os_thb": 496035861,
+        "live_os_thb": 462624154
+      },
+      {
+        "province_th": "แม่ฮ่องสอน",
+        "region": "North",
+        "npl_live_os_pct": 7.64,
+        "n": 540,
+        "os_thb": 53483047,
+        "live_os_thb": 52296889
+      },
+      {
+        "province_th": "อุดรธานี",
+        "region": "Isan",
+        "npl_live_os_pct": 7.6,
+        "n": 6756,
+        "os_thb": 1063518154,
+        "live_os_thb": 985779934
+      },
+      {
+        "province_th": "สมุทรสงคราม",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 7.56,
+        "n": 1177,
+        "os_thb": 97805556,
+        "live_os_thb": 92705848
+      },
+      {
+        "province_th": "หนองบัวลำภู",
+        "region": "Isan",
+        "npl_live_os_pct": 7.52,
+        "n": 1845,
+        "os_thb": 277129226,
+        "live_os_thb": 259355163
+      },
+      {
+        "province_th": "ชัยภูมิ",
+        "region": "Isan",
+        "npl_live_os_pct": 7.44,
+        "n": 4974,
+        "os_thb": 813619332,
+        "live_os_thb": 742611357
+      },
+      {
+        "province_th": "อุทัยธานี",
+        "region": "North",
+        "npl_live_os_pct": 7.19,
+        "n": 2411,
+        "os_thb": 281857597,
+        "live_os_thb": 246519658
+      },
+      {
+        "province_th": "สุรินทร์",
+        "region": "Isan",
+        "npl_live_os_pct": 7.16,
+        "n": 4877,
+        "os_thb": 581745256,
+        "live_os_thb": 549131084
+      },
+      {
+        "province_th": "พิจิตร",
+        "region": "North",
+        "npl_live_os_pct": 7.15,
+        "n": 2204,
+        "os_thb": 258793434,
+        "live_os_thb": 240449518
+      },
+      {
+        "province_th": "อำนาจเจริญ",
+        "region": "Isan",
+        "npl_live_os_pct": 7.09,
+        "n": 2424,
+        "os_thb": 306721847,
+        "live_os_thb": 277238282
+      },
+      {
+        "province_th": "กรุงเทพมหานคร",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 7.02,
+        "n": 36113,
+        "os_thb": 4429281436,
+        "live_os_thb": 4099018364
+      },
+      {
+        "province_th": "หนองคาย",
+        "region": "Isan",
+        "npl_live_os_pct": 6.91,
+        "n": 2754,
+        "os_thb": 361338516,
+        "live_os_thb": 333891379
+      },
+      {
+        "province_th": "ตราด",
+        "region": "East",
+        "npl_live_os_pct": 6.79,
+        "n": 1679,
+        "os_thb": 165647855,
+        "live_os_thb": 156642310
+      },
+      {
+        "province_th": "นครราชสีมา",
+        "region": "Isan",
+        "npl_live_os_pct": 6.74,
+        "n": 15547,
+        "os_thb": 1807083833,
+        "live_os_thb": 1694816316
+      },
+      {
+        "province_th": "ลพบุรี",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 6.69,
+        "n": 4267,
+        "os_thb": 463376699,
+        "live_os_thb": 423146867
+      },
+      {
+        "province_th": "ขอนแก่น",
+        "region": "Isan",
+        "npl_live_os_pct": 6.67,
+        "n": 6115,
+        "os_thb": 972403472,
+        "live_os_thb": 904703917
+      },
+      {
+        "province_th": "บึงกาฬ",
+        "region": "Isan",
+        "npl_live_os_pct": 6.66,
+        "n": 3450,
+        "os_thb": 446148346,
+        "live_os_thb": 422179210
+      },
+      {
+        "province_th": "สุโขทัย",
+        "region": "North",
+        "npl_live_os_pct": 6.64,
+        "n": 1982,
+        "os_thb": 219972454,
+        "live_os_thb": 205830437
+      },
+      {
+        "province_th": "อุบลราชธานี",
+        "region": "Isan",
+        "npl_live_os_pct": 6.59,
+        "n": 8787,
+        "os_thb": 1139178225,
+        "live_os_thb": 1050648962
+      },
+      {
+        "province_th": "มุกดาหาร",
+        "region": "Isan",
+        "npl_live_os_pct": 6.54,
+        "n": 1588,
+        "os_thb": 179612833,
+        "live_os_thb": 166104999
+      },
+      {
+        "province_th": "สกลนคร",
+        "region": "Isan",
+        "npl_live_os_pct": 6.45,
+        "n": 5910,
+        "os_thb": 723427984,
+        "live_os_thb": 678274808
+      },
+      {
+        "province_th": "บุรีรัมย์",
+        "region": "Isan",
+        "npl_live_os_pct": 6.12,
+        "n": 8616,
+        "os_thb": 1031765741,
+        "live_os_thb": 978410980
+      },
+      {
+        "province_th": "ศรีสะเกษ",
+        "region": "Isan",
+        "npl_live_os_pct": 6.09,
+        "n": 6021,
+        "os_thb": 709025549,
+        "live_os_thb": 663664860
+      },
+      {
+        "province_th": "อ่างทอง",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 5.96,
+        "n": 1515,
+        "os_thb": 160631501,
+        "live_os_thb": 154103758
+      },
+      {
+        "province_th": "ลำพูน",
+        "region": "North",
+        "npl_live_os_pct": 5.91,
+        "n": 1679,
+        "os_thb": 188531587,
+        "live_os_thb": 174296200
+      },
+      {
+        "province_th": "สุพรรณบุรี",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 5.87,
+        "n": 4612,
+        "os_thb": 499809821,
+        "live_os_thb": 467206227
+      },
+      {
+        "province_th": "จันทบุรี",
+        "region": "East",
+        "npl_live_os_pct": 5.69,
+        "n": 3994,
+        "os_thb": 414468492,
+        "live_os_thb": 385984140
+      },
+      {
+        "province_th": "ราชบุรี",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 5.65,
+        "n": 5919,
+        "os_thb": 555790680,
+        "live_os_thb": 522055833
+      },
+      {
+        "province_th": "ตรัง",
+        "region": "South",
+        "npl_live_os_pct": 5.49,
+        "n": 4102,
+        "os_thb": 532064647,
+        "live_os_thb": 494455298
+      },
+      {
+        "province_th": "สิงห์บุรี",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 5.47,
+        "n": 1383,
+        "os_thb": 128940225,
+        "live_os_thb": 121952930
+      },
+      {
+        "province_th": "นนทบุรี",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 5.46,
+        "n": 9134,
+        "os_thb": 1371964207,
+        "live_os_thb": 1293794790
+      },
+      {
+        "province_th": "นครพนม",
+        "region": "Isan",
+        "npl_live_os_pct": 5.41,
+        "n": 4750,
+        "os_thb": 576805696,
+        "live_os_thb": 523253172
+      },
+      {
+        "province_th": "ชลบุรี",
+        "region": "East",
+        "npl_live_os_pct": 5.4,
+        "n": 19762,
+        "os_thb": 2446722740,
+        "live_os_thb": 2321492979
+      },
+      {
+        "province_th": "ฉะเชิงเทรา",
+        "region": "East",
+        "npl_live_os_pct": 5.3,
+        "n": 6934,
+        "os_thb": 882930620,
+        "live_os_thb": 840207287
+      },
+      {
+        "province_th": "สมุทรปราการ",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 5.3,
+        "n": 10203,
+        "os_thb": 1198031172,
+        "live_os_thb": 1135306705
+      },
+      {
+        "province_th": "สมุทรสาคร",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 5.29,
+        "n": 3954,
+        "os_thb": 426822112,
+        "live_os_thb": 400377845
+      },
+      {
+        "province_th": "สตูล",
+        "region": "South",
+        "npl_live_os_pct": 5.26,
+        "n": 1678,
+        "os_thb": 207042055,
+        "live_os_thb": 196247367
+      },
+      {
+        "province_th": "น่าน",
+        "region": "North",
+        "npl_live_os_pct": 5.03,
+        "n": 1397,
+        "os_thb": 236061998,
+        "live_os_thb": 150026191
+      },
+      {
+        "province_th": "นครศรีธรรมราช",
+        "region": "South",
+        "npl_live_os_pct": 5.02,
+        "n": 7523,
+        "os_thb": 886281175,
+        "live_os_thb": 845670059
+      },
+      {
+        "province_th": "เชียงใหม่",
+        "region": "North",
+        "npl_live_os_pct": 5.02,
+        "n": 6140,
+        "os_thb": 826173390,
+        "live_os_thb": 782008303
+      },
+      {
+        "province_th": "ปราจีนบุรี",
+        "region": "East",
+        "npl_live_os_pct": 4.99,
+        "n": 4017,
+        "os_thb": 450917359,
+        "live_os_thb": 430653567
+      },
+      {
+        "province_th": "พิษณุโลก",
+        "region": "North",
+        "npl_live_os_pct": 4.97,
+        "n": 3865,
+        "os_thb": 544334475,
+        "live_os_thb": 517233334
+      },
+      {
+        "province_th": "ระยอง",
+        "region": "East",
+        "npl_live_os_pct": 4.9,
+        "n": 11520,
+        "os_thb": 1244626414,
+        "live_os_thb": 1175377383
+      },
+      {
+        "province_th": "เชียงราย",
+        "region": "North",
+        "npl_live_os_pct": 4.84,
+        "n": 3986,
+        "os_thb": 477905544,
+        "live_os_thb": 457825884
+      },
+      {
+        "province_th": "ระนอง",
+        "region": "South",
+        "npl_live_os_pct": 4.51,
+        "n": 1139,
+        "os_thb": 97392801,
+        "live_os_thb": 91558521
+      },
+      {
+        "province_th": "แพร่",
+        "region": "North",
+        "npl_live_os_pct": 4.36,
+        "n": 1217,
+        "os_thb": 167603545,
+        "live_os_thb": 136602356
+      },
+      {
+        "province_th": "พระนครศรีอยุธยา",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 4.3,
+        "n": 5088,
+        "os_thb": 560340874,
+        "live_os_thb": 527771119
+      },
+      {
+        "province_th": "ตาก",
+        "region": "North",
+        "npl_live_os_pct": 4.25,
+        "n": 1473,
+        "os_thb": 139154704,
+        "live_os_thb": 134544710
+      },
+      {
+        "province_th": "เพชรบุรี",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 4.25,
+        "n": 3135,
+        "os_thb": 348001191,
+        "live_os_thb": 331307043
+      },
+      {
+        "province_th": "สุราษฎร์ธานี",
+        "region": "South",
+        "npl_live_os_pct": 4.15,
+        "n": 6937,
+        "os_thb": 967236295,
+        "live_os_thb": 928014144
+      },
+      {
+        "province_th": "สระแก้ว",
+        "region": "East",
+        "npl_live_os_pct": 4.14,
+        "n": 3987,
+        "os_thb": 354439501,
+        "live_os_thb": 329969341
+      },
+      {
+        "province_th": "ภูเก็ต",
+        "region": "South",
+        "npl_live_os_pct": 3.96,
+        "n": 3549,
+        "os_thb": 357880741,
+        "live_os_thb": 342372225
+      },
+      {
+        "province_th": "ปทุมธานี",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 3.93,
+        "n": 9657,
+        "os_thb": 1255657641,
+        "live_os_thb": 1201541958
+      },
+      {
+        "province_th": "กำแพงเพชร",
+        "region": "North",
+        "npl_live_os_pct": 3.9,
+        "n": 3691,
+        "os_thb": 500378230,
+        "live_os_thb": 481654288
+      },
+      {
+        "province_th": "นครปฐม",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 3.89,
+        "n": 5341,
+        "os_thb": 618561234,
+        "live_os_thb": 585011768
+      },
+      {
+        "province_th": "ลำปาง",
+        "region": "North",
+        "npl_live_os_pct": 3.63,
+        "n": 3029,
+        "os_thb": 401762529,
+        "live_os_thb": 381675516
+      },
+      {
+        "province_th": "พะเยา",
+        "region": "North",
+        "npl_live_os_pct": 3.35,
+        "n": 1449,
+        "os_thb": 168538253,
+        "live_os_thb": 161326499
+      },
+      {
+        "province_th": "ยะลา",
+        "region": "South",
+        "npl_live_os_pct": 3.32,
+        "n": 4596,
+        "os_thb": 242647624,
+        "live_os_thb": 232694404
+      },
+      {
+        "province_th": "นราธิวาส",
+        "region": "South",
+        "npl_live_os_pct": 3.29,
+        "n": 5434,
+        "os_thb": 309745509,
+        "live_os_thb": 300522227
+      },
+      {
+        "province_th": "ประจวบคีรีขันธ์",
+        "region": "Central&BKK",
+        "npl_live_os_pct": 3.2,
+        "n": 6237,
+        "os_thb": 735778304,
+        "live_os_thb": 711717347
+      },
+      {
+        "province_th": "ปัตตานี",
+        "region": "South",
+        "npl_live_os_pct": 2.99,
+        "n": 2914,
+        "os_thb": 200393244,
+        "live_os_thb": 194053190
+      },
+      {
+        "province_th": "กระบี่",
+        "region": "South",
+        "npl_live_os_pct": 2.94,
+        "n": 2447,
+        "os_thb": 323700080,
+        "live_os_thb": 313233836
+      },
+      {
+        "province_th": "พัทลุง",
+        "region": "South",
+        "npl_live_os_pct": 2.92,
+        "n": 2778,
+        "os_thb": 305824345,
+        "live_os_thb": 292237550
+      },
+      {
+        "province_th": "ชุมพร",
+        "region": "South",
+        "npl_live_os_pct": 2.91,
+        "n": 3271,
+        "os_thb": 355990100,
+        "live_os_thb": 345268357
+      },
+      {
+        "province_th": "พังงา",
+        "region": "South",
+        "npl_live_os_pct": 2.85,
+        "n": 1887,
+        "os_thb": 207158605,
+        "live_os_thb": 199489929
+      },
+      {
+        "province_th": "สงขลา",
+        "region": "South",
+        "npl_live_os_pct": 2.29,
+        "n": 5376,
+        "os_thb": 537364514,
+        "live_os_thb": 519806952
+      }
+    ],
+    "n_provinces": 77,
+    "n_suppressed": 0,
+    "min_cell": 30,
+    "min_pct": 2.29,
+    "max_pct": 10.43,
+    "median_pct": 5.65,
+    "national_os_weighted_pct": 6.06,
+    "band_max_pct": 6.8,
+    "band_max_peer": "Heng Leasing & Capital",
+    "band_median_pct": 3.1,
+    "n_above_band_max": 23,
+    "n_above_band_median": 71,
+    "basis": "MEASURED — AutoX own live-book NPL (90-179dpd, OS-weighted) per province from the real loan tape (tape_real.json geo.provinces), the same basis as the national anchor. All 77 rows >= 30 accounts; 0 suppressed below the floor.",
+    "caveat": "This is the AutoX book's OWN per-province distribution, NOT a like-for-like per-province peer table: the reported-peer band is national and on a different (reported IFRS-9 Stage-3) basis — peers publish no provincial NPL — so it is used here only as an orientation ruler. Read where our own book is weakest, not a precise peer rank. No open/close/expand call."
   }
 }
