@@ -95,7 +95,11 @@ def _reads_back(text, fname):
     # literal passed to a load/read helper, or open(literal) not in write mode
     if re.search(r"(?:load|read)\w*\([^)\n]*['\"][^'\"]*" + lit + r"['\"]", text):
         return True
-    if re.search(r"open\(\s*['\"][^'\"]*" + lit + r"['\"]\s*[),]", text):
+    # A bare read `open("…/f.json")` closes right after the path literal — terminator `)`.
+    # A write `open("…/f.json", "w")` has a comma + mode next; that is a WRITE, not a read-back,
+    # so it must NOT match here (a trailing-comma terminator would misread it as self-consuming and
+    # hide a pure-writer orphan — the branch_density shape this whole check exists to catch).
+    if re.search(r"open\(\s*['\"][^'\"]*" + lit + r"['\"]\s*\)", text):
         return True
     for m in re.finditer(r"(\w+)\s*=\s*[^\n]*['\"][^'\"]*" + lit + r"['\"]", text):
         v = re.escape(m.group(1))
@@ -149,6 +153,10 @@ def _find_orphans(leaves, scripts):
 
 def _selftest():
     orphan = 'OUT = os.path.join(R, "x_orphan.json")\njson.dump(doc, open(OUT, "w"))'
+    # A pure writer that opens the path LITERAL (not a variable) in write mode: json.dump(doc,
+    # open("x_litw.json", "w")). The write's trailing `,"w"` must not be read as a read-back — this
+    # is the save_competitors.py shape that hid rayong_competitors.json until the _reads_back fix.
+    lit_writer = 'json.dump(doc, open("x_litw.json", "w"))'
     cache = 'C = os.path.join(R, "x_cache.json")\ncache = _load_json(C, {})\njson.dump(cache, open(C, "w"))'
     harvest = ('SRC = os.path.join(R, "x_src.json")\n'
                'with open(SRC, "w") as f: f.write(d)\n'
@@ -158,6 +166,7 @@ def _selftest():
     cases = [
         # name, scripts-dict, expect_orphan
         ("pure-orphan", {"p.py": orphan}, {"x_orphan.json"}),
+        ("literal-write-orphan", {"p.py": lit_writer}, {"x_litw.json"}),
         ("warm-cache", {"pull.py": cache}, set()),
         ("harvest+build", {"b.py": harvest}, set()),
         ("downstream-consumed", {"prod.py": downstream_producer, "cons.py": downstream_consumer}, set()),

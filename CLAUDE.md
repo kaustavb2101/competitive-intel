@@ -155,7 +155,12 @@ timeseries `--check` plus `node --check` on every page's JS.*
   - `build_rival_pulse.py` — deterministic `--check`; sentiment ladder (score, 1★ share, 90-day
     trend anchored on newest review date IN the data, dev-reply rate, ESTIMATED Thai-lexicon
     detractor themes) + promo feed → `platform/data/rival_pulse.json`.
-- `save_competitors.py` — writes `rayong_competitors.json` (hand-curated Google Places list).
+- `save_competitors.py` — regenerates a hand-curated 30-point Rayong Google-Places competitor list (the
+  points are hardcoded in the script). Its committed output `source-data/rayong_competitors.json` was
+  RETIRED 2026-09-13: it was superseded by the MEASURED national census (`competitors_census.json`,
+  16,503 rivals — the competitor source for every province, Rayong included) and had zero consumers
+  (`build_province.py._load_competitors` reads `competitors_census.json` only; no page fetches it). The
+  script is kept for reversibility; the curated list survives inline in it.
 - `pull_buildings.py`, `pull_wide.py` — Overpass building-footprint pulls. (The old
   `build_platform.py` HTML assembler was retired 2026-09-05 — the pages are committed static and its
   inputs no longer exist; the per-province deep-dive is now `build_province.py → provinces/<slug>.json`.)
@@ -224,7 +229,7 @@ per cycle, never regressing a metric (see `committee/COMMITTEE.md`). Members:
 - `branches_final.json` — **the master**, all 2,015 branches, 46 fields each (see DATA_SOURCES.md
   for the field dictionary). Everything in `platform/data/` is derived from this.
 - `osm_layers.json` — 13 national OSM POI coordinate layers (~79k points; items are `[lng,lat]`).
-- `estates.json` (35 industrial estates), `rayong_competitors.json` (30 live competitor branches),
+- `estates.json` (35 industrial estates),
   `commodity_board.json` / `commodities*.json` (Pink Sheet prices), `crop_prov_area.json` /
   `rice_prov_area.json` (province planting area), `bldg_wide.json` (3,633 Rayong buildings),
   `rayong_districts.geojson` (8 district polygons + rollups).
