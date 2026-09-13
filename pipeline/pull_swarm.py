@@ -327,6 +327,44 @@ FEEDS = [
          label="NSO 2566 Agricultural Census agri-holder debt incidence + lender-source mix (obj #1/#2; feeds nso_agri_debt)",
          cadence="quarterly", ip="any", group="gov", out="source-data/nso/agri_debt_2566.json", timeout=600),
 
+    # THREE MORE keyless any-IP NSO pullers off the SAME catalogapi.nso.go.th host as nso_agri_debt
+    # above, each feeding a WIRED, --check-gated objective-#1 (portfolio-risk) builder yet sitting in
+    # NO scheduler — the exact NEXT_STEPS §3 "widen pull_swarm's registry so no puller is left
+    # unscheduled to age in silence" item, same silent-stale failure mode as nabc_agri / diw_scurve /
+    # nso_agri_debt above. Chains:
+    #   * nso_ses_debt   -> source-data/nso_ses_debt_2566.json   -> build_household_risk.py (tests/run.sh L558)
+    #   * nso_ses_income -> source-data/nso_ses_income_2566.json -> build_household_risk.py (tests/run.sh L558)
+    #   * nso_lfs_status -> source-data/nso_lfs_status.json       -> build_labour_context.py (tests/run.sh L335)
+    # SES debt+income are the two authoritative NSO SES-2566 inputs to the household-DTI lens
+    # (household_risk_by_province.json — the hhdti/pstress National-map lenses); nso_lfs_status is the
+    # employment-status / self-employed / agri-jobs battery behind labour_context.json. The SES layers
+    # got their last refresh only through hand-authored fix PRs (#941, #947) — never a schedule — so
+    # they were ageing in silence exactly like nso_agri_debt was. VERIFIED reachable + EXIT=0 + BYTE-
+    # IDENTICAL reproduction (two consecutive live runs, sha-equal) from THIS cloud runner 2026-09-13:
+    # the two SES layers reproduced the committed bytes exactly (a FROZEN 2566 survey vintage — moves
+    # only when NSO publishes a new SES year, so a re-pull is a no-op until then and the SCHEDULE is the
+    # improvement, not a data revision, same discipline as nso_agri_debt); nso_lfs_status passed its own
+    # 2/2 anchor-quarter acceptance test and produced a genuine fresh quarter vs the committed
+    # 2026-08-02 vintage, confirming the staleness gap is real. All three import stdlib+urllib only (csv
+    # / io / json / urllib.request + lib.regionmap — no openpyxl/pdfplumber/browser), so no data-swarm.yml
+    # dep change is needed. Arg interfaces differ (verified from each script's argparse): the two SES
+    # pullers anchor on the survey vintage IN the data and take no --stamp (args=[], like energy_prices /
+    # nso_agri_debt), while pull_nso_lfs_status.py takes --stamp. rederive_drift.py discovers builders by
+    # parsing tests/run.sh, so it rebuilds household_risk / labour_context automatically on the next fresh
+    # pull. QUARTERLY: SES is an annual survey and LFS a quarterly one, so quarterly is the cheapest
+    # cadence that still auto-catches the next release without churning byte-identical no-ops.
+    dict(key="nso_ses_debt", script="pull_nso_ses_debt.py", args=[],
+         label="NSO SES-2566 household debt per province (obj #1; feeds household_risk DTI lens)",
+         cadence="quarterly", ip="any", group="gov", out="source-data/nso_ses_debt_2566.json", timeout=600),
+
+    dict(key="nso_ses_income", script="pull_nso_ses_income.py", args=[],
+         label="NSO SES-2566 household income per province (obj #1; DTI-lens income denominator)",
+         cadence="quarterly", ip="any", group="gov", out="source-data/nso_ses_income_2566.json", timeout=600),
+
+    dict(key="nso_lfs_status", script="pull_nso_lfs_status.py", args=["--stamp", STAMP],
+         label="NSO LFS employment-status / self-employed / agri-jobs battery (obj #1; feeds labour_context)",
+         cadence="quarterly", ip="any", group="gov", out="source-data/nso_lfs_status.json", timeout=600),
+
     # The LAST keyless CI-reachable puller feeding a live layer that sat in NO scheduler, ageing in
     # silence (same silent-stale failure mode as nabc_agri / tpso_cpi / diw_scurve above; the exact
     # NEXT_STEPS §3 "widen pull_swarm's registry so no puller is left unscheduled to age in silence"

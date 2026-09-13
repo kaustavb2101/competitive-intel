@@ -212,6 +212,21 @@ def _count_found():
     return counts, sources
 
 
+def _census_vintage():
+    """The competitor census's own snapshot vintage (competitors_census.json meta.vintage,
+    e.g. 2026-07-04). Every rival branch count on this national-standing board rolls up from
+    that census, so this IS the board's measured as-of. Carried forward under `census_vintage`
+    — the same key peer_province.json / rival_density.json use — so the Data-room freshness pulse
+    surfaces the board's real vintage instead of leaving it blank. Returns None if absent
+    (stripped sandbox) so the field degrades honestly rather than inventing a date."""
+    path = os.path.join(DATA, CENSUS_FILES[0])
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding="utf-8") as f:
+        d = json.load(f)
+    return (d.get("meta") or {}).get("vintage") if isinstance(d, dict) else None
+
+
 def _autox_branch_count():
     """MEASURED count of AutoX's OWN operating network = number of committed branches
     (branches.json is a top-level array, one object per branch). Returns None if absent
@@ -658,6 +673,7 @@ def build():
                   "reports (cited company IR / annual reports, see expected_sources)."
                   % (", ".join(sources) if sources else "competitor census (none found)"),
         "census_files_used": sources,
+        "census_vintage": _census_vintage(),
         "expected_label": "ESTIMATED-from-public-reports",
         "expected_sources": {b: EXPECTED_SOURCES[b] for b in BRANDS},
         "peer_financials_label": "REPORTED-from-public-reports (peer loan book & branch net-adds — "
