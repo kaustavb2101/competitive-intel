@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-13T04:15:35+00:00",
-    "commit": "2cf59d1"
+    "generated_at": "2026-09-13T10:20:06+00:00",
+    "commit": "5c1ae55"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-09-13T10:20:06+00:00",
+      "sha": "5c1ae55",
+      "summary": "intel(peer): stamp census_vintage on the per-region rival-threat board so its density axis surfaces its real as-of",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-13T10:00:18+00:00",
+      "sha": "d6832f9",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-13, run 34750596822)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-13T08:23:28+00:00",
+      "sha": "ce41b52",
+      "summary": "docs(progress): log the mobile top-nav scroll-cue fade ship + deploy-verify (#957)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-13T15:21:01+07:00",
+      "sha": "ee42973",
+      "summary": "ux: right-edge scroll-cue fade on the mobile top nav (#957)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-13T07:16:38+00:00",
+      "sha": "5505225",
+      "summary": "data(census): refresh the Union Auction forward book (run 34736268525) (#955)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-13T06:52:10+00:00",
+      "sha": "81723d7",
+      "summary": "data: market-pulse swarm refresh (run 34736204561) (#956)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-13T06:28:08+00:00",
+      "sha": "1385309",
+      "summary": "sched(swarm): wire the three keyless any-IP NSO pullers so the household-DTI + labour risk inputs stop ageing in silence",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-09-13T04:16:31+00:00",
+      "sha": "1606f63",
+      "summary": "chore(plan): refresh CEO dashboard after census_vintage peer-board stamp",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-09-13T04:15:35+00:00",
       "sha": "2cf59d1",
       "summary": "intel(peer): stamp census_vintage on the national peer-standing board so it surfaces its real as-of",
@@ -662,54 +710,6 @@
       "date": "2026-09-12T14:20:57+00:00",
       "sha": "deb6cc4",
       "summary": "docs(progress-log): record ux-loop #942 merge + deploy-verify result",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-12T21:17:55+07:00",
-      "sha": "9ccdcfb",
-      "summary": "ux: name the last two empty table-header columns (closes ux-table-empty-th-sweep) (#942)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-12T13:19:57+00:00",
-      "sha": "655728a",
-      "summary": "fix(risk): household-debt input from authoritative NSO CKAN SES-2566 — the vendored file was wrong for 73/77 provinces (#941)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-09-12T11:16:32+00:00",
-      "sha": "82377d5",
-      "summary": "chore(dashboard): re-run plan_cycle after #940 ship — refresh CEO autonomy dashboard to HEAD",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-12T11:14:05+00:00",
-      "sha": "44cedc9",
-      "summary": "peer: put the loan-quality league on one like-for-like Q2/2026 Stage-3 basis (#940)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-12T10:32:50+00:00",
-      "sha": "fae1fad",
-      "summary": "data: market-pulse swarm refresh (run 34686411216) (#939)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-12T09:28:45+00:00",
-      "sha": "ad5ae5c",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-12, run 34685866852)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-12T09:18:04+00:00",
-      "sha": "03f5c3a",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34681465996) (#937)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-12T08:37:10+00:00",
-      "sha": "942cd04",
-      "summary": "docs: log the 2026-09-12 UX-loop #exposure tape-ladder empty-th fix (PR #938)",
       "pillar": "uxui"
     }
   ]

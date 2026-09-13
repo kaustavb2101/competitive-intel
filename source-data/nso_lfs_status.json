@@ -9,7 +9,7 @@
     },
     "unit": "thousand persons",
     "frequency": "quarterly",
-    "pulled": "2026-08-02",
+    "pulled": "2026-09-13",
     "quarters_available_both_tables": [
       "2563-ไตรมาส 1",
       "2563-ไตรมาส 2",
@@ -49,7 +49,7 @@
     "quarter": "ไตรมาส 1",
     "n_rows_industry": 289,
     "n_rows_status": 76,
-    "employed_total_thousand": 41194.44,
+    "employed_total_thousand": 41194.45,
     "agriculture": {
       "employed_thousand": 11252.79,
       "share_pct": 27.32
@@ -105,7 +105,7 @@
     "quarter": "ไตรมาส 1",
     "n_rows_industry": 286,
     "n_rows_status": 74,
-    "employed_total_thousand": 39383.25,
+    "employed_total_thousand": 39383.26,
     "agriculture": {
       "employed_thousand": 10592.23,
       "share_pct": 26.9
