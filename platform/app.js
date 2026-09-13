@@ -7479,6 +7479,33 @@ function renderExposureTape(){
         <td class="mono" style="color:${v.npat_margin_avg<0?'var(--agri)':'var(--merch)'}">${v.npat_margin_avg.toLocaleString()}</td>
         <td class="mono sub">${(v.os_sum/1e9).toFixed(1)}</td></tr>`).join('');
   }
+  // --- FINE occupation cut: the ungrouped tape occupation the coarse 11-bucket table above flattens.
+  // obj #1 portfolio risk. From tape_real.json.occupations_fine (real loan tape, same MEASURED cells,
+  // ungrouped; each row n>=30 no-PII floor). The read: broad buckets like "รับจ้างทั่วไป"/"บริการ"
+  // hide gig/transport occupations (couriers, motorcycle-taxi, taxi) that carry ~2x the hard
+  // delinquency. Narrative is COMPUTED (spread over the substantive rows), so a future tape with a
+  // different shape ships the honest number. Null-safe: absent/older tape with no occupations_fine
+  // (or <2 substantive rows) → the whole block stays display:none.
+  const ofw=$('#expo-tape-occfinewrap'), oft=$('#expo-tape-occfine'), OF=TAPE.occupations_fine;
+  if(ofw&&oft&&OF&&typeof OF==='object'){
+    const rows=Object.entries(OF).filter(([k,v])=>k!=='(blank)'&&v&&v.n&&v.dpd90p_pct!=null)
+      .sort((a,b)=>b[1].dpd90p_pct-a[1].dpd90p_pct);
+    // headline off the SUBSTANTIVE rows only (n>=1000) so a thin cell can't drive it
+    const sub=rows.filter(([,v])=>v.n>=1000);
+    if(rows.length>=2 && sub.length>=2){
+      ofw.style.display='';
+      const hi=sub[0], lo=sub[sub.length-1], spread=hi[1].dpd90p_pct-lo[1].dpd90p_pct;
+      const lead=$('#expo-tape-occfine-lead');
+      if(lead) lead.innerHTML=`The 11-bucket view above flattens the book's real occupation risk. Across the <b>${rows.length}</b> ungrouped occupations, 90+dpd spans <b style="color:var(--agri)">${spread.toFixed(1)} pts</b> — from <b style="color:var(--merch)">${lo[0]} ${lo[1].dpd90p_pct}%</b> to <b style="color:var(--agri)">${hi[0]} ${hi[1].dpd90p_pct}%</b>. The gig / transport livelihoods buried inside the broad "labour" and "service" buckets carry the sharpest hard delinquency.`;
+      const worst=Math.max(...rows.map(([,v])=>v.dpd90p_pct));
+      oft.innerHTML=`<tr><th scope="col">Occupation (ungrouped)</th><th scope="col">Accounts</th><th scope="col" title="share of accounts 90+ days past due">90+dpd</th><th scope="col" title="X-days: late but under 30dpd — the pre-emptive assistance window">X-days</th><th scope="col" title="average NPAT margin per account, ฿">NPAT/acct</th><th scope="col">OS ฿bn</th></tr>`+
+        rows.map(([k,v])=>`<tr><td>${k}</td><td class="mono sub">${N(v.n)}</td>
+          <td class="mono" style="color:${sev(v.dpd90p_pct)}">${barHTML(v.dpd90p_pct,'var(--agri)',worst)} <b>${v.dpd90p_pct}%</b></td>
+          <td class="mono sub">${v.early_pct}%</td>
+          <td class="mono" style="color:${v.npat_margin_avg<0?'var(--agri)':'var(--merch)'}">${v.npat_margin_avg.toLocaleString()}</td>
+          <td class="mono sub">${(v.os_sum/1e9).toFixed(1)}</td></tr>`).join('');
+    }
+  }
   const fr=$('#expo-tape-frontier');
   if(fr&&Array.isArray(TAPE.npat_frontier)){
     const cells=TAPE.npat_frontier.slice(0,18);

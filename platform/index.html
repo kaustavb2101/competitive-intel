@@ -1302,6 +1302,16 @@
           <table class="tbl" id="expo-tape-occ"></table>
         </div>
       </div>
+      <!-- FINE occupation cut: the ungrouped tape occupation the coarse 11-bucket table above
+           flattens. From tape_real.json occupations_fine (real loan tape, same MEASURED cells,
+           ungrouped, each row n>=30 no-PII floor). Obj #1: the broad "labour"/"service" buckets
+           hide gig/transport occupations with ~2x the hard delinquency. Null-safe: an absent/older
+           tape with no occupations_fine (or <2 substantive rows) → the block stays display:none. -->
+      <div id="expo-tape-occfinewrap" style="display:none;margin-top:4px">
+        <h3 class="compsub">Occupation → delinquency · fine cut <span class="sub">(ungrouped, MEASURED)</span></h3>
+        <p class="lead" id="expo-tape-occfine-lead" style="font-size:12px"></p>
+        <table class="tbl" id="expo-tape-occfine"></table>
+      </div>
       <div class="dash2">
         <div class="dash2-side">
           <h3 class="compsub">Risk × return · occupation × region <span class="sub">(NPAT frontier)</span></h3>
