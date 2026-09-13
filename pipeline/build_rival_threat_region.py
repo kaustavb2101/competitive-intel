@@ -94,6 +94,13 @@ def build():
     peer = json.load(open(PEER, encoding="utf-8"))
     rep = json.load(open(REPUTATION, encoding="utf-8"))
     rep_by = {r.get("region"): r for r in rep.get("by_region", []) if r.get("region")}
+    # The DENSITY axis is measured from the competitor census (via peer_province), so its honest
+    # as-of is that census snapshot date — carry it forward exactly as peer_province / rival_density
+    # do so the layer surfaces its real vintage in the freshness pulse instead of showing blank. The
+    # SERVICE axis (rival_reputation) carries no captured observation date, so it stays undated here;
+    # census_vintage is the density half's real freshness, read verbatim (never invented) and only
+    # when peer_province actually carries it (honest ABSENT otherwise).
+    census_vintage = (peer.get("meta") or {}).get("census_vintage") or None
 
     # Aggregate the measured per-province footprint to regions. Ordered by first appearance so the
     # output is deterministic without sorting on a float that could tie.
@@ -176,6 +183,7 @@ def build():
                      % (WELL_LOVED, nat_ratio),
             "source": "join of platform/data/peer_province.json (measured census footprint, per region) + "
                       "platform/data/rival_reputation.json by_region (measured Google service rating).",
+            "census_vintage": census_vintage,
             "national_rivals_vs_autox": nat_ratio,
             "autox_branches_ranked": tot_autox,
             "rivals_counted": tot_rivals,
