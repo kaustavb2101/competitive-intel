@@ -1524,6 +1524,18 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
   .tblwrap:has(#provtbl),
   .tblwrap:has(#mkttbl){background:linear-gradient(to left, var(--scrollcue), transparent) right center / 26px 100% no-repeat}
 }
+/* Same right-edge fade for the fixed top #nav. It is a nowrap overflow-x:auto swipe-scroller with its
+   scrollbar hidden (#nav::-webkit-scrollbar{display:none}), and at ≤760px it is wider than the viewport
+   (verified: at 760px "Explore ▾", "Print tab" and the theme toggle clip off the right), so the tabs
+   scrolled off — Risk / Competition / Brand / Explore — read as absent with no scroll cue, exactly the
+   gap the table/.ic-scroll fades close. The gradient is LAYERED over the theme's own #nav base colour
+   (dark rgba(15,20,34,.85) L217 / light rgba(255,255,255,.92) L708) so backdrop-filter and both themes
+   are preserved; theme-aware via --scrollcue. Gated to ≤760px where the nav is guaranteed to overflow,
+   so desktop (>760px, all tabs fit) shows no spurious fade. */
+@media (max-width:760px){
+  #nav{background:linear-gradient(to left, var(--scrollcue), transparent) right center / 26px 100% no-repeat, rgba(15,20,34,.85)}
+  html[data-theme="light"] #nav{background:linear-gradient(to left, var(--scrollcue), transparent) right center / 26px 100% no-repeat, rgba(255,255,255,.92)}
+}
 .ic-tbl{border-collapse:collapse;width:100%;font-size:12px;min-width:760px}
 .ic-tbl th,.ic-tbl td{text-align:left;padding:6px 9px;border-bottom:1px solid var(--line2);white-space:nowrap}
 .ic-tbl thead th{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
