@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-13T05:20:02+07:00",
-    "commit": "c032074"
+    "generated_at": "2026-09-13T04:15:35+00:00",
+    "commit": "2cf59d1"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,60 @@
   ],
   "activity": [
     {
+      "date": "2026-09-13T04:15:35+00:00",
+      "sha": "2cf59d1",
+      "summary": "intel(peer): stamp census_vintage on the national peer-standing board so it surfaces its real as-of",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-13T03:35:39+00:00",
+      "sha": "d1cd595",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-13, run 34735791148)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-13T02:37:46+00:00",
+      "sha": "853c82b",
+      "summary": "data: NABC live prices (2026-09-13, run 34733306357)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-13T02:31:23+00:00",
+      "sha": "70d5560",
+      "summary": "docs(progress): log the rayong-catchment page-<h1> ship (PR #954, merged + deployed + verified live)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-13T09:27:43+07:00",
+      "sha": "37dc4e5",
+      "summary": "ux: add page-level <h1> to rayong-catchment.html (page-has-heading-one) (#954)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-13T00:57:23+00:00",
+      "sha": "c36a82b",
+      "summary": "tape(exposure): surface the fine occupation cut the coarse 11-bucket table flattens (#953)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-09-12T23:31:19+00:00",
+      "sha": "25f31fc",
+      "summary": "data: rival Facebook promo feed refresh (run 34721875926) (#951)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-12T23:06:10+00:00",
+      "sha": "c2acc81",
+      "summary": "data: market-pulse swarm refresh (run 34720544412) (#950)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-12T22:20:34+00:00",
+      "sha": "4ef890a",
+      "summary": "chore(dashboard): refresh plan_cycle status after the census_vintage freshness-reader ship",
+      "pillar": "data-integration"
+    },
+    {
       "date": "2026-09-13T05:20:02+07:00",
       "sha": "c032074",
       "summary": "service: wire census_vintage into the freshness reader so rival_density + peer_province surface their real as-of (#952)",
@@ -656,60 +710,6 @@
       "date": "2026-09-12T08:37:10+00:00",
       "sha": "942cd04",
       "summary": "docs: log the 2026-09-12 UX-loop #exposure tape-ladder empty-th fix (PR #938)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-12T15:30:22+07:00",
-      "sha": "fca0b60",
-      "summary": "ux: name empty th over the #exposure tape-ladder bar column (a11y) (#938)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-12T07:01:00+00:00",
-      "sha": "d4a169f",
-      "summary": "feat(map): National-map lens for newly-licensed PICO rivals (#936)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-12T05:39:00+00:00",
-      "sha": "67ca044",
-      "summary": "data: market-pulse swarm refresh (run 34671087016) (#934)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-12T05:13:19+00:00",
-      "sha": "283b497",
-      "summary": "data(census): refresh the Union Auction forward book (run 34671178999) (#933)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-12T04:19:18+00:00",
-      "sha": "8c3f2f3",
-      "summary": "chore(dashboard): re-run plan_cycle after #935 ship — refresh CEO autonomy dashboard to HEAD",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-12T11:18:08+07:00",
-      "sha": "cf2bf11",
-      "summary": "intel(acq): surface MTC's cited forward book-growth guidance in expansion-pace readout (#935)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-12T03:33:59+00:00",
-      "sha": "72b9404",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-12, run 34670635039)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-12T02:37:04+00:00",
-      "sha": "795ee09",
-      "summary": "data: NABC live prices (2026-09-12, run 34667899609)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-12T02:14:58+00:00",
-      "sha": "069415e",
-      "summary": "docs: log the 2026-09-12 UX-loop data-book ladder empty-th fix (PR #932)",
       "pillar": "uxui"
     }
   ]
