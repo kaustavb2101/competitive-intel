@@ -70,6 +70,12 @@ phase_check(){
   if [ "$rc" -eq 0 ]; then ok "build_vehicle_base.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_vehicle_base.py --check (vehicle_census_province.json absent — not data drift)"
   else bad "build_vehicle_base.py --check (vehicles_by_province.json drifted from the CI DLT census vehicle_census_province.json — run: python3 pipeline/build_vehicle_base.py)"; fi
+  # Master-integrity invariant (offline, reads only the committed master): every branch's
+  # province/region must still normalize to the canonical 77 with ZERO records in region "Other".
+  # A record that resolves to "Other" is silently dropped from every by-region rollup, corrupting
+  # BOTH the competitive-risk (per-province rival density) and portfolio-risk (province stress)
+  # reads with the gate otherwise green — the exact "116->77, 0 Other" invariant CLAUDE.md asserts.
+  ( cd "$PIPE" && python3 fix_provinces.py --check >/dev/null 2>&1 ) && ok "fix_provinces.py --check (0 branches fall into region Other)" || bad "fix_provinces.py --check (a branch's province/region no longer resolves to the canonical 77 — it would drop from every by-region rollup; run: python3 pipeline/fix_provinces.py)"
   ( cd "$PIPE" && python3 derive.py --check >/dev/null 2>&1 ) && ok "derive.py --check" || bad "derive.py --check (platform/data drifted from source-data)"
   ( cd "$PIPE" && python3 build_province.py --check >/dev/null 2>&1 ) && ok "build_province.py --check" || bad "build_province.py --check (province files drifted)"
   ( cd "$PIPE" && python3 build_regions.py --check >/dev/null 2>&1 ) && ok "build_regions.py --check" || bad "build_regions.py --check (regions.json drifted from provinces/*.json + competitors_census.json)"
