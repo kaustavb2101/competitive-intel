@@ -2950,6 +2950,65 @@ def check_peer_npl():
     else:
         ok("peer_npl rows sane (npl in (0,100], every peer figure cites a source)")
 
+    # AutoX OWN live-book NPL distribution by province (autox_province_npl). OPTIONAL block (older
+    # tape vintages lack it) → SKIP-PASS when absent. When present, gate the invariants the render +
+    # tape-pii-floor depend on: canonical regions, the >=MIN_CELL disclosure floor on every published
+    # row, numeric render fields, worst-first ordering, and min/median/max stat consistency — so a
+    # privacy or schema regression cannot pass the gate the way a bare byte-compare would let it.
+    dist = d.get("autox_province_npl")
+    if dist is None:
+        ok("peer_npl autox_province_npl absent — skipped (optional, older tape vintage)")
+    elif not isinstance(dist, dict):
+        fail("peer_npl autox_province_npl is an object", "got %s" % type(dist).__name__)
+    else:
+        provs = dist.get("provinces")
+        mc = dist.get("min_cell")
+        if not isinstance(provs, list) or not provs:
+            fail("peer_npl autox_province_npl.provinces present", "missing/empty")
+        elif not (isinstance(mc, int) and mc > 0):
+            fail("peer_npl autox_province_npl.min_cell is a positive int", "got %r" % mc)
+        else:
+            dbad = []
+            npls = []
+            for i, r in enumerate(provs):
+                if not isinstance(r, dict):
+                    dbad.append("#%d not an object" % i); continue
+                nm = r.get("province_th") or "#%d" % i
+                if not (isinstance(r.get("province_th"), str) and r["province_th"].strip()):
+                    dbad.append("%s province_th missing" % nm)
+                if r.get("region") not in KNOWN_REGIONS:
+                    dbad.append("%s region=%r not in %s" % (nm, r.get("region"), sorted(KNOWN_REGIONS)))
+                v = r.get("npl_live_os_pct")
+                if not is_finite_number(v) or not (0.0 < v <= 100.0):
+                    dbad.append("%s npl_live_os_pct=%r out of (0,100]" % (nm, v))
+                else:
+                    npls.append(v)
+                n = r.get("n")
+                if not (isinstance(n, int) and n >= mc):           # tape-pii-floor: every row >= MIN_CELL
+                    dbad.append("%s n=%r below MIN_CELL=%d (PII floor)" % (nm, n, mc))
+                for k in ("os_thb", "live_os_thb"):
+                    if not is_finite_number(r.get(k)):
+                        dbad.append("%s %s not numeric" % (nm, k))
+            # worst-first ordering (descending by npl_live_os_pct), the order the render relies on
+            if npls != sorted(npls, reverse=True):
+                dbad.append("provinces not sorted worst-first by npl_live_os_pct")
+            # stat consistency: the summary min/median/max must match the rows (no invented headline)
+            if npls:
+                import statistics as _st
+                for key, want in (("min_pct", min(npls)), ("max_pct", max(npls)),
+                                  ("median_pct", round(_st.median(npls), 2))):
+                    got = dist.get(key)
+                    if not is_finite_number(got) or abs(got - want) > 0.01:
+                        dbad.append("%s=%r != rows (%r)" % (key, got, want))
+            if not is_finite_number(dist.get("n_provinces")) or dist.get("n_provinces") != len(provs):
+                dbad.append("n_provinces=%r != len(provinces)=%d" % (dist.get("n_provinces"), len(provs)))
+            if dbad:
+                fail("peer_npl autox_province_npl invariants (regions, PII floor, order, stats)",
+                     first_n(dbad))
+            else:
+                ok("peer_npl autox_province_npl invariants (%d provinces, all >= MIN_CELL=%d, "
+                   "worst-first, stats consistent)" % (len(provs), mc))
+
 
 # ---------------------------------------------------------------------------
 def check_vintage_digest():

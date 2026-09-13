@@ -248,12 +248,18 @@ def _measured_autox_province_dist(peers):
         npl = v.get("npl_live_os_pct")
         if npl is None:
             continue
+        os_total = float(v.get("os_sum") or 0.0)          # combined book (live + 180+ legacy)
+        # npl_live_os_pct is a rate of the LIVE book only, so its matching denominator is the live
+        # outstanding = combined minus the separately-held 180+ legacy stock. Carry both: os_thb for
+        # book size, live_os_thb as the honest denominator for any roll-up of the live-book rate.
+        live_os = os_total - float(v.get("late180_os") or 0.0)
         rows.append({
             "province_th": name,
             "region": REGION[name],
             "npl_live_os_pct": round(float(npl), 2),
             "n": n,
-            "os_thb": round(float(v.get("os_sum") or 0.0)),
+            "os_thb": round(os_total),
+            "live_os_thb": round(live_os),
         })
     # deterministic order: worst live-book NPL first, province name as the tie-break
     rows.sort(key=lambda r: (-r["npl_live_os_pct"], r["province_th"]))
@@ -266,10 +272,11 @@ def _measured_autox_province_dist(peers):
     n_above_max = sum(1 for r in rows if band_max is not None and r["npl_live_os_pct"] > band_max)
     n_above_med = sum(1 for r in rows if band_median is not None and r["npl_live_os_pct"] > band_median)
 
-    # OS-weighted national roll-up as an internal self-check (≈ the 6.06% anchor; small gap because
-    # os_sum is the combined live+legacy book value while npl_live_os_pct is the live-book rate).
-    os_tot = sum(r["os_thb"] for r in rows) or 1
-    nat_os = round(sum(r["os_thb"] * r["npl_live_os_pct"] for r in rows) / os_tot, 2)
+    # live-OS-weighted national roll-up as an internal self-check: weight each province's live-book
+    # rate by its LIVE outstanding (not the combined os_sum, which carries the separately-held 180+
+    # legacy book), so this reproduces the national live-book anchor rather than a mixed denominator.
+    live_tot = sum(r["live_os_thb"] for r in rows) or 1
+    nat_os = round(sum(r["live_os_thb"] * r["npl_live_os_pct"] for r in rows) / live_tot, 2)
     npls = [r["npl_live_os_pct"] for r in rows]
     return {
         "provinces": rows,
@@ -323,8 +330,9 @@ def build():
                      "collateral mix: gold/vehicle books run lower Stage-3, land/agri/heavy-vehicle "
                      "books higher. The autox_province_npl block carries AutoX's OWN live-book NPL "
                      "MEASURED per province (the same live-book basis as the anchor), so the single "
-                     "national 6.06%% figure's distribution is visible; the reported-peer band there "
-                     "is an orientation ruler only, NOT a per-province peer read.") % (period, asof_label),
+                     "national %.2f%% figure's distribution is visible; the reported-peer band there "
+                     "is an orientation ruler only, NOT a per-province peer read.")
+                    % (period, asof_label, autox["npl_live_os_pct"]),
             "measured": "peers = SET-filed IFRS-9 Stage-3 share (reported); AutoX = measured from the real loan tape",
             "source": ("peers: platform/data/peer_asset_quality.json (all six, SET %s reviewed "
                        "financial-statement NOTES, TFRS9 Stage-3, as-of %s); big-three "

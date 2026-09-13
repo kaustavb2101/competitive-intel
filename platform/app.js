@@ -6395,6 +6395,11 @@ function renderPeerNpl(){
 function drawPeerNpl(){
   const tbl=$('#peernpltbl'), ro=$('#peernplreadout'); if(!tbl) return;
   const peers=(PEERNPL&&Array.isArray(PEERNPL.peers))?PEERNPL.peers:[];
+  // The per-province block is driven by its own layer (autox_province_npl) and hides as a whole unit
+  // — heading, lead, readout AND table — when that data is absent. Run it BEFORE the peer-list early
+  // return below, so an older/partial peer_npl.json can never leave a measured-province claim visible
+  // with no data under it.
+  drawPeerNplProvinces(peers);
   if(!peers.length){
     tbl.innerHTML='';
     if(ro) ro.innerHTML='<b>Peer NPL benchmark not available.</b> <span class="sub">data/peer_npl.json is absent — it fills in from docs/RESEARCH_DIGEST.md §B on the next data refresh.</span>';
@@ -6476,45 +6481,55 @@ function drawPeerNpl(){
          (ax&&ft!=null)?`AutoX carries three MEASURED cuts of the same live 90–179dpd stress from the tape: <b>live-book OS</b> (${axv.toFixed(2)}%, the internal collections view — the headline bar), <b>full-book OS</b> (${ft.toFixed(2)}%, the same numerator over live + legacy — the denominator the listed peers report on), and <b>account-weighted</b> (${acct!=null?acct.toFixed(2)+'%':'—'}, tickets not balances). The full-book cut is the like-for-like comparator; the others are shown so the basis is explicit, not blended.`:'',
          'The spread tracks collateral mix, not operator skill alone: a heavier land / agri / heavy-vehicle book carries structurally higher NPL than a vehicle/gold book at the same underwriting discipline.'].filter(Boolean));
   }
-  // ---- AutoX OWN live-book NPL distribution by province (MEASURED, same basis as the anchor) ----
-  // The single national anchor masks where our own book is actually weakest. The reported-peer band
-  // is an orientation ruler only — peers publish no provincial NPL — never a per-province peer rank.
-  const dt=$('#peernplprovtbl'), dro=$('#peernplprovreadout');
-  if(dt){
-    const D=(PEERNPL&&PEERNPL.autox_province_npl)?PEERNPL.autox_province_npl:null;
-    if(!D||!Array.isArray(D.provinces)||!D.provinces.length){
-      dt.innerHTML=''; if(dro) dro.innerHTML='';
-    } else {
-      const bmax=D.band_max_pct, bmed=D.band_median_pct;
-      const dcol=v=>(typeof bmax==='number'&&v>bmax)?'var(--agri)':(typeof bmed==='number'&&v>bmed)?'var(--gold)':'var(--merch)';
-      const dmax=Math.max(D.max_pct||0, bmax||0, 4);
-      const TOPN=12, top=D.provinces.slice(0,TOPN);
-      dt.innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th>`+
-        `<th scope="col" title="AutoX own live-book NPL (90–179dpd, OS-weighted), measured per province from the real loan tape — the same basis as the national anchor above">Live-book NPL</th>`+
-        `<th scope="col" title="accounts in that province's book (every row ≥ ${D.min_cell})">Accounts</th></tr>`+
-        top.map((r,i)=>{
-          const c=dcol(r.npl_live_os_pct);
-          return `<tr>
-            <td class="mono sub">${i+1}</td>
-            <td><b>${r.province_th}</b> <span class="sub mono">${r.region}</span></td>
-            <td>${barHTML(r.npl_live_os_pct,c,dmax)} <span class="mono" style="color:${c}"><b>${r.npl_live_os_pct.toFixed(2)}%</b></span></td>
-            <td class="mono sub">${(r.n||0).toLocaleString()}</td>
-          </tr>`;}).join('');
-      if(dro){
-        const peer=D.band_max_peer||'the worst reported peer';
-        const rulerLine=(typeof bmax==='number')
-          ? ` <b>In ${D.n_above_band_max} of the ${D.n_provinces} provinces AutoX's own live-book NPL sits above ${bmax}% — the top of the entire reported-peer band (${peer})</b>`+
-            (typeof bmed==='number'?`; ${D.n_above_band_median} sit above the band's ${bmed}% median.`:'.')
-          : '';
-        dro.innerHTML=`<b>Our own book's NPL is far from uniform</b> — measured per province from the real tape it runs from `+
-          `<b style="color:var(--merch)">${D.min_pct.toFixed(2)}%</b> to <b style="color:var(--agri)">${D.max_pct.toFixed(2)}%</b> (median ${D.median_pct.toFixed(2)}%), so the single national anchor hides the tail.`+
-          `${rulerLine} Worst: <b>${top[0].province_th} ${top[0].npl_live_os_pct.toFixed(2)}%</b>. Showing the ${Math.min(TOPN,D.provinces.length)} weakest of ${D.n_provinces}. ${TAG_M}`+
-          methodBox(D.basis||null,
-            [D.caveat?`<b>${D.caveat}</b>`:'',
-             (typeof bmax==='number')?`The reported-peer band (max ${bmax}% ${peer}, median ${bmed}%) is each listed peer's reported IFRS-9 Stage-3 share — a NATIONAL figure on a different basis, used here only as a ruler. AutoX's per-province figure is the live-book 90–179dpd OS-weighted rate, the same basis as the national anchor.`:'',
-             `All ${D.n_provinces} province rows rest on ≥ ${D.min_cell} accounts (${D.n_suppressed} suppressed below the floor). Makes no open/close/expand call — a portfolio-quality read.`].filter(Boolean));
-      }
-    }
+}
+
+/* ---- AutoX OWN live-book NPL distribution by province (MEASURED, same basis as the anchor) ----
+   The single national anchor masks where our own book is actually weakest. The reported-peer band is
+   an orientation ruler only — peers publish no provincial NPL — never a per-province peer rank. The
+   WHOLE block (heading + lead + readout + table, wrapped in #peernplprovblock) hides as one unit when
+   the autox_province_npl layer is absent, so an older/partial peer_npl.json never leaves a measured-
+   province claim visible with no data. `peers` supplies the band ruler; when it is empty the ruler
+   line is simply omitted and the distribution still shows. */
+function drawPeerNplProvinces(peers){
+  const block=$('#peernplprovblock'), dt=$('#peernplprovtbl'), dro=$('#peernplprovreadout');
+  if(!block||!dt) return;
+  const D=(PEERNPL&&PEERNPL.autox_province_npl)?PEERNPL.autox_province_npl:null;
+  if(!D||!Array.isArray(D.provinces)||!D.provinces.length){
+    block.hidden=true; dt.innerHTML=''; if(dro) dro.innerHTML=''; return;
+  }
+  block.hidden=false;
+  const pv=(Array.isArray(peers)?peers:[]).map(p=>p.npl).filter(v=>typeof v==='number');
+  // Prefer the band figures the layer already computed; fall back to the live peers list so the ruler
+  // stays correct if the two ever diverge.
+  const bmax=(typeof D.band_max_pct==='number')?D.band_max_pct:(pv.length?Math.max(...pv):null);
+  const bmed=(typeof D.band_median_pct==='number')?D.band_median_pct:null;
+  const dcol=v=>(typeof bmax==='number'&&v>bmax)?'var(--agri)':(typeof bmed==='number'&&v>bmed)?'var(--gold)':'var(--merch)';
+  const dmax=Math.max(D.max_pct||0, bmax||0, 4);
+  const TOPN=12, top=D.provinces.slice(0,TOPN);
+  dt.innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th>`+
+    `<th scope="col" title="AutoX own live-book NPL (90–179dpd, OS-weighted), measured per province from the real loan tape — the same basis as the national anchor above">Live-book NPL</th>`+
+    `<th scope="col" title="accounts in that province's book (every row ≥ ${D.min_cell})">Accounts</th></tr>`+
+    top.map((r,i)=>{
+      const c=dcol(r.npl_live_os_pct);
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${r.province_th}</b> <span class="sub mono">${r.region}</span></td>
+        <td>${barHTML(r.npl_live_os_pct,c,dmax)} <span class="mono" style="color:${c}"><b>${r.npl_live_os_pct.toFixed(2)}%</b></span></td>
+        <td class="mono sub">${(r.n||0).toLocaleString()}</td>
+      </tr>`;}).join('');
+  if(dro){
+    const peer=D.band_max_peer||'the worst reported peer';
+    const rulerLine=(typeof bmax==='number')
+      ? ` <b>In ${D.n_above_band_max} of the ${D.n_provinces} provinces AutoX's own live-book NPL sits above ${bmax}% — the top of the entire reported-peer band (${peer})</b>`+
+        (typeof bmed==='number'?`; ${D.n_above_band_median} sit above the band's ${bmed}% median.`:'.')
+      : '';
+    dro.innerHTML=`<b>Our own book's NPL is far from uniform</b> — measured per province from the real tape it runs from `+
+      `<b style="color:var(--merch)">${D.min_pct.toFixed(2)}%</b> to <b style="color:var(--agri)">${D.max_pct.toFixed(2)}%</b> (median ${D.median_pct.toFixed(2)}%), so the single national anchor hides the tail.`+
+      `${rulerLine} Worst: <b>${top[0].province_th} ${top[0].npl_live_os_pct.toFixed(2)}%</b>. Showing the ${Math.min(TOPN,D.provinces.length)} weakest of ${D.n_provinces}. ${TAG_M}`+
+      methodBox(D.basis||null,
+        [D.caveat?`<b>${D.caveat}</b>`:'',
+         (typeof bmax==='number')?`The reported-peer band (max ${bmax}% ${peer}, median ${bmed}%) is each listed peer's reported IFRS-9 Stage-3 share — a NATIONAL figure on a different basis, used here only as a ruler. AutoX's per-province figure is the live-book 90–179dpd OS-weighted rate, the same basis as the national anchor.`:'',
+         `All ${D.n_provinces} province rows rest on ≥ ${D.min_cell} accounts (${D.n_suppressed} suppressed below the floor). Makes no open/close/expand call — a portfolio-quality read.`].filter(Boolean));
   }
 }
 
