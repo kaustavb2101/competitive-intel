@@ -9,13 +9,13 @@
   "n_card_gap_operators": 3,
   "n_drift_operators": 6,
   "n_operators": 23,
-  "n_read": 17,
-  "n_with_quote": 17,
+  "n_read": 16,
+  "n_with_quote": 16,
   "objective": "Competitive risk (#2) — a scheduled watch that flags when a rival's live page moves off the rate the app measures it against, so the curated card does not go stale unseen.",
   "provenance": "MEASURED · pipeline/pull_rival_rates.py re-reads every operator's pinned rate_url weekly; this layer projects that read and its card comparison. It never overwrites source-data/rival_rate_card.json, which stays hand-curated.",
-  "pulled_at": "2026-09-07",
+  "pulled_at": "2026-09-13",
   "source": "source-data/rival_rate_observed.json (pipeline/pull_rival_rates.py) compared against source-data/rival_rate_card.json",
-  "summary": "23 operators re-read 2026-09-07 · 17 with a parseable quote · 6 now quote a rate outside the card's band · 3 quote a unit the card does not carry",
+  "summary": "23 operators re-read 2026-09-13 · 16 with a parseable quote · 6 now quote a rate outside the card's band · 3 quote a unit the card does not carry",
   "title": "Rate-card drift watch — each rival's OWN page re-read vs the hand-curated card"
  },
  "operators": [
@@ -472,24 +472,16 @@
   },
   {
    "drift_lines": [],
-   "error": null,
+   "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1016)>",
    "fetched_via": "http",
-   "in_card": true,
+   "in_card": false,
    "key": "KTC_PBERM",
    "n_gap": 0,
    "name": "KTC พี่เบิ้ม รถแลกเงิน",
-   "quotes": [
-    {
-     "basis": null,
-     "effective_pct_year": null,
-     "quote_th": "KTC พี่เบิ้ม รถแลกเงิน : กู้เท่าที่จําเป็นและชําระคืนไหว อัตราดอกเบี้ย 12.99%-24% ต่อปี",
-     "unit": "pct_per_year",
-     "value": 24.0
-    }
-   ],
+   "quotes": [],
    "quotes_more": 0,
    "rate_url": "https://ktc.co.th/ktc-p-berm",
-   "status": "ok"
+   "status": "error"
   },
   {
    "drift_lines": [],
