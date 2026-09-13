@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-13T10:20:06+00:00",
-    "commit": "5c1ae55"
+    "generated_at": "2026-09-13T22:19:53+00:00",
+    "commit": "90cda70"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,90 @@
   ],
   "activity": [
     {
+      "date": "2026-09-13T22:19:53+00:00",
+      "sha": "90cda70",
+      "summary": "service(liveness): recalibrate frozen-value window for the NABC farm-gate price series",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-13T21:27:42+00:00",
+      "sha": "9dd8294",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-13, run 34783792645)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-13T20:12:32+00:00",
+      "sha": "bc8b3ff",
+      "summary": "docs: log UX loop PR #963 (data.html branch-search visible count) — merged + deploy-verified",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-14T03:10:40+07:00",
+      "sha": "1cd7522",
+      "summary": "ux: visible result count under data.html #brsearch branch filter (#963)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-13T19:54:27+00:00",
+      "sha": "59e9ede",
+      "summary": "data: Thai-IP-only swarm refresh (run 34777481326) (#962)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-13T18:20:50+00:00",
+      "sha": "e735ab7",
+      "summary": "test(gate): enforce the master's \"0 branches in region Other\" invariant",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-09-13T17:28:25+00:00",
+      "sha": "24f9bf2",
+      "summary": "intel(peer): surface AutoX's own live-book NPL by province on #acq (#961)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-13T16:36:59+00:00",
+      "sha": "02ac823",
+      "summary": "data: market-pulse swarm refresh (run 34766255670) (#960)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-13T15:26:45+00:00",
+      "sha": "4dc857a",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-13, run 34765521140)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-13T14:19:22+00:00",
+      "sha": "0463910",
+      "summary": "docs(progress): log the visible search-count ship (PR #959, merged + deployed + verified live)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-09-13T21:16:00+07:00",
+      "sha": "8dbc6cb",
+      "summary": "ux: visible per-table search result count on #branches/#provinces/#market (#959)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-13T12:32:08+00:00",
+      "sha": "79fd321",
+      "summary": "test(orphan-guard): fix write-call false negative in orphan_sources, retire the orphan it hid",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-13T10:56:38+00:00",
+      "sha": "d8ff75d",
+      "summary": "data: market-pulse swarm refresh (run 34750878262) (#958)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-13T10:20:32+00:00",
+      "sha": "56ce2b4",
+      "summary": "chore(plan): refresh CEO dashboard after the rival-threat census_vintage stamp",
+      "pillar": "market"
+    },
+    {
       "date": "2026-09-13T10:20:06+00:00",
       "sha": "5c1ae55",
       "summary": "intel(peer): stamp census_vintage on the per-region rival-threat board so its density axis surfaces its real as-of",
@@ -627,90 +711,6 @@
       "sha": "c2acc81",
       "summary": "data: market-pulse swarm refresh (run 34720544412) (#950)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-09-12T22:20:34+00:00",
-      "sha": "4ef890a",
-      "summary": "chore(dashboard): refresh plan_cycle status after the census_vintage freshness-reader ship",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-13T05:20:02+07:00",
-      "sha": "c032074",
-      "summary": "service: wire census_vintage into the freshness reader so rival_density + peer_province surface their real as-of (#952)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-12T21:28:15+00:00",
-      "sha": "52e4361",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-12, run 34719954215)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-12T20:29:59+00:00",
-      "sha": "631caaa",
-      "summary": "docs: log the mobile scroll-cue UX loop (PR #949, merged + deployed + verified)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-13T03:26:46+07:00",
-      "sha": "6a06cdb",
-      "summary": "ux: mobile scroll-cue on the primary search tables (Branches/Provinces/Market) (#949)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-12T19:55:55+00:00",
-      "sha": "dda8012",
-      "summary": "data: Thai-IP-only swarm refresh (run 34713983258) (#948)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-12T18:59:26+00:00",
-      "sha": "d04ba32",
-      "summary": "risk: authoritative NSO-CKAN income denominator for the household-DTI lens (objective #1) (#947)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-09-12T17:55:06+00:00",
-      "sha": "ce6d255",
-      "summary": "data: market-pulse swarm refresh (run 34702883281) (#943)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-12T17:27:31+00:00",
-      "sha": "b7098e3",
-      "summary": "deck(mcom): rebuild — the data moved past the committed figures (run 34704828269) (#946)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-12T16:57:45+00:00",
-      "sha": "3003067",
-      "summary": "data: SET peer filings refresh (run 34703529264) (#944)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-12T16:19:10+00:00",
-      "sha": "5a5474c",
-      "summary": "chore(dashboard): re-run plan_cycle after #945 ship — refresh CEO autonomy dashboard to HEAD",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-12T23:18:31+07:00",
-      "sha": "4f28243",
-      "summary": "intel(peer): stamp competitor-census as-of vintage through the rival layers + surface it on the peer board (#945)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-12T15:26:12+00:00",
-      "sha": "99028cd",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-12, run 34702139240)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-12T14:20:57+00:00",
-      "sha": "deb6cc4",
-      "summary": "docs(progress-log): record ux-loop #942 merge + deploy-verify result",
-      "pillar": "uxui"
     }
   ]
 }
