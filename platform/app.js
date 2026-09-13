@@ -10515,6 +10515,9 @@ function branch3DLinks(d,stop){
 // is active, via the shared #searchstatus polite live region. Empty query -> '' (silent on tab open,
 // and clearing the box announces nothing). Guarded so setting an identical string doesn't re-announce.
 function setSearchStatus(msg){const el=$('#searchstatus'); if(el && el.textContent!==msg) el.textContent=msg;}
+// visible sighted-user result count under each search box (aria-hidden div; the sr-only
+// #searchstatus region carries the same info to AT). Always shown — leads with the answer.
+function setSearchCount(id,html){const el=$('#'+id); if(el) el.innerHTML=html;}
 function renderBranches(){
   const q=($('#search').value||'').trim().toLowerCase();
   let rows=DATA.filter(d=>!q || d.n.toLowerCase().includes(q) || d.v.toLowerCase().includes(q)
@@ -10522,6 +10525,9 @@ function renderBranches(){
   rows.sort((a,b)=> branchSort==='w' ? a.w-b.w : branchSortVal(b,branchSort)-branchSortVal(a,branchSort));
   const total=rows.length, CAP=150;   // silent-cap guard: the table renders only the top CAP; surface the count so the ~1,865 unshown branches aren't hidden without a cue
   setSearchStatus(q ? `${total.toLocaleString()} ${total===1?'branch':'branches'} match “${q}”.` : '');
+  setSearchCount('branchcount', q
+    ? `<b>${total.toLocaleString()}</b> of ${DATA.length.toLocaleString()} ${total===1?'branch':'branches'} match`
+    : `<b>${DATA.length.toLocaleString()}</b> branches`);
   rows=rows.slice(0,CAP);
   $('#branches').innerHTML = `<tr><th class="no-print" scope="col"><span class="sr-only">Watchlist</span></th><th class="h-agri" scope="col" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th scope="col">Branch</th><th scope="col">Prov</th><th class="h-opp" scope="col" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th scope="col">Pickups (prov)</th><th scope="col">Informal (prov)</th><th scope="col">AutoX</th><th class="no-print" scope="col">3D</th></tr>`+
     (rows.length ? rows.map(d=>{const pl=PLOOK[d.v]||{}; const rk=riskVal(d); const rc=rk>=60?'var(--agri)':rk>=40?'var(--gold)':'var(--merch)';
@@ -10570,6 +10576,9 @@ function drawProv(){
     (!q || p.th.includes(q) || (p.en||'').toLowerCase().includes(q) || p.slug.includes(q)))
     .sort((a,b)=>b.branches-a.branches);
   setSearchStatus(q ? `${rows.length} ${rows.length===1?'province':'provinces'} match “${q}”${provRegion==='all'?'':` in ${provRegion}`}.` : '');
+  setSearchCount('provcount', (q||provRegion!=='all')
+    ? `<b>${rows.length}</b> of ${PROV.length} ${rows.length===1?'province':'provinces'}${provRegion==='all'?'':` in ${provRegion}`}`
+    : `<b>${PROV.length}</b> provinces`);
   $('#provtbl').innerHTML=`<tr><th class="no-print" scope="col"><span class="sr-only">Watchlist</span></th><th scope="col">Province</th><th scope="col">Region</th><th scope="col">Br</th><th scope="col">Distr</th><th scope="col">Factories</th><th scope="col">Vehicles</th><th scope="col">Fac/br</th><th class="no-print" scope="col">View</th></tr>`+
    (rows.length ? rows.map(p=>{const id=`prov:${p.th}`;
      const wItem={id,label:p.th,sub:`${p.region} · ${p.branches} branches`,val:`${(p.factories||0).toLocaleString()}`,valSub:'factories · measured',col:'var(--gold)',prov:p.th};
@@ -10683,6 +10692,9 @@ function drawMarket(){
     .sort((a,b)=>{const an=a.informal==null, bn=b.informal==null;
       if(an!==bn) return an?1:-1; return (b.informal||0)-(a.informal||0);});
   setSearchStatus(q ? `${rows.length} ${rows.length===1?'province':'provinces'} match “${q}”${mktRegion==='all'?'':` in ${mktRegion}`}.` : '');
+  setSearchCount('mktcount', (q||mktRegion!=='all')
+    ? `<b>${rows.length}</b> of ${PROV.length} ${rows.length===1?'province':'provinces'}${mktRegion==='all'?'':` in ${mktRegion}`}`
+    : `<b>${PROV.length}</b> provinces`);
   const pct=p=>p.vehicles?Math.round(100*(p.pickup||0)/p.vehicles):0;
   $('#mkttbl').innerHTML=`<tr><th scope="col">Province</th><th scope="col">Region</th><th class="h-opp" scope="col" title="DIW registered factory workers — distinct from NSO informal/formal labour">Registered factory workers (DIW)</th><th scope="col" title="NSO informal workforce — borrower base proxy">Informal workforce (NSO)</th><th scope="col">Pickups</th><th scope="col">Pickup %</th><th scope="col" title="World Bank global price direction proxy, region-attributed — not Thai farm-gate">Weakest crop (YoY) · est</th></tr>`+
    rows.map(p=>{const wc=regionWorstCrop(p.region);
