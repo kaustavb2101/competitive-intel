@@ -87,7 +87,6 @@ because the DERIVED platform layers inherit it.
 | `vehicles_by_province.json` | MEASURED | DLT vehicle registrations per province. | |
 | `employment_by_province.json` | MEASURED | NSO labour-force (formal/informal). | |
 | `estates.json` | MEASURED | 35 industrial estates (IEAT). | |
-| `rayong_competitors.json` | MEASURED (hand-curated) | Google Places hand-curated competitor list (`save_competitors.py`). | Curated, not exhaustive. |
 | `bldg_wide.json` | MEASURED | Overpass building footprints (Rayong wide pull). | |
 | `th_amphoe.geojson` | MEASURED | Nationwide 928 amphoe (district) polygons (gov boundaries). | Drives all spatial joins. |
 | `province_narratives.json` | EDITORIAL | Hand-written "what impacts them" narratives (Rayong curated). | **EDITORIAL, not data** — labelled as such. Not a numeric series. |

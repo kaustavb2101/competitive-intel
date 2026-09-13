@@ -122,8 +122,11 @@ Rayong was the pilot template; the goal was the same deep-dive for every provinc
   `build_province.py` (`_load_competitors` → point-in-polygon into each amphoe) writes a per-district
   `competitors` count onto all 77 `platform/data/provinces/<slug>.json` (e.g. Khon Kaen = 397 rivals
   across 23 districts), and `province.html` plots the per-province competitor points live from the
-  census (`_CENSUS.filter(c=>c.prov===provTh)`). The hand-curated 30-point `rayong_competitors.json`
-  survives only as a Rayong fallback, unioned-not-replaced. (NB: the province files' branch-level
+  census (`_CENSUS.filter(c=>c.prov===provTh)`). (CORRECTED 2026-09-13: the earlier claim that the
+  hand-curated 30-point `rayong_competitors.json` "survives as a Rayong fallback, unioned-not-replaced"
+  was STALE — `build_province.py._load_competitors` reads `competitors_census.json` ONLY, no page fetches
+  it, and it had zero consumers, so the committed `source-data/rayong_competitors.json` was RETIRED; its
+  producer `save_competitors.py` is kept for reversibility.) (NB: the province files' branch-level
   `ncomp`/`ncompn` and top-level `competitors[]` remain stubs — `None`/`[]` — but have NO app consumer;
   the live census filter supplies the points, so this is a harmless stub, not a gap.)
 - **Remaining (editorial, NOT deterministic):** template the "what impacts them" narrative by region
