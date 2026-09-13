@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 958,
+  "n_points": 960,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -768,7 +768,7 @@
     147.0,
     151.0,
     148.0,
-    148.0
+    145.0
    ]
   },
   "fuel_diesel": {
@@ -1089,11 +1089,12 @@
     "2026-09-09",
     "2026-09-10",
     "2026-09-11",
-    "2026-09-12"
+    "2026-09-12",
+    "2026-09-13"
    ],
    "first_seen": "2026-07-05",
    "label": "Rice (Hom Mali) - NABC farm-gate",
-   "n": 51,
+   "n": 52,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/tonne",
@@ -1140,6 +1141,7 @@
     17700.0,
     17650.0,
     17650.0,
+    17416.67,
     17416.67,
     17416.67,
     17416.67,
@@ -1204,11 +1206,12 @@
     "2026-09-09",
     "2026-09-10",
     "2026-09-11",
-    "2026-09-12"
+    "2026-09-12",
+    "2026-09-13"
    ],
    "first_seen": "2026-07-05",
    "label": "Rubber (raw sheet) - NABC farm-gate",
-   "n": 51,
+   "n": 52,
    "path": "source-data/nabc_prices.json",
    "source": "NABC Agricultural Data Service",
    "unit": "THB/kg",
@@ -1262,6 +1265,7 @@
     81.3,
     82.01,
     82.01,
+    80.19,
     80.19,
     80.19
    ]
@@ -1376,7 +1380,7 @@
     60.0,
     50.0,
     26.0,
-    28.0
+    26.0
    ]
   },
   "rain_max_mm": {
@@ -1489,7 +1493,7 @@
     141.3,
     139.3,
     112.0,
-    112.0
+    109.0
    ]
   },
   "rival_ads_live": {
