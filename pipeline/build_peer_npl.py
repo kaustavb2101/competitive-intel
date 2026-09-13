@@ -50,12 +50,23 @@ the output is a pure function of the committed tree). Added to the determinism g
 import argparse
 import json
 import os
+import statistics
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PIPELINE = os.path.dirname(os.path.abspath(__file__))
 TAPE = os.path.join(ROOT, "platform", "data", "tape_real.json")
 ASSET_QUALITY = os.path.join(ROOT, "platform", "data", "peer_asset_quality.json")
 OUT = os.path.join(ROOT, "platform", "data", "peer_npl.json")
+
+sys.path.insert(0, PIPELINE)
+from lib.regionmap import REGION  # canonical 77-province Thai-name set (drops the head-office cell)
+
+# Disclosure floor for the real tape (see .claude/skills/tape-pii-floor): nothing published may
+# rest on fewer than 30 accounts. tape_real.json's geo.provinces are already province-level no-PII
+# aggregates, but the floor is re-asserted at this projection boundary and any suppression disclosed
+# — the file's own discipline.
+MIN_CELL = 30
 
 # --- (1) Editorial descriptors per peer (NOT the NPL number — that is READ from
 # peer_asset_quality.json so the loan-quality figure has ONE source of truth). Display order;
@@ -215,9 +226,88 @@ def _measured_autox_anchor():
     }
 
 
+def _measured_autox_province_dist(peers):
+    """AutoX's OWN live-book NPL, MEASURED per province from the real loan tape, so the single
+    national anchor's distribution is visible — the 6.06% headline masks where the book is actually
+    weakest. This is the SAME live-book npl_live_os_pct basis as the national anchor above (90-179dpd
+    of the live book, OS-weighted), NOT the peers' reported IFRS-9 Stage-3 basis. The reported-peer
+    band is carried here ONLY as an orientation ruler — peers publish no provincial NPL, so this is
+    the AutoX book's own distribution, never a like-for-like per-province peer table. Every value is
+    read from tape_real.json's committed geo.provinces; nothing is hand-typed. Makes no
+    open/close/expand call — a pure portfolio-quality read (objectives #1 and #2)."""
+    with open(TAPE, encoding="utf-8") as f:
+        gp = json.load(f)["geo"]["provinces"]
+    rows, n_suppressed = [], 0
+    for name, v in gp.items():
+        if name not in REGION:            # drop the non-province '(head office / direct sales)' cell
+            continue
+        n = int(v.get("n") or 0)
+        if n < MIN_CELL:                  # PII floor: suppress + disclose (none today; the guard stays)
+            n_suppressed += 1
+            continue
+        npl = v.get("npl_live_os_pct")
+        if npl is None:
+            continue
+        os_total = float(v.get("os_sum") or 0.0)          # combined book (live + 180+ legacy)
+        # npl_live_os_pct is a rate of the LIVE book only, so its matching denominator is the live
+        # outstanding = combined minus the separately-held 180+ legacy stock. Carry both: os_thb for
+        # book size, live_os_thb as the honest denominator for any roll-up of the live-book rate.
+        live_os = os_total - float(v.get("late180_os") or 0.0)
+        rows.append({
+            "province_th": name,
+            "region": REGION[name],
+            "npl_live_os_pct": round(float(npl), 2),
+            "n": n,
+            "os_thb": round(os_total),
+            "live_os_thb": round(live_os),
+        })
+    # deterministic order: worst live-book NPL first, province name as the tie-break
+    rows.sort(key=lambda r: (-r["npl_live_os_pct"], r["province_th"]))
+
+    # reference ruler only: the reported-peer band (a DIFFERENT, reported IFRS-9 Stage-3 basis)
+    pv = [p["npl"] for p in peers if isinstance(p.get("npl"), (int, float))]
+    band_max = max(pv) if pv else None
+    band_max_peer = next((p["name"] for p in peers if p.get("npl") == band_max), None) if pv else None
+    band_median = round(statistics.median(pv), 2) if pv else None
+    n_above_max = sum(1 for r in rows if band_max is not None and r["npl_live_os_pct"] > band_max)
+    n_above_med = sum(1 for r in rows if band_median is not None and r["npl_live_os_pct"] > band_median)
+
+    # live-OS-weighted national roll-up as an internal self-check: weight each province's live-book
+    # rate by its LIVE outstanding (not the combined os_sum, which carries the separately-held 180+
+    # legacy book), so this reproduces the national live-book anchor rather than a mixed denominator.
+    live_tot = sum(r["live_os_thb"] for r in rows) or 1
+    nat_os = round(sum(r["live_os_thb"] * r["npl_live_os_pct"] for r in rows) / live_tot, 2)
+    npls = [r["npl_live_os_pct"] for r in rows]
+    return {
+        "provinces": rows,
+        "n_provinces": len(rows),
+        "n_suppressed": n_suppressed,
+        "min_cell": MIN_CELL,
+        "min_pct": min(npls) if npls else None,
+        "max_pct": max(npls) if npls else None,
+        "median_pct": round(statistics.median(npls), 2) if npls else None,
+        "national_os_weighted_pct": nat_os,
+        "band_max_pct": band_max,
+        "band_max_peer": band_max_peer,
+        "band_median_pct": band_median,
+        "n_above_band_max": n_above_max,
+        "n_above_band_median": n_above_med,
+        "basis": ("MEASURED — AutoX own live-book NPL (90-179dpd, OS-weighted) per province from the "
+                  "real loan tape (tape_real.json geo.provinces), the same basis as the national "
+                  "anchor. All %d rows >= %d accounts; %d suppressed below the floor."
+                  % (len(rows), MIN_CELL, n_suppressed)),
+        "caveat": ("This is the AutoX book's OWN per-province distribution, NOT a like-for-like "
+                   "per-province peer table: the reported-peer band is national and on a different "
+                   "(reported IFRS-9 Stage-3) basis — peers publish no provincial NPL — so it is used "
+                   "here only as an orientation ruler. Read where our own book is weakest, not a "
+                   "precise peer rank. No open/close/expand call."),
+    }
+
+
 def build():
     autox = _measured_autox_anchor()
     peers, as_of, period, asof_label = _peers_from_asset_quality()
+    autox_province_npl = _measured_autox_province_dist(peers)
     return {
         "meta": {
             "title": "Peer loan-quality league (like-for-like) + AutoX measured anchor",
@@ -238,7 +328,11 @@ def build():
                      "CONTRACTING peer and the only reported peer whose Stage-3 share brackets "
                      "AutoX's own impaired share ('compliant' is not 'thriving'). The spread tracks "
                      "collateral mix: gold/vehicle books run lower Stage-3, land/agri/heavy-vehicle "
-                     "books higher.") % (period, asof_label),
+                     "books higher. The autox_province_npl block carries AutoX's OWN live-book NPL "
+                     "MEASURED per province (the same live-book basis as the anchor), so the single "
+                     "national %.2f%% figure's distribution is visible; the reported-peer band there "
+                     "is an orientation ruler only, NOT a per-province peer read.")
+                    % (period, asof_label, autox["npl_live_os_pct"]),
             "measured": "peers = SET-filed IFRS-9 Stage-3 share (reported); AutoX = measured from the real loan tape",
             "source": ("peers: platform/data/peer_asset_quality.json (all six, SET %s reviewed "
                        "financial-statement NOTES, TFRS9 Stage-3, as-of %s); big-three "
@@ -251,6 +345,7 @@ def build():
         },
         "peers": peers,
         "autox": autox,
+        "autox_province_npl": autox_province_npl,
     }
 
 
@@ -282,9 +377,13 @@ def main():
         f.write(payload)
     b = build()
     a = b["autox"]
+    d = b["autox_province_npl"]
     print("wrote %s — %d peers (like-for-like Q2/2026 Stage-3) + AutoX anchor "
-          "(NPL-live %.2f%% OS · 90+%.2f%% OS)"
-          % (OUT, len(b["peers"]), a["npl_live_os_pct"], a["npl_90plus_os_pct"]))
+          "(NPL-live %.2f%% OS · 90+%.2f%% OS) + per-province dist "
+          "(%d provinces, %d suppressed; %d above the reported-peer band max %s%%)"
+          % (OUT, len(b["peers"]), a["npl_live_os_pct"], a["npl_90plus_os_pct"],
+             d["n_provinces"], d["n_suppressed"], d["n_above_band_max"],
+             d["band_max_pct"]))
 
 
 if __name__ == "__main__":
