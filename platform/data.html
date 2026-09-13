@@ -902,6 +902,7 @@ function renderBranchBrowse(){
     h+='<p class="db-sub">Every one of the '+num(BR2.length)+' AutoX branches, with all measured features and the estimated lens scores. Sort any column, filter by region, search, or download. Click a branch for its full readout.</p>';
     h+='<div class="db-chiprow" id="brchips">'+regions.map(function(r){return '<button class="db-chip'+(r===brFilter?' on':'')+'" data-r="'+esc(r)+'">'+(r==='all'?'All 77':esc(r))+'</button>';}).join('')+'</div>';
     h+='<input class="search" id="brsearch" type="search" enterkeyhint="search" aria-label="Search branches by name, province, or district" placeholder="Search branch / province / district…" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" style="margin-bottom:10px" value="'+esc(brQuery)+'">';
+    h+='<div class="searchcount" id="brsearchcount" aria-hidden="true"></div>';
     h+='<div id="brsearchstatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>';
     h+='<button class="db-chip" id="brcsv" style="margin:0 0 12px">⬇ Download CSV</button>';
     h+='<div class="db-tblwrap"><table class="db-tbl" id="brtbl"><thead><tr>';
@@ -946,9 +947,21 @@ function setBrStatus(n){
     msg=n+' '+(n===1?'branch':'branches')+' match'+reg;}
   if(msg===brLastStatus)return; brLastStatus=msg; el.textContent=msg;
 }
+// Visible, always-present result count under #brsearch — the sighted sibling of the sr-only
+// #brsearchstatus live region, so the data-book branch search also "leads with the answer"
+// (mirrors the SPA's setSearchCount for #branchcount/#provcount). aria-hidden so AT isn't
+// double-announced (the live region stays the announced source). Empty query + all regions
+// shows the honest network total; a query or active region chip shows "N of TOTAL[ in region]".
+function setBrCount(n){
+  var el=document.getElementById('brsearchcount'); if(!el)return;
+  var total=BR2.length, q=brQuery.trim(), reg=(brFilter&&brFilter!=='all');
+  el.innerHTML=(q||reg)
+    ? '<b>'+num(n)+'</b> of '+num(total)+' '+(n===1?'branch':'branches')+(reg?(' in '+esc(brFilter)):'')
+    : '<b>'+num(total)+'</b> branches';
+}
 function fillBranchBody(){
   var rows=branchRows(), body=document.getElementById('brbody'); if(!body)return;
-  setBrStatus(rows.length);
+  setBrStatus(rows.length); setBrCount(rows.length);
   document.querySelectorAll('#brtbl th').forEach(function(th){var c=+th.getAttribute('data-c');var on=(c===brSort.c);
     th.className=on?(brSort.dir>0?'sort-asc':'sort-desc'):'';
     th.setAttribute('aria-sort',on?(brSort.dir>0?'ascending':'descending'):'none');});
