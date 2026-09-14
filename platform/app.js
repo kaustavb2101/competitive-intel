@@ -2942,7 +2942,7 @@ function renderDroughtDistrict(j){
   const total=ds.length, mworse=(c.extreme||0)+(c.severe||0)+(c.moderate||0);
   wrap.style.display='block';
   const v=$('#drought-district-verdict');
-  if(v) v.innerHTML=`<div class="verdict-line">🌾 <b>District drought:</b> ${mworse} of ${total} districts at moderate-or-worse on OAE's SPEI${snap?` (${snap})`:''} — <b style="color:var(--agri)">${c.extreme||0} extreme</b>, <span style="color:var(--gold)">${c.severe||0} severe</span>, ${c.moderate||0} moderate.</div>`+
+  if(v) v.innerHTML=`<div class="verdict-line"><span aria-hidden="true">🌾</span> <b>District drought:</b> ${mworse} of ${total} districts at moderate-or-worse on OAE's SPEI${snap?` (${snap})`:''} — <b style="color:var(--agri)">${c.extreme||0} extreme</b>, <span style="color:var(--gold)">${c.severe||0} severe</span>, ${c.moderate||0} moderate.</div>`+
     `<div class="sub" style="margin-top:4px">A sharper district-grain read behind the province crop-stress verdict above · ${provChip('e','modelled','OAE SPEI')}</div>`;
   const note=$('#drought-district-note');
   if(note) note.innerHTML='<b>SPEI</b> (Standardized Precipitation-Evapotranspiration Index) is a <b>MODELLED</b> drought index OAE computes from ERA5-Land reanalysis — an official model product, <b>not</b> station rainfall and <b>not</b> a disaster declaration. Lower (more negative) = drier. The crop-stress table above uses a coarser HDX rainfall proxy; this resolves the same signal to the <b>district</b>.';
@@ -2980,7 +2980,7 @@ function renderAmphoeCrops(j){
   const top=hs[0];
   const rai=v=>(v==null||!isFinite(v))?'—':Math.round(v).toLocaleString('en-US');
   const v=$('#amphoe-crops-verdict');
-  if(v) v.innerHTML=`<div class="verdict-line">🌾 <b>Crop × drought exposure:</b> ${sw} district-crop cells sit at severe-or-worse drought across ${rows.length?rows.length.toLocaleString('en-US')+' measured':'the measured'} amphoe crop rows. `+
+  if(v) v.innerHTML=`<div class="verdict-line"><span aria-hidden="true">🌾</span> <b>Crop × drought exposure:</b> ${sw} district-crop cells sit at severe-or-worse drought across ${rows.length?rows.length.toLocaleString('en-US')+' measured':'the measured'} amphoe crop rows. `+
     `Largest single exposure: <b>${top.crop_th||top.crop}</b> in <b>${top.province_th}·${top.amphoe_th}</b> — ${rai(top.planted_rai)} rai at SPEI ${(top.spei).toFixed(2)}.</div>`+
     `<div class="sub" style="margin-top:4px">Which slice of the agri-PD book sits under the driest ground · ${provChip('m','measured','OAE area')} × ${provChip('e','modelled','OAE SPEI')}</div>`;
   const note=$('#amphoe-crops-note');
@@ -3037,7 +3037,7 @@ function renderBrandTrends(){
   const vb=$('#btrend-verdict');
   if(vb){
     vb.className='verdict v-warn'; vb.style.display='block';
-    vb.innerHTML=`<div class="verdict-line">🛻 <b>New-pickup registrations ${pkChg!=null?(pkChg<0?'fell '+Math.abs(pkChg).toFixed(0)+'%':'rose '+pkChg.toFixed(0)+'%'):'moved'}</b> ${y0}→${y1} — ${num(pk0)} → ${num(pk1)}${totChg!=null?`, far faster than the whole new-vehicle market (${pct(totChg)})`:''}.</div>`+
+    vb.innerHTML=`<div class="verdict-line"><span aria-hidden="true">🛻</span> <b>New-pickup registrations ${pkChg!=null?(pkChg<0?'fell '+Math.abs(pkChg).toFixed(0)+'%':'rose '+pkChg.toFixed(0)+'%'):'moved'}</b> ${y0}→${y1} — ${num(pk0)} → ${num(pk1)}${totChg!=null?`, far faster than the whole new-vehicle market (${pct(totChg)})`:''}.</div>`+
       `<div class="sub" style="margin-top:4px">The diesel pickup is AutoX's core auto-title collateral — a shrinking new-pickup stream means a <b>shrinking future used-pickup collateral pool</b>${ev!=null?`, while pure-EV take a rising <b>${ev}%</b> of new inflow (${evYr}), thinner and less-certain used values as they age into the pool`:''}. Counts ${TAG_M} DLT first registrations,${basis}${ev!=null?` · EV share ${TAG_E}`:''}.</div>`;
   }
   // ---- note ----
@@ -3184,7 +3184,7 @@ function renderThaiwater(){
       ? `Most widespread 24h rain: <b>${worstRW.th}</b> — <b>${pct(worstRW.pct_heavy)}</b> of its stations over the heavy threshold, peaking at ${num(worstRW.max_mm)}mm.`
         +(rSuspect.length?` <span class="sub">(${rSuspect.map(r=>`${r.th} reports ${num(r.max_mm)}mm at one gauge with only ${pct(r.pct_heavy)} of its stations heavy — treated as a suspect reading, not the headline.)`).join(' ')}</span>`:'')
       : '';
-    vb.innerHTML=`<div class="verdict-line">🌊 ${fLine} ${rLine}</div>`+
+    vb.innerHTML=`<div class="verdict-line"><span aria-hidden="true">🌊</span> ${fLine} ${rLine}</div>`+
       `<div class="sub" style="margin-top:4px">Water on the ground / arriving is an <b>acute</b> collections + collateral event, days before it reaches any monthly series — the fast counterpart to the crop-stress drought read above. Live snapshot, observed to <b>${obs}</b>. ${TAG_M}.</div>`;
   }
   const note=$('#thaiwater-note');
@@ -8337,7 +8337,7 @@ function renderExpoVerdict(top){
   const hhi=(top.hhi||0).toFixed(2);
   const dom=SEG_LABEL[top.dominant_segment]||top.dominant_segment||'mixed';
   box.style.display='block';
-  box.innerHTML=`<div class="verdict-line">🔴 <b>${top.region}</b> is the most concentrated region — HHI ${hhi}, dominant <b>${dom}</b></div>`+
+  box.innerHTML=`<div class="verdict-line"><span aria-hidden="true">🔴</span> <b>${top.region}</b> is the most concentrated region — HHI ${hhi}, dominant <b>${dom}</b></div>`+
     `<div class="sub" style="margin-top:4px">${(top.n_branches||0)} branches · higher HHI = the footprint leans on one segment ${TAG_E}</div>`;
 }
 function renderConcentration(){
