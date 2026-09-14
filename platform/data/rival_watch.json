@@ -38,12 +38,12 @@
   "disappeared": [],
   "label": "MEASURED — n_new_30d is Google Ads Transparency's own per-creative first_shown date, counted within 30 days of the pull date.",
   "live_total_series": {
-   "delta_vs_prior_pull": 2.0,
+   "delta_vs_prior_pull": 31.0,
    "first_seen": "2026-07-30",
-   "latest_date": "2026-09-06",
-   "latest_value": 314.0,
-   "n_observations": 16,
-   "prior_date": "2026-09-05"
+   "latest_date": "2026-09-14",
+   "latest_value": 345.0,
+   "n_observations": 17,
+   "prior_date": "2026-09-06"
   },
   "n_appeared_brands": 4,
   "n_disappeared_brands": 0,
