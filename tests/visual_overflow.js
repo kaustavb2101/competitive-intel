@@ -20,9 +20,17 @@
  * (overflow-x:auto — tables, code, the resale chart on a phone), off-screen/aria-hidden nodes,
  * zero-size nodes, and SVG internals (an SVG's own coordinate system is not CSS layout).
  *
- * Usage:  node tests/visual_overflow.js [baseUrl] [--viewports=1440,900;390,844]
- *         (serve platform/ first: cd platform && python3 -m http.server 8765)
- * Exit 0 = clean, 1 = findings, 2 = could not run (server down, playwright missing).
+ * Usage:  node tests/visual_overflow.js [--viewports=1440,900;390,844]
+ *         Self-serves platform/ and drives the pre-provisioned headless chromium DIRECTLY (chrome
+ *         CLI --dump-dom, the exact zero-dependency approach tests/lib/render.sh already uses), so
+ *         it needs no `npm i playwright` and no external server. 2026-09-14: this was the one QA
+ *         script still gated behind the playwright npm package that the harness RETIRED as a
+ *         dependency on 2026-08-01 (see tests/package.json) — so it self-skipped (exit 2) in the
+ *         determinism-gate / CI / autonomous-loop environment where node_modules is absent, and the
+ *         standing layout audit only ever ran hand-driven. Rewiring it to the provisioned chromium
+ *         lets `bash tests/run.sh overflow` actually run the audit there.
+ * Exit 0 = clean, 1 = findings (overflow / console errors / a route that could not be audited),
+ *          2 = could not run at all (no chromium under /opt/pw-browsers).
  */
 const ROUTES = [
   ['home', '/index.html#home'],
@@ -42,7 +50,6 @@ const ROUTES = [
 const DEFAULT_VIEWPORTS = [[1440, 900], [390, 844]];
 const TOLERANCE = 2; // px — sub-pixel rounding and 1px borders are not findings
 
-const base = (process.argv[2] && !process.argv[2].startsWith('--')) ? process.argv[2] : 'http://localhost:8765';
 const vpArg = process.argv.find(a => a.startsWith('--viewports='));
 const VIEWPORTS = vpArg
   ? vpArg.slice(12).split(';').map(s => s.split(',').map(Number))
@@ -212,53 +219,177 @@ const AUDIT = /* js */ `(tol => {
 // (or an MCP browser_evaluate) and it returns the same finding list this script would print.
 if (process.argv.includes('--print-audit')) { console.log(AUDIT); process.exit(0); }
 
-(async () => {
-  let chromium;
-  try { ({ chromium } = require('playwright')); }
-  catch {
-    console.error('visual_overflow: the playwright npm package is not installed here.');
-    console.error('  Either `npm i -D playwright` and re-run, or use the escape hatch:');
-    console.error('    node tests/visual_overflow.js --print-audit');
-    console.error('  and evaluate that expression in a browser on each route.');
+// ---------------------------------------------------------------------------
+// Runner. Mirrors tests/lib/render.sh exactly: no npm, no playwright — a tiny in-process static
+// server over platform/, plus the pre-provisioned headless chromium driven by CLI flags. The AUDIT
+// above cannot come off a static --dump-dom (it needs live getComputedStyle / getBoundingClientRect),
+// so it is injected as a probe that opens every <details>, runs the audit on an interval, and writes
+// the finding list onto a <meta id="__ovf"> node. --virtual-time-budget lets async data fetches
+// settle, then --dump-dom serialises the settled DOM and we read the node back — same mechanism
+// render.sh uses to read its deck/Leaflet-init probe.
+const fs = require('fs');
+const path = require('path');
+const { execFileSync, spawn } = require('child_process');
+const os = require('os');
+
+const PLATFORM = path.resolve(__dirname, '..', 'platform');
+const BUDGET = 7000;                                   // virtual-time ms per page — room for data fetch + layout
+
+function findChrome() {
+  const cands = [process.env.CHROME_PATH, '/opt/pw-browsers/chromium'].filter(Boolean);
+  try {
+    for (const d of fs.readdirSync('/opt/pw-browsers')) {
+      if (/^chromium-\d/.test(d)) cands.push(`/opt/pw-browsers/${d}/chrome-linux/chrome`);
+    }
+  } catch (e) { /* dir absent — handled below */ }
+  for (const c of cands) { try { if (fs.statSync(c)) return c; } catch (e) { /* next */ } }
+  return null;
+}
+
+// The injected probe. Uses AUDIT verbatim (the tested detector) — the value is plain JS text, so it
+// embeds by concatenation with no re-escaping. The cross-origin fetch guard matches render.sh's:
+// the audit must see the page the way it ships, not a page that reached a proxy-blocked CDN.
+//
+// The leading CSP meta REFUSES every external subresource (Google-Fonts CSS/fonts, cartocdn basemap
+// tiles, any CDN) the instant it is requested. Those hosts are proxy-blocked in the gate/CI/loop
+// environment regardless, so the SETTLED layout is identical either way (fallback fonts, blank
+// basemap — the same state render.sh documents) — but WITHOUT this, chrome's virtual clock pauses in
+// REAL time waiting ~30s for each blocked request to time out, which made a single route take ~40s.
+// With it each route settles in a few seconds. Only external hosts are blocked; every same-origin
+// asset (app.js, vendored deck.gl/Leaflet, styles.css, data/*.json, inline scripts) still loads.
+const PROBE = '<meta http-equiv="Content-Security-Policy" content="default-src \'self\' \'unsafe-inline\' \'unsafe-eval\' data: blob:;">'
+  + '<script>(function(){'
+  + 'var of=window.fetch;window.fetch=function(u,o){var s=(typeof u==="string")?u:(u&&u.url)||"";'
+  + 'if(/^https?:[/][/]/i.test(s)&&s.indexOf(location.origin)!==0){return Promise.reject(new TypeError("qa-blocked cross-origin fetch: "+s));}'
+  + 'return of.apply(this,arguments);};'
+  + 'var d=document.createElement("meta");d.id="__ovf";d.setAttribute("data-findings","[]");d.setAttribute("data-errors","[]");document.documentElement.appendChild(d);'
+  + 'var errs=[];function pushErr(m){if(errs.length<40)errs.push(String(m).slice(0,160));}'
+  + 'var ce=console.error;console.error=function(){pushErr([].join.call(arguments," "));return ce.apply(console,arguments);};'
+  + 'window.addEventListener("error",function(e){pushErr(e.message||(e.error&&e.error.message)||e);});'
+  + 'window.addEventListener("unhandledrejection",function(e){pushErr("reject:"+((e.reason&&e.reason.message)||e.reason));});'
+  // Opening <details> is cheap (a property set), so keep late-rendered ones open on a light interval;
+  // the AUDIT itself walks every element and is O(n) per call, so run it only at a couple of timed
+  // checkpoints (the last completed one wins) rather than on every tick — a per-tick audit made a
+  // heavy tab like #map take ~20x longer for no extra coverage.
+  + 'function openAll(){try{document.querySelectorAll("details").forEach(function(x){x.open=true;});}catch(e){}}'
+  + 'function run(){try{openAll();var r=(' + AUDIT + ');d.setAttribute("data-findings",JSON.stringify(r));d.setAttribute("data-errors",JSON.stringify(errs));}'
+  + 'catch(e){d.setAttribute("data-auditerr",String(e&&e.message||e));}}'
+  + 'window.addEventListener("load",openAll);setInterval(openAll,600);'
+  + 'setTimeout(run,4000);setTimeout(run,7500);'
+  + '})();</script>';
+
+const unesc = s => s.replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+  .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+
+(() => {
+  const chrome = findChrome();
+  if (!chrome) {
+    console.error('visual_overflow: no chromium under /opt/pw-browsers (set CHROME_PATH to override).');
+    console.error('  Escape hatch: node tests/visual_overflow.js --print-audit  then eval in any browser.');
     process.exit(2);
   }
 
-  const browser = await chromium.launch();
+  // Inject the probe once per DISTINCT page (many routes share index.html). The temp copies live in
+  // platform/ so every relative path (data/, vendor/, styles.css) still resolves; cleaned in finally.
+  const pages = [...new Set(ROUTES.map(([, r]) => r.split('#')[0]))];
+  const tmpFor = {};
+  let server;
+  const cleanup = () => {
+    if (server) { try { server.kill('SIGKILL'); } catch (e) {} }
+    for (const t of Object.values(tmpFor)) { try { fs.unlinkSync(t); } catch (e) {} }
+  };
+  process.on('SIGINT', () => { cleanup(); process.exit(2); });
+  process.on('SIGTERM', () => { cleanup(); process.exit(2); });
+
   const findings = [];
-  const consoleErrors = [];
-
-  for (const [w, h] of VIEWPORTS) {
-    const ctx = await browser.newContext({ viewport: { width: w, height: h } });
-    const page = await ctx.newPage();
-    page.on('console', m => { if (m.type() === 'error') consoleErrors.push(`${w}x${h} ${m.text().slice(0, 160)}`); });
-    page.on('pageerror', e => consoleErrors.push(`${w}x${h} pageerror: ${String(e).slice(0, 160)}`));
-
-    for (const [name, route] of ROUTES) {
-      try {
-        await page.goto(base + route, { waitUntil: 'load', timeout: 20000 });
-      } catch (e) {
-        console.error(`visual_overflow: cannot reach ${base + route} — is the server running?`);
-        await browser.close();
-        process.exit(2);
-      }
-      // Data layers land async and several sections are <details> that only lay out once open.
-      await page.waitForTimeout(3500);
-      await page.evaluate(() => document.querySelectorAll('details').forEach(d => { d.open = true; }));
-      await page.waitForTimeout(1200);
-      const res = await page.evaluate(AUDIT);
-      res.forEach(f => findings.push({ ...f, route: name, vp: `${w}x${h}` }));
+  const consoleErrors = new Set();
+  const failed = [];
+  try {
+    for (const pg of pages) {
+      const src = path.join(PLATFORM, pg.replace(/^\//, ''));
+      if (!fs.existsSync(src)) { failed.push(`${pg} (no such page)`); continue; }
+      const tmpName = '_ovf_' + pg.replace(/^\//, '').replace(/[/]/g, '_');
+      const tmp = path.join(PLATFORM, tmpName);
+      const htmlOut = fs.readFileSync(src, 'utf8').replace('<head>', '<head>' + PROBE);
+      fs.writeFileSync(tmp, htmlOut);
+      tmpFor[pg] = tmp;
     }
-    await ctx.close();
-  }
-  await browser.close();
 
-  if (consoleErrors.length) {
-    console.log(`\nCONSOLE ERRORS (${consoleErrors.length}):`);
-    [...new Set(consoleErrors)].slice(0, 20).forEach(e => console.log('  ' + e));
+    // The server MUST be a separate process, not an in-process Node http server: the chrome passes
+    // below run through the SYNCHRONOUS execFileSync, which blocks this process's event loop for the
+    // whole run — an in-process server could not answer chrome's data/*.json fetches during that
+    // block, so the page would never load and every pass would hit the wall. python3 -m http.server
+    // is exactly what tests/lib/render.sh uses, for the same reason.
+    let port = 0;
+    for (let t = 0; t < 6 && !port; t++) {
+      const tryPort = 8800 + Math.floor(Math.random() * 700);
+      server = spawn('python3', ['-m', 'http.server', String(tryPort), '--directory', PLATFORM], { stdio: 'ignore' });
+      try {   // poll until it answers (bash exits 0), or give up on this port (exits 1 -> throws)
+        execFileSync('bash', ['-c',
+          `for i in $(seq 1 40); do curl -s -o /dev/null "http://localhost:${tryPort}/" && exit 0; sleep 0.25; done; exit 1`],
+          { stdio: 'ignore' });
+        port = tryPort;
+      } catch (e) { try { server.kill('SIGKILL'); } catch (e2) {} server = null; }
+    }
+    if (!port) { console.error('visual_overflow: could not start a static server for platform/.'); cleanup(); process.exit(2); }
+
+    for (const [w, h] of VIEWPORTS) {
+      for (const [name, route] of ROUTES) {
+        const page = route.split('#')[0];
+        const hash = route.includes('#') ? '#' + route.split('#').slice(1).join('#') : '';
+        if (!tmpFor[page]) { failed.push(`${name} @ ${w}x${h} (page missing)`); continue; }
+        const url = `http://localhost:${port}/${path.basename(tmpFor[page])}${hash}`;
+        const flags = ['--headless=new', '--no-sandbox', '--disable-gpu', '--use-gl=angle',
+          '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--hide-scrollbars',
+          `--window-size=${w},${h}`, `--virtual-time-budget=${BUDGET}`, '--dump-dom'];
+        if (process.env.VOVF_PROGRESS) process.stderr.write(`  · ${name} @ ${w}x${h}\n`);
+        let dom = '';
+        // A single swiftshader pass occasionally comes back empty (render.sh sees the same); retry
+        // with a fresh profile until the settled probe node is present. killSignal SIGKILL because a
+        // wedged swiftshader chrome ignores SIGTERM (execFileSync's default) and would hang the wall.
+        for (let attempt = 0; attempt < 3 && !/<meta id="__ovf"[^>]*data-findings=/.test(dom); attempt++) {
+          const prof = fs.mkdtempSync(path.join(os.tmpdir(), 'ovf-'));
+          try {
+            dom = execFileSync(chrome, [...flags, `--user-data-dir=${prof}`, url],
+              { encoding: 'utf8', timeout: BUDGET + 8000, killSignal: 'SIGKILL', maxBuffer: 96 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
+          } catch (e) { dom = (e && e.stdout) ? String(e.stdout) : ''; }
+          finally { try { fs.rmSync(prof, { recursive: true, force: true }); } catch (e2) {} }
+        }
+        const m = dom.match(/<meta id="__ovf"[^>]*>/g);
+        if (!m) { failed.push(`${name} @ ${w}x${h} (no probe — chromium produced no settled DOM)`); continue; }
+        const tag = m[m.length - 1];
+        const ae = tag.match(/data-auditerr="(.*?)"/);
+        if (ae) { failed.push(`${name} @ ${w}x${h} (audit threw: ${unesc(ae[1])})`); continue; }
+        const fm = tag.match(/data-findings="(.*?)"/s);
+        const em = tag.match(/data-errors="(.*?)"/s);
+        try {
+          (JSON.parse(fm ? unesc(fm[1]) : '[]')).forEach(f => findings.push({ ...f, route: name, vp: `${w}x${h}` }));
+        } catch (e) { failed.push(`${name} @ ${w}x${h} (unparseable findings)`); }
+        try {
+          (JSON.parse(em ? unesc(em[1]) : '[]')).forEach(x => consoleErrors.add(`${w}x${h} ${name}: ${x}`));
+        } catch (e) { /* errors are advisory */ }
+      }
+    }
+  } finally {
+    cleanup();   // kills the static server + removes the probe temp copies
+  }
+
+  if (failed.length === VIEWPORTS.length * ROUTES.length) {
+    console.error('visual_overflow: could not audit any route — chromium produced no settled DOM.');
+    failed.slice(0, 6).forEach(f => console.error('  ' + f));
+    process.exit(2);
+  }
+  if (consoleErrors.size) {
+    console.log(`\nCONSOLE ERRORS (${consoleErrors.size}):`);
+    [...consoleErrors].slice(0, 20).forEach(e => console.log('  ' + e));
+  }
+  if (failed.length) {
+    console.log(`\nROUTES NOT AUDITED (${failed.length}):`);
+    failed.forEach(f => console.log('  ' + f));
   }
   if (!findings.length) {
     console.log(`\nvisual_overflow: clean — ${ROUTES.length} routes x ${VIEWPORTS.length} viewports, no bleed, clipping, page-x or collisions.`);
-    process.exit(consoleErrors.length ? 1 : 0);
+    process.exit(consoleErrors.size || failed.length ? 1 : 0);
   }
   const byKind = findings.reduce((m, f) => (m[f.kind] = (m[f.kind] || 0) + 1, m), {});
   console.log(`\nvisual_overflow: ${findings.length} finding(s) — ` +

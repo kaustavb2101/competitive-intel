@@ -37,6 +37,8 @@ source-data/occupation_places_named.json
 # QA render temp (headless screenshots)
 platform/_qa_vendor/
 platform/_qa_*.html
+# visual-overflow probe temp (self-cleaned in finally; ignored so a killed run can't leak into a commit)
+platform/_ovf_*.html
 
 # test harness caches/work — regenerate with tests/run.sh (npm-installed deps + fresh renders).
 # tests/baseline/*.png IS committed (visual-regression reference); everything else here is not.
