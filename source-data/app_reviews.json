@@ -3,7 +3,7 @@
   "title": "Title-lender app sentiment — Google Play ratings + newest reviews (incl. our own)",
   "generated_by": "pipeline/pull_app_reviews.py",
   "label": "MEASURED — Google Play store pages (th/th). Star histogram + dated public reviews; review store accumulates across pulls (dedup by reviewId, newest 1500 kept per app).",
-  "pulled_at": "2026-09-13"
+  "pulled_at": "2026-09-14"
  },
  "apps": {
   "AUTOX": {
@@ -12,15 +12,15 @@
    "own": true,
    "stats": {
     "score": 4,
-    "ratings": 1040,
-    "reviews_total": 336,
+    "ratings": 1041,
+    "reviews_total": 337,
     "installs": "500,000+",
     "histogram": [
      161,
      50,
      70,
      100,
-     655
+     656
     ],
     "app_updated": null,
     "version": "Varies with device"
@@ -1713,16 +1713,16 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.698781,
-    "ratings": 17095,
+    "score": 4.707118,
+    "ratings": 17104,
     "reviews_total": 5293,
     "installs": "1,000,000+",
     "histogram": [
-     574,
-     188,
-     485,
-     1309,
-     14535
+     528,
+     199,
+     488,
+     1316,
+     14569
     ],
     "app_updated": "2026-08-06",
     "version": "3.2.0"
@@ -2509,7 +2509,7 @@
      "at": "2026-08-24",
      "score": 5,
      "content": "ใช้ดี ใช้ง่าย เบิกถอนง่าย แต่ให้อัพเดทบ่อยไปนิดค่ะ",
-     "thumbs": 2,
+     "thumbs": 3,
      "replied": false
     },
     {
@@ -3173,7 +3173,7 @@
      "at": "2026-08-20",
      "score": 5,
      "content": "ดีมากๆครับแถมมีบัตรกดยอดเงินที่ผ่อนไปแล้วมาใช้ใด้ด้วยเมื่อจำเป็นสะดวกไม่ต้องไปรีไฟฯที่เงินติดล้อแค่กดเงินได้ที่ตู้atmง่ายๆมากแนะนำครับดอกก็ถูกมาก",
-     "thumbs": 8,
+     "thumbs": 9,
      "replied": false
     },
     {
@@ -6311,16 +6311,16 @@
    "name": "เมืองไทย แคปปิตอล",
    "own": false,
    "stats": {
-    "score": 4.691244,
-    "ratings": 6532,
+    "score": 4.6969233,
+    "ratings": 6536,
     "reviews_total": 2159,
     "installs": "1,000,000+",
     "histogram": [
-     250,
-     59,
-     200,
-     431,
-     5588
+     241,
+     60,
+     201,
+     432,
+     5600
     ],
     "app_updated": "2026-08-18",
     "version": "2.5.114"
@@ -6579,7 +6579,7 @@
      "at": "2026-08-16",
      "score": 5,
      "content": "อยากให้มีกดปรับสัญญาผ่านแอปด้วยค่ะ ที่สามารถทำได้ง่ายๆไม่ต้องเดินทางไปที่สาขา",
-     "thumbs": 6,
+     "thumbs": 7,
      "replied": false
     },
     {
@@ -8317,21 +8317,29 @@
    "name": "ศรีสวัสดิ์",
    "own": false,
    "stats": {
-    "score": 4.5387597,
-    "ratings": 2510,
-    "reviews_total": 882,
+    "score": 4.535714,
+    "ratings": 2514,
+    "reviews_total": 885,
     "installs": "500,000+",
     "histogram": [
-     126,
-     58,
-     97,
-     281,
-     1945
+     129,
+     49,
+     99,
+     298,
+     1935
     ],
     "app_updated": "2026-07-01",
     "version": "1.0.60"
    },
    "reviews_store": [
+    {
+     "id": "76c8629f-69ad-4353-afce-11f4d53b5064",
+     "at": "2026-09-13",
+     "score": 5,
+     "content": "ได้รับการติดต่อจากพนักงาน ดีมากเลยครับ ขอบคุณครับ.",
+     "thumbs": 0,
+     "replied": true
+    },
     {
      "id": "394e8aab-58bb-4b98-8cbc-e579bf70bf3f",
      "at": "2026-09-12",
@@ -10703,7 +10711,7 @@
      "at": "2026-04-21",
      "score": 5,
      "content": "อยากให้ในแอพขึ้นด้วยว่าจ่ายแล้วกี่งวด งวดที่เท่าไหร่/กี่งวด ต่อเลขที่สัญญา เหมือนของเมืองไทยอ่ะรู้เลยว่าจ่ายไปกี่งวดแล้ว ฝากปรับปรุงด้วยครับ",
-     "thumbs": 15,
+     "thumbs": 16,
      "replied": false
     },
     {
@@ -13669,21 +13677,37 @@
    "name": "Good Money เงินดีดี (GSB)",
    "own": false,
    "stats": {
-    "score": 3.7112463,
-    "ratings": 3292,
-    "reviews_total": 1449,
+    "score": 3.7048192,
+    "ratings": 3295,
+    "reviews_total": 1450,
     "installs": "1,000,000+",
     "histogram": [
-     799,
-     149,
-     159,
-     269,
-     1910
+     803,
+     148,
+     168,
+     267,
+     1904
     ],
     "app_updated": "2026-08-11",
     "version": "1.0.45"
    },
    "reviews_store": [
+    {
+     "id": "3fd3d37e-f32a-490c-8519-67cc1293e279",
+     "at": "2026-09-13",
+     "score": 1,
+     "content": "ไม่เห็นจะสมัครได้เลย กรอกเอกสารจนครบ ยังบอกว่าให้กรอกเอกสารให้ตรงกับบัตรประชาชน คืออะไร งง เอกสารก็ถูกต้องตามบัตรประชาชน",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "124bf32f-e88f-4af2-8749-9870d13e9438",
+     "at": "2026-09-13",
+     "score": 1,
+     "content": "สมัครแล้วไม่ผ่าน ไม่อนุญาตให้นำหมายเลขบัรตประชาชนและรูปภาพบัตรประชาชนไปใช้ต่อ เลขที่ลงท้ายบัตรประชาชนคือ 189",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "986920b5-4e96-4570-9171-90a364b6f265",
      "at": "2026-09-12",
@@ -14473,7 +14497,7 @@
      "at": "2026-08-05",
      "score": 5,
      "content": "แอพใช้งานง่าย ทำเรื่องกู้ง่าย ไม่ต้องไปที่ธนาคารเลย ครบจบที่แอพ😊",
-     "thumbs": 6,
+     "thumbs": 7,
      "replied": true
     },
     {
@@ -14641,7 +14665,7 @@
      "at": "2026-08-04",
      "score": 5,
      "content": "เป็น app ที่ดีมากๆ ครับ ส่วนตัวผมถือว่าดีมากๆ ครับ เข้ามาในช่วงเวลาฉุกเฉินที่ผมจำเป็นต้องใช้เงินพอดี ดอกเบี้ยก็ถูก ผ่อนจ่ายสบายๆ สมกับเป็นชื่อ app (เงินดี ^_^ ตามชื่อเลยครับ...)",
-     "thumbs": 7,
+     "thumbs": 8,
      "replied": true
     },
     {
@@ -16889,16 +16913,16 @@
    "name": "GO by Krungsri Auto",
    "own": false,
    "stats": {
-    "score": 4.40625,
-    "ratings": 9352,
+    "score": 4.407527,
+    "ratings": 9354,
     "reviews_total": 3812,
     "installs": "1,000,000+",
     "histogram": [
-     724,
+     723,
      251,
-     482,
-     926,
-     6963
+     481,
+     924,
+     6969
     ],
     "app_updated": "2026-08-19",
     "version": "8.6.0"
@@ -16957,7 +16981,7 @@
      "at": "2026-08-31",
      "score": 5,
      "content": "สะดวกสบายในการใช้งาน ได้รับการแจ้งเตือนข่าวสารต่างๆดี",
-     "thumbs": 1,
+     "thumbs": 2,
      "replied": true
     },
     {
