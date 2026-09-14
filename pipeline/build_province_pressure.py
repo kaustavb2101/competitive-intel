@@ -208,6 +208,17 @@ def build():
         if p["province_th"] in tape_pv and tape_pv[p["province_th"]].get("os_sum") is not None
     )
 
+    # MEASURED-book CREDIT-QUALITY pool: the LIVE-book NPL rate across the provinces the peer board
+    # covers, so book_npl_pctile answers "how bad is AutoX's OWN book here vs its other provinces"
+    # on the same 77-province scale as contest_pctile. COMPUTED over a MEASURED input (the tape's
+    # npl_live_os_pct). This is the portfolio axis of the MEASURED book-squeeze cross below —
+    # distinct from book_pctile (which ranks book SIZE, not quality).
+    book_npl_pool = sorted(
+        float(tape_pv[p["province_th"]]["npl_live_os_pct"])
+        for p in prows
+        if p["province_th"] in tape_pv and tape_pv[p["province_th"]].get("npl_live_os_pct") is not None
+    )
+
     records = []
     for p in prows:
         prov = p["province_th"]
@@ -228,6 +239,10 @@ def build():
         book_n = tv.get("n") if tv else None
         book_pctile = (_percentile_rank(float(book_os), book_os_pool)
                        if book_os is not None and book_os_pool else None)
+        # COMPUTED-over-MEASURED credit-quality percentile: where THIS province's LIVE-book NPL sits
+        # among all provinces with a measured book. The portfolio axis of the book-squeeze cross.
+        book_npl_pctile = (_percentile_rank(float(book_npl_os_pct), book_npl_pool)
+                           if book_npl_os_pct is not None and book_npl_pool else None)
 
         # MEASURED flood-collateral context for this province (null when the flood/amphoe inputs are
         # absent; a MEASURED 0 when present but no AutoX branch here sits on flooded ground).
@@ -248,6 +263,19 @@ def build():
         else:
             both_min = both_mean = q = None
             dbl = False
+
+        # MEASURED book-squeeze cross: our OWN live-book credit-quality axis (book_npl_pctile) x the
+        # SAME measured rival-dominance axis (contest_pctile). BOTH axes are COMPUTED over MEASURED
+        # inputs — so this cross is measured-basis, unlike the ESTIMATED DTI double_pressure above.
+        # It answers a DIFFERENT question: not "where does the NSO macro proxy say borrowers are
+        # stressed" but "where is AutoX's ACTUAL book going bad, right where rivals dominate". Null
+        # (never a guessed 0) when the province lacks a measured book or an AutoX footprint.
+        if book_npl_pctile is not None and contest_pctile is not None:
+            book_min = round(min(book_npl_pctile, contest_pctile), 2)
+            book_dbl = book_npl_pctile >= TOP_THIRD and contest_pctile >= TOP_THIRD
+        else:
+            book_min = None
+            book_dbl = False
 
         records.append({
             "province_th": prov,
@@ -278,6 +306,11 @@ def build():
             "book_npl_os_pct": book_npl_os_pct,
             "book_n": book_n,
             "book_pctile": book_pctile,
+            # MEASURED book-squeeze cross (obj #1 x obj #2, our OWN book): credit-quality percentile
+            # of the LIVE-book NPL rate, and the alert flag / sort key for the book-squeeze board.
+            "book_npl_pctile": book_npl_pctile,
+            "book_min": book_min,
+            "book_double_pressure": book_dbl,
             # MEASURED flood-collateral CONTEXT (flood_hazard.json x amphoe.json — GISTDA 50k repeated-
             # flood census x AutoX branch locations). How many of THIS province's branches sit on
             # ground that floods chronically / at all, and the province's worst branch flood_freq. A
@@ -345,6 +378,27 @@ def build():
     dbl_flood_chronic = sum(r["flood_chronic_branches"] for r in dbl_flood_rows)
     n_dbl_flood_present = sum(1 for r in dbl_flood_rows if r["flood_chronic_branches"] > 0)
     flood_meta = _load(FLOOD).get("meta", {}) if (flood_present_any and os.path.exists(FLOOD)) else {}
+
+    # MEASURED book-squeeze alert set: provinces top-third on BOTH our own live-book NPL AND rival
+    # dominance — "worst book x densest rivals", both axes computed over MEASURED inputs. Sorted
+    # worst-first by book_min (the weaker axis still high). Carries the real ฿ + os-weighted NPL of
+    # the set, and — the headline — HOW MANY of these MEASURED-book provinces the ESTIMATED DTI
+    # double_pressure board does NOT flag (the proxy misses them), so the front door can lead with
+    # the measured answer, not the proxy one. book_present_any gates surfacing (null when tape absent).
+    book_present_any = bool(book_npl_pool)
+    book_scored = [r for r in records if r.get("book_min") is not None]
+    book_dbl_rows = sorted(
+        (r for r in records if r.get("book_double_pressure")),
+        key=lambda r: (-(r["book_min"] if r["book_min"] is not None else 0), r["province_th"]),
+    )
+    dti_set = {r["province_th"] for r in dbl_rows}
+    book_not_in_dti = [r["province_th"] for r in book_dbl_rows if r["province_th"] not in dti_set]
+    bk_os_rows = [r for r in book_dbl_rows if r.get("book_os") is not None]
+    bk_os_total = sum(r["book_os"] for r in bk_os_rows) or 0
+    bk_os_with_npl = sum(r["book_os"] for r in bk_os_rows if r.get("book_npl_os_pct") is not None)
+    bk_npl_num = sum((r["book_os"] * (r.get("book_npl_os_pct") or 0.0))
+                     for r in bk_os_rows if r.get("book_npl_os_pct") is not None)
+    bk_npl_pct = round(bk_npl_num / bk_os_with_npl, 2) if bk_os_with_npl else None
 
     meta = {
         "generated_by": "pipeline/build_province_pressure.py",
@@ -414,6 +468,21 @@ def build():
                            "the provinces the peer board covers (same mid-rank-ties method as the two "
                            "pressure axes, so ฿-scale is directly comparable to stress/contest). "
                            "Lets the reader ask 'is this a big-book province too?' on one scale.",
+            "book_npl_pctile": "COMPUTED over a MEASURED input — 0-100 percentile rank of the LIVE-book "
+                               "NPL RATE (book_npl_os_pct) across the provinces with a measured book "
+                               "(same mid-rank-ties method as the other axes). The portfolio axis of "
+                               "the MEASURED book-squeeze cross: 'how bad is AutoX's OWN book here vs "
+                               "its other provinces'. DISTINCT from book_pctile, which ranks book SIZE.",
+            "book_min": "COMPUTED — min(book_npl_pctile, contest_pctile). The book-squeeze board's sort "
+                        "key (desc): high ONLY when the weaker of our-book-quality / rival-dominance is "
+                        "also high. null when either axis is null.",
+            "book_double_pressure": "COMPUTED over MEASURED inputs — true when BOTH the LIVE-book NPL "
+                                     "percentile AND the rival-dominance percentile are top-third "
+                                     "(>= %.2f). The MEASURED counterpart to double_pressure: it names "
+                                     "where AutoX's ACTUAL book is going bad exactly where rivals "
+                                     "dominate, rather than where the ESTIMATED NSO macro proxy is high. "
+                                     "Both axes MEASURED-basis, so this cross carries the MEASURED label "
+                                     "(double_pressure inherits ESTIMATED from its DTI axis)." % TOP_THIRD,
             "flood_chronic_branches": "MEASURED CONTEXT (not an axis) — count of THIS province's AutoX "
                                       "branches whose district flooded in >= %d of the 12 census years "
                                       "(2005-2016), from flood_hazard.json (GISTDA 50k repeated-flood "
@@ -464,6 +533,17 @@ def build():
             "the most real ฿ and the worst live NPL?' — so an abstract percentile ranking can be read "
             "in real money. book_npl_os_pct is the LIVE book only; the 180+ legacy book is held apart "
             "(see tape_real.json) and is never blended in here. book_os is the combined outstanding.",
+            "The MEASURED book-squeeze cross (book_npl_pctile x contest_pctile → book_double_pressure "
+            "/ book_min) is a SEPARATE cross from the ESTIMATED DTI double_pressure, not a replacement "
+            "for it and not a change to it: double_pressure, both_min, both_mean, quadrant and the sort "
+            "order are all untouched. It swaps the portfolio axis from the NSO macro PROXY (DTI + "
+            "unemployment) to AutoX's OWN MEASURED live-book NPL, so both of its axes are computed over "
+            "measured inputs and it can carry the MEASURED label. The two crosses disagree materially "
+            "(the proxy and the real book rank provinces differently), which is exactly why both are "
+            "surfaced. Still a RELATIVE ranking across the 77 provinces, NOT a probability or an "
+            "absolute default level, and makes NO open/close/expand call. The NPL rate is the LIVE book "
+            "only (180+ legacy held apart, never blended); provinces below MIN_CELL or without an AutoX "
+            "footprint carry a null axis and are never flagged (honest gap, never a guessed 0).",
             "The MEASURED flood columns (flood_chronic_branches / flood_flagged_branches / "
             "flood_maxfreq) are likewise CONTEXT, not a third axis: they do NOT change double_pressure, "
             "both_min, both_mean or the sort. They answer 'of the double-pressure provinces, which also "
@@ -477,7 +557,8 @@ def build():
         "record_format": "{province_th, region, stress_pctile, debt_to_income, unemployment_rate, "
                          "contest_pctile, autox, rivals, ratio, leader, autox_rank, n_ranked, "
                          "n_districts, n_outnumbered_districts, pico, book_os, book_npl_os_pct, "
-                         "book_n, book_pctile, flood_chronic_branches, flood_flagged_branches, "
+                         "book_n, book_pctile, book_npl_pctile, book_min, book_double_pressure, "
+                         "flood_chronic_branches, flood_flagged_branches, "
                          "flood_maxfreq, both_min, both_mean, quadrant, double_pressure}. "
                          "provinces[] sorted by both_min desc (worst double pressure first); "
                          "null-axis provinces sort last. The pico, book_* and flood_* columns are "
@@ -524,6 +605,19 @@ def build():
             "book_os_total": dbl_book_os,
             "book_npl_os_pct": dbl_book_npl_pct,
         } if dbl_book_rows else None),
+        # MEASURED book-squeeze alert set (obj #1 x obj #2 on our OWN book) — the summary the
+        # front-door card leads with. n_not_in_dti / provinces_not_in_dti is the headline: how many
+        # of these MEASURED-worst-book, rival-dense provinces the ESTIMATED DTI board does NOT flag.
+        # null when the tape is absent from the sandbox (honest gap).
+        "book_double_pressure_set": ({
+            "n_provinces": len(book_dbl_rows),
+            "n_provinces_scored": len(book_scored),
+            "provinces": [r["province_th"] for r in book_dbl_rows],
+            "book_os_total": bk_os_total,
+            "book_npl_os_pct": bk_npl_pct,
+            "n_not_in_dti": len(book_not_in_dti),
+            "provinces_not_in_dti": book_not_in_dti,
+        } if book_present_any else None),
         # MEASURED sub-scale-competitor context on the alert set: how many licensed PICO-finance
         # operators cluster in the double-pressure provinces (the distinct class the big-4
         # contest_pctile misses). Context only — never a third pressure axis. null when the FPO
@@ -612,6 +706,15 @@ def run(check=False):
         print("  MEASURED flood collateral in the alert set: %d AutoX branches on chronic-flood "
               "ground across %d of %d double-pressure provinces (context only)"
               % (dpf["chronic_branches_total"], dpf["n_provinces_flood_present"], dpf["n_provinces"]))
+    bds = m.get("book_double_pressure_set")
+    if bds:
+        print("  MEASURED book-squeeze (own live-NPL top-third x rivals top-third): %d provinces — %s"
+              % (bds["n_provinces"], ", ".join(bds["provinces"]) or "none"))
+        print("    of which %d NOT flagged by the ESTIMATED DTI board: %s"
+              % (bds["n_not_in_dti"], ", ".join(bds["provinces_not_in_dti"]) or "none"))
+        if bds["book_npl_os_pct"] is not None:
+            print("    ฿%.2fbn outstanding in the set, LIVE NPL %.2f%% (os-weighted)"
+                  % (bds["book_os_total"] / 1e9, bds["book_npl_os_pct"]))
     return 0
 
 

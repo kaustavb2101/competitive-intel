@@ -11750,6 +11750,55 @@ function renderHomeDoublePressure(){
   wrapTables();   // this card mounts AFTER the PROVPRESS fetch resolves, past the boot-time wrapTables() — upgrade its inline .tblwrap to a keyboard-reachable, labelled scroll region (WCAG 2.1.1)
   wrap.style.display='';
 }
+/* ---------- MEASURED BOOK-SQUEEZE PROVINCE WATCHLIST (obj #1 × obj #2, the MEASURED counterpart) ----------
+   Surfaces the same data/province_pressure.json but on its book_double_pressure flag: the NAMED provinces
+   top-third on BOTH AutoX's OWN MEASURED live-book NPL (book_npl_pctile ← tape_real.json) AND rival dominance
+   (contest_pctile — the SAME measured census). This is the MEASURED counterpart to the ESTIMATED DTI card
+   above: it swaps the portfolio axis from the NSO macro proxy to our ACTUAL book, so BOTH axes are computed
+   over MEASURED inputs and the cross carries the MEASURED label. The proxy and the real book rank provinces
+   DIFFERENTLY, so it leads with which measured-worst provinces the DTI board misses. We RANK & show, never
+   recompute. Still a RELATIVE ranking across the 77 provinces, NOT a probability; NO open/close/expand call.
+   Null-safe: hidden until PROVPRESS resolves, the layer carries book_double_pressure, and ≥1 province qualifies.
+   Mounted directly below the DTI card so the measured and proxy answers read together. */
+function renderHomeBookSqueeze(){
+  const wrap=$('#cc-booksqueeze'), body=$('#cc-booksqueeze-body');
+  if(!wrap||!body) return;
+  const recs=(PROVPRESS&&Array.isArray(PROVPRESS.provinces))?PROVPRESS.provinces:[];
+  if(!recs.length) return;                                   // stay hidden until the fetch resolves
+  const bs=recs.filter(r=>r&&r.book_double_pressure)
+    .sort((a,b)=>(b.book_min||0)-(a.book_min||0));           // worst book-squeeze first
+  if(!bs.length) return;                                     // pre-fold layer (no flag) or none qualify → stay hidden
+  const m=PROVPRESS.meta||{};
+  const pct=v=>(typeof v==='number')?Math.round(v):'—';
+  const rat=v=>(typeof v==='number')?v.toFixed(1)+'×':'—';
+  const nplp=v=>(typeof v==='number')?v.toFixed(1)+'%':'—';
+  const baht=v=>{if(typeof v!=='number')return '—';const a=Math.abs(v);return a>=1e9?'฿'+(v/1e9).toFixed(2)+'bn':a>=1e6?'฿'+Math.round(v/1e6)+'m':'฿'+Math.round(v/1e3)+'k';};
+  const set=(m.book_double_pressure_set&&typeof m.book_double_pressure_set.n_provinces==='number')?m.book_double_pressure_set:null;
+  const mob=(m.book_source&&m.book_source.mob_anchor)?m.book_source.mob_anchor:null;
+  // Which book-squeeze provinces are ALSO on the ESTIMATED DTI double-pressure board — so the card can
+  // point at what is NEW here (the measured-worst provinces the proxy does not see).
+  const dpSet=new Set(recs.filter(r=>r&&r.double_pressure).map(r=>r.province_th));
+  body.innerHTML=
+    `<div class="tblwrap"><table class="tbl"><tr><th scope="col">Province</th>`+
+      `<th scope="col" title="Portfolio-risk axis (obj #1), MEASURED — the province's LIVE-book NPL from the real loan tape (tape_real.json, outstanding-weighted), and its 0–100 rank across the provinces with a measured book. Our ACTUAL book quality, not a macro proxy. LIVE book only — 180+ legacy held apart.">Our live NPL ▲</th>`+
+      `<th scope="col" title="Competitive-risk percentile (obj #2) — 0–100 rank of the MEASURED rival:AutoX branch ratio across the 77 provinces (same census as the double-pressure board above). COMPUTED over measured counts.">Rival ◆</th>`+
+      `<th scope="col" title="Rivals ÷ AutoX branches in the province (MEASURED census), and the top rival brand.">Outgunned</th>`+
+      `<th scope="col" title="MEASURED real loan tape — the province's outstanding book (฿, combined), and whether the ESTIMATED household-DTI double-pressure board also flags it.">Book ฿</th>`+
+      `</tr>`+
+    bs.map(r=>{
+      const alsoDP=dpSet.has(r.province_th);
+      return `<tr>
+        <td><b style="border-left:3px solid var(--accent);padding-left:7px">${r.province_th||'—'}</b> <span class="sub">${r.region||''}</span></td>
+        <td class="mono" style="color:var(--accent)"><b>${nplp(r.book_npl_os_pct)}</b> <span class="sub" style="font-weight:400">· ${pct(r.book_npl_pctile)} pctile</span></td>
+        <td class="mono" style="color:var(--accent)"><b>${pct(r.contest_pctile)}</b></td>
+        <td class="mono">${rat(r.ratio)} <span class="sub" style="font-weight:400">${r.leader?'· '+r.leader:''}</span></td>
+        <td class="mono"><b>${baht(r.book_os)}</b>${alsoDP?' <span class="mono sub" style="color:var(--agri);font-weight:400" title="Also top-third on the ESTIMATED household-DTI double-pressure board above">· also DTI ▲</span>':''}</td>
+      </tr>`;}).join('')+`</table></div>`+
+    (set&&set.book_npl_os_pct!=null?`<div class="sub" style="margin-top:6px;color:var(--txt)">These <b>${set.n_provinces}</b> provinces hold <b>${baht(set.book_os_total)}</b> of MEASURED outstanding book at a <b>${nplp(set.book_npl_os_pct)}</b> live NPL${mob?' (tape '+mob+')':''} — our OWN book, not a proxy.${set.n_not_in_dti>0?` <b>${set.n_not_in_dti}</b> of them (<b>${(set.provinces_not_in_dti||[]).join(', ')}</b>) are <b>not</b> flagged by the estimated DTI board above — the macro proxy misses where our actual book is weakest.`:''}</div>`:'')+
+    `<div class="sub" style="margin-top:6px;color:var(--dim)"><b>${bs.length}</b> province${bs.length===1?'':'s'} sit top-third on <b>both</b> our OWN measured live-book NPL and rival dominance — where the book is actually going bad exactly where margin defence is hardest. The <b>MEASURED counterpart</b> to the estimated DTI card above: it swaps the NSO macro proxy for AutoX's real book, so <b>both</b> axes are <b>measured</b> (live NPL from the real tape; rival ratio computed over the measured census) — a RANKING across the 77 provinces, not a probability, and no open/close/expand call. LIVE book only (180+ legacy apart). Full per-province board &amp; brand split → <a class="cc-link no-print" data-v="acq" href="#acq" style="display:inline">Competition</a>.</div>`;
+  wrapTables();   // mounts AFTER the PROVPRESS fetch resolves, past boot-time wrapTables() — upgrade its .tblwrap to a keyboard-reachable, labelled scroll region (WCAG 2.1.1)
+  wrap.style.display='';
+}
 /* ---------- AGRI-COMPETITIVE SQUEEZE PROVINCE WATCHLIST (obj #1 × obj #2, DISTINCT cross) ----------
    Surfaces data/agri_squeeze.json (build_agri_squeeze.py): the NAMED provinces top-third on BOTH the
    AGRICULTURAL portfolio axis (agri_pctile — crop_stress agri_stress: MEASURED farm-gate price + OAE
@@ -14269,6 +14318,7 @@ function renderHome(){
   renderHomeMacro();        // META.macro + META.board
   renderHomeDefend();       // rival_threat_region.json — hardest-to-defend regions (lazy, null-safe)
   renderHomeDoublePressure(); // province_pressure.json — provinces top-third on BOTH axes (lazy, null-safe)
+  renderHomeBookSqueeze();  // province_pressure.json — MEASURED counterpart: own live-book NPL × rival dominance (lazy, null-safe)
   renderHomeAgriSqueeze();  // agri_squeeze.json — provinces top-third on BOTH the AGRI axis AND rival dominance (lazy, null-safe)
   renderHomeCollatSqueeze();// collateral_squeeze.json — provinces top-third on BOTH the COLLATERAL-softening axis AND rival dominance (lazy, null-safe)
   renderHomeMovers();       // deltas.json
@@ -14327,7 +14377,7 @@ function renderHome(){
     loadRateObserved().then(()=>{ if(onHome()) renderHomeThesis(); });
     // obj#1 x obj#2 — the INTERSECTION clause: provinces both borrower-stressed AND rival-dominated
     // (province_pressure.json, a deterministic join of the two per-province axes). Null-safe re-render.
-    loadProvincePressure().then(()=>{ if(onHome()){ renderHomeThesis(); renderHomeDoublePressure(); renderHomeAgriSqueeze(); renderHomeCollatSqueeze(); } });
+    loadProvincePressure().then(()=>{ if(onHome()){ renderHomeThesis(); renderHomeDoublePressure(); renderHomeBookSqueeze(); renderHomeAgriSqueeze(); renderHomeCollatSqueeze(); } });
     // obj#1(agri) x obj#2 — the DISTINCT agri-competitive squeeze: farm-borrower stress (crop_stress
     // agri_stress) AND rival dominance coincide (agri_squeeze.json). Loads after province_pressure so the
     // card can tag which squeeze provinces are ALSO household double-pressure. Null-safe re-render.
