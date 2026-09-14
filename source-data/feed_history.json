@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 996,
+  "n_points": 1005,
   "n_series": 29,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -743,11 +743,12 @@
     "2026-09-11",
     "2026-09-12",
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-07-11",
    "label": "River stations above their high mark",
-   "n": 51,
+   "n": 52,
    "path": "platform/data/thaiwater_flood.json",
    "source": "ThaiWater live river/reservoir telemetry",
    "unit": "stations",
@@ -802,7 +803,8 @@
     151.0,
     148.0,
     143.0,
-    142.0
+    142.0,
+    141.0
    ]
   },
   "fuel_diesel": {
@@ -1369,11 +1371,12 @@
     "2026-09-11",
     "2026-09-12",
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-07-10",
    "label": "Provinces with heavy rain somewhere",
-   "n": 51,
+   "n": 52,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "provinces",
@@ -1428,7 +1431,8 @@
     50.0,
     26.0,
     21.0,
-    39.0
+    39.0,
+    38.0
    ]
   },
   "rain_max_mm": {
@@ -1484,11 +1488,12 @@
     "2026-09-11",
     "2026-09-12",
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-07-10",
    "label": "Heaviest 24h rainfall, any gauge",
-   "n": 51,
+   "n": 52,
    "path": "platform/data/thaiwater_rain.json",
    "source": "ThaiWater rain-gauge telemetry",
    "unit": "mm",
@@ -1543,7 +1548,8 @@
     139.3,
     112.0,
     174.5,
-    269.0
+    269.0,
+    278.0
    ]
   },
   "rival_ads_live": {
@@ -1564,11 +1570,12 @@
     "2026-09-03",
     "2026-09-04",
     "2026-09-05",
-    "2026-09-06"
+    "2026-09-06",
+    "2026-09-14"
    ],
    "first_seen": "2026-07-30",
    "label": "Rival ad creatives running now",
-   "n": 16,
+   "n": 17,
    "path": "platform/data/rival_ads.json",
    "source": "Google Ads Transparency Center",
    "unit": "creatives",
@@ -1588,7 +1595,8 @@
     315.0,
     309.0,
     312.0,
-    314.0
+    314.0,
+    345.0
    ]
   },
   "rival_promo_live_mtc": {
@@ -1626,11 +1634,12 @@
     "2026-09-10",
     "2026-09-11",
     "2026-09-12",
-    "2026-09-13"
+    "2026-09-13",
+    "2026-09-14"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC · live promo/news items",
-   "n": 33,
+   "n": 34,
    "path": "source-data/rival_promos.json",
    "source": "muangthaicap.com (own-site pull)",
    "unit": "items",
@@ -1640,6 +1649,7 @@
     13.0,
     13.0,
     13.0,
+    11.0,
     11.0,
     11.0,
     11.0,
@@ -1705,15 +1715,17 @@
     "2026-09-10",
     "2026-09-11",
     "2026-09-12",
-    "2026-09-13"
+    "2026-09-13",
+    "2026-09-14"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD · live promo/news items",
-   "n": 33,
+   "n": 34,
    "path": "source-data/rival_promos.json",
    "source": "sawad.co.th (own-site pull)",
    "unit": "items",
    "values": [
+    5.0,
     5.0,
     5.0,
     5.0,
@@ -1784,15 +1796,17 @@
     "2026-09-10",
     "2026-09-11",
     "2026-09-12",
-    "2026-09-13"
+    "2026-09-13",
+    "2026-09-14"
    ],
    "first_seen": "2026-07-19",
    "label": "TIDLOR · live promo/news items",
-   "n": 33,
+   "n": 34,
    "path": "source-data/rival_promos.json",
    "source": "tidlor.com (own-site pull)",
    "unit": "items",
    "values": [
+    6.0,
     6.0,
     6.0,
     6.0,
@@ -1862,11 +1876,12 @@
     "2026-09-10",
     "2026-09-11",
     "2026-09-12",
-    "2026-09-13"
+    "2026-09-13",
+    "2026-09-14"
    ],
    "first_seen": "2026-07-30",
    "label": "Rival YouTube brand channels · total views",
-   "n": 32,
+   "n": 33,
    "path": "platform/data/rival_youtube.json",
    "source": "YouTube Data API v3 (official) — public brand-channel statistics",
    "unit": "views",
@@ -1902,7 +1917,8 @@
     947803053.0,
     948200635.0,
     948620698.0,
-    949080661.0
+    949080661.0,
+    949488073.0
    ]
   },
   "search_share_autox": {
@@ -2339,11 +2355,12 @@
     "2026-09-09",
     "2026-09-10",
     "2026-09-11",
-    "2026-09-12"
+    "2026-09-12",
+    "2026-09-14"
    ],
    "first_seen": "2026-08-07",
    "label": "Social-listening corpus · total demand documents",
-   "n": 29,
+   "n": 30,
    "path": "platform/data/social_themes.json",
    "source": "app-store reviews + YouTube comments + Pantip threads (build_social_themes.py)",
    "unit": "documents",
@@ -2376,7 +2393,8 @@
     13206.0,
     13293.0,
     13323.0,
-    13335.0
+    13335.0,
+    13352.0
    ]
   }
  }
