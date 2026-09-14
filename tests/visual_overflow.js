@@ -44,10 +44,14 @@ const ROUTES = [
   ['market', '/index.html#market'],
   ['branches', '/index.html#branches'],
   ['databook', '/data.html'],
+  ['live', '/live.html'],
+  ['status', '/status.html'],
 ];
 // Phone first: almost every overflow bug shows there first, and the desktop width is where the
-// owner actually reviews. Two viewports keep the run under a minute.
-const DEFAULT_VIEWPORTS = [[1440, 900], [390, 844]];
+// owner actually reviews. A mid-band 1000px is added because several bleed classes only appear at
+// the tablet width where a desktop 2-col grid has collapsed but the phone stack has not yet — the
+// two-viewport default (1440 / 390) stepped straight over it.
+const DEFAULT_VIEWPORTS = [[1440, 900], [1000, 800], [390, 844]];
 const TOLERANCE = 2; // px — sub-pixel rounding and 1px borders are not findings
 
 const vpArg = process.argv.find(a => a.startsWith('--viewports='));
