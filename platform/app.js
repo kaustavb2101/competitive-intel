@@ -8714,7 +8714,7 @@ function renderSimVerdict(baseHiP,baseHiBr,N,shocked,scenHiP,scenHiBr){
   const box=$('#sim-verdict'); if(!box) return;
   box.style.display='block';
   if(baseHiP==null){
-    box.innerHTML=`<div class="verdict-line">⚙️ <b>Baseline ready.</b> The agri what-if needs crop-stress data (data/crop_stress.json) — load it to run the crop / rainfall shock.</div>`;
+    box.innerHTML=`<div class="verdict-line"><span aria-hidden="true">⚙️</span> <b>Baseline ready.</b> The agri what-if needs crop-stress data (data/crop_stress.json) — load it to run the crop / rainfall shock.</div>`;
     return;
   }
   if(!shocked){
@@ -8725,15 +8725,15 @@ function renderSimVerdict(baseHiP,baseHiBr,N,shocked,scenHiP,scenHiBr){
       // the real, reassuring reading. Frame the zero as a "clear today" result (with the bar named so
       // the 0 is legible as "under a defined threshold", not "no data") and point at the sliders — the
       // action that makes the tool move. A severe crop+drought shock does tip provinces over 45.
-      box.innerHTML=`<div class="verdict-line">⚙️ <b>Baseline: the book is clear today</b> — no province crosses the high agri-stress bar (agri-stress ≥45/100).</div>`+
+      box.innerHTML=`<div class="verdict-line"><span aria-hidden="true">⚙️</span> <b>Baseline: the book is clear today</b> — no province crosses the high agri-stress bar (agri-stress ≥45/100).</div>`+
         `<div class="sub" style="margin-top:4px">Drag the crop-price and drought sliders to see which provinces tip in first. ILLUSTRATIVE what-if (estimated proxy, no loan balances) — a direction, not a number. ${TAG_E}</div>`;
     } else {
-      box.innerHTML=`<div class="verdict-line">⚙️ <b>Baseline:</b> ${baseHiP} provinces in high agri-stress today — ${baseHiBr.toLocaleString()} branches (${pct}% of the network)</div>`+
+      box.innerHTML=`<div class="verdict-line"><span aria-hidden="true">⚙️</span> <b>Baseline:</b> ${baseHiP} provinces in high agri-stress today — ${baseHiBr.toLocaleString()} branches (${pct}% of the network)</div>`+
         `<div class="sub" style="margin-top:4px">Drag a slider to stress the book. ILLUSTRATIVE what-if (estimated proxy, no loan balances) — a direction, not a number. ${TAG_E}</div>`;
     }
   } else {
     const dP=scenHiP-baseHiP, dBr=scenHiBr-baseHiBr; const s=v=>(v>0?'+':'')+v;
-    box.innerHTML=`<div class="verdict-line">⚙️ <b>Under this shock:</b> high-stress provinces ${baseHiP} → ${scenHiP} (${s(dP)}) · exposed branches ${baseHiBr.toLocaleString()} → ${scenHiBr.toLocaleString()} (${s(dBr)})</div>`+
+    box.innerHTML=`<div class="verdict-line"><span aria-hidden="true">⚙️</span> <b>Under this shock:</b> high-stress provinces ${baseHiP} → ${scenHiP} (${s(dP)}) · exposed branches ${baseHiBr.toLocaleString()} → ${scenHiBr.toLocaleString()} (${s(dBr)})</div>`+
       `<div class="sub" style="margin-top:4px">ILLUSTRATIVE what-if · branch counts measured, stress flag estimated ${TAG_E}</div>`;
   }
 }
