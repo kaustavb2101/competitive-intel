@@ -10386,8 +10386,8 @@ function popupHTML(d){
     <div class="pv">${d.v}${d.d?' · '+d.d:''} · ${d.r} · ${d.w} AutoX ≤10km</div>
     ${(()=>{const slug=pl&&pl.slug; const bh=bldgCenterHref(slug,d.y,d.x);
       const btn='display:block;text-align:center;padding:7px;border-radius:7px;text-decoration:none;font:700 12px \'IBM Plex Sans Thai\'';
-      const bldg=bh?`<a href="${bh}" style="${btn};background:var(--accent);color:#fff">🏙 3D buildings</a>`:'';
-      const expl=`<a href="branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}${themeQS()}" style="${btn};background:var(--accent);color:#fff">🔎 10 km explorer</a>`;
+      const bldg=bh?`<a href="${bh}" style="${btn};background:var(--accent);color:#fff"><span aria-hidden="true">🏙</span> 3D buildings</a>`:'';
+      const expl=`<a href="branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}${themeQS()}" style="${btn};background:var(--accent);color:#fff"><span aria-hidden="true">🔎</span> 10 km explorer</a>`;
       return `<div style="display:grid;grid-template-columns:${bh?'1fr 1fr':'1fr'};gap:6px;margin:8px 0 2px">${bldg}${expl}</div>`;})()}
     ${recsPopupHTML(d)}
     ${briefPopupHTML(d,sec,r)}
@@ -10562,8 +10562,8 @@ function branch3DLinks(d,stop){
   const s=stop?' onclick="event.stopPropagation()"':'';
   const parts=[];
   const b=bldgCenterHref(branchSlug(d),d.y,d.x);
-  if(b) parts.push(`<a href="${b}"${s} title="3D building scene — centred on this branch" style="text-decoration:none;color:var(--accent)">🏙 3D</a>`);
-  parts.push(`<a href="${branchHref(d)}"${s} title="Per-branch 3D explorer — what's within 10 km" style="text-decoration:none;margin-left:8px;color:var(--mid,#8A94A8)">🔎 explorer</a>`);
+  if(b) parts.push(`<a href="${b}"${s} title="3D building scene — centred on this branch" style="text-decoration:none;color:var(--accent)"><span aria-hidden="true">🏙</span> 3D</a>`);
+  parts.push(`<a href="${branchHref(d)}"${s} title="Per-branch 3D explorer — what's within 10 km" style="text-decoration:none;margin-left:8px;color:var(--mid,#8A94A8)"><span aria-hidden="true">🔎</span> explorer</a>`);
   return parts.join('');
 }
 // WCAG 4.1.3 Status Messages: announce the live match count to screen readers when a search filter
@@ -10647,7 +10647,7 @@ function drawProv(){
      <td class="mono">${Math.round((p.vehicles||0)/1000)}k</td>
      <td class="mono" style="color:var(--collat)">${p.branches?Math.round((p.factories||0)/p.branches):0}</td>
      <td class="no-print sub" style="white-space:nowrap">
-       <a href="${bldgURL(p.slug)}" onclick="event.stopPropagation()" title="3D building scene" style="text-decoration:none;color:var(--accent)">🏙 3D</a>
+       <a href="${bldgURL(p.slug)}" onclick="event.stopPropagation()" title="3D building scene" style="text-decoration:none;color:var(--accent)"><span aria-hidden="true">🏙</span> 3D</a>
        <a href="${distURL(p.slug)}" onclick="event.stopPropagation()" title="Extruded district view" style="text-decoration:none;margin-left:8px;color:var(--mid,#8A94A8)">▦ district</a>
      </td></tr>`;}).join('')
     : `<tr><td colspan="9" class="cc-empty" style="padding:14px 7px">No provinces match “${dqEsc(q)}”${provRegion==='all'?'':` in ${dqEsc(provRegion)}`}. Clear the search to see all 77.</td></tr>`);
@@ -10858,10 +10858,10 @@ function queue3DLink(it){
   if((it.type==='defend'||it.type==='audit') && typeof DATA!=='undefined' && Array.isArray(DATA)){
     const b=DATA.find(d=>d&&d.n===it.name);
     if(b){ const h=bldgCenterHref(branchSlug(b),b.y,b.x);
-      if(h) return ` <a href="${h}" title="3D building scene — centred on this branch" style="text-decoration:none">🏙 3D</a>`; }
+      if(h) return ` <a href="${h}" title="3D building scene — centred on this branch" style="text-decoration:none"><span aria-hidden="true">🏙</span> 3D</a>`; }
   }
   const pl=(typeof PLOOK!=='undefined'&&PLOOK)?PLOOK[it.prov]:null;
-  if(pl&&pl.slug) return ` <a href="rayong-catchment.html?city=${pl.slug}${themeQS()}" title="3D building scene — ${dqEsc(pl.th||it.prov)}" style="text-decoration:none;color:var(--accent)">🏙 3D</a>`;
+  if(pl&&pl.slug) return ` <a href="rayong-catchment.html?city=${pl.slug}${themeQS()}" title="3D building scene — ${dqEsc(pl.th||it.prov)}" style="text-decoration:none;color:var(--accent)"><span aria-hidden="true">🏙</span> 3D</a>`;
   return '';
 }
 /* ---------- IMPACT CARDS — the Region → Province → Branch drill (owner sign-off 2026-07-25) ----
