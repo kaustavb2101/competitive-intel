@@ -2,47 +2,39 @@
  "ads": {
   "appeared": [
    {
-    "brand": "Ngern Tid Lor",
-    "key": "TIDLOR",
-    "live_pct": 17.0,
-    "n_live": 140,
-    "n_new_30d": 24,
-    "share_of_volume_pct": 54.8
-   },
-   {
     "brand": "Srisawad",
     "key": "SAWAD",
-    "live_pct": 34.8,
-    "n_live": 130,
-    "n_new_30d": 21,
-    "share_of_volume_pct": 24.9
+    "live_pct": 35.3,
+    "n_live": 138,
+    "n_new_30d": 26,
+    "share_of_volume_pct": 25.7
+   },
+   {
+    "brand": "Ngern Tid Lor",
+    "key": "TIDLOR",
+    "live_pct": 18.4,
+    "n_live": 152,
+    "n_new_30d": 14,
+    "share_of_volume_pct": 54.1
    },
    {
     "brand": "Ngern Hai Jai",
     "key": "NGERNHAIJAI",
-    "live_pct": 12.2,
-    "n_live": 17,
-    "n_new_30d": 17,
+    "live_pct": 17.7,
+    "n_live": 25,
+    "n_new_30d": 7,
     "share_of_volume_pct": 9.3
    },
    {
     "brand": "Ngern Turbo",
     "key": "TURBO",
-    "live_pct": 21.0,
-    "n_live": 26,
-    "n_new_30d": 2,
-    "share_of_volume_pct": 8.3
-   },
-   {
-    "brand": "MoneyDD",
-    "key": "GSB_MONEYDD",
-    "live_pct": 4.8,
-    "n_live": 1,
-    "n_new_30d": 1,
-    "share_of_volume_pct": 1.4
+    "live_pct": 23.2,
+    "n_live": 29,
+    "n_new_30d": 3,
+    "share_of_volume_pct": 8.2
    }
   ],
-  "as_of": "2026-09-06",
+  "as_of": "2026-09-14",
   "disappeared": [],
   "label": "MEASURED — n_new_30d is Google Ads Transparency's own per-creative first_shown date, counted within 30 days of the pull date.",
   "live_total_series": {
@@ -53,7 +45,7 @@
    "n_observations": 16,
    "prior_date": "2026-09-05"
   },
-  "n_appeared_brands": 5,
+  "n_appeared_brands": 4,
   "n_disappeared_brands": 0,
   "note": "ads.disappeared is empty: rival_ads.json's brand rows are monthly aggregates with no per-creative last_shown, so a specific creative going dark cannot be identified from this input."
  },
@@ -85,7 +77,7 @@
    }
   },
   "label": "MIXED, labelled per section. promos.new and ads.appeared are MEASURED from real per-item/per-creative first_seen/first_shown dates already in the source files. promos.disappeared, ads.disappeared and search_demand movement are all empty by design — none of this pipeline's inputs currently carry the second data point (last_seen, per-creative last_shown, or a prior share-of-search vintage) that an honest 'disappeared' or 'movement' figure requires.",
-  "newest_observation_date": "2026-09-13",
+  "newest_observation_date": "2026-09-14",
   "title": "Rival watch — what changed in the rival field since last time (obj #2)"
  },
  "promos": {
