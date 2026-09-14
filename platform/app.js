@@ -11778,24 +11778,41 @@ function renderHomeBookSqueeze(){
   // Which book-squeeze provinces are ALSO on the ESTIMATED DTI double-pressure board — so the card can
   // point at what is NEW here (the measured-worst provinces the proxy does not see).
   const dpSet=new Set(recs.filter(r=>r&&r.double_pressure).map(r=>r.province_th));
+  // MEASURED collateral-impairment overlay: AutoX branches on chronic (≥7/12-yr) repeated-flood ground
+  // (GISTDA census × branch→amphoe→province crosswalk). Already carried on every province row and already
+  // shown on the ESTIMATED DTI double-pressure card directly above — so the MEASURED book-squeeze card
+  // shows it too, mirroring that card exactly (same field, #3E7CB1 colour, "context, never in score"
+  // framing). A physical recovery/collateral hazard on the province's worst REAL book — seized vehicles
+  // are harder to recover/re-sell and borrower cash-flow is hit — that the live-NPL rate alone cannot see.
+  // Context only, never in the sort/score; gated so a pre-flood province_pressure.json degrades cleanly to
+  // no column. The set totals are summed client-side from the shown rows (no new layer field, no builder change).
+  const floodVin=(m.flood_source&&m.flood_source.data_vintage)?m.flood_source.data_vintage:null;
+  const hasFlood=bs.some(r=>typeof r.flood_chronic_branches==='number');
+  const floodTotal=bs.reduce((s,r)=>s+(typeof r.flood_chronic_branches==='number'&&r.flood_chronic_branches>0?r.flood_chronic_branches:0),0);
+  const floodProvN=bs.filter(r=>typeof r.flood_chronic_branches==='number'&&r.flood_chronic_branches>0).length;
   body.innerHTML=
     `<div class="tblwrap"><table class="tbl"><tr><th scope="col">Province</th>`+
       `<th scope="col" title="Portfolio-risk axis (obj #1), MEASURED — the province's LIVE-book NPL from the real loan tape (tape_real.json, outstanding-weighted), and its 0–100 rank across the provinces with a measured book. Our ACTUAL book quality, not a macro proxy. LIVE book only — 180+ legacy held apart.">Our live NPL ▲</th>`+
       `<th scope="col" title="Competitive-risk percentile (obj #2) — 0–100 rank of the MEASURED rival:AutoX branch ratio across the 77 provinces (same census as the double-pressure board above). COMPUTED over measured counts.">Rival ◆</th>`+
       `<th scope="col" title="Rivals ÷ AutoX branches in the province (MEASURED census), and the top rival brand.">Outgunned</th>`+
       `<th scope="col" title="MEASURED real loan tape — the province's outstanding book (฿, combined), and whether the ESTIMATED household-DTI double-pressure board also flags it.">Book ฿</th>`+
+      (hasFlood?`<th scope="col" title="MEASURED — AutoX branches in a CHRONIC repeated-flood district (flooded ≥7 of the 12 years 2005–2016; GISTDA 50k census${floodVin?', '+floodVin:''}). A physical collateral/recovery hazard on the book — seized vehicles are harder to recover and re-sell, and borrower cash-flow is hit — that the live-NPL rate alone cannot see. Frequency only (a hazard flag, no flooded-area or loss claimed). Context, never folded into the score.">Flood ⚑</th>`:'')+
       `</tr>`+
     bs.map(r=>{
       const alsoDP=dpSet.has(r.province_th);
+      const fc=r.flood_chronic_branches;
+      const floodCell=hasFlood?`<td class="mono" style="color:${typeof fc==='number'&&fc>0?'#3E7CB1':'var(--dim)'}"><b>${typeof fc==='number'?fc:'—'}</b>${typeof fc==='number'&&fc>0&&typeof r.flood_maxfreq==='number'?` <span class="sub" style="font-weight:400">· ${r.flood_maxfreq}/12 yr</span>`:''}</td>`:'';
       return `<tr>
         <td><b style="border-left:3px solid var(--accent);padding-left:7px">${r.province_th||'—'}</b> <span class="sub">${r.region||''}</span></td>
         <td class="mono" style="color:var(--accent)"><b>${nplp(r.book_npl_os_pct)}</b> <span class="sub" style="font-weight:400">· ${pct(r.book_npl_pctile)} pctile</span></td>
         <td class="mono" style="color:var(--accent)"><b>${pct(r.contest_pctile)}</b></td>
         <td class="mono">${rat(r.ratio)} <span class="sub" style="font-weight:400">${r.leader?'· '+r.leader:''}</span></td>
         <td class="mono"><b>${baht(r.book_os)}</b>${alsoDP?' <span class="mono sub" style="color:var(--agri);font-weight:400" title="Also top-third on the ESTIMATED household-DTI double-pressure board above">· also DTI ▲</span>':''}</td>
+        ${floodCell}
       </tr>`;}).join('')+`</table></div>`+
     (set&&set.book_npl_os_pct!=null?`<div class="sub" style="margin-top:6px;color:var(--txt)">These <b>${set.n_provinces}</b> provinces hold <b>${baht(set.book_os_total)}</b> of MEASURED outstanding book at a <b>${nplp(set.book_npl_os_pct)}</b> live NPL${mob?' (tape '+mob+')':''} — our OWN book, not a proxy.${set.n_not_in_dti>0?` <b>${set.n_not_in_dti}</b> of them (<b>${(set.provinces_not_in_dti||[]).join(', ')}</b>) are <b>not</b> flagged by the estimated DTI board above — the macro proxy misses where our actual book is weakest.`:''}</div>`:'')+
-    `<div class="sub" style="margin-top:6px;color:var(--dim)"><b>${bs.length}</b> province${bs.length===1?'':'s'} sit top-third on <b>both</b> our OWN measured live-book NPL and rival dominance — where the book is actually going bad exactly where margin defence is hardest. The <b>MEASURED counterpart</b> to the estimated DTI card above: it swaps the NSO macro proxy for AutoX's real book, so <b>both</b> axes are <b>measured</b> (live NPL from the real tape; rival ratio computed over the measured census) — a RANKING across the 77 provinces, not a probability, and no open/close/expand call. LIVE book only (180+ legacy apart). Full per-province board &amp; brand split → <a class="cc-link no-print" data-v="acq" href="#acq" style="display:inline">Competition</a>.</div>`;
+    (hasFlood&&floodTotal>0?`<div class="sub" style="margin-top:4px;color:var(--txt)">On the ground, <b style="color:#3E7CB1">${floodTotal}</b> AutoX branch${floodTotal===1?'':'es'} across <b>${floodProvN}</b> of these provinces sit in a <b>chronic repeated-flood</b> district (flooded ≥7 of 12 yrs; MEASURED, GISTDA${floodVin?' '+floodVin:''}) — a physical collateral/recovery hazard stacked on the worst real book, one the live-NPL rate alone cannot see. A hazard flag, not a loss estimate (no flooded area claimed); context, never in the score.</div>`:'')+
+    `<div class="sub" style="margin-top:6px;color:var(--dim)"><b>${bs.length}</b> province${bs.length===1?'':'s'} sit top-third on <b>both</b> our OWN measured live-book NPL and rival dominance — where the book is actually going bad exactly where margin defence is hardest. The <b>MEASURED counterpart</b> to the estimated DTI card above: it swaps the NSO macro proxy for AutoX's real book, so <b>both</b> axes are <b>measured</b> (live NPL from the real tape; rival ratio computed over the measured census) — a RANKING across the 77 provinces, not a probability, and no open/close/expand call. LIVE book only (180+ legacy apart)${hasFlood?'; the <b>Flood ⚑</b> column is a <b>MEASURED</b> count of branches on chronic repeated-flood ground (GISTDA), carried as context and never in the score':''}. Full per-province board &amp; brand split → <a class="cc-link no-print" data-v="acq" href="#acq" style="display:inline">Competition</a>.</div>`;
   wrapTables();   // mounts AFTER the PROVPRESS fetch resolves, past boot-time wrapTables() — upgrade its .tblwrap to a keyboard-reachable, labelled scroll region (WCAG 2.1.1)
   wrap.style.display='';
 }
