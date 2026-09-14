@@ -272,6 +272,20 @@
         <div class="cc-card-b" id="cc-double-body"></div>
       </div>
 
+      <!-- MEASURED BOOK-SQUEEZE (province_pressure.json book_double_pressure ← build_province_pressure.py) — the
+           MEASURED counterpart to the ESTIMATED DTI card directly above: it swaps the portfolio axis from the NSO
+           macro proxy (DTI + unemployment) to AutoX's OWN MEASURED live-book NPL (tape_real.json), crossed with the
+           SAME measured rival:AutoX census. Names the provinces where our ACTUAL book is going bad exactly where
+           rivals dominate — both axes computed over MEASURED inputs, so the cross carries the MEASURED label. It
+           disagrees materially with the proxy board (different provinces), which is why both are shown; it leads
+           with which measured-worst provinces the DTI board misses. A RANKING over relative percentiles, MEASURED
+           basis, NO open/close/expand call. Null-safe: absent tape / no book-squeeze province → hidden. -->
+      <div class="cc-card cc-card-wide" id="cc-booksqueeze" style="display:none">
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--accent)"></span>Our own book going bad and outgunned — the measured book squeeze
+          <a class="cc-link no-print" data-v="acq" href="#acq">Competition <span aria-hidden="true">→</span></a></div>
+        <div class="cc-card-b" id="cc-booksqueeze-body"></div>
+      </div>
+
       <!-- AGRI-COMPETITIVE SQUEEZE (agri_squeeze.json ← build_agri_squeeze.py) — a DISTINCT cross from
            the household double-pressure card above: the portfolio axis here is AGRICULTURAL (crop_stress
            agri_stress: MEASURED farm-gate price + OAE drought), crossed with the SAME measured rival:AutoX
