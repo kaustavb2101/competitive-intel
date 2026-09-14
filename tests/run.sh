@@ -871,19 +871,12 @@ phase_visual(){
 phase_overflow(){
   hdr "visual overflow audit (bleed / clip / page-x / collide)"
   if ! command -v node >/dev/null 2>&1; then skip "overflow (node not installed)"; return 0; fi
-  local port=8791
-  python3 -m http.server "$port" --directory "$PLATFORM" >/dev/null 2>&1 &
-  local srv=$!
-  local i=0
-  while [ $i -lt 40 ]; do
-    curl -s -o /dev/null "http://localhost:$port/" 2>/dev/null && break
-    i=$((i+1)); sleep 0.25
-  done
+  # visual_overflow.js now self-serves platform/ and drives the provisioned chromium directly (the
+  # same zero-npm approach as lib/render.sh), so no server plumbing here — just run it.
   local out rc
-  out="$(node "$TESTS/visual_overflow.js" "http://localhost:$port" 2>&1)"; rc=$?
-  kill "$srv" 2>/dev/null; wait "$srv" 2>/dev/null
+  out="$(node "$TESTS/visual_overflow.js" 2>&1)"; rc=$?
   printf '%s\n' "$out"
-  # exit 2 is "could not run" (playwright missing) — an environment gap, not a layout defect.
+  # exit 2 is "could not run" (no chromium) — an environment gap, not a layout defect.
   if [ "$rc" -eq 0 ]; then ok "visual overflow (no findings)"
   elif [ "$rc" -eq 2 ]; then skip "visual overflow (could not run)"
   else bad "visual overflow (findings above)"; fi
