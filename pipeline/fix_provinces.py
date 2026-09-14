@@ -47,7 +47,15 @@ def run(check=False):
             print(f"  {p!r}: {c}")
 
     if check:
-        return 1 if unresolved else 0
+        # derive.py projects the master's stored prov/region VERBATIM — it reads b["prov"]/
+        # b["region"] directly (derive.py:82) and rolls up by the stored region (derive.py:103);
+        # it does NOT re-normalize. So a record that is resolvable but UN-NORMALIZED
+        # (canonical(prov)!=prov or region_of(...)!=region, yet region!="Other") would ship a
+        # STALE province/region into platform/data with the gate otherwise green — silently
+        # miscounting the by-region/by-province rollups that feed BOTH the competitive-risk and
+        # portfolio-risk reads. Fail on ANY pending change, not only on the unresolved "Other"
+        # records; the fix is `python3 fix_provinces.py` (apply) so the projection is clean.
+        return 1 if (changed or unresolved) else 0
     json.dump(master, open(MASTER, "w"), ensure_ascii=False)
     print(f"wrote {MASTER}")
     print("next: run `python3 derive.py` to push the corrected regions into platform/data")
