@@ -75,10 +75,18 @@ def collect_refs(text):
 
 def main():
     refs = {}  # name -> sorted list of frontend files that reference it
+    # The frontend = every top-level page (*.html) PLUS every non-vendor script. Scan ALL
+    # non-vendor JS, not just app.js by name: pmtiles-layer.js (loaded by the three 3D
+    # scenes) and any future helper module fetch layers too, and a dangling ref left in one
+    # 404s in production exactly like one in app.js — so the guard's stated guarantee ("every
+    # literal the frontend fetches") only holds if it actually reads them all. Vendored
+    # library bundles under vendor/ are excluded: a minified deck.gl / Leaflet build can carry
+    # an incidental "data/…json" string that is not one of our layer fetches (a false RED).
     sources = sorted(glob.glob(os.path.join(REPO, "platform", "*.html")))
-    app_js = os.path.join(REPO, "platform", "app.js")
-    if os.path.exists(app_js):
-        sources.append(app_js)
+    for js in sorted(glob.glob(os.path.join(REPO, "platform", "**", "*.js"), recursive=True)):
+        if "vendor" in os.path.relpath(js, REPO).split(os.sep):
+            continue
+        sources.append(js)
     for p in sources:
         text = open(p, encoding="utf-8", errors="ignore").read()
         for n in collect_refs(text):
