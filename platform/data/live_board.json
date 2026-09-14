@@ -100,8 +100,8 @@
    "label": "Listed rival scoreboard",
    "measured": true,
    "source": "Stock Exchange of Thailand · set.or.th in-browser JSON API (highlight-data + profile + company-highlight/financial-data)",
-   "stamp": "2026-09-10",
-   "stamp_iso": "2026-09-10",
+   "stamp": "2026-09-11",
+   "stamp_iso": "2026-09-11",
    "stamp_kind": "price_asof",
    "unit": "listed peers",
    "value": 6,
@@ -489,7 +489,7 @@
    "stamp_kind": "vintage",
    "unit": "juristic persons",
    "value": 7909,
-   "what": "merchant-segment formation — new small firms are the merchant book's feedstock"
+   "what": "merchant-segment formation — new small firms are the merchant book's feedstock. THAI-IP ONLY: openapi.dbd.go.th now 403s from CI, so only an owner-side pull refreshes it"
   },
   {
    "aging_days": null,

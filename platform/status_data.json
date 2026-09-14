@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-14T11:21:10+07:00",
-    "commit": "557030b"
+    "generated_at": "2026-09-14T10:15:53+00:00",
+    "commit": "913003e"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,54 @@
   ],
   "activity": [
     {
+      "date": "2026-09-14T10:15:53+00:00",
+      "sha": "913003e",
+      "summary": "intel(service): live board tells the truth about dbd_formation — source went CI-unreachable, mark it Thai-IP-only",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-09-14T09:38:32+00:00",
+      "sha": "43b2a9d",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-14, run 34828885296)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-14T08:31:41+00:00",
+      "sha": "8b26dbc",
+      "summary": "docs(progress): log UX loop PR #971 (aria-hidden the 3D-scene link glyphs) — merged + deploy-verified",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-14T15:27:50+07:00",
+      "sha": "2a2770f",
+      "summary": "ux: aria-hidden the decorative 🏙/🔎 glyphs in the SPA's 3D-scene links (#971)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-09-14T07:04:11+00:00",
+      "sha": "a1b6dee",
+      "summary": "test(overflow): make the visual-overflow layout audit runnable in the gate/CI by driving chromium directly (drop retired-playwright dependency)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-14T05:32:20+00:00",
+      "sha": "3b4e288",
+      "summary": "data(census): refresh the Union Auction forward book (run 34803854288) (#968)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-14T05:07:35+00:00",
+      "sha": "6d8c819",
+      "summary": "data: market-pulse swarm refresh (run 34803805613) (#969)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-14T04:23:45+00:00",
+      "sha": "59130ed",
+      "summary": "chore(plan): refresh CEO dashboard after the measured book-squeeze ship (#970)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-14T11:21:10+07:00",
       "sha": "557030b",
       "summary": "intel(market): MEASURED book-squeeze cross on the command centre (own live-NPL × rivals) (#970)",
@@ -663,54 +711,6 @@
       "sha": "0463910",
       "summary": "docs(progress): log the visible search-count ship (PR #959, merged + deployed + verified live)",
       "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-13T21:16:00+07:00",
-      "sha": "8dbc6cb",
-      "summary": "ux: visible per-table search result count on #branches/#provinces/#market (#959)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-13T12:32:08+00:00",
-      "sha": "79fd321",
-      "summary": "test(orphan-guard): fix write-call false negative in orphan_sources, retire the orphan it hid",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-13T10:56:38+00:00",
-      "sha": "d8ff75d",
-      "summary": "data: market-pulse swarm refresh (run 34750878262) (#958)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-13T10:20:32+00:00",
-      "sha": "56ce2b4",
-      "summary": "chore(plan): refresh CEO dashboard after the rival-threat census_vintage stamp",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-13T10:20:06+00:00",
-      "sha": "5c1ae55",
-      "summary": "intel(peer): stamp census_vintage on the per-region rival-threat board so its density axis surfaces its real as-of",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-13T10:00:18+00:00",
-      "sha": "d6832f9",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-13, run 34750596822)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-13T08:23:28+00:00",
-      "sha": "ce41b52",
-      "summary": "docs(progress): log the mobile top-nav scroll-cue fade ship + deploy-verify (#957)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-13T15:21:01+07:00",
-      "sha": "ee42973",
-      "summary": "ux: right-edge scroll-cue fade on the mobile top nav (#957)",
-      "pillar": "uxui"
     }
   ]
 }

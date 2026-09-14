@@ -311,9 +311,19 @@ REGISTRY = [
          pick=lambda d: (dig(d, "series.rice.values.-1"), "$/mt"), measured=True,
          history=dict(file="commodity_history.json", kind="commodity", points=60,
                       note="60 months, 11 series — World Bank Pink Sheet")),
+    # DBD's own open API (openapi.dbd.go.th) was documented CI-reachable in the 2026-07-09 breakthrough
+    # (docs/INSIGHTS.md §3 — "the departments' OWN CKANs are not geoblocked, only the data.go.th
+    # aggregator is"). That has since REGRESSED: as of 2026-09-14 the resource 403s from a CI/cloud IP
+    # on every retry (3/3), while control CKANs stay up (diw-dataset.diw.go.th → 200) — so it is DBD-side
+    # geoblocking, not a proxy fault. The scheduled pull can therefore no longer refresh it; only an
+    # owner Thai-IP run of pull_datagoth.py --only dbd_newco can. Like pantip_panel above, we LIST it
+    # aging rather than exempt it from the stale test: the feed IS stale, and a board that hides a source
+    # it cannot refresh is telling a comfortable lie. Its `what` says why, so the reader knows where the
+    # refresh has to come from. See docs/BLOCKED_SOURCES.md.
     dict(key="dbd_formation", file="dbd_formation.json", cadence="monthly",
          label="New businesses registered", group="Merchant book",
-         what="merchant-segment formation — new small firms are the merchant book's feedstock",
+         what="merchant-segment formation — new small firms are the merchant book's feedstock. "
+              "THAI-IP ONLY: openapi.dbd.go.th now 403s from CI, so only an owner-side pull refreshes it",
          pick=lambda d: (sum((p or {}).get("n", 0) for p in (d.get("by_province") or {}).values()) or None,
                          "juristic persons"), measured=True),
 
