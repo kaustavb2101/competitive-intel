@@ -489,7 +489,7 @@
    "stamp_kind": "vintage",
    "unit": "juristic persons",
    "value": 7909,
-   "what": "merchant-segment formation — new small firms are the merchant book's feedstock"
+   "what": "merchant-segment formation — new small firms are the merchant book's feedstock. THAI-IP ONLY: openapi.dbd.go.th now 403s from CI, so only an owner-side pull refreshes it"
   },
   {
    "aging_days": null,
