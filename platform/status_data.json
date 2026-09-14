@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-13T22:19:53+00:00",
-    "commit": "90cda70"
+    "generated_at": "2026-09-14T11:21:10+07:00",
+    "commit": "557030b"
   },
   "overall": {
     "progress_pct": 100,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-09-13",
+    "eta_date": "2026-09-14",
     "done_items": 50,
     "in_progress_items": 0,
     "open_items": 0,
@@ -533,6 +533,78 @@
   ],
   "activity": [
     {
+      "date": "2026-09-14T11:21:10+07:00",
+      "sha": "557030b",
+      "summary": "intel(market): MEASURED book-squeeze cross on the command centre (own live-NPL × rivals) (#970)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-14T03:38:47+00:00",
+      "sha": "c40e366",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-14, run 34803204955)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-14T02:47:46+00:00",
+      "sha": "b866d68",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-14T02:44:37+00:00",
+      "sha": "92c0e54",
+      "summary": "docs(progress): log #overview mobile PAGEX fix — merge #967, deploy-verified live",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-14T02:42:46+00:00",
+      "sha": "86c1f63",
+      "summary": "Merge remote-tracking branch 'origin/master'",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-14T02:41:55+00:00",
+      "sha": "e530e14",
+      "summary": "data: NABC live prices (2026-09-14, run 34799767960)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-14T09:37:50+07:00",
+      "sha": "ff17cbf",
+      "summary": "ux: fix #overview horizontal page-scroll on mobile (sr-only absolute overflow) (#967)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-14T00:22:12+00:00",
+      "sha": "fc4cfec",
+      "summary": "test(gate): fail province-integrity check on a resolvable-but-un-normalized master",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-09-13T23:47:37+00:00",
+      "sha": "f0e505a",
+      "summary": "data: rival published rate pages re-read (run 34789315317) (#966)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-13T23:24:12+00:00",
+      "sha": "78b3fe7",
+      "summary": "data: rival Facebook promo feed refresh (run 34785891818) (#965)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-13T22:57:04+00:00",
+      "sha": "0788ac5",
+      "summary": "data: market-pulse swarm refresh (run 34784458100) (#964)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-13T22:22:02+00:00",
+      "sha": "2056284",
+      "summary": "chore(plan): refresh CEO dashboard after the feed-liveness recalibration ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-13T22:19:53+00:00",
       "sha": "90cda70",
       "summary": "service(liveness): recalibrate frozen-value window for the NABC farm-gate price series",
@@ -639,78 +711,6 @@
       "sha": "ee42973",
       "summary": "ux: right-edge scroll-cue fade on the mobile top nav (#957)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-13T07:16:38+00:00",
-      "sha": "5505225",
-      "summary": "data(census): refresh the Union Auction forward book (run 34736268525) (#955)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-13T06:52:10+00:00",
-      "sha": "81723d7",
-      "summary": "data: market-pulse swarm refresh (run 34736204561) (#956)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-13T06:28:08+00:00",
-      "sha": "1385309",
-      "summary": "sched(swarm): wire the three keyless any-IP NSO pullers so the household-DTI + labour risk inputs stop ageing in silence",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-09-13T04:16:31+00:00",
-      "sha": "1606f63",
-      "summary": "chore(plan): refresh CEO dashboard after census_vintage peer-board stamp",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-13T04:15:35+00:00",
-      "sha": "2cf59d1",
-      "summary": "intel(peer): stamp census_vintage on the national peer-standing board so it surfaces its real as-of",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-13T03:35:39+00:00",
-      "sha": "d1cd595",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-13, run 34735791148)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-13T02:37:46+00:00",
-      "sha": "853c82b",
-      "summary": "data: NABC live prices (2026-09-13, run 34733306357)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-13T02:31:23+00:00",
-      "sha": "70d5560",
-      "summary": "docs(progress): log the rayong-catchment page-<h1> ship (PR #954, merged + deployed + verified live)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-13T09:27:43+07:00",
-      "sha": "37dc4e5",
-      "summary": "ux: add page-level <h1> to rayong-catchment.html (page-has-heading-one) (#954)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-13T00:57:23+00:00",
-      "sha": "c36a82b",
-      "summary": "tape(exposure): surface the fine occupation cut the coarse 11-bucket table flattens (#953)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-09-12T23:31:19+00:00",
-      "sha": "25f31fc",
-      "summary": "data: rival Facebook promo feed refresh (run 34721875926) (#951)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-12T23:06:10+00:00",
-      "sha": "c2acc81",
-      "summary": "data: market-pulse swarm refresh (run 34720544412) (#950)",
-      "pillar": "market"
     }
   ]
 }
