@@ -91,11 +91,27 @@ FROZEN_WINDOW_OVERRIDE = {
     # genuinely dead NABC upstream (stamp advancing, value frozen) still fires past these windows.
     "nabc_rice_price": 45,
     "nabc_rubber_price": 25,
+    # cassava / maize / oil palm — three MORE NABC farm-gate series added 2026-09-15, the SAME
+    # daily-pulled step-function shape (national-average farm-gate quotes that hold flat for a week-plus
+    # between moves; each starts with two identical seed readings, and all clearly move over time —
+    # cassava +77% yoy, maize +12%, oil palm +24% in the source). They have no multi-week in-repo
+    # history yet to measure a longest legitimate hold from, so each is set to rice's CONSERVATIVE
+    # 45-day window (the most generous existing NABC entry) so TEST B does not cry wolf on a normal
+    # plateau; tighten toward rubber's 25 once a series has accumulated its own distinct-value record.
+    # TEST A (stale stamp) still watches pull_nabc_prices.py on its daily cadence, so a STOPPED puller
+    # is caught within 7 days regardless, and a genuinely dead upstream (stamp advancing, value frozen)
+    # still fires past this window.
+    "nabc_cassava_price": 45,
+    "nabc_maize_price": 45,
+    "nabc_oilpalm_price": 45,
 }
 FROZEN_MIN_POINTS_OVERRIDE = {
     "fuel_gasohol95": 15,   # ~a month of daily pulls must accumulate before a flat run is judged
     "nabc_rice_price": 15,   # ~a month of daily pulls inside the 45-day window before a flat run counts
     "nabc_rubber_price": 12,  # ~2.5 weeks of daily pulls inside the 25-day window before it counts
+    "nabc_cassava_price": 15,  # conservative NABC-class default (see FROZEN_WINDOW_OVERRIDE)
+    "nabc_maize_price": 15,
+    "nabc_oilpalm_price": 15,
 }
 
 # Series that are legitimately allowed to sit flat, with the reason. A checker that cries wolf gets
