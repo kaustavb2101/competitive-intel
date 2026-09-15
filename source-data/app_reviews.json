@@ -3,7 +3,7 @@
   "title": "Title-lender app sentiment — Google Play ratings + newest reviews (incl. our own)",
   "generated_by": "pipeline/pull_app_reviews.py",
   "label": "MEASURED — Google Play store pages (th/th). Star histogram + dated public reviews; review store accumulates across pulls (dedup by reviewId, newest 1500 kept per app).",
-  "pulled_at": "2026-09-14"
+  "pulled_at": "2026-09-15"
  },
  "apps": {
   "AUTOX": {
@@ -11,21 +11,29 @@
    "name": "เงินไชโย (AutoX)",
    "own": true,
    "stats": {
-    "score": 4,
-    "ratings": 1041,
+    "score": 3.961165,
+    "ratings": 1042,
     "reviews_total": 337,
     "installs": "500,000+",
     "histogram": [
-     161,
+     171,
      50,
      70,
      100,
-     656
+     647
     ],
     "app_updated": null,
     "version": "Varies with device"
    },
    "reviews_store": [
+    {
+     "id": "a9232f21-0bf0-439d-bdff-ff71a665391b",
+     "at": "2026-09-14",
+     "score": 1,
+     "content": "ยุ่งยาก กรอกเสร็จ ไม่ไปหน้าต่อไป ควรพัฒนาแอปให้มันสะดวกในการใช้งาน",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "2cfa93df-91aa-4f08-9b9e-777ddb155531",
      "at": "2026-09-06",
@@ -55,7 +63,7 @@
      "at": "2026-08-31",
      "score": 1,
      "content": "ไม่อนุญาตให้นำเลขท้ายบัตรประจำตัว978ไปใช้โดยเด็ดขาด",
-     "thumbs": 2,
+     "thumbs": 3,
      "replied": false
     },
     {
@@ -1713,21 +1721,29 @@
    "name": "ติดใจ โดย เงินติดล้อ",
    "own": false,
    "stats": {
-    "score": 4.707118,
-    "ratings": 17104,
-    "reviews_total": 5293,
+    "score": 4.708868,
+    "ratings": 17111,
+    "reviews_total": 5296,
     "installs": "1,000,000+",
     "histogram": [
      528,
-     199,
+     189,
      488,
-     1316,
-     14569
+     1317,
+     14585
     ],
     "app_updated": "2026-08-06",
     "version": "3.2.0"
    },
    "reviews_store": [
+    {
+     "id": "f662a25b-a7f1-4301-9fc0-782899b897c8",
+     "at": "2026-09-14",
+     "score": 5,
+     "content": "ดีมาก",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "893af6fa-8a18-4f3f-a951-0e72db60a609",
      "at": "2026-09-12",
@@ -1861,7 +1877,7 @@
      "at": "2026-09-09",
      "score": 5,
      "content": "ดีมากเลยครับ บัตรก็มีกด เงินสดก็มีใช้ ไม่ต้องไปรีไฟแนนซ์ที่สาขาให้เสียเวลา",
-     "thumbs": 0,
+     "thumbs": 1,
      "replied": false
     },
     {
@@ -6435,7 +6451,7 @@
      "at": "2026-08-27",
      "score": 5,
      "content": "บริการมดีมากค่ะ ไม่ทำให้ลูกค้าเครียด แนะทางออกที่ดีมาก พนักงานสุภาพ ทุกสาขา ที่กาฬสินธุ์ค่ะ",
-     "thumbs": 6,
+     "thumbs": 7,
      "replied": false
     },
     {
@@ -8317,21 +8333,45 @@
    "name": "ศรีสวัสดิ์",
    "own": false,
    "stats": {
-    "score": 4.535714,
-    "ratings": 2514,
+    "score": 4.5436506,
+    "ratings": 2521,
     "reviews_total": 885,
     "installs": "500,000+",
     "histogram": [
-     129,
-     49,
+     119,
+     59,
      99,
-     298,
-     1935
+     289,
+     1950
     ],
     "app_updated": "2026-07-01",
     "version": "1.0.60"
    },
    "reviews_store": [
+    {
+     "id": "c839a868-874e-4629-affe-9762c953521d",
+     "at": "2026-09-14",
+     "score": 1,
+     "content": "ขนาดไม่ได้สนใจแล้วยังสารพัดหาเบอร์โทรมาไม่หยุดหย่อนเกินไป",
+     "thumbs": 0,
+     "replied": true
+    },
+    {
+     "id": "8c610e71-fe62-4c72-89af-54fb0cfebfbd",
+     "at": "2026-09-14",
+     "score": 5,
+     "content": "ใช่ดีคะ ไม่ยุ่งยาก",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "6070882d-155e-4069-9f77-8dcca551ada3",
+     "at": "2026-09-14",
+     "score": 5,
+     "content": "จากจากประสบการณ์ที่ใช้งานมาดีมาก การทำประกันข้อเสนอแต่ไม่ได้บังคับ",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "76c8629f-69ad-4353-afce-11f4d53b5064",
      "at": "2026-09-13",
@@ -8401,7 +8441,7 @@
      "at": "2026-09-07",
      "score": 5,
      "content": "ใช้งานดีสะดวกสบาย รวดเร็วทันใจคลิ๊กปุ่มเปิดใช้งานง่ายมากค่ะ",
-     "thumbs": 1,
+     "thumbs": 2,
      "replied": false
     },
     {
@@ -8465,7 +8505,7 @@
      "at": "2026-09-04",
      "score": 1,
      "content": "เอายอดดอกเบี้ย​ที่ค้างจากสัญญา​เดิมมาห้อย​สัญญา​นี้โดยไม่แจ้ง.ปิดยอดจะรีใหม่กลับกลายเป็นต้องชำระค่าปรับเพิ่มพนักงานสาขา... สุดๆระวังกันด้วนนะเตือนก่อนเลยขอสัญญาทุกครั้งที่ทำกับ​บ. นี้ถ่ายสำเนาก็ได้ไม่งั้นมีค่าปรับบวกมาไม่รู้ตัว...",
-     "thumbs": 1,
+     "thumbs": 2,
      "replied": true
     },
     {
@@ -8673,7 +8713,7 @@
      "at": "2026-08-11",
      "score": 5,
      "content": "ศรีสวัสดิ์ดีที่สุดครับดอกเบี้ยก็ถูกขั้นตอนก็ไม่ยุ่งยากครับok ครับไม่มีครับ",
-     "thumbs": 7,
+     "thumbs": 8,
      "replied": false
     },
     {
@@ -10555,16 +10595,16 @@
    "name": "เงินเทอร์โบ",
    "own": false,
    "stats": {
-    "score": 4.31,
-    "ratings": 845,
+    "score": 4.3168316,
+    "ratings": 846,
     "reviews_total": 265,
     "installs": "500,000+",
     "histogram": [
-     118,
+     117,
      8,
      25,
      33,
-     658
+     660
     ],
     "app_updated": "2026-08-24",
     "version": "1.0.62-ngernturbo"
@@ -12225,16 +12265,16 @@
    "name": "สมหวัง เงินสั่งได้ (TISCO)",
    "own": false,
    "stats": {
-    "score": 4.1485147,
-    "ratings": 360,
-    "reviews_total": 138,
+    "score": 4.16,
+    "ratings": 361,
+    "reviews_total": 139,
     "installs": "100,000+",
     "histogram": [
-     53,
+     54,
      7,
-     21,
+     18,
      28,
-     249
+     252
     ],
     "app_updated": "2026-07-20",
     "version": "1.12.0"
@@ -13677,21 +13717,37 @@
    "name": "Good Money เงินดีดี (GSB)",
    "own": false,
    "stats": {
-    "score": 3.7048192,
-    "ratings": 3295,
-    "reviews_total": 1450,
+    "score": 3.6969697,
+    "ratings": 3301,
+    "reviews_total": 1452,
     "installs": "1,000,000+",
     "histogram": [
-     803,
-     148,
-     168,
-     267,
-     1904
+     799,
+     159,
+     179,
+     259,
+     1899
     ],
     "app_updated": "2026-08-11",
     "version": "1.0.45"
    },
    "reviews_store": [
+    {
+     "id": "95cf44fd-f50e-4f9c-b304-a47101270c9c",
+     "at": "2026-09-14",
+     "score": 1,
+     "content": "ให้อัฟสลิปเงินเดือน แต่ในนั้นบอกอาชีพอิสระกู้ได้งง",
+     "thumbs": 0,
+     "replied": false
+    },
+    {
+     "id": "67563466-c391-493d-8461-25930e732d76",
+     "at": "2026-09-14",
+     "score": 1,
+     "content": "ไม่อนุญาตให้นำบัตรประชาชนที่ลงท้ายด้วยเลข 5925 ไปใช้เพราะได้มีการถ่ายบัตรประชาชนกับสแกนใบหน้าไปมิเช่นนั้นจะทำการดำเนินคดีให้ถึงที่สุด",
+     "thumbs": 0,
+     "replied": false
+    },
     {
      "id": "3fd3d37e-f32a-490c-8519-67cc1293e279",
      "at": "2026-09-13",
@@ -14113,7 +14169,7 @@
      "at": "2026-08-22",
      "score": 1,
      "content": "ติดตรงอัพสเตทเม้น ttb ครับ ไฟล์ที่ได้มาจากแอพธนาคารมันไม่มีรหัสเปิดไฟล์อยู่แล้ว ดูได้เลย ตรวจสอบไม่ผ่าน ถอดใจแล้วครับ",
-     "thumbs": 6,
+     "thumbs": 7,
      "replied": true
     },
     {
@@ -16687,7 +16743,7 @@
      "at": "2026-08-04",
      "score": 5,
      "content": "แอปทุกอย่างดีครับแต่ต้องปรับปรุงเรื่องเจ้าหน้าที่โทรช่วยติดตามลูกค้าด้วยหรือมีบรืการแชตออนไลได้ยิ่งดี ขอบคุณครับ",
-     "thumbs": 1,
+     "thumbs": 2,
      "replied": false
     },
     {
@@ -16719,7 +16775,7 @@
      "at": "2025-08-22",
      "score": 1,
      "content": "โหลดมาสมัคร ระบบแจ้งว่าผ่านรอโอนเงิน แต่ระบบรันอยู่7ชม.แต่ไม่มีเงินเข้า",
-     "thumbs": 9,
+     "thumbs": 10,
      "replied": false
     },
     {
@@ -16913,16 +16969,16 @@
    "name": "GO by Krungsri Auto",
    "own": false,
    "stats": {
-    "score": 4.407527,
+    "score": 4.406688,
     "ratings": 9354,
-    "reviews_total": 3812,
+    "reviews_total": 3811,
     "installs": "1,000,000+",
     "histogram": [
-     723,
-     251,
-     481,
-     924,
-     6969
+     725,
+     252,
+     483,
+     917,
+     6972
     ],
     "app_updated": "2026-08-19",
     "version": "8.6.0"

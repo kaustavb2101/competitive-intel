@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_apple_reviews.py",
   "label": "MEASURED — Apple Thai storefront. Aggregate rating + public review text. Ids are hand-pinned and verified against sellerName + bundleId, never resolved by search rank (searching 'เฮงลิสซิ่ง' returns a different lender entirely).",
   "store": "th",
-  "pulled_at": "2026-09-14",
+  "pulled_at": "2026-09-15",
   "cap_per_app": 1500,
   "pages_per_app": 10,
   "reviews_live": true,
@@ -428,10 +428,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.79025,
-    "ratings": 1764,
-    "score_current_version": 3.79025,
-    "ratings_current_version": 1764,
+    "score": 3.79299,
+    "ratings": 1768,
+    "score_current_version": 3.79299,
+    "ratings_current_version": 1768,
     "version": "3.2.0",
     "app_updated": "2026-08-13",
     "released": "2020-04-30",
@@ -3395,16 +3395,43 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.29425,
-    "ratings": 435,
-    "score_current_version": 3.29425,
-    "ratings_current_version": 435,
+    "score": 3.30979,
+    "ratings": 439,
+    "score_current_version": 3.30979,
+    "ratings_current_version": 439,
     "version": "1.0.60",
     "app_updated": "2026-07-02",
     "released": "2024-01-16",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14548626886",
+     "at": null,
+     "score": 5,
+     "title": "ดี",
+     "content": "เข้าถึงง่าย",
+     "version": "1.0.60",
+     "votes": 0
+    },
+    {
+     "id": "14548484632",
+     "at": null,
+     "score": 5,
+     "title": "รีวิววค่าา",
+     "content": "สะดวกรวดเร็วเพิ่มวงเงินไม่เกิน30นาทีจริงๆเครดิตดีก็มีวงเง้นส่วนลดเยอะ",
+     "version": "1.0.60",
+     "votes": 0
+    },
+    {
+     "id": "14548481662",
+     "at": null,
+     "score": 5,
+     "title": "ดี",
+     "content": "ดีดี",
+     "version": "1.0.60",
+     "votes": 0
+    },
     {
      "id": "14500854451",
      "at": null,
@@ -3448,7 +3475,7 @@
      "title": "ห่วย",
      "content": "แอปเข้าไม่ได้ ควรปรับปรุง",
      "version": "1.0.59",
-     "votes": 0
+     "votes": 1
     },
     {
      "id": "14244245024",
@@ -7517,10 +7544,10 @@
    "cohort": "title",
    "own": false,
    "stats": {
-    "score": 3.39763,
-    "ratings": 1602,
-    "score_current_version": 3.39763,
-    "ratings_current_version": 1602,
+    "score": 3.39738,
+    "ratings": 1603,
+    "score_current_version": 3.39738,
+    "ratings_current_version": 1603,
     "version": "8.6.0",
     "app_updated": "2026-08-21",
     "released": "2020-03-03",
@@ -10617,15 +10644,24 @@
    "own": false,
    "stats": {
     "score": 4.82408,
-    "ratings": 173784,
+    "ratings": 173797,
     "score_current_version": 4.82408,
-    "ratings_current_version": 173784,
+    "ratings_current_version": 173797,
     "version": "3.0.8",
     "app_updated": "2026-09-03",
     "released": "2021-04-20",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14548317040",
+     "at": null,
+     "score": 1,
+     "title": "ส",
+     "content": "ข้าพเจ้า สมปอง แซ่ลี้\nได้ทำการสมัครขอวงเงินกับแอพ 'ฟินนิกซ์' แต่ไม่ได้รับการอนุมัติ และได้ลงข้อมูลส่วนตัวลงไปในแอพ\nวันที่13/09/2569มีชื่อนามสกุลที่อยู่ หมายเลขบัตรประจำ ตัวประชาชนหน้าหลังและเบอร์โทรศัพท์ทั้งบุคคลอ้างอิง ทั้ง 2ท่าน ทั้งนี้ถ้าแอพ 'ฟินนิกซ์' ได้นำข้อมูลไปปลอมแปลงในรูปแบบใดๆที่ผิดกฎหมายคุกคามหรือละเมิดสิทธิส่วนบุคคล ข้าพเจ้าสมปองแซ่ลี้และบุคคลอ้างอิง ทั้ง 2ท่านจะไม่ขอรับผิดชอบใดๆทั้งส",
+     "version": "3.0.8",
+     "votes": 0
+    },
     {
      "id": "14544082347",
      "at": null,
@@ -15794,10 +15830,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.70676,
-    "ratings": 65412,
-    "score_current_version": 4.70676,
-    "ratings_current_version": 65412,
+    "score": 4.70672,
+    "ratings": 65473,
+    "score_current_version": 4.70672,
+    "ratings_current_version": 65473,
     "version": "7.8.0",
     "app_updated": "2026-09-07",
     "released": "2021-10-10",
@@ -20810,16 +20846,52 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.84286,
-    "ratings": 45825,
-    "score_current_version": 4.84286,
-    "ratings_current_version": 45825,
+    "score": 4.84263,
+    "ratings": 45942,
+    "score_current_version": 4.84263,
+    "ratings_current_version": 45942,
     "version": "3.1.4",
     "app_updated": "2026-09-07",
     "released": "2023-03-06",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14548587179",
+     "at": null,
+     "score": 5,
+     "title": "เร็ว",
+     "content": "สะดวก รวดเร็ว",
+     "version": "3.1.4",
+     "votes": 0
+    },
+    {
+     "id": "14548486808",
+     "at": null,
+     "score": 5,
+     "title": "ทำง่ายมาก",
+     "content": "ดีมากๆ",
+     "version": "3.1.4",
+     "votes": 0
+    },
+    {
+     "id": "14548074539",
+     "at": null,
+     "score": 5,
+     "title": "บริการ",
+     "content": "ดีมากบริการไวพูดเพราะ",
+     "version": "3.1.4",
+     "votes": 0
+    },
+    {
+     "id": "14547683542",
+     "at": null,
+     "score": 5,
+     "title": "บริการดี",
+     "content": "อนุมัติไว ระบบลื่นไหลไม่มีปัญหา",
+     "version": "3.1.4",
+     "votes": 0
+    },
     {
      "id": "14532821821",
      "at": null,
@@ -25736,10 +25808,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.76911,
-    "ratings": 27217,
-    "score_current_version": 4.76911,
-    "ratings_current_version": 27217,
+    "score": 4.76894,
+    "ratings": 27231,
+    "score_current_version": 4.76894,
+    "ratings_current_version": 27231,
     "version": "1.8.8",
     "app_updated": "2026-09-07",
     "released": "2020-08-05",
@@ -27158,6 +27230,24 @@
      "content": "Superb!!!",
      "version": "1.0.5",
      "votes": 11
+    },
+    {
+     "id": "14548113809",
+     "at": null,
+     "score": 1,
+     "title": "แย่",
+     "content": "ไม่เคยเข้าไปถึงหน้ายื่นเอกสารเลย แต่บอกว่าไม่ผ่าน",
+     "version": "1.8.8",
+     "votes": 0
+    },
+    {
+     "id": "14548107114",
+     "at": null,
+     "score": 1,
+     "title": "ไม่ผ่านการประเมินสินเชื่อ",
+     "content": "ข้อมูลหมายเลขบัตรที่ลงท้าย 3479 เนื่องจากไม่ผ่านการประเมิน ไม่อนุญาตให้นำข้อมูลไปใช้ทุกๆกรณี หากพบว่ามีการนำไปใช้โดยมิชอบ ขอดำเนินคดีตามกฎหมาย",
+     "version": "1.8.8",
+     "votes": 0
     },
     {
      "id": "14532062282",
@@ -29969,10 +30059,10 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 2.62698,
-    "ratings": 2142,
-    "score_current_version": 2.62698,
-    "ratings_current_version": 2142,
+    "score": 2.62809,
+    "ratings": 2143,
+    "score_current_version": 2.62809,
+    "ratings_current_version": 2143,
     "version": "3.4.1",
     "app_updated": "2026-08-31",
     "released": "2022-05-11",
