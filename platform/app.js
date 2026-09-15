@@ -3218,7 +3218,7 @@ function renderThaiwater(){
       const mc=r.suspect?'var(--dim)':mm>=90.1?'var(--agri)':mm>=35.1?'var(--gold)':'var(--dim)';
       return `<tr><td class="mono sub">${i+1}</td><td><b>${r.th}</b></td>`+
         `<td class="mono" style="color:${c}"><b>${pct(ph)}</b></td>`+
-        `<td class="mono" style="color:${mc}">${num(mm)}mm${r.suspect?` <span class="tw-susp" title="One gauge reads ${num(mm)}mm while only ${pct(ph)} of this province's stations cleared 35.1mm. Thailand's 24h record is around 500mm and real province-wide rain wets neighbouring gauges, so this is treated as a suspect single-station reading — shown, not believed, and not used to rank or to colour the row.">⚠ suspect</span>`:''}</td></tr>`;}).join('')
+        `<td class="mono" style="color:${mc}">${num(mm)}mm${r.suspect?` <span class="tw-susp" title="One gauge reads ${num(mm)}mm while only ${pct(ph)} of this province's stations cleared 35.1mm. Thailand's 24h record is around 500mm and real province-wide rain wets neighbouring gauges, so this is treated as a suspect single-station reading — shown, not believed, and not used to rank or to colour the row."><span aria-hidden="true">⚠</span> suspect</span>`:''}</td></tr>`;}).join('')
       :`<tr><td colspan="4" class="sub">No heavy-rain station in the current snapshot.</td></tr>`);
   wrap.style.display='';
 }
@@ -9816,7 +9816,7 @@ function rivalPressureLineHTML(d){
   for(let j=0;j<e.d.length;j++){ if(e.d[j]!=null&&(nb<0||e.d[j]<e.d[nb])) nb=j; }
   const near=nb>=0?`nearest ${RIVP.brands[nb]} ${e.d[nb]} km`:'no rival located';
   const col=e.s?'var(--agri)':(e.n2>0?'var(--gold)':'var(--merch)');
-  const siege=e.s?` <span style="color:var(--agri);font-weight:700" title="siege = ≥3 rivals within 2 km (stated rule over measured counts)">⚑ under siege</span>`:'';
+  const siege=e.s?` <span style="color:var(--agri);font-weight:700" title="siege = ≥3 rivals within 2 km (stated rule over measured counts)"><span aria-hidden="true">⚑</span> under siege</span>`:'';
   return `<div class="pr" style="margin-top:4px"><span title="measured — haversine vs the merged competitor census (official locators, all four big brands)">Rival pressure (measured)</span>`
     +`<b style="color:${col}">${e.n2} ≤2 km · ${e.n5} ≤5 km · ${near}${siege}</b></div>`;
 }
@@ -10115,7 +10115,7 @@ function occriskPopupHTML(d,sec,r){
   return sec('Occupation × stress — MEASURED mix · ESTIMATED weighting')
     + r('Occupation-stress ▲ · est', `<span style="color:${col}">${sc}</span> <span class="sub">/100</span>`, col)
     + r('Dominant base · measured', `${domLab}${e.ds?` <span class="sub">${Math.round(e.ds*100)}%</span>`:''}`, '#8b90a7')
-    + (e.f?`<div class="sub" style="margin:2px 0 0;font-size:10px;color:var(--agri)">⚠ FLAGGED — borrower base concentrated in a stressed sector (occupation shares MEASURED; stressed-sector weighting ESTIMATED). A triage flag, not a measured default rate.</div>`
+    + (e.f?`<div class="sub" style="margin:2px 0 0;font-size:10px;color:var(--agri)"><span aria-hidden="true">⚠</span> FLAGGED — borrower base concentrated in a stressed sector (occupation shares MEASURED; stressed-sector weighting ESTIMATED). A triage flag, not a measured default rate.</div>`
           :`<div class="sub" style="margin:2px 0 0;font-size:10px">occupation shares MEASURED (Overture, lower bound); stressed-sector weighting ESTIMATED (factory slowdown · province crop-stress)</div>`);
 }
 // Relevant-POI density block for a branch popup — the MEASURED title-loan-relevant POI counts
