@@ -4,8 +4,8 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 1017,
-  "n_series": 32,
+  "n_points": 1025,
+  "n_series": 36,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
  },
@@ -180,6 +180,23 @@
     4.0
    ]
   },
+  "app_autox_score_apple": {
+   "cadence": "daily",
+   "dates": [
+    "2026-09-13",
+    "2026-09-14"
+   ],
+   "first_seen": "2026-09-13",
+   "label": "AutoX app (Ngern Chaiyo) - App Store rating",
+   "n": 2,
+   "path": "source-data/apple_reviews.json",
+   "source": "Apple App Store TH (id1604782763)",
+   "unit": "stars",
+   "values": [
+    3.2464,
+    3.2464
+   ]
+  },
   "app_mtc_1star_pct": {
    "cadence": "weekly",
    "dates": [
@@ -348,6 +365,23 @@
     4.6908,
     4.6912,
     4.6969
+   ]
+  },
+  "app_mtc_score_apple": {
+   "cadence": "daily",
+   "dates": [
+    "2026-09-13",
+    "2026-09-14"
+   ],
+   "first_seen": "2026-09-13",
+   "label": "MTC app · App Store rating",
+   "n": 2,
+   "path": "source-data/apple_reviews.json",
+   "source": "Apple App Store TH (id1322301792)",
+   "unit": "stars",
+   "values": [
+    3.4673,
+    3.4673
    ]
   },
   "app_sawad_1star_pct": {
@@ -520,6 +554,23 @@
     4.5357
    ]
   },
+  "app_sawad_score_apple": {
+   "cadence": "daily",
+   "dates": [
+    "2026-09-13",
+    "2026-09-14"
+   ],
+   "first_seen": "2026-09-13",
+   "label": "SAWAD app · App Store rating",
+   "n": 2,
+   "path": "source-data/apple_reviews.json",
+   "source": "Apple App Store TH (id6464282089)",
+   "unit": "stars",
+   "values": [
+    3.2982,
+    3.2942
+   ]
+  },
   "app_tidlor_1star_pct": {
    "cadence": "weekly",
    "dates": [
@@ -688,6 +739,23 @@
     4.7005,
     4.6988,
     4.7071
+   ]
+  },
+  "app_tidlor_score_apple": {
+   "cadence": "daily",
+   "dates": [
+    "2026-09-13",
+    "2026-09-14"
+   ],
+   "first_seen": "2026-09-13",
+   "label": "Tidlor app · App Store rating",
+   "n": 2,
+   "path": "source-data/apple_reviews.json",
+   "source": "Apple App Store TH (id1505259341)",
+   "unit": "stars",
+   "values": [
+    3.7919,
+    3.7902
    ]
   },
   "flood_high": {
