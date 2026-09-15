@@ -1971,6 +1971,7 @@ async function boot(){
       fetch('data/meta.json').then(r=>r.json())
     ]);
     DATA=b; META=m;
+    loadCropBoard(); // pre-warm the MEASURED Thai farm-gate board for the weakest-crop lens (#exposure/#market/#map)
     // stamp each branch with its index once so the index-aligned lens accessors (branch-risk,
     // occupation-risk, poi-relevance, occupation-mix) can read d._i in O(1) instead of an
     // O(n) DATA.indexOf on every marker repaint (2,015 markers → O(n²) per lens switch/paint).
@@ -7882,6 +7883,7 @@ function renderAgriDoubleExposure(){
 }
 function renderExposure(){
   if(!DATA||!$('#expocards')||!$('#expotbl')) return;
+  if(CROP_BOARD===null){ loadCropBoard().then(renderExposure); return; } // measured weakest-crop on first paint
   loadTapeReal().then(renderExposureTape);
   renderAgriDoubleExposure();
   const N=DATA.length;
@@ -7904,7 +7906,7 @@ function renderExposure(){
   const hhiLabel=hhi<1500?'unconcentrated':hhi<2500?'moderate':'concentrated';
   const hhiCol=hhi<1500?'var(--merch)':hhi<2500?'var(--gold)':'var(--agri)';
   const cards=[
-    ['Stressed-crop regions', stressed.length, pctS(stressed.length), 'Region weakest crop in price stress (World Bank YoY < −10%, direction proxy)', 'var(--agri)','▼'],
+    ['Stressed-crop regions', stressed.length, pctS(stressed.length), 'Region weakest crop in price stress (MEASURED Thai farm-gate YoY < −10%, NABC)', 'var(--agri)','▼'],
     ['Drought-proxy (dry quartile)', drought.length, pctS(drought.length), 'Branch in the driest 25% by recent rainfall (HDX proxy)', 'var(--gold)','☀'],
     ['High agri-PD proxy', weakAgri.length, pctS(weakAgri.length), 'Estimated agri-PD risk proxy ≥ 60 (OSM/price-based, not measured)', 'var(--agri)','▲'],
   ];
@@ -10422,7 +10424,7 @@ function popupHTML(d){
     ${compPopupHTML(d,sec,r)}
     ${rivalPressureLineHTML(d)}
     ${picoLineHTML(d)}
-    ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'var(--agri)':'var(--merch)'):''}
+    ${wc?r('Region weakest crop (YoY) · Thai farm-gate', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'var(--agri)':'var(--merch)'):''}
     ${cstressPopupHTML(d,sec,r)}
     ${sec('Within 10 km (OSM · measured)')}
     ${radar.map(rrow).join('')}
@@ -10668,10 +10670,38 @@ const BOARD_REG_TAGS={
   'South':['South'],                 // Palm oil — deep south
   'North':['North'],                 // Maize — northern uplands
 };
+// MEASURED Thai farm-gate crop-price board (data/commodities.json `board`, built by
+// build_commodities.py from the NABC live farm-gate pull — refreshed every NABC cycle). Preferred
+// over the World Bank GLOBAL-proxy META.board for the region weakest-crop / agri-stress lens
+// (objective #1): the Thai farm-gate price is what the borrower is actually paid, so e.g. administered
+// cane at −17.9% YoY (measured) is the real squeeze the global sugar proxy (−8.1%) understates.
+// Lazy-loaded + cached; null until first resolved, [] on absence/error.
+let CROP_BOARD=null, cropBoardPromise=null;
+function loadCropBoard(){
+  if(cropBoardPromise) return cropBoardPromise;
+  cropBoardPromise=(async()=>{
+    try{ const c=await tmliFetch('commodities'); CROP_BOARD=(c&&Array.isArray(c.board))?c.board:[]; }
+    catch(e){ CROP_BOARD=[]; }
+    return CROP_BOARD;
+  })();
+  return cropBoardPromise;
+}
+// Keep the SAME 5 dominant-smallholder crops + SAME region attribution as the global board (see
+// BOARD_REG_TAGS); the measured board carries ~21 commodities but we deliberately upgrade ONLY the
+// YoY basis (global proxy → MEASURED Thai farm-gate), not the crop set, so no minor-crop noise leaks in.
+const CORE_CROP=/^(rice|rubber|sugar|palm oil|maize)$/i;
 function regionWorstCrop(region){
-  if(!META||!META.board) return null;
+  // Prefer the MEASURED Thai farm-gate board once loaded; until then fall back to the World Bank
+  // global-proxy META.board (identical to legacy behaviour) so this never blocks a render.
+  const measured=(CROP_BOARD&&CROP_BOARD.length)
+    ? CROP_BOARD.filter(b=>CORE_CROP.test(b.lab||''))
+        .map(b=>({lab:b.lab, reg:b.reg, yoy:(b.local_yoy!=null?b.local_yoy:b.global_yoy),
+                  measured:b.local_yoy!=null}))
+        .filter(b=>b.yoy!=null)
+    : null;
+  const src=measured||((META&&META.board)?META.board.filter(b=>b.seg==='Crops'&&b.yoy!=null):[]);
   let worst=null;
-  META.board.filter(b=>b.seg==='Crops' && b.yoy!=null).forEach(b=>{
+  src.forEach(b=>{
     const tags=BOARD_REG_TAGS[b.reg]; // only explicitly-tagged crop rows are eligible
     if(tags && tags.includes(region) && (!worst||b.yoy<worst.yoy)) worst=b;
   });
@@ -10689,7 +10719,7 @@ function renderMarket(){
         document.querySelectorAll('#mktchips .chip').forEach(c=>{const on=c===b;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));});
         mktRegion=b.dataset.r; drawMarket();};
       $('#mktsearch').oninput=drawMarket; $('#mktchips').dataset.init='1';
-      $('#mktnote').textContent='Registered factory workers DIW · informal workforce NSO 2024 (some provinces n/a) · vehicles/pickups DLT · weakest crop = World Bank global price direction proxy (not Thai farm-gate), region-attributed.';
+      $('#mktnote').textContent='Registered factory workers DIW · informal workforce NSO 2024 (some provinces n/a) · vehicles/pickups DLT · weakest crop = MEASURED Thai farm-gate YoY (NABC), region-attributed (World Bank global proxy is a load-time fallback only).';
     }
     drawMarket();
     loadTapeReal().then(renderMarketCollateral);   // acquisition lens — collateral concentration
@@ -10739,6 +10769,7 @@ function renderMarketCollateral(){
 }
 let mktRegion='all';
 function drawMarket(){
+  if(CROP_BOARD===null){ loadCropBoard().then(drawMarket); return; } // measured weakest-crop on first paint
   const q=($('#mktsearch').value||'').trim().toLowerCase();
   // sort by informal workforce, but push null-informal provinces (not in NSO release) to the
   // bottom rather than ranking them as a fake zero (e.g. Bangkok).
@@ -10751,7 +10782,7 @@ function drawMarket(){
     ? `<b>${rows.length}</b> of ${PROV.length} ${rows.length===1?'province':'provinces'}${mktRegion==='all'?'':` in ${mktRegion}`}`
     : `<b>${PROV.length}</b> provinces`);
   const pct=p=>p.vehicles?Math.round(100*(p.pickup||0)/p.vehicles):0;
-  $('#mkttbl').innerHTML=`<tr><th scope="col">Province</th><th scope="col">Region</th><th class="h-opp" scope="col" title="DIW registered factory workers — distinct from NSO informal/formal labour">Registered factory workers (DIW)</th><th scope="col" title="NSO informal workforce — borrower base proxy">Informal workforce (NSO)</th><th scope="col">Pickups</th><th scope="col">Pickup %</th><th scope="col" title="World Bank global price direction proxy, region-attributed — not Thai farm-gate">Weakest crop (YoY) · est</th></tr>`+
+  $('#mkttbl').innerHTML=`<tr><th scope="col">Province</th><th scope="col">Region</th><th class="h-opp" scope="col" title="DIW registered factory workers — distinct from NSO informal/formal labour">Registered factory workers (DIW)</th><th scope="col" title="NSO informal workforce — borrower base proxy">Informal workforce (NSO)</th><th scope="col">Pickups</th><th scope="col">Pickup %</th><th scope="col" title="region's weakest of the 5 dominant smallholder crops — MEASURED Thai farm-gate YoY (NABC; World Bank global proxy is a load-time fallback only)">Weakest crop (YoY)</th></tr>`+
    rows.map(p=>{const wc=regionWorstCrop(p.region);
      return `<tr onclick="location.href='${bldgURL(p.slug)}'" tabindex="0" role="link" style="cursor:pointer">
      <td><a href="${bldgURL(p.slug)}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a> <a href="${distURL(p.slug)}" onclick="event.stopPropagation()" title="Extruded district view" class="sub" style="text-decoration:none;margin-left:6px;color:var(--mid,#8A94A8)">▦</a></td>
@@ -10763,7 +10794,7 @@ function drawMarket(){
      <td class="mono" style="color:${wc&&wc.yoy<0?'var(--agri)':'var(--mid)'}">${wc?wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%':'—'}</td></tr>`;}).join('')
     || `<tr><td colspan="7" class="cc-empty" style="padding:14px 7px">No provinces match “${dqEsc(q)}”${mktRegion==='all'?'':` in ${dqEsc(mktRegion)}`}. Clear the search to see all 77.</td></tr>`;
   $('#mktcsv').onclick=()=>{
-    const hdr=['province','province_en','region','branches','registered_factory_workers_diw','informal_workforce_nso','pickups_dlt','pickup_share_pct','vehicles_total','weakest_crop_est','weakest_crop_yoy_est'];
+    const hdr=['province','province_en','region','branches','registered_factory_workers_diw','informal_workforce_nso','pickups_dlt','pickup_share_pct','vehicles_total','weakest_crop','weakest_crop_yoy_thai_farmgate'];
     const lines=[hdr.join(',')].concat(rows.map(p=>{const wc=regionWorstCrop(p.region);
       return [p.th,p.en,p.region,p.branches,p.workers,p.informal,p.pickup,pct(p),p.vehicles,wc?wc.lab:'',wc?wc.yoy:'']
         .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
