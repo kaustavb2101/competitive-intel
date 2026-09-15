@@ -40590,7 +40590,7 @@
    "_CATEGORY"
   ],
   "coverage": "SEARCH IS CAPPED AT 10 THREADS PER TERM by Pantip itself — ?page=2+ repeats page 1 with last_page:true and the POST search API refuses limit>10. The reported totals in meta.reported_totals are what Pantip CLAIMS exists, not what is retrievable. Coverage widens only by adding query terms and by re-running as relevance ordering drifts, never by paging.",
-  "generated": "2026-09-15T19:29:29Z",
+  "generated": "2026-09-15T20:56:35Z",
   "measured": "Thread and comment COUNTS and TEXT are measured — read verbatim from Pantip.",
   "n_comments": 4083,
   "n_threads": 248,
@@ -40616,7 +40616,7 @@
    "เงินดีดี GSB": null,
    "เงินติดล้อ": "พบ 2,879 กระทู้",
    "เงินเทอร์โบ": "พบ 325 กระทู้",
-   "เงินให้ใจ": "พบ 6,380 กระทู้",
+   "เงินให้ใจ": "พบ 6,381 กระทู้",
    "เงินไชโย": "พบ 256 กระทู้",
    "เมืองไทย แคปปิตอล": "พบ 861 กระทู้",
    "เมืองไทยแคปปิตอล": "พบ 899 กระทู้",
