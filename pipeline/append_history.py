@@ -303,13 +303,20 @@ REGISTRY = [
          source="Google Play (com.srisawad.mobileApplications)",
          pick=lambda d: _app_1star_pct(d, "SAWAD")),
 
-    # ---- NABC farm-gate — the two crops with the longest, most consistent daily read -----------
-    # (all five crop_yoy categories are consistently present across every committed vintage; rice
-    # and rubber are picked as the two headline reads. latest_date tracks 'pulled' within a day or
-    # two across every vintage checked, the same ThaiWater-style lag already handled elsewhere.)
-    # Registry `label` strings are printed to a cp1252 console by --show, so these stay
-    # transliterated (Hom Mali rice / RSS3 rubber) even though the dict keys they dig for are the
-    # Thai category names NABC actually publishes (that lookup never touches the console).
+    # ---- NABC farm-gate — the five field crops NABC tracks a year-on-year read on ---------------
+    # crop_yoy in nabc_prices.json is {cassava, maize, oilpalm, rice, rubber}, and every one of those
+    # five category prices is consistently present across every committed vintage. All five now get an
+    # accumulating series: rice + rubber are the two headline reads, and cassava / maize / oil palm are
+    # the three that feed straight into the objective-#1 agri-stress builders (build_crop_stress,
+    # build_farmgate_prices, build_branch_agri, build_income_impact) yet had no farm-gate trend line and
+    # no feed_freshness staleness coverage of their own. Seeding them starts the same daily accumulation
+    # rice/rubber already have (the committed vintages backfill only the leading edge; the line fills in
+    # as the daily cron runs, exactly how rice/rubber bootstrapped — below CHART_MIN they show as a
+    # number + freshness chip, not yet a line). latest_date tracks 'pulled' within a day or two across
+    # every vintage checked, the same ThaiWater-style lag already handled elsewhere.
+    # Registry `label` strings are printed to a cp1252 console by --show, so these stay transliterated
+    # even though the dict keys they dig for are the Thai category names NABC actually publishes (that
+    # lookup never touches the console).
     dict(key="nabc_rice_price", path="source-data/nabc_prices.json", stamp=("pulled",),
          label="Rice (Hom Mali) - NABC farm-gate", unit="THB/tonne", cadence="daily",
          source="NABC Agricultural Data Service",
@@ -318,6 +325,18 @@ REGISTRY = [
          label="Rubber (raw sheet) - NABC farm-gate", unit="THB/kg", cadence="daily",
          source="NABC Agricultural Data Service",
          pick=lambda d: dig(d, "categories.ยางพารา.price")),
+    dict(key="nabc_cassava_price", path="source-data/nabc_prices.json", stamp=("pulled",),
+         label="Cassava (fresh root) - NABC farm-gate", unit="THB/kg", cadence="daily",
+         source="NABC Agricultural Data Service",
+         pick=lambda d: dig(d, "categories.มันสำปะหลัง.price")),
+    dict(key="nabc_maize_price", path="source-data/nabc_prices.json", stamp=("pulled",),
+         label="Maize (feed) - NABC farm-gate", unit="THB/kg", cadence="daily",
+         source="NABC Agricultural Data Service",
+         pick=lambda d: dig(d, "categories.ข้าวโพดเลี้ยงสัตว์.price")),
+    dict(key="nabc_oilpalm_price", path="source-data/nabc_prices.json", stamp=("pulled",),
+         label="Oil palm (whole bunch) - NABC farm-gate", unit="THB/kg", cadence="daily",
+         source="NABC Agricultural Data Service",
+         pick=lambda d: dig(d, "categories.ปาล์มน้ำมัน.price")),
 
     # ---- rival promo/news count — live items per brand on the rival's OWN site -----------------
     dict(key="rival_promo_live_mtc", path="source-data/rival_promos.json", stamp=("pulled_at",),
