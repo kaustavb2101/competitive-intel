@@ -4170,6 +4170,7 @@ function drawPeerScore(){
     `<th scope="col" title="return on equity, newest audited full fiscal year (SET quarter code Q9)">ROE</th>`+
     `<th scope="col" title="net profit, newest audited full fiscal year">Net profit/yr</th>`+
     `<th scope="col" title="net profit margin — net profit as a share of total revenue, newest audited full fiscal year (MEASURED, SET). Isolates loan-book profitability per baht of revenue, independent of leverage — a cleaner margin-erosion read than ROE (which the D/E funding structure distorts).">Margin</th>`+
+    `<th scope="col" title="loan-book size — total assets, newest audited full year (SET quarter code Q9). Total assets ≈ the loan book for a title lender, so this is roughly each listed rival's book. AutoX is unlisted (no audited SET figure); its ~฿70bn book is a stated TARGET, shown on the reference line only.">Book</th>`+
     `<th scope="col" title="loan-book growth — year-over-year change in total assets between the two most recent audited full years (SET quarter code Q9). Total assets ≈ the loan book for a title lender, so this reads as book expansion (green) vs retreat (red). Blank where no clean like-for-like prior year exists.">Book Δ</th>`+
     `<th scope="col" title="price / earnings">P/E</th>`+
     `<th scope="col" title="price / book value — the primary valuation multiple for an equity-heavy lender; below 1.0× = trading under book">P/BV</th>`+
@@ -4185,12 +4186,13 @@ function drawPeerScore(){
         <td class="mono">${roeBar} <b>${p.roe}%</b></td>
         <td class="mono sub">฿${p.net_profit_bn}bn</td>
         <td class="mono sub">${(typeof p.npm==='number')?`${p.npm.toFixed(1)}%${p.npm<5?` <span style="color:var(--agri)" title="margin collapse — near-zero net profitability of the loan book">▾</span>`:''}`:'—'}</td>
+        <td class="mono sub">${(typeof p.assets_bn==='number')?`฿${Math.round(p.assets_bn)}bn`:'—'}</td>
         <td class="mono" style="color:${yc(p.assets_yoy_pct)}"${(typeof p.revenue_yoy_pct==='number'||typeof p.net_profit_yoy_pct==='number')?` title="${p.growth_basis||''}${typeof p.revenue_yoy_pct==='number'?` · revenue ${p.revenue_yoy_pct>0?'+':''}${p.revenue_yoy_pct}%`:''}${typeof p.net_profit_yoy_pct==='number'?` · net profit ${p.net_profit_yoy_pct>0?'+':''}${p.net_profit_yoy_pct}%`:''}"`:''}>${(typeof p.assets_yoy_pct==='number')?`<b>${p.assets_yoy_pct>0?'+':''}${p.assets_yoy_pct}%</b>`:'<span class="sub">—</span>'}</td>
         <td class="mono sub">${p.pe}</td>
         <td class="mono sub">${(typeof p.pbv==='number')?p.pbv.toFixed(2)+'×'+(p.pbv<1?` <span class="sub" style="color:var(--gold)" title="trading below book value">·bk</span>`:''):'—'}</td>
         <td class="mono sub">${p.div_yield}%</td>
       </tr>`;}).join('')+
-    (tgt?`<tr style="border-top:1px dashed var(--line)"><td></td><td><b style="color:var(--gold)">AutoX target</b> <span class="sub">(unlisted)</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">${tgt}%</b> <span class="sub">ROE goal</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td></tr>`:'');
+    (tgt?`<tr style="border-top:1px dashed var(--line)"><td></td><td><b style="color:var(--gold)">AutoX target</b> <span class="sub">(unlisted)</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">${tgt}%</b> <span class="sub">ROE goal</span></td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">~฿70bn</b> <span class="sub">target</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td></tr>`:'');
   if(ro){
     const byRoe=peers.filter(p=>typeof p.roe==='number');
     const below=byRoe.filter(p=>p.roe<tgt).map(p=>p.name), above=byRoe.filter(p=>p.roe>=tgt).map(p=>p.name);
@@ -4329,11 +4331,22 @@ function drawPeerScore(){
       const worstEq=(typeof worst.equity_bn==='number')?` (฿${worst.equity_bn}bn book equity)`:'';
       derateLine=` <b>Equity de-rating (52-week).</b> ${breadth} trade below their 52-week high${eqClause}; ${worst.name}${worstEq} has de-rated hardest, ${Math.abs(worst.off_high_pct).toFixed(1)}% below its high${posClause} — the market marking down the listed title-lender field, so fresh equity capital runs tighter and costlier for rivals (AutoX is unlisted, so it has no market price to mark against).`;
     }
+    // Loan-book SIZE read (assets_bn, MEASURED SET) — objective #2's "how big is each rival's book
+    // next to ours" signal that the growth (Book Δ) and margin lines don't give. Total assets ≈ the
+    // loan book for a title lender. AutoX's ~฿70bn book is a stated TARGET (unlisted, no audited SET
+    // figure), shown only as the comparison anchor — never mixed into the measured cohort total.
+    const bk=peers.filter(p=>typeof p.assets_bn==='number');
+    let bookSizeLine='';
+    if(bk.length>=3){
+      const big=bk.slice().sort((a,b)=>b.assets_bn-a.assets_bn)[0];
+      const tot=bk.reduce((a,p)=>a+p.assets_bn,0);
+      bookSizeLine=` <b>Loan-book size (MEASURED, SET).</b> ${big.name}'s ฿${Math.round(big.assets_bn)}bn book is the largest listed rival — ~${(big.assets_bn/70).toFixed(1)}× AutoX's ~฿70bn target book; the ${bk.length} listed rivals hold ฿${Math.round(tot)}bn of total assets between them (total assets ≈ the loan book; AutoX is unlisted, so its ฿70bn is a stated target shown only as the anchor, not part of this cohort total).`;
+    }
     ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
-      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+betaLine+growLine+marginLine+derateLine+
+      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+levLine+valLine+aqLine+betaLine+growLine+bookSizeLine+marginLine+derateLine+
       methodBox(m.roe_caveat||null,
         [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the newest audited full year'}.`,
-         '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE target is a stated goal shown only as the reference line.',
+         '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE and ~฿70bn loan book are stated TARGETS, shown only on the reference line — never blended into the measured peer figures.',
          m.roe_caveat||'ROE is each peer’s own SET-reported ratio.',
          m.holdco_caveat||null,
          m.fs_type_caveat||null,
