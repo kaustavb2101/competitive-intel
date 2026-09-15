@@ -309,23 +309,29 @@ REGISTRY = [
     # already digs), NOT a 1-5 rating histogram — so there is deliberately NO 1-star-share series here
     # (there is nothing to compute it from); pairing the two per-store SCORE lines is the honest read.
     # source-data/apple_reviews.json stamps under meta.pulled_at, exactly like app_reviews.json, so the
-    # same stamp=("pulled_at",) resolves it. Only ~2 committed vintages exist (the daily file overwrites
-    # in place), so these start below CHART_MIN as a number + freshness chip and fill into a line as the
-    # daily cron accumulates — the same bootstrap rice/rubber and the NABC crops went through.
+    # same stamp=("pulled_at",) resolves it. cadence="daily" because pull_swarm.py schedules apple_reviews
+    # (and app_reviews) daily — social listening went daily by owner request 2026-08-15 — so the freshness
+    # dead-bound must be the daily one (feed_freshness.py: daily 45d, weekly 60d); a "weekly" label here
+    # would mask a dead daily pull for an extra ~15d. Only ~2 committed vintages exist (the daily file
+    # overwrites in place), so these start below CHART_MIN as a number + freshness chip and fill into a
+    # line as the daily swarm accumulates points — the same bootstrap rice/rubber and the NABC crops went
+    # through. (The 8 Google-Play app_*_score/_1star_pct entries above carry the same daily-pull-but-labelled-
+    # weekly mismatch pre-existing; correcting those touches already-shipped series and is left to a focused
+    # follow-up rather than widened into this PR.)
     dict(key="app_autox_score_apple", path="source-data/apple_reviews.json", stamp=("pulled_at",),
-         label="AutoX app (Ngern Chaiyo) - App Store rating", unit="stars", cadence="weekly",
+         label="AutoX app (Ngern Chaiyo) - App Store rating", unit="stars", cadence="daily",
          source="Apple App Store TH (id1604782763)",
          pick=lambda d: _app_score(d, "AUTOX")),
     dict(key="app_tidlor_score_apple", path="source-data/apple_reviews.json", stamp=("pulled_at",),
-         label="Tidlor app · App Store rating", unit="stars", cadence="weekly",
+         label="Tidlor app · App Store rating", unit="stars", cadence="daily",
          source="Apple App Store TH (id1505259341)",
          pick=lambda d: _app_score(d, "TIDLOR")),
     dict(key="app_mtc_score_apple", path="source-data/apple_reviews.json", stamp=("pulled_at",),
-         label="MTC app · App Store rating", unit="stars", cadence="weekly",
+         label="MTC app · App Store rating", unit="stars", cadence="daily",
          source="Apple App Store TH (id1322301792)",
          pick=lambda d: _app_score(d, "MTC")),
     dict(key="app_sawad_score_apple", path="source-data/apple_reviews.json", stamp=("pulled_at",),
-         label="SAWAD app · App Store rating", unit="stars", cadence="weekly",
+         label="SAWAD app · App Store rating", unit="stars", cadence="daily",
          source="Apple App Store TH (id6464282089)",
          pick=lambda d: _app_score(d, "SAWAD")),
 

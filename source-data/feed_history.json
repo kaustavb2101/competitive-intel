@@ -181,7 +181,7 @@
    ]
   },
   "app_autox_score_apple": {
-   "cadence": "weekly",
+   "cadence": "daily",
    "dates": [
     "2026-09-13",
     "2026-09-14"
@@ -368,7 +368,7 @@
    ]
   },
   "app_mtc_score_apple": {
-   "cadence": "weekly",
+   "cadence": "daily",
    "dates": [
     "2026-09-13",
     "2026-09-14"
@@ -555,7 +555,7 @@
    ]
   },
   "app_sawad_score_apple": {
-   "cadence": "weekly",
+   "cadence": "daily",
    "dates": [
     "2026-09-13",
     "2026-09-14"
@@ -742,7 +742,7 @@
    ]
   },
   "app_tidlor_score_apple": {
-   "cadence": "weekly",
+   "cadence": "daily",
    "dates": [
     "2026-09-13",
     "2026-09-14"
