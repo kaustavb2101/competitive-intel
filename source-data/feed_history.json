@@ -4,7 +4,7 @@
   "generated_by": "pipeline/append_history.py",
   "label": "MEASURED — each row is a value the source itself published, dated by the source's own stamp (meta.pulled), never by this machine's clock.",
   "max_points": 800,
-  "n_points": 1025,
+  "n_points": 1045,
   "n_series": 36,
   "note": "Nothing is interpolated. A missed pull leaves a GAP, not a filled-in value, so a line drawn from this joins the observations that exist and invents none. meta.first_seen on each series says where the record actually begins — a short series is a short record, not a short trend.",
   "title": "Accumulated history for the feeds whose API only publishes 'now'"
@@ -48,11 +48,12 @@
     "2026-09-11",
     "2026-09-12",
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-07-19",
    "label": "AutoX app · 1-star share",
-   "n": 36,
+   "n": 37,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (th.co.autox.chaiyo)",
    "unit": "%",
@@ -92,7 +93,8 @@
     16.3285,
     16.3285,
     15.5405,
-    15.5256
+    15.5256,
+    16.474
    ]
   },
   "app_autox_score": {
@@ -133,11 +135,12 @@
     "2026-09-11",
     "2026-09-12",
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-07-19",
    "label": "AutoX app (Ngern Chaiyo) - Play Store rating",
-   "n": 36,
+   "n": 37,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (th.co.autox.chaiyo)",
    "unit": "stars",
@@ -177,22 +180,25 @@
     3.9712,
     3.9712,
     4.0,
-    4.0
+    4.0,
+    3.9612
    ]
   },
   "app_autox_score_apple": {
    "cadence": "daily",
    "dates": [
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-09-13",
    "label": "AutoX app (Ngern Chaiyo) - App Store rating",
-   "n": 2,
+   "n": 3,
    "path": "source-data/apple_reviews.json",
    "source": "Apple App Store TH (id1604782763)",
    "unit": "stars",
    "values": [
+    3.2464,
     3.2464,
     3.2464
    ]
@@ -235,11 +241,12 @@
     "2026-09-11",
     "2026-09-12",
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC app · 1-star share",
-   "n": 36,
+   "n": 37,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (co.th.muangthaileasing.mtls)",
    "unit": "%",
@@ -279,6 +286,7 @@
     3.6804,
     3.8308,
     3.8297,
+    3.6884,
     3.6884
    ]
   },
@@ -320,11 +328,12 @@
     "2026-09-11",
     "2026-09-12",
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-07-19",
    "label": "MTC app · Play Store rating",
-   "n": 36,
+   "n": 37,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (co.th.muangthaileasing.mtls)",
    "unit": "stars",
@@ -364,6 +373,7 @@
     4.7005,
     4.6908,
     4.6912,
+    4.6969,
     4.6969
    ]
   },
@@ -371,15 +381,17 @@
    "cadence": "daily",
    "dates": [
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-09-13",
    "label": "MTC app · App Store rating",
-   "n": 2,
+   "n": 3,
    "path": "source-data/apple_reviews.json",
    "source": "Apple App Store TH (id1322301792)",
    "unit": "stars",
    "values": [
+    3.4673,
     3.4673,
     3.4673
    ]
@@ -422,11 +434,12 @@
     "2026-09-11",
     "2026-09-12",
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD app · 1-star share",
-   "n": 36,
+   "n": 37,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.srisawad.mobileApplications)",
    "unit": "%",
@@ -466,7 +479,8 @@
     5.1159,
     5.1139,
     5.0259,
-    5.1394
+    5.1394,
+    4.7297
    ]
   },
   "app_sawad_score": {
@@ -507,11 +521,12 @@
     "2026-09-11",
     "2026-09-12",
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-07-19",
    "label": "SAWAD app · Play Store rating",
-   "n": 36,
+   "n": 37,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.srisawad.mobileApplications)",
    "unit": "stars",
@@ -551,24 +566,27 @@
     4.5455,
     4.5472,
     4.5388,
-    4.5357
+    4.5357,
+    4.5437
    ]
   },
   "app_sawad_score_apple": {
    "cadence": "daily",
    "dates": [
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-09-13",
    "label": "SAWAD app · App Store rating",
-   "n": 2,
+   "n": 3,
    "path": "source-data/apple_reviews.json",
    "source": "Apple App Store TH (id6464282089)",
    "unit": "stars",
    "values": [
     3.2982,
-    3.2942
+    3.2942,
+    3.3098
    ]
   },
   "app_tidlor_1star_pct": {
@@ -609,11 +627,12 @@
     "2026-09-11",
     "2026-09-12",
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-07-19",
    "label": "Tidlor app · 1-star share",
-   "n": 36,
+   "n": 37,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.ntl.cxm_mobile)",
    "unit": "%",
@@ -653,7 +672,8 @@
     3.322,
     3.3195,
     3.3585,
-    3.0877
+    3.0877,
+    3.0865
    ]
   },
   "app_tidlor_score": {
@@ -694,11 +714,12 @@
     "2026-09-11",
     "2026-09-12",
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-07-19",
    "label": "Tidlor app · Play Store rating",
-   "n": 36,
+   "n": 37,
    "path": "source-data/app_reviews.json",
    "source": "Google Play (com.ntl.cxm_mobile)",
    "unit": "stars",
@@ -738,24 +759,27 @@
     4.6992,
     4.7005,
     4.6988,
-    4.7071
+    4.7071,
+    4.7089
    ]
   },
   "app_tidlor_score_apple": {
    "cadence": "daily",
    "dates": [
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-09-13",
    "label": "Tidlor app · App Store rating",
-   "n": 2,
+   "n": 3,
    "path": "source-data/apple_reviews.json",
    "source": "Apple App Store TH (id1505259341)",
    "unit": "stars",
    "values": [
     3.7919,
-    3.7902
+    3.7902,
+    3.793
    ]
   },
   "flood_high": {
@@ -872,7 +896,7 @@
     148.0,
     143.0,
     142.0,
-    157.0
+    155.0
    ]
   },
   "fuel_diesel": {
@@ -930,11 +954,12 @@
     "2026-09-11",
     "2026-09-12",
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-07-05",
    "label": "Diesel · retail pump",
-   "n": 53,
+   "n": 54,
    "path": "source-data/fuel_prices.json",
    "source": "Bangchak retail oil-price API",
    "unit": "฿/L",
@@ -991,6 +1016,7 @@
     39.84,
     39.84,
     39.84,
+    40.69,
     40.69
    ]
   },
@@ -1049,11 +1075,12 @@
     "2026-09-11",
     "2026-09-12",
     "2026-09-13",
-    "2026-09-14"
+    "2026-09-14",
+    "2026-09-15"
    ],
    "first_seen": "2026-07-05",
    "label": "Gasohol 95 · retail pump",
-   "n": 53,
+   "n": 54,
    "path": "source-data/fuel_prices.json",
    "source": "Bangchak retail oil-price API",
    "unit": "฿/L",
@@ -1110,6 +1137,7 @@
     39.09,
     39.09,
     39.09,
+    39.94,
     39.94
    ]
   },
@@ -1563,7 +1591,7 @@
     26.0,
     21.0,
     39.0,
-    56.0
+    59.0
    ]
   },
   "rain_max_mm": {
@@ -1680,7 +1708,7 @@
     112.0,
     174.5,
     269.0,
-    151.5
+    150.0
    ]
   },
   "rival_ads_live": {
@@ -2104,11 +2132,12 @@
     "2026-09-08",
     "2026-09-09",
     "2026-09-10",
-    "2026-09-11"
+    "2026-09-11",
+    "2026-09-14"
    ],
    "first_seen": "2026-07-17",
    "label": "MTC · market cap",
-   "n": 25,
+   "n": 26,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -2137,6 +2166,7 @@
     64.13,
     63.6,
     63.6,
+    62.01,
     62.01
    ]
   },
@@ -2167,11 +2197,12 @@
     "2026-09-08",
     "2026-09-09",
     "2026-09-10",
-    "2026-09-11"
+    "2026-09-11",
+    "2026-09-14"
    ],
    "first_seen": "2026-07-17",
    "label": "MTC · price/book",
-   "n": 25,
+   "n": 26,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -2200,6 +2231,7 @@
     1.39,
     1.38,
     1.38,
+    1.35,
     1.35
    ]
   },
@@ -2230,11 +2262,12 @@
     "2026-09-08",
     "2026-09-09",
     "2026-09-10",
-    "2026-09-11"
+    "2026-09-11",
+    "2026-09-14"
    ],
    "first_seen": "2026-07-17",
    "label": "SAWAD · market cap",
-   "n": 25,
+   "n": 26,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -2263,7 +2296,8 @@
     38.0485,
     37.5501,
     37.7162,
-    37.0516
+    37.0516,
+    36.8855
    ]
   },
   "set_sawad_pbv": {
@@ -2293,11 +2327,12 @@
     "2026-09-08",
     "2026-09-09",
     "2026-09-10",
-    "2026-09-11"
+    "2026-09-11",
+    "2026-09-14"
    ],
    "first_seen": "2026-07-17",
    "label": "SAWAD · price/book",
-   "n": 25,
+   "n": 26,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -2326,6 +2361,7 @@
     0.96,
     0.95,
     0.95,
+    0.93,
     0.93
    ]
   },
@@ -2356,11 +2392,12 @@
     "2026-09-08",
     "2026-09-09",
     "2026-09-10",
-    "2026-09-11"
+    "2026-09-11",
+    "2026-09-14"
    ],
    "first_seen": "2026-07-17",
    "label": "TIDLOR · market cap",
-   "n": 25,
+   "n": 26,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "฿bn",
@@ -2389,6 +2426,7 @@
     54.1539,
     52.7059,
     52.4163,
+    51.5475,
     51.5475
    ]
   },
@@ -2419,11 +2457,12 @@
     "2026-09-08",
     "2026-09-09",
     "2026-09-10",
-    "2026-09-11"
+    "2026-09-11",
+    "2026-09-14"
    ],
    "first_seen": "2026-07-17",
    "label": "TIDLOR · price/book",
-   "n": 25,
+   "n": 26,
    "path": "source-data/set_peers.json",
    "source": "Stock Exchange of Thailand (set.or.th)",
    "unit": "x",
@@ -2452,6 +2491,7 @@
     1.53,
     1.49,
     1.48,
+    1.46,
     1.46
    ]
   },
