@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-14T10:15:53+00:00",
-    "commit": "913003e"
+    "generated_at": "2026-09-14T22:26:07+00:00",
+    "commit": "a0e24dc"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,90 @@
   ],
   "activity": [
     {
+      "date": "2026-09-14T22:26:07+00:00",
+      "sha": "a0e24dc",
+      "summary": "test(dangling-refs): scan every non-vendor frontend script, not just app.js by name",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-14T21:27:47+00:00",
+      "sha": "f30d4f2",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-14, run 34898799540)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-14T20:15:12+00:00",
+      "sha": "03c08c3",
+      "summary": "docs(progress): log ux-loop #sim/#exposure verdict-line glyph aria-hidden sweep — merge+deploy+verify (PR #978)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-15T03:12:26+07:00",
+      "sha": "b4f8e6f",
+      "summary": "ux: wrap #sim/#exposure verdict-line leading glyphs in aria-hidden (#978)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-14T19:56:11+00:00",
+      "sha": "f5ec45b",
+      "summary": "data: Thai-IP-only swarm refresh (run 34886694132) (#977)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-14T18:46:52+00:00",
+      "sha": "39c5ee3",
+      "summary": "feat(home): surface MEASURED chronic-flood collateral overlay on the book-squeeze card (#976)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-09-14T16:38:25+00:00",
+      "sha": "45869d8",
+      "summary": "data: market-pulse swarm refresh (run 34863874369) (#975)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-14T15:31:43+00:00",
+      "sha": "2ff539f",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-14, run 34862528518)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-14T14:39:45+00:00",
+      "sha": "7203d82",
+      "summary": "docs(progress): log ux-loop #sim verdict gear-glyph a11y fix — merge+deploy+verify (PR #974)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-14T21:35:02+07:00",
+      "sha": "79c430f",
+      "summary": "ux: hide decorative ⚙️ gear glyph from screen readers on #sim verdict lines (#974)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-14T12:26:25+00:00",
+      "sha": "9b7308f",
+      "summary": "test(overflow): audit live.html + status.html and a mid-band 1000px viewport",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-09-14T12:18:48+00:00",
+      "sha": "2978d1b",
+      "summary": "data: market-pulse swarm refresh (run 34829730520) (#972)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-14T11:57:31+00:00",
+      "sha": "7417d47",
+      "summary": "data: SET listed-peer scoreboard refresh (run 34837905941) (#973)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-09-14T10:16:15+00:00",
+      "sha": "d647bd8",
+      "summary": "chore(plan): refresh CEO dashboard after the live-board honesty ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-14T10:15:53+00:00",
       "sha": "913003e",
       "summary": "intel(service): live board tells the truth about dbd_formation — source went CI-unreachable, mark it Thai-IP-only",
@@ -626,90 +710,6 @@
       "date": "2026-09-14T00:22:12+00:00",
       "sha": "fc4cfec",
       "summary": "test(gate): fail province-integrity check on a resolvable-but-un-normalized master",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-13T23:47:37+00:00",
-      "sha": "f0e505a",
-      "summary": "data: rival published rate pages re-read (run 34789315317) (#966)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-13T23:24:12+00:00",
-      "sha": "78b3fe7",
-      "summary": "data: rival Facebook promo feed refresh (run 34785891818) (#965)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-13T22:57:04+00:00",
-      "sha": "0788ac5",
-      "summary": "data: market-pulse swarm refresh (run 34784458100) (#964)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-13T22:22:02+00:00",
-      "sha": "2056284",
-      "summary": "chore(plan): refresh CEO dashboard after the feed-liveness recalibration ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-13T22:19:53+00:00",
-      "sha": "90cda70",
-      "summary": "service(liveness): recalibrate frozen-value window for the NABC farm-gate price series",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-13T21:27:42+00:00",
-      "sha": "9dd8294",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-13, run 34783792645)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-13T20:12:32+00:00",
-      "sha": "bc8b3ff",
-      "summary": "docs: log UX loop PR #963 (data.html branch-search visible count) — merged + deploy-verified",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-14T03:10:40+07:00",
-      "sha": "1cd7522",
-      "summary": "ux: visible result count under data.html #brsearch branch filter (#963)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-13T19:54:27+00:00",
-      "sha": "59e9ede",
-      "summary": "data: Thai-IP-only swarm refresh (run 34777481326) (#962)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-13T18:20:50+00:00",
-      "sha": "e735ab7",
-      "summary": "test(gate): enforce the master's \"0 branches in region Other\" invariant",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-13T17:28:25+00:00",
-      "sha": "24f9bf2",
-      "summary": "intel(peer): surface AutoX's own live-book NPL by province on #acq (#961)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-13T16:36:59+00:00",
-      "sha": "02ac823",
-      "summary": "data: market-pulse swarm refresh (run 34766255670) (#960)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-13T15:26:45+00:00",
-      "sha": "4dc857a",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-13, run 34765521140)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-13T14:19:22+00:00",
-      "sha": "0463910",
-      "summary": "docs(progress): log the visible search-count ship (PR #959, merged + deployed + verified live)",
       "pillar": "deployment"
     }
   ]
