@@ -303,6 +303,32 @@ REGISTRY = [
          source="Google Play (com.srisawad.mobileApplications)",
          pick=lambda d: _app_1star_pct(d, "SAWAD")),
 
+    # ---- app-store sentiment — Apple App Store (TH) rating, the SAME four brands as Google Play above.
+    # A distinct sentiment channel: iOS users are a different cohort, and each store carries its own
+    # aggregate. Apple's public feed exposes only the aggregate score (stats.score, same shape _app_score
+    # already digs), NOT a 1-5 rating histogram — so there is deliberately NO 1-star-share series here
+    # (there is nothing to compute it from); pairing the two per-store SCORE lines is the honest read.
+    # source-data/apple_reviews.json stamps under meta.pulled_at, exactly like app_reviews.json, so the
+    # same stamp=("pulled_at",) resolves it. Only ~2 committed vintages exist (the daily file overwrites
+    # in place), so these start below CHART_MIN as a number + freshness chip and fill into a line as the
+    # daily cron accumulates — the same bootstrap rice/rubber and the NABC crops went through.
+    dict(key="app_autox_score_apple", path="source-data/apple_reviews.json", stamp=("pulled_at",),
+         label="AutoX app (Ngern Chaiyo) - App Store rating", unit="stars", cadence="weekly",
+         source="Apple App Store TH (id1604782763)",
+         pick=lambda d: _app_score(d, "AUTOX")),
+    dict(key="app_tidlor_score_apple", path="source-data/apple_reviews.json", stamp=("pulled_at",),
+         label="Tidlor app · App Store rating", unit="stars", cadence="weekly",
+         source="Apple App Store TH (id1505259341)",
+         pick=lambda d: _app_score(d, "TIDLOR")),
+    dict(key="app_mtc_score_apple", path="source-data/apple_reviews.json", stamp=("pulled_at",),
+         label="MTC app · App Store rating", unit="stars", cadence="weekly",
+         source="Apple App Store TH (id1322301792)",
+         pick=lambda d: _app_score(d, "MTC")),
+    dict(key="app_sawad_score_apple", path="source-data/apple_reviews.json", stamp=("pulled_at",),
+         label="SAWAD app · App Store rating", unit="stars", cadence="weekly",
+         source="Apple App Store TH (id6464282089)",
+         pick=lambda d: _app_score(d, "SAWAD")),
+
     # ---- NABC farm-gate — the five field crops NABC tracks a year-on-year read on ---------------
     # crop_yoy in nabc_prices.json is {cassava, maize, oilpalm, rice, rubber}, and every one of those
     # five category prices is consistently present across every committed vintage. All five now get an
