@@ -6,11 +6,6 @@
    "name_th": "อะมานะฮ์ ลิสซิ่ง"
   },
   {
-   "card_floor": 14.99,
-   "key": "AUTOX",
-   "name_th": "เงินไชโย"
-  },
-  {
    "card_floor": 12.0,
    "key": "CAR4CASH",
    "name_th": "คาร์ ฟอร์ แคช"
@@ -91,9 +86,9 @@
   "label": "MEASURED on both sides. The card floor is the lender's own published effective rate; the promo figure is a rate the lender printed in a creative or a post. The only computed step is the flat-to-effective conversion, and it is done in the direction that makes an undercut HARDER to claim, not easier.",
   "material_threshold_pp": 1.5,
   "method": "A monthly promo rate with no stated basis is read as FLAT and converted at the operator's own published maximum tenor (fallback 60 months) — the reading that produces the HIGHEST effective cost. It is only reported as an undercut if even that reading falls 1.5pp or more below the card floor.",
-  "n_card_only": 17,
-  "n_checked": 2,
-  "n_undercutting": 1,
+  "n_card_only": 16,
+  "n_checked": 3,
+  "n_undercutting": 2,
   "so_what": "A published rate card is a ceiling, not a price. Where these two disagree by more than 1.5pp, the promo is what the rival is actually selling and the card understates how hard they are competing.",
   "sources": {
    "ads": "platform/data/rival_ads.json",
@@ -170,6 +165,30 @@
     }
    ],
    "tier": "nonbank",
+   "undercuts_own_card": true,
+   "within_noise": false
+  },
+  {
+   "card_floor": 14.99,
+   "card_tenor_months": 60,
+   "card_variant": "นิติบุคคล",
+   "cheapest_promo_effective": 9.11,
+   "gap_pp": 5.88,
+   "key": "AUTOX",
+   "n_quotes": 1,
+   "name_th": "เงินไชโย",
+   "quotes": [
+    {
+     "channel": "facebook",
+     "context_th": "นนซ์เงินไชโย ดอกเบี้ยเริ่มต้น 9.11% ต่อปี* ผ่อนรถเบ",
+     "effective_worst_case": 9.11,
+     "quoted": 9.11,
+     "read_as": "as_quoted_per_year",
+     "seen": "20 ชั่วโมง",
+     "unit": "pct_per_year"
+    }
+   ],
+   "tier": "us",
    "undercuts_own_card": true,
    "within_noise": false
   },
