@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-14T22:26:07+00:00",
-    "commit": "a0e24dc"
+    "generated_at": "2026-09-15T04:43:45+00:00",
+    "commit": "ddcf5ed"
   },
   "overall": {
     "progress_pct": 100,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-09-14",
+    "eta_date": "2026-09-15",
     "done_items": 50,
     "in_progress_items": 0,
     "open_items": 0,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-09-15T04:43:45+00:00",
+      "sha": "ddcf5ed",
+      "summary": "feat(home): PICO ◇ sub-scale-rival column on the MEASURED book-squeeze card (#986)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-15T03:36:11+00:00",
+      "sha": "c9d4ab0",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-15, run 34925508269)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-15T02:38:22+00:00",
+      "sha": "ef71b91",
+      "summary": "data: NABC live prices (2026-09-15, run 34921656165)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-15T02:24:39+00:00",
+      "sha": "be2b4d8",
+      "summary": "docs(progress): log ux-statusflag-decorative-glyph-aria-hidden merge+deploy (PR #983)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-15T09:20:53+07:00",
+      "sha": "c649920",
+      "summary": "ux: aria-hidden decorative status glyphs prefixing a text label (#983)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-15T02:03:56+00:00",
+      "sha": "b01c71e",
+      "summary": "data: macro indicators (2026-09-14, run 34899065729) (#979)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-15T01:42:07+00:00",
+      "sha": "9ec67e0",
+      "summary": "data: rival Facebook promo feed refresh (run 34902621697) (#981)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-15T01:18:33+00:00",
+      "sha": "f27fc59",
+      "summary": "feat(feed-history): accumulate NABC cassava / maize / oil-palm farm-gate prices (#982)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-14T22:46:44+00:00",
+      "sha": "7b531dc",
+      "summary": "data: live fuel prices (2026-09-14, run 34905543805)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-14T22:26:52+00:00",
+      "sha": "524912c",
+      "summary": "chore(plan): refresh CEO dashboard after the dangling-refs guard-coverage ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-14T22:26:07+00:00",
       "sha": "a0e24dc",
       "summary": "test(dangling-refs): scan every non-vendor frontend script, not just app.js by name",
@@ -651,66 +711,6 @@
       "sha": "3b4e288",
       "summary": "data(census): refresh the Union Auction forward book (run 34803854288) (#968)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-14T05:07:35+00:00",
-      "sha": "6d8c819",
-      "summary": "data: market-pulse swarm refresh (run 34803805613) (#969)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-14T04:23:45+00:00",
-      "sha": "59130ed",
-      "summary": "chore(plan): refresh CEO dashboard after the measured book-squeeze ship (#970)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-14T11:21:10+07:00",
-      "sha": "557030b",
-      "summary": "intel(market): MEASURED book-squeeze cross on the command centre (own live-NPL × rivals) (#970)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-14T03:38:47+00:00",
-      "sha": "c40e366",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-14, run 34803204955)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-14T02:47:46+00:00",
-      "sha": "b866d68",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-14T02:44:37+00:00",
-      "sha": "92c0e54",
-      "summary": "docs(progress): log #overview mobile PAGEX fix — merge #967, deploy-verified live",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-14T02:42:46+00:00",
-      "sha": "86c1f63",
-      "summary": "Merge remote-tracking branch 'origin/master'",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-14T02:41:55+00:00",
-      "sha": "e530e14",
-      "summary": "data: NABC live prices (2026-09-14, run 34799767960)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-14T09:37:50+07:00",
-      "sha": "ff17cbf",
-      "summary": "ux: fix #overview horizontal page-scroll on mobile (sr-only absolute overflow) (#967)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-14T00:22:12+00:00",
-      "sha": "fc4cfec",
-      "summary": "test(gate): fail province-integrity check on a resolvable-but-un-normalized master",
-      "pillar": "deployment"
     }
   ]
 }
