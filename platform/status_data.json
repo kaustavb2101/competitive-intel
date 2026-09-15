@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-09-15T04:43:45+00:00",
-    "commit": "ddcf5ed"
+    "generated_at": "2026-09-15T17:27:22+07:00",
+    "commit": "f63da16"
   },
   "overall": {
     "progress_pct": 100,
@@ -533,6 +533,66 @@
   ],
   "activity": [
     {
+      "date": "2026-09-15T17:27:22+07:00",
+      "sha": "f63da16",
+      "summary": "market: region weakest-crop lens reads MEASURED Thai farm-gate YoY, not the World Bank global proxy (#990)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-15T09:36:47+00:00",
+      "sha": "2be742d",
+      "summary": "data: ThaiWater flood + rain pulse (2026-09-15, run 34953233756)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-15T08:37:53+00:00",
+      "sha": "94e225a",
+      "summary": "data: NABC live prices (2026-09-15, run 34947573297)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-15T08:20:50+00:00",
+      "sha": "43b15cf",
+      "summary": "docs(progress-log): record PR #988 merge + deploy-verify (crop-chip arrow aria-hidden)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-09-15T15:18:25+07:00",
+      "sha": "cfe7c4b",
+      "summary": "ux: hide decorative direction arrow on region crop-price chips from AT (#988)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-09-15T07:27:52+00:00",
+      "sha": "099f6be",
+      "summary": "feat(feed-history): accumulate Apple App Store (TH) ratings for AutoX + 3 closest rivals (#987)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-15T06:38:52+00:00",
+      "sha": "cd2bba3",
+      "summary": "data: market-pulse swarm refresh (run 34900020465) (#980)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-15T06:12:34+00:00",
+      "sha": "2895b3d",
+      "summary": "data(census): refresh the Union Auction forward book (run 34926267964) (#984)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-09-15T05:29:40+00:00",
+      "sha": "52c8be6",
+      "summary": "data: market-pulse swarm refresh (run 34926187007) (#985)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-09-15T04:47:17+00:00",
+      "sha": "21af01d",
+      "summary": "chore(plan): refresh CEO dashboard after the book-squeeze PICO column ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-09-15T04:43:45+00:00",
       "sha": "ddcf5ed",
       "summary": "feat(home): PICO ◇ sub-scale-rival column on the MEASURED book-squeeze card (#986)",
@@ -651,66 +711,6 @@
       "sha": "79c430f",
       "summary": "ux: hide decorative ⚙️ gear glyph from screen readers on #sim verdict lines (#974)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-14T12:26:25+00:00",
-      "sha": "9b7308f",
-      "summary": "test(overflow): audit live.html + status.html and a mid-band 1000px viewport",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-14T12:18:48+00:00",
-      "sha": "2978d1b",
-      "summary": "data: market-pulse swarm refresh (run 34829730520) (#972)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-09-14T11:57:31+00:00",
-      "sha": "7417d47",
-      "summary": "data: SET listed-peer scoreboard refresh (run 34837905941) (#973)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-09-14T10:16:15+00:00",
-      "sha": "d647bd8",
-      "summary": "chore(plan): refresh CEO dashboard after the live-board honesty ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-09-14T10:15:53+00:00",
-      "sha": "913003e",
-      "summary": "intel(service): live board tells the truth about dbd_formation — source went CI-unreachable, mark it Thai-IP-only",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-09-14T09:38:32+00:00",
-      "sha": "43b2a9d",
-      "summary": "data: ThaiWater flood + rain pulse (2026-09-14, run 34828885296)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-09-14T08:31:41+00:00",
-      "sha": "8b26dbc",
-      "summary": "docs(progress): log UX loop PR #971 (aria-hidden the 3D-scene link glyphs) — merged + deploy-verified",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-14T15:27:50+07:00",
-      "sha": "2a2770f",
-      "summary": "ux: aria-hidden the decorative 🏙/🔎 glyphs in the SPA's 3D-scene links (#971)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-09-14T07:04:11+00:00",
-      "sha": "a1b6dee",
-      "summary": "test(overflow): make the visual-overflow layout audit runnable in the gate/CI by driving chromium directly (drop retired-playwright dependency)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-09-14T05:32:20+00:00",
-      "sha": "3b4e288",
-      "summary": "data(census): refresh the Union Auction forward book (run 34803854288) (#968)",
-      "pillar": "data-integration"
     }
   ]
 }
