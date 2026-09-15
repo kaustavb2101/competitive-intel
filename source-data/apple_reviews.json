@@ -3406,6 +3406,33 @@
    },
    "reviews_store": [
     {
+     "id": "14549075248",
+     "at": null,
+     "score": 5,
+     "title": "ดี",
+     "content": "เเอปเข้าใจง่าย ใช้งานไม่ยุ่งยาก",
+     "version": "1.0.60",
+     "votes": 0
+    },
+    {
+     "id": "14548995413",
+     "at": null,
+     "score": 5,
+     "title": "สินเชื่อบริการ",
+     "content": "สะดวกรวดเร็ว",
+     "version": "1.0.60",
+     "votes": 0
+    },
+    {
+     "id": "14548881886",
+     "at": null,
+     "score": 5,
+     "title": "ดี",
+     "content": "ใช้งานง่าย",
+     "version": "1.0.60",
+     "votes": 0
+    },
+    {
      "id": "14548626886",
      "at": null,
      "score": 5,
@@ -10643,16 +10670,25 @@
    "cohort": "digital",
    "own": false,
    "stats": {
-    "score": 4.82408,
-    "ratings": 173797,
-    "score_current_version": 4.82408,
-    "ratings_current_version": 173797,
+    "score": 4.82407,
+    "ratings": 173799,
+    "score_current_version": 4.82407,
+    "ratings_current_version": 173799,
     "version": "3.0.8",
     "app_updated": "2026-09-03",
     "released": "2021-04-20",
     "genre": "Finance"
    },
    "reviews_store": [
+    {
+     "id": "14549356775",
+     "at": null,
+     "score": 4,
+     "title": "ไม่อนุญาตให้นำข้อมูลส่วนตัวไปใช้",
+     "content": "หากพบเห็นข้อมูลถูกนำไปใช้ในทางอื่น จะขอสงสัยและขอดำเนินการตามกฎหมาย",
+     "version": "3.0.8",
+     "votes": 0
+    },
     {
      "id": "14548317040",
      "at": null,
