@@ -45,15 +45,15 @@
   "HONDA WAVE|moto|2024": {
    "auction": {
     "median": 19000,
-    "n": 14,
-    "p25": 15000,
+    "n": 15,
+    "p25": 16000,
     "p75": 23000
    },
    "km": {
-    "median": 27165,
-    "n": 13,
-    "p25": 17486,
-    "p75": 32100
+    "median": 25208,
+    "n": 14,
+    "p25": 18236,
+    "p75": 30652
    }
   },
   "HONDA WAVE|moto|2025": {
@@ -72,10 +72,10 @@
   },
   "HONDA|car|2013": {
    "auction": {
-    "median": 130000,
+    "median": 110000,
     "n": 15,
     "p25": 90000,
-    "p75": 200000
+    "p75": 183000
    },
    "km": {
     "median": 199829,
@@ -84,28 +84,20 @@
     "p75": 294612
    }
   },
-  "HONDA|car|2018": {
-   "auction": {
-    "median": 220000,
-    "n": 8,
-    "p25": 137250,
-    "p75": 358750
-   }
-  },
   "HONDA|moto|2016": {
    "auction": {
     "median": 7000,
     "n": 9,
-    "p25": 5000,
+    "p25": 4500,
     "p75": 14500
    }
   },
   "HONDA|moto|2017": {
    "auction": {
-    "median": 17000,
-    "n": 8,
-    "p25": 11500,
-    "p75": 27750
+    "median": 14000,
+    "n": 9,
+    "p25": 9500,
+    "p75": 25500
    }
   },
   "HONDA|moto|2018": {
@@ -154,7 +146,7 @@
    "auction": {
     "median": 27500,
     "n": 14,
-    "p25": 23000,
+    "p25": 21500,
     "p75": 62750
    },
    "km": {
@@ -178,69 +170,31 @@
     "p75": 18709
    }
   },
-  "ISUZU PU|car|2011": {
-   "auction": {
-    "median": 117000,
-    "n": 14,
-    "p25": 95000,
-    "p75": 117500
-   }
-  },
-  "ISUZU PU|car|2013": {
-   "auction": {
-    "median": 147500,
-    "n": 8,
-    "p25": 112250,
-    "p75": 227500
-   }
-  },
-  "ISUZU PU|car|2021": {
-   "auction": {
-    "median": 230000,
-    "n": 8,
-    "p25": 160500,
-    "p75": 265000
-   }
-  },
   "ISUZU PU|car|2022": {
    "auction": {
-    "median": 263500,
+    "median": 264000,
     "n": 10,
-    "p25": 240000,
+    "p25": 245250,
     "p75": 295000
    },
    "km": {
-    "median": 91496,
+    "median": 90220,
     "n": 8,
     "p25": 62860,
-    "p75": 116359
-   }
-  },
-  "ISUZU PU|car|2023": {
-   "auction": {
-    "median": 380000,
-    "n": 8,
-    "p25": 305000,
-    "p75": 537500
-   },
-   "km": {
-    "median": 46841,
-    "n": 8,
-    "p25": 37091,
-    "p75": 71097
+    "p75": 107885
    }
   },
   "YAMAHA|moto|2011": {
    "auction": {
     "median": 4000,
-    "n": 15,
+    "n": 30,
     "p25": 4000,
     "p75": 5000
    }
   },
   "YAMAHA|moto|2016": {
    "auction": {
-    "median": 11500,
+    "median": 11000,
     "n": 10,
     "p25": 6250,
     "p75": 21000
@@ -312,30 +266,30 @@
   },
   "YAMAHA|moto|2023": {
    "auction": {
-    "median": 31000,
-    "n": 29,
-    "p25": 17500,
-    "p75": 39000
+    "median": 31500,
+    "n": 30,
+    "p25": 17750,
+    "p75": 38500
    },
    "km": {
-    "median": 25328,
-    "n": 27,
-    "p25": 17001,
-    "p75": 38871
+    "median": 24848,
+    "n": 28,
+    "p25": 16845,
+    "p75": 38368
    }
   },
   "YAMAHA|moto|2024": {
    "auction": {
-    "median": 31000,
-    "n": 19,
+    "median": 30500,
+    "n": 20,
     "p25": 28000,
-    "p75": 34000
+    "p75": 33750
    },
    "km": {
-    "median": 26441,
-    "n": 19,
-    "p25": 12200,
-    "p75": 30861
+    "median": 26868,
+    "n": 20,
+    "p25": 14351,
+    "p75": 32914
    }
   },
   "YAMAHA|moto|2025": {
@@ -359,10 +313,10 @@
   "min_cell": 8,
   "note": "Stage-1 aggregate of the gitignored venue harvests. Committed so that stage 2 is reproducible from the repo alone; the ~500 MB of raw rows never enters git.",
   "observed_to": "",
-  "rows_priced": 858,
-  "rows_read": 2630,
+  "rows_priced": 777,
+  "rows_read": 2634,
   "venues": {
-   "auct": 2630
+   "auct": 2634
   }
  }
 }
