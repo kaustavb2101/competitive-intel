@@ -11,53 +11,6 @@
    "append_history_rc": 0,
    "feeds": [
     {
-     "bytes_after": 7110,
-     "bytes_before": 7110,
-     "key": "thaiwater_flood",
-     "rc": 0,
-     "seconds": 3.9,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 8927,
-     "bytes_before": 8927,
-     "key": "thaiwater_rain",
-     "rc": 0,
-     "seconds": 4.8,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 3991,
-     "bytes_before": 3991,
-     "key": "nabc_prices",
-     "rc": 0,
-     "seconds": 148.4,
-     "status": "ok"
-    },
-    {
-     "bytes_after": 1413051,
-     "bytes_before": 1413051,
-     "key": "google_ads",
-     "rc": 3,
-     "seconds": 372.6,
-     "status": "skipped"
-    }
-   ],
-   "finished": "2026-09-02T13:56:18Z",
-   "include_thai": false,
-   "jobs": 6,
-   "n_changed": 0,
-   "n_failed": 0,
-   "n_ok": 3,
-   "n_skipped": 1,
-   "n_timeout": 0,
-   "rederive_drift_rc": 0,
-   "started": "2026-09-02T13:50:06Z"
-  },
-  {
-   "append_history_rc": 0,
-   "feeds": [
-    {
      "bytes_after": 1443,
      "bytes_before": 1443,
      "key": "fuel_prices",
@@ -3322,6 +3275,45 @@
    "n_timeout": 0,
    "rederive_drift_rc": 0,
    "started": "2026-09-14T21:39:56Z"
+  },
+  {
+   "append_history_rc": 0,
+   "feeds": [
+    {
+     "bytes_after": 7107,
+     "bytes_before": 7107,
+     "key": "thaiwater_flood",
+     "rc": 0,
+     "seconds": 4.2,
+     "status": "changed"
+    },
+    {
+     "bytes_after": 8977,
+     "bytes_before": 8977,
+     "key": "thaiwater_rain",
+     "rc": 0,
+     "seconds": 5.8,
+     "status": "ok"
+    },
+    {
+     "bytes_after": 3991,
+     "bytes_before": 3991,
+     "key": "nabc_prices",
+     "rc": 0,
+     "seconds": 143.3,
+     "status": "ok"
+    }
+   ],
+   "finished": "2026-09-15T03:48:06Z",
+   "include_thai": false,
+   "jobs": 6,
+   "n_changed": 1,
+   "n_failed": 0,
+   "n_ok": 3,
+   "n_skipped": 0,
+   "n_timeout": 0,
+   "rederive_drift_rc": 0,
+   "started": "2026-09-15T03:45:43Z"
   }
  ]
 }
