@@ -11034,7 +11034,7 @@ function icCard(g){
   const commods=(g.commodities||[]).map(c=>{
     const cl=c.cls==='stress'?'bad':c.cls==='up'?'good':'flat';
     const ar=c.cls==='stress'?'▼':c.cls==='up'?'▲':'→';
-    return `<span class="ic-cchip ${cl}" title="${c.note||''} — World Bank Pink Sheet YoY">${c.lab} ${ar} ${c.yoy>0?'+':''}${c.yoy}%</span>`;
+    return `<span class="ic-cchip ${cl}" title="${c.note||''} — World Bank Pink Sheet YoY">${c.lab} <span aria-hidden="true">${ar}</span> ${c.yoy>0?'+':''}${c.yoy}%</span>`;
   }).join('');
   return `<div class="ic-card" data-r="${g.key}">
     <span class="ic-sev" style="background:${fcol}"></span>
